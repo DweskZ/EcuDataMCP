@@ -54,7 +54,7 @@ Este MCP unifica **3 fuentes gubernamentales** en un solo servidor:
 
 | Fuente | Datos | Cobertura |
 |--------|-------|-----------|
-| **Datos Abiertos** (CKAN) | 1,581 datasets de 98+ instituciones | datosabiertos.presidencia.gob.ec |
+| **Datos Abiertos** (CKAN) | 1,581 datasets de 98+ instituciones | www.datosabiertos.gob.ec |
 | **Trámites** (Gob.ec) | Procedimientos gubernamentales, requisitos, costos | gob.ec/api/v1 |
 | **Categorías temáticas** | 18 categorías: Salud, Educación, Economía, etc. | Portal de datos abiertos |
 
@@ -176,8 +176,8 @@ Agrega a `~/.codeium/windsurf/mcp_config.json`:
 ### Con Docker (recomendado)
 
 ```bash
-git clone https://github.com/ecuador-mcp/ecuador-mcp.git
-cd ecuador-mcp
+git clone https://github.com/DweskZ/EcuDataMCP.git
+cd EcuDataMCP
 
 # Iniciar con configuración por defecto (puerto 8000)
 docker compose up -d
@@ -194,8 +194,8 @@ docker compose down
 Requiere Python 3.11+ y [uv](https://docs.astral.sh/uv/).
 
 ```bash
-git clone https://github.com/ecuador-mcp/ecuador-mcp.git
-cd ecuador-mcp
+git clone https://github.com/DweskZ/EcuDataMCP.git
+cd EcuDataMCP
 
 # Instalar dependencias
 uv sync
@@ -303,7 +303,7 @@ Cliente MCP (Claude, ChatGPT, Cursor, etc.)
 ├──────────────────────────────┤
 │  tools/                      │
 │   ├── search_datasets        │
-│   ├── get_dataset_info       │  → helpers/ckan_client.py → CKAN API (datosabiertos.presidencia.gob.ec)
+│   ├── get_dataset_info       │  → helpers/ckan_client.py → CKAN API (www.datosabiertos.gob.ec)
 │   ├── list_dataset_resources │
 │   ├── get_resource_info      │
 │   ├── preview_resource_data  │  → helpers/csv_reader.py  → Descarga directa CSV
