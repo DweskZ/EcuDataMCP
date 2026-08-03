@@ -6,12 +6,34 @@ from typing import Any
 import httpx
 
 from helpers.logging import MAIN_LOGGER_NAME
+from helpers.tls import is_cert_verification_error
 from helpers.user_agent import USER_AGENT
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 MAX_DOWNLOAD_BYTES = 5 * 1024 * 1024  # 5 MB
 _TIMEOUT = 30.0
+
+
+async def _download(session: httpx.AsyncClient, url: str) -> tuple[bytes, bool]:
+    truncated = False
+    async with session.stream("GET", url, timeout=_TIMEOUT) as resp:
+        resp.raise_for_status()
+
+        content_length = resp.headers.get("content-length")
+        if content_length and int(content_length) > MAX_DOWNLOAD_BYTES:
+            truncated = True
+
+        chunks: list[bytes] = []
+        total = 0
+        async for chunk in resp.aiter_bytes(chunk_size=64 * 1024):
+            chunks.append(chunk)
+            total += len(chunk)
+            if total >= MAX_DOWNLOAD_BYTES:
+                truncated = True
+                break
+
+    return b"".join(chunks), truncated
 
 
 async def preview_csv(
@@ -31,25 +53,24 @@ async def preview_csv(
     assert session is not None
     try:
         logger.debug("Downloading CSV from %s (max %d bytes)", url, MAX_DOWNLOAD_BYTES)
-        async with session.stream("GET", url, timeout=_TIMEOUT) as resp:
-            resp.raise_for_status()
-
-            content_length = resp.headers.get("content-length")
-            if content_length and int(content_length) > MAX_DOWNLOAD_BYTES:
-                truncated = True
-            else:
-                truncated = False
-
-            chunks: list[bytes] = []
-            total = 0
-            async for chunk in resp.aiter_bytes(chunk_size=64 * 1024):
-                chunks.append(chunk)
-                total += len(chunk)
-                if total >= MAX_DOWNLOAD_BYTES:
-                    truncated = True
-                    break
-
-        raw = b"".join(chunks)
+        try:
+            raw, truncated = await _download(session, url)
+        except httpx.ConnectError as exc:
+            if not is_cert_verification_error(exc):
+                raise
+            # Same expired-certificate issue as helpers/ckan_client.py — some
+            # resource files are hosted directly on the portal domain.
+            logger.warning(
+                "TLS verification failed for %s (portal cert expired); "
+                "retrying without verification",
+                url,
+            )
+            async with httpx.AsyncClient(
+                headers={"User-Agent": USER_AGENT},
+                follow_redirects=True,
+                verify=False,
+            ) as insecure_session:
+                raw, truncated = await _download(insecure_session, url)
 
         # Strip UTF-8 BOM if present
         if raw.startswith(b"\xef\xbb\xbf"):

@@ -5,6 +5,7 @@ import httpx
 
 from helpers import env_config
 from helpers.logging import MAIN_LOGGER_NAME
+from helpers.tls import is_cert_verification_error
 from helpers.user_agent import USER_AGENT
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
@@ -23,7 +24,24 @@ async def _fetch_json(
     assert session is not None
     try:
         logger.debug("CKAN GET %s params=%s", url, params)
-        resp = await session.get(url, params=params, timeout=_TIMEOUT)
+        try:
+            resp = await session.get(url, params=params, timeout=_TIMEOUT)
+        except httpx.ConnectError as exc:
+            if not is_cert_verification_error(exc):
+                raise
+            # www.datosabiertos.gob.ec's TLS certificate expired 2026-07-28 and
+            # has not been renewed (verified against multiple networks); retry
+            # once without verification rather than failing every CKAN-backed
+            # tool until the government renews it. Revisit once they do.
+            logger.warning(
+                "CKAN TLS verification failed for %s (portal cert expired); "
+                "retrying without verification",
+                url,
+            )
+            async with httpx.AsyncClient(
+                headers={"User-Agent": USER_AGENT}, verify=False
+            ) as insecure_session:
+                resp = await insecure_session.get(url, params=params, timeout=_TIMEOUT)
         resp.raise_for_status()
         data = resp.json()
         if not data.get("success"):
