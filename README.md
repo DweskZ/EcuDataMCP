@@ -64,6 +64,21 @@ Este MCP unifica **3 fuentes gubernamentales** en un solo servidor:
 
 ## Conecta tu chatbot al servidor MCP
 
+### Opción rápida: pídeselo a tu IA
+
+Si usas un asistente con acceso a la terminal (Claude Code, Cursor, Windsurf, etc.), puedes pegarle este prompt y dejar que él mismo clone el repo, instale las dependencias y edite la configuración de tu cliente MCP:
+
+```
+Clona https://github.com/DweskZ/EcuDataMCP, instala sus dependencias con uv sync,
+y regístralo como servidor MCP en mi cliente (Claude Desktop / Claude Code / Cursor)
+usando modo stdio con `uv run --directory <ruta-del-clon> python -c "from main import mcp; mcp.run()"`.
+Verifica que el servidor responda antes de darlo por terminado.
+```
+
+Revisa siempre lo que tu asistente cambie (archivos de configuración, comandos ejecutados) antes de confirmar.
+
+### Manual
+
 ### Claude Desktop
 
 Agrega lo siguiente a tu archivo de configuración de Claude Desktop (`~/Library/Application Support/Claude/claude_desktop_config.json` en macOS, `%APPDATA%\Claude\claude_desktop_config.json` en Windows):
