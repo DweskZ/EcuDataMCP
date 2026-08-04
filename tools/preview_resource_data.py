@@ -3,6 +3,7 @@ from mcp.server.fastmcp import FastMCP
 
 from helpers import ckan_client
 from helpers.csv_reader import format_table, preview_csv, preview_json, preview_xlsx
+from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 _CSV_FORMATS = {"CSV", "TSV", "TXT", ""}
@@ -13,7 +14,11 @@ _XLSX_FORMATS = {"XLSX", "XLS", "EXCEL"}
 def register_preview_resource_data_tool(mcp: FastMCP) -> None:
     @mcp.tool()
     @log_tool
-    async def preview_resource_data(resource_id: str, rows: int = 20) -> str:
+    async def preview_resource_data(
+        resource_id: str,
+        rows: int = 20,
+        format: str = "text",
+    ) -> str:
         """
         Download and preview a resource from Ecuador's open data portal.
 
@@ -25,6 +30,7 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
         Args:
             resource_id: The resource UUID (get it from list_dataset_resources)
             rows: Number of data rows to preview (default: 20, max: 100)
+            format: text | json
         """
         rows = min(max(rows, 1), 100)
 
@@ -32,69 +38,134 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
             res = await ckan_client.get_resource(resource_id)
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
-                return f"Error: Recurso con ID '{resource_id}' no encontrado."
-            return f"Error: HTTP {e.response.status_code} - {e}"
+                return render_output(
+                    {"error": "not_found", "resource_id": resource_id},
+                    format,
+                    text_builder=lambda d: (
+                        f"Error: Recurso con ID '{d['resource_id']}' no encontrado."
+                    ),
+                )
+            return render_output(
+                {"error": f"HTTP {e.response.status_code}", "detail": str(e)},
+                format,
+                text_builder=lambda d: f"Error: {d['error']} - {d['detail']}",
+            )
         except Exception as e:
-            return f"Error al obtener metadata del recurso: {e}"
+            return render_output(
+                {"error": str(e)},
+                format,
+                text_builder=lambda d: f"Error al obtener metadata del recurso: {d['error']}",
+            )
 
         url = res.get("url")
         if not url:
-            return "Error: Este recurso no tiene URL de descarga."
+            return render_output(
+                {"error": "sin_url", "resource_id": resource_id},
+                format,
+                text_builder=lambda _: "Error: Este recurso no tiene URL de descarga.",
+            )
 
         fmt = (res.get("format") or "").upper()
         name = res.get("name") or res.get("description") or "Sin título"
 
         try:
-            if fmt in _CSV_FORMATS or (not fmt and url.lower().endswith((".csv", ".tsv", ".txt"))):
+            if fmt in _CSV_FORMATS or (
+                not fmt and url.lower().endswith((".csv", ".tsv", ".txt"))
+            ):
                 result = await preview_csv(url, max_rows=rows)
             elif fmt in _JSON_FORMATS or url.lower().endswith((".json", ".geojson")):
                 result = await preview_json(url, max_rows=rows)
             elif fmt in _XLSX_FORMATS or url.lower().endswith((".xlsx", ".xls")):
                 if fmt == "XLS" or url.lower().endswith(".xls"):
-                    return (
-                        f"Este recurso es Excel legacy (.xls). "
-                        f"Convierte a XLSX o descárgalo desde: {url}"
+                    return render_output(
+                        {
+                            "error": "xls_no_soportado",
+                            "url": url,
+                            "resource_id": resource_id,
+                        },
+                        format,
+                        text_builder=lambda d: (
+                            "Este recurso es Excel legacy (.xls). "
+                            f"Convierte a XLSX o descárgalo desde: {d['url']}"
+                        ),
                     )
                 result = await preview_xlsx(url, max_rows=rows)
             else:
-                return (
-                    f"Este recurso tiene formato '{fmt or 'desconocido'}'. "
-                    f"preview_resource_data soporta CSV/TSV, JSON/GeoJSON y XLSX. "
-                    f"Si está en DataStore prueba query_resource_data. "
-                    f"Descarga directa: {url}"
+                return render_output(
+                    {
+                        "error": "formato_no_soportado",
+                        "format_detectado": fmt or None,
+                        "url": url,
+                        "resource_id": resource_id,
+                    },
+                    format,
+                    text_builder=lambda d: (
+                        f"Este recurso tiene formato '{d.get('format_detectado') or 'desconocido'}'. "
+                        "preview_resource_data soporta CSV/TSV, JSON/GeoJSON y XLSX. "
+                        "Si está en DataStore prueba query_resource_data. "
+                        f"Descarga directa: {d['url']}"
+                    ),
                 )
         except httpx.HTTPError as e:
-            return f"Error al descargar el archivo: {e}"
+            return render_output(
+                {"error": f"download_failed: {e}", "url": url},
+                format,
+                text_builder=lambda d: f"Error al descargar el archivo: {d['error']}",
+            )
         except Exception as e:
-            return f"Error al procesar el archivo: {e}"
+            return render_output(
+                {"error": str(e)},
+                format,
+                text_builder=lambda d: f"Error al procesar el archivo: {d['error']}",
+            )
 
         headers = result["headers"]
         data_rows = result["rows"]
 
         if not headers:
-            return f"El archivo '{name}' está vacío o no pudo ser parseado."
-
-        parts = [
-            f"Preview de: {name}",
-            f"Resource ID: {resource_id}",
-            f"Formato: {result.get('format', fmt or 'csv')}",
-            f"Columnas: {len(headers)}",
-            f"Filas mostradas: {result['total_rows_in_preview']}",
-        ]
-        if result.get("sheet"):
-            parts.append(f"Hoja: {result['sheet']}")
-        if result.get("total_records") is not None:
-            parts.append(f"Registros totales (en archivo): {result['total_records']}")
-        if result["truncated"]:
-            parts.append("⚠ Archivo truncado (excede 5 MB o tiene más filas)")
-        parts.append("")
-        parts.append(format_table(headers, data_rows))
-
-        if result["truncated"]:
-            parts.append("")
-            parts.append(f"Descarga el archivo completo: {url}")
-            parts.append(
-                "Tip: si el recurso está en DataStore, usa query_resource_data para paginar."
+            return render_output(
+                {"error": "vacio", "name": name, "resource_id": resource_id},
+                format,
+                text_builder=lambda d: (
+                    f"El archivo '{d['name']}' está vacío o no pudo ser parseado."
+                ),
             )
 
-        return "\n".join(parts)
+        payload = {
+            "resource_id": resource_id,
+            "name": name,
+            "url": url,
+            "format": result.get("format", fmt or "csv"),
+            "headers": headers,
+            "rows": data_rows,
+            "total_rows_in_preview": result["total_rows_in_preview"],
+            "truncated": result.get("truncated", False),
+            "sheet": result.get("sheet"),
+            "total_records": result.get("total_records"),
+        }
+
+        def to_text(data: dict) -> str:
+            parts = [
+                f"Preview de: {data['name']}",
+                f"Resource ID: {data['resource_id']}",
+                f"Formato: {data.get('format')}",
+                f"Columnas: {len(data.get('headers') or [])}",
+                f"Filas mostradas: {data['total_rows_in_preview']}",
+            ]
+            if data.get("sheet"):
+                parts.append(f"Hoja: {data['sheet']}")
+            if data.get("total_records") is not None:
+                parts.append(f"Registros totales (en archivo): {data['total_records']}")
+            if data.get("truncated"):
+                parts.append("⚠ Archivo truncado (excede 5 MB o tiene más filas)")
+            parts.append("")
+            parts.append(format_table(data["headers"], data["rows"]))
+            if data.get("truncated"):
+                parts.append("")
+                parts.append(f"Descarga el archivo completo: {data['url']}")
+                parts.append(
+                    "Tip: si el recurso está en DataStore, usa query_resource_data para paginar."
+                )
+            return "\n".join(parts)
+
+        return render_output(payload, format, text_builder=to_text)

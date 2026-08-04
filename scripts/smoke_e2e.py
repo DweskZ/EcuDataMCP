@@ -116,6 +116,11 @@ async def main() -> int:
             ("list_capabilities", {}, ["CKAN", "SERCOP"]),
             ("lookup_ubicacion", {"query": "Pichincha"}, ["17", "Pichincha"]),
             ("lookup_ubicacion", {"query": "Cuenca", "nivel": "canton"}, ["0101", "Cuenca"]),
+            (
+                "lookup_ubicacion",
+                {"query": "Tumbaco", "nivel": "parroquia", "format": "json"},
+                ["170150", "Tumbaco", "parroquias"],
+            ),
             ("list_recent_datasets", {"page_size": 3, "format": "json"}, ['"results"']),
             ("search_datasets", {"query": "salud", "page_size": 2}, ["dataset"]),
             ("search_tramites", {"query": "pasaporte", "format": "json"}, ["tramite_id", "pasaporte"]),

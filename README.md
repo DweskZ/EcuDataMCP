@@ -253,7 +253,7 @@ Varios tools aceptan `format="json"` además de texto.
 |------|-------------|
 | `list_capabilities` | Resume fuentes, tools, prompts y límites del servidor. |
 | `search_ecuador` | Busca a la vez en datasets, orgs, trámites, regulaciones, contratos y riesgos. |
-| `lookup_ubicacion` | Provincias y cantones (código INEC, región, población). |
+| `lookup_ubicacion` | Provincias, cantones y parroquias (código INEC, región, población). |
 
 ### Datos Abiertos
 
@@ -321,6 +321,7 @@ Plantillas listas para el cliente (Claude/Cursor): `explorar_datos`, `consultar_
 | `ecuador://fuentes` | Fuentes integradas y tools asociadas |
 | `ecuador://provincias` | 24 provincias (JSON) |
 | `ecuador://cantones` | 224 cantones (JSON) |
+| `ecuador://parroquias` | ~1040 parroquias (JSON) |
 | `ecuador://instituciones-clave` | IDs frecuentes de gob.ec (SRI, IESS, etc.) |
 
 ---

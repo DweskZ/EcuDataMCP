@@ -84,7 +84,7 @@ def register_workflow_prompts(mcp: FastMCP) -> None:
         )
         return (
             f"Revisa eventos de riesgo en Ecuador para '{lugar}'.\n"
-            "1) Usa lookup_ubicacion para confirmar provincia/cantón.\n"
+            "1) Usa lookup_ubicacion para confirmar provincia/cantón/parroquia.\n"
             f"2) Llama search_eventos_riesgo(provincia o canton='{lugar}', "
             f"estado='Seguimiento'). {evento_line}\n"
             "3) Resume eventos activos, impactos y descripción.\n"

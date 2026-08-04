@@ -1,0 +1,8322 @@
+[
+  {
+    "codigo": "010150",
+    "nombre": "Cuenca",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010151",
+    "nombre": "Baños",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010152",
+    "nombre": "Cumbe",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010153",
+    "nombre": "Chaucha",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010154",
+    "nombre": "Checa (Jidcay)",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010155",
+    "nombre": "Chiquintad",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010156",
+    "nombre": "Llacao",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010157",
+    "nombre": "Molleturo",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010158",
+    "nombre": "Nulti",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010159",
+    "nombre": "Octavio Cordero Palacios (Sta. Rosa)",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010160",
+    "nombre": "Paccha",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010161",
+    "nombre": "Quingeo",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010162",
+    "nombre": "Ricaurte",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010163",
+    "nombre": "San Joaquin",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010164",
+    "nombre": "Santa Ana",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010165",
+    "nombre": "Sayausi",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010166",
+    "nombre": "Sidcay",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010167",
+    "nombre": "Sinincay",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010168",
+    "nombre": "Tarqui",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010169",
+    "nombre": "Turi",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010170",
+    "nombre": "Valle",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010171",
+    "nombre": "Victoria Del Portete (Irquis)",
+    "canton_codigo": "0101",
+    "canton": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010250",
+    "nombre": "Giron",
+    "canton_codigo": "0102",
+    "canton": "Giron",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010251",
+    "nombre": "Asuncion",
+    "canton_codigo": "0102",
+    "canton": "Giron",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010252",
+    "nombre": "San Gerardo",
+    "canton_codigo": "0102",
+    "canton": "Giron",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010350",
+    "nombre": "Gualaceo",
+    "canton_codigo": "0103",
+    "canton": "Gualaceo",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010352",
+    "nombre": "Daniel Cordova Toral (El Oriente)",
+    "canton_codigo": "0103",
+    "canton": "Gualaceo",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010353",
+    "nombre": "Jadan",
+    "canton_codigo": "0103",
+    "canton": "Gualaceo",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010354",
+    "nombre": "Mariano Moreno",
+    "canton_codigo": "0103",
+    "canton": "Gualaceo",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010356",
+    "nombre": "Remigio Crespo Toral (Gulag)",
+    "canton_codigo": "0103",
+    "canton": "Gualaceo",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010357",
+    "nombre": "San Juan",
+    "canton_codigo": "0103",
+    "canton": "Gualaceo",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010358",
+    "nombre": "Zhidmad",
+    "canton_codigo": "0103",
+    "canton": "Gualaceo",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010359",
+    "nombre": "Luis Cordero Vega",
+    "canton_codigo": "0103",
+    "canton": "Gualaceo",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010360",
+    "nombre": "Simon Bolivar (Cab. En Gañanzol)",
+    "canton_codigo": "0103",
+    "canton": "Gualaceo",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010450",
+    "nombre": "Nabon",
+    "canton_codigo": "0104",
+    "canton": "Nabon",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010451",
+    "nombre": "Cochapata",
+    "canton_codigo": "0104",
+    "canton": "Nabon",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010452",
+    "nombre": "El Progreso (Cab. En Zhota)",
+    "canton_codigo": "0104",
+    "canton": "Nabon",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010453",
+    "nombre": "Las Nieves (Chaya)",
+    "canton_codigo": "0104",
+    "canton": "Nabon",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010550",
+    "nombre": "Paute",
+    "canton_codigo": "0105",
+    "canton": "Paute",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010552",
+    "nombre": "Bulan (Jose Victor Izquierdo)",
+    "canton_codigo": "0105",
+    "canton": "Paute",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010553",
+    "nombre": "Chican (Guillermo Ortega)",
+    "canton_codigo": "0105",
+    "canton": "Paute",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010554",
+    "nombre": "El Cabo",
+    "canton_codigo": "0105",
+    "canton": "Paute",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010556",
+    "nombre": "Guarainag",
+    "canton_codigo": "0105",
+    "canton": "Paute",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010559",
+    "nombre": "San Cristobal (Carlos Ordoñez Lazo)",
+    "canton_codigo": "0105",
+    "canton": "Paute",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010561",
+    "nombre": "Tomebamba",
+    "canton_codigo": "0105",
+    "canton": "Paute",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010562",
+    "nombre": "Dug Dug",
+    "canton_codigo": "0105",
+    "canton": "Paute",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010650",
+    "nombre": "Pucara",
+    "canton_codigo": "0106",
+    "canton": "Pucara",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010652",
+    "nombre": "San Rafael De Sharug",
+    "canton_codigo": "0106",
+    "canton": "Pucara",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010750",
+    "nombre": "San Fernando",
+    "canton_codigo": "0107",
+    "canton": "San Fernando",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010751",
+    "nombre": "Chumblin",
+    "canton_codigo": "0107",
+    "canton": "San Fernando",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010850",
+    "nombre": "Santa Isabel (Chaguarurco)",
+    "canton_codigo": "0108",
+    "canton": "Santa Isabel",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010851",
+    "nombre": "Abdon Calderon (La Union)",
+    "canton_codigo": "0108",
+    "canton": "Santa Isabel",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010853",
+    "nombre": "Zhaglli (Shaglli )",
+    "canton_codigo": "0108",
+    "canton": "Santa Isabel",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010854",
+    "nombre": "San Salvador De Cañaribamba",
+    "canton_codigo": "0108",
+    "canton": "Santa Isabel",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010950",
+    "nombre": "Sigsig",
+    "canton_codigo": "0109",
+    "canton": "Sigsig",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010951",
+    "nombre": "Cuchil (Cutchil)",
+    "canton_codigo": "0109",
+    "canton": "Sigsig",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010952",
+    "nombre": "Gima",
+    "canton_codigo": "0109",
+    "canton": "Sigsig",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010953",
+    "nombre": "Guel",
+    "canton_codigo": "0109",
+    "canton": "Sigsig",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010954",
+    "nombre": "Ludo",
+    "canton_codigo": "0109",
+    "canton": "Sigsig",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010955",
+    "nombre": "San Bartolome",
+    "canton_codigo": "0109",
+    "canton": "Sigsig",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "010956",
+    "nombre": "San Jose De Raranga",
+    "canton_codigo": "0109",
+    "canton": "Sigsig",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "011050",
+    "nombre": "San Felipe De Oña",
+    "canton_codigo": "0110",
+    "canton": "Oña",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "011051",
+    "nombre": "Susudel",
+    "canton_codigo": "0110",
+    "canton": "Oña",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "011150",
+    "nombre": "Chordeleg",
+    "canton_codigo": "0111",
+    "canton": "Chordeleg",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "011151",
+    "nombre": "Principal",
+    "canton_codigo": "0111",
+    "canton": "Chordeleg",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "011152",
+    "nombre": "La Union",
+    "canton_codigo": "0111",
+    "canton": "Chordeleg",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "011153",
+    "nombre": "Luis Galarza Orellana (Cab. En Delegsol)",
+    "canton_codigo": "0111",
+    "canton": "Chordeleg",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "011154",
+    "nombre": "San Martin De Puzhio",
+    "canton_codigo": "0111",
+    "canton": "Chordeleg",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "011250",
+    "nombre": "El Pan",
+    "canton_codigo": "0112",
+    "canton": "El Pan",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "011253",
+    "nombre": "San Vicente",
+    "canton_codigo": "0112",
+    "canton": "El Pan",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "011350",
+    "nombre": "Sevilla De Oro",
+    "canton_codigo": "0113",
+    "canton": "Sevilla De Oro",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "011351",
+    "nombre": "Amaluza",
+    "canton_codigo": "0113",
+    "canton": "Sevilla De Oro",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "011352",
+    "nombre": "Palmas",
+    "canton_codigo": "0113",
+    "canton": "Sevilla De Oro",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "011450",
+    "nombre": "Guachapala",
+    "canton_codigo": "0114",
+    "canton": "Guachapala",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "011550",
+    "nombre": "Camilo Ponce Enriquez",
+    "canton_codigo": "0115",
+    "canton": "Camilo Ponce Enriquez",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "011551",
+    "nombre": "El Carmen De Pijili",
+    "canton_codigo": "0115",
+    "canton": "Camilo Ponce Enriquez",
+    "provincia_codigo": "01",
+    "provincia": "Azuay"
+  },
+  {
+    "codigo": "020150",
+    "nombre": "Guaranda",
+    "canton_codigo": "0201",
+    "canton": "Guaranda",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020151",
+    "nombre": "Facundo Vela",
+    "canton_codigo": "0201",
+    "canton": "Guaranda",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020153",
+    "nombre": "Julio E. Moreno (Catanahuan Grande)",
+    "canton_codigo": "0201",
+    "canton": "Guaranda",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020155",
+    "nombre": "Salinas",
+    "canton_codigo": "0201",
+    "canton": "Guaranda",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020156",
+    "nombre": "San Lorenzo",
+    "canton_codigo": "0201",
+    "canton": "Guaranda",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020157",
+    "nombre": "San Simon (Yacoto)",
+    "canton_codigo": "0201",
+    "canton": "Guaranda",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020158",
+    "nombre": "Santa Fe (Santa Fe)",
+    "canton_codigo": "0201",
+    "canton": "Guaranda",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020159",
+    "nombre": "Simiatug",
+    "canton_codigo": "0201",
+    "canton": "Guaranda",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020160",
+    "nombre": "San Luis De Pambil",
+    "canton_codigo": "0201",
+    "canton": "Guaranda",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020250",
+    "nombre": "Chillanes",
+    "canton_codigo": "0202",
+    "canton": "Chillanes",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020251",
+    "nombre": "San Jose Del Tambo (Tambopamba)",
+    "canton_codigo": "0202",
+    "canton": "Chillanes",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020350",
+    "nombre": "San Jose De Chimbo",
+    "canton_codigo": "0203",
+    "canton": "Chimbo",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020351",
+    "nombre": "Asuncion (Asancoto)",
+    "canton_codigo": "0203",
+    "canton": "Chimbo",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020353",
+    "nombre": "Magdalena (Chapacoto)",
+    "canton_codigo": "0203",
+    "canton": "Chimbo",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020354",
+    "nombre": "San Sebastian",
+    "canton_codigo": "0203",
+    "canton": "Chimbo",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020355",
+    "nombre": "Telimbela",
+    "canton_codigo": "0203",
+    "canton": "Chimbo",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020450",
+    "nombre": "Echeandia",
+    "canton_codigo": "0204",
+    "canton": "Echeandia",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020550",
+    "nombre": "San Miguel",
+    "canton_codigo": "0205",
+    "canton": "San Miguel",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020551",
+    "nombre": "Balsapamba",
+    "canton_codigo": "0205",
+    "canton": "San Miguel",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020552",
+    "nombre": "Bilovan",
+    "canton_codigo": "0205",
+    "canton": "San Miguel",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020553",
+    "nombre": "Regulo De Mora",
+    "canton_codigo": "0205",
+    "canton": "San Miguel",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020554",
+    "nombre": "San Pablo (San Pablo De Atenas)",
+    "canton_codigo": "0205",
+    "canton": "San Miguel",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020555",
+    "nombre": "Santiago",
+    "canton_codigo": "0205",
+    "canton": "San Miguel",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020556",
+    "nombre": "San Vicente",
+    "canton_codigo": "0205",
+    "canton": "San Miguel",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020650",
+    "nombre": "Caluma",
+    "canton_codigo": "0206",
+    "canton": "Caluma",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "020750",
+    "nombre": "Las Naves",
+    "canton_codigo": "0207",
+    "canton": "Las Naves",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar"
+  },
+  {
+    "codigo": "030150",
+    "nombre": "Azogues",
+    "canton_codigo": "0301",
+    "canton": "Azogues",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030151",
+    "nombre": "Cojitambo",
+    "canton_codigo": "0301",
+    "canton": "Azogues",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030153",
+    "nombre": "Guapan",
+    "canton_codigo": "0301",
+    "canton": "Azogues",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030154",
+    "nombre": "Javier Loyola (Chuquipata)",
+    "canton_codigo": "0301",
+    "canton": "Azogues",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030155",
+    "nombre": "Luis Cordero",
+    "canton_codigo": "0301",
+    "canton": "Azogues",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030156",
+    "nombre": "Pindilig",
+    "canton_codigo": "0301",
+    "canton": "Azogues",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030157",
+    "nombre": "Rivera",
+    "canton_codigo": "0301",
+    "canton": "Azogues",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030158",
+    "nombre": "San Miguel",
+    "canton_codigo": "0301",
+    "canton": "Azogues",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030160",
+    "nombre": "Taday",
+    "canton_codigo": "0301",
+    "canton": "Azogues",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030250",
+    "nombre": "Biblian",
+    "canton_codigo": "0302",
+    "canton": "Biblian",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030251",
+    "nombre": "Nazon (Cab. En Pampa De Dominguez)",
+    "canton_codigo": "0302",
+    "canton": "Biblian",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030252",
+    "nombre": "San Francisco De Sageo",
+    "canton_codigo": "0302",
+    "canton": "Biblian",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030253",
+    "nombre": "Turupamba",
+    "canton_codigo": "0302",
+    "canton": "Biblian",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030254",
+    "nombre": "Jerusalen",
+    "canton_codigo": "0302",
+    "canton": "Biblian",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030350",
+    "nombre": "Cañar",
+    "canton_codigo": "0303",
+    "canton": "Cañar",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030351",
+    "nombre": "Chontamarca",
+    "canton_codigo": "0303",
+    "canton": "Cañar",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030352",
+    "nombre": "Chorocopte",
+    "canton_codigo": "0303",
+    "canton": "Cañar",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030353",
+    "nombre": "General Morales (Socarte)",
+    "canton_codigo": "0303",
+    "canton": "Cañar",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030354",
+    "nombre": "Gualleturo",
+    "canton_codigo": "0303",
+    "canton": "Cañar",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030355",
+    "nombre": "Honorato Vasquez (Tambo Viejo)",
+    "canton_codigo": "0303",
+    "canton": "Cañar",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030356",
+    "nombre": "Ingapirca",
+    "canton_codigo": "0303",
+    "canton": "Cañar",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030357",
+    "nombre": "Juncal",
+    "canton_codigo": "0303",
+    "canton": "Cañar",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030358",
+    "nombre": "San Antonio",
+    "canton_codigo": "0303",
+    "canton": "Cañar",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030361",
+    "nombre": "Zhud",
+    "canton_codigo": "0303",
+    "canton": "Cañar",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030362",
+    "nombre": "Ventura",
+    "canton_codigo": "0303",
+    "canton": "Cañar",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030363",
+    "nombre": "Ducur",
+    "canton_codigo": "0303",
+    "canton": "Cañar",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030450",
+    "nombre": "La Troncal",
+    "canton_codigo": "0304",
+    "canton": "La Troncal",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030451",
+    "nombre": "Manuel J. Calle",
+    "canton_codigo": "0304",
+    "canton": "La Troncal",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030452",
+    "nombre": "Pancho Negro",
+    "canton_codigo": "0304",
+    "canton": "La Troncal",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030550",
+    "nombre": "El Tambo",
+    "canton_codigo": "0305",
+    "canton": "El Tambo",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030650",
+    "nombre": "Deleg",
+    "canton_codigo": "0306",
+    "canton": "Deleg",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030651",
+    "nombre": "Solano",
+    "canton_codigo": "0306",
+    "canton": "Deleg",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "030750",
+    "nombre": "Suscal",
+    "canton_codigo": "0307",
+    "canton": "Suscal",
+    "provincia_codigo": "03",
+    "provincia": "Cañar"
+  },
+  {
+    "codigo": "040150",
+    "nombre": "Tulcan",
+    "canton_codigo": "0401",
+    "canton": "Tulcan",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040151",
+    "nombre": "El Carmelo (El Pun)",
+    "canton_codigo": "0401",
+    "canton": "Tulcan",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040153",
+    "nombre": "Julio Andrade (Orejuela)",
+    "canton_codigo": "0401",
+    "canton": "Tulcan",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040154",
+    "nombre": "Maldonado",
+    "canton_codigo": "0401",
+    "canton": "Tulcan",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040155",
+    "nombre": "Pioter",
+    "canton_codigo": "0401",
+    "canton": "Tulcan",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040156",
+    "nombre": "Tobar Donoso (La Bocana De Camumbi)",
+    "canton_codigo": "0401",
+    "canton": "Tulcan",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040157",
+    "nombre": "Tufiño",
+    "canton_codigo": "0401",
+    "canton": "Tulcan",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040158",
+    "nombre": "Urbina (Taya)",
+    "canton_codigo": "0401",
+    "canton": "Tulcan",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040159",
+    "nombre": "El Chical",
+    "canton_codigo": "0401",
+    "canton": "Tulcan",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040161",
+    "nombre": "Santa Martha De Cuba",
+    "canton_codigo": "0401",
+    "canton": "Tulcan",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040250",
+    "nombre": "Bolivar",
+    "canton_codigo": "0402",
+    "canton": "Bolivar",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040251",
+    "nombre": "Garcia Moreno",
+    "canton_codigo": "0402",
+    "canton": "Bolivar",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040252",
+    "nombre": "Los Andes",
+    "canton_codigo": "0402",
+    "canton": "Bolivar",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040253",
+    "nombre": "Monte Olivo",
+    "canton_codigo": "0402",
+    "canton": "Bolivar",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040254",
+    "nombre": "San Vicente De Pusir",
+    "canton_codigo": "0402",
+    "canton": "Bolivar",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040255",
+    "nombre": "San Rafael",
+    "canton_codigo": "0402",
+    "canton": "Bolivar",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040350",
+    "nombre": "El Angel",
+    "canton_codigo": "0403",
+    "canton": "Espejo",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040351",
+    "nombre": "El Goaltal",
+    "canton_codigo": "0403",
+    "canton": "Espejo",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040352",
+    "nombre": "La Libertad (Alizo)",
+    "canton_codigo": "0403",
+    "canton": "Espejo",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040353",
+    "nombre": "San Isidro",
+    "canton_codigo": "0403",
+    "canton": "Espejo",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040450",
+    "nombre": "Mira (Chontahuasi)",
+    "canton_codigo": "0404",
+    "canton": "Mira",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040451",
+    "nombre": "Concepcion",
+    "canton_codigo": "0404",
+    "canton": "Mira",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040452",
+    "nombre": "Jijon Y Caamaño (Cab. En Rio Blanco)",
+    "canton_codigo": "0404",
+    "canton": "Mira",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040453",
+    "nombre": "Juan Montalvo (San Ignacio De Quil)",
+    "canton_codigo": "0404",
+    "canton": "Mira",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040550",
+    "nombre": "San Gabriel",
+    "canton_codigo": "0405",
+    "canton": "Montufar",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040551",
+    "nombre": "Cristobal Colon",
+    "canton_codigo": "0405",
+    "canton": "Montufar",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040552",
+    "nombre": "Chitan De Navarrete",
+    "canton_codigo": "0405",
+    "canton": "Montufar",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040553",
+    "nombre": "Fernandez Salvador",
+    "canton_codigo": "0405",
+    "canton": "Montufar",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040554",
+    "nombre": "La Paz",
+    "canton_codigo": "0405",
+    "canton": "Montufar",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040555",
+    "nombre": "Piartal",
+    "canton_codigo": "0405",
+    "canton": "Montufar",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040650",
+    "nombre": "Huaca",
+    "canton_codigo": "0406",
+    "canton": "San Pedro De Huaca",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "040651",
+    "nombre": "Mariscal Sucre",
+    "canton_codigo": "0406",
+    "canton": "San Pedro De Huaca",
+    "provincia_codigo": "04",
+    "provincia": "Carchi"
+  },
+  {
+    "codigo": "050150",
+    "nombre": "Latacunga",
+    "canton_codigo": "0501",
+    "canton": "Latacunga",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050151",
+    "nombre": "Alaques (Alaquez)",
+    "canton_codigo": "0501",
+    "canton": "Latacunga",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050152",
+    "nombre": "Belisario Quevedo (Guanailin)",
+    "canton_codigo": "0501",
+    "canton": "Latacunga",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050153",
+    "nombre": "Guaitacama (Guaytacama)",
+    "canton_codigo": "0501",
+    "canton": "Latacunga",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050154",
+    "nombre": "Joseguango Bajo",
+    "canton_codigo": "0501",
+    "canton": "Latacunga",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050156",
+    "nombre": "Mulalo",
+    "canton_codigo": "0501",
+    "canton": "Latacunga",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050157",
+    "nombre": "11 De Noviembre (Ilinchisi)",
+    "canton_codigo": "0501",
+    "canton": "Latacunga",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050158",
+    "nombre": "Poalo",
+    "canton_codigo": "0501",
+    "canton": "Latacunga",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050159",
+    "nombre": "San Juan De Pastocalle",
+    "canton_codigo": "0501",
+    "canton": "Latacunga",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050161",
+    "nombre": "Tanicuchi",
+    "canton_codigo": "0501",
+    "canton": "Latacunga",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050162",
+    "nombre": "Toacaso",
+    "canton_codigo": "0501",
+    "canton": "Latacunga",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050250",
+    "nombre": "La Mana",
+    "canton_codigo": "0502",
+    "canton": "La Mana",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050251",
+    "nombre": "Guasaganda (Cab. En Guasaganda Centro)",
+    "canton_codigo": "0502",
+    "canton": "La Mana",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050252",
+    "nombre": "Pucayacu",
+    "canton_codigo": "0502",
+    "canton": "La Mana",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050350",
+    "nombre": "El Corazon",
+    "canton_codigo": "0503",
+    "canton": "Pangua",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050351",
+    "nombre": "Moraspungo",
+    "canton_codigo": "0503",
+    "canton": "Pangua",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050352",
+    "nombre": "Pinllopata",
+    "canton_codigo": "0503",
+    "canton": "Pangua",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050353",
+    "nombre": "Ramon Campaña",
+    "canton_codigo": "0503",
+    "canton": "Pangua",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050450",
+    "nombre": "Pujili",
+    "canton_codigo": "0504",
+    "canton": "Pujili",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050451",
+    "nombre": "Angamarca",
+    "canton_codigo": "0504",
+    "canton": "Pujili",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050453",
+    "nombre": "Guangaje",
+    "canton_codigo": "0504",
+    "canton": "Pujili",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050455",
+    "nombre": "La Victoria",
+    "canton_codigo": "0504",
+    "canton": "Pujili",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050456",
+    "nombre": "Pilalo",
+    "canton_codigo": "0504",
+    "canton": "Pujili",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050457",
+    "nombre": "Tingo",
+    "canton_codigo": "0504",
+    "canton": "Pujili",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050458",
+    "nombre": "Zumbahua",
+    "canton_codigo": "0504",
+    "canton": "Pujili",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050550",
+    "nombre": "San Miguel",
+    "canton_codigo": "0505",
+    "canton": "Salcedo",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050551",
+    "nombre": "Antonio Jose Holguin (Santa Lucia)",
+    "canton_codigo": "0505",
+    "canton": "Salcedo",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050552",
+    "nombre": "Cusubamba",
+    "canton_codigo": "0505",
+    "canton": "Salcedo",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050553",
+    "nombre": "Mulalillo",
+    "canton_codigo": "0505",
+    "canton": "Salcedo",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050554",
+    "nombre": "Mulliquindil (Santa Ana)",
+    "canton_codigo": "0505",
+    "canton": "Salcedo",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050555",
+    "nombre": "Pansaleo",
+    "canton_codigo": "0505",
+    "canton": "Salcedo",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050650",
+    "nombre": "Saquisili",
+    "canton_codigo": "0506",
+    "canton": "Saquisili",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050651",
+    "nombre": "Canchagua",
+    "canton_codigo": "0506",
+    "canton": "Saquisili",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050652",
+    "nombre": "Chantilin",
+    "canton_codigo": "0506",
+    "canton": "Saquisili",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050653",
+    "nombre": "Cochapamba",
+    "canton_codigo": "0506",
+    "canton": "Saquisili",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050750",
+    "nombre": "Sigchos",
+    "canton_codigo": "0507",
+    "canton": "Sigchos",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050751",
+    "nombre": "Chugchillan",
+    "canton_codigo": "0507",
+    "canton": "Sigchos",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050752",
+    "nombre": "Isinlivi",
+    "canton_codigo": "0507",
+    "canton": "Sigchos",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050753",
+    "nombre": "Las Pampas",
+    "canton_codigo": "0507",
+    "canton": "Sigchos",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "050754",
+    "nombre": "Palo Quemado",
+    "canton_codigo": "0507",
+    "canton": "Sigchos",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi"
+  },
+  {
+    "codigo": "060150",
+    "nombre": "Riobamba",
+    "canton_codigo": "0601",
+    "canton": "Riobamba",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060151",
+    "nombre": "Cacha (Cab. En Machangara)",
+    "canton_codigo": "0601",
+    "canton": "Riobamba",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060152",
+    "nombre": "Calpi",
+    "canton_codigo": "0601",
+    "canton": "Riobamba",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060153",
+    "nombre": "Cubijies",
+    "canton_codigo": "0601",
+    "canton": "Riobamba",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060154",
+    "nombre": "Flores",
+    "canton_codigo": "0601",
+    "canton": "Riobamba",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060155",
+    "nombre": "Lican",
+    "canton_codigo": "0601",
+    "canton": "Riobamba",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060156",
+    "nombre": "Licto",
+    "canton_codigo": "0601",
+    "canton": "Riobamba",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060157",
+    "nombre": "Pungala",
+    "canton_codigo": "0601",
+    "canton": "Riobamba",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060158",
+    "nombre": "Punin",
+    "canton_codigo": "0601",
+    "canton": "Riobamba",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060159",
+    "nombre": "Quimiag",
+    "canton_codigo": "0601",
+    "canton": "Riobamba",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060160",
+    "nombre": "San Juan",
+    "canton_codigo": "0601",
+    "canton": "Riobamba",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060161",
+    "nombre": "San Luis",
+    "canton_codigo": "0601",
+    "canton": "Riobamba",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060250",
+    "nombre": "Alausi",
+    "canton_codigo": "0602",
+    "canton": "Alausi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060251",
+    "nombre": "Achupallas",
+    "canton_codigo": "0602",
+    "canton": "Alausi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060253",
+    "nombre": "Guasuntos",
+    "canton_codigo": "0602",
+    "canton": "Alausi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060254",
+    "nombre": "Huigra",
+    "canton_codigo": "0602",
+    "canton": "Alausi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060255",
+    "nombre": "Multitud",
+    "canton_codigo": "0602",
+    "canton": "Alausi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060256",
+    "nombre": "Pistishi (Nariz Del Diablo)",
+    "canton_codigo": "0602",
+    "canton": "Alausi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060257",
+    "nombre": "Pumallacta",
+    "canton_codigo": "0602",
+    "canton": "Alausi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060258",
+    "nombre": "Sevilla",
+    "canton_codigo": "0602",
+    "canton": "Alausi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060259",
+    "nombre": "Sibambe",
+    "canton_codigo": "0602",
+    "canton": "Alausi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060260",
+    "nombre": "Tixan",
+    "canton_codigo": "0602",
+    "canton": "Alausi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060350",
+    "nombre": "Villa La Union (Cajabamba)",
+    "canton_codigo": "0603",
+    "canton": "Colta",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060351",
+    "nombre": "Cañi",
+    "canton_codigo": "0603",
+    "canton": "Colta",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060352",
+    "nombre": "Columbe",
+    "canton_codigo": "0603",
+    "canton": "Colta",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060353",
+    "nombre": "Juan De Velasco (Pangor)",
+    "canton_codigo": "0603",
+    "canton": "Colta",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060354",
+    "nombre": "Santiago De Quito (Cab. En San Antonio De Quito)",
+    "canton_codigo": "0603",
+    "canton": "Colta",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060450",
+    "nombre": "Chambo",
+    "canton_codigo": "0604",
+    "canton": "Chambo",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060550",
+    "nombre": "Chunchi",
+    "canton_codigo": "0605",
+    "canton": "Chunchi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060551",
+    "nombre": "Capzol",
+    "canton_codigo": "0605",
+    "canton": "Chunchi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060552",
+    "nombre": "Compud",
+    "canton_codigo": "0605",
+    "canton": "Chunchi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060553",
+    "nombre": "Gonzol",
+    "canton_codigo": "0605",
+    "canton": "Chunchi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060554",
+    "nombre": "Llagos",
+    "canton_codigo": "0605",
+    "canton": "Chunchi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060650",
+    "nombre": "Guamote",
+    "canton_codigo": "0606",
+    "canton": "Guamote",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060651",
+    "nombre": "Cebadas",
+    "canton_codigo": "0606",
+    "canton": "Guamote",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060652",
+    "nombre": "Palmira",
+    "canton_codigo": "0606",
+    "canton": "Guamote",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060750",
+    "nombre": "Guano",
+    "canton_codigo": "0607",
+    "canton": "Guano",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060751",
+    "nombre": "Guanando",
+    "canton_codigo": "0607",
+    "canton": "Guano",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060752",
+    "nombre": "Ilapo",
+    "canton_codigo": "0607",
+    "canton": "Guano",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060753",
+    "nombre": "La Providencia",
+    "canton_codigo": "0607",
+    "canton": "Guano",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060754",
+    "nombre": "San Andres",
+    "canton_codigo": "0607",
+    "canton": "Guano",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060755",
+    "nombre": "San Gerardo De Pacaicaguan",
+    "canton_codigo": "0607",
+    "canton": "Guano",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060756",
+    "nombre": "San Isidro De Patulu",
+    "canton_codigo": "0607",
+    "canton": "Guano",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060757",
+    "nombre": "San Jose Del Chazo",
+    "canton_codigo": "0607",
+    "canton": "Guano",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060758",
+    "nombre": "Santa Fe De Galan",
+    "canton_codigo": "0607",
+    "canton": "Guano",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060759",
+    "nombre": "Valparaiso",
+    "canton_codigo": "0607",
+    "canton": "Guano",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060850",
+    "nombre": "Pallatanga",
+    "canton_codigo": "0608",
+    "canton": "Pallatanga",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060950",
+    "nombre": "Penipe",
+    "canton_codigo": "0609",
+    "canton": "Penipe",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060951",
+    "nombre": "El Altar",
+    "canton_codigo": "0609",
+    "canton": "Penipe",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060952",
+    "nombre": "Matus",
+    "canton_codigo": "0609",
+    "canton": "Penipe",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060953",
+    "nombre": "Puela",
+    "canton_codigo": "0609",
+    "canton": "Penipe",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060954",
+    "nombre": "San Antonio De Bayushig",
+    "canton_codigo": "0609",
+    "canton": "Penipe",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060955",
+    "nombre": "La Candelaria",
+    "canton_codigo": "0609",
+    "canton": "Penipe",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "060956",
+    "nombre": "Bilbao (Cab. En Quilluyacu)",
+    "canton_codigo": "0609",
+    "canton": "Penipe",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "061050",
+    "nombre": "Cumanda",
+    "canton_codigo": "0610",
+    "canton": "Cumanda",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo"
+  },
+  {
+    "codigo": "070150",
+    "nombre": "Machala",
+    "canton_codigo": "0701",
+    "canton": "Machala",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070152",
+    "nombre": "El Retiro",
+    "canton_codigo": "0701",
+    "canton": "Machala",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070250",
+    "nombre": "Arenillas",
+    "canton_codigo": "0702",
+    "canton": "Arenillas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070251",
+    "nombre": "Chacras",
+    "canton_codigo": "0702",
+    "canton": "Arenillas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070254",
+    "nombre": "Palmales",
+    "canton_codigo": "0702",
+    "canton": "Arenillas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070255",
+    "nombre": "Carcabon",
+    "canton_codigo": "0702",
+    "canton": "Arenillas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070350",
+    "nombre": "Paccha",
+    "canton_codigo": "0703",
+    "canton": "Atahualpa",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070351",
+    "nombre": "Ayapamba",
+    "canton_codigo": "0703",
+    "canton": "Atahualpa",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070352",
+    "nombre": "Cordoncillo",
+    "canton_codigo": "0703",
+    "canton": "Atahualpa",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070353",
+    "nombre": "Milagro",
+    "canton_codigo": "0703",
+    "canton": "Atahualpa",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070354",
+    "nombre": "San Jose",
+    "canton_codigo": "0703",
+    "canton": "Atahualpa",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070355",
+    "nombre": "San Juan De Cerro Azul",
+    "canton_codigo": "0703",
+    "canton": "Atahualpa",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070450",
+    "nombre": "Balsas",
+    "canton_codigo": "0704",
+    "canton": "Balsas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070451",
+    "nombre": "Bellamaria",
+    "canton_codigo": "0704",
+    "canton": "Balsas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070550",
+    "nombre": "Chilla",
+    "canton_codigo": "0705",
+    "canton": "Chilla",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070650",
+    "nombre": "El Guabo",
+    "canton_codigo": "0706",
+    "canton": "El Guabo",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070651",
+    "nombre": "Barbones (Sucre)",
+    "canton_codigo": "0706",
+    "canton": "El Guabo",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070652",
+    "nombre": "La Iberia",
+    "canton_codigo": "0706",
+    "canton": "El Guabo",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070653",
+    "nombre": "Tendales (Cab. En Puerto Tendales)",
+    "canton_codigo": "0706",
+    "canton": "El Guabo",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070654",
+    "nombre": "Rio Bonito",
+    "canton_codigo": "0706",
+    "canton": "El Guabo",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070750",
+    "nombre": "Huaquillas",
+    "canton_codigo": "0707",
+    "canton": "Huaquillas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070850",
+    "nombre": "Marcabeli",
+    "canton_codigo": "0708",
+    "canton": "Marcabeli",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070851",
+    "nombre": "El Ingenio",
+    "canton_codigo": "0708",
+    "canton": "Marcabeli",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070950",
+    "nombre": "Pasaje",
+    "canton_codigo": "0709",
+    "canton": "Pasaje",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070951",
+    "nombre": "Buenavista",
+    "canton_codigo": "0709",
+    "canton": "Pasaje",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070952",
+    "nombre": "Casacay",
+    "canton_codigo": "0709",
+    "canton": "Pasaje",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070953",
+    "nombre": "La Peaña",
+    "canton_codigo": "0709",
+    "canton": "Pasaje",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070954",
+    "nombre": "Progreso",
+    "canton_codigo": "0709",
+    "canton": "Pasaje",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070955",
+    "nombre": "Uzhcurrumi",
+    "canton_codigo": "0709",
+    "canton": "Pasaje",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "070956",
+    "nombre": "Cañaquemada",
+    "canton_codigo": "0709",
+    "canton": "Pasaje",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071050",
+    "nombre": "Piñas",
+    "canton_codigo": "0710",
+    "canton": "Piñas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071051",
+    "nombre": "Capiro (Cab. En La Capilla De Capiro)",
+    "canton_codigo": "0710",
+    "canton": "Piñas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071052",
+    "nombre": "La Bocana",
+    "canton_codigo": "0710",
+    "canton": "Piñas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071053",
+    "nombre": "Moromoro (Cab. En El Vado)",
+    "canton_codigo": "0710",
+    "canton": "Piñas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071054",
+    "nombre": "Piedras",
+    "canton_codigo": "0710",
+    "canton": "Piñas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071055",
+    "nombre": "San Roque (Ambrosio Maldonado)",
+    "canton_codigo": "0710",
+    "canton": "Piñas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071056",
+    "nombre": "Saracay",
+    "canton_codigo": "0710",
+    "canton": "Piñas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071150",
+    "nombre": "Portovelo",
+    "canton_codigo": "0711",
+    "canton": "Portovelo",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071151",
+    "nombre": "Curtincapa",
+    "canton_codigo": "0711",
+    "canton": "Portovelo",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071152",
+    "nombre": "Morales",
+    "canton_codigo": "0711",
+    "canton": "Portovelo",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071153",
+    "nombre": "Salati",
+    "canton_codigo": "0711",
+    "canton": "Portovelo",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071250",
+    "nombre": "Santa Rosa",
+    "canton_codigo": "0712",
+    "canton": "Santa Rosa",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071251",
+    "nombre": "Bellavista",
+    "canton_codigo": "0712",
+    "canton": "Santa Rosa",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071252",
+    "nombre": "Jambeli",
+    "canton_codigo": "0712",
+    "canton": "Santa Rosa",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071253",
+    "nombre": "La Avanzada",
+    "canton_codigo": "0712",
+    "canton": "Santa Rosa",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071254",
+    "nombre": "San Antonio",
+    "canton_codigo": "0712",
+    "canton": "Santa Rosa",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071255",
+    "nombre": "Torata",
+    "canton_codigo": "0712",
+    "canton": "Santa Rosa",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071256",
+    "nombre": "Victoria",
+    "canton_codigo": "0712",
+    "canton": "Santa Rosa",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071257",
+    "nombre": "Bellamaria",
+    "canton_codigo": "0712",
+    "canton": "Santa Rosa",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071350",
+    "nombre": "Zaruma",
+    "canton_codigo": "0713",
+    "canton": "Zaruma",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071351",
+    "nombre": "Abañin",
+    "canton_codigo": "0713",
+    "canton": "Zaruma",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071352",
+    "nombre": "Arcapamba",
+    "canton_codigo": "0713",
+    "canton": "Zaruma",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071353",
+    "nombre": "Guanazan",
+    "canton_codigo": "0713",
+    "canton": "Zaruma",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071354",
+    "nombre": "Guizhaguiña",
+    "canton_codigo": "0713",
+    "canton": "Zaruma",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071355",
+    "nombre": "Huertas",
+    "canton_codigo": "0713",
+    "canton": "Zaruma",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071356",
+    "nombre": "Malvas",
+    "canton_codigo": "0713",
+    "canton": "Zaruma",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071357",
+    "nombre": "Muluncay Grande",
+    "canton_codigo": "0713",
+    "canton": "Zaruma",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071358",
+    "nombre": "Sinsao",
+    "canton_codigo": "0713",
+    "canton": "Zaruma",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071359",
+    "nombre": "Salvias",
+    "canton_codigo": "0713",
+    "canton": "Zaruma",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071450",
+    "nombre": "La Victoria",
+    "canton_codigo": "0714",
+    "canton": "Las Lajas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071451",
+    "nombre": "La Libertad",
+    "canton_codigo": "0714",
+    "canton": "Las Lajas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071452",
+    "nombre": "El Paraiso",
+    "canton_codigo": "0714",
+    "canton": "Las Lajas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "071453",
+    "nombre": "San Isidro",
+    "canton_codigo": "0714",
+    "canton": "Las Lajas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro"
+  },
+  {
+    "codigo": "080150",
+    "nombre": "Esmeraldas",
+    "canton_codigo": "0801",
+    "canton": "Esmeraldas",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080152",
+    "nombre": "Camarones (Cab. En San Vicente)",
+    "canton_codigo": "0801",
+    "canton": "Esmeraldas",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080153",
+    "nombre": "Crnel. Carlos Concha Torres (Cab. En Huele)",
+    "canton_codigo": "0801",
+    "canton": "Esmeraldas",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080154",
+    "nombre": "Chinca",
+    "canton_codigo": "0801",
+    "canton": "Esmeraldas",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080159",
+    "nombre": "Majua",
+    "canton_codigo": "0801",
+    "canton": "Esmeraldas",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080163",
+    "nombre": "San Mateo",
+    "canton_codigo": "0801",
+    "canton": "Esmeraldas",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080165",
+    "nombre": "Tabiazo",
+    "canton_codigo": "0801",
+    "canton": "Esmeraldas",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080166",
+    "nombre": "Tachina",
+    "canton_codigo": "0801",
+    "canton": "Esmeraldas",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080168",
+    "nombre": "Vuelta Larga",
+    "canton_codigo": "0801",
+    "canton": "Esmeraldas",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080250",
+    "nombre": "Valdez (Limones)",
+    "canton_codigo": "0802",
+    "canton": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080251",
+    "nombre": "Anchayacu",
+    "canton_codigo": "0802",
+    "canton": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080252",
+    "nombre": "Atahualpa (Cab. En Camarones)",
+    "canton_codigo": "0802",
+    "canton": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080253",
+    "nombre": "Borbon",
+    "canton_codigo": "0802",
+    "canton": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080254",
+    "nombre": "La Tola",
+    "canton_codigo": "0802",
+    "canton": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080255",
+    "nombre": "Luis Vargas Torres (Cab. En Playa De Oro)",
+    "canton_codigo": "0802",
+    "canton": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080256",
+    "nombre": "Maldonado",
+    "canton_codigo": "0802",
+    "canton": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080257",
+    "nombre": "Pampanal De Bolivar",
+    "canton_codigo": "0802",
+    "canton": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080258",
+    "nombre": "San Francisco De Onzole",
+    "canton_codigo": "0802",
+    "canton": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080259",
+    "nombre": "Santo Domingo De Onzole",
+    "canton_codigo": "0802",
+    "canton": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080260",
+    "nombre": "Selva Alegre",
+    "canton_codigo": "0802",
+    "canton": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080261",
+    "nombre": "Telembi",
+    "canton_codigo": "0802",
+    "canton": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080262",
+    "nombre": "Colon Eloy Del Maria",
+    "canton_codigo": "0802",
+    "canton": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080263",
+    "nombre": "San Jose De Cayapas",
+    "canton_codigo": "0802",
+    "canton": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080264",
+    "nombre": "Timbire",
+    "canton_codigo": "0802",
+    "canton": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080265",
+    "nombre": "Santa Lucia De Las Peñas",
+    "canton_codigo": "0802",
+    "canton": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080350",
+    "nombre": "Muisne",
+    "canton_codigo": "0803",
+    "canton": "Muisne",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080351",
+    "nombre": "Bolivar",
+    "canton_codigo": "0803",
+    "canton": "Muisne",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080352",
+    "nombre": "Daule",
+    "canton_codigo": "0803",
+    "canton": "Muisne",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080353",
+    "nombre": "Galera",
+    "canton_codigo": "0803",
+    "canton": "Muisne",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080354",
+    "nombre": "Quingue (Olmedo Perdomo Franco)",
+    "canton_codigo": "0803",
+    "canton": "Muisne",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080355",
+    "nombre": "Salima",
+    "canton_codigo": "0803",
+    "canton": "Muisne",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080356",
+    "nombre": "San Francisco",
+    "canton_codigo": "0803",
+    "canton": "Muisne",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080357",
+    "nombre": "San Gregorio",
+    "canton_codigo": "0803",
+    "canton": "Muisne",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080358",
+    "nombre": "San Jose De Chamanga",
+    "canton_codigo": "0803",
+    "canton": "Muisne",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080450",
+    "nombre": "Rosa Zarate (Quininde)",
+    "canton_codigo": "0804",
+    "canton": "Quininde",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080451",
+    "nombre": "Cube",
+    "canton_codigo": "0804",
+    "canton": "Quininde",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080452",
+    "nombre": "Chura (Chancama) (Cab. En El Yerbero)",
+    "canton_codigo": "0804",
+    "canton": "Quininde",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080453",
+    "nombre": "Malimpia",
+    "canton_codigo": "0804",
+    "canton": "Quininde",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080454",
+    "nombre": "Viche",
+    "canton_codigo": "0804",
+    "canton": "Quininde",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080455",
+    "nombre": "La Union",
+    "canton_codigo": "0804",
+    "canton": "Quininde",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080550",
+    "nombre": "San Lorenzo",
+    "canton_codigo": "0805",
+    "canton": "San Lorenzo",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080551",
+    "nombre": "Alto Tambo (Cab En Guadual)",
+    "canton_codigo": "0805",
+    "canton": "San Lorenzo",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080552",
+    "nombre": "Ancon (Pichangal) (Cab. En Palma Real)",
+    "canton_codigo": "0805",
+    "canton": "San Lorenzo",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080553",
+    "nombre": "Calderon",
+    "canton_codigo": "0805",
+    "canton": "San Lorenzo",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080554",
+    "nombre": "Carondelet",
+    "canton_codigo": "0805",
+    "canton": "San Lorenzo",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080555",
+    "nombre": "5 De Junio (Cab. En Uimbi)",
+    "canton_codigo": "0805",
+    "canton": "San Lorenzo",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080556",
+    "nombre": "Concepcion",
+    "canton_codigo": "0805",
+    "canton": "San Lorenzo",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080557",
+    "nombre": "Mataje (Cab. En Santander)",
+    "canton_codigo": "0805",
+    "canton": "San Lorenzo",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080558",
+    "nombre": "San Javier De Cachavi (Cab. En San Javier)",
+    "canton_codigo": "0805",
+    "canton": "San Lorenzo",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080559",
+    "nombre": "Santa Rita",
+    "canton_codigo": "0805",
+    "canton": "San Lorenzo",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080560",
+    "nombre": "Tambillo",
+    "canton_codigo": "0805",
+    "canton": "San Lorenzo",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080561",
+    "nombre": "Tululbi (Cab. En Ricaurte)",
+    "canton_codigo": "0805",
+    "canton": "San Lorenzo",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080562",
+    "nombre": "Urbina",
+    "canton_codigo": "0805",
+    "canton": "San Lorenzo",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080650",
+    "nombre": "Atacames",
+    "canton_codigo": "0806",
+    "canton": "Atacames",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080651",
+    "nombre": "La Union",
+    "canton_codigo": "0806",
+    "canton": "Atacames",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080652",
+    "nombre": "Sua (Cab. En La Bocana)",
+    "canton_codigo": "0806",
+    "canton": "Atacames",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080653",
+    "nombre": "Tonchigue",
+    "canton_codigo": "0806",
+    "canton": "Atacames",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080654",
+    "nombre": "Tonsupa",
+    "canton_codigo": "0806",
+    "canton": "Atacames",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080750",
+    "nombre": "Rioverde",
+    "canton_codigo": "0807",
+    "canton": "Rioverde",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080751",
+    "nombre": "Chontaduro",
+    "canton_codigo": "0807",
+    "canton": "Rioverde",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080752",
+    "nombre": "Chumunde",
+    "canton_codigo": "0807",
+    "canton": "Rioverde",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080753",
+    "nombre": "Lagarto",
+    "canton_codigo": "0807",
+    "canton": "Rioverde",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080754",
+    "nombre": "Montalvo (Cab En Horqueta)",
+    "canton_codigo": "0807",
+    "canton": "Rioverde",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080755",
+    "nombre": "Rocafuerte",
+    "canton_codigo": "0807",
+    "canton": "Rioverde",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080850",
+    "nombre": "La Concordia",
+    "canton_codigo": "0808",
+    "canton": "La Concordia",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080851",
+    "nombre": "Monterrey",
+    "canton_codigo": "0808",
+    "canton": "La Concordia",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080852",
+    "nombre": "La Villegas",
+    "canton_codigo": "0808",
+    "canton": "La Concordia",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "080853",
+    "nombre": "Plan Piloto",
+    "canton_codigo": "0808",
+    "canton": "La Concordia",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas"
+  },
+  {
+    "codigo": "090150",
+    "nombre": "Guayaquil",
+    "canton_codigo": "0901",
+    "canton": "Guayaquil",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090152",
+    "nombre": "Juan Gomez Rendon (Progreso)",
+    "canton_codigo": "0901",
+    "canton": "Guayaquil",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090153",
+    "nombre": "Morro",
+    "canton_codigo": "0901",
+    "canton": "Guayaquil",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090156",
+    "nombre": "Posorja",
+    "canton_codigo": "0901",
+    "canton": "Guayaquil",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090157",
+    "nombre": "Puna",
+    "canton_codigo": "0901",
+    "canton": "Guayaquil",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090158",
+    "nombre": "Tenguel",
+    "canton_codigo": "0901",
+    "canton": "Guayaquil",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090250",
+    "nombre": "Alfredo Baquerizo Moreno (Jujan)",
+    "canton_codigo": "0902",
+    "canton": "Alfredo Baquerizo Moreno",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090350",
+    "nombre": "Balao",
+    "canton_codigo": "0903",
+    "canton": "Balao",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090450",
+    "nombre": "Balzar",
+    "canton_codigo": "0904",
+    "canton": "Balzar",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090550",
+    "nombre": "Colimes",
+    "canton_codigo": "0905",
+    "canton": "Colimes",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090551",
+    "nombre": "San Jacinto",
+    "canton_codigo": "0905",
+    "canton": "Colimes",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090650",
+    "nombre": "Daule",
+    "canton_codigo": "0906",
+    "canton": "Daule",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090652",
+    "nombre": "Juan Bautista Aguirre (Los Tintos)",
+    "canton_codigo": "0906",
+    "canton": "Daule",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090653",
+    "nombre": "Laurel",
+    "canton_codigo": "0906",
+    "canton": "Daule",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090654",
+    "nombre": "Limonal",
+    "canton_codigo": "0906",
+    "canton": "Daule",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090656",
+    "nombre": "Los Lojas (Enrique Baquerizo Moreno)",
+    "canton_codigo": "0906",
+    "canton": "Daule",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090750",
+    "nombre": "Eloy Alfaro (Duran)",
+    "canton_codigo": "0907",
+    "canton": "Duran",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090850",
+    "nombre": "Velasco Ibarra (Cab. El Empalme)",
+    "canton_codigo": "0908",
+    "canton": "Empalme",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090851",
+    "nombre": "Guayas (Pueblo Nuevo)",
+    "canton_codigo": "0908",
+    "canton": "Empalme",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090852",
+    "nombre": "El Rosario",
+    "canton_codigo": "0908",
+    "canton": "Empalme",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "090950",
+    "nombre": "El Triunfo",
+    "canton_codigo": "0909",
+    "canton": "El Triunfo",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091050",
+    "nombre": "Milagro",
+    "canton_codigo": "0910",
+    "canton": "Milagro",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091051",
+    "nombre": "Chobo",
+    "canton_codigo": "0910",
+    "canton": "Milagro",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091053",
+    "nombre": "Mariscal Sucre (Huaques)",
+    "canton_codigo": "0910",
+    "canton": "Milagro",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091054",
+    "nombre": "Roberto Astudillo (Cab. En Cruce De Venecia)",
+    "canton_codigo": "0910",
+    "canton": "Milagro",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091150",
+    "nombre": "Naranjal",
+    "canton_codigo": "0911",
+    "canton": "Naranjal",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091151",
+    "nombre": "Jesus Maria",
+    "canton_codigo": "0911",
+    "canton": "Naranjal",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091152",
+    "nombre": "San Carlos",
+    "canton_codigo": "0911",
+    "canton": "Naranjal",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091153",
+    "nombre": "Santa Rosa De Flandes",
+    "canton_codigo": "0911",
+    "canton": "Naranjal",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091154",
+    "nombre": "Taura",
+    "canton_codigo": "0911",
+    "canton": "Naranjal",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091250",
+    "nombre": "Naranjito",
+    "canton_codigo": "0912",
+    "canton": "Naranjito",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091350",
+    "nombre": "Palestina",
+    "canton_codigo": "0913",
+    "canton": "Palestina",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091450",
+    "nombre": "Pedro Carbo",
+    "canton_codigo": "0914",
+    "canton": "Pedro Carbo",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091451",
+    "nombre": "Valle De La Virgen",
+    "canton_codigo": "0914",
+    "canton": "Pedro Carbo",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091452",
+    "nombre": "Sabanilla",
+    "canton_codigo": "0914",
+    "canton": "Pedro Carbo",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091650",
+    "nombre": "Samborondon",
+    "canton_codigo": "0916",
+    "canton": "Samborondon",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091651",
+    "nombre": "Tarifa",
+    "canton_codigo": "0916",
+    "canton": "Samborondon",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091850",
+    "nombre": "Santa Lucia",
+    "canton_codigo": "0918",
+    "canton": "Santa Lucia",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091950",
+    "nombre": "El Salitre (Las Ramas)",
+    "canton_codigo": "0919",
+    "canton": "Salitre",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091951",
+    "nombre": "Gral. Vernaza (Dos Esteros)",
+    "canton_codigo": "0919",
+    "canton": "Salitre",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091952",
+    "nombre": "La Victoria (Ñauza)",
+    "canton_codigo": "0919",
+    "canton": "Salitre",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "091953",
+    "nombre": "Junquillal",
+    "canton_codigo": "0919",
+    "canton": "Salitre",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "092050",
+    "nombre": "San Jacinto De Yaguachi",
+    "canton_codigo": "0920",
+    "canton": "San Jacinto De Yaguachi",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "092053",
+    "nombre": "Gral. Pedro J. Montero (Boliche)",
+    "canton_codigo": "0920",
+    "canton": "San Jacinto De Yaguachi",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "092055",
+    "nombre": "Yaguachi Viejo (Cone)",
+    "canton_codigo": "0920",
+    "canton": "San Jacinto De Yaguachi",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "092056",
+    "nombre": "Virgen De Fatima",
+    "canton_codigo": "0920",
+    "canton": "San Jacinto De Yaguachi",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "092150",
+    "nombre": "General Villamil (Playas)",
+    "canton_codigo": "0921",
+    "canton": "Playas",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "092250",
+    "nombre": "Simon Bolivar",
+    "canton_codigo": "0922",
+    "canton": "Simon Bolivar",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "092251",
+    "nombre": "Crnel. Lorenzo De Garaicoa (Pedregal)",
+    "canton_codigo": "0922",
+    "canton": "Simon Bolivar",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "092350",
+    "nombre": "Coronel Marcelino Maridueña (San Carlos)",
+    "canton_codigo": "0923",
+    "canton": "Crnel. Marcelino Maridueña",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "092450",
+    "nombre": "Lomas De Sargentillo",
+    "canton_codigo": "0924",
+    "canton": "Lomas De Sargentillo",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "092550",
+    "nombre": "Narcisa De Jesus",
+    "canton_codigo": "0925",
+    "canton": "Nobol",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "092750",
+    "nombre": "Gral. Antonio Elizalde (Bucay)",
+    "canton_codigo": "0927",
+    "canton": "Gnral. Antonio Elizalde",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "092850",
+    "nombre": "Isidro Ayora",
+    "canton_codigo": "0928",
+    "canton": "Isidro Ayora",
+    "provincia_codigo": "09",
+    "provincia": "Guayas"
+  },
+  {
+    "codigo": "100150",
+    "nombre": "San Miguel De Ibarra",
+    "canton_codigo": "1001",
+    "canton": "Ibarra",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100151",
+    "nombre": "Ambuqui",
+    "canton_codigo": "1001",
+    "canton": "Ibarra",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100152",
+    "nombre": "Angochagua",
+    "canton_codigo": "1001",
+    "canton": "Ibarra",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100153",
+    "nombre": "Carolina",
+    "canton_codigo": "1001",
+    "canton": "Ibarra",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100154",
+    "nombre": "La Esperanza",
+    "canton_codigo": "1001",
+    "canton": "Ibarra",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100155",
+    "nombre": "Lita",
+    "canton_codigo": "1001",
+    "canton": "Ibarra",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100156",
+    "nombre": "Salinas",
+    "canton_codigo": "1001",
+    "canton": "Ibarra",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100157",
+    "nombre": "San Antonio",
+    "canton_codigo": "1001",
+    "canton": "Ibarra",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100250",
+    "nombre": "Atuntaqui",
+    "canton_codigo": "1002",
+    "canton": "Antonio Ante",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100251",
+    "nombre": "Imbaya (San Luis De Cobuendo)",
+    "canton_codigo": "1002",
+    "canton": "Antonio Ante",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100252",
+    "nombre": "San Fco. De Natabuela",
+    "canton_codigo": "1002",
+    "canton": "Antonio Ante",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100253",
+    "nombre": "San Jose De Chaltura",
+    "canton_codigo": "1002",
+    "canton": "Antonio Ante",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100254",
+    "nombre": "San Roque",
+    "canton_codigo": "1002",
+    "canton": "Antonio Ante",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100350",
+    "nombre": "Cotacachi",
+    "canton_codigo": "1003",
+    "canton": "Cotacachi",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100351",
+    "nombre": "Apuela",
+    "canton_codigo": "1003",
+    "canton": "Cotacachi",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100352",
+    "nombre": "Garcia Moreno (Llurimagua)",
+    "canton_codigo": "1003",
+    "canton": "Cotacachi",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100353",
+    "nombre": "Imantag",
+    "canton_codigo": "1003",
+    "canton": "Cotacachi",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100354",
+    "nombre": "Peñaherrera",
+    "canton_codigo": "1003",
+    "canton": "Cotacachi",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100355",
+    "nombre": "Plaza Gutierrez (Calvario)",
+    "canton_codigo": "1003",
+    "canton": "Cotacachi",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100356",
+    "nombre": "Quiroga",
+    "canton_codigo": "1003",
+    "canton": "Cotacachi",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100357",
+    "nombre": "6 De Julio De Cuellaje (Cab. En Cuellaje)",
+    "canton_codigo": "1003",
+    "canton": "Cotacachi",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100358",
+    "nombre": "Vacas Galindo (El Churo) (Cab. En San Miguel Alto)",
+    "canton_codigo": "1003",
+    "canton": "Cotacachi",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100450",
+    "nombre": "Otavalo",
+    "canton_codigo": "1004",
+    "canton": "Otavalo",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100451",
+    "nombre": "Doctor Miguel Egas Cabezas (Peguche)",
+    "canton_codigo": "1004",
+    "canton": "Otavalo",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100452",
+    "nombre": "Eugenio Espejo (Calpaqui)",
+    "canton_codigo": "1004",
+    "canton": "Otavalo",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100453",
+    "nombre": "Gonzalez Suarez",
+    "canton_codigo": "1004",
+    "canton": "Otavalo",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100454",
+    "nombre": "Pataqui",
+    "canton_codigo": "1004",
+    "canton": "Otavalo",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100455",
+    "nombre": "San Jose De Quichinche",
+    "canton_codigo": "1004",
+    "canton": "Otavalo",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100456",
+    "nombre": "San Juan De Iluman",
+    "canton_codigo": "1004",
+    "canton": "Otavalo",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100457",
+    "nombre": "San Pablo",
+    "canton_codigo": "1004",
+    "canton": "Otavalo",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100458",
+    "nombre": "San Rafael",
+    "canton_codigo": "1004",
+    "canton": "Otavalo",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100459",
+    "nombre": "Selva Alegre (Cab. En San Miguel De Pamplona)",
+    "canton_codigo": "1004",
+    "canton": "Otavalo",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100550",
+    "nombre": "Pimampiro",
+    "canton_codigo": "1005",
+    "canton": "Pimampiro",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100551",
+    "nombre": "Chuga",
+    "canton_codigo": "1005",
+    "canton": "Pimampiro",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100552",
+    "nombre": "Mariano Acosta",
+    "canton_codigo": "1005",
+    "canton": "Pimampiro",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100553",
+    "nombre": "San  Fco. De Sigsipamba",
+    "canton_codigo": "1005",
+    "canton": "Pimampiro",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100650",
+    "nombre": "Urcuqui",
+    "canton_codigo": "1006",
+    "canton": "San Miguel De Urcuqui",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100651",
+    "nombre": "Cahuasqui",
+    "canton_codigo": "1006",
+    "canton": "San Miguel De Urcuqui",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100652",
+    "nombre": "La Merced De Buenos Aires",
+    "canton_codigo": "1006",
+    "canton": "San Miguel De Urcuqui",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100653",
+    "nombre": "Pablo Arenas",
+    "canton_codigo": "1006",
+    "canton": "San Miguel De Urcuqui",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100654",
+    "nombre": "San Blas",
+    "canton_codigo": "1006",
+    "canton": "San Miguel De Urcuqui",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "100655",
+    "nombre": "Tumbabiro",
+    "canton_codigo": "1006",
+    "canton": "San Miguel De Urcuqui",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura"
+  },
+  {
+    "codigo": "110150",
+    "nombre": "Loja",
+    "canton_codigo": "1101",
+    "canton": "Loja",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110151",
+    "nombre": "Chantaco",
+    "canton_codigo": "1101",
+    "canton": "Loja",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110152",
+    "nombre": "Chuquiribamba",
+    "canton_codigo": "1101",
+    "canton": "Loja",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110153",
+    "nombre": "El Cisne",
+    "canton_codigo": "1101",
+    "canton": "Loja",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110154",
+    "nombre": "Gualel",
+    "canton_codigo": "1101",
+    "canton": "Loja",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110155",
+    "nombre": "Jimbilla",
+    "canton_codigo": "1101",
+    "canton": "Loja",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110156",
+    "nombre": "Malacatos (Valladolid)",
+    "canton_codigo": "1101",
+    "canton": "Loja",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110157",
+    "nombre": "San Lucas",
+    "canton_codigo": "1101",
+    "canton": "Loja",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110158",
+    "nombre": "San Pedro De Vilcabamba",
+    "canton_codigo": "1101",
+    "canton": "Loja",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110159",
+    "nombre": "Santiago",
+    "canton_codigo": "1101",
+    "canton": "Loja",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110160",
+    "nombre": "Taquil (Miguel Riofrio)",
+    "canton_codigo": "1101",
+    "canton": "Loja",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110161",
+    "nombre": "Vilcabamba (Victoria)",
+    "canton_codigo": "1101",
+    "canton": "Loja",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110162",
+    "nombre": "Yangana (Arsenio Castillo)",
+    "canton_codigo": "1101",
+    "canton": "Loja",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110163",
+    "nombre": "Quinara",
+    "canton_codigo": "1101",
+    "canton": "Loja",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110250",
+    "nombre": "Cariamanga",
+    "canton_codigo": "1102",
+    "canton": "Calvas",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110251",
+    "nombre": "Colaisaca",
+    "canton_codigo": "1102",
+    "canton": "Calvas",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110252",
+    "nombre": "El Lucero",
+    "canton_codigo": "1102",
+    "canton": "Calvas",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110253",
+    "nombre": "Utuana",
+    "canton_codigo": "1102",
+    "canton": "Calvas",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110254",
+    "nombre": "Sanguillin",
+    "canton_codigo": "1102",
+    "canton": "Calvas",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110350",
+    "nombre": "Catamayo (La Toma)",
+    "canton_codigo": "1103",
+    "canton": "Catamayo",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110351",
+    "nombre": "El Tambo",
+    "canton_codigo": "1103",
+    "canton": "Catamayo",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110352",
+    "nombre": "Guayquichuma",
+    "canton_codigo": "1103",
+    "canton": "Catamayo",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110353",
+    "nombre": "San Pedro De La Bendita",
+    "canton_codigo": "1103",
+    "canton": "Catamayo",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110354",
+    "nombre": "Zambi",
+    "canton_codigo": "1103",
+    "canton": "Catamayo",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110450",
+    "nombre": "Celica",
+    "canton_codigo": "1104",
+    "canton": "Celica",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110451",
+    "nombre": "Cruzpamba (Cab En Carlos Bustamante)",
+    "canton_codigo": "1104",
+    "canton": "Celica",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110455",
+    "nombre": "Pozul (San Juan De Pozul)",
+    "canton_codigo": "1104",
+    "canton": "Celica",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110456",
+    "nombre": "Sabanilla",
+    "canton_codigo": "1104",
+    "canton": "Celica",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110457",
+    "nombre": "Tnte. Maximiliano Rodriguez Loaiza",
+    "canton_codigo": "1104",
+    "canton": "Celica",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110550",
+    "nombre": "Chaguarpamba",
+    "canton_codigo": "1105",
+    "canton": "Chaguarpamba",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110551",
+    "nombre": "Buenavista",
+    "canton_codigo": "1105",
+    "canton": "Chaguarpamba",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110552",
+    "nombre": "El Rosario",
+    "canton_codigo": "1105",
+    "canton": "Chaguarpamba",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110553",
+    "nombre": "Santa Rufina",
+    "canton_codigo": "1105",
+    "canton": "Chaguarpamba",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110554",
+    "nombre": "Amarillos",
+    "canton_codigo": "1105",
+    "canton": "Chaguarpamba",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110650",
+    "nombre": "Amaluza",
+    "canton_codigo": "1106",
+    "canton": "Espindola",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110651",
+    "nombre": "Bellavista",
+    "canton_codigo": "1106",
+    "canton": "Espindola",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110652",
+    "nombre": "Jimbura",
+    "canton_codigo": "1106",
+    "canton": "Espindola",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110653",
+    "nombre": "Santa Teresita",
+    "canton_codigo": "1106",
+    "canton": "Espindola",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110654",
+    "nombre": "27 De Abril (Cab. En La Naranja)",
+    "canton_codigo": "1106",
+    "canton": "Espindola",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110655",
+    "nombre": "El Ingenio",
+    "canton_codigo": "1106",
+    "canton": "Espindola",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110656",
+    "nombre": "El Airo",
+    "canton_codigo": "1106",
+    "canton": "Espindola",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110750",
+    "nombre": "Gonzanama",
+    "canton_codigo": "1107",
+    "canton": "Gonzanama",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110751",
+    "nombre": "Changaimina (La Libertad)",
+    "canton_codigo": "1107",
+    "canton": "Gonzanama",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110753",
+    "nombre": "Nambacola",
+    "canton_codigo": "1107",
+    "canton": "Gonzanama",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110754",
+    "nombre": "Purunuma (Eguiguren)",
+    "canton_codigo": "1107",
+    "canton": "Gonzanama",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110756",
+    "nombre": "Sacapalca",
+    "canton_codigo": "1107",
+    "canton": "Gonzanama",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110850",
+    "nombre": "Macara",
+    "canton_codigo": "1108",
+    "canton": "Macara",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110851",
+    "nombre": "Larama",
+    "canton_codigo": "1108",
+    "canton": "Macara",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110852",
+    "nombre": "La Victoria",
+    "canton_codigo": "1108",
+    "canton": "Macara",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110853",
+    "nombre": "Sabiango (La Capilla)",
+    "canton_codigo": "1108",
+    "canton": "Macara",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110950",
+    "nombre": "Catacocha",
+    "canton_codigo": "1109",
+    "canton": "Paltas",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110951",
+    "nombre": "Cangonama",
+    "canton_codigo": "1109",
+    "canton": "Paltas",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110952",
+    "nombre": "Guachanama",
+    "canton_codigo": "1109",
+    "canton": "Paltas",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110954",
+    "nombre": "Lauro Guerrero",
+    "canton_codigo": "1109",
+    "canton": "Paltas",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110956",
+    "nombre": "Orianga",
+    "canton_codigo": "1109",
+    "canton": "Paltas",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110957",
+    "nombre": "San Antonio",
+    "canton_codigo": "1109",
+    "canton": "Paltas",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110958",
+    "nombre": "Casanga",
+    "canton_codigo": "1109",
+    "canton": "Paltas",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "110959",
+    "nombre": "Yamana",
+    "canton_codigo": "1109",
+    "canton": "Paltas",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111050",
+    "nombre": "Alamor",
+    "canton_codigo": "1110",
+    "canton": "Puyango",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111051",
+    "nombre": "Ciano",
+    "canton_codigo": "1110",
+    "canton": "Puyango",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111052",
+    "nombre": "El Arenal",
+    "canton_codigo": "1110",
+    "canton": "Puyango",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111053",
+    "nombre": "El Limo (Mariana De Jesus)",
+    "canton_codigo": "1110",
+    "canton": "Puyango",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111054",
+    "nombre": "Mercadillo",
+    "canton_codigo": "1110",
+    "canton": "Puyango",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111055",
+    "nombre": "Vicentino",
+    "canton_codigo": "1110",
+    "canton": "Puyango",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111150",
+    "nombre": "Saraguro",
+    "canton_codigo": "1111",
+    "canton": "Saraguro",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111151",
+    "nombre": "El Paraiso De Celen",
+    "canton_codigo": "1111",
+    "canton": "Saraguro",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111152",
+    "nombre": "El Tablon",
+    "canton_codigo": "1111",
+    "canton": "Saraguro",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111153",
+    "nombre": "Lluzhapa",
+    "canton_codigo": "1111",
+    "canton": "Saraguro",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111154",
+    "nombre": "Manu",
+    "canton_codigo": "1111",
+    "canton": "Saraguro",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111155",
+    "nombre": "San Antonio De Qumbe (Cumbe)",
+    "canton_codigo": "1111",
+    "canton": "Saraguro",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111156",
+    "nombre": "San Pablo De Tenta",
+    "canton_codigo": "1111",
+    "canton": "Saraguro",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111157",
+    "nombre": "San Sebastian De Yuluc",
+    "canton_codigo": "1111",
+    "canton": "Saraguro",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111158",
+    "nombre": "Selva Alegre",
+    "canton_codigo": "1111",
+    "canton": "Saraguro",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111159",
+    "nombre": "Urdaneta (Paquishapa)",
+    "canton_codigo": "1111",
+    "canton": "Saraguro",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111160",
+    "nombre": "Sumaypamba",
+    "canton_codigo": "1111",
+    "canton": "Saraguro",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111250",
+    "nombre": "Sozoranga",
+    "canton_codigo": "1112",
+    "canton": "Sozoranga",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111251",
+    "nombre": "Nueva Fatima",
+    "canton_codigo": "1112",
+    "canton": "Sozoranga",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111252",
+    "nombre": "Tacamoros",
+    "canton_codigo": "1112",
+    "canton": "Sozoranga",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111350",
+    "nombre": "Zapotillo",
+    "canton_codigo": "1113",
+    "canton": "Zapotillo",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111351",
+    "nombre": "Mangahurco",
+    "canton_codigo": "1113",
+    "canton": "Zapotillo",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111352",
+    "nombre": "Garzareal",
+    "canton_codigo": "1113",
+    "canton": "Zapotillo",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111353",
+    "nombre": "Limones",
+    "canton_codigo": "1113",
+    "canton": "Zapotillo",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111354",
+    "nombre": "Paletillas",
+    "canton_codigo": "1113",
+    "canton": "Zapotillo",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111355",
+    "nombre": "Bolaspamba",
+    "canton_codigo": "1113",
+    "canton": "Zapotillo",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111356",
+    "nombre": "Cazaderos",
+    "canton_codigo": "1113",
+    "canton": "Zapotillo",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111450",
+    "nombre": "Pindal",
+    "canton_codigo": "1114",
+    "canton": "Pindal",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111451",
+    "nombre": "Chaquinal",
+    "canton_codigo": "1114",
+    "canton": "Pindal",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111452",
+    "nombre": "12 De Diciembre (Cab. En Achiotes)",
+    "canton_codigo": "1114",
+    "canton": "Pindal",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111453",
+    "nombre": "Milagros",
+    "canton_codigo": "1114",
+    "canton": "Pindal",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111550",
+    "nombre": "Quilanga",
+    "canton_codigo": "1115",
+    "canton": "Quilanga",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111551",
+    "nombre": "Fundochamba",
+    "canton_codigo": "1115",
+    "canton": "Quilanga",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111552",
+    "nombre": "San Antonio De Las Aradas (Cab. En Las Aradas)",
+    "canton_codigo": "1115",
+    "canton": "Quilanga",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111650",
+    "nombre": "Olmedo",
+    "canton_codigo": "1116",
+    "canton": "Olmedo",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "111651",
+    "nombre": "La Tingue",
+    "canton_codigo": "1116",
+    "canton": "Olmedo",
+    "provincia_codigo": "11",
+    "provincia": "Loja"
+  },
+  {
+    "codigo": "120150",
+    "nombre": "Babahoyo",
+    "canton_codigo": "1201",
+    "canton": "Babahoyo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120152",
+    "nombre": "Caracol",
+    "canton_codigo": "1201",
+    "canton": "Babahoyo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120153",
+    "nombre": "Febres Cordero (Las Juntas)",
+    "canton_codigo": "1201",
+    "canton": "Babahoyo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120154",
+    "nombre": "Pimocha",
+    "canton_codigo": "1201",
+    "canton": "Babahoyo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120155",
+    "nombre": "La Union",
+    "canton_codigo": "1201",
+    "canton": "Babahoyo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120250",
+    "nombre": "Baba",
+    "canton_codigo": "1202",
+    "canton": "Baba",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120251",
+    "nombre": "Guare",
+    "canton_codigo": "1202",
+    "canton": "Baba",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120252",
+    "nombre": "Isla De Bejucal",
+    "canton_codigo": "1202",
+    "canton": "Baba",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120350",
+    "nombre": "Montalvo",
+    "canton_codigo": "1203",
+    "canton": "Montalvo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120351",
+    "nombre": "La Esmeralda",
+    "canton_codigo": "1203",
+    "canton": "Montalvo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120450",
+    "nombre": "Puebloviejo",
+    "canton_codigo": "1204",
+    "canton": "Puebloviejo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120451",
+    "nombre": "Puerto Pechiche",
+    "canton_codigo": "1204",
+    "canton": "Puebloviejo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120452",
+    "nombre": "San Juan",
+    "canton_codigo": "1204",
+    "canton": "Puebloviejo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120550",
+    "nombre": "Quevedo",
+    "canton_codigo": "1205",
+    "canton": "Quevedo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120553",
+    "nombre": "San Carlos",
+    "canton_codigo": "1205",
+    "canton": "Quevedo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120555",
+    "nombre": "La Esperanza",
+    "canton_codigo": "1205",
+    "canton": "Quevedo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120650",
+    "nombre": "Catarama",
+    "canton_codigo": "1206",
+    "canton": "Urdaneta",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120651",
+    "nombre": "Ricaurte",
+    "canton_codigo": "1206",
+    "canton": "Urdaneta",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120750",
+    "nombre": "Ventanas",
+    "canton_codigo": "1207",
+    "canton": "Ventanas",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120752",
+    "nombre": "Zapotal",
+    "canton_codigo": "1207",
+    "canton": "Ventanas",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120753",
+    "nombre": "Chacarita",
+    "canton_codigo": "1207",
+    "canton": "Ventanas",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120754",
+    "nombre": "Los Angeles",
+    "canton_codigo": "1207",
+    "canton": "Ventanas",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120850",
+    "nombre": "Vinces",
+    "canton_codigo": "1208",
+    "canton": "Vinces",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120851",
+    "nombre": "Antonio Sotomayor (Cab. En Playas De Vinces)",
+    "canton_codigo": "1208",
+    "canton": "Vinces",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "120950",
+    "nombre": "Palenque",
+    "canton_codigo": "1209",
+    "canton": "Palenque",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "121050",
+    "nombre": "San Jacinto De Buena Fe",
+    "canton_codigo": "1210",
+    "canton": "Buena Fe",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "121051",
+    "nombre": "Patricia Pilar",
+    "canton_codigo": "1210",
+    "canton": "Buena Fe",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "121150",
+    "nombre": "Valencia",
+    "canton_codigo": "1211",
+    "canton": "Valencia",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "121250",
+    "nombre": "Mocache",
+    "canton_codigo": "1212",
+    "canton": "Mocache",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "121350",
+    "nombre": "Quinsaloma",
+    "canton_codigo": "1213",
+    "canton": "Quinsaloma",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios"
+  },
+  {
+    "codigo": "130150",
+    "nombre": "Portoviejo",
+    "canton_codigo": "1301",
+    "canton": "Portoviejo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130151",
+    "nombre": "Abdon Calderon (San Francisco)",
+    "canton_codigo": "1301",
+    "canton": "Portoviejo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130152",
+    "nombre": "Alhajuela (Bajo Grande)",
+    "canton_codigo": "1301",
+    "canton": "Portoviejo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130153",
+    "nombre": "Crucita",
+    "canton_codigo": "1301",
+    "canton": "Portoviejo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130154",
+    "nombre": "Pueblo Nuevo",
+    "canton_codigo": "1301",
+    "canton": "Portoviejo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130155",
+    "nombre": "Riochico (Rio Chico)",
+    "canton_codigo": "1301",
+    "canton": "Portoviejo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130156",
+    "nombre": "San Placido",
+    "canton_codigo": "1301",
+    "canton": "Portoviejo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130157",
+    "nombre": "Chirijos",
+    "canton_codigo": "1301",
+    "canton": "Portoviejo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130250",
+    "nombre": "Calceta",
+    "canton_codigo": "1302",
+    "canton": "Bolivar",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130251",
+    "nombre": "Membrillo",
+    "canton_codigo": "1302",
+    "canton": "Bolivar",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130252",
+    "nombre": "Quiroga",
+    "canton_codigo": "1302",
+    "canton": "Bolivar",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130350",
+    "nombre": "Chone",
+    "canton_codigo": "1303",
+    "canton": "Chone",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130351",
+    "nombre": "Boyaca",
+    "canton_codigo": "1303",
+    "canton": "Chone",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130352",
+    "nombre": "Canuto",
+    "canton_codigo": "1303",
+    "canton": "Chone",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130353",
+    "nombre": "Convento",
+    "canton_codigo": "1303",
+    "canton": "Chone",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130354",
+    "nombre": "Chibunga",
+    "canton_codigo": "1303",
+    "canton": "Chone",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130355",
+    "nombre": "Eloy Alfaro",
+    "canton_codigo": "1303",
+    "canton": "Chone",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130356",
+    "nombre": "Ricaurte",
+    "canton_codigo": "1303",
+    "canton": "Chone",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130357",
+    "nombre": "San Antonio",
+    "canton_codigo": "1303",
+    "canton": "Chone",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130450",
+    "nombre": "El Carmen",
+    "canton_codigo": "1304",
+    "canton": "El Carmen",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130451",
+    "nombre": "Wilfrido Loor Moreira (Maicito)",
+    "canton_codigo": "1304",
+    "canton": "El Carmen",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130452",
+    "nombre": "San Pedro De Suma",
+    "canton_codigo": "1304",
+    "canton": "El Carmen",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130550",
+    "nombre": "Flavio Alfaro",
+    "canton_codigo": "1305",
+    "canton": "Flavio Alfaro",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130551",
+    "nombre": "San Francisco De Novillo (Cab. En Novillo)",
+    "canton_codigo": "1305",
+    "canton": "Flavio Alfaro",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130552",
+    "nombre": "Zapallo",
+    "canton_codigo": "1305",
+    "canton": "Flavio Alfaro",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130650",
+    "nombre": "Jipijapa",
+    "canton_codigo": "1306",
+    "canton": "Jipijapa",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130651",
+    "nombre": "America",
+    "canton_codigo": "1306",
+    "canton": "Jipijapa",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130652",
+    "nombre": "El Anegado (Cab. En Eloy Alfaro)",
+    "canton_codigo": "1306",
+    "canton": "Jipijapa",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130653",
+    "nombre": "Julcuy",
+    "canton_codigo": "1306",
+    "canton": "Jipijapa",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130654",
+    "nombre": "La Union",
+    "canton_codigo": "1306",
+    "canton": "Jipijapa",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130656",
+    "nombre": "Membrillal",
+    "canton_codigo": "1306",
+    "canton": "Jipijapa",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130657",
+    "nombre": "Pedro Pablo Gomez",
+    "canton_codigo": "1306",
+    "canton": "Jipijapa",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130658",
+    "nombre": "Puerto De Cayo",
+    "canton_codigo": "1306",
+    "canton": "Jipijapa",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130750",
+    "nombre": "Junin",
+    "canton_codigo": "1307",
+    "canton": "Junin",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130850",
+    "nombre": "Manta",
+    "canton_codigo": "1308",
+    "canton": "Manta",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130851",
+    "nombre": "San Lorenzo",
+    "canton_codigo": "1308",
+    "canton": "Manta",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130852",
+    "nombre": "Santa Marianita (Boca De Pacoche)",
+    "canton_codigo": "1308",
+    "canton": "Manta",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130950",
+    "nombre": "Montecristi",
+    "canton_codigo": "1309",
+    "canton": "Montecristi",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "130952",
+    "nombre": "La Pila",
+    "canton_codigo": "1309",
+    "canton": "Montecristi",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131050",
+    "nombre": "Pajan",
+    "canton_codigo": "1310",
+    "canton": "Pajan",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131051",
+    "nombre": "Campozano (La Palma De Pajan)",
+    "canton_codigo": "1310",
+    "canton": "Pajan",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131052",
+    "nombre": "Cascol",
+    "canton_codigo": "1310",
+    "canton": "Pajan",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131053",
+    "nombre": "Guale",
+    "canton_codigo": "1310",
+    "canton": "Pajan",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131054",
+    "nombre": "Lascano",
+    "canton_codigo": "1310",
+    "canton": "Pajan",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131150",
+    "nombre": "Pichincha",
+    "canton_codigo": "1311",
+    "canton": "Pichincha",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131151",
+    "nombre": "Barraganete",
+    "canton_codigo": "1311",
+    "canton": "Pichincha",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131152",
+    "nombre": "San Sebastian",
+    "canton_codigo": "1311",
+    "canton": "Pichincha",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131250",
+    "nombre": "Rocafuerte",
+    "canton_codigo": "1312",
+    "canton": "Rocafuerte",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131350",
+    "nombre": "Santa Ana De Vuelta Larga",
+    "canton_codigo": "1313",
+    "canton": "Santa Ana",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131351",
+    "nombre": "Ayacucho",
+    "canton_codigo": "1313",
+    "canton": "Santa Ana",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131352",
+    "nombre": "Honorato Vasquez (Cab En Vasquez)",
+    "canton_codigo": "1313",
+    "canton": "Santa Ana",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131353",
+    "nombre": "La Union",
+    "canton_codigo": "1313",
+    "canton": "Santa Ana",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131355",
+    "nombre": "San Pablo (Cab En Pueblo Nuevo)",
+    "canton_codigo": "1313",
+    "canton": "Santa Ana",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131450",
+    "nombre": "Bahia De Caraquez",
+    "canton_codigo": "1314",
+    "canton": "Sucre",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131453",
+    "nombre": "Charapoto",
+    "canton_codigo": "1314",
+    "canton": "Sucre",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131457",
+    "nombre": "San Isidro",
+    "canton_codigo": "1314",
+    "canton": "Sucre",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131550",
+    "nombre": "Tosagua",
+    "canton_codigo": "1315",
+    "canton": "Tosagua",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131551",
+    "nombre": "Bachillero",
+    "canton_codigo": "1315",
+    "canton": "Tosagua",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131552",
+    "nombre": "Angel Pedro Giler (La Estancilla)",
+    "canton_codigo": "1315",
+    "canton": "Tosagua",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131650",
+    "nombre": "Sucre",
+    "canton_codigo": "1316",
+    "canton": "24 De Mayo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131651",
+    "nombre": "Bellavista",
+    "canton_codigo": "1316",
+    "canton": "24 De Mayo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131652",
+    "nombre": "Noboa",
+    "canton_codigo": "1316",
+    "canton": "24 De Mayo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131653",
+    "nombre": "Arq. Sixto Duran Ballen",
+    "canton_codigo": "1316",
+    "canton": "24 De Mayo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131750",
+    "nombre": "Pedernales",
+    "canton_codigo": "1317",
+    "canton": "Pedernales",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131751",
+    "nombre": "Cojimies",
+    "canton_codigo": "1317",
+    "canton": "Pedernales",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131752",
+    "nombre": "10 De Agosto",
+    "canton_codigo": "1317",
+    "canton": "Pedernales",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131753",
+    "nombre": "Atahualpa",
+    "canton_codigo": "1317",
+    "canton": "Pedernales",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131850",
+    "nombre": "Olmedo",
+    "canton_codigo": "1318",
+    "canton": "Olmedo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131950",
+    "nombre": "Puerto Lopez",
+    "canton_codigo": "1319",
+    "canton": "Puerto Lopez",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131951",
+    "nombre": "Machalilla",
+    "canton_codigo": "1319",
+    "canton": "Puerto Lopez",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "131952",
+    "nombre": "Salango",
+    "canton_codigo": "1319",
+    "canton": "Puerto Lopez",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "132050",
+    "nombre": "Jama",
+    "canton_codigo": "1320",
+    "canton": "Jama",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "132150",
+    "nombre": "Jaramijo",
+    "canton_codigo": "1321",
+    "canton": "Jaramijo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "132250",
+    "nombre": "San Vicente",
+    "canton_codigo": "1322",
+    "canton": "San Vicente",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "132251",
+    "nombre": "Canoa",
+    "canton_codigo": "1322",
+    "canton": "San Vicente",
+    "provincia_codigo": "13",
+    "provincia": "Manabi"
+  },
+  {
+    "codigo": "140150",
+    "nombre": "Macas",
+    "canton_codigo": "1401",
+    "canton": "Morona",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140151",
+    "nombre": "Alshi (Cab En 9 De Octubre)",
+    "canton_codigo": "1401",
+    "canton": "Morona",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140153",
+    "nombre": "General Proaño",
+    "canton_codigo": "1401",
+    "canton": "Morona",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140156",
+    "nombre": "San Isidro",
+    "canton_codigo": "1401",
+    "canton": "Morona",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140157",
+    "nombre": "Sevilla Don Bosco",
+    "canton_codigo": "1401",
+    "canton": "Morona",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140158",
+    "nombre": "Sinai",
+    "canton_codigo": "1401",
+    "canton": "Morona",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140160",
+    "nombre": "Zuña (Zuñac)",
+    "canton_codigo": "1401",
+    "canton": "Morona",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140162",
+    "nombre": "Cuchaentza",
+    "canton_codigo": "1401",
+    "canton": "Morona",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140164",
+    "nombre": "Rio Blanco",
+    "canton_codigo": "1401",
+    "canton": "Morona",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140250",
+    "nombre": "Gualaquiza",
+    "canton_codigo": "1402",
+    "canton": "Gualaquiza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140251",
+    "nombre": "Amazonas (Rosario De Cuyes)",
+    "canton_codigo": "1402",
+    "canton": "Gualaquiza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140252",
+    "nombre": "Bermejos",
+    "canton_codigo": "1402",
+    "canton": "Gualaquiza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140253",
+    "nombre": "Bomboiza",
+    "canton_codigo": "1402",
+    "canton": "Gualaquiza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140254",
+    "nombre": "Chiguinda",
+    "canton_codigo": "1402",
+    "canton": "Gualaquiza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140255",
+    "nombre": "El Rosario",
+    "canton_codigo": "1402",
+    "canton": "Gualaquiza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140256",
+    "nombre": "Nueva Tarqui",
+    "canton_codigo": "1402",
+    "canton": "Gualaquiza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140257",
+    "nombre": "San Miguel De Cuyes",
+    "canton_codigo": "1402",
+    "canton": "Gualaquiza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140258",
+    "nombre": "El Ideal",
+    "canton_codigo": "1402",
+    "canton": "Gualaquiza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140350",
+    "nombre": "Gral. Leonidas Plaza Gutierrez",
+    "canton_codigo": "1403",
+    "canton": "Limon Indanza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140351",
+    "nombre": "Indanza",
+    "canton_codigo": "1403",
+    "canton": "Limon Indanza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140353",
+    "nombre": "San Antonio (Cab En San Antonio Centro)",
+    "canton_codigo": "1403",
+    "canton": "Limon Indanza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140356",
+    "nombre": "San Miguel De Conchay",
+    "canton_codigo": "1403",
+    "canton": "Limon Indanza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140357",
+    "nombre": "Sta Susana De Chiviaza (Cab En Chiviaza)",
+    "canton_codigo": "1403",
+    "canton": "Limon Indanza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140358",
+    "nombre": "Yunganza (Cab En El Rosario)",
+    "canton_codigo": "1403",
+    "canton": "Limon Indanza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140450",
+    "nombre": "Palora (Metzera)",
+    "canton_codigo": "1404",
+    "canton": "Palora",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140451",
+    "nombre": "Arapicos",
+    "canton_codigo": "1404",
+    "canton": "Palora",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140452",
+    "nombre": "Cumanda (Cab En Colonia Agricola Sevilla Del Oro)",
+    "canton_codigo": "1404",
+    "canton": "Palora",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140454",
+    "nombre": "Sangay (Cab En Nayamanaca)",
+    "canton_codigo": "1404",
+    "canton": "Palora",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140455",
+    "nombre": "16 De Agosto",
+    "canton_codigo": "1404",
+    "canton": "Palora",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140550",
+    "nombre": "Santiago De Mendez",
+    "canton_codigo": "1405",
+    "canton": "Santiago",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140551",
+    "nombre": "Copal",
+    "canton_codigo": "1405",
+    "canton": "Santiago",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140552",
+    "nombre": "Chupianza",
+    "canton_codigo": "1405",
+    "canton": "Santiago",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140553",
+    "nombre": "Patuca",
+    "canton_codigo": "1405",
+    "canton": "Santiago",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140554",
+    "nombre": "San Luis De El Acho (Cab En El Acho)",
+    "canton_codigo": "1405",
+    "canton": "Santiago",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140556",
+    "nombre": "Tayuza",
+    "canton_codigo": "1405",
+    "canton": "Santiago",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140557",
+    "nombre": "San Francisco De Chinimbimi",
+    "canton_codigo": "1405",
+    "canton": "Santiago",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140650",
+    "nombre": "Sucua",
+    "canton_codigo": "1406",
+    "canton": "Sucua",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140651",
+    "nombre": "Asuncion",
+    "canton_codigo": "1406",
+    "canton": "Sucua",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140652",
+    "nombre": "Huambi",
+    "canton_codigo": "1406",
+    "canton": "Sucua",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140655",
+    "nombre": "Santa Marianita De Jesus",
+    "canton_codigo": "1406",
+    "canton": "Sucua",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140750",
+    "nombre": "Huamboya",
+    "canton_codigo": "1407",
+    "canton": "Huamboya",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140751",
+    "nombre": "Chiguaza",
+    "canton_codigo": "1407",
+    "canton": "Huamboya",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140850",
+    "nombre": "San Juan Bosco",
+    "canton_codigo": "1408",
+    "canton": "San Juan Bosco",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140851",
+    "nombre": "Pan De Azucar",
+    "canton_codigo": "1408",
+    "canton": "San Juan Bosco",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140852",
+    "nombre": "San Carlos De Limon",
+    "canton_codigo": "1408",
+    "canton": "San Juan Bosco",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140853",
+    "nombre": "San Jacinto De Wakambeis",
+    "canton_codigo": "1408",
+    "canton": "San Juan Bosco",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140854",
+    "nombre": "Santiago De Pananza",
+    "canton_codigo": "1408",
+    "canton": "San Juan Bosco",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140950",
+    "nombre": "Taisha",
+    "canton_codigo": "1409",
+    "canton": "Taisha",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140951",
+    "nombre": "Huasaga (Cab En Wampuik)",
+    "canton_codigo": "1409",
+    "canton": "Taisha",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140952",
+    "nombre": "Macuma",
+    "canton_codigo": "1409",
+    "canton": "Taisha",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140953",
+    "nombre": "Tuutinentza",
+    "canton_codigo": "1409",
+    "canton": "Taisha",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "140954",
+    "nombre": "Pumpuentsa",
+    "canton_codigo": "1409",
+    "canton": "Taisha",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "141050",
+    "nombre": "Logroño",
+    "canton_codigo": "1410",
+    "canton": "Logroðo",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "141051",
+    "nombre": "Yaupi",
+    "canton_codigo": "1410",
+    "canton": "Logroðo",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "141052",
+    "nombre": "Shimpis",
+    "canton_codigo": "1410",
+    "canton": "Logroðo",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "141150",
+    "nombre": "Pablo Sexto",
+    "canton_codigo": "1411",
+    "canton": "Pablo Sexto",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "141250",
+    "nombre": "Santiago",
+    "canton_codigo": "1412",
+    "canton": "Tiwintza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "141251",
+    "nombre": "San Jose De Morona",
+    "canton_codigo": "1412",
+    "canton": "Tiwintza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "150150",
+    "nombre": "Tena",
+    "canton_codigo": "1501",
+    "canton": "Tena",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150151",
+    "nombre": "Ahuano",
+    "canton_codigo": "1501",
+    "canton": "Tena",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150153",
+    "nombre": "Chontapunta",
+    "canton_codigo": "1501",
+    "canton": "Tena",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150154",
+    "nombre": "Pano",
+    "canton_codigo": "1501",
+    "canton": "Tena",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150155",
+    "nombre": "Puerto Misahualli",
+    "canton_codigo": "1501",
+    "canton": "Tena",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150156",
+    "nombre": "Puerto Napo",
+    "canton_codigo": "1501",
+    "canton": "Tena",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150157",
+    "nombre": "Talag",
+    "canton_codigo": "1501",
+    "canton": "Tena",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150158",
+    "nombre": "San Juan De Muyuna",
+    "canton_codigo": "1501",
+    "canton": "Tena",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150350",
+    "nombre": "Archidona",
+    "canton_codigo": "1503",
+    "canton": "Archidona",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150352",
+    "nombre": "Cotundo",
+    "canton_codigo": "1503",
+    "canton": "Archidona",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150354",
+    "nombre": "San Pablo De Ushpayacu",
+    "canton_codigo": "1503",
+    "canton": "Archidona",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150356",
+    "nombre": "Hatun Sumaku",
+    "canton_codigo": "1503",
+    "canton": "Archidona",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150450",
+    "nombre": "El Chaco",
+    "canton_codigo": "1504",
+    "canton": "El Chaco",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150451",
+    "nombre": "Gonzalo Diaz De Pineda (El Bombon)",
+    "canton_codigo": "1504",
+    "canton": "El Chaco",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150452",
+    "nombre": "Linares",
+    "canton_codigo": "1504",
+    "canton": "El Chaco",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150453",
+    "nombre": "Oyacachi",
+    "canton_codigo": "1504",
+    "canton": "El Chaco",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150454",
+    "nombre": "Santa Rosa",
+    "canton_codigo": "1504",
+    "canton": "El Chaco",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150455",
+    "nombre": "Sardinas",
+    "canton_codigo": "1504",
+    "canton": "El Chaco",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150750",
+    "nombre": "Baeza",
+    "canton_codigo": "1507",
+    "canton": "Quijos",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150751",
+    "nombre": "Cosanga",
+    "canton_codigo": "1507",
+    "canton": "Quijos",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150752",
+    "nombre": "Cuyuja",
+    "canton_codigo": "1507",
+    "canton": "Quijos",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150753",
+    "nombre": "Papallacta",
+    "canton_codigo": "1507",
+    "canton": "Quijos",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150754",
+    "nombre": "San Francisco De Borja (Virgilio Davila)",
+    "canton_codigo": "1507",
+    "canton": "Quijos",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150756",
+    "nombre": "Sumaco",
+    "canton_codigo": "1507",
+    "canton": "Quijos",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "150950",
+    "nombre": "Carlos Julio Arosemena Tola",
+    "canton_codigo": "1509",
+    "canton": "Carlos Julio Arosemena Tola",
+    "provincia_codigo": "15",
+    "provincia": "Napo"
+  },
+  {
+    "codigo": "160150",
+    "nombre": "Puyo",
+    "canton_codigo": "1601",
+    "canton": "Pastaza",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160152",
+    "nombre": "Canelos",
+    "canton_codigo": "1601",
+    "canton": "Pastaza",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160154",
+    "nombre": "Diez De Agosto",
+    "canton_codigo": "1601",
+    "canton": "Pastaza",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160155",
+    "nombre": "Fatima",
+    "canton_codigo": "1601",
+    "canton": "Pastaza",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160156",
+    "nombre": "Montalvo (Andoas)",
+    "canton_codigo": "1601",
+    "canton": "Pastaza",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160157",
+    "nombre": "Pomona",
+    "canton_codigo": "1601",
+    "canton": "Pastaza",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160158",
+    "nombre": "Rio Corrientes",
+    "canton_codigo": "1601",
+    "canton": "Pastaza",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160159",
+    "nombre": "Rio Tigre",
+    "canton_codigo": "1601",
+    "canton": "Pastaza",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160161",
+    "nombre": "Sarayacu",
+    "canton_codigo": "1601",
+    "canton": "Pastaza",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160162",
+    "nombre": "Simon Bolivar (Cab. En Mushullacta)",
+    "canton_codigo": "1601",
+    "canton": "Pastaza",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160163",
+    "nombre": "Tarqui",
+    "canton_codigo": "1601",
+    "canton": "Pastaza",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160164",
+    "nombre": "Teniente Hugo Ortiz",
+    "canton_codigo": "1601",
+    "canton": "Pastaza",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160165",
+    "nombre": "Veracruz (Indillama) (Cab. En Indillama)",
+    "canton_codigo": "1601",
+    "canton": "Pastaza",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160166",
+    "nombre": "El Triunfo",
+    "canton_codigo": "1601",
+    "canton": "Pastaza",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160250",
+    "nombre": "Mera",
+    "canton_codigo": "1602",
+    "canton": "Mera",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160251",
+    "nombre": "Madre Tierra",
+    "canton_codigo": "1602",
+    "canton": "Mera",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160252",
+    "nombre": "Shell",
+    "canton_codigo": "1602",
+    "canton": "Mera",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160350",
+    "nombre": "Santa Clara",
+    "canton_codigo": "1603",
+    "canton": "Santa Clara",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160351",
+    "nombre": "San Jose",
+    "canton_codigo": "1603",
+    "canton": "Santa Clara",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160450",
+    "nombre": "Arajuno",
+    "canton_codigo": "1604",
+    "canton": "Arajuno",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "160451",
+    "nombre": "Curaray",
+    "canton_codigo": "1604",
+    "canton": "Arajuno",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza"
+  },
+  {
+    "codigo": "170150",
+    "nombre": "Quito",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170151",
+    "nombre": "Alangasi",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170152",
+    "nombre": "Amaguaña",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170153",
+    "nombre": "Atahualpa (Habaspamba)",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170154",
+    "nombre": "Calacali",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170155",
+    "nombre": "Calderon (Carapungo)",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170156",
+    "nombre": "Conocoto",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170157",
+    "nombre": "Cumbaya",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170158",
+    "nombre": "Chavezpamba",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170159",
+    "nombre": "Checa (Chilpa)",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170160",
+    "nombre": "El Quinche",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170161",
+    "nombre": "Gualea",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170162",
+    "nombre": "Guangopolo",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170163",
+    "nombre": "Guayllabamba",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170164",
+    "nombre": "La Merced",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170165",
+    "nombre": "Llano Chico",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170166",
+    "nombre": "Lloa",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170168",
+    "nombre": "Nanegal",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170169",
+    "nombre": "Nanegalito",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170170",
+    "nombre": "Nayon",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170171",
+    "nombre": "Nono",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170172",
+    "nombre": "Pacto",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170174",
+    "nombre": "Perucho",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170175",
+    "nombre": "Pifo",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170176",
+    "nombre": "Pintag",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170177",
+    "nombre": "Pomasqui",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170178",
+    "nombre": "Puellaro",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170179",
+    "nombre": "Puembo",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170180",
+    "nombre": "San Antonio",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170181",
+    "nombre": "San Jose De Minas",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170183",
+    "nombre": "Tababela",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170184",
+    "nombre": "Tumbaco",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170185",
+    "nombre": "Yaruqui",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170186",
+    "nombre": "Zambiza",
+    "canton_codigo": "1701",
+    "canton": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170250",
+    "nombre": "Cayambe",
+    "canton_codigo": "1702",
+    "canton": "Cayambe",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170251",
+    "nombre": "Ascazubi",
+    "canton_codigo": "1702",
+    "canton": "Cayambe",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170252",
+    "nombre": "Cangahua",
+    "canton_codigo": "1702",
+    "canton": "Cayambe",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170253",
+    "nombre": "Olmedo (Pesillo)",
+    "canton_codigo": "1702",
+    "canton": "Cayambe",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170254",
+    "nombre": "Oton",
+    "canton_codigo": "1702",
+    "canton": "Cayambe",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170255",
+    "nombre": "Santa Rosa De Cuzubamba",
+    "canton_codigo": "1702",
+    "canton": "Cayambe",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170256",
+    "nombre": "San Jose De Ayora",
+    "canton_codigo": "1702",
+    "canton": "Cayambe",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170350",
+    "nombre": "Machachi",
+    "canton_codigo": "1703",
+    "canton": "Mejia",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170351",
+    "nombre": "Aloag",
+    "canton_codigo": "1703",
+    "canton": "Mejia",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170352",
+    "nombre": "Aloasi",
+    "canton_codigo": "1703",
+    "canton": "Mejia",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170353",
+    "nombre": "Cutuglahua",
+    "canton_codigo": "1703",
+    "canton": "Mejia",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170354",
+    "nombre": "El Chaupi",
+    "canton_codigo": "1703",
+    "canton": "Mejia",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170355",
+    "nombre": "Manuel Cornejo Astorga (Tandapi)",
+    "canton_codigo": "1703",
+    "canton": "Mejia",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170356",
+    "nombre": "Tambillo",
+    "canton_codigo": "1703",
+    "canton": "Mejia",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170357",
+    "nombre": "Uyumbicho",
+    "canton_codigo": "1703",
+    "canton": "Mejia",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170450",
+    "nombre": "Tabacundo",
+    "canton_codigo": "1704",
+    "canton": "Pedro Moncayo",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170451",
+    "nombre": "La Esperanza",
+    "canton_codigo": "1704",
+    "canton": "Pedro Moncayo",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170452",
+    "nombre": "Malchingui",
+    "canton_codigo": "1704",
+    "canton": "Pedro Moncayo",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170453",
+    "nombre": "Tocachi",
+    "canton_codigo": "1704",
+    "canton": "Pedro Moncayo",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170454",
+    "nombre": "Tupigachi",
+    "canton_codigo": "1704",
+    "canton": "Pedro Moncayo",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170550",
+    "nombre": "Sangolqui",
+    "canton_codigo": "1705",
+    "canton": "Rumiðahui",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170551",
+    "nombre": "Cotogchoa",
+    "canton_codigo": "1705",
+    "canton": "Rumiðahui",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170552",
+    "nombre": "Rumipamba",
+    "canton_codigo": "1705",
+    "canton": "Rumiðahui",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170750",
+    "nombre": "San Miguel De Los Bancos",
+    "canton_codigo": "1707",
+    "canton": "San Miguel De Los Bancos",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170751",
+    "nombre": "Mindo",
+    "canton_codigo": "1707",
+    "canton": "San Miguel De Los Bancos",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170850",
+    "nombre": "Pedro Vicente Maldonado",
+    "canton_codigo": "1708",
+    "canton": "Pedro Vicente Maldonado",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "170950",
+    "nombre": "Puerto Quito",
+    "canton_codigo": "1709",
+    "canton": "Puerto Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha"
+  },
+  {
+    "codigo": "180150",
+    "nombre": "Ambato",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180151",
+    "nombre": "Ambatillo",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180152",
+    "nombre": "Atahualpa (Chisalata)",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180153",
+    "nombre": "Augusto N. Martinez (Mundugleo)",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180154",
+    "nombre": "Constantino Fernandez (Cab. En Cullitahua)",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180155",
+    "nombre": "Huachi Grande",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180156",
+    "nombre": "Izamba",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180157",
+    "nombre": "Juan Benigno Vela",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180158",
+    "nombre": "Montalvo",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180159",
+    "nombre": "Pasa",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180160",
+    "nombre": "Picaigua",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180161",
+    "nombre": "Pilaguin (Pilahuin)",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180162",
+    "nombre": "Quisapincha (Quizapincha)",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180163",
+    "nombre": "San Bartolome De Pinllog",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180164",
+    "nombre": "San Fernando (Pasa San Fernando)",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180165",
+    "nombre": "Santa Rosa",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180166",
+    "nombre": "Totoras",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180167",
+    "nombre": "Cunchibamba",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180168",
+    "nombre": "Unamuncho",
+    "canton_codigo": "1801",
+    "canton": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180250",
+    "nombre": "Baños De Agua Santa",
+    "canton_codigo": "1802",
+    "canton": "Baños De Agua Santa",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180251",
+    "nombre": "Lligua",
+    "canton_codigo": "1802",
+    "canton": "Baños De Agua Santa",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180252",
+    "nombre": "Rio Negro",
+    "canton_codigo": "1802",
+    "canton": "Baños De Agua Santa",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180253",
+    "nombre": "Rio Verde",
+    "canton_codigo": "1802",
+    "canton": "Baños De Agua Santa",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180254",
+    "nombre": "Ulba",
+    "canton_codigo": "1802",
+    "canton": "Baños De Agua Santa",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180350",
+    "nombre": "Cevallos",
+    "canton_codigo": "1803",
+    "canton": "Cevallos",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180450",
+    "nombre": "Mocha",
+    "canton_codigo": "1804",
+    "canton": "Mocha",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180451",
+    "nombre": "Pinguili",
+    "canton_codigo": "1804",
+    "canton": "Mocha",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180550",
+    "nombre": "Patate",
+    "canton_codigo": "1805",
+    "canton": "Patate",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180551",
+    "nombre": "El Triunfo",
+    "canton_codigo": "1805",
+    "canton": "Patate",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180552",
+    "nombre": "Los Andes (Cab. En Poatug)",
+    "canton_codigo": "1805",
+    "canton": "Patate",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180553",
+    "nombre": "Sucre (Cab. En Sucre-Patate Urcu)",
+    "canton_codigo": "1805",
+    "canton": "Patate",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180650",
+    "nombre": "Quero",
+    "canton_codigo": "1806",
+    "canton": "Quero",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180651",
+    "nombre": "Rumipamba",
+    "canton_codigo": "1806",
+    "canton": "Quero",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180652",
+    "nombre": "Yanayacu - Mochapata (Cab. En Yanayacu)",
+    "canton_codigo": "1806",
+    "canton": "Quero",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180750",
+    "nombre": "Pelileo",
+    "canton_codigo": "1807",
+    "canton": "San Pedro De Pelileo",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180751",
+    "nombre": "Benitez (Pachanlica)",
+    "canton_codigo": "1807",
+    "canton": "San Pedro De Pelileo",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180752",
+    "nombre": "Bolivar",
+    "canton_codigo": "1807",
+    "canton": "San Pedro De Pelileo",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180753",
+    "nombre": "Cotalo",
+    "canton_codigo": "1807",
+    "canton": "San Pedro De Pelileo",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180754",
+    "nombre": "Chiquicha (Cab. En Chiquicha Grande)",
+    "canton_codigo": "1807",
+    "canton": "San Pedro De Pelileo",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180755",
+    "nombre": "El Rosario (Rumichaca)",
+    "canton_codigo": "1807",
+    "canton": "San Pedro De Pelileo",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180756",
+    "nombre": "Garcia Moreno (Chumaqui)",
+    "canton_codigo": "1807",
+    "canton": "San Pedro De Pelileo",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180757",
+    "nombre": "Guambalo (Huambalo)",
+    "canton_codigo": "1807",
+    "canton": "San Pedro De Pelileo",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180758",
+    "nombre": "Salasaca",
+    "canton_codigo": "1807",
+    "canton": "San Pedro De Pelileo",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180850",
+    "nombre": "Pillaro",
+    "canton_codigo": "1808",
+    "canton": "Santiago De Pillaro",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180851",
+    "nombre": "Baquerizo Moreno",
+    "canton_codigo": "1808",
+    "canton": "Santiago De Pillaro",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180852",
+    "nombre": "Emilio Maria Teran (Rumipamba)",
+    "canton_codigo": "1808",
+    "canton": "Santiago De Pillaro",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180853",
+    "nombre": "Marcos Espinel (Chacata)",
+    "canton_codigo": "1808",
+    "canton": "Santiago De Pillaro",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180854",
+    "nombre": "Presidente Urbina (Chagrapamba -Patzucul)",
+    "canton_codigo": "1808",
+    "canton": "Santiago De Pillaro",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180855",
+    "nombre": "San Andres",
+    "canton_codigo": "1808",
+    "canton": "Santiago De Pillaro",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180856",
+    "nombre": "San Jose De Poalo",
+    "canton_codigo": "1808",
+    "canton": "Santiago De Pillaro",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180857",
+    "nombre": "San Miguelito",
+    "canton_codigo": "1808",
+    "canton": "Santiago De Pillaro",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180950",
+    "nombre": "Tisaleo",
+    "canton_codigo": "1809",
+    "canton": "Tisaleo",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "180951",
+    "nombre": "Quinchicoto",
+    "canton_codigo": "1809",
+    "canton": "Tisaleo",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua"
+  },
+  {
+    "codigo": "190150",
+    "nombre": "Zamora",
+    "canton_codigo": "1901",
+    "canton": "Zamora",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190151",
+    "nombre": "Cumbaratza",
+    "canton_codigo": "1901",
+    "canton": "Zamora",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190152",
+    "nombre": "Guadalupe",
+    "canton_codigo": "1901",
+    "canton": "Zamora",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190153",
+    "nombre": "Imbana (La Victoria De Imbana)",
+    "canton_codigo": "1901",
+    "canton": "Zamora",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190155",
+    "nombre": "Sabanilla",
+    "canton_codigo": "1901",
+    "canton": "Zamora",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190156",
+    "nombre": "Timbara",
+    "canton_codigo": "1901",
+    "canton": "Zamora",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190158",
+    "nombre": "San Carlos De Las Minas",
+    "canton_codigo": "1901",
+    "canton": "Zamora",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190250",
+    "nombre": "Zumba",
+    "canton_codigo": "1902",
+    "canton": "Chinchipe",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190251",
+    "nombre": "Chito",
+    "canton_codigo": "1902",
+    "canton": "Chinchipe",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190252",
+    "nombre": "El Chorro",
+    "canton_codigo": "1902",
+    "canton": "Chinchipe",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190254",
+    "nombre": "La Chonta",
+    "canton_codigo": "1902",
+    "canton": "Chinchipe",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190256",
+    "nombre": "Pucapamba",
+    "canton_codigo": "1902",
+    "canton": "Chinchipe",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190259",
+    "nombre": "San Andres",
+    "canton_codigo": "1902",
+    "canton": "Chinchipe",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190350",
+    "nombre": "Guayzimi",
+    "canton_codigo": "1903",
+    "canton": "Nangaritza",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190351",
+    "nombre": "Zurmi",
+    "canton_codigo": "1903",
+    "canton": "Nangaritza",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190352",
+    "nombre": "Nuevo Paraiso",
+    "canton_codigo": "1903",
+    "canton": "Nangaritza",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190450",
+    "nombre": "28 De Mayo (San Jose De Yacuambi)",
+    "canton_codigo": "1904",
+    "canton": "Yacuambi",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190451",
+    "nombre": "La Paz",
+    "canton_codigo": "1904",
+    "canton": "Yacuambi",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190452",
+    "nombre": "Tutupali",
+    "canton_codigo": "1904",
+    "canton": "Yacuambi",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190550",
+    "nombre": "Yantzaza (Yanzatza)",
+    "canton_codigo": "1905",
+    "canton": "Yantzaza",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190551",
+    "nombre": "Chicaña",
+    "canton_codigo": "1905",
+    "canton": "Yantzaza",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190553",
+    "nombre": "Los Encuentros",
+    "canton_codigo": "1905",
+    "canton": "Yantzaza",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190650",
+    "nombre": "El Pangui",
+    "canton_codigo": "1906",
+    "canton": "El Pangui",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190651",
+    "nombre": "El Guisme",
+    "canton_codigo": "1906",
+    "canton": "El Pangui",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190652",
+    "nombre": "Pachicutza",
+    "canton_codigo": "1906",
+    "canton": "El Pangui",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190653",
+    "nombre": "Tundayme",
+    "canton_codigo": "1906",
+    "canton": "El Pangui",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190750",
+    "nombre": "Zumbi",
+    "canton_codigo": "1907",
+    "canton": "Centinela Del Condor",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190752",
+    "nombre": "Triunfo-Dorado",
+    "canton_codigo": "1907",
+    "canton": "Centinela Del Condor",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190753",
+    "nombre": "Panguintza",
+    "canton_codigo": "1907",
+    "canton": "Centinela Del Condor",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190850",
+    "nombre": "Palanda",
+    "canton_codigo": "1908",
+    "canton": "Palanda",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190851",
+    "nombre": "El Porvenir Del Carmen",
+    "canton_codigo": "1908",
+    "canton": "Palanda",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190852",
+    "nombre": "San Francisco Del Vergel",
+    "canton_codigo": "1908",
+    "canton": "Palanda",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190853",
+    "nombre": "Valladolid",
+    "canton_codigo": "1908",
+    "canton": "Palanda",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190854",
+    "nombre": "La Canela",
+    "canton_codigo": "1908",
+    "canton": "Palanda",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190950",
+    "nombre": "Paquisha",
+    "canton_codigo": "1909",
+    "canton": "Paquisha",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190951",
+    "nombre": "Bellavista",
+    "canton_codigo": "1909",
+    "canton": "Paquisha",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "190952",
+    "nombre": "Nuevo Quito",
+    "canton_codigo": "1909",
+    "canton": "Paquisha",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe"
+  },
+  {
+    "codigo": "200150",
+    "nombre": "Puerto Baquerizo Moreno",
+    "canton_codigo": "2001",
+    "canton": "San Cristobal",
+    "provincia_codigo": "20",
+    "provincia": "Galapagos"
+  },
+  {
+    "codigo": "200151",
+    "nombre": "El Progreso",
+    "canton_codigo": "2001",
+    "canton": "San Cristobal",
+    "provincia_codigo": "20",
+    "provincia": "Galapagos"
+  },
+  {
+    "codigo": "200152",
+    "nombre": "Isla Santa María (Floreana) (Cab. En  Pto. Velasco Ibarra)",
+    "canton_codigo": "2001",
+    "canton": "San Cristobal",
+    "provincia_codigo": "20",
+    "provincia": "Galapagos"
+  },
+  {
+    "codigo": "200250",
+    "nombre": "Puerto Villamil",
+    "canton_codigo": "2002",
+    "canton": "Isabela",
+    "provincia_codigo": "20",
+    "provincia": "Galapagos"
+  },
+  {
+    "codigo": "200251",
+    "nombre": "Tomas De Berlanga (Santo Tomas)",
+    "canton_codigo": "2002",
+    "canton": "Isabela",
+    "provincia_codigo": "20",
+    "provincia": "Galapagos"
+  },
+  {
+    "codigo": "200350",
+    "nombre": "Puerto Ayora",
+    "canton_codigo": "2003",
+    "canton": "Santa Cruz",
+    "provincia_codigo": "20",
+    "provincia": "Galapagos"
+  },
+  {
+    "codigo": "200351",
+    "nombre": "Bellavista",
+    "canton_codigo": "2003",
+    "canton": "Santa Cruz",
+    "provincia_codigo": "20",
+    "provincia": "Galapagos"
+  },
+  {
+    "codigo": "200352",
+    "nombre": "Santa Rosa",
+    "canton_codigo": "2003",
+    "canton": "Santa Cruz",
+    "provincia_codigo": "20",
+    "provincia": "Galapagos"
+  },
+  {
+    "codigo": "210150",
+    "nombre": "Nueva Loja",
+    "canton_codigo": "2101",
+    "canton": "Lago Agrio",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210152",
+    "nombre": "Dureno",
+    "canton_codigo": "2101",
+    "canton": "Lago Agrio",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210153",
+    "nombre": "General Farfan",
+    "canton_codigo": "2101",
+    "canton": "Lago Agrio",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210155",
+    "nombre": "El Eno",
+    "canton_codigo": "2101",
+    "canton": "Lago Agrio",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210156",
+    "nombre": "Pacayacu",
+    "canton_codigo": "2101",
+    "canton": "Lago Agrio",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210157",
+    "nombre": "Jambeli",
+    "canton_codigo": "2101",
+    "canton": "Lago Agrio",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210158",
+    "nombre": "Santa Cecilia",
+    "canton_codigo": "2101",
+    "canton": "Lago Agrio",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210160",
+    "nombre": "10 De Agosto",
+    "canton_codigo": "2101",
+    "canton": "Lago Agrio",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210250",
+    "nombre": "Lumbaqui",
+    "canton_codigo": "2102",
+    "canton": "Gonzalo Pizarro",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210251",
+    "nombre": "El Reventador",
+    "canton_codigo": "2102",
+    "canton": "Gonzalo Pizarro",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210252",
+    "nombre": "Gonzalo Pizarro",
+    "canton_codigo": "2102",
+    "canton": "Gonzalo Pizarro",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210254",
+    "nombre": "Puerto Libre",
+    "canton_codigo": "2102",
+    "canton": "Gonzalo Pizarro",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210350",
+    "nombre": "Puerto El Carmen Del Putumayo",
+    "canton_codigo": "2103",
+    "canton": "Putumayo",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210351",
+    "nombre": "Palma Roja",
+    "canton_codigo": "2103",
+    "canton": "Putumayo",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210352",
+    "nombre": "Puerto Bolivar (Puerto Montufar)",
+    "canton_codigo": "2103",
+    "canton": "Putumayo",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210353",
+    "nombre": "Puerto Rodriguez",
+    "canton_codigo": "2103",
+    "canton": "Putumayo",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210354",
+    "nombre": "Santa Elena",
+    "canton_codigo": "2103",
+    "canton": "Putumayo",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210450",
+    "nombre": "Shushufindi",
+    "canton_codigo": "2104",
+    "canton": "Shushufindi",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210451",
+    "nombre": "Limoncocha",
+    "canton_codigo": "2104",
+    "canton": "Shushufindi",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210452",
+    "nombre": "Pañacocha",
+    "canton_codigo": "2104",
+    "canton": "Shushufindi",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210453",
+    "nombre": "San Roque (Cab. En San Vicente)",
+    "canton_codigo": "2104",
+    "canton": "Shushufindi",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210454",
+    "nombre": "San Pedro De Los Cofanes",
+    "canton_codigo": "2104",
+    "canton": "Shushufindi",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210455",
+    "nombre": "Siete De Julio",
+    "canton_codigo": "2104",
+    "canton": "Shushufindi",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210550",
+    "nombre": "La Bonita",
+    "canton_codigo": "2105",
+    "canton": "Sucumbios",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210551",
+    "nombre": "El Playon De San Francisco",
+    "canton_codigo": "2105",
+    "canton": "Sucumbios",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210552",
+    "nombre": "La Sofia",
+    "canton_codigo": "2105",
+    "canton": "Sucumbios",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210553",
+    "nombre": "Rosa Florida",
+    "canton_codigo": "2105",
+    "canton": "Sucumbios",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210554",
+    "nombre": "Santa Barbara",
+    "canton_codigo": "2105",
+    "canton": "Sucumbios",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210650",
+    "nombre": "El Dorado De Cascales",
+    "canton_codigo": "2106",
+    "canton": "Cascales",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210651",
+    "nombre": "Santa Rosa De Sucumbios",
+    "canton_codigo": "2106",
+    "canton": "Cascales",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210652",
+    "nombre": "Sevilla",
+    "canton_codigo": "2106",
+    "canton": "Cascales",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210750",
+    "nombre": "Tarapoa",
+    "canton_codigo": "2107",
+    "canton": "Cuyabeno",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210751",
+    "nombre": "Cuyabeno",
+    "canton_codigo": "2107",
+    "canton": "Cuyabeno",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "210752",
+    "nombre": "Aguas Negras",
+    "canton_codigo": "2107",
+    "canton": "Cuyabeno",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios"
+  },
+  {
+    "codigo": "220150",
+    "nombre": "Puerto Francisco De Orellana (El Coca)",
+    "canton_codigo": "2201",
+    "canton": "Orellana",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220151",
+    "nombre": "Dayuma",
+    "canton_codigo": "2201",
+    "canton": "Orellana",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220152",
+    "nombre": "Taracoa (Nueva Esperanza: Yuca)",
+    "canton_codigo": "2201",
+    "canton": "Orellana",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220153",
+    "nombre": "Alejandro Labaka",
+    "canton_codigo": "2201",
+    "canton": "Orellana",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220154",
+    "nombre": "El Dorado",
+    "canton_codigo": "2201",
+    "canton": "Orellana",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220155",
+    "nombre": "El Eden",
+    "canton_codigo": "2201",
+    "canton": "Orellana",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220156",
+    "nombre": "Garcia Moreno",
+    "canton_codigo": "2201",
+    "canton": "Orellana",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220157",
+    "nombre": "Ines Arango (Cab. En Western)",
+    "canton_codigo": "2201",
+    "canton": "Orellana",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220158",
+    "nombre": "La Belleza",
+    "canton_codigo": "2201",
+    "canton": "Orellana",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220159",
+    "nombre": "Nuevo Paraiso (Cab. En Union )",
+    "canton_codigo": "2201",
+    "canton": "Orellana",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220160",
+    "nombre": "San Jose De Guayusa",
+    "canton_codigo": "2201",
+    "canton": "Orellana",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220161",
+    "nombre": "San Luis De Armenia",
+    "canton_codigo": "2201",
+    "canton": "Orellana",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220250",
+    "nombre": "Nuevo Rocafuerte",
+    "canton_codigo": "2202",
+    "canton": "Aguarico",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220251",
+    "nombre": "Capitan Augusto Rivadeneyra",
+    "canton_codigo": "2202",
+    "canton": "Aguarico",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220252",
+    "nombre": "Cononaco",
+    "canton_codigo": "2202",
+    "canton": "Aguarico",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220253",
+    "nombre": "Santa Maria De Huiririma",
+    "canton_codigo": "2202",
+    "canton": "Aguarico",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220254",
+    "nombre": "Tiputini",
+    "canton_codigo": "2202",
+    "canton": "Aguarico",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220255",
+    "nombre": "Yasuni",
+    "canton_codigo": "2202",
+    "canton": "Aguarico",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220350",
+    "nombre": "La Joya De Los Sachas",
+    "canton_codigo": "2203",
+    "canton": "La Joya De Los Sachas",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220351",
+    "nombre": "Enokanqui",
+    "canton_codigo": "2203",
+    "canton": "La Joya De Los Sachas",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220352",
+    "nombre": "Pompeya",
+    "canton_codigo": "2203",
+    "canton": "La Joya De Los Sachas",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220353",
+    "nombre": "San Carlos",
+    "canton_codigo": "2203",
+    "canton": "La Joya De Los Sachas",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220354",
+    "nombre": "San Sebastian Del Coca",
+    "canton_codigo": "2203",
+    "canton": "La Joya De Los Sachas",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220355",
+    "nombre": "Lago San Pedro",
+    "canton_codigo": "2203",
+    "canton": "La Joya De Los Sachas",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220356",
+    "nombre": "Rumipamba",
+    "canton_codigo": "2203",
+    "canton": "La Joya De Los Sachas",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220357",
+    "nombre": "Tres De Noviembre",
+    "canton_codigo": "2203",
+    "canton": "La Joya De Los Sachas",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220358",
+    "nombre": "Union Milagreña",
+    "canton_codigo": "2203",
+    "canton": "La Joya De Los Sachas",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220450",
+    "nombre": "Loreto",
+    "canton_codigo": "2204",
+    "canton": "Loreto",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220451",
+    "nombre": "Avila (Cab. En Huiruno)",
+    "canton_codigo": "2204",
+    "canton": "Loreto",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220452",
+    "nombre": "Puerto Murialdo",
+    "canton_codigo": "2204",
+    "canton": "Loreto",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220453",
+    "nombre": "San Jose De Payamino",
+    "canton_codigo": "2204",
+    "canton": "Loreto",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220454",
+    "nombre": "San Jose De Dahuano",
+    "canton_codigo": "2204",
+    "canton": "Loreto",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "220455",
+    "nombre": "San Vicente De Huaticocha",
+    "canton_codigo": "2204",
+    "canton": "Loreto",
+    "provincia_codigo": "22",
+    "provincia": "Orellana"
+  },
+  {
+    "codigo": "230150",
+    "nombre": "Santo Domingo De Los Colorados",
+    "canton_codigo": "2301",
+    "canton": "Santo Domingo",
+    "provincia_codigo": "23",
+    "provincia": "Santo Domingo De Los Tsachilas"
+  },
+  {
+    "codigo": "230151",
+    "nombre": "Alluriquin",
+    "canton_codigo": "2301",
+    "canton": "Santo Domingo",
+    "provincia_codigo": "23",
+    "provincia": "Santo Domingo De Los Tsachilas"
+  },
+  {
+    "codigo": "230152",
+    "nombre": "Puerto Limon",
+    "canton_codigo": "2301",
+    "canton": "Santo Domingo",
+    "provincia_codigo": "23",
+    "provincia": "Santo Domingo De Los Tsachilas"
+  },
+  {
+    "codigo": "230153",
+    "nombre": "Luz De America",
+    "canton_codigo": "2301",
+    "canton": "Santo Domingo",
+    "provincia_codigo": "23",
+    "provincia": "Santo Domingo De Los Tsachilas"
+  },
+  {
+    "codigo": "230154",
+    "nombre": "San Jacinto Del Bua",
+    "canton_codigo": "2301",
+    "canton": "Santo Domingo",
+    "provincia_codigo": "23",
+    "provincia": "Santo Domingo De Los Tsachilas"
+  },
+  {
+    "codigo": "230155",
+    "nombre": "Valle Hermoso",
+    "canton_codigo": "2301",
+    "canton": "Santo Domingo",
+    "provincia_codigo": "23",
+    "provincia": "Santo Domingo De Los Tsachilas"
+  },
+  {
+    "codigo": "230156",
+    "nombre": "El Esfuerzo",
+    "canton_codigo": "2301",
+    "canton": "Santo Domingo",
+    "provincia_codigo": "23",
+    "provincia": "Santo Domingo De Los Tsachilas"
+  },
+  {
+    "codigo": "230157",
+    "nombre": "Santa Maria Del Toachi",
+    "canton_codigo": "2301",
+    "canton": "Santo Domingo",
+    "provincia_codigo": "23",
+    "provincia": "Santo Domingo De Los Tsachilas"
+  },
+  {
+    "codigo": "240150",
+    "nombre": "Santa Elena",
+    "canton_codigo": "2401",
+    "canton": "Santa Elena",
+    "provincia_codigo": "24",
+    "provincia": "Santa Elena"
+  },
+  {
+    "codigo": "240151",
+    "nombre": "Atahualpa",
+    "canton_codigo": "2401",
+    "canton": "Santa Elena",
+    "provincia_codigo": "24",
+    "provincia": "Santa Elena"
+  },
+  {
+    "codigo": "240152",
+    "nombre": "Colonche",
+    "canton_codigo": "2401",
+    "canton": "Santa Elena",
+    "provincia_codigo": "24",
+    "provincia": "Santa Elena"
+  },
+  {
+    "codigo": "240153",
+    "nombre": "Chanduy",
+    "canton_codigo": "2401",
+    "canton": "Santa Elena",
+    "provincia_codigo": "24",
+    "provincia": "Santa Elena"
+  },
+  {
+    "codigo": "240154",
+    "nombre": "Manglaralto",
+    "canton_codigo": "2401",
+    "canton": "Santa Elena",
+    "provincia_codigo": "24",
+    "provincia": "Santa Elena"
+  },
+  {
+    "codigo": "240155",
+    "nombre": "Simon Bolivar (Julio Moreno)",
+    "canton_codigo": "2401",
+    "canton": "Santa Elena",
+    "provincia_codigo": "24",
+    "provincia": "Santa Elena"
+  },
+  {
+    "codigo": "240156",
+    "nombre": "San Jose De Ancon",
+    "canton_codigo": "2401",
+    "canton": "Santa Elena",
+    "provincia_codigo": "24",
+    "provincia": "Santa Elena"
+  },
+  {
+    "codigo": "240250",
+    "nombre": "La Libertad",
+    "canton_codigo": "2402",
+    "canton": "La Libertad",
+    "provincia_codigo": "24",
+    "provincia": "Santa Elena"
+  },
+  {
+    "codigo": "240350",
+    "nombre": "Salinas",
+    "canton_codigo": "2403",
+    "canton": "Salinas",
+    "provincia_codigo": "24",
+    "provincia": "Santa Elena"
+  },
+  {
+    "codigo": "240351",
+    "nombre": "Anconcito",
+    "canton_codigo": "2403",
+    "canton": "Salinas",
+    "provincia_codigo": "24",
+    "provincia": "Santa Elena"
+  },
+  {
+    "codigo": "240352",
+    "nombre": "Jose Luis Tamayo (Muey)",
+    "canton_codigo": "2403",
+    "canton": "Salinas",
+    "provincia_codigo": "24",
+    "provincia": "Santa Elena"
+  },
+  {
+    "codigo": "900151",
+    "nombre": "Las Golondrinas",
+    "canton_codigo": "9001",
+    "canton": "Las Golondrinas",
+    "provincia_codigo": "90",
+    "provincia": "Zona No Delimitada"
+  },
+  {
+    "codigo": "900351",
+    "nombre": "Manga Del Cura",
+    "canton_codigo": "9003",
+    "canton": "Manga Del Cura",
+    "provincia_codigo": "90",
+    "provincia": "Zona No Delimitada"
+  },
+  {
+    "codigo": "900451",
+    "nombre": "El Piedrero",
+    "canton_codigo": "9004",
+    "canton": "El Piedrero",
+    "provincia_codigo": "90",
+    "provincia": "Zona No Delimitada"
+  }
+]

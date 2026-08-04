@@ -2,13 +2,14 @@ import httpx
 from mcp.server.fastmcp import FastMCP
 
 from helpers import ckan_client, env_config
+from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
 def register_get_dataset_info_tool(mcp: FastMCP) -> None:
     @mcp.tool()
     @log_tool
-    async def get_dataset_info(dataset_id: str) -> str:
+    async def get_dataset_info(dataset_id: str, format: str = "text") -> str:
         """
         Get detailed metadata about a specific dataset from Ecuador's open data portal.
 
@@ -17,73 +18,104 @@ def register_get_dataset_info_tool(mcp: FastMCP) -> None:
 
         Args:
             dataset_id: The dataset ID or slug (e.g. "registro-estadistico-de-recursos-y-actividades-de-salud-2019")
+            format: text | json
         """
         try:
             data = await ckan_client.get_dataset(dataset_id)
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
-                return f"Error: Dataset con ID '{dataset_id}' no encontrado."
-            return f"Error: HTTP {e.response.status_code} - {e}"
+                return render_output(
+                    {"error": "not_found", "dataset_id": dataset_id},
+                    format,
+                    text_builder=lambda d: (
+                        f"Error: Dataset con ID '{d['dataset_id']}' no encontrado."
+                    ),
+                )
+            return render_output(
+                {"error": f"HTTP {e.response.status_code}", "detail": str(e)},
+                format,
+                text_builder=lambda d: f"Error: {d['error']} - {d['detail']}",
+            )
         except Exception as e:
-            return f"Error: {e}"
+            return render_output(
+                {"error": str(e)},
+                format,
+                text_builder=lambda d: f"Error: {d['error']}",
+            )
 
-        site = env_config.get_base_url("ckan_site")
-        parts = [f"Dataset: {data.get('title', 'Desconocido')}", ""]
-
-        if data.get("id"):
-            parts.append(f"ID: {data['id']}")
+        site = env_config.get_base_url("ckan_site").rstrip("/")
         slug = data.get("name", "")
-        if slug:
-            parts.append(f"Slug: {slug}")
-            parts.append(f"URL: {site}dataset/{slug}")
+        resources = data.get("resources") or []
+        payload = {
+            "id": data.get("id"),
+            "name": slug,
+            "title": data.get("title"),
+            "url": f"{site}/dataset/{slug}" if slug else None,
+            "notes": data.get("notes"),
+            "organization": {
+                "title": (data.get("organization") or {}).get("title"),
+                "name": (data.get("organization") or {}).get("name"),
+            }
+            if data.get("organization")
+            else None,
+            "tags": [
+                t.get("display_name", t.get("name", ""))
+                for t in (data.get("tags") or [])[:20]
+            ],
+            "groups": [
+                g.get("title", g.get("display_name", ""))
+                for g in (data.get("groups") or [])
+            ],
+            "num_resources": len(resources),
+            "metadata_created": data.get("metadata_created"),
+            "metadata_modified": data.get("metadata_modified"),
+            "license_title": data.get("license_title"),
+            "update_frequency": data.get("update_frequency"),
+            "author": data.get("author"),
+            "maintainer": data.get("maintainer"),
+        }
 
-        notes = data.get("notes", "")
-        if notes:
+        def to_text(p: dict) -> str:
+            parts = [f"Dataset: {p.get('title') or 'Desconocido'}", ""]
+            if p.get("id"):
+                parts.append(f"ID: {p['id']}")
+            if p.get("name"):
+                parts.append(f"Slug: {p['name']}")
+                parts.append(f"URL: {p.get('url')}")
+            if p.get("notes"):
+                parts.append("")
+                parts.append(f"Descripción: {str(p['notes'])[:800]}")
+            org = p.get("organization") or {}
+            if org.get("title"):
+                parts.append("")
+                parts.append(f"Organización: {org['title']}")
+                if org.get("name"):
+                    parts.append(f"  ID organización: {org['name']}")
+            if p.get("tags"):
+                parts.append("")
+                parts.append(f"Tags: {', '.join(p['tags'][:10])}")
+            if p.get("groups"):
+                parts.append(f"Categorías: {', '.join(p['groups'])}")
             parts.append("")
-            parts.append(f"Descripción: {notes[:800]}")
+            parts.append(f"Recursos: {p.get('num_resources', 0)} archivo(s)")
+            if p.get("metadata_created"):
+                parts.append("")
+                parts.append(f"Creado: {p['metadata_created']}")
+            if p.get("metadata_modified"):
+                parts.append(f"Última modificación: {p['metadata_modified']}")
+            if p.get("license_title"):
+                parts.append("")
+                parts.append(f"Licencia: {p['license_title']}")
+            freq = p.get("update_frequency")
+            if freq:
+                if isinstance(freq, list):
+                    freq = ", ".join(freq)
+                parts.append(f"Frecuencia de actualización: {freq}")
+            if p.get("author"):
+                parts.append("")
+                parts.append(f"Autor: {p['author']}")
+            if p.get("maintainer"):
+                parts.append(f"Mantenedor: {p['maintainer']}")
+            return "\n".join(parts)
 
-        org = data.get("organization")
-        if org and isinstance(org, dict):
-            parts.append("")
-            parts.append(f"Organización: {org.get('title', 'Desconocida')}")
-            if org.get("name"):
-                parts.append(f"  ID organización: {org['name']}")
-
-        tags = data.get("tags", [])
-        if tags:
-            tag_names = [t.get("display_name", t.get("name", "")) for t in tags[:10]]
-            parts.append("")
-            parts.append(f"Tags: {', '.join(tag_names)}")
-
-        groups = data.get("groups", [])
-        if groups:
-            group_names = [g.get("title", g.get("display_name", "")) for g in groups]
-            parts.append(f"Categorías: {', '.join(group_names)}")
-
-        resources = data.get("resources", [])
-        parts.append("")
-        parts.append(f"Recursos: {len(resources)} archivo(s)")
-
-        if data.get("metadata_created"):
-            parts.append("")
-            parts.append(f"Creado: {data['metadata_created']}")
-        if data.get("metadata_modified"):
-            parts.append(f"Última modificación: {data['metadata_modified']}")
-
-        if data.get("license_title"):
-            parts.append("")
-            parts.append(f"Licencia: {data['license_title']}")
-
-        freq = data.get("update_frequency")
-        if freq:
-            if isinstance(freq, list):
-                freq = ", ".join(freq)
-            parts.append(f"Frecuencia de actualización: {freq}")
-
-        if data.get("author"):
-            parts.append("")
-            parts.append(f"Autor: {data['author']}")
-        if data.get("maintainer"):
-            parts.append(f"Mantenedor: {data['maintainer']}")
-
-        return "\n".join(parts)
+        return render_output(payload, format, text_builder=to_text)

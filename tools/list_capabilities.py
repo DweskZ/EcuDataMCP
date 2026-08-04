@@ -5,13 +5,13 @@ from helpers.logging import log_tool
 
 _CAPABILITIES = {
     "name": "Ecuador MCP",
-    "version": "0.4.2",
+    "version": "0.4.3",
     "fuentes": [
         "CKAN datos abiertos",
         "gob.ec trámites/instituciones/regulaciones",
         "SERCOP OCDS contratos",
         "SGR COE eventos de riesgo + SAT tsunami",
-        "DPA provincias/cantones (offline INEC)",
+        "DPA provincias/cantones/parroquias (offline INEC)",
     ],
     "entrada": [
         "list_capabilities",
@@ -40,14 +40,15 @@ _CAPABILITIES = {
         "ecuador://fuentes",
         "ecuador://provincias",
         "ecuador://cantones",
+        "ecuador://parroquias",
         "ecuador://instituciones-clave",
     ],
     "format": "Varios tools aceptan format='json' además de text",
     "limites": [
         "CKAN puede requerir TLS insecure allowlist (CKAN_INSECURE_TLS)",
-        "SERCOP a veces rate-limita (429); hay reintentos + caché 10 min",
+        "SERCOP a veces rate-limita (429); hay reintentos + caché negativa/TTL",
         "SGR COE es un snapshot público; no sustituye alertas oficiales en tiempo real",
-        "Parroquias no están embebidas; usar datasets DPA INEC en CKAN",
+        "lookup_ubicacion(nivel='parroquia') requiere query, canton o provincia",
     ],
 }
 

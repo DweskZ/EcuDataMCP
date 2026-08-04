@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.3 — 2026-08-04
+
+### Added
+- DPA parroquias offline (~1040) + `lookup_ubicacion` con `nivel=parroquia`
+- Resource MCP `ecuador://parroquias`
+- Script `scripts/fetch_parroquias.py` (fuente ArcGIS Parroquias_del_Ecuador)
+- `format=json` en `get_dataset_info`, `list_dataset_resources`, `preview_resource_data`, `query_resource_data`
+
 ## 0.4.2 — 2026-08-04
 
 ### Added / Improved

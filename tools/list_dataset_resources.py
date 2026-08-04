@@ -1,6 +1,7 @@
 from mcp.server.fastmcp import FastMCP
 
 from helpers import ckan_client
+from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
@@ -19,7 +20,7 @@ def _format_size(size: int | None) -> str:
 def register_list_dataset_resources_tool(mcp: FastMCP) -> None:
     @mcp.tool()
     @log_tool
-    async def list_dataset_resources(dataset_id: str) -> str:
+    async def list_dataset_resources(dataset_id: str, format: str = "text") -> str:
         """
         List all resources (files) in a dataset with their metadata.
 
@@ -29,45 +30,62 @@ def register_list_dataset_resources_tool(mcp: FastMCP) -> None:
 
         Args:
             dataset_id: The dataset ID or slug
+            format: text | json
         """
         try:
             dataset = await ckan_client.get_dataset(dataset_id)
         except Exception as e:
-            return f"Error: {e}"
+            return render_output(
+                {"error": str(e)},
+                format,
+                text_builder=lambda d: f"Error: {d['error']}",
+            )
 
         resources = dataset.get("resources", [])
-        title = dataset.get("title", "Desconocido")
+        payload = {
+            "dataset_id": dataset.get("id", dataset_id),
+            "title": dataset.get("title", "Desconocido"),
+            "total": len(resources),
+            "resources": [
+                {
+                    "id": res.get("id"),
+                    "name": res.get("name") or res.get("description") or "Sin título",
+                    "format": res.get("format"),
+                    "size": res.get("size"),
+                    "size_label": _format_size(res.get("size")),
+                    "mimetype": res.get("mimetype"),
+                    "description": res.get("description"),
+                    "url": res.get("url"),
+                }
+                for res in resources
+                if res.get("id")
+            ],
+        }
 
-        parts = [
-            f"Recursos del dataset: {title}",
-            f"Dataset ID: {dataset.get('id', dataset_id)}",
-            f"Total de recursos: {len(resources)}\n",
-        ]
-
-        if not resources:
-            parts.append("Este dataset no tiene recursos.")
+        def to_text(data: dict) -> str:
+            rows = data.get("resources") or []
+            parts = [
+                f"Recursos del dataset: {data.get('title')}",
+                f"Dataset ID: {data.get('dataset_id')}",
+                f"Total de recursos: {data.get('total', 0)}\n",
+            ]
+            if not rows:
+                parts.append("Este dataset no tiene recursos.")
+                return "\n".join(parts)
+            for i, res in enumerate(rows, 1):
+                parts.append(f"{i}. {res.get('name')}")
+                parts.append(f"   Resource ID: {res.get('id')}")
+                if res.get("format"):
+                    parts.append(f"   Formato: {res['format']}")
+                if res.get("size_label"):
+                    parts.append(f"   Tamaño: {res['size_label']}")
+                if res.get("mimetype"):
+                    parts.append(f"   MIME: {res['mimetype']}")
+                if res.get("description") and res.get("name"):
+                    parts.append(f"   Descripción: {str(res['description'])[:200]}")
+                if res.get("url"):
+                    parts.append(f"   URL: {res['url']}")
+                parts.append("")
             return "\n".join(parts)
 
-        for i, res in enumerate(resources, 1):
-            rid = res.get("id")
-            if not rid:
-                continue
-            name = res.get("name") or res.get("description") or "Sin título"
-            parts.append(f"{i}. {name}")
-            parts.append(f"   Resource ID: {rid}")
-
-            if res.get("format"):
-                parts.append(f"   Formato: {res['format']}")
-            size_str = _format_size(res.get("size"))
-            if size_str:
-                parts.append(f"   Tamaño: {size_str}")
-            if res.get("mimetype"):
-                parts.append(f"   MIME: {res['mimetype']}")
-            if res.get("description") and res.get("name"):
-                parts.append(f"   Descripción: {res['description'][:200]}")
-            if res.get("url"):
-                parts.append(f"   URL: {res['url']}")
-
-            parts.append("")
-
-        return "\n".join(parts)
+        return render_output(payload, format, text_builder=to_text)

@@ -1,7 +1,9 @@
 from helpers.geo_data import (
     find_cantones,
+    find_parroquias,
     find_provincias,
     list_cantones,
+    list_parroquias,
     list_provincias,
 )
 
@@ -36,3 +38,22 @@ def test_cantones_by_province():
     pichincha = find_cantones(provincia="Pichincha")
     assert pichincha
     assert all(c["provincia_codigo"] == "17" for c in pichincha)
+
+
+def test_parroquias_loaded():
+    items = list_parroquias()
+    assert len(items) >= 1000
+    assert items[0]["codigo"]
+
+
+def test_find_parroquia_tumbaco():
+    rows = find_parroquias("tumbaco")
+    assert rows
+    assert any(r["nombre"].lower() == "tumbaco" for r in rows)
+    assert rows[0]["provincia_codigo"] == "17"
+
+
+def test_parroquias_by_canton():
+    rows = find_parroquias(canton="Quito")
+    assert len(rows) >= 10
+    assert all("quito" in r["canton"].lower() for r in rows)
