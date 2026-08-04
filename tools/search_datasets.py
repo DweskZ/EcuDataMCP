@@ -11,7 +11,7 @@ def register_search_datasets_tool(mcp: FastMCP) -> None:
         query: str, page: int = 1, page_size: int = 20, category: str = ""
     ) -> str:
         """
-        Search for datasets on Ecuador's open data portal (datosabiertos.presidencia.gob.ec).
+        Search for datasets on Ecuador's open data portal (www.datosabiertos.gob.ec).
 
         This is the starting point for exploring government data from 98+ public institutions.
         Use short, specific queries in Spanish for best results.

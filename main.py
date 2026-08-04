@@ -68,7 +68,7 @@ if __name__ == "__main__":
         "Starting Ecuador MCP server v%s on %s:%d",
         VERSION, host, port,
     )
-    logger.info("CKAN API: datosabiertos.presidencia.gob.ec")
+    logger.info("CKAN API: www.datosabiertos.gob.ec")
     logger.info("GobEC API: gob.ec/api/v1")
     logger.info("MCP endpoint: http://%s:%d/mcp", host, port)
     logger.info("Health check: http://%s:%d/health", host, port)

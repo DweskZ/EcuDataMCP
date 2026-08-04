@@ -1,8 +1,8 @@
 import os
 
 _API_URLS = {
-    "ckan": "https://datosabiertos.presidencia.gob.ec/api/3/action/",
-    "ckan_site": "https://datosabiertos.presidencia.gob.ec/",
+    "ckan": "https://www.datosabiertos.gob.ec/api/3/action/",
+    "ckan_site": "https://www.datosabiertos.gob.ec/",
     "gobec": "https://www.gob.ec/api/v1/",
     "gobec_site": "https://www.gob.ec/",
 }
