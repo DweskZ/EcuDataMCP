@@ -58,13 +58,16 @@ def register_search_tramites_tool(mcp: FastMCP) -> None:
             keyword_to_inst = {
                 "ruc": "8", "sri": "8", "impuesto": "8", "factura": "8",
                 "tributar": "8", "retención": "8", "retenciones": "8",
+                "declaracion": "8", "declaración": "8", "rimpe": "8",
                 "cedula": "23", "cédula": "23", "partida": "23",
                 "nacimiento": "23", "registro civil": "23", "defunción": "23",
+                "matrimonio": "23", "identidad": "23",
                 "licencia": "62", "conducir": "62", "matricula": "62",
-                "vehicul": "62", "ant": "62",
+                "vehicul": "62", "ant": "62", "revision tecnica": "62",
                 "pasaporte": "16", "apostilla": "16", "visa": "16",
+                "consulado": "16", "legalizacion": "16",
                 "iess": "5", "seguro social": "5", "pensión": "5",
-                "fondo de reserva": "5",
+                "fondo de reserva": "5", "afiliacion": "5", "cesantia": "5",
             }
             q_lower = query.lower()
             for keyword, inst_id in keyword_to_inst.items():

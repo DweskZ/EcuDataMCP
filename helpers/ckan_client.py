@@ -66,12 +66,30 @@ async def search_datasets(
     rows: int = 20,
     start: int = 0,
     category: str = "",
+    sort: str = "",
     session: httpx.AsyncClient | None = None,
 ) -> dict[str, Any]:
     params: dict[str, Any] = {"q": query, "rows": min(rows, 100), "start": start}
     if category:
         params["fq"] = f"groups:{category}"
+    if sort:
+        params["sort"] = sort
     return await _fetch_json(_ckan_url("package_search"), params=params, session=session)
+
+
+async def recent_datasets(
+    rows: int = 20,
+    start: int = 0,
+    session: httpx.AsyncClient | None = None,
+) -> dict[str, Any]:
+    """Newest packages by metadata_modified."""
+    return await search_datasets(
+        query="*:*",
+        rows=rows,
+        start=start,
+        sort="metadata_modified desc",
+        session=session,
+    )
 
 
 async def get_dataset(

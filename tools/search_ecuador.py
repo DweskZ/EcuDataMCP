@@ -108,26 +108,76 @@ def register_search_ecuador_tool(mcp: FastMCP) -> None:
             _riesgos(),
         )
 
+        def _trim_datasets(value: dict | Exception) -> dict:
+            if isinstance(value, Exception):
+                return {"error": str(value)}
+            results = []
+            for ds in (value.get("results") or [])[:limit]:
+                results.append(
+                    {
+                        "id": ds.get("id"),
+                        "name": ds.get("name"),
+                        "title": ds.get("title"),
+                        "organization": (ds.get("organization") or {}).get("title"),
+                    }
+                )
+            return {"count": value.get("count", len(results)), "results": results}
+
+        def _trim_contratos(value: dict | Exception) -> dict:
+            if isinstance(value, Exception):
+                return {"error": str(value)}
+            data = (value.get("data") or [])[:limit]
+            return {
+                "total": value.get("total", len(data)),
+                "year": value.get("_resolved_year"),
+                "data": data,
+            }
+
+        def _trim_riesgos(value: dict | Exception) -> dict:
+            if isinstance(value, Exception):
+                return {"error": str(value)}
+            events = []
+            for ev in (value.get("events") or [])[:limit]:
+                events.append(
+                    {
+                        "evento": ev.get("Evento"),
+                        "estado": ev.get("EstadoDelEvento"),
+                        "provincia": ev.get("Provincia"),
+                        "canton": ev.get("Canton"),
+                        "fecha": ev.get("FechaDelEvento"),
+                        "descripcion": (ev.get("DescripcionGeneralDeEvento") or "")[:240],
+                    }
+                )
+            return {"total": value.get("total", len(events)), "events": events}
+
         payload = {
             "query": query,
-            "datasets": datasets_r
-            if not isinstance(datasets_r, Exception)
-            else {"error": str(datasets_r)},
+            "datasets": _trim_datasets(datasets_r),
             "organizations": orgs_r
             if not isinstance(orgs_r, Exception)
             else {"error": str(orgs_r)},
-            "tramites": tramites_r
+            "tramites": [
+                {
+                    "tramite_id": t.get("tramite_id"),
+                    "nombre": t.get("nombre"),
+                    "codigo": t.get("codigo"),
+                }
+                for t in (tramites_r if not isinstance(tramites_r, Exception) else [])
+            ]
             if not isinstance(tramites_r, Exception)
             else {"error": str(tramites_r)},
-            "regulaciones": regs_r
+            "regulaciones": [
+                {
+                    "regulacion_id": r.get("regulacion_id"),
+                    "regulacion": _clean_html(r.get("regulacion", "")).strip('"')[:160],
+                    "tipo": r.get("tipo"),
+                }
+                for r in (regs_r if not isinstance(regs_r, Exception) else [])[:limit]
+            ]
             if not isinstance(regs_r, Exception)
             else {"error": str(regs_r)},
-            "contratos": contratos_r
-            if not isinstance(contratos_r, Exception)
-            else {"error": str(contratos_r)},
-            "riesgos": riesgos_r
-            if not isinstance(riesgos_r, Exception)
-            else {"error": str(riesgos_r)},
+            "contratos": _trim_contratos(contratos_r),
+            "riesgos": _trim_riesgos(riesgos_r),
         }
 
         def to_text(_: dict) -> str:

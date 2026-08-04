@@ -243,7 +243,7 @@ uv run python main.py --transport stdio
 
 ---
 
-## Herramientas disponibles (23 tools)
+## Herramientas disponibles (24 tools)
 
 Varios tools aceptan `format="json"` además de texto.
 
@@ -260,6 +260,7 @@ Varios tools aceptan `format="json"` además de texto.
 | Tool | Descripción |
 |------|-------------|
 | `search_datasets` | Buscar datasets por palabras clave. Soporta filtro por categoría. |
+| `list_recent_datasets` | Datasets más recientemente actualizados en el portal. |
 | `get_dataset_info` | Metadata detallada de un dataset: título, descripción, organización, tags, licencia, fechas. |
 | `list_dataset_resources` | Listar todos los archivos (recursos) de un dataset con formato, tamaño y URL. |
 | `get_resource_info` | Información detallada de un archivo específico. |

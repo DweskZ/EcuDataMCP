@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.1 — 2026-08-04
+
+### Added
+- `list_recent_datasets` (CKAN ordenado por `metadata_modified`)
+- Smoke e2e `scripts/smoke_e2e.py`
+- Más keywords auto-mapeadas en `search_tramites`
+- `format=json` en `search_datasets`
+
 ## 0.4.0 — 2026-08-04
 
 ### Added

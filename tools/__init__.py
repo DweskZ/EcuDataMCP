@@ -12,6 +12,7 @@ from tools.list_capabilities import register_list_capabilities_tool
 from tools.list_categories import register_list_categories_tool
 from tools.list_dataset_resources import register_list_dataset_resources_tool
 from tools.list_instituciones import register_list_instituciones_tool
+from tools.list_recent_datasets import register_list_recent_datasets_tool
 from tools.list_sat_tsunami import register_list_sat_tsunami_tool
 from tools.lookup_ubicacion import register_lookup_ubicacion_tool
 from tools.preview_resource_data import register_preview_resource_data_tool
@@ -34,6 +35,7 @@ def register_tools(mcp: FastMCP) -> None:
     register_list_sat_tsunami_tool(mcp)
 
     register_search_datasets_tool(mcp)
+    register_list_recent_datasets_tool(mcp)
     register_get_dataset_info_tool(mcp)
     register_list_dataset_resources_tool(mcp)
     register_get_resource_info_tool(mcp)
