@@ -28,7 +28,7 @@ def register_list_categories_tool(mcp: FastMCP) -> None:
 
         total_datasets = sum(g.get("package_count", 0) for g in groups)
         parts = [
-            f"Categorías temáticas del portal de datos abiertos de Ecuador",
+            "Categorías temáticas del portal de datos abiertos de Ecuador",
             f"Total: {len(groups)} categorías con {total_datasets} datasets\n",
         ]
 

@@ -1,9 +1,10 @@
 from unicodedata import category, normalize
 
+from mcp.server.fastmcp import FastMCP
+
 from helpers import gobec_client
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
-from mcp.server.fastmcp import FastMCP
 
 
 def _strip_accents(text: str) -> str:
@@ -89,9 +90,13 @@ def register_search_tramites_tool(mcp: FastMCP) -> None:
                 tramites = filtered
                 total_scanned = len(all_tramites)
             elif query_words and not institution_id:
-                # No institution: fetch first page and filter
-                api_page = max(page - 1, 0)
-                all_tramites = await gobec_client.search_tramites(page=api_page)
+                # No institution: scan several pages and filter client-side
+                all_tramites: list[dict] = []
+                for api_page in range(5):
+                    batch = await gobec_client.search_tramites(page=api_page)
+                    if not batch:
+                        break
+                    all_tramites.extend(batch)
                 filtered = [t for t in all_tramites if _matches_query(t, query_words)]
                 tramites = filtered
                 total_scanned = len(all_tramites)

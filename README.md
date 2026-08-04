@@ -18,7 +18,7 @@ En lugar de navegar manualmente por portales gubernamentales, simplemente pregun
 
 - **Acceso instantáneo a datos públicos**: Pregunta en lenguaje natural y obtén datos de 98 instituciones del Estado ecuatoriano sin navegar portales, descargar archivos ni lidiar con formatos.
 - **Unifica múltiples fuentes en un solo punto**: Datos abiertos (CKAN), trámites gubernamentales (gob.ec) y categorías temáticas, todo accesible desde una sola conversación con tu IA.
-- **Preview de datos sin descargas**: La herramienta `preview_resource_data` descarga y parsea archivos CSV en memoria para que el LLM pueda "ver" los datos y responder preguntas sobre ellos, sin que tú descargues nada.
+- **Preview de datos sin descargas**: `preview_resource_data` parsea CSV/TSV, JSON/GeoJSON y XLSX en memoria; `query_resource_data` consulta el DataStore CKAN sin bajar el archivo completo.
 - **Cero fricción**: No necesitas API key, no necesitas cuenta, no necesitas permisos especiales. 100% datos públicos bajo licencia abierta.
 - **Compatible con cualquier cliente MCP**: Claude, ChatGPT, Gemini, Cursor, VS Code, Windsurf, Le Chat, HuggingChat y más.
 - **Listo para producción**: Docker, health checks, logging estructurado, y un servidor HTTP Streamable que sigue la especificación MCP al pie de la letra.
@@ -50,13 +50,14 @@ En lugar de navegar manualmente por portales gubernamentales, simplemente pregun
 
 ## Fuentes de datos
 
-Este MCP unifica **3 fuentes gubernamentales** en un solo servidor:
+Este MCP unifica **fuentes gubernamentales** en un solo servidor:
 
 | Fuente | Datos | Cobertura |
 |--------|-------|-----------|
-| **Datos Abiertos** (CKAN) | 1,581 datasets de 98+ instituciones | www.datosabiertos.gob.ec |
-| **Trámites** (Gob.ec) | Procedimientos gubernamentales, requisitos, costos | gob.ec/api/v1 |
-| **Categorías temáticas** | 18 categorías: Salud, Educación, Economía, etc. | Portal de datos abiertos |
+| **Datos Abiertos** (CKAN) | Catálogo nacional + DataStore + preview CSV/JSON/XLSX | www.datosabiertos.gob.ec |
+| **Trámites e instituciones** (Gob.ec) | Procedimientos, requisitos, costos | gob.ec/api/v1 |
+| **Regulaciones** (Gob.ec) | Normas, acuerdos, Registro Oficial | gob.ec/api/v1/regulaciones |
+| **Contratos públicos** (SERCOP/OCDS) | Licitaciones, compradores, proveedores | datosabiertos.compraspublicas.gob.ec |
 
 **Sin API key. Sin restricciones de acceso. 100% datos públicos.**
 
@@ -71,7 +72,7 @@ Si usas un asistente con acceso a la terminal (Claude Code, Cursor, Windsurf, et
 ```
 Clona https://github.com/DweskZ/EcuDataMCP, instala sus dependencias con uv sync,
 y regístralo como servidor MCP en mi cliente (Claude Desktop / Claude Code / Cursor)
-usando modo stdio con `uv run --directory <ruta-del-clon> python -c "from main import mcp; mcp.run()"`.
+usando modo stdio con `uv run --directory <ruta-del-clon> python main.py --transport stdio`.
 Verifica que el servidor responda antes de darlo por terminado.
 ```
 
@@ -228,44 +229,71 @@ uv run main.py
 |----------|-------------|---------|
 | `MCP_HOST` | Dirección de bind | `0.0.0.0` |
 | `MCP_PORT` | Puerto del servidor | `8000` |
+| `MCP_TRANSPORT` | Transporte: `http` o `stdio` | `http` |
 | `LOG_LEVEL` | Nivel de log (DEBUG, INFO, WARNING, ERROR) | `INFO` |
+| `CKAN_INSECURE_TLS` | Reintento TLS inseguro solo para el portal de datos (`1`/`0`) | `1` |
+
+Stdio local:
+
+```bash
+uv run python main.py --transport stdio
+```
 
 ---
 
-## Herramientas disponibles (11 tools)
+## Herramientas disponibles (19 tools)
 
-### Datos Abiertos (5 tools)
+### Entrada unificada
 
 | Tool | Descripción |
 |------|-------------|
-| `search_datasets` | Buscar datasets por palabras clave entre los 1,581 del catálogo. Soporta filtro por categoría. |
+| `search_ecuador` | Busca a la vez en datasets, organizaciones CKAN y trámites gob.ec. Ideal como primer paso. |
+
+### Datos Abiertos
+
+| Tool | Descripción |
+|------|-------------|
+| `search_datasets` | Buscar datasets por palabras clave. Soporta filtro por categoría. |
 | `get_dataset_info` | Metadata detallada de un dataset: título, descripción, organización, tags, licencia, fechas. |
 | `list_dataset_resources` | Listar todos los archivos (recursos) de un dataset con formato, tamaño y URL. |
 | `get_resource_info` | Información detallada de un archivo específico. |
-| `preview_resource_data` | **Descarga un CSV y muestra las primeras filas como tabla.** Permite al LLM "ver" los datos sin que descargues nada. |
+| `preview_resource_data` | Preview de CSV/TSV, JSON/GeoJSON o XLSX como tabla (máx. 5 MB). |
+| `query_resource_data` | Consulta tabular vía CKAN DataStore (filtros, texto, paginación) sin descargar el archivo. |
 
-### Trámites Gubernamentales (3 tools)
+### Trámites Gubernamentales
 
 | Tool | Descripción |
 |------|-------------|
 | `search_tramites` | Buscar trámites del gobierno ecuatoriano (cédula, pasaporte, RUC, licencia, etc.) |
 | `get_tramite_info` | Detalle completo: requisitos, procedimiento, costo, tiempo estimado. |
-| `list_instituciones` | Listar instituciones públicas del Ecuador con sus datos de contacto. |
+| `list_instituciones` | Listar instituciones públicas del Ecuador. |
+| `get_institucion_info` | Detalle de una institución (sector, web, descripción). |
 
-### Exploración (3 tools)
+### Regulaciones y contratos
+
+| Tool | Descripción |
+|------|-------------|
+| `search_regulaciones` | Buscar/listar regulaciones en gob.ec (con ref. Registro Oficial). |
+| `get_regulacion_info` | Detalle de una regulación + enlace al PDF. |
+| `search_contratos` | Buscar procedimientos de contratación pública (SERCOP/OCDS). |
+| `get_contrato_info` | Expediente OCDS: comprador, licitación, adjudicaciones, contratos. |
+
+### Exploración
 
 | Tool | Descripción |
 |------|-------------|
 | `search_organizations` | Buscar entre 98+ instituciones que publican datos (INEC, SRI, BCE, MSP, etc.) |
-| `get_organization_info` | Info de una organización con listado de todos sus datasets. |
-| `list_categories` | Las 18 categorías temáticas: Salud, Educación, Economía, Seguridad, Anticorrupción, etc. |
+| `get_organization_info` | Info de una organización con listado de sus datasets. |
+| `list_categories` | Categorías temáticas con conteo de datasets. |
+| `get_category_info` | Detalle de una categoría y datasets de ejemplo. |
 
 ### Flujo de trabajo típico
 
 ```
-1. search_datasets("recaudación tributaria")     → Encuentra datasets del SRI
+1. search_ecuador("recaudación tributaria")       → Orientación rápida
 2. list_dataset_resources("dataset-id")           → Ve los archivos disponibles
-3. preview_resource_data("resource-id")           → Mira los datos en una tabla
+3. query_resource_data("resource-id", query=...)  → Consulta tabular (DataStore)
+   # o preview_resource_data("resource-id")       → Preview del archivo
 ```
 
 ---
@@ -317,17 +345,14 @@ Cliente MCP (Claude, ChatGPT, Cursor, etc.)
 │   FastMCP Server (main.py)   │
 ├──────────────────────────────┤
 │  tools/                      │
+│   ├── search_ecuador         │  → CKAN + gob.ec (unificado)
 │   ├── search_datasets        │
-│   ├── get_dataset_info       │  → helpers/ckan_client.py → CKAN API (www.datosabiertos.gob.ec)
-│   ├── list_dataset_resources │
-│   ├── get_resource_info      │
-│   ├── preview_resource_data  │  → helpers/csv_reader.py  → Descarga directa CSV
-│   ├── search_organizations   │
-│   ├── get_organization_info  │
-│   ├── list_categories        │
+│   ├── query_resource_data    │  → CKAN DataStore
+│   ├── preview_resource_data  │  → CSV / JSON / XLSX
+│   ├── get_category_info      │  → helpers/ckan_client.py
 │   ├── search_tramites        │
-│   ├── get_tramite_info       │  → helpers/gobec_client.py → Gob.ec API
-│   └── list_instituciones     │
+│   ├── get_institucion_info   │  → helpers/gobec_client.py
+│   └── ...                    │
 └──────────────────────────────┘
 ```
 

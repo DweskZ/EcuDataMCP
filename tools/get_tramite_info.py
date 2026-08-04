@@ -1,7 +1,8 @@
+from mcp.server.fastmcp import FastMCP
+
 from helpers import gobec_client
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
-from mcp.server.fastmcp import FastMCP
 
 
 def register_get_tramite_info_tool(mcp: FastMCP) -> None:

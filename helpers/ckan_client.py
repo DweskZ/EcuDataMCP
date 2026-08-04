@@ -1,11 +1,13 @@
+import json
 import logging
 from typing import Any
 
 import httpx
 
 from helpers import env_config
+from helpers.cache import categories_cache
 from helpers.logging import MAIN_LOGGER_NAME
-from helpers.tls import is_cert_verification_error
+from helpers.tls import should_retry_insecure
 from helpers.user_agent import USER_AGENT
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
@@ -27,12 +29,11 @@ async def _fetch_json(
         try:
             resp = await session.get(url, params=params, timeout=_TIMEOUT)
         except httpx.ConnectError as exc:
-            if not is_cert_verification_error(exc):
+            if not should_retry_insecure(exc, url):
                 raise
-            # www.datosabiertos.gob.ec's TLS certificate expired 2026-07-28 and
-            # has not been renewed (verified against multiple networks); retry
-            # once without verification rather than failing every CKAN-backed
-            # tool until the government renews it. Revisit once they do.
+            # www.datosabiertos.gob.ec's TLS certificate expired 2026-07-28.
+            # Only allowlisted portal hosts retry once with verify=False.
+            # Set CKAN_INSECURE_TLS=0 after the government renews the cert.
             logger.warning(
                 "CKAN TLS verification failed for %s (portal cert expired); "
                 "retrying without verification",
@@ -123,9 +124,14 @@ async def get_organization(
 async def list_groups(
     session: httpx.AsyncClient | None = None,
 ) -> list[dict[str, Any]]:
-    return await _fetch_json(
+    cached = categories_cache.get("group_list")
+    if cached is not None:
+        return cached
+    result = await _fetch_json(
         _ckan_url("group_list"), params={"all_fields": "true"}, session=session
     )
+    categories_cache.set("group_list", result)
+    return result
 
 
 async def get_group(
@@ -138,4 +144,33 @@ async def get_group(
         params["include_datasets"] = "true"
     return await _fetch_json(
         _ckan_url("group_show"), params=params, session=session
+    )
+
+
+async def datastore_search(
+    resource_id: str,
+    filters: dict[str, Any] | None = None,
+    q: str = "",
+    limit: int = 20,
+    offset: int = 0,
+    fields: list[str] | None = None,
+    sort: str = "",
+    session: httpx.AsyncClient | None = None,
+) -> dict[str, Any]:
+    """Query a CKAN DataStore resource (tabular API, no full-file download)."""
+    params: dict[str, Any] = {
+        "resource_id": resource_id,
+        "limit": min(max(limit, 1), 100),
+        "offset": max(offset, 0),
+    }
+    if filters:
+        params["filters"] = json.dumps(filters)
+    if q:
+        params["q"] = q
+    if fields:
+        params["fields"] = ",".join(fields)
+    if sort:
+        params["sort"] = sort
+    return await _fetch_json(
+        _ckan_url("datastore_search"), params=params, session=session
     )

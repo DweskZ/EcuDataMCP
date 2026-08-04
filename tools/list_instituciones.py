@@ -1,6 +1,7 @@
+from mcp.server.fastmcp import FastMCP
+
 from helpers import gobec_client
 from helpers.logging import log_tool
-from mcp.server.fastmcp import FastMCP
 
 
 def register_list_instituciones_tool(mcp: FastMCP) -> None:

@@ -1,7 +1,7 @@
 [project]
 name = "ecuador-mcp"
-version = "0.1.0"
-description = "Model Context Protocol (MCP) server for Ecuador's open government data. Search datasets, explore institutions, preview CSV data, and look up government procedures — all through AI conversation."
+version = "0.3.0"
+description = "Model Context Protocol (MCP) server for Ecuador's open government data: CKAN datasets, gob.ec trámites/regulaciones, and SERCOP public contracts (OCDS)."
 authors = [{ name = "Ecuador MCP Contributors" }]
 readme = "README.md"
 license = { text = "MIT" }
@@ -9,6 +9,8 @@ requires-python = ">=3.11"
 dependencies = [
     "httpx>=0.28.0",
     "mcp>=1.25.0,<2",
+    "openpyxl>=3.1.0",
+    "uvicorn>=0.30.0",
 ]
 
 [build-system]
@@ -25,6 +27,7 @@ dev = [
 
 [tool.ruff.lint]
 extend-select = ["I"]
+ignore = ["BLE001"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

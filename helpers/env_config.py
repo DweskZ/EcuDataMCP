@@ -5,6 +5,17 @@ _API_URLS = {
     "ckan_site": "https://www.datosabiertos.gob.ec/",
     "gobec": "https://www.gob.ec/api/v1/",
     "gobec_site": "https://www.gob.ec/",
+    "sercop": "https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/api/",
+    "sercop_site": "https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/",
+}
+
+_ENV_OVERRIDES = {
+    "ckan": "CKAN_API_URL",
+    "ckan_site": "CKAN_SITE_URL",
+    "gobec": "GOBEC_API_URL",
+    "gobec_site": "GOBEC_SITE_URL",
+    "sercop": "SERCOP_API_URL",
+    "sercop_site": "SERCOP_SITE_URL",
 }
 
 
@@ -26,7 +37,8 @@ def get_base_url(api_name: str) -> str:
             f"Invalid api_name: {api_name}. "
             f"Valid values are: {', '.join(_API_URLS.keys())}"
         )
-    return _API_URLS[api_name]
+    env_key = _ENV_OVERRIDES[api_name]
+    return os.getenv(env_key, _API_URLS[api_name])
 
 
 def get_mcp_host() -> str:
@@ -39,3 +51,9 @@ def get_mcp_port() -> int:
         return int(port_str)
     except ValueError:
         return 8000
+
+
+def get_transport() -> str:
+    """Return 'stdio' or 'http'. Env MCP_TRANSPORT overrides default http."""
+    raw = os.getenv("MCP_TRANSPORT", "http").strip().lower()
+    return "stdio" if raw == "stdio" else "http"

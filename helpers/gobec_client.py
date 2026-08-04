@@ -6,7 +6,6 @@ import httpx
 
 from helpers import env_config
 from helpers.logging import MAIN_LOGGER_NAME
-from helpers.user_agent import USER_AGENT
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
@@ -163,3 +162,87 @@ async def get_institucion(
     if isinstance(result, dict):
         return result
     return None
+
+
+async def list_regulaciones(
+    page: int = 0,
+    session: httpx.AsyncClient | None = None,
+) -> list[dict[str, Any]]:
+    """List regulations published on gob.ec."""
+    result = await _fetch_json(
+        _gobec_url("regulaciones"), params={"page": page}, session=session
+    )
+    if isinstance(result, list):
+        return result
+    return []
+
+
+async def get_regulacion(
+    regulacion_id: str, session: httpx.AsyncClient | None = None
+) -> dict[str, Any] | None:
+    """Get details of a specific regulation."""
+    result = await _fetch_json(
+        _gobec_url(f"regulaciones/{regulacion_id}"), session=session
+    )
+    if isinstance(result, list) and result:
+        return result[0]
+    if isinstance(result, dict):
+        return result
+    return None
+
+
+async def find_regulaciones(
+    query: str,
+    max_pages: int = 5,
+    session: httpx.AsyncClient | None = None,
+) -> list[dict[str, Any]]:
+    """Client-side search across regulation pages (gob.ec has no search param)."""
+    from unicodedata import category, normalize
+
+    def strip(text: str) -> str:
+        nfkd = normalize("NFKD", text or "")
+        return "".join(c for c in nfkd if category(c) != "Mn").lower()
+
+    words = [strip(w) for w in query.split() if len(w) >= 2]
+    if not words:
+        return []
+
+    own = session is None
+    if own:
+        transport = httpx.AsyncHTTPTransport(retries=2)
+        session = httpx.AsyncClient(
+            headers=_HEADERS, transport=transport, follow_redirects=True
+        )
+    assert session is not None
+    try:
+        matches: list[dict[str, Any]] = []
+        for page in range(max(max_pages, 1)):
+            items = await list_regulaciones(page=page, session=session)
+            if not items:
+                break
+            for reg in items:
+                blob = strip(
+                    f"{reg.get('regulacion', '')} {reg.get('descripcion', '')} "
+                    f"{reg.get('tipo', '')} {reg.get('institucion_emisora', '')} "
+                    f"{reg.get('registro_oficial_numero', '')}"
+                )
+                if all(w in blob for w in words):
+                    matches.append(reg)
+        return matches
+    finally:
+        if own:
+            await session.aclose()
+
+
+async def get_tramite_regulaciones(
+    tramite_id: str, session: httpx.AsyncClient | None = None
+) -> list[dict[str, Any]]:
+    """Regulations that underpin a given trámite."""
+    result = await _fetch_json(
+        _gobec_url(f"tramites-regulaciones/{tramite_id}"), session=session
+    )
+    if isinstance(result, list):
+        return result
+    if isinstance(result, dict):
+        return [result]
+    return []

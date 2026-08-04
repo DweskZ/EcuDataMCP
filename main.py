@@ -1,21 +1,21 @@
+import argparse
 import json
 import logging
-import os
 import sys
-from datetime import datetime, timezone
-from typing import Awaitable, Callable
+from collections.abc import Awaitable, Callable
+from datetime import UTC, datetime
 
 import uvicorn
 from mcp.server.fastmcp import FastMCP
 
-from helpers.env_config import get_mcp_host, get_mcp_port
+from helpers.env_config import get_mcp_host, get_mcp_port, get_transport
 from helpers.logging import MAIN_LOGGER_NAME, UVICORN_LOGGING_CONFIG, setup_logging
 from tools import register_tools
 
 setup_logging()
 
-SERVER_START_TIME = datetime.now(timezone.utc)
-VERSION = "0.1.0"
+SERVER_START_TIME = datetime.now(UTC)
+VERSION = "0.3.0"
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
@@ -60,9 +60,31 @@ def with_health_endpoint(
 
 asgi_app = with_health_endpoint(mcp.streamable_http_app())
 
-if __name__ == "__main__":
-    host = get_mcp_host()
-    port = get_mcp_port()
+
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Ecuador open data MCP server")
+    parser.add_argument(
+        "--transport",
+        choices=("http", "stdio"),
+        default=None,
+        help="Transport mode (default: MCP_TRANSPORT or http)",
+    )
+    parser.add_argument("--host", default=None, help="HTTP bind host")
+    parser.add_argument("--port", type=int, default=None, help="HTTP bind port")
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> None:
+    args = _parse_args(argv)
+    transport = args.transport or get_transport()
+
+    if transport == "stdio":
+        logger.info("Starting Ecuador MCP server v%s (stdio)", VERSION)
+        mcp.run(transport="stdio")
+        return
+
+    host = args.host or get_mcp_host()
+    port = args.port or get_mcp_port()
 
     logger.info(
         "Starting Ecuador MCP server v%s on %s:%d",
@@ -80,3 +102,7 @@ if __name__ == "__main__":
         log_level="info",
         log_config=UVICORN_LOGGING_CONFIG,
     )
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
