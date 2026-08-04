@@ -1,6 +1,7 @@
 from mcp.server.fastmcp import FastMCP
 
 from helpers import gobec_client
+from helpers.format_out import render_output
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
 
@@ -8,7 +9,9 @@ from helpers.logging import log_tool
 def register_get_institucion_info_tool(mcp: FastMCP) -> None:
     @mcp.tool()
     @log_tool
-    async def get_institucion_info(institucion_id: str) -> str:
+    async def get_institucion_info(
+        institucion_id: str, format: str = "text"
+    ) -> str:
         """
         Get detailed information about a public institution registered on gob.ec.
 
@@ -19,40 +22,69 @@ def register_get_institucion_info_tool(mcp: FastMCP) -> None:
 
         Args:
             institucion_id: Institution ID (e.g. "8")
+            format: text | json
         """
         try:
             inst = await gobec_client.get_institucion(institucion_id)
         except Exception as e:
-            return f"Error al obtener institución: {e}"
+            return render_output(
+                {"error": str(e), "institucion_id": institucion_id},
+                format,
+                text_builder=lambda d: f"Error al obtener institución: {d['error']}",
+            )
 
         if not inst:
-            return f"No se encontró la institución con ID '{institucion_id}'."
+            return render_output(
+                {"error": "not_found", "institucion_id": institucion_id},
+                format,
+                text_builder=lambda d: (
+                    f"No se encontró la institución con ID '{d['institucion_id']}'."
+                ),
+            )
 
         nombre = inst.get("institucion") or inst.get("nombre") or "Desconocida"
         siglas = inst.get("siglas", "")
-        title = f"{nombre} ({siglas})" if siglas else nombre
-
-        parts = [f"Institución: {title}", f"ID: {inst.get('institucion_id', institucion_id)}"]
-
-        if inst.get("sector"):
-            parts.append(f"Sector: {inst['sector']}")
-        if inst.get("website"):
-            parts.append(f"Web: {inst['website']}")
-        if inst.get("url"):
-            parts.append(f"Portal gob.ec: {inst['url']}")
-        if inst.get("email"):
-            parts.append(f"Email: {inst['email']}")
-        if inst.get("telefono"):
-            parts.append(f"Teléfono: {inst['telefono']}")
-
         desc = _clean_html(inst.get("descripcion", ""))
-        if desc:
-            parts.append("")
-            parts.append(f"Descripción: {desc[:1000]}")
+        payload = {
+            "institucion_id": inst.get("institucion_id", institucion_id),
+            "nombre": nombre,
+            "siglas": siglas or None,
+            "sector": inst.get("sector"),
+            "website": inst.get("website"),
+            "url": inst.get("url"),
+            "email": inst.get("email"),
+            "telefono": inst.get("telefono"),
+            "descripcion": desc or None,
+        }
 
-        parts.append("")
-        parts.append(
-            f"Tip: Usa search_tramites(institution_id='{institucion_id}') "
-            "para ver sus trámites."
-        )
-        return "\n".join(parts)
+        def to_text(data: dict) -> str:
+            title = (
+                f"{data['nombre']} ({data['siglas']})"
+                if data.get("siglas")
+                else data["nombre"]
+            )
+            parts = [
+                f"Institución: {title}",
+                f"ID: {data.get('institucion_id', institucion_id)}",
+            ]
+            if data.get("sector"):
+                parts.append(f"Sector: {data['sector']}")
+            if data.get("website"):
+                parts.append(f"Web: {data['website']}")
+            if data.get("url"):
+                parts.append(f"Portal gob.ec: {data['url']}")
+            if data.get("email"):
+                parts.append(f"Email: {data['email']}")
+            if data.get("telefono"):
+                parts.append(f"Teléfono: {data['telefono']}")
+            if data.get("descripcion"):
+                parts.append("")
+                parts.append(f"Descripción: {str(data['descripcion'])[:1000]}")
+            parts.append("")
+            parts.append(
+                f"Tip: Usa search_tramites(institution_id='{institucion_id}') "
+                "para ver sus trámites."
+            )
+            return "\n".join(parts)
+
+        return render_output(payload, format, text_builder=to_text)

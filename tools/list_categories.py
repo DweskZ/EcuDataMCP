@@ -1,13 +1,14 @@
 from mcp.server.fastmcp import FastMCP
 
 from helpers import ckan_client
+from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
 def register_list_categories_tool(mcp: FastMCP) -> None:
     @mcp.tool()
     @log_tool
-    async def list_categories() -> str:
+    async def list_categories(format: str = "text") -> str:
         """
         List all thematic categories of Ecuador's open data portal.
 
@@ -17,34 +18,55 @@ def register_list_categories_tool(mcp: FastMCP) -> None:
 
         Use the category 'name' field as the 'category' parameter in search_datasets
         to filter results by topic.
+
+        Args:
+            format: text | json
         """
         try:
             groups = await ckan_client.list_groups()
         except Exception as e:
-            return f"Error: {e}"
+            return render_output(
+                {"error": str(e)},
+                format,
+                text_builder=lambda d: f"Error: {d['error']}",
+            )
 
-        if not groups:
-            return "No se encontraron categorías."
-
-        total_datasets = sum(g.get("package_count", 0) for g in groups)
-        parts = [
-            "Categorías temáticas del portal de datos abiertos de Ecuador",
-            f"Total: {len(groups)} categorías con {total_datasets} datasets\n",
-        ]
-
-        groups_sorted = sorted(groups, key=lambda g: g.get("package_count", 0), reverse=True)
-
-        for i, g in enumerate(groups_sorted, 1):
-            title = g.get("title", g.get("display_name", "Sin nombre"))
-            name = g.get("name", "")
-            count = g.get("package_count", 0)
-            parts.append(f"{i}. {title} ({count} datasets)")
-            parts.append(f"   ID para filtrar: {name}")
-            parts.append("")
-
-        parts.append(
-            "Tip: Usa search_datasets(query='...', category='nombre_categoria') "
-            "para filtrar datasets por categoría."
+        groups_sorted = sorted(
+            groups, key=lambda g: g.get("package_count", 0), reverse=True
         )
+        payload = {
+            "total": len(groups_sorted),
+            "total_datasets": sum(g.get("package_count", 0) for g in groups_sorted),
+            "categories": [
+                {
+                    "name": g.get("name", ""),
+                    "title": g.get("title") or g.get("display_name") or "Sin nombre",
+                    "package_count": g.get("package_count", 0),
+                }
+                for g in groups_sorted
+            ],
+        }
 
-        return "\n".join(parts)
+        if not groups_sorted:
+            return render_output(
+                payload,
+                format,
+                text_builder=lambda _: "No se encontraron categorías.",
+            )
+
+        def to_text(data: dict) -> str:
+            parts = [
+                "Categorías temáticas del portal de datos abiertos de Ecuador",
+                f"Total: {data['total']} categorías con {data['total_datasets']} datasets\n",
+            ]
+            for i, g in enumerate(data["categories"], 1):
+                parts.append(f"{i}. {g['title']} ({g['package_count']} datasets)")
+                parts.append(f"   ID para filtrar: {g['name']}")
+                parts.append("")
+            parts.append(
+                "Tip: Usa search_datasets(query='...', category='nombre_categoria') "
+                "para filtrar datasets por categoría."
+            )
+            return "\n".join(parts)
+
+        return render_output(payload, format, text_builder=to_text)

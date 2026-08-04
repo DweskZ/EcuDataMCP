@@ -122,6 +122,8 @@ async def main() -> int:
                 ["170150", "Tumbaco", "parroquias"],
             ),
             ("list_recent_datasets", {"page_size": 3, "format": "json"}, ['"results"']),
+            ("list_categories", {"format": "json"}, ['"categories"', "salud"]),
+            ("list_instituciones", {"query": "SRI", "format": "json"}, ['"institucion_id"', "SRI"]),
             ("search_datasets", {"query": "salud", "page_size": 2}, ["dataset"]),
             ("search_tramites", {"query": "pasaporte", "format": "json"}, ["tramite_id", "pasaporte"]),
             ("search_regulaciones", {"query": "datos", "format": "json"}, ["regulacion_id"]),

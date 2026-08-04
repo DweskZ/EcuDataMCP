@@ -245,7 +245,7 @@ uv run python main.py --transport stdio
 
 ## Herramientas disponibles (24 tools)
 
-Varios tools aceptan `format="json"` además de texto.
+Casi todos los tools aceptan `format="json"` además de texto.
 
 ### Entrada unificada
 

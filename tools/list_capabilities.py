@@ -5,7 +5,7 @@ from helpers.logging import log_tool
 
 _CAPABILITIES = {
     "name": "Ecuador MCP",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "fuentes": [
         "CKAN datos abiertos",
         "gob.ec trámites/instituciones/regulaciones",
@@ -43,7 +43,7 @@ _CAPABILITIES = {
         "ecuador://parroquias",
         "ecuador://instituciones-clave",
     ],
-    "format": "Varios tools aceptan format='json' además de text",
+    "format": "Casi todos los tools aceptan format='json' además de text",
     "limites": [
         "CKAN puede requerir TLS insecure allowlist (CKAN_INSECURE_TLS)",
         "SERCOP a veces rate-limita (429); hay reintentos + caché negativa/TTL",

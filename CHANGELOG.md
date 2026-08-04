@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.4 — 2026-08-04
+
+### Added
+- `format=json` en tools restantes: `get_resource_info`, `get_organization_info`, `search_organizations`, `list_categories`, `get_category_info`, `list_instituciones`, `get_institucion_info`, `get_contrato_info`
+
 ## 0.4.3 — 2026-08-04
 
 ### Added
