@@ -41,3 +41,4 @@ class TtlCache:
 # Shared caches for catalog-style endpoints
 categories_cache = TtlCache(ttl_seconds=3600.0)
 instituciones_cache = TtlCache(ttl_seconds=1800.0)
+sercop_search_cache = TtlCache(ttl_seconds=600.0, max_entries=128)

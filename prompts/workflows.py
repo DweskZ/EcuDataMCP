@@ -69,3 +69,25 @@ def register_workflow_prompts(mcp: FastMCP) -> None:
             "3) Si aplica a un trámite concreto, sugiere search_tramites / get_tramite_info.\n"
             "Responde en español con referencias claras al Registro Oficial."
         )
+
+    @mcp.prompt(
+        name="monitorear_riesgos",
+        title="Monitorear riesgos / emergencias",
+        description="Guía para consultar eventos SGR COE y estaciones SAT tsunami.",
+    )
+    def monitorear_riesgos(lugar: str = "Pichincha", evento: str = "") -> str:
+        """Prompt para riesgos y emergencias."""
+        evento_line = (
+            f"Filtra evento='{evento}'."
+            if evento
+            else "Si aplica, filtra por evento (Deslizamiento, Inundación, Aluvión, etc.)."
+        )
+        return (
+            f"Revisa eventos de riesgo en Ecuador para '{lugar}'.\n"
+            "1) Usa lookup_ubicacion para confirmar provincia/cantón.\n"
+            f"2) Llama search_eventos_riesgo(provincia o canton='{lugar}', "
+            f"estado='Seguimiento'). {evento_line}\n"
+            "3) Resume eventos activos, impactos y descripción.\n"
+            "4) Si el usuario pregunta por tsunami/SAT, usa list_sat_tsunami.\n"
+            "Aclara que es información pública de apoyo, no un canal oficial de alerta."
+        )

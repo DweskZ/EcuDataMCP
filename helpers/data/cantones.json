@@ -1,0 +1,2018 @@
+[
+  {
+    "codigo": "0101",
+    "nombre": "Cuenca",
+    "provincia_codigo": "01",
+    "provincia": "Azuay",
+    "region": "Sierra",
+    "area_km2": 3189.4401003062117,
+    "poblacion": 653894
+  },
+  {
+    "codigo": "0102",
+    "nombre": "Giron",
+    "provincia_codigo": "01",
+    "provincia": "Azuay",
+    "region": "Sierra",
+    "area_km2": 350.23190769174454,
+    "poblacion": 13218
+  },
+  {
+    "codigo": "0103",
+    "nombre": "Gualaceo",
+    "provincia_codigo": "01",
+    "provincia": "Azuay",
+    "region": "Sierra",
+    "area_km2": 349.7132699091882,
+    "poblacion": 50117
+  },
+  {
+    "codigo": "0104",
+    "nombre": "Nabon",
+    "provincia_codigo": "01",
+    "provincia": "Azuay",
+    "region": "Sierra",
+    "area_km2": 632.2296476566415,
+    "poblacion": 17587
+  },
+  {
+    "codigo": "0105",
+    "nombre": "Paute",
+    "provincia_codigo": "01",
+    "provincia": "Azuay",
+    "region": "Sierra",
+    "area_km2": 269.2401049248302,
+    "poblacion": 29810
+  },
+  {
+    "codigo": "0106",
+    "nombre": "Pucara",
+    "provincia_codigo": "01",
+    "provincia": "Azuay",
+    "region": "Sierra",
+    "area_km2": 585.1672768259385,
+    "poblacion": 10742
+  },
+  {
+    "codigo": "0107",
+    "nombre": "San Fernando",
+    "provincia_codigo": "01",
+    "provincia": "Azuay",
+    "region": "Sierra",
+    "area_km2": 141.9460429902013,
+    "poblacion": 4215
+  },
+  {
+    "codigo": "0108",
+    "nombre": "Santa Isabel",
+    "provincia_codigo": "01",
+    "provincia": "Azuay",
+    "region": "Sierra",
+    "area_km2": 604.2744180025625,
+    "poblacion": 21353
+  },
+  {
+    "codigo": "0109",
+    "nombre": "Sigsig",
+    "provincia_codigo": "01",
+    "provincia": "Azuay",
+    "region": "Sierra",
+    "area_km2": 675.6734892911174,
+    "poblacion": 31111
+  },
+  {
+    "codigo": "0110",
+    "nombre": "Oña",
+    "provincia_codigo": "01",
+    "provincia": "Azuay",
+    "region": "Sierra",
+    "area_km2": 293.8276519045282,
+    "poblacion": 4214
+  },
+  {
+    "codigo": "0111",
+    "nombre": "Chordeleg",
+    "provincia_codigo": "01",
+    "provincia": "Azuay",
+    "region": "Sierra",
+    "area_km2": 105.1443537937425,
+    "poblacion": 15536
+  },
+  {
+    "codigo": "0112",
+    "nombre": "El Pan",
+    "provincia_codigo": "01",
+    "provincia": "Azuay",
+    "region": "Sierra",
+    "area_km2": 132.51112230597096,
+    "poblacion": 3131
+  },
+  {
+    "codigo": "0113",
+    "nombre": "Sevilla De Oro",
+    "provincia_codigo": "01",
+    "provincia": "Azuay",
+    "region": "Sierra",
+    "area_km2": 314.6510565876728,
+    "poblacion": 7040
+  },
+  {
+    "codigo": "0114",
+    "nombre": "Guachapala",
+    "provincia_codigo": "01",
+    "provincia": "Azuay",
+    "region": "Sierra",
+    "area_km2": 39.97590744350875,
+    "poblacion": 3935
+  },
+  {
+    "codigo": "0115",
+    "nombre": "Camilo Ponce Enriquez",
+    "provincia_codigo": "01",
+    "provincia": "Azuay",
+    "region": "Sierra",
+    "area_km2": 639.4876175606786,
+    "poblacion": 37657
+  },
+  {
+    "codigo": "0201",
+    "nombre": "Guaranda",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar",
+    "region": "Sierra",
+    "area_km2": 1891.1395565456396,
+    "poblacion": 111182
+  },
+  {
+    "codigo": "0202",
+    "nombre": "Chillanes",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar",
+    "region": "Sierra",
+    "area_km2": 662.2454601792266,
+    "poblacion": 17009
+  },
+  {
+    "codigo": "0203",
+    "nombre": "Chimbo",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar",
+    "region": "Sierra",
+    "area_km2": 261.18371958174566,
+    "poblacion": 17684
+  },
+  {
+    "codigo": "0204",
+    "nombre": "Echeandia",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar",
+    "region": "Sierra",
+    "area_km2": 230.58555516347045,
+    "poblacion": 14378
+  },
+  {
+    "codigo": "0205",
+    "nombre": "San Miguel",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar",
+    "region": "Sierra",
+    "area_km2": 572.9956326213224,
+    "poblacion": 29452
+  },
+  {
+    "codigo": "0206",
+    "nombre": "Caluma",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar",
+    "region": "Sierra",
+    "area_km2": 176.81893863115826,
+    "poblacion": 16853
+  },
+  {
+    "codigo": "0207",
+    "nombre": "Las Naves",
+    "provincia_codigo": "02",
+    "provincia": "Bolivar",
+    "region": "Sierra",
+    "area_km2": 148.69435569592235,
+    "poblacion": 7608
+  },
+  {
+    "codigo": "0301",
+    "nombre": "Azogues",
+    "provincia_codigo": "03",
+    "provincia": "Cañar",
+    "region": "Sierra",
+    "area_km2": 612.3594765350815,
+    "poblacion": 88392
+  },
+  {
+    "codigo": "0302",
+    "nombre": "Biblian",
+    "provincia_codigo": "03",
+    "provincia": "Cañar",
+    "region": "Sierra",
+    "area_km2": 226.70301214437717,
+    "poblacion": 24206
+  },
+  {
+    "codigo": "0303",
+    "nombre": "Cañar",
+    "provincia_codigo": "03",
+    "provincia": "Cañar",
+    "region": "Sierra",
+    "area_km2": 1797.8457489567802,
+    "poblacion": 70165
+  },
+  {
+    "codigo": "0304",
+    "nombre": "La Troncal",
+    "provincia_codigo": "03",
+    "provincia": "Cañar",
+    "region": "Sierra",
+    "area_km2": 318.89395873068213,
+    "poblacion": 79447
+  },
+  {
+    "codigo": "0305",
+    "nombre": "El Tambo",
+    "provincia_codigo": "03",
+    "provincia": "Cañar",
+    "region": "Sierra",
+    "area_km2": 64.03094183483894,
+    "poblacion": 12821
+  },
+  {
+    "codigo": "0306",
+    "nombre": "Deleg",
+    "provincia_codigo": "03",
+    "provincia": "Cañar",
+    "region": "Sierra",
+    "area_km2": 76.01138754403219,
+    "poblacion": 6904
+  },
+  {
+    "codigo": "0307",
+    "nombre": "Suscal",
+    "provincia_codigo": "03",
+    "provincia": "Cañar",
+    "region": "Sierra",
+    "area_km2": 49.787571677635135,
+    "poblacion": 6698
+  },
+  {
+    "codigo": "0401",
+    "nombre": "Tulcan",
+    "provincia_codigo": "04",
+    "provincia": "Carchi",
+    "region": "Sierra",
+    "area_km2": 1820.8113692308734,
+    "poblacion": 104708
+  },
+  {
+    "codigo": "0402",
+    "nombre": "Bolivar",
+    "provincia_codigo": "04",
+    "provincia": "Carchi",
+    "region": "Sierra",
+    "area_km2": 355.6209974530749,
+    "poblacion": 15790
+  },
+  {
+    "codigo": "0403",
+    "nombre": "Espejo",
+    "provincia_codigo": "04",
+    "provincia": "Carchi",
+    "region": "Sierra",
+    "area_km2": 558.6067638484321,
+    "poblacion": 14009
+  },
+  {
+    "codigo": "0404",
+    "nombre": "Mira",
+    "provincia_codigo": "04",
+    "provincia": "Carchi",
+    "region": "Sierra",
+    "area_km2": 582.9548926468667,
+    "poblacion": 12097
+  },
+  {
+    "codigo": "0405",
+    "nombre": "Montufar",
+    "provincia_codigo": "04",
+    "provincia": "Carchi",
+    "region": "Sierra",
+    "area_km2": 384.709203479388,
+    "poblacion": 34884
+  },
+  {
+    "codigo": "0406",
+    "nombre": "San Pedro De Huaca",
+    "provincia_codigo": "04",
+    "provincia": "Carchi",
+    "region": "Sierra",
+    "area_km2": 70.27426689015533,
+    "poblacion": 9126
+  },
+  {
+    "codigo": "0501",
+    "nombre": "Latacunga",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi",
+    "region": "Sierra",
+    "area_km2": 1384.9214886346572,
+    "poblacion": 210528
+  },
+  {
+    "codigo": "0502",
+    "nombre": "La Mana",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi",
+    "region": "Sierra",
+    "area_km2": 656.9870009266912,
+    "poblacion": 58673
+  },
+  {
+    "codigo": "0503",
+    "nombre": "Pangua",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi",
+    "region": "Sierra",
+    "area_km2": 721.3423699284563,
+    "poblacion": 25082
+  },
+  {
+    "codigo": "0504",
+    "nombre": "Pujili",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi",
+    "region": "Sierra",
+    "area_km2": 1299.701836618624,
+    "poblacion": 81453
+  },
+  {
+    "codigo": "0505",
+    "nombre": "Salcedo",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi",
+    "region": "Sierra",
+    "area_km2": 485.704904674568,
+    "poblacion": 68505
+  },
+  {
+    "codigo": "0506",
+    "nombre": "Saquisili",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi",
+    "region": "Sierra",
+    "area_km2": 205.35131599193502,
+    "poblacion": 32234
+  },
+  {
+    "codigo": "0507",
+    "nombre": "Sigchos",
+    "provincia_codigo": "05",
+    "provincia": "Cotopaxi",
+    "region": "Sierra",
+    "area_km2": 1351.3370772313347,
+    "poblacion": 23641
+  },
+  {
+    "codigo": "0601",
+    "nombre": "Riobamba",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo",
+    "region": "Sierra",
+    "area_km2": 980.6662695945482,
+    "poblacion": 269822
+  },
+  {
+    "codigo": "0602",
+    "nombre": "Alausi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo",
+    "region": "Sierra",
+    "area_km2": 1656.70076714438,
+    "poblacion": 45651
+  },
+  {
+    "codigo": "0603",
+    "nombre": "Colta",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo",
+    "region": "Sierra",
+    "area_km2": 836.323671399796,
+    "poblacion": 45361
+  },
+  {
+    "codigo": "0604",
+    "nombre": "Chambo",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo",
+    "region": "Sierra",
+    "area_km2": 164.00860851034494,
+    "poblacion": 13638
+  },
+  {
+    "codigo": "0605",
+    "nombre": "Chunchi",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo",
+    "region": "Sierra",
+    "area_km2": 273.2412116771101,
+    "poblacion": 12954
+  },
+  {
+    "codigo": "0606",
+    "nombre": "Guamote",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo",
+    "region": "Sierra",
+    "area_km2": 1220.3051317739084,
+    "poblacion": 59938
+  },
+  {
+    "codigo": "0607",
+    "nombre": "Guano",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo",
+    "region": "Sierra",
+    "area_km2": 459.71115057813245,
+    "poblacion": 49344
+  },
+  {
+    "codigo": "0608",
+    "nombre": "Pallatanga",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo",
+    "region": "Sierra",
+    "area_km2": 379.63904439655914,
+    "poblacion": 12471
+  },
+  {
+    "codigo": "0609",
+    "nombre": "Penipe",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo",
+    "region": "Sierra",
+    "area_km2": 366.1464941205633,
+    "poblacion": 7051
+  },
+  {
+    "codigo": "0610",
+    "nombre": "Cumanda",
+    "provincia_codigo": "06",
+    "provincia": "Chimborazo",
+    "region": "Sierra",
+    "area_km2": 158.65545842151735,
+    "poblacion": 18568
+  },
+  {
+    "codigo": "0701",
+    "nombre": "Machala",
+    "provincia_codigo": "07",
+    "provincia": "El Oro",
+    "region": "Costa",
+    "area_km2": 323.6171241226279,
+    "poblacion": 295512
+  },
+  {
+    "codigo": "0702",
+    "nombre": "Arenillas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro",
+    "region": "Costa",
+    "area_km2": 806.5697462353356,
+    "poblacion": 34338
+  },
+  {
+    "codigo": "0703",
+    "nombre": "Atahualpa",
+    "provincia_codigo": "07",
+    "provincia": "El Oro",
+    "region": "Costa",
+    "area_km2": 278.5154246202264,
+    "poblacion": 6552
+  },
+  {
+    "codigo": "0704",
+    "nombre": "Balsas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro",
+    "region": "Costa",
+    "area_km2": 69.21432727603279,
+    "poblacion": 9518
+  },
+  {
+    "codigo": "0705",
+    "nombre": "Chilla",
+    "provincia_codigo": "07",
+    "provincia": "El Oro",
+    "region": "Costa",
+    "area_km2": 331.4249099663626,
+    "poblacion": 2400
+  },
+  {
+    "codigo": "0706",
+    "nombre": "El Guabo",
+    "provincia_codigo": "07",
+    "provincia": "El Oro",
+    "region": "Costa",
+    "area_km2": 603.6037515657908,
+    "poblacion": 65374
+  },
+  {
+    "codigo": "0707",
+    "nombre": "Huaquillas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro",
+    "region": "Costa",
+    "area_km2": 63.5663002026577,
+    "poblacion": 62017
+  },
+  {
+    "codigo": "0708",
+    "nombre": "Marcabeli",
+    "provincia_codigo": "07",
+    "provincia": "El Oro",
+    "region": "Costa",
+    "area_km2": 148.413029338719,
+    "poblacion": 6387
+  },
+  {
+    "codigo": "0709",
+    "nombre": "Pasaje",
+    "provincia_codigo": "07",
+    "provincia": "El Oro",
+    "region": "Costa",
+    "area_km2": 456.08026064794706,
+    "poblacion": 89795
+  },
+  {
+    "codigo": "0710",
+    "nombre": "Piñas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro",
+    "region": "Costa",
+    "area_km2": 617.1286957956397,
+    "poblacion": 30850
+  },
+  {
+    "codigo": "0711",
+    "nombre": "Portovelo",
+    "provincia_codigo": "07",
+    "provincia": "El Oro",
+    "region": "Costa",
+    "area_km2": 285.7478579870944,
+    "poblacion": 14317
+  },
+  {
+    "codigo": "0712",
+    "nombre": "Santa Rosa",
+    "provincia_codigo": "07",
+    "provincia": "El Oro",
+    "region": "Costa",
+    "area_km2": 811.057175944058,
+    "poblacion": 84048
+  },
+  {
+    "codigo": "0713",
+    "nombre": "Zaruma",
+    "provincia_codigo": "07",
+    "provincia": "El Oro",
+    "region": "Costa",
+    "area_km2": 651.677649277349,
+    "poblacion": 26056
+  },
+  {
+    "codigo": "0714",
+    "nombre": "Las Lajas",
+    "provincia_codigo": "07",
+    "provincia": "El Oro",
+    "region": "Costa",
+    "area_km2": 298.83924746916,
+    "poblacion": 5032
+  },
+  {
+    "codigo": "0801",
+    "nombre": "Esmeraldas",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas",
+    "region": "Costa",
+    "area_km2": 1340.9290440290772,
+    "poblacion": 223261
+  },
+  {
+    "codigo": "0802",
+    "nombre": "Eloy Alfaro",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas",
+    "region": "Costa",
+    "area_km2": 4262.207739352786,
+    "poblacion": 46560
+  },
+  {
+    "codigo": "0803",
+    "nombre": "Muisne",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas",
+    "region": "Costa",
+    "area_km2": 1240.0124486818288,
+    "poblacion": 31641
+  },
+  {
+    "codigo": "0804",
+    "nombre": "Quininde",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas",
+    "region": "Costa",
+    "area_km2": 3874.1647641684403,
+    "poblacion": 149191
+  },
+  {
+    "codigo": "0805",
+    "nombre": "San Lorenzo",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas",
+    "region": "Costa",
+    "area_km2": 3016.870962237008,
+    "poblacion": 64899
+  },
+  {
+    "codigo": "0806",
+    "nombre": "Atacames",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas",
+    "region": "Costa",
+    "area_km2": 508.4684534813177,
+    "poblacion": 57172
+  },
+  {
+    "codigo": "0807",
+    "nombre": "Rioverde",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas",
+    "region": "Costa",
+    "area_km2": 1507.3057377531354,
+    "poblacion": 32157
+  },
+  {
+    "codigo": "0808",
+    "nombre": "La Concordia",
+    "provincia_codigo": "08",
+    "provincia": "Esmeraldas",
+    "region": "Costa",
+    "area_km2": 324.2985204106211,
+    "poblacion": null
+  },
+  {
+    "codigo": "0901",
+    "nombre": "Guayaquil",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 4113.898530776315,
+    "poblacion": 2781896
+  },
+  {
+    "codigo": "0902",
+    "nombre": "Alfredo Baquerizo Moreno",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 218.65579934946382,
+    "poblacion": 32996
+  },
+  {
+    "codigo": "0903",
+    "nombre": "Balao",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 409.23058697562874,
+    "poblacion": 27086
+  },
+  {
+    "codigo": "0904",
+    "nombre": "Balzar",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 1187.9857919786944,
+    "poblacion": 61408
+  },
+  {
+    "codigo": "0905",
+    "nombre": "Colimes",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 758.7845095582796,
+    "poblacion": 26667
+  },
+  {
+    "codigo": "0906",
+    "nombre": "Daule",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 466.2786053095931,
+    "poblacion": 179569
+  },
+  {
+    "codigo": "0907",
+    "nombre": "Duran",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 300.5566210622277,
+    "poblacion": 325436
+  },
+  {
+    "codigo": "0908",
+    "nombre": "Empalme",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 716.1041737047534,
+    "poblacion": 87901
+  },
+  {
+    "codigo": "0909",
+    "nombre": "El Triunfo",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 395.4084516054925,
+    "poblacion": 61450
+  },
+  {
+    "codigo": "0910",
+    "nombre": "Milagro",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 405.55527894238776,
+    "poblacion": 204552
+  },
+  {
+    "codigo": "0911",
+    "nombre": "Naranjal",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 1732.4615004540117,
+    "poblacion": 98151
+  },
+  {
+    "codigo": "0912",
+    "nombre": "Naranjito",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 224.83366525591046,
+    "poblacion": 44850
+  },
+  {
+    "codigo": "0913",
+    "nombre": "Palestina",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 193.62014367923368,
+    "poblacion": 18835
+  },
+  {
+    "codigo": "0914",
+    "nombre": "Pedro Carbo",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 935.4747604031629,
+    "poblacion": 53006
+  },
+  {
+    "codigo": "0916",
+    "nombre": "Samborondon",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 359.0639294663643,
+    "poblacion": 105874
+  },
+  {
+    "codigo": "0918",
+    "nombre": "Santa Lucia",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 357.8631643046485,
+    "poblacion": 45960
+  },
+  {
+    "codigo": "0919",
+    "nombre": "Salitre",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 393.5719703692555,
+    "poblacion": 67124
+  },
+  {
+    "codigo": "0920",
+    "nombre": "San Jacinto De Yaguachi",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 509.5804100327538,
+    "poblacion": 80391
+  },
+  {
+    "codigo": "0921",
+    "nombre": "Playas",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 268.4221383382697,
+    "poblacion": 61648
+  },
+  {
+    "codigo": "0922",
+    "nombre": "Simon Bolivar",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 291.60595291236973,
+    "poblacion": 33095
+  },
+  {
+    "codigo": "0923",
+    "nombre": "Crnel. Marcelino Maridueña",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 254.41025786758968,
+    "poblacion": 13363
+  },
+  {
+    "codigo": "0924",
+    "nombre": "Lomas De Sargentillo",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 66.88525207002469,
+    "poblacion": 24937
+  },
+  {
+    "codigo": "0925",
+    "nombre": "Nobol",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 136.81324650437733,
+    "poblacion": 27271
+  },
+  {
+    "codigo": "0927",
+    "nombre": "Gnral. Antonio Elizalde",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 153.23521328217453,
+    "poblacion": 13493
+  },
+  {
+    "codigo": "0928",
+    "nombre": "Isidro Ayora",
+    "provincia_codigo": "09",
+    "provincia": "Guayas",
+    "region": "Costa",
+    "area_km2": 487.7554719668409,
+    "poblacion": 15032
+  },
+  {
+    "codigo": "1001",
+    "nombre": "Ibarra",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura",
+    "region": "Sierra",
+    "area_km2": 1103.827186423547,
+    "poblacion": 226636
+  },
+  {
+    "codigo": "1002",
+    "nombre": "Antonio Ante",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura",
+    "region": "Sierra",
+    "area_km2": 81.92856678342743,
+    "poblacion": 55737
+  },
+  {
+    "codigo": "1003",
+    "nombre": "Cotacachi",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura",
+    "region": "Sierra",
+    "area_km2": 1685.4344824987058,
+    "poblacion": 45014
+  },
+  {
+    "codigo": "1004",
+    "nombre": "Otavalo",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura",
+    "region": "Sierra",
+    "area_km2": 497.2714691412743,
+    "poblacion": 128763
+  },
+  {
+    "codigo": "1005",
+    "nombre": "Pimampiro",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura",
+    "region": "Sierra",
+    "area_km2": 442.46952360827083,
+    "poblacion": 13448
+  },
+  {
+    "codigo": "1006",
+    "nombre": "San Miguel De Urcuqui",
+    "provincia_codigo": "10",
+    "provincia": "Imbabura",
+    "region": "Sierra",
+    "area_km2": 766.1996752443611,
+    "poblacion": 17877
+  },
+  {
+    "codigo": "1101",
+    "nombre": "Loja",
+    "provincia_codigo": "11",
+    "provincia": "Loja",
+    "region": "Sierra",
+    "area_km2": 1894.6900626117817,
+    "poblacion": 281552
+  },
+  {
+    "codigo": "1102",
+    "nombre": "Calvas",
+    "provincia_codigo": "11",
+    "provincia": "Loja",
+    "region": "Sierra",
+    "area_km2": 840.7629408793484,
+    "poblacion": 29995
+  },
+  {
+    "codigo": "1103",
+    "nombre": "Catamayo",
+    "provincia_codigo": "11",
+    "provincia": "Loja",
+    "region": "Sierra",
+    "area_km2": 653.1744296675467,
+    "poblacion": 36744
+  },
+  {
+    "codigo": "1104",
+    "nombre": "Celica",
+    "provincia_codigo": "11",
+    "provincia": "Loja",
+    "region": "Sierra",
+    "area_km2": 521.6054296437277,
+    "poblacion": 16460
+  },
+  {
+    "codigo": "1105",
+    "nombre": "Chaguarpamba",
+    "provincia_codigo": "11",
+    "provincia": "Loja",
+    "region": "Sierra",
+    "area_km2": 313.60695110911496,
+    "poblacion": 6664
+  },
+  {
+    "codigo": "1106",
+    "nombre": "Espindola",
+    "provincia_codigo": "11",
+    "provincia": "Loja",
+    "region": "Sierra",
+    "area_km2": 515.5714048374359,
+    "poblacion": 14336
+  },
+  {
+    "codigo": "1107",
+    "nombre": "Gonzanama",
+    "provincia_codigo": "11",
+    "provincia": "Loja",
+    "region": "Sierra",
+    "area_km2": 698.7344977589419,
+    "poblacion": 10977
+  },
+  {
+    "codigo": "1108",
+    "nombre": "Macara",
+    "provincia_codigo": "11",
+    "provincia": "Loja",
+    "region": "Sierra",
+    "area_km2": 577.478014823037,
+    "poblacion": 20585
+  },
+  {
+    "codigo": "1109",
+    "nombre": "Paltas",
+    "provincia_codigo": "11",
+    "provincia": "Loja",
+    "region": "Sierra",
+    "area_km2": 1156.4310528916194,
+    "poblacion": 23721
+  },
+  {
+    "codigo": "1110",
+    "nombre": "Puyango",
+    "provincia_codigo": "11",
+    "provincia": "Loja",
+    "region": "Sierra",
+    "area_km2": 637.4139038953921,
+    "poblacion": 16135
+  },
+  {
+    "codigo": "1111",
+    "nombre": "Saraguro",
+    "provincia_codigo": "11",
+    "provincia": "Loja",
+    "region": "Sierra",
+    "area_km2": 1082.1406863383231,
+    "poblacion": 34115
+  },
+  {
+    "codigo": "1112",
+    "nombre": "Sozoranga",
+    "provincia_codigo": "11",
+    "provincia": "Loja",
+    "region": "Sierra",
+    "area_km2": 411.7698091446693,
+    "poblacion": 7182
+  },
+  {
+    "codigo": "1113",
+    "nombre": "Zapotillo",
+    "provincia_codigo": "11",
+    "provincia": "Loja",
+    "region": "Sierra",
+    "area_km2": 1213.6167071155755,
+    "poblacion": 14629
+  },
+  {
+    "codigo": "1114",
+    "nombre": "Pindal",
+    "provincia_codigo": "11",
+    "provincia": "Loja",
+    "region": "Sierra",
+    "area_km2": 202.33830470588228,
+    "poblacion": 10795
+  },
+  {
+    "codigo": "1115",
+    "nombre": "Quilanga",
+    "provincia_codigo": "11",
+    "provincia": "Loja",
+    "region": "Sierra",
+    "area_km2": 236.07386492551,
+    "poblacion": 4237
+  },
+  {
+    "codigo": "1116",
+    "nombre": "Olmedo",
+    "provincia_codigo": "11",
+    "provincia": "Loja",
+    "region": "Sierra",
+    "area_km2": 112.29694315049133,
+    "poblacion": 4230
+  },
+  {
+    "codigo": "1201",
+    "nombre": "Babahoyo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios",
+    "region": "Costa",
+    "area_km2": 1086.8142486201527,
+    "poblacion": 178853
+  },
+  {
+    "codigo": "1202",
+    "nombre": "Baba",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios",
+    "region": "Costa",
+    "area_km2": 517.162824197997,
+    "poblacion": 44201
+  },
+  {
+    "codigo": "1203",
+    "nombre": "Montalvo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios",
+    "region": "Costa",
+    "area_km2": 363.1975363703607,
+    "poblacion": 29383
+  },
+  {
+    "codigo": "1204",
+    "nombre": "Puebloviejo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios",
+    "region": "Costa",
+    "area_km2": 335.52945979579135,
+    "poblacion": 45847
+  },
+  {
+    "codigo": "1205",
+    "nombre": "Quevedo",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios",
+    "region": "Costa",
+    "area_km2": 304.66323452209866,
+    "poblacion": 219271
+  },
+  {
+    "codigo": "1206",
+    "nombre": "Urdaneta",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios",
+    "region": "Costa",
+    "area_km2": 378.4990588592987,
+    "poblacion": 33236
+  },
+  {
+    "codigo": "1207",
+    "nombre": "Ventanas",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios",
+    "region": "Costa",
+    "area_km2": 531.3090568679901,
+    "poblacion": 76632
+  },
+  {
+    "codigo": "1208",
+    "nombre": "Vinces",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios",
+    "region": "Costa",
+    "area_km2": 696.7065792996725,
+    "poblacion": 84043
+  },
+  {
+    "codigo": "1209",
+    "nombre": "Palenque",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios",
+    "region": "Costa",
+    "area_km2": 579.7571270390386,
+    "poblacion": 24009
+  },
+  {
+    "codigo": "1210",
+    "nombre": "Buena Fe",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios",
+    "region": "Costa",
+    "area_km2": 581.3216750749082,
+    "poblacion": 86172
+  },
+  {
+    "codigo": "1211",
+    "nombre": "Valencia",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios",
+    "region": "Costa",
+    "area_km2": 977.8576660523833,
+    "poblacion": 56171
+  },
+  {
+    "codigo": "1212",
+    "nombre": "Mocache",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios",
+    "region": "Costa",
+    "area_km2": 568.0773834773333,
+    "poblacion": 44170
+  },
+  {
+    "codigo": "1213",
+    "nombre": "Quinsaloma",
+    "provincia_codigo": "12",
+    "provincia": "Los Rios",
+    "region": "Costa",
+    "area_km2": 282.9758590527203,
+    "poblacion": 20955
+  },
+  {
+    "codigo": "1301",
+    "nombre": "Portoviejo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 962.4225669375443,
+    "poblacion": 328427
+  },
+  {
+    "codigo": "1302",
+    "nombre": "Bolivar",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 538.506367008877,
+    "poblacion": 46347
+  },
+  {
+    "codigo": "1303",
+    "nombre": "Chone",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 3055.9424782895703,
+    "poblacion": 132829
+  },
+  {
+    "codigo": "1304",
+    "nombre": "El Carmen",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 1267.035622355489,
+    "poblacion": 114245
+  },
+  {
+    "codigo": "1305",
+    "nombre": "Flavio Alfaro",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 1347.400039424425,
+    "poblacion": 24029
+  },
+  {
+    "codigo": "1306",
+    "nombre": "Jipijapa",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 1469.0585662525978,
+    "poblacion": 75752
+  },
+  {
+    "codigo": "1307",
+    "nombre": "Junin",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 246.28908439961722,
+    "poblacion": 19033
+  },
+  {
+    "codigo": "1308",
+    "nombre": "Manta",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 292.23106684840604,
+    "poblacion": 269984
+  },
+  {
+    "codigo": "1309",
+    "nombre": "Montecristi",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 752.2251082140043,
+    "poblacion": 111437
+  },
+  {
+    "codigo": "1310",
+    "nombre": "Pajan",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 1089.6901228838926,
+    "poblacion": 37529
+  },
+  {
+    "codigo": "1311",
+    "nombre": "Pichincha",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 1075.603906863286,
+    "poblacion": 29906
+  },
+  {
+    "codigo": "1312",
+    "nombre": "Rocafuerte",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 279.97583677697475,
+    "poblacion": 38007
+  },
+  {
+    "codigo": "1313",
+    "nombre": "Santa Ana",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 1026.8919031007358,
+    "poblacion": 48766
+  },
+  {
+    "codigo": "1314",
+    "nombre": "Sucre",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 677.1569450106866,
+    "poblacion": 63527
+  },
+  {
+    "codigo": "1315",
+    "nombre": "Tosagua",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 376.2874018057155,
+    "poblacion": 43057
+  },
+  {
+    "codigo": "1316",
+    "nombre": "24 De Mayo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 525.696765620508,
+    "poblacion": 28828
+  },
+  {
+    "codigo": "1317",
+    "nombre": "Pedernales",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 1904.9821274160802,
+    "poblacion": 64753
+  },
+  {
+    "codigo": "1318",
+    "nombre": "Olmedo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 253.64183192679255,
+    "poblacion": 10336
+  },
+  {
+    "codigo": "1319",
+    "nombre": "Puerto Lopez",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 430.77903863743103,
+    "poblacion": 25275
+  },
+  {
+    "codigo": "1320",
+    "nombre": "Jama",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 579.2378888459965,
+    "poblacion": 26615
+  },
+  {
+    "codigo": "1321",
+    "nombre": "Jaramijo",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 97.3014686166484,
+    "poblacion": 29403
+  },
+  {
+    "codigo": "1322",
+    "nombre": "San Vicente",
+    "provincia_codigo": "13",
+    "provincia": "Manabi",
+    "region": "Costa",
+    "area_km2": 709.2705712477656,
+    "poblacion": 25277
+  },
+  {
+    "codigo": "1401",
+    "nombre": "Morona",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago",
+    "region": "Amazonía",
+    "area_km2": 4647.069512043575,
+    "poblacion": 60194
+  },
+  {
+    "codigo": "1402",
+    "nombre": "Gualaquiza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago",
+    "region": "Amazonía",
+    "area_km2": 2189.4552894877784,
+    "poblacion": 19921
+  },
+  {
+    "codigo": "1403",
+    "nombre": "Limon Indanza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago",
+    "region": "Amazonía",
+    "area_km2": 1803.4718197148318,
+    "poblacion": 10498
+  },
+  {
+    "codigo": "1404",
+    "nombre": "Palora",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago",
+    "region": "Amazonía",
+    "area_km2": 1453.9337437034526,
+    "poblacion": 7852
+  },
+  {
+    "codigo": "1405",
+    "nombre": "Santiago",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago",
+    "region": "Amazonía",
+    "area_km2": 1415.9207388407094,
+    "poblacion": 11328
+  },
+  {
+    "codigo": "1406",
+    "nombre": "Sucua",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago",
+    "region": "Amazonía",
+    "area_km2": 891.9007359632003,
+    "poblacion": 24473
+  },
+  {
+    "codigo": "1407",
+    "nombre": "Huamboya",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago",
+    "region": "Amazonía",
+    "area_km2": 663.25407944115,
+    "poblacion": 12802
+  },
+  {
+    "codigo": "1408",
+    "nombre": "San Juan Bosco",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago",
+    "region": "Amazonía",
+    "area_km2": 1049.0412297273422,
+    "poblacion": 5115
+  },
+  {
+    "codigo": "1409",
+    "nombre": "Taisha",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago",
+    "region": "Amazonía",
+    "area_km2": 6140.839875545555,
+    "poblacion": 27680
+  },
+  {
+    "codigo": "1410",
+    "nombre": "Logroðo",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago",
+    "region": "Amazonía",
+    "area_km2": 1169.2934223850336,
+    "poblacion": 7865
+  },
+  {
+    "codigo": "1411",
+    "nombre": "Pablo Sexto",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago",
+    "region": "Amazonía",
+    "area_km2": 1387.2696628125593,
+    "poblacion": 2995
+  },
+  {
+    "codigo": "1412",
+    "nombre": "Tiwintza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago",
+    "region": "Amazonía",
+    "area_km2": 1169.5531387106362,
+    "poblacion": 11415
+  },
+  {
+    "codigo": "1501",
+    "nombre": "Tena",
+    "provincia_codigo": "15",
+    "provincia": "Napo",
+    "region": "Amazonía",
+    "area_km2": 3912.8125951398565,
+    "poblacion": 81463
+  },
+  {
+    "codigo": "1503",
+    "nombre": "Archidona",
+    "provincia_codigo": "15",
+    "provincia": "Napo",
+    "region": "Amazonía",
+    "area_km2": 3021.7938724155215,
+    "poblacion": 34060
+  },
+  {
+    "codigo": "1504",
+    "nombre": "El Chaco",
+    "provincia_codigo": "15",
+    "provincia": "Napo",
+    "region": "Amazonía",
+    "area_km2": 3492.2212012643968,
+    "poblacion": 10421
+  },
+  {
+    "codigo": "1507",
+    "nombre": "Quijos",
+    "provincia_codigo": "15",
+    "provincia": "Napo",
+    "region": "Amazonía",
+    "area_km2": 1585.2425852206247,
+    "poblacion": 6970
+  },
+  {
+    "codigo": "1509",
+    "nombre": "Carlos Julio Arosemena Tola",
+    "provincia_codigo": "15",
+    "provincia": "Napo",
+    "region": "Amazonía",
+    "area_km2": 501.2034760169897,
+    "poblacion": 4576
+  },
+  {
+    "codigo": "1601",
+    "nombre": "Pastaza",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza",
+    "region": "Amazonía",
+    "area_km2": 19835.161185403067,
+    "poblacion": 87042
+  },
+  {
+    "codigo": "1602",
+    "nombre": "Mera",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza",
+    "region": "Amazonía",
+    "area_km2": 525.9336837685161,
+    "poblacion": 18142
+  },
+  {
+    "codigo": "1603",
+    "nombre": "Santa Clara",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza",
+    "region": "Amazonía",
+    "area_km2": 312.527155663155,
+    "poblacion": 4239
+  },
+  {
+    "codigo": "1604",
+    "nombre": "Arajuno",
+    "provincia_codigo": "16",
+    "provincia": "Pastaza",
+    "region": "Amazonía",
+    "area_km2": 8821.736767199483,
+    "poblacion": 8341
+  },
+  {
+    "codigo": "1701",
+    "nombre": "Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha",
+    "region": "Sierra",
+    "area_km2": 4210.913423132275,
+    "poblacion": 2853320
+  },
+  {
+    "codigo": "1702",
+    "nombre": "Cayambe",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha",
+    "region": "Sierra",
+    "area_km2": 1192.733015779704,
+    "poblacion": 110505
+  },
+  {
+    "codigo": "1703",
+    "nombre": "Mejia",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha",
+    "region": "Sierra",
+    "area_km2": 1483.4283219492363,
+    "poblacion": 111433
+  },
+  {
+    "codigo": "1704",
+    "nombre": "Pedro Moncayo",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha",
+    "region": "Sierra",
+    "area_km2": 337.81113414056085,
+    "poblacion": 44534
+  },
+  {
+    "codigo": "1705",
+    "nombre": "Rumiðahui",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha",
+    "region": "Sierra",
+    "area_km2": 135.43117739147297,
+    "poblacion": 119002
+  },
+  {
+    "codigo": "1707",
+    "nombre": "San Miguel De Los Bancos",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha",
+    "region": "Sierra",
+    "area_km2": 850.196087710585,
+    "poblacion": 30984
+  },
+  {
+    "codigo": "1708",
+    "nombre": "Pedro Vicente Maldonado",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha",
+    "region": "Sierra",
+    "area_km2": 623.1107893769664,
+    "poblacion": 17688
+  },
+  {
+    "codigo": "1709",
+    "nombre": "Puerto Quito",
+    "provincia_codigo": "17",
+    "provincia": "Pichincha",
+    "region": "Sierra",
+    "area_km2": 694.5902376610577,
+    "poblacion": 25522
+  },
+  {
+    "codigo": "1801",
+    "nombre": "Ambato",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua",
+    "region": "Sierra",
+    "area_km2": 1017.5753819362278,
+    "poblacion": 396043
+  },
+  {
+    "codigo": "1802",
+    "nombre": "Baños De Agua Santa",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua",
+    "region": "Sierra",
+    "area_km2": 1064.4071321532083,
+    "poblacion": 25710
+  },
+  {
+    "codigo": "1803",
+    "nombre": "Cevallos",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua",
+    "region": "Sierra",
+    "area_km2": 18.77566879755283,
+    "poblacion": 10183
+  },
+  {
+    "codigo": "1804",
+    "nombre": "Mocha",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua",
+    "region": "Sierra",
+    "area_km2": 85.77950312407282,
+    "poblacion": 7463
+  },
+  {
+    "codigo": "1805",
+    "nombre": "Patate",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua",
+    "region": "Sierra",
+    "area_km2": 315.36029429500735,
+    "poblacion": 16180
+  },
+  {
+    "codigo": "1806",
+    "nombre": "Quero",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua",
+    "region": "Sierra",
+    "area_km2": 173.63548253895357,
+    "poblacion": 20974
+  },
+  {
+    "codigo": "1807",
+    "nombre": "San Pedro De Pelileo",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua",
+    "region": "Sierra",
+    "area_km2": 201.55076255078987,
+    "poblacion": 68370
+  },
+  {
+    "codigo": "1808",
+    "nombre": "Santiago De Pillaro",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua",
+    "region": "Sierra",
+    "area_km2": 445.8348303770756,
+    "poblacion": 44244
+  },
+  {
+    "codigo": "1809",
+    "nombre": "Tisaleo",
+    "provincia_codigo": "18",
+    "provincia": "Tungurahua",
+    "region": "Sierra",
+    "area_km2": 59.0803815553652,
+    "poblacion": 14645
+  },
+  {
+    "codigo": "1901",
+    "nombre": "Zamora",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe",
+    "region": "Amazonía",
+    "area_km2": 1898.698665782089,
+    "poblacion": 33638
+  },
+  {
+    "codigo": "1902",
+    "nombre": "Chinchipe",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe",
+    "region": "Amazonía",
+    "area_km2": 1150.2125764663956,
+    "poblacion": 10902
+  },
+  {
+    "codigo": "1903",
+    "nombre": "Nangaritza",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe",
+    "region": "Amazonía",
+    "area_km2": 2018.9556656563552,
+    "poblacion": 8286
+  },
+  {
+    "codigo": "1904",
+    "nombre": "Yacuambi",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe",
+    "region": "Amazonía",
+    "area_km2": 1253.745186832776,
+    "poblacion": 7288
+  },
+  {
+    "codigo": "1905",
+    "nombre": "Yantzaza",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe",
+    "region": "Amazonía",
+    "area_km2": 1015.0191731887671,
+    "poblacion": 27323
+  },
+  {
+    "codigo": "1906",
+    "nombre": "El Pangui",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe",
+    "region": "Amazonía",
+    "area_km2": 631.0890768093899,
+    "poblacion": 11230
+  },
+  {
+    "codigo": "1907",
+    "nombre": "Centinela Del Condor",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe",
+    "region": "Amazonía",
+    "area_km2": 261.4581144011866,
+    "poblacion": 8535
+  },
+  {
+    "codigo": "1908",
+    "nombre": "Palanda",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe",
+    "region": "Amazonía",
+    "area_km2": 1991.5408883893094,
+    "poblacion": 10400
+  },
+  {
+    "codigo": "1909",
+    "nombre": "Paquisha",
+    "provincia_codigo": "19",
+    "provincia": "Zamora Chinchipe",
+    "region": "Amazonía",
+    "area_km2": 339.2056404199334,
+    "poblacion": 6195
+  },
+  {
+    "codigo": "2001",
+    "nombre": "San Cristobal",
+    "provincia_codigo": "20",
+    "provincia": "Galapagos",
+    "region": "Región Insular",
+    "area_km2": 824.5447664396377,
+    "poblacion": 9938
+  },
+  {
+    "codigo": "2002",
+    "nombre": "Isabela",
+    "provincia_codigo": "20",
+    "provincia": "Galapagos",
+    "region": "Región Insular",
+    "area_km2": 5355.7752210782655,
+    "poblacion": 3170
+  },
+  {
+    "codigo": "2003",
+    "nombre": "Santa Cruz",
+    "provincia_codigo": "20",
+    "provincia": "Galapagos",
+    "region": "Región Insular",
+    "area_km2": 1808.2143598800815,
+    "poblacion": 20899
+  },
+  {
+    "codigo": "2101",
+    "nombre": "Lago Agrio",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios",
+    "region": "Amazonía",
+    "area_km2": 3142.5396583890656,
+    "poblacion": 123045
+  },
+  {
+    "codigo": "2102",
+    "nombre": "Gonzalo Pizarro",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios",
+    "region": "Amazonía",
+    "area_km2": 2228.061408555964,
+    "poblacion": 10222
+  },
+  {
+    "codigo": "2103",
+    "nombre": "Putumayo",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios",
+    "region": "Amazonía",
+    "area_km2": 3525.627345918645,
+    "poblacion": 16652
+  },
+  {
+    "codigo": "2104",
+    "nombre": "Shushufindi",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios",
+    "region": "Amazonía",
+    "area_km2": 2519.090828549237,
+    "poblacion": 59632
+  },
+  {
+    "codigo": "2105",
+    "nombre": "Sucumbios",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios",
+    "region": "Amazonía",
+    "area_km2": 1514.38521984639,
+    "poblacion": 3885
+  },
+  {
+    "codigo": "2106",
+    "nombre": "Cascales",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios",
+    "region": "Amazonía",
+    "area_km2": 1247.928896842363,
+    "poblacion": 16420
+  },
+  {
+    "codigo": "2107",
+    "nombre": "Cuyabeno",
+    "provincia_codigo": "21",
+    "provincia": "Sucumbios",
+    "region": "Amazonía",
+    "area_km2": 3872.430191709943,
+    "poblacion": 7240
+  },
+  {
+    "codigo": "2201",
+    "nombre": "Orellana",
+    "provincia_codigo": "22",
+    "provincia": "Orellana",
+    "region": "Amazonía",
+    "area_km2": 7046.177316403927,
+    "poblacion": 96388
+  },
+  {
+    "codigo": "2202",
+    "nombre": "Aguarico",
+    "provincia_codigo": "22",
+    "provincia": "Orellana",
+    "region": "Amazonía",
+    "area_km2": 11161.561052542082,
+    "poblacion": 3619
+  },
+  {
+    "codigo": "2203",
+    "nombre": "La Joya De Los Sachas",
+    "provincia_codigo": "22",
+    "provincia": "Orellana",
+    "region": "Amazonía",
+    "area_km2": 1196.8656298282926,
+    "poblacion": 39923
+  },
+  {
+    "codigo": "2204",
+    "nombre": "Loreto",
+    "provincia_codigo": "22",
+    "provincia": "Orellana",
+    "region": "Amazonía",
+    "area_km2": 2143.696918637266,
+    "poblacion": 25098
+  },
+  {
+    "codigo": "2301",
+    "nombre": "Santo Domingo",
+    "provincia_codigo": "23",
+    "provincia": "Santo Domingo De Los Tsachilas",
+    "region": "Costa",
+    "area_km2": 3445.3604661673467,
+    "poblacion": 470624
+  },
+  {
+    "codigo": "2401",
+    "nombre": "Santa Elena",
+    "provincia_codigo": "24",
+    "provincia": "Santa Elena",
+    "region": "Costa",
+    "area_km2": 3604.208592556383,
+    "poblacion": 194371
+  },
+  {
+    "codigo": "2402",
+    "nombre": "La Libertad",
+    "provincia_codigo": "24",
+    "provincia": "Santa Elena",
+    "region": "Costa",
+    "area_km2": 25.174983069708475,
+    "poblacion": 120728
+  },
+  {
+    "codigo": "2403",
+    "nombre": "Salinas",
+    "provincia_codigo": "24",
+    "provincia": "Santa Elena",
+    "region": "Costa",
+    "area_km2": 70.30579378967643,
+    "poblacion": 97677
+  },
+  {
+    "codigo": "9001",
+    "nombre": "Las Golondrinas",
+    "provincia_codigo": "90",
+    "provincia": "Zona No Delimitada",
+    "region": "Sierra",
+    "area_km2": 127.91810383653106,
+    "poblacion": null
+  },
+  {
+    "codigo": "9003",
+    "nombre": "Manga Del Cura",
+    "provincia_codigo": "90",
+    "provincia": "Zona No Delimitada",
+    "region": "Costa",
+    "area_km2": 482.96728050840517,
+    "poblacion": null
+  },
+  {
+    "codigo": "9004",
+    "nombre": "El Piedrero",
+    "provincia_codigo": "90",
+    "provincia": "Zona No Delimitada",
+    "region": "Sierra",
+    "area_km2": 170.1631455813902,
+    "poblacion": null
+  }
+]

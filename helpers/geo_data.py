@@ -1,4 +1,4 @@
-"""Offline geographic reference data (INEC DPA province codes)."""
+"""Offline geographic reference data (INEC DPA provinces + cantons)."""
 
 from __future__ import annotations
 
@@ -8,7 +8,9 @@ from pathlib import Path
 from typing import Any
 from unicodedata import category, normalize
 
-_DATA_PATH = Path(__file__).resolve().parent / "data" / "provincias.json"
+_DATA_DIR = Path(__file__).resolve().parent / "data"
+_PROVINCIAS_PATH = _DATA_DIR / "provincias.json"
+_CANTONES_PATH = _DATA_DIR / "cantones.json"
 
 
 def _strip(text: str) -> str:
@@ -18,9 +20,14 @@ def _strip(text: str) -> str:
 
 @lru_cache(maxsize=1)
 def list_provincias() -> list[dict[str, Any]]:
-    with _DATA_PATH.open(encoding="utf-8") as fh:
-        data = json.load(fh)
-    return list(data)
+    with _PROVINCIAS_PATH.open(encoding="utf-8") as fh:
+        return list(json.load(fh))
+
+
+@lru_cache(maxsize=1)
+def list_cantones() -> list[dict[str, Any]]:
+    with _CANTONES_PATH.open(encoding="utf-8") as fh:
+        return list(json.load(fh))
 
 
 def find_provincias(query: str = "", region: str = "") -> list[dict[str, Any]]:
@@ -41,4 +48,34 @@ def find_provincias(query: str = "", region: str = "") -> list[dict[str, Any]]:
         )
         if any(q == f or q in f for f in fields):
             out.append(p)
+    return out
+
+
+def find_cantones(
+    query: str = "",
+    provincia: str = "",
+    region: str = "",
+) -> list[dict[str, Any]]:
+    items = list_cantones()
+    q = _strip(query)
+    p = _strip(provincia)
+    r = _strip(region)
+    out: list[dict[str, Any]] = []
+    for c in items:
+        if r and r not in _strip(c.get("region", "")):
+            continue
+        if p:
+            prov_blob = _strip(f"{c.get('provincia', '')} {c.get('provincia_codigo', '')}")
+            if p not in prov_blob:
+                continue
+        if not q:
+            out.append(c)
+            continue
+        fields = (
+            _strip(c.get("codigo", "")),
+            _strip(c.get("nombre", "")),
+            _strip(c.get("provincia", "")),
+        )
+        if any(q == f or q in f for f in fields):
+            out.append(c)
     return out

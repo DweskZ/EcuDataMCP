@@ -10,6 +10,7 @@ from typing import Any
 import httpx
 
 from helpers import env_config
+from helpers.cache import sercop_search_cache
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.user_agent import USER_AGENT
 
@@ -94,6 +95,19 @@ async def search_contracts(
     if fallback_years > 0:
         years.extend(start_year - i for i in range(1, fallback_years + 1))
 
+    cache_key = (
+        "search",
+        search.lower(),
+        start_year,
+        max(page, 1),
+        buyer.strip().lower(),
+        supplier.strip().lower(),
+        fallback_years,
+    )
+    cached = sercop_search_cache.get(cache_key)
+    if isinstance(cached, dict):
+        return cached
+
     last: dict[str, Any] = {"total": 0, "page": page, "pages": 0, "data": []}
     for y in years:
         if y < 2015:
@@ -116,7 +130,9 @@ async def search_contracts(
         last = result
         last["_resolved_year"] = y
         if result.get("data"):
+            sercop_search_cache.set(cache_key, last)
             return last
+    sercop_search_cache.set(cache_key, last)
     return last
 
 

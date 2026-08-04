@@ -2,7 +2,7 @@ import json
 
 from mcp.server.fastmcp import FastMCP
 
-from helpers.geo_data import list_provincias
+from helpers.geo_data import list_cantones, list_provincias
 
 _INSTITUCIONES_CLAVE = [
     {"id": "8", "nombre": "SRI", "uso": "impuestos, RUC, facturación"},
@@ -53,8 +53,14 @@ def register_catalog_resources(mcp: FastMCP) -> None:
                     "tools": ["search_contratos", "get_contrato_info"],
                 },
                 {
+                    "id": "sgr",
+                    "nombre": "SGR Gestión de Riesgos (COE + SAT)",
+                    "base": "https://sgrportal.gestionderiesgos.gob.ec/server/rest/services",
+                    "tools": ["search_eventos_riesgo", "list_sat_tsunami"],
+                },
+                {
                     "id": "geo",
-                    "nombre": "DPA provincias (referencia offline INEC)",
+                    "nombre": "DPA provincias y cantones (referencia offline INEC)",
                     "tools": ["lookup_ubicacion"],
                 },
             ]
@@ -70,6 +76,16 @@ def register_catalog_resources(mcp: FastMCP) -> None:
     )
     def provincias() -> str:
         return json.dumps(list_provincias(), ensure_ascii=False, indent=2)
+
+    @mcp.resource(
+        "ecuador://cantones",
+        name="cantones_ecuador",
+        title="Cantones del Ecuador",
+        description="Cantones con código INEC, provincia, región y población estimada.",
+        mime_type="application/json",
+    )
+    def cantones() -> str:
+        return json.dumps(list_cantones(), ensure_ascii=False, indent=2)
 
     @mcp.resource(
         "ecuador://instituciones-clave",

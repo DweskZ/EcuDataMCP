@@ -58,7 +58,8 @@ Este MCP unifica **fuentes gubernamentales** en un solo servidor:
 | **Trámites e instituciones** (Gob.ec) | Procedimientos, requisitos, costos | gob.ec/api/v1 |
 | **Regulaciones** (Gob.ec) | Normas, acuerdos, Registro Oficial | gob.ec/api/v1/regulaciones |
 | **Contratos públicos** (SERCOP/OCDS) | Licitaciones, compradores, proveedores | datosabiertos.compraspublicas.gob.ec |
-| **Geografía** (DPA) | 24 provincias, códigos INEC, capitales | referencia offline |
+| **Gestión de Riesgos** (SGR) | Eventos COE + estaciones SAT tsunami | sgrportal.gestionderiesgos.gob.ec |
+| **Geografía** (DPA) | 24 provincias + 224 cantones (códigos INEC) | referencia offline |
 
 **Sin API key. Sin restricciones de acceso. 100% datos públicos.**
 
@@ -242,15 +243,17 @@ uv run python main.py --transport stdio
 
 ---
 
-## Herramientas disponibles (21 tools)
+## Herramientas disponibles (23 tools)
+
+Varios tools aceptan `format="json"` además de texto.
 
 ### Entrada unificada
 
 | Tool | Descripción |
 |------|-------------|
 | `list_capabilities` | Resume fuentes, tools, prompts y límites del servidor. |
-| `search_ecuador` | Busca a la vez en datasets, organizaciones, trámites, regulaciones y contratos. Ideal como primer paso. |
-| `lookup_ubicacion` | Provincias del Ecuador (código INEC, capital, región). |
+| `search_ecuador` | Busca a la vez en datasets, orgs, trámites, regulaciones, contratos y riesgos. |
+| `lookup_ubicacion` | Provincias y cantones (código INEC, región, población). |
 
 ### Datos Abiertos
 
@@ -281,6 +284,13 @@ uv run python main.py --transport stdio
 | `search_contratos` | Buscar procedimientos de contratación pública (SERCOP/OCDS). |
 | `get_contrato_info` | Expediente OCDS: comprador, licitación, adjudicaciones, contratos. |
 
+### Riesgos (SGR)
+
+| Tool | Descripción |
+|------|-------------|
+| `search_eventos_riesgo` | Eventos de emergencia/riesgo del COE (deslizamientos, inundaciones, etc.). |
+| `list_sat_tsunami` | Estaciones SAT de alerta temprana por tsunami. |
+
 ### Exploración
 
 | Tool | Descripción |
@@ -301,7 +311,7 @@ uv run python main.py --transport stdio
 
 ### Prompts MCP
 
-Plantillas listas para el cliente (Claude/Cursor): `explorar_datos`, `consultar_tramite`, `investigar_contrato`, `buscar_regulacion`.
+Plantillas listas para el cliente (Claude/Cursor): `explorar_datos`, `consultar_tramite`, `investigar_contrato`, `buscar_regulacion`, `monitorear_riesgos`.
 
 ### Resources MCP
 
@@ -309,6 +319,7 @@ Plantillas listas para el cliente (Claude/Cursor): `explorar_datos`, `consultar_
 |-----|-----------|
 | `ecuador://fuentes` | Fuentes integradas y tools asociadas |
 | `ecuador://provincias` | 24 provincias (JSON) |
+| `ecuador://cantones` | 224 cantones (JSON) |
 | `ecuador://instituciones-clave` | IDs frecuentes de gob.ec (SRI, IESS, etc.) |
 
 ---
