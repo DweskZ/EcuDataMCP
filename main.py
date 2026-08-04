@@ -11,12 +11,13 @@ from mcp.server.fastmcp import FastMCP
 from helpers.env_config import get_mcp_host, get_mcp_port, get_transport
 from helpers.logging import MAIN_LOGGER_NAME, UVICORN_LOGGING_CONFIG, setup_logging
 from prompts import register_prompts
+from resources import register_resources
 from tools import register_tools
 
 setup_logging()
 
 SERVER_START_TIME = datetime.now(UTC)
-VERSION = "0.3.1"
+VERSION = "0.3.2"
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
@@ -26,6 +27,7 @@ mcp = FastMCP(
 )
 register_tools(mcp)
 register_prompts(mcp)
+register_resources(mcp)
 
 
 def with_health_endpoint(
