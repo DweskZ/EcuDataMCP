@@ -1,6 +1,7 @@
 from mcp.server.fastmcp import FastMCP
 
 from helpers import gobec_client
+from helpers.format_out import render_output
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
 
@@ -8,7 +9,9 @@ from helpers.logging import log_tool
 def register_search_regulaciones_tool(mcp: FastMCP) -> None:
     @mcp.tool()
     @log_tool
-    async def search_regulaciones(query: str = "", page: int = 1) -> str:
+    async def search_regulaciones(
+        query: str = "", page: int = 1, format: str = "text"
+    ) -> str:
         """
         Search or list regulations published on Ecuador's gob.ec portal.
 
@@ -19,6 +22,7 @@ def register_search_regulaciones_tool(mcp: FastMCP) -> None:
         Args:
             query: Keywords (e.g. "datos personales", "tránsito", "LOTAIP")
             page: Page number when query is empty (1-based)
+            format: text | json
         """
         try:
             if query.strip():
@@ -27,48 +31,68 @@ def register_search_regulaciones_tool(mcp: FastMCP) -> None:
                 api_page = max(page - 1, 0)
                 regs = await gobec_client.list_regulaciones(page=api_page)
         except Exception as e:
-            return f"Error al buscar regulaciones: {e}"
+            return render_output(
+                {"error": str(e)},
+                format,
+                text_builder=lambda d: f"Error al buscar regulaciones: {d['error']}",
+            )
 
-        if not regs:
-            msg = "No se encontraron regulaciones"
-            if query:
-                msg += f" para '{query}'"
-            return msg + "."
+        payload = {
+            "query": query,
+            "page": page,
+            "total": len(regs),
+            "results": [
+                {
+                    "regulacion_id": reg.get("regulacion_id"),
+                    "regulacion": _clean_html(reg.get("regulacion", "")).strip('"'),
+                    "tipo": reg.get("tipo"),
+                    "registro_oficial_numero": reg.get("registro_oficial_numero"),
+                    "registro_oficial_fecha": reg.get("registro_oficial_fecha"),
+                    "url": reg.get("url"),
+                    "descripcion": _clean_html(reg.get("descripcion", ""))[:300],
+                }
+                for reg in regs[:20]
+            ],
+        }
 
-        parts = []
-        if query.strip():
-            parts.append(f"Regulaciones que coinciden con '{query}':")
-            parts.append(f"Encontradas: {len(regs)} (máx. páginas escaneadas)\n")
-        else:
-            parts.append(f"Regulaciones en gob.ec (página {page}):")
-            parts.append(f"Mostrando {min(len(regs), 20)} resultados\n")
+        def to_text(data: dict) -> str:
+            rows = data.get("results") or []
+            if not rows:
+                msg = "No se encontraron regulaciones"
+                if data.get("query"):
+                    msg += f" para '{data['query']}'"
+                return msg + "."
 
-        for i, reg in enumerate(regs[:20], 1):
-            title = _clean_html(reg.get("regulacion", "Sin título")).strip('"').strip()
-            parts.append(f"{i}. {title}")
-            parts.append(f"   ID: {reg.get('regulacion_id', '?')}")
-            if reg.get("tipo"):
-                parts.append(f"   Tipo: {reg['tipo']}")
-            if reg.get("registro_oficial_numero"):
+            parts: list[str] = []
+            if data.get("query"):
+                parts.append(f"Regulaciones que coinciden con '{data['query']}':")
                 parts.append(
-                    f"   Registro Oficial: {reg['registro_oficial_numero']}"
-                    + (
-                        f" ({reg['registro_oficial_fecha']})"
-                        if reg.get("registro_oficial_fecha")
-                        else ""
-                    )
+                    f"Encontradas: {data['total']} (máx. páginas escaneadas)\n"
                 )
-            desc = _clean_html(reg.get("descripcion", ""))
-            if desc:
-                parts.append(f"   Descripción: {desc[:220]}")
-            if reg.get("url"):
-                parts.append(f"   URL: {reg['url']}")
-            parts.append("")
+            else:
+                parts.append(f"Regulaciones en gob.ec (página {data['page']}):")
+                parts.append(f"Mostrando {len(rows)} resultados\n")
 
-        if len(regs) > 20:
-            parts.append(f"... y {len(regs) - 20} más.")
+            for i, reg in enumerate(rows, 1):
+                parts.append(f"{i}. {reg.get('regulacion') or 'Sin título'}")
+                parts.append(f"   ID: {reg.get('regulacion_id', '?')}")
+                if reg.get("tipo"):
+                    parts.append(f"   Tipo: {reg['tipo']}")
+                if reg.get("registro_oficial_numero"):
+                    ro = reg["registro_oficial_numero"]
+                    if reg.get("registro_oficial_fecha"):
+                        ro += f" ({reg['registro_oficial_fecha']})"
+                    parts.append(f"   Registro Oficial: {ro}")
+                if reg.get("descripcion"):
+                    parts.append(f"   Descripción: {reg['descripcion']}")
+                if reg.get("url"):
+                    parts.append(f"   URL: {reg['url']}")
+                parts.append("")
+            if data["total"] > 20:
+                parts.append(f"... y {data['total'] - 20} más.")
+            parts.append(
+                "Tip: Usa get_regulacion_info(regulacion_id='...') para el detalle y el PDF."
+            )
+            return "\n".join(parts)
 
-        parts.append(
-            "Tip: Usa get_regulacion_info(regulacion_id='...') para el detalle y el PDF."
-        )
-        return "\n".join(parts)
+        return render_output(payload, format, text_builder=to_text)

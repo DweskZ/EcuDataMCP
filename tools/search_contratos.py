@@ -5,6 +5,7 @@ from mcp.server.fastmcp import FastMCP
 from helpers import sercop_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
+from helpers.sercop_client import SercopRateLimitError
 
 
 def register_search_contratos_tool(mcp: FastMCP) -> None:
@@ -24,7 +25,7 @@ def register_search_contratos_tool(mcp: FastMCP) -> None:
         Useful for journalists, researchers and citizens looking for contracts,
         tenders, buyers or suppliers. Requires a keyword of at least 3 characters.
         Year defaults to the current calendar year and falls back to prior years
-        when year=0. Results are cached ~10 minutes to reduce SERCOP 429s.
+        when year=0. Results are cached ~30 minutes; on 429 the client cools down.
 
         Args:
             query: Keyword (min 3 chars), e.g. "medicinas", "vialidad", "software"
@@ -59,13 +60,18 @@ def register_search_contratos_tool(mcp: FastMCP) -> None:
                 supplier=supplier,
                 fallback_years=fallback,
             )
+        except SercopRateLimitError as e:
+            return render_output(
+                {"error": "rate_limited", "message": str(e)},
+                format,
+                text_builder=lambda d: f"SERCOP ocupado: {d['message']}",
+            )
         except Exception as e:
             return render_output(
                 {"error": str(e)},
                 format,
                 text_builder=lambda d: (
-                    f"Error al buscar contratos en SERCOP: {d['error']}. "
-                    "La API a veces responde 429 (rate limit); reintenta en unos segundos."
+                    f"Error al buscar contratos en SERCOP: {d['error']}."
                 ),
             )
 

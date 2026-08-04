@@ -1,6 +1,16 @@
 import pytest
 
 from helpers import sercop_client
+from helpers.cache import TtlCache
+
+
+@pytest.fixture(autouse=True)
+def _reset_sercop_state():
+    sercop_client._COOLDOWN_UNTIL = 0.0
+    sercop_client.sercop_search_cache = TtlCache(ttl_seconds=60)
+    sercop_client._negative_cache = TtlCache(ttl_seconds=60)
+    yield
+    sercop_client._COOLDOWN_UNTIL = 0.0
 
 
 @pytest.mark.asyncio
@@ -30,6 +40,26 @@ async def test_search_contracts_success(httpx_mock):
 async def test_search_contracts_rejects_short_query():
     with pytest.raises(ValueError):
         await sercop_client.search_contracts(search="ab", year=2024)
+
+
+@pytest.mark.asyncio
+async def test_search_contracts_rate_limit(httpx_mock, monkeypatch):
+    monkeypatch.setattr(sercop_client, "_MAX_RETRIES", 2)
+
+    async def _no_sleep(_: float) -> None:
+        return None
+
+    monkeypatch.setattr(sercop_client.asyncio, "sleep", _no_sleep)
+
+    url = (
+        "https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/api/search_ocds"
+        "?year=2024&search=agua&page=1"
+    )
+    httpx_mock.add_response(url=url, status_code=429)
+    httpx_mock.add_response(url=url, status_code=429)
+
+    with pytest.raises(sercop_client.SercopRateLimitError):
+        await sercop_client.search_contracts(search="agua", year=2024, page=1)
 
 
 @pytest.mark.asyncio

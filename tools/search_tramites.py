@@ -3,6 +3,7 @@ from unicodedata import category, normalize
 from mcp.server.fastmcp import FastMCP
 
 from helpers import gobec_client
+from helpers.format_out import render_output
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
 
@@ -26,7 +27,10 @@ def register_search_tramites_tool(mcp: FastMCP) -> None:
     @mcp.tool()
     @log_tool
     async def search_tramites(
-        query: str = "", institution_id: str = "", page: int = 1
+        query: str = "",
+        institution_id: str = "",
+        page: int = 1,
+        format: str = "text",
     ) -> str:
         """
         Search for government procedures (trámites) on Ecuador's official portal gob.ec.
@@ -52,8 +56,8 @@ def register_search_tramites_tool(mcp: FastMCP) -> None:
             institution_id: Institution ID (strongly recommended for relevant results)
             page: Page number (1-based, default: 1). Ignored when query is provided
                   (all pages are searched automatically).
+            format: text | json
         """
-        # Auto-detect institution from common keywords
         if query and not institution_id:
             keyword_to_inst = {
                 "ruc": "8", "sri": "8", "impuesto": "8", "factura": "8",
@@ -75,86 +79,113 @@ def register_search_tramites_tool(mcp: FastMCP) -> None:
                     institution_id = inst_id
                     break
 
-        query_words = [_strip_accents(w.lower()) for w in query.split() if len(w) >= 2] if query else []
+        query_words = (
+            [_strip_accents(w.lower()) for w in query.split() if len(w) >= 2]
+            if query
+            else []
+        )
 
         try:
             if query_words and institution_id:
-                # Fetch ALL pages and filter to find the best matches
                 all_tramites: list[dict] = []
-                for api_page in range(10):  # Max 10 pages
+                for api_page in range(10):
                     batch = await gobec_client.search_tramites(
                         institution_id=institution_id, page=api_page
                     )
                     if not batch:
                         break
                     all_tramites.extend(batch)
-
-                filtered = [t for t in all_tramites if _matches_query(t, query_words)]
-                tramites = filtered
+                tramites = [t for t in all_tramites if _matches_query(t, query_words)]
                 total_scanned = len(all_tramites)
             elif query_words and not institution_id:
-                # No institution: scan several pages and filter client-side
-                all_tramites: list[dict] = []
+                all_tramites = []
                 for api_page in range(5):
                     batch = await gobec_client.search_tramites(page=api_page)
                     if not batch:
                         break
                     all_tramites.extend(batch)
-                filtered = [t for t in all_tramites if _matches_query(t, query_words)]
-                tramites = filtered
+                tramites = [t for t in all_tramites if _matches_query(t, query_words)]
                 total_scanned = len(all_tramites)
             else:
-                # No query: just paginate normally
                 api_page = max(page - 1, 0)
                 tramites = await gobec_client.search_tramites(
                     institution_id=institution_id, page=api_page
                 )
                 total_scanned = len(tramites)
         except Exception as e:
-            return f"Error al buscar trámites: {e}"
-
-        if not tramites:
-            msg_parts = ["No se encontraron trámites"]
-            if query:
-                msg_parts.append(f"que coincidan con '{query}'")
-            if institution_id:
-                msg_parts.append(f"en la institución ID {institution_id}")
-            if query_words and total_scanned > 0:
-                msg_parts.append(f"(se revisaron {total_scanned} trámites en total)")
-            return " ".join(msg_parts) + "."
-
-        parts = []
-        if query and institution_id:
-            parts.append(
-                f"Trámites que coinciden con '{query}' en institución ID {institution_id}:"
+            return render_output(
+                {"error": str(e)},
+                format,
+                text_builder=lambda d: f"Error al buscar trámites: {d['error']}",
             )
-            parts.append(
-                f"Encontrados: {len(tramites)} de {total_scanned} trámites revisados\n"
-            )
-        elif institution_id:
-            parts.append(f"Trámites de la institución (ID: {institution_id}), página {page}:")
-            parts.append(f"Mostrando {min(len(tramites), 20)} resultados\n")
-        elif query:
-            parts.append(f"Trámites que coinciden con '{query}':")
-            parts.append(f"Encontrados: {len(tramites)}\n")
-        else:
-            parts.append(f"Trámites (página {page}):")
-            parts.append(f"Mostrando {min(len(tramites), 20)} resultados\n")
 
-        for i, t in enumerate(tramites[:20], 1):
-            nombre = t.get("nombre", "Sin nombre")
-            parts.append(f"{i}. {nombre}")
-            parts.append(f"   ID: {t.get('tramite_id', '?')}")
-            if t.get("codigo"):
-                parts.append(f"   Código: {t['codigo']}")
-            if t.get("url"):
-                parts.append(f"   URL: {t['url']}")
-            desc = _clean_html(t.get("descripcion", ""))
-            if desc:
-                parts.append(f"   Descripción: {desc[:250]}...")
-            parts.append("")
+        payload = {
+            "query": query,
+            "institution_id": institution_id,
+            "page": page,
+            "total_scanned": total_scanned,
+            "total": len(tramites),
+            "results": [
+                {
+                    "tramite_id": t.get("tramite_id"),
+                    "nombre": t.get("nombre"),
+                    "codigo": t.get("codigo"),
+                    "url": t.get("url"),
+                    "descripcion": _clean_html(t.get("descripcion", ""))[:300],
+                }
+                for t in tramites[:20]
+            ],
+        }
 
-        if len(tramites) > 20:
-            parts.append(f"... y {len(tramites) - 20} más.")
+        def to_text(data: dict) -> str:
+            rows = data.get("results") or []
+            if not rows:
+                msg_parts = ["No se encontraron trámites"]
+                if data.get("query"):
+                    msg_parts.append(f"que coincidan con '{data['query']}'")
+                if data.get("institution_id"):
+                    msg_parts.append(f"en la institución ID {data['institution_id']}")
+                if query_words and data.get("total_scanned", 0) > 0:
+                    msg_parts.append(
+                        f"(se revisaron {data['total_scanned']} trámites en total)"
+                    )
+                return " ".join(msg_parts) + "."
 
-        return "\n".join(parts)
+            parts: list[str] = []
+            if data.get("query") and data.get("institution_id"):
+                parts.append(
+                    f"Trámites que coinciden con '{data['query']}' "
+                    f"en institución ID {data['institution_id']}:"
+                )
+                parts.append(
+                    f"Encontrados: {data['total']} de {data['total_scanned']} "
+                    "trámites revisados\n"
+                )
+            elif data.get("institution_id"):
+                parts.append(
+                    f"Trámites de la institución (ID: {data['institution_id']}), "
+                    f"página {data['page']}:"
+                )
+                parts.append(f"Mostrando {len(rows)} resultados\n")
+            elif data.get("query"):
+                parts.append(f"Trámites que coinciden con '{data['query']}':")
+                parts.append(f"Encontrados: {data['total']}\n")
+            else:
+                parts.append(f"Trámites (página {data['page']}):")
+                parts.append(f"Mostrando {len(rows)} resultados\n")
+
+            for i, t in enumerate(rows, 1):
+                parts.append(f"{i}. {t.get('nombre', 'Sin nombre')}")
+                parts.append(f"   ID: {t.get('tramite_id', '?')}")
+                if t.get("codigo"):
+                    parts.append(f"   Código: {t['codigo']}")
+                if t.get("url"):
+                    parts.append(f"   URL: {t['url']}")
+                if t.get("descripcion"):
+                    parts.append(f"   Descripción: {t['descripcion']}...")
+                parts.append("")
+            if data["total"] > 20:
+                parts.append(f"... y {data['total'] - 20} más.")
+            return "\n".join(parts)
+
+        return render_output(payload, format, text_builder=to_text)

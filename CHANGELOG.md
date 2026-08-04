@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.2 — 2026-08-04
+
+### Added / Improved
+- SERCOP: cooldown + negative cache + `SercopRateLimitError` con mensaje claro
+- Caché SERCOP ampliada a 30 min; respeta `Retry-After` cuando existe
+- `format=json` en `search_tramites`, `search_regulaciones`, `get_tramite_info`, `get_regulacion_info`
+
 ## 0.4.1 — 2026-08-04
 
 ### Added
