@@ -1,5 +1,6 @@
 import logging
 import re
+from html import unescape
 from typing import Any
 
 import httpx
@@ -22,12 +23,12 @@ def _clean_html(text: str) -> str:
     """Strip HTML tags, preserving line breaks for list items and paragraphs."""
     if not text:
         return ""
-    # Unescape double-encoded HTML (gob.ec sends &lt;p&gt; inside <p>)
-    text = re.sub(r"&lt;", "<", text)
-    text = re.sub(r"&gt;", ">", text)
-    text = re.sub(r"&amp;", "&", text)
-    text = re.sub(r"&nbsp;", " ", text)
-    text = re.sub(r"&quot;", '"', text)
+    # gob.ec often double-encodes entities (&amp;quot; → &quot; → ")
+    for _ in range(3):
+        unescaped = unescape(text)
+        if unescaped == text:
+            break
+        text = unescaped
     # Insert line breaks before block/list elements
     text = re.sub(r"<br\s*/?>", "\n", text, flags=re.IGNORECASE)
     text = re.sub(r"</li>", "\n", text, flags=re.IGNORECASE)
@@ -35,7 +36,6 @@ def _clean_html(text: str) -> str:
     text = re.sub(r"</tr>", "\n", text, flags=re.IGNORECASE)
     # Add bullet for list items
     text = re.sub(r"<li[^>]*>", "- ", text, flags=re.IGNORECASE)
-    # Numbered items like "1. ", "2. " often appear as raw text — keep them
     # Strip all remaining HTML tags
     text = re.sub(r"<[^>]+>", "", text)
     # Clean up whitespace per line, remove blank lines

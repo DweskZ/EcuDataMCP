@@ -37,13 +37,16 @@ def register_search_contratos_tool(mcp: FastMCP) -> None:
         year = year or datetime.now(UTC).year
         page = max(page, 1)
 
+        # If the caller didn't pin a year, fall back up to 2 previous years.
+        fallback = 0 if year else 2
         try:
             result = await sercop_client.search_contracts(
                 search=query,
-                year=year,
+                year=year or None,
                 page=page,
                 buyer=buyer,
                 supplier=supplier,
+                fallback_years=fallback,
             )
         except Exception as e:
             return (
@@ -54,15 +57,16 @@ def register_search_contratos_tool(mcp: FastMCP) -> None:
         data = result.get("data") or []
         total = result.get("total", len(data))
         pages = result.get("pages", "?")
+        resolved_year = result.get("_resolved_year", year or datetime.now(UTC).year)
 
         if not data:
             return (
-                f"No se encontraron contratos para '{query}' en {year}. "
+                f"No se encontraron contratos para '{query}' en {resolved_year}. "
                 "Prueba otro año, buyer o supplier."
             )
 
         parts = [
-            f"Contratos públicos (SERCOP/OCDS) — '{query}' — año {year}",
+            f"Contratos públicos (SERCOP/OCDS) — '{query}' — año {resolved_year}",
             f"Total: {total} | Página {result.get('page', page)}/{pages}",
             f"Mostrando {len(data)} resultados\n",
         ]

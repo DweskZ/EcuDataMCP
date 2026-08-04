@@ -76,7 +76,10 @@ def register_search_ecuador_tool(mcp: FastMCP) -> None:
                 return ValueError("query corto para SERCOP")
             try:
                 return await sercop_client.search_contracts(
-                    search=query, year=datetime.now(UTC).year, page=1
+                    search=query,
+                    year=datetime.now(UTC).year,
+                    page=1,
+                    fallback_years=2,
                 )
             except Exception as e:
                 return e

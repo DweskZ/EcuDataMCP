@@ -247,7 +247,7 @@ uv run python main.py --transport stdio
 
 | Tool | Descripción |
 |------|-------------|
-| `search_ecuador` | Busca a la vez en datasets, organizaciones CKAN y trámites gob.ec. Ideal como primer paso. |
+| `search_ecuador` | Busca a la vez en datasets, organizaciones, trámites, regulaciones y contratos. Ideal como primer paso. |
 
 ### Datos Abiertos
 
@@ -295,6 +295,10 @@ uv run python main.py --transport stdio
 3. query_resource_data("resource-id", query=...)  → Consulta tabular (DataStore)
    # o preview_resource_data("resource-id")       → Preview del archivo
 ```
+
+### Prompts MCP
+
+Plantillas listas para el cliente (Claude/Cursor): `explorar_datos`, `consultar_tramite`, `investigar_contrato`, `buscar_regulacion`.
 
 ---
 

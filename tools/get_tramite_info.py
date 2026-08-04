@@ -81,4 +81,24 @@ def register_get_tramite_info_tool(mcp: FastMCP) -> None:
             parts.append("")
             parts.append(f"Imagen: {t['imagen_url']}")
 
+        # Linked regulations that underpin the procedure
+        try:
+            regs = await gobec_client.get_tramite_regulaciones(tramite_id)
+        except Exception:
+            regs = []
+        if regs:
+            parts.append("")
+            parts.append(f"Regulaciones relacionadas ({len(regs)}):")
+            for i, reg in enumerate(regs[:8], 1):
+                title = _clean_html(
+                    reg.get("regulacion") or reg.get("nombre") or "Regulación"
+                ).strip('"')
+                rid = reg.get("regulacion_id", "?")
+                parts.append(f"{i}. {title} (ID: {rid})")
+                if reg.get("registro_oficial_numero"):
+                    parts.append(f"   R.O.: {reg['registro_oficial_numero']}")
+            parts.append(
+                "Tip: Usa get_regulacion_info(regulacion_id='...') para el detalle/PDF."
+            )
+
         return "\n".join(parts)

@@ -1,6 +1,6 @@
 [project]
 name = "ecuador-mcp"
-version = "0.3.0"
+version = "0.3.1"
 description = "Model Context Protocol (MCP) server for Ecuador's open government data: CKAN datasets, gob.ec trámites/regulaciones, and SERCOP public contracts (OCDS)."
 authors = [{ name = "Ecuador MCP Contributors" }]
 readme = "README.md"
@@ -16,6 +16,9 @@ dependencies = [
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["helpers*", "tools*", "prompts*"]
 
 [dependency-groups]
 dev = [

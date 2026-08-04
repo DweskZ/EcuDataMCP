@@ -54,3 +54,25 @@ async def test_get_contract_record(httpx_mock):
     )
     result = await sercop_client.get_contract_record(ocid)
     assert result["records"][0]["ocid"] == ocid
+
+
+@pytest.mark.asyncio
+async def test_search_contracts_fallback_year(httpx_mock):
+    httpx_mock.add_response(
+        url="https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/api/search_ocds?year=2026&search=agua&page=1",
+        json={"total": 0, "page": "1", "pages": 0, "data": []},
+    )
+    httpx_mock.add_response(
+        url="https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/api/search_ocds?year=2025&search=agua&page=1",
+        json={
+            "total": 1,
+            "page": "1",
+            "pages": 1,
+            "data": [{"ocid": "ocds-2025", "title": "Agua 2025"}],
+        },
+    )
+    result = await sercop_client.search_contracts(
+        search="agua", year=2026, page=1, fallback_years=1
+    )
+    assert result["_resolved_year"] == 2025
+    assert result["data"][0]["ocid"] == "ocds-2025"

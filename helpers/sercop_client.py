@@ -75,32 +75,49 @@ async def search_contracts(
     page: int = 1,
     buyer: str = "",
     supplier: str = "",
+    fallback_years: int = 0,
     session: httpx.AsyncClient | None = None,
 ) -> dict[str, Any]:
     """
     Search OCDS contracting procedures.
 
     Required by API: year + search (>= 3 chars).
+    If fallback_years > 0 and the chosen year returns empty data, try previous
+    years (useful early in a calendar year or when a topic is sparse).
     """
     search = (search or "").strip()
     if len(search) < 3:
         raise ValueError("search debe tener al menos 3 caracteres")
 
-    year = year or datetime.now(UTC).year
-    params: dict[str, Any] = {
-        "year": year,
-        "search": search,
-        "page": max(page, 1),
-    }
-    if buyer.strip():
-        params["buyer"] = buyer.strip()
-    if supplier.strip():
-        params["supplier"] = supplier.strip()
+    start_year = year or datetime.now(UTC).year
+    years = [start_year]
+    if fallback_years > 0:
+        years.extend(start_year - i for i in range(1, fallback_years + 1))
 
-    result = await _get_json(_sercop_url("search_ocds"), params=params, session=session)
-    if isinstance(result, dict):
-        return result
-    return {"total": 0, "page": page, "pages": 0, "data": []}
+    last: dict[str, Any] = {"total": 0, "page": page, "pages": 0, "data": []}
+    for y in years:
+        if y < 2015:
+            continue
+        params: dict[str, Any] = {
+            "year": y,
+            "search": search,
+            "page": max(page, 1),
+        }
+        if buyer.strip():
+            params["buyer"] = buyer.strip()
+        if supplier.strip():
+            params["supplier"] = supplier.strip()
+
+        result = await _get_json(
+            _sercop_url("search_ocds"), params=params, session=session
+        )
+        if not isinstance(result, dict):
+            continue
+        last = result
+        last["_resolved_year"] = y
+        if result.get("data"):
+            return last
+    return last
 
 
 async def get_contract_record(
