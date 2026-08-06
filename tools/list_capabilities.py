@@ -12,6 +12,7 @@ _CAPABILITIES = {
         "SERCOP OCDS contratos",
         "SGR COE eventos de riesgo + SAT tsunami",
         "DPA provincias/cantones/parroquias (offline INEC)",
+        "ANDA (NADA/IHSN) catálogo de encuestas y censos del INEC",
     ],
     "entrada": [
         "list_capabilities",
@@ -35,6 +36,7 @@ _CAPABILITIES = {
         "compras": ["search_contratos", "get_contrato_info"],
         "riesgos": ["search_eventos_riesgo", "list_sat_tsunami"],
         "geo": ["lookup_ubicacion"],
+        "encuestas": ["search_anda"],
     },
     "resources": [
         "ecuador://fuentes",

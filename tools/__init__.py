@@ -17,6 +17,7 @@ from tools.list_sat_tsunami import register_list_sat_tsunami_tool
 from tools.lookup_ubicacion import register_lookup_ubicacion_tool
 from tools.preview_resource_data import register_preview_resource_data_tool
 from tools.query_resource_data import register_query_resource_data_tool
+from tools.search_anda import register_search_anda_tool
 from tools.search_contratos import register_search_contratos_tool
 from tools.search_datasets import register_search_datasets_tool
 from tools.search_ecuador import register_search_ecuador_tool
@@ -50,6 +51,8 @@ def register_tools(mcp: FastMCP) -> None:
     register_get_tramite_info_tool(mcp)
     register_list_instituciones_tool(mcp)
     register_get_institucion_info_tool(mcp)
+
+    register_search_anda_tool(mcp)
 
     register_search_regulaciones_tool(mcp)
     register_get_regulacion_info_tool(mcp)
