@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Any
 
 import httpx
@@ -10,6 +11,12 @@ from helpers.user_agent import USER_AGENT
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 _TIMEOUT = 20.0
+
+_CSRF_RE = re.compile(r'name="ncsrf"\s+value="([a-f0-9]+)"')
+_DOWNLOAD_LINK_RE = re.compile(
+    r'href="(https://anda\.inec\.gob\.ec/anda5/index\.php/catalog/\d+/download/\d+)"'
+    r'[^>]*title="([^"]+)"'
+)
 
 # NADA marks surveys with no microdata attached (aggregate-only publications,
 # e.g. price indices) as "data_na" — in the catalog list endpoint that's the
@@ -82,6 +89,55 @@ async def get_survey(
         return resp.json().get("dataset", {})
     except httpx.HTTPError as exc:
         logger.error("ANDA survey detail request failed for %s: %s", idno, exc)
+        raise
+    finally:
+        if own:
+            await session.aclose()
+
+
+async def list_microdata_files(
+    survey_id: str,
+    session: httpx.AsyncClient | None = None,
+) -> list[dict[str, str]]:
+    """Discover direct download links for a survey's microdata files.
+
+    ANDA gates the file list behind a one-click usage-terms form (research/
+    statistical use only, no re-identifying respondents, cite the source) on
+    the "get-microdata" page before showing download links. This walks that
+    flow — GET the page for its CSRF token, POST acceptance — to reveal them.
+
+    The download URLs themselves turned out to require no session or cookie
+    at all once known: a plain GET from a fresh client with no prior request
+    returns the file directly. So nothing from this session needs to carry
+    over to actually fetch a file — these links work on their own.
+
+    Takes the survey's numeric id (not its idno) since that's what the
+    get-microdata URL is keyed on; get it from get_survey()'s "id" field.
+    """
+    own = session is None
+    if own:
+        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
+    assert session is not None
+    try:
+        url = f"{env_config.get_base_url('anda_site')}index.php/catalog/{survey_id}/get-microdata"
+        page = await session.get(url, timeout=_TIMEOUT, follow_redirects=True)
+        page.raise_for_status()
+        token_match = _CSRF_RE.search(page.text)
+        if not token_match:
+            return []
+        resp = await session.post(
+            url,
+            data={"ncsrf": token_match.group(1), "accept": "Aceptar"},
+            timeout=_TIMEOUT,
+            follow_redirects=True,
+        )
+        resp.raise_for_status()
+        files: dict[str, str] = {}
+        for link, filename in _DOWNLOAD_LINK_RE.findall(resp.text):
+            files[link] = filename
+        return [{"filename": name, "url": link} for link, name in files.items()]
+    except httpx.HTTPError as exc:
+        logger.error("ANDA microdata file listing failed for id=%s: %s", survey_id, exc)
         raise
     finally:
         if own:

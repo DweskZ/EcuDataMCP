@@ -81,3 +81,45 @@ async def test_get_survey_not_found(httpx_mock):
     )
     with pytest.raises(ValueError, match="No se encontró"):
         await anda_client.get_survey("NOPE")
+
+
+@pytest.mark.asyncio
+async def test_list_microdata_files(httpx_mock):
+    get_microdata_url = "https://anda.inec.gob.ec/anda5/index.php/catalog/1153/get-microdata"
+    httpx_mock.add_response(
+        method="GET",
+        url=get_microdata_url,
+        html='<form><input type="hidden" name="ncsrf" value="abc123def456" /></form>',
+    )
+    httpx_mock.add_response(
+        method="POST",
+        url=get_microdata_url,
+        html=(
+            '<a href="https://anda.inec.gob.ec/anda5/index.php/catalog/1153/download/1" '
+            'title="archivo_a.zip">a</a>'
+            '<a href="https://anda.inec.gob.ec/anda5/index.php/catalog/1153/download/2" '
+            'title="archivo_b.zip">b</a>'
+        ),
+    )
+    files = await anda_client.list_microdata_files("1153")
+    assert files == [
+        {
+            "filename": "archivo_a.zip",
+            "url": "https://anda.inec.gob.ec/anda5/index.php/catalog/1153/download/1",
+        },
+        {
+            "filename": "archivo_b.zip",
+            "url": "https://anda.inec.gob.ec/anda5/index.php/catalog/1153/download/2",
+        },
+    ]
+
+
+@pytest.mark.asyncio
+async def test_list_microdata_files_no_csrf_token(httpx_mock):
+    httpx_mock.add_response(
+        method="GET",
+        url="https://anda.inec.gob.ec/anda5/index.php/catalog/1/get-microdata",
+        html="<p>no form here</p>",
+    )
+    files = await anda_client.list_microdata_files("1")
+    assert files == []

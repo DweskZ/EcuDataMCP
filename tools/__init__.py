@@ -1,5 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 
+from tools.download_anda_microdata import register_download_anda_microdata_tool
 from tools.get_anda_survey_info import register_get_anda_survey_info_tool
 from tools.get_category_info import register_get_category_info_tool
 from tools.get_contrato_info import register_get_contrato_info_tool
@@ -55,6 +56,7 @@ def register_tools(mcp: FastMCP) -> None:
 
     register_search_anda_tool(mcp)
     register_get_anda_survey_info_tool(mcp)
+    register_download_anda_microdata_tool(mcp)
 
     register_search_regulaciones_tool(mcp)
     register_get_regulacion_info_tool(mcp)
