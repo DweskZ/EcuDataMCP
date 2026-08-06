@@ -1,8 +1,29 @@
+from unicodedata import category, normalize
+
 from mcp.server.fastmcp import FastMCP
 
 from helpers import anda_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
+
+# ANDA's own full-text search (`sk`) is loose — it ranks by relevance across
+# a broad blob of fields rather than requiring every query word to match, so
+# a search for "ENESEM" also surfaces REEM, price indices, etc. Fetch a wider
+# candidate batch and filter locally so results actually contain the query.
+_FETCH_SIZE = 100
+
+
+def _strip_accents(text: str) -> str:
+    nfkd = normalize("NFKD", text or "")
+    return "".join(c for c in nfkd if category(c) != "Mn")
+
+
+def _matches_query(row: dict, words: list[str]) -> bool:
+    blob = _strip_accents(
+        f"{row.get('title', '')} {row.get('subtitle', '')} "
+        f"{row.get('idno', '')} {row.get('authoring_entity', '')}"
+    ).lower()
+    return all(w in blob for w in words)
 
 
 def register_search_anda_tool(mcp: FastMCP) -> None:
@@ -17,16 +38,24 @@ def register_search_anda_tool(mcp: FastMCP) -> None:
         authoring entity). Not every entry has downloadable microdata — many are
         aggregate-only publications (e.g. price indices); each result says so.
 
-        Use short, specific keywords in Spanish — multi-word queries are matched
-        loosely, not as a strict AND.
+        Follow up with get_anda_survey_info(idno) for full metadata on one survey.
 
         Args:
             query: Search keywords (e.g. "empleo", "REEM", "censo agropecuario")
             limit: Max results (default: 10, max: 50)
             format: text | json
         """
+        words = [_strip_accents(w.lower()) for w in query.split() if len(w) >= 2]
         try:
-            result = await anda_client.search_catalog(query=query, limit=limit)
+            if words:
+                result = await anda_client.search_catalog(query=query, limit=_FETCH_SIZE)
+                candidates = result.get("rows", [])
+                matched = [r for r in candidates if _matches_query(r, words)]
+                total_scanned = len(candidates)
+            else:
+                result = await anda_client.search_catalog(limit=limit)
+                matched = result.get("rows", [])
+                total_scanned = len(matched)
         except Exception as e:
             return render_output(
                 {"error": str(e)},
@@ -34,10 +63,11 @@ def register_search_anda_tool(mcp: FastMCP) -> None:
                 text_builder=lambda d: f"Error al buscar en ANDA: {d['error']}",
             )
 
-        rows = result.get("rows", [])
+        total = len(matched)
         payload = {
             "query": query,
-            "total": result.get("found", 0),
+            "total": total,
+            "total_scanned": total_scanned,
             "results": [
                 {
                     "id": r.get("id"),
@@ -48,7 +78,7 @@ def register_search_anda_tool(mcp: FastMCP) -> None:
                     "microdatos_disponibles": anda_client.has_microdata(r),
                     "url": r.get("url"),
                 }
-                for r in rows
+                for r in matched[:limit]
             ],
         }
 

@@ -244,7 +244,7 @@ uv run python main.py --transport stdio
 
 ---
 
-## Herramientas disponibles (25 tools)
+## Herramientas disponibles (26 tools)
 
 Casi todos los tools aceptan `format="json"` además de texto.
 
@@ -282,6 +282,7 @@ Casi todos los tools aceptan `format="json"` además de texto.
 | Tool | Descripción |
 |------|-------------|
 | `search_anda` | Buscar encuestas y censos en el catálogo ANDA del INEC (NADA/IHSN). Indica si cada encuesta tiene microdatos descargables. |
+| `get_anda_survey_info` | Metadata completa de una encuesta ANDA: resumen, variables, confidencialidad y contacto. |
 
 ### Regulaciones y contratos
 

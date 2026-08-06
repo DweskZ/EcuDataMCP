@@ -12,9 +12,12 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 _TIMEOUT = 20.0
 
 # NADA marks surveys with no microdata attached (aggregate-only publications,
-# e.g. price indices) as form_model "data_na". Anything else ("direct",
-# "external", etc.) means the survey has actual microdata behind it.
-NO_MICRODATA_FORM_MODEL = "data_na"
+# e.g. price indices) as "data_na" — in the catalog list endpoint that's the
+# form_model field, in the per-survey detail endpoint it's data_access_type.
+# Anything else ("direct", "external", etc.) means the survey has actual
+# microdata behind it. data_class_id looks like the obvious field to check
+# but it comes back null on every survey regardless of access — don't use it.
+NO_MICRODATA_VALUE = "data_na"
 
 
 def _anda_url(path: str) -> str:
@@ -54,6 +57,42 @@ async def search_catalog(
             await session.aclose()
 
 
+async def get_survey(
+    idno: str,
+    session: httpx.AsyncClient | None = None,
+) -> dict[str, Any]:
+    """Fetch full DDI-style metadata for one survey by its idno (not its numeric id)."""
+    own = session is None
+    if own:
+        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
+    assert session is not None
+    try:
+        logger.debug("ANDA GET catalog detail idno=%s", idno)
+        resp = await session.get(
+            _anda_url(f"catalog/{idno}"), timeout=_TIMEOUT, follow_redirects=True
+        )
+        if resp.status_code == 400:
+            try:
+                message = resp.json().get("message", "")
+            except ValueError:
+                message = ""
+            if message == "IDNO-NOT-FOUND":
+                raise ValueError(f"No se encontró ninguna encuesta con idno '{idno}' en ANDA.")
+        resp.raise_for_status()
+        return resp.json().get("dataset", {})
+    except httpx.HTTPError as exc:
+        logger.error("ANDA survey detail request failed for %s: %s", idno, exc)
+        raise
+    finally:
+        if own:
+            await session.aclose()
+
+
 def has_microdata(row: dict[str, Any]) -> bool:
-    """True if a catalog entry has downloadable microdata, not just aggregates."""
-    return row.get("form_model") != NO_MICRODATA_FORM_MODEL
+    """True if a catalog entry has downloadable microdata, not just aggregates.
+
+    Catalog-list rows use `form_model`; per-survey detail records use
+    `data_access_type` instead. Check whichever is present.
+    """
+    value = row.get("form_model", row.get("data_access_type"))
+    return value != NO_MICRODATA_VALUE

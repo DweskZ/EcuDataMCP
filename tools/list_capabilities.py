@@ -36,7 +36,7 @@ _CAPABILITIES = {
         "compras": ["search_contratos", "get_contrato_info"],
         "riesgos": ["search_eventos_riesgo", "list_sat_tsunami"],
         "geo": ["lookup_ubicacion"],
-        "encuestas": ["search_anda"],
+        "encuestas": ["search_anda", "get_anda_survey_info"],
     },
     "resources": [
         "ecuador://fuentes",

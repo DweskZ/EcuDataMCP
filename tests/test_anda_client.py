@@ -45,3 +45,39 @@ def test_has_microdata_direct():
 
 def test_has_microdata_aggregate_only():
     assert anda_client.has_microdata({"form_model": "data_na"}) is False
+
+
+def test_has_microdata_from_detail_field():
+    assert anda_client.has_microdata({"data_access_type": "direct"}) is True
+    assert anda_client.has_microdata({"data_access_type": "data_na"}) is False
+
+
+@pytest.mark.asyncio
+async def test_get_survey(httpx_mock):
+    httpx_mock.add_response(
+        url="https://anda.inec.gob.ec/anda5/index.php/api/catalog/ECU-INEC-EMPLEO-2025",
+        json={
+            "status": "success",
+            "dataset": {
+                "id": "1319",
+                "idno": "ECU-INEC-EMPLEO-2025",
+                "title": "Encuesta de Empleo 2025",
+                "data_access_type": "direct",
+                "varcount": "150",
+            },
+        },
+    )
+    dataset = await anda_client.get_survey("ECU-INEC-EMPLEO-2025")
+    assert dataset["id"] == "1319"
+    assert dataset["varcount"] == "150"
+
+
+@pytest.mark.asyncio
+async def test_get_survey_not_found(httpx_mock):
+    httpx_mock.add_response(
+        url="https://anda.inec.gob.ec/anda5/index.php/api/catalog/NOPE",
+        status_code=400,
+        json={"status": "failed", "message": "IDNO-NOT-FOUND"},
+    )
+    with pytest.raises(ValueError, match="No se encontró"):
+        await anda_client.get_survey("NOPE")
