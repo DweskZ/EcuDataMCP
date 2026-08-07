@@ -1,5 +1,7 @@
 # Changelog
 
+Este repositorio es un fork de [DweskZ/EcuDataMCP](https://github.com/DweskZ/EcuDataMCP).
+
 ## 0.4.4 — 2026-08-04
 
 ### Added

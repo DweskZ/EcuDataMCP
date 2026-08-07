@@ -6,6 +6,8 @@
 
 **Servidor MCP (Model Context Protocol) que permite a chatbots de IA (Claude, ChatGPT, Gemini, Cursor, etc.) buscar, explorar y analizar datos abiertos del gobierno de Ecuador, directamente por conversación.**
 
+> Este repositorio es un fork de [DweskZ/EcuDataMCP](https://github.com/DweskZ/EcuDataMCP).
+
 En lugar de navegar manualmente por portales gubernamentales, simplemente pregunta cosas como:
 - *"¿Qué datos tiene el SRI sobre recaudación tributaria?"*
 - *"Muéstrame los datasets de salud del INEC"*
