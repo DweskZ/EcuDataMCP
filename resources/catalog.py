@@ -59,6 +59,12 @@ def register_catalog_resources(mcp: FastMCP) -> None:
                     "tools": ["search_eventos_riesgo", "list_sat_tsunami"],
                 },
                 {
+                    "id": "igepn",
+                    "nombre": "Instituto Geofísico EPN (catálogo sísmico)",
+                    "base": "https://www.igepn.edu.ec/portal/eventos/www/",
+                    "tools": ["search_sismos"],
+                },
+                {
                     "id": "geo",
                     "nombre": "DPA provincias, cantones y parroquias (referencia offline INEC)",
                     "tools": ["lookup_ubicacion"],

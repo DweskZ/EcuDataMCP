@@ -2,6 +2,18 @@
 
 Este repositorio es un fork de [DweskZ/EcuDataMCP](https://github.com/DweskZ/EcuDataMCP).
 
+## 0.5.0 — 2026-08-10
+
+### Added
+- Integración Instituto Geofísico EPN (IG-EPN): tool `search_sismos` sobre el
+  catálogo sísmico público (`portal/eventos/www/events.csv`) con filtros por
+  texto, magnitud mínima y días, hora local (UTC-5) + UTC, y enlace al detalle
+  de cada evento
+- `helpers/igepn_client.py` con caché TTL (~2 min) y parseo tolerante del CSV
+  (cabecera opcional, comas sin comillas en `place`)
+- Fuente `igepn` en `ecuador://fuentes`; paso de sismos en el prompt
+  `monitorear_riesgos`
+
 ## 0.4.4 — 2026-08-04
 
 ### Added

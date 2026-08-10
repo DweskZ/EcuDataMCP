@@ -61,6 +61,7 @@ Este MCP unifica **fuentes gubernamentales** en un solo servidor:
 | **Regulaciones** (Gob.ec) | Normas, acuerdos, Registro Oficial | gob.ec/api/v1/regulaciones |
 | **Contratos públicos** (SERCOP/OCDS) | Licitaciones, compradores, proveedores | datosabiertos.compraspublicas.gob.ec |
 | **Gestión de Riesgos** (SGR) | Eventos COE + estaciones SAT tsunami | sgrportal.gestionderiesgos.gob.ec |
+| **Sismos** (IG-EPN) | Catálogo sísmico del Instituto Geofísico | www.igepn.edu.ec |
 | **Geografía** (DPA) | 24 provincias + 224 cantones (códigos INEC) | referencia offline |
 
 **Sin API key. Sin restricciones de acceso. 100% datos públicos.**
@@ -245,7 +246,7 @@ uv run python main.py --transport stdio
 
 ---
 
-## Herramientas disponibles (24 tools)
+## Herramientas disponibles (25 tools)
 
 Casi todos los tools aceptan `format="json"` además de texto.
 
@@ -287,12 +288,13 @@ Casi todos los tools aceptan `format="json"` además de texto.
 | `search_contratos` | Buscar procedimientos de contratación pública (SERCOP/OCDS). |
 | `get_contrato_info` | Expediente OCDS: comprador, licitación, adjudicaciones, contratos. |
 
-### Riesgos (SGR)
+### Riesgos y sismos
 
 | Tool | Descripción |
 |------|-------------|
 | `search_eventos_riesgo` | Eventos de emergencia/riesgo del COE (deslizamientos, inundaciones, etc.). |
 | `list_sat_tsunami` | Estaciones SAT de alerta temprana por tsunami. |
+| `search_sismos` | Sismos recientes del catálogo del Instituto Geofísico (IG-EPN): magnitud, profundidad, ubicación y estado de revisión. |
 
 ### Exploración
 
