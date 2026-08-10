@@ -89,5 +89,7 @@ def register_workflow_prompts(mcp: FastMCP) -> None:
             f"estado='Seguimiento'). {evento_line}\n"
             "3) Resume eventos activos, impactos y descripción.\n"
             "4) Si el usuario pregunta por tsunami/SAT, usa list_sat_tsunami.\n"
+            "5) Si pregunta por sismos/temblores recientes, usa search_sismos "
+            f"(IG-EPN), p. ej. search_sismos(query='{lugar}', dias=7).\n"
             "Aclara que es información pública de apoyo, no un canal oficial de alerta."
         )

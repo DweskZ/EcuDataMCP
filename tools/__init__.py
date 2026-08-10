@@ -26,6 +26,7 @@ from tools.search_ecuador import register_search_ecuador_tool
 from tools.search_eventos_riesgo import register_search_eventos_riesgo_tool
 from tools.search_organizations import register_search_organizations_tool
 from tools.search_regulaciones import register_search_regulaciones_tool
+from tools.search_sismos import register_search_sismos_tool
 from tools.search_tramites import register_search_tramites_tool
 
 
@@ -36,6 +37,7 @@ def register_tools(mcp: FastMCP) -> None:
     register_lookup_ubicacion_tool(mcp)
     register_search_eventos_riesgo_tool(mcp)
     register_list_sat_tsunami_tool(mcp)
+    register_search_sismos_tool(mcp)
 
     register_search_datasets_tool(mcp)
     register_list_recent_datasets_tool(mcp)
