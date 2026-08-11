@@ -62,6 +62,7 @@ Este MCP unifica **fuentes gubernamentales** en un solo servidor:
 | **Contratos públicos** (SERCOP/OCDS) | Licitaciones, compradores, proveedores | datosabiertos.compraspublicas.gob.ec |
 | **Gestión de Riesgos** (SGR) | Eventos COE + estaciones SAT tsunami | sgrportal.gestionderiesgos.gob.ec |
 | **Geografía** (DPA) | 24 provincias + 224 cantones (códigos INEC) | referencia offline |
+| **ANDA** (NADA/IHSN) | Catálogo de encuestas y censos del INEC | anda.inec.gob.ec |
 
 **Sin API key. Sin restricciones de acceso. 100% datos públicos.**
 
@@ -245,7 +246,7 @@ uv run python main.py --transport stdio
 
 ---
 
-## Herramientas disponibles (24 tools)
+## Herramientas disponibles (27 tools)
 
 Casi todos los tools aceptan `format="json"` además de texto.
 
@@ -277,6 +278,14 @@ Casi todos los tools aceptan `format="json"` además de texto.
 | `get_tramite_info` | Detalle completo: requisitos, procedimiento, costo, tiempo estimado. |
 | `list_instituciones` | Listar instituciones públicas del Ecuador. |
 | `get_institucion_info` | Detalle de una institución (sector, web, descripción). |
+
+### ANDA (INEC)
+
+| Tool | Descripción |
+|------|-------------|
+| `search_anda` | Buscar encuestas y censos en el catálogo ANDA del INEC (NADA/IHSN). Indica si cada encuesta tiene microdatos descargables. |
+| `get_anda_survey_info` | Metadata completa de una encuesta ANDA: resumen, variables, confidencialidad y contacto. |
+| `download_anda_microdata` | Links directos de descarga de los archivos de microdatos de una encuesta ANDA. |
 
 ### Regulaciones y contratos
 
@@ -334,6 +343,21 @@ Plantillas listas para el cliente (Claude/Cursor): `explorar_datos`, `consultar_
 |----------|-------------|
 | `POST /mcp` | Mensajes JSON-RPC (cliente → servidor) |
 | `GET /health` | Health check: `{"status":"ok","uptime_since":"...","version":"..."}` |
+
+---
+
+## Problema conocido: el portal de Datos Abiertos a veces bloquea conexiones
+
+El portal `www.datosabiertos.gob.ec` a veces rechaza las conexiones que vienen de fuera de Latinoamérica (error 403). Esto afecta a las herramientas que dependen de ese portal: `search_datasets`, `search_organizations`, `get_organization_info`, `get_dataset_info`, `list_dataset_resources`, `get_resource_info`, `preview_resource_data`, `query_resource_data`, `list_recent_datasets`, `list_categories` y `get_category_info`.
+
+En nuestras pruebas:
+- Conectando desde Canadá: bloqueado.
+- Conectando desde Estados Unidos: bloqueado.
+- Conectando desde Colombia: funcionó sin problemas.
+
+Las herramientas de trámites e instituciones (`search_tramites`, `list_instituciones`, `get_institucion_info`, etc.) usan otro portal (`gob.ec`) y no tienen este problema.
+
+**Si ves errores 403 en las herramientas de Datos Abiertos:** intenta correr el servidor desde una conexión (por ejemplo, una VPN) con salida en algún país de Latinoamérica.
 
 ---
 
