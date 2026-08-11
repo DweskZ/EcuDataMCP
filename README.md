@@ -335,6 +335,21 @@ Plantillas listas para el cliente (Claude/Cursor): `explorar_datos`, `consultar_
 
 ---
 
+## Problema conocido: el portal de Datos Abiertos a veces bloquea conexiones
+
+El portal `www.datosabiertos.gob.ec` a veces rechaza las conexiones que vienen de fuera de Latinoamérica (error 403). Esto afecta a las herramientas que dependen de ese portal: `search_datasets`, `search_organizations`, `get_organization_info`, `get_dataset_info`, `list_dataset_resources`, `get_resource_info`, `preview_resource_data`, `query_resource_data`, `list_recent_datasets`, `list_categories` y `get_category_info`.
+
+En nuestras pruebas:
+- Conectando desde Canadá: bloqueado.
+- Conectando desde Estados Unidos: bloqueado.
+- Conectando desde Colombia: funcionó sin problemas.
+
+Las herramientas de trámites e instituciones (`search_tramites`, `list_instituciones`, `get_institucion_info`, etc.) usan otro portal (`gob.ec`) y no tienen este problema.
+
+**Si ves errores 403 en las herramientas de Datos Abiertos:** intenta correr el servidor desde una conexión (por ejemplo, una VPN) con salida en algún país de Latinoamérica.
+
+---
+
 ## Ejemplos de uso
 
 ### Buscar datos del SRI
