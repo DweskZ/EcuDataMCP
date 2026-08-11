@@ -7,6 +7,8 @@ _API_URLS = {
     "gobec_site": "https://www.gob.ec/",
     "sercop": "https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/api/",
     "sercop_site": "https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/",
+    "anda": "https://anda.inec.gob.ec/anda5/index.php/api/",
+    "anda_site": "https://anda.inec.gob.ec/anda5/",
 }
 
 _ENV_OVERRIDES = {
@@ -16,6 +18,8 @@ _ENV_OVERRIDES = {
     "gobec_site": "GOBEC_SITE_URL",
     "sercop": "SERCOP_API_URL",
     "sercop_site": "SERCOP_SITE_URL",
+    "anda": "ANDA_API_URL",
+    "anda_site": "ANDA_SITE_URL",
 }
 
 
