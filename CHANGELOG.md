@@ -2,22 +2,6 @@
 
 Este repositorio es un fork de [DweskZ/EcuDataMCP](https://github.com/DweskZ/EcuDataMCP).
 
-## Sincronizado con upstream — 2026-08-11
-
-Se trajeron dos PRs ya mergeados en el repo original (DweskZ/EcuDataMCP):
-
-### Added
-- `search_anda`, `get_anda_survey_info`, `download_anda_microdata`: catálogo
-  ANDA/NADA del INEC (encuestas y censos), separado de datosabiertos.gob.ec.
-  No bloquea por región. Indica si cada encuesta tiene microdatos
-  descargables y automatiza el flujo de aceptación de términos de uso para
-  obtener los links de descarga
-
-### Fixed
-- Mensaje claro cuando datosabiertos.gob.ec rechaza conexiones por región
-  (403 fuera de Latinoamérica) en vez de un "403 Forbidden" genérico
-- Orden de imports en `test_server.py` (lint)
-
 ## 0.5.0 — 2026-08-10
 
 ### Added
