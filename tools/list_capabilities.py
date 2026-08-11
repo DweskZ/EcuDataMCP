@@ -13,6 +13,7 @@ _CAPABILITIES = {
         "SGR COE eventos de riesgo + SAT tsunami",
         "IG-EPN Instituto Geofísico (sismos)",
         "DPA provincias/cantones/parroquias (offline INEC)",
+        "ANDA (NADA/IHSN) catálogo de encuestas y censos del INEC",
     ],
     "entrada": [
         "list_capabilities",
@@ -36,6 +37,7 @@ _CAPABILITIES = {
         "compras": ["search_contratos", "get_contrato_info"],
         "riesgos": ["search_eventos_riesgo", "list_sat_tsunami", "search_sismos"],
         "geo": ["lookup_ubicacion"],
+        "encuestas": ["search_anda", "get_anda_survey_info", "download_anda_microdata"],
     },
     "resources": [
         "ecuador://fuentes",
