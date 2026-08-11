@@ -6,6 +6,7 @@ Make sure the server is running on http://localhost:8000 first.
 
 import asyncio
 import json
+
 import httpx
 
 MCP_URL = "http://localhost:8000/mcp"

@@ -43,6 +43,18 @@ async def _fetch_json(
                 headers={"User-Agent": USER_AGENT}, verify=False
             ) as insecure_session:
                 resp = await insecure_session.get(url, params=params, timeout=_TIMEOUT)
+        if resp.status_code == 403:
+            # The portal has been observed rejecting connections from outside
+            # Latin America (403) while accepting them from the region. Give
+            # callers a message that points at the likely cause instead of a
+            # bare "403 Forbidden".
+            logger.warning("CKAN request to %s got 403 Forbidden", url)
+            raise RuntimeError(
+                "El portal de Datos Abiertos (datosabiertos.gob.ec) rechazó la "
+                "conexión (403). Esto suele pasar cuando el servidor se conecta "
+                "desde fuera de Latinoamérica. Si el problema persiste, prueba "
+                "conectando desde una VPN con salida en algún país de la región."
+            )
         resp.raise_for_status()
         data = resp.json()
         if not data.get("success"):
