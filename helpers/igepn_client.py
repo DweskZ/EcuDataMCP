@@ -162,7 +162,8 @@ def parse_events_csv(text: str) -> list[dict[str, Any]]:
             continue
         event["tiempo_local"] = times[0]
         event["tiempo_utc"] = times[1]
-        event["estado"] = record.get("status", "")
+        status = record.get("status", "")
+        event["estado"] = "" if status.lower() == "none" else status
         event["localizacion"] = " ".join(record.get("place", "").split())
         event["url"] = _EVENT_PAGE_TEMPLATE.format(event_id=event["id"])
         events.append(event)
