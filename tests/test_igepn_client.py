@@ -43,6 +43,31 @@ def test_parse_events_csv_without_header_and_bad_rows():
     assert [ev["id"] for ev in events] == ["igepn2026mrim"]
 
 
+def test_parse_events_csv_alternate_schema_utc_header():
+    # Real-world historical IG-EPN export uses a different column order/names
+    # (Spanish + abbreviated) and explicitly labels the time column as UTC.
+    body = (
+        "Mag,Lat,Long,Prof,Region,Hora UTC,Update,ID\n"
+        "3.7,0.35,-80.81,10,COSTA DE ECUADOR,2019-05-30 09:14:59,"
+        "2019-05-30 09:31:32,igepn2019kmyh\n"
+        "2.1,-0.19,-78.52,4,PICHINCHA,2019-05-29 01:13:43,"
+        "2019-05-29 01:21:04,igepn2019kkmw\n"
+    )
+    events = igepn_client.parse_events_csv(body)
+    assert len(events) == 2
+    ev = next(e for e in events if e["id"] == "igepn2019kmyh")
+    assert ev["magnitud"] == 3.7
+    assert ev["latitud"] == 0.35
+    assert ev["longitud"] == -80.81
+    assert ev["profundidad_km"] == 10.0
+    assert ev["localizacion"] == "COSTA DE ECUADOR"
+    # "Hora UTC" header means the value is UTC already, not Ecuador local
+    assert ev["tiempo_utc"] == "2019-05-30T09:14:59+00:00"
+    assert ev["tiempo_local"] == "2019-05-30T04:14:59-05:00"
+    # Unmapped "Update" column is simply ignored, not misread as status
+    assert ev["estado"] == ""
+
+
 async def test_list_earthquakes_filters(monkeypatch):
     async def fake_get_text(url: str) -> str:
         assert url.endswith("events.csv")
