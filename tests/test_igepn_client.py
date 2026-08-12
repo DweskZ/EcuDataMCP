@@ -68,6 +68,18 @@ def test_parse_events_csv_alternate_schema_utc_header():
     assert ev["estado"] == ""
 
 
+def test_parse_events_csv_literal_none_status():
+    # The live feed sometimes emits the literal string "None" for status.
+    body = (
+        "latitude,longitude,mag,depth,time,status,id,place\n"
+        "-1.9355,-80.3598,3.55,10.0000,2026/07/28 05:44:36,None,igepn2026oqma,"
+        "a 18.66 km de Pedro Carbo, Guayas\n"
+    )
+    events = igepn_client.parse_events_csv(body)
+    assert len(events) == 1
+    assert events[0]["estado"] == ""
+
+
 async def test_list_earthquakes_filters(monkeypatch):
     async def fake_get_text(url: str) -> str:
         assert url.endswith("events.csv")
