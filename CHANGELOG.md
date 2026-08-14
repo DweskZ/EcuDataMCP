@@ -8,6 +8,10 @@ Este repositorio es un fork de [DweskZ/EcuDataMCP](https://github.com/DweskZ/Ecu
 - `created` y `last_modified` por recurso en `list_dataset_resources`, para
   poder identificar el archivo más reciente de un dataset con archivos
   periódicos sin tener que llamar a `get_resource_info` por cada uno
+- `get_dataset_info` ahora incluye `source_url` (el campo "Fuente" del
+  dataset: link a donde la entidad publicadora mantiene el dato original,
+  fuera del portal) y `extras` (metadatos personalizados que la entidad haya
+  agregado más allá del esquema estándar)
 
 ## 0.5.0 — 2026-08-10
 

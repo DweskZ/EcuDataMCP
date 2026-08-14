@@ -14,7 +14,9 @@ def register_get_dataset_info_tool(mcp: FastMCP) -> None:
         Get detailed metadata about a specific dataset from Ecuador's open data portal.
 
         Returns title, description, organization, tags, resource count,
-        creation/update dates, license, and update frequency.
+        creation/update dates, license, update frequency, the publisher's
+        source URL (where the entity keeps the authoritative data, if any),
+        and any custom metadata fields the publisher added.
 
         Args:
             dataset_id: The dataset ID or slug (e.g. "registro-estadistico-de-recursos-y-actividades-de-salud-2019")
@@ -46,11 +48,17 @@ def register_get_dataset_info_tool(mcp: FastMCP) -> None:
         site = env_config.get_base_url("ckan_site").rstrip("/")
         slug = data.get("name", "")
         resources = data.get("resources") or []
+        extras = {
+            e.get("key"): e.get("value")
+            for e in (data.get("extras") or [])
+            if e.get("key")
+        }
         payload = {
             "id": data.get("id"),
             "name": slug,
             "title": data.get("title"),
             "url": f"{site}/dataset/{slug}" if slug else None,
+            "source_url": data.get("url") or None,
             "notes": data.get("notes"),
             "organization": {
                 "title": (data.get("organization") or {}).get("title"),
@@ -73,6 +81,7 @@ def register_get_dataset_info_tool(mcp: FastMCP) -> None:
             "update_frequency": data.get("update_frequency"),
             "author": data.get("author"),
             "maintainer": data.get("maintainer"),
+            "extras": extras,
         }
 
         def to_text(p: dict) -> str:
@@ -82,6 +91,8 @@ def register_get_dataset_info_tool(mcp: FastMCP) -> None:
             if p.get("name"):
                 parts.append(f"Slug: {p['name']}")
                 parts.append(f"URL: {p.get('url')}")
+            if p.get("source_url"):
+                parts.append(f"Fuente original: {p['source_url']}")
             if p.get("notes"):
                 parts.append("")
                 parts.append(f"Descripción: {str(p['notes'])[:800]}")
@@ -116,6 +127,12 @@ def register_get_dataset_info_tool(mcp: FastMCP) -> None:
                 parts.append(f"Autor: {p['author']}")
             if p.get("maintainer"):
                 parts.append(f"Mantenedor: {p['maintainer']}")
+            extras = p.get("extras") or {}
+            if extras:
+                parts.append("")
+                parts.append("Metadatos adicionales:")
+                for key, value in extras.items():
+                    parts.append(f"  {key}: {value}")
             return "\n".join(parts)
 
         return render_output(payload, format, text_builder=to_text)
