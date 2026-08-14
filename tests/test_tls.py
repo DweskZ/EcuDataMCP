@@ -2,9 +2,15 @@ import ssl
 
 from helpers.tls import (
     host_allows_insecure_tls,
+    insecure_tls_enabled,
     is_cert_verification_error,
     should_retry_insecure,
 )
+
+
+def test_insecure_tls_disabled_by_default(monkeypatch):
+    monkeypatch.delenv("CKAN_INSECURE_TLS", raising=False)
+    assert insecure_tls_enabled() is False
 
 
 def test_is_cert_verification_error_walks_context():

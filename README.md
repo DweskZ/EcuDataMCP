@@ -237,7 +237,7 @@ uv run main.py
 | `MCP_PORT` | Puerto del servidor | `8000` |
 | `MCP_TRANSPORT` | Transporte: `http` o `stdio` | `http` |
 | `LOG_LEVEL` | Nivel de log (DEBUG, INFO, WARNING, ERROR) | `INFO` |
-| `CKAN_INSECURE_TLS` | Reintento TLS inseguro solo para el portal de datos (`1`/`0`) | `1` |
+| `CKAN_INSECURE_TLS` | Reintento TLS inseguro solo para el portal de datos (`1`/`0`); poner en `1` solo si el certificado del portal vuelve a fallar | `0` |
 
 Stdio local:
 

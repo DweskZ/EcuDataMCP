@@ -17,6 +17,17 @@ Este repositorio es un fork de [DweskZ/EcuDataMCP](https://github.com/DweskZ/Ecu
   preview con coordenadas, y convierte columnas en formato decimal europeo
   (`7.760,2` → `7760.2`) a notación estándar. El mismo descarte de columnas
   de geometría aplica también al preview de JSON plano (arrays de objetos)
+- `list_dataset_resources` ahora avisa cuando 3+ recursos de un dataset
+  parecen ser una serie periódica (nombres casi idénticos, solo cambian
+  números/fechas), para que quien consulte revise si cada archivo nuevo
+  reemplaza a los anteriores o los complementa antes de sumar valores
+
+### Changed
+- `CKAN_INSECURE_TLS` ahora es `0` (desactivado) por defecto — el
+  certificado de `www.datosabiertos.gob.ec` que expiró el 2026-07-28 fue
+  renovado el 2026-08-07 (válido hasta 2026-11-05). Seguía activado por
+  defecto desde que se agregó el fallback; poner `CKAN_INSECURE_TLS=1` solo
+  si el certificado del portal vuelve a fallar
 
 ## 0.5.0 — 2026-08-10
 
