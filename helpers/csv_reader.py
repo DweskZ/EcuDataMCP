@@ -2,6 +2,7 @@ import csv
 import io
 import json
 import logging
+import re
 from typing import Any
 
 import httpx
@@ -14,6 +15,96 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 MAX_DOWNLOAD_BYTES = 5 * 1024 * 1024  # 5 MB
 _TIMEOUT = 30.0
+
+_GEOM_COLUMN_NAMES = {"geom", "geometry", "the_geom", "wkt", "wkt_geom", "shape"}
+_WKT_PREFIXES = (
+    "POINT",
+    "LINESTRING",
+    "POLYGON",
+    "MULTIPOINT",
+    "MULTILINESTRING",
+    "MULTIPOLYGON",
+    "GEOMETRYCOLLECTION",
+)
+
+# "7.760,2" (thousands dot, decimal comma) or plain "168,15".
+_EU_DECIMAL_RE = re.compile(r"^-?(?:\d{1,3}(?:\.\d{3})+|\d+),\d+$")
+
+
+def _looks_like_wkt(value: str) -> bool:
+    return value.strip().upper().startswith(_WKT_PREFIXES)
+
+
+def strip_geometry_columns(
+    headers: list[str], rows: list[list[str]]
+) -> tuple[list[str], list[list[str]], list[str]]:
+    """Drop columns that look like WKT/geometry data, by column name or content.
+
+    A single polygon/multipolygon cell can be tens of KB of coordinates,
+    which drowns out the rest of a preview. Returns (headers, rows, dropped_names).
+    """
+    if not headers:
+        return headers, rows, []
+
+    drop_idx: list[int] = []
+    for i, name in enumerate(headers):
+        if name.strip().lower() in _GEOM_COLUMN_NAMES:
+            drop_idx.append(i)
+            continue
+        sample = [row[i] for row in rows[:5] if i < len(row) and row[i]]
+        if sample and all(_looks_like_wkt(v) for v in sample):
+            drop_idx.append(i)
+
+    if not drop_idx:
+        return headers, rows, []
+
+    drop_set = set(drop_idx)
+    dropped_names = [headers[i] for i in drop_idx]
+    new_headers = [h for i, h in enumerate(headers) if i not in drop_set]
+    new_rows = [
+        [cell for i, cell in enumerate(row) if i not in drop_set] for row in rows
+    ]
+    return new_headers, new_rows, dropped_names
+
+
+def _convert_eu_decimal(value: str) -> str:
+    v = value.strip()
+    sign = "-" if v.startswith("-") else ""
+    v = v.lstrip("-").replace(".", "").replace(",", ".")
+    return sign + v
+
+
+def normalize_eu_decimal_columns(
+    headers: list[str], rows: list[list[str]]
+) -> tuple[list[list[str]], list[str]]:
+    """Convert columns formatted as European decimals (7.760,2 -> 7760.2).
+
+    Ecuadorian government CSVs commonly use dot-thousands/comma-decimal
+    notation. Left as-is, those values sort and parse wrong downstream.
+    A column only qualifies if every sampled value matches the pattern, so
+    genuinely ambiguous columns are left untouched. Returns (rows, converted_names).
+    """
+    if not headers or not rows:
+        return rows, []
+
+    idxs: list[int] = []
+    for i in range(len(headers)):
+        sample = [row[i] for row in rows[:5] if i < len(row) and row[i]]
+        if sample and all(_EU_DECIMAL_RE.match(v.strip()) for v in sample):
+            idxs.append(i)
+
+    if not idxs:
+        return rows, []
+
+    idx_set = set(idxs)
+    new_rows = [
+        [
+            _convert_eu_decimal(cell) if i in idx_set and cell else cell
+            for i, cell in enumerate(row)
+        ]
+        for row in rows
+    ]
+    return new_rows, [headers[i] for i in idxs]
 
 
 async def _download(session: httpx.AsyncClient, url: str) -> tuple[bytes, bool]:
@@ -113,13 +204,21 @@ async def preview_csv(
     headers = rows_read[0]
     data_rows = rows_read[1 : max_rows + 1]
 
-    return {
+    headers, data_rows, dropped_geom = strip_geometry_columns(headers, data_rows)
+    data_rows, converted_decimals = normalize_eu_decimal_columns(headers, data_rows)
+
+    result: dict[str, Any] = {
         "headers": headers,
         "rows": data_rows,
         "total_rows_in_preview": len(data_rows),
         "truncated": truncated,
         "format": "csv",
     }
+    if dropped_geom:
+        result["dropped_columns"] = dropped_geom
+    if converted_decimals:
+        result["converted_decimal_columns"] = converted_decimals
+    return result
 
 
 async def preview_json(
@@ -171,7 +270,8 @@ async def preview_json(
             rows = [
                 [str(item.get(k, ""))[:120] for k in keys] for item in data[:max_rows]
             ]
-            return {
+            keys, rows, dropped_geom = strip_geometry_columns(keys, rows)
+            result: dict[str, Any] = {
                 "headers": keys,
                 "rows": rows,
                 "total_rows_in_preview": len(rows),
@@ -179,6 +279,9 @@ async def preview_json(
                 "format": "json",
                 "total_records": len(data),
             }
+            if dropped_geom:
+                result["dropped_columns"] = dropped_geom
+            return result
         preview_items = data[:max_rows]
         return {
             "headers": ["value"],

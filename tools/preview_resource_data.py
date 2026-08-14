@@ -24,8 +24,10 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
 
         Supports CSV/TSV, JSON/GeoJSON and Excel (XLSX). Returns the first N rows
         as a formatted table so the model can inspect data without a local download.
-        Max download size: 5 MB. For large tabular DataStore resources prefer
-        query_resource_data.
+        Geometry/WKT columns are dropped from the table (they can be tens of KB
+        per cell); CSV columns in European decimal notation (7.760,2) are
+        normalized to standard notation (7760.2). Max download size: 5 MB. For
+        large tabular DataStore resources prefer query_resource_data.
 
         Args:
             resource_id: The resource UUID (get it from list_dataset_resources)
@@ -142,6 +144,8 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
             "truncated": result.get("truncated", False),
             "sheet": result.get("sheet"),
             "total_records": result.get("total_records"),
+            "dropped_columns": result.get("dropped_columns"),
+            "converted_decimal_columns": result.get("converted_decimal_columns"),
         }
 
         def to_text(data: dict) -> str:
@@ -158,6 +162,16 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
                 parts.append(f"Registros totales (en archivo): {data['total_records']}")
             if data.get("truncated"):
                 parts.append("⚠ Archivo truncado (excede 5 MB o tiene más filas)")
+            if data.get("dropped_columns"):
+                parts.append(
+                    "⚠ Columnas de geometría omitidas (WKT): "
+                    + ", ".join(data["dropped_columns"])
+                )
+            if data.get("converted_decimal_columns"):
+                parts.append(
+                    "Columnas convertidas de formato decimal europeo (7.760,2 → 7760.2): "
+                    + ", ".join(data["converted_decimal_columns"])
+                )
             parts.append("")
             parts.append(format_table(data["headers"], data["rows"]))
             if data.get("truncated"):

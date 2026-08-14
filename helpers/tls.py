@@ -11,8 +11,14 @@ _INSECURE_TLS_HOST_SUFFIXES = (
 
 
 def insecure_tls_enabled() -> bool:
-    """Allow insecure TLS retry. Default on until the portal renews its cert."""
-    raw = os.getenv("CKAN_INSECURE_TLS", "1").strip().lower()
+    """Allow insecure TLS retry, opt-in only.
+
+    The portal's cert was expired 2026-07-28 through early August; this
+    defaulted on during that window. Renewed 2026-08-07 (valid through
+    2026-11-05), so the fallback now defaults off. Set CKAN_INSECURE_TLS=1
+    if the portal's cert breaks again before the code is updated.
+    """
+    raw = os.getenv("CKAN_INSECURE_TLS", "0").strip().lower()
     return raw not in {"0", "false", "no", "off"}
 
 

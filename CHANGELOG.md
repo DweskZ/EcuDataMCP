@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.5.1 — 2026-08-13
+
+### Added
+- `created` y `last_modified` por recurso en `list_dataset_resources`, para
+  poder identificar el archivo más reciente de un dataset con archivos
+  periódicos sin tener que llamar a `get_resource_info` por cada uno
+- `get_dataset_info` ahora incluye `source_url` (el campo "Fuente" del
+  dataset: link a donde la entidad publicadora mantiene el dato original,
+  fuera del portal) y `extras` (metadatos personalizados que la entidad haya
+  agregado más allá del esquema estándar)
+- `preview_resource_data` (CSV) ahora descarta columnas de geometría/WKT
+  (`geom`, `wkt`, polígonos detectados por contenido) para no inundar el
+  preview con coordenadas, y convierte columnas en formato decimal europeo
+  (`7.760,2` → `7760.2`) a notación estándar. El mismo descarte de columnas
+  de geometría aplica también al preview de JSON plano (arrays de objetos)
+- `list_dataset_resources` ahora avisa cuando 3+ recursos de un dataset
+  parecen ser una serie periódica (nombres casi idénticos, solo cambian
+  números/fechas), para que quien consulte revise si cada archivo nuevo
+  reemplaza a los anteriores o los complementa antes de sumar valores
+
+### Changed
+- `CKAN_INSECURE_TLS` ahora es `0` (desactivado) por defecto — el
+  certificado de `www.datosabiertos.gob.ec` que expiró el 2026-07-28 fue
+  renovado el 2026-08-07 (válido hasta 2026-11-05). Seguía activado por
+  defecto desde que se agregó el fallback; poner `CKAN_INSECURE_TLS=1` solo
+  si el certificado del portal vuelve a fallar
+
 ## 0.5.0 — 2026-08-10
 
 ### Added
