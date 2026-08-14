@@ -266,7 +266,7 @@ Casi todos los tools aceptan `format="json"` además de texto.
 | `search_datasets` | Buscar datasets por palabras clave. Soporta filtro por categoría. |
 | `list_recent_datasets` | Datasets más recientemente actualizados en el portal. |
 | `get_dataset_info` | Metadata detallada de un dataset: título, descripción, organización, tags, licencia, fechas. |
-| `list_dataset_resources` | Listar todos los archivos (recursos) de un dataset con formato, tamaño y URL. |
+| `list_dataset_resources` | Listar todos los archivos (recursos) de un dataset con formato, tamaño, URL y fechas de creación/modificación. |
 | `get_resource_info` | Información detallada de un archivo específico. |
 | `preview_resource_data` | Preview de CSV/TSV, JSON/GeoJSON o XLSX como tabla (máx. 5 MB). |
 | `query_resource_data` | Consulta tabular vía CKAN DataStore (filtros, texto, paginación) sin descargar el archivo. |

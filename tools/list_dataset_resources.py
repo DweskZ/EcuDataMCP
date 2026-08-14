@@ -24,7 +24,10 @@ def register_list_dataset_resources_tool(mcp: FastMCP) -> None:
         """
         List all resources (files) in a dataset with their metadata.
 
-        Returns resource ID, title, format, size, and download URL for each file.
+        Returns resource ID, title, format, size, download URL, and creation/
+        last-modified dates for each file. The dates let you tell whether a
+        dataset's files are periodic snapshots (compare last_modified across
+        resources to find the most recent one) before reading any of them.
         Next step: use preview_resource_data on a CSV resource to see its contents,
         or use get_resource_info for detailed metadata.
 
@@ -56,6 +59,8 @@ def register_list_dataset_resources_tool(mcp: FastMCP) -> None:
                     "mimetype": res.get("mimetype"),
                     "description": res.get("description"),
                     "url": res.get("url"),
+                    "created": res.get("created"),
+                    "last_modified": res.get("last_modified"),
                 }
                 for res in resources
                 if res.get("id")
@@ -85,6 +90,10 @@ def register_list_dataset_resources_tool(mcp: FastMCP) -> None:
                     parts.append(f"   Descripción: {str(res['description'])[:200]}")
                 if res.get("url"):
                     parts.append(f"   URL: {res['url']}")
+                if res.get("created"):
+                    parts.append(f"   Creado: {res['created']}")
+                if res.get("last_modified"):
+                    parts.append(f"   Última modificación: {res['last_modified']}")
                 parts.append("")
             return "\n".join(parts)
 
