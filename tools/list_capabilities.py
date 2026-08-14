@@ -5,12 +5,13 @@ from helpers.logging import log_tool
 
 _CAPABILITIES = {
     "name": "Ecuador MCP",
-    "version": "0.4.4",
+    "version": "0.5.0",
     "fuentes": [
         "CKAN datos abiertos",
         "gob.ec trámites/instituciones/regulaciones",
         "SERCOP OCDS contratos",
         "SGR COE eventos de riesgo + SAT tsunami",
+        "IG-EPN Instituto Geofísico (sismos)",
         "DPA provincias/cantones/parroquias (offline INEC)",
         "ANDA (NADA/IHSN) catálogo de encuestas y censos del INEC",
     ],
@@ -34,7 +35,7 @@ _CAPABILITIES = {
         ],
         "normas": ["search_regulaciones", "get_regulacion_info"],
         "compras": ["search_contratos", "get_contrato_info"],
-        "riesgos": ["search_eventos_riesgo", "list_sat_tsunami"],
+        "riesgos": ["search_eventos_riesgo", "list_sat_tsunami", "search_sismos"],
         "geo": ["lookup_ubicacion"],
         "encuestas": ["search_anda", "get_anda_survey_info", "download_anda_microdata"],
     },
@@ -50,6 +51,10 @@ _CAPABILITIES = {
         "CKAN puede requerir TLS insecure allowlist (CKAN_INSECURE_TLS)",
         "SERCOP a veces rate-limita (429); hay reintentos + caché negativa/TTL",
         "SGR COE es un snapshot público; no sustituye alertas oficiales en tiempo real",
+        (
+            "Sismos IG-EPN: feed público events.csv con hora local (UTC-5); "
+            "no sustituye canales oficiales de alerta"
+        ),
         "lookup_ubicacion(nivel='parroquia') requiere query, canton o provincia",
     ],
 }
