@@ -12,6 +12,11 @@ Este repositorio es un fork de [DweskZ/EcuDataMCP](https://github.com/DweskZ/Ecu
   dataset: link a donde la entidad publicadora mantiene el dato original,
   fuera del portal) y `extras` (metadatos personalizados que la entidad haya
   agregado más allá del esquema estándar)
+- `preview_resource_data` (CSV) ahora descarta columnas de geometría/WKT
+  (`geom`, `wkt`, polígonos detectados por contenido) para no inundar el
+  preview con coordenadas, y convierte columnas en formato decimal europeo
+  (`7.760,2` → `7760.2`) a notación estándar. El mismo descarte de columnas
+  de geometría aplica también al preview de JSON plano (arrays de objetos)
 
 ## 0.5.0 — 2026-08-10
 
