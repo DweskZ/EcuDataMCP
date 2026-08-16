@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.5.4 — 2026-08-16
+
+Integración completa de la Superintendencia de Compañías (Supercías):
+directorio, ranking financiero, y registro de auditores externos.
+
+### Added
+- **Directorio de compañías** (`search_companias`/`get_compania_info`):
+  el directorio nacional de compañías (226k+, actualizado a diario) —
+  situación legal, representante legal, capital suscrito, CIIU, dirección.
+  `helpers/supercias_client.py` parsea el export Excel del portal con
+  `ElementTree.iterparse` (el `<dimension>` del archivo viene mal
+  declarado y rompe el modo `read_only` de openpyxl), cacheado en memoria
+  6h (parseo CPU-bound corre en `asyncio.to_thread` para no bloquear el
+  event loop con clientes HTTP concurrentes).
+- **Ranking financiero** (`search_ranking`/`get_financials`): segundo
+  dataset de Supercías (`bi_ranking.csv`, ~356 MB / ~9M filas) — ingresos,
+  activos, patrimonio y ~38 ratios financieros por compañía y año fiscal,
+  derivados de balances reales. `helpers/supercias_financials.py` consulta
+  un SQLite local construido de antemano por
+  `scripts/build_supercias_financials_db.py` (recortado a los últimos 5
+  años fiscales, autoajustable), con su propia tabla `companias`
+  (expediente, ruc, nombre) cargada desde `bi_compania.csv` — resuelve
+  nombre/RUC sin depender del directorio, que se cachea y refresca por
+  separado. El build es atómico: construye en `<db>.building`, verifica
+  integridad y columnas requeridas, y recién entonces reemplaza la base
+  que ya funciona — un build fallido nunca la deja sin datos.
+  `helpers/tls.py` gana `legacy_cipher_context()` para el handshake TLS de
+  `appscvsmovil.supercias.gob.ec` (host distinto del directorio, exige un
+  mínimo de cifrado que OpenSSL 3 rechaza por defecto — mecanismo separado
+  del fallback de certificados vencidos).
+- **Registro de auditores externos** (`search_auditores`/`get_auditor_info`):
+  tercer dataset de Supercías, el registro de firmas/personas autorizadas
+  para actuar como auditores externos (1,447 filas, ~190 KB, mismo host y
+  patrón de refresco diario que el directorio). `_parse_xlsx` generalizado
+  para aceptar `header_markers` configurables, ya que este export usa
+  `IDENTIFICACION` como columna de identificación en vez de `RUC`.
+
 ## 0.5.1 — 2026-08-13
 
 ### Added

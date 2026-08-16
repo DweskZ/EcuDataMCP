@@ -69,6 +69,26 @@ def register_catalog_resources(mcp: FastMCP) -> None:
                     "nombre": "DPA provincias, cantones y parroquias (referencia offline INEC)",
                     "tools": ["lookup_ubicacion"],
                 },
+                {
+                    "id": "supercias",
+                    "nombre": (
+                        "Superintendencia de Compañías (directorio de compañías, "
+                        "auditores externos)"
+                    ),
+                    "base": "https://mercadodevalores.supercias.gob.ec/reportes/",
+                    "tools": [
+                        "search_companias",
+                        "get_compania_info",
+                        "search_auditores",
+                        "get_auditor_info",
+                    ],
+                },
+                {
+                    "id": "supercias-financials",
+                    "nombre": "Superintendencia de Compañías (ranking financiero, últimos años)",
+                    "base": "https://appscvsmovil.supercias.gob.ec/ranking/",
+                    "tools": ["search_ranking", "get_financials"],
+                },
             ]
         }
         return json.dumps(payload, ensure_ascii=False, indent=2)
