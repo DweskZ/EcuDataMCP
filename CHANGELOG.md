@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.5.3 — 2026-08-16
+
+Endurecimiento de seguridad e infraestructura, producto de un review externo
+de producción sobre este repo. Sin cambios de tools/capacidades — sigue
+siendo un PR independiente del resto.
+
+### Added
+- `helpers/safe_download.py`: guardia SSRF centralizada (`assert_public_url`,
+  `safe_stream`) para descargas cuya URL viene de metadata externa no
+  confiable — hoy solo `preview_resource_data` (URLs de recursos CKAN,
+  definidas por quien publica el dataset, no por este código). Valida la URL
+  inicial y cada hop de redirección contra IPs privadas/loopback/link-local/
+  multicast/reservadas/no especificadas antes de conectar; tope de 5
+  redirecciones. No cubre DNS rebinding (documentado explícitamente en el
+  docstring del módulo).
+- `helpers/csv_reader.py`: `download_bytes()` ahora usa `safe_stream()` en
+  vez de `httpx` con `follow_redirects=True`.
+
+### Changed
+- `uv.lock` ahora se commitea (`.gitignore` tenía `*.lock` sin excepción);
+  CI usa `uv sync --locked` y corre en Python 3.11/3.12/3.13 (antes solo
+  3.12, pese a que `pyproject.toml` declara `>=3.11` y el Dockerfile usa
+  3.13).
+- Dockerfile: copiaba `pyproject.toml` e instalaba antes de copiar el código
+  fuente — `pip install .` corría sin los paquetes (`helpers/`, `tools/`,
+  etc.) ni el `README.md` que el propio `pyproject.toml` declara, y solo
+  "funcionaba" porque el `COPY . .` posterior ponía los archivos crudos en
+  el path de Python. Ahora usa `uv sync --locked --no-dev` con el código
+  copiado antes.
+- Nuevo `.dockerignore` (`.git/`, `.env`, caches, `tests/` no entraban al
+  build context antes).
+
 ## 0.5.1 — 2026-08-13
 
 ### Added

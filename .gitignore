@@ -14,5 +14,8 @@ env/
 .pytest_cache/
 .mypy_cache/
 *.lock
+# uv.lock pins the exact dependency graph CI/Docker build against; without
+# it, "passes CI today" doesn't guarantee the same resolution tomorrow.
+!uv.lock
 .DS_Store
 Thumbs.db

@@ -8,6 +8,7 @@ from typing import Any
 import httpx
 
 from helpers.logging import MAIN_LOGGER_NAME
+from helpers.safe_download import safe_stream
 from helpers.tls import should_retry_insecure
 from helpers.user_agent import USER_AGENT
 
@@ -109,7 +110,10 @@ def normalize_eu_decimal_columns(
 
 async def _download(session: httpx.AsyncClient, url: str) -> tuple[bytes, bool]:
     truncated = False
-    async with session.stream("GET", url, timeout=_TIMEOUT) as resp:
+    # `url` comes from CKAN resource metadata -- external, not first-party --
+    # so every hop (including redirects) must be checked against the SSRF
+    # guard rather than trusting httpx's own follow_redirects.
+    async with safe_stream(session, url, timeout=_TIMEOUT) as resp:
         resp.raise_for_status()
 
         content_length = resp.headers.get("content-length")
@@ -134,9 +138,11 @@ async def download_bytes(
     """Download up to MAX_DOWNLOAD_BYTES with TLS fallback for portal hosts."""
     own = session is None
     if own:
-        session = httpx.AsyncClient(
-            headers={"User-Agent": USER_AGENT}, follow_redirects=True
-        )
+        # follow_redirects is deliberately not set here: safe_stream() always
+        # makes its own per-request follow_redirects=False and handles
+        # redirects itself (validating each hop), so a client-level default
+        # would be misleading rather than wrong.
+        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
     assert session is not None
     try:
         logger.debug("Downloading from %s (max %d bytes)", url, MAX_DOWNLOAD_BYTES)
@@ -152,7 +158,6 @@ async def download_bytes(
             )
             async with httpx.AsyncClient(
                 headers={"User-Agent": USER_AGENT},
-                follow_redirects=True,
                 verify=False,
             ) as insecure_session:
                 return await _download(insecure_session, url)
