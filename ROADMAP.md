@@ -73,21 +73,27 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
 - [ ] **Tool `read_pdf(url, pages)`** — no hay soporte para leer PDFs del
       portal. Pocos casos hoy, pero es el desbloqueo para fuentes curadas más
       adelante.
-- [ ] **Prompts de flujo de trabajo adicionales** (`@mcp.prompt()`) — hoy solo
-      hay uno; falta al menos un segundo prompt guiado para exploración
-      temática (ej. "explorar_tema").
-- [ ] **Descartar columnas de geometría/WKT** antes de renderizar previews de
-      GeoJSON/CSV — una sola columna de polígono puede inundar el contexto de
-      un preview. `preview_json`/`preview_csv` no lo hacen hoy.
-- [ ] **Parseo de decimales en formato europeo** (`7.760,2` = 7760.20) —
-      común en varios recursos del portal; falta detectarlo y ofrecer
-      conversión, no solo advertir.
-- [ ] **Soporte `.rar`** — decisión pendiente: implementarlo (necesita binario
-      `unrar`) o documentar el rechazo como definitivo.
+- [x] **Prompts de flujo de trabajo adicionales** (`@mcp.prompt()`) — agregado
+      `explorar_tema`, guía transversal a todas las fuentes (datasets,
+      trámites, regulaciones, contratos, riesgos) en una sola pasada.
+- [x] **Descartar columnas de geometría/WKT** antes de renderizar previews de
+      GeoJSON/CSV — ya hecho (ver CHANGELOG 0.5.1): `preview_json`/`preview_csv`
+      descartan columnas de geometría/WKT detectadas por nombre o contenido.
+      Este ítem había quedado desactualizado en el roadmap.
+- [x] **Parseo de decimales en formato europeo** (`7.760,2` = 7760.20) — ya
+      hecho (ver CHANGELOG 0.5.1): se detecta y convierte a notación estándar
+      en CSV. Este ítem había quedado desactualizado en el roadmap.
+- [x] **Soporte `.rar`** — **decidido: rechazo definitivo, sin implementar.**
+      No vale la pena la dependencia del binario `unrar` para el volumen de
+      casos que se ve hoy. `preview_resource_data` ahora devuelve un mensaje
+      explícito (`rar_no_soportado`) con el link de descarga directa, en vez
+      de caer en el genérico "formato no soportado".
 - [ ] **Recursos sin extensión** — requieren sniffing de content-type; sin
       implementar ni probar.
-- [ ] **Soporte `.xls` legacy** — hoy `preview_resource_data` lo rechaza
-      explícitamente; decidir si vale la pena soportarlo.
+- [x] **Soporte `.xls` legacy** — **decidido: rechazo definitivo, sin
+      implementar.** Ya estaba así en el código (`xls_no_soportado`, pide
+      convertir a XLSX o descargar); este ítem solo formaliza que es
+      intencional, no un pendiente por resolver.
 
 ## Verificación end-to-end pendiente
 

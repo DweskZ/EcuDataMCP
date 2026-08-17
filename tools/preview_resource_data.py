@@ -71,6 +71,20 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
         name = res.get("name") or res.get("description") or "Sin título"
 
         try:
+            if fmt == "RAR" or url.lower().endswith(".rar"):
+                return render_output(
+                    {
+                        "error": "rar_no_soportado",
+                        "url": url,
+                        "resource_id": resource_id,
+                    },
+                    format,
+                    text_builder=lambda d: (
+                        "Este recurso es un archivo .rar. No lo soportamos "
+                        "(requeriría el binario unrar como dependencia externa). "
+                        f"Descárgalo y extráelo manualmente desde: {d['url']}"
+                    ),
+                )
             if fmt in _CSV_FORMATS or (
                 not fmt and url.lower().endswith((".csv", ".tsv", ".txt"))
             ):

@@ -6,6 +6,13 @@
 - Prompt MCP `explorar_tema`: exploración temática transversal (datasets,
   trámites, regulaciones, contratos y riesgos) en una sola guía, en vez de
   requerir un prompt por fuente
+- `preview_resource_data` rechaza `.rar` con un mensaje explícito
+  (`rar_no_soportado`) en vez de caer en el genérico "formato no soportado"
+
+### Decided
+- `.rar` y `.xls` legacy: rechazo definitivo en `preview_resource_data`, no
+  se va a implementar soporte (evita la dependencia del binario `unrar`;
+  `.xls` ya se pedía convertir a XLSX)
 
 ## 0.5.1 — 2026-08-13
 
