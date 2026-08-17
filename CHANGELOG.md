@@ -25,6 +25,18 @@
   tras expirar el caché de 24h tarda ~10-15s), deduplicando series con
   nombre idéntico repetido entre desagregaciones (ej. "DESEMPLEO" aparece
   igual en nacional/urbano/rural).
+- Integración con el SRI: tool `search_sri_datasets` sobre `helpers/sri_client.py`,
+  que indexa los ~130 archivos (catastro RUC por provincia, recaudación,
+  ventas/compras, vehículos, CEL, diccionarios de variables) que el SRI
+  publica en su propia página (`sri.gob.ec/datasets`), fuera del portal
+  CKAN, por lo que `search_datasets` no los encuentra. Esa página es un
+  CMS Liferay sin API — cada archivo vive en un `<p>` con una etiqueta
+  corta junto al link de descarga; **ojo:** el agrupamiento por sección que
+  ofrece el HTML no es confiable (al menos una sección está mal titulada:
+  "Prueba" contiene en realidad los archivos reales de Recaudación), así
+  que el parser indexa cada archivo por su propia etiqueta/URL en vez de
+  confiar en el título de la sección que lo contiene. Caché de 6h.
+- Fuente `sri` en `ecuador://fuentes`
 
 ## 0.5.1 — 2026-08-13
 

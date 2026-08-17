@@ -29,6 +29,7 @@ from tools.search_indicadores_bce import register_search_indicadores_bce_tool
 from tools.search_organizations import register_search_organizations_tool
 from tools.search_regulaciones import register_search_regulaciones_tool
 from tools.search_sismos import register_search_sismos_tool
+from tools.search_sri_datasets import register_search_sri_datasets_tool
 from tools.search_tramites import register_search_tramites_tool
 
 
@@ -52,6 +53,7 @@ def register_tools(mcp: FastMCP) -> None:
     register_get_organization_info_tool(mcp)
     register_list_categories_tool(mcp)
     register_get_category_info_tool(mcp)
+    register_search_sri_datasets_tool(mcp)
 
     register_search_tramites_tool(mcp)
     register_get_tramite_info_tool(mcp)

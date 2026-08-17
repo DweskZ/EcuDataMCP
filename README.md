@@ -55,6 +55,7 @@ Este MCP unifica **fuentes gubernamentales** en un solo servidor:
 | Fuente | Datos | Cobertura |
 |--------|-------|-----------|
 | **Datos Abiertos** (CKAN) | Catálogo nacional + DataStore + preview CSV/JSON/XLSX | www.datosabiertos.gob.ec |
+| **SRI Datasets** | ~130 archivos (CSV/XLSX/ZIP) fuera del portal CKAN: RUC por provincia, recaudación, ventas/compras, vehículos, CEL | www.sri.gob.ec/datasets |
 | **Trámites e instituciones** (Gob.ec) | Procedimientos, requisitos, costos | gob.ec/api/v1 |
 | **Regulaciones** (Gob.ec) | Normas, acuerdos, Registro Oficial | gob.ec/api/v1/regulaciones |
 | **Contratos públicos** (SERCOP/OCDS) | Licitaciones, compradores, proveedores | datosabiertos.compraspublicas.gob.ec |
@@ -246,7 +247,7 @@ uv run python main.py --transport stdio
 
 ---
 
-## Herramientas disponibles (30 tools)
+## Herramientas disponibles (31 tools)
 
 Casi todos los tools aceptan `format="json"` además de texto.
 
@@ -269,6 +270,7 @@ Casi todos los tools aceptan `format="json"` además de texto.
 | `get_resource_info` | Información detallada de un archivo específico. |
 | `preview_resource_data` | Preview de CSV/TSV, JSON/GeoJSON o XLSX como tabla (máx. 5 MB). |
 | `query_resource_data` | Consulta tabular vía CKAN DataStore (filtros, texto, paginación) sin descargar el archivo. |
+| `search_sri_datasets` | Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN (sri.gob.ec/datasets): catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables. |
 
 ### Trámites Gubernamentales
 

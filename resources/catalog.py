@@ -36,6 +36,12 @@ def register_catalog_resources(mcp: FastMCP) -> None:
                     ],
                 },
                 {
+                    "id": "sri",
+                    "nombre": "SRI Datasets (fuera del portal CKAN)",
+                    "base": "https://www.sri.gob.ec/datasets",
+                    "tools": ["search_sri_datasets"],
+                },
+                {
                     "id": "gobec",
                     "nombre": "gob.ec trámites / instituciones / regulaciones",
                     "base": "https://www.gob.ec/api/v1/",
