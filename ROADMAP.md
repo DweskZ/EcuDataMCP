@@ -83,17 +83,19 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
 - [x] **Parseo de decimales en formato europeo** (`7.760,2` = 7760.20) — ya
       hecho (ver CHANGELOG 0.5.1): se detecta y convierte a notación estándar
       en CSV. Este ítem había quedado desactualizado en el roadmap.
-- [x] **Soporte `.rar`** — **decidido: rechazo definitivo, sin implementar.**
-      No vale la pena la dependencia del binario `unrar` para el volumen de
-      casos que se ve hoy. `preview_resource_data` ahora devuelve un mensaje
-      explícito (`rar_no_soportado`) con el link de descarga directa, en vez
-      de caer en el genérico "formato no soportado".
+- [~] **Soporte `.rar`** — todavía sin preview como tabla (necesitaría el
+      binario `unrar` como dependencia externa; puerta abierta si el volumen
+      de casos lo justifica). Mientras tanto, `preview_resource_data` señala
+      el caso explícitamente (`rar_no_soportado`) y ahora hay un tool nuevo,
+      `download_resource(resource_id)`, que baja el archivo completo
+      (base64, hasta 5 MB) para que se pueda usar fuera del MCP.
 - [ ] **Recursos sin extensión** — requieren sniffing de content-type; sin
       implementar ni probar.
-- [x] **Soporte `.xls` legacy** — **decidido: rechazo definitivo, sin
-      implementar.** Ya estaba así en el código (`xls_no_soportado`, pide
-      convertir a XLSX o descargar); este ítem solo formaliza que es
-      intencional, no un pendiente por resolver.
+- [~] **Soporte `.xls` legacy** — `preview_resource_data` sigue sin parsear
+      `.xls` como tabla (`xls_no_soportado`), pero ahora se puede bajar el
+      archivo completo con `download_resource(resource_id)` para abrirlo
+      localmente. Preview real (vía `xlrd`, que es pura Python, sin binario
+      externo) queda como posible siguiente paso si hace falta.
 
 ## Verificación end-to-end pendiente
 

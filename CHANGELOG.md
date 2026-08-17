@@ -6,13 +6,13 @@
 - Prompt MCP `explorar_tema`: exploración temática transversal (datasets,
   trámites, regulaciones, contratos y riesgos) en una sola guía, en vez de
   requerir un prompt por fuente
-- `preview_resource_data` rechaza `.rar` con un mensaje explícito
-  (`rar_no_soportado`) en vez de caer en el genérico "formato no soportado"
-
-### Decided
-- `.rar` y `.xls` legacy: rechazo definitivo en `preview_resource_data`, no
-  se va a implementar soporte (evita la dependencia del binario `unrar`;
-  `.xls` ya se pedía convertir a XLSX)
+- Tool `download_resource(resource_id)`: baja el archivo crudo de un
+  recurso en base64 (máx. 5 MB, mismo límite que `preview_resource_data`)
+  para formatos que no se pueden previsualizar como tabla — pensado sobre
+  todo para `.rar` y `.xls` legacy, pero sirve para cualquier resource_id
+- `preview_resource_data` señala `.rar` explícitamente (`rar_no_soportado`,
+  antes caía en el genérico "formato no soportado") y tanto ese mensaje
+  como el de `.xls` (`xls_no_soportado`) ahora apuntan a `download_resource`
 
 ## 0.5.1 — 2026-08-13
 

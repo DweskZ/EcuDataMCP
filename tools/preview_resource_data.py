@@ -80,9 +80,10 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
                     },
                     format,
                     text_builder=lambda d: (
-                        "Este recurso es un archivo .rar. No lo soportamos "
-                        "(requeriría el binario unrar como dependencia externa). "
-                        f"Descárgalo y extráelo manualmente desde: {d['url']}"
+                        "Este recurso es un archivo .rar. Todavía no lo previsualizamos como "
+                        "tabla (requeriría el binario unrar como dependencia externa), pero "
+                        f"puedes bajar el archivo completo con download_resource('{d['resource_id']}'), "
+                        f"o directamente desde: {d['url']}"
                     ),
                 )
             if fmt in _CSV_FORMATS or (
@@ -101,8 +102,9 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
                         },
                         format,
                         text_builder=lambda d: (
-                            "Este recurso es Excel legacy (.xls). "
-                            f"Convierte a XLSX o descárgalo desde: {d['url']}"
+                            "Este recurso es Excel legacy (.xls), que no previsualizamos como "
+                            f"tabla. Puedes bajarlo con download_resource('{d['resource_id']}') "
+                            f"y abrirlo localmente, o desde: {d['url']}"
                         ),
                     )
                 result = await preview_xlsx(url, max_rows=rows)
