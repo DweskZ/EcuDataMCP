@@ -25,6 +25,21 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       `search_eventos_riesgo` y `list_sat_tsunami`, y si falta, diseñar una
       conexión dedicada. Búsqueda quedada interrumpida sin retomar.
 - [ ] **Ecuador en Cifras / portal BI del INEC** — sin investigar todavía.
+- [~] **IESS (Instituto Ecuatoriano de Seguridad Social)** — **agregado
+      2026-08-16, pedido por Daniel: tienen boletines/reportes en PDF en su
+      propio portal.** Ya reachable hoy vía CKAN genérico
+      (`organization="instituto-ecuatoriano-de-seguridad-social"`) — 3
+      datasets: afiliados activos del Seguro General Obligatorio y Régimen
+      Especial Voluntario, pagos y beneficiarios del Seguro de Desempleo
+      (verificado en la sección de verificación e2e de abajo), encuesta
+      familiar del Seguro Social Campesino. **Sin confirmar todavía:** los
+      PDFs (boletines estadísticos) que Daniel menciona — una revisión
+      rápida de `iess.gob.ec/es/estadisticas` no encontró links `.pdf` en el
+      HTML plano (puede ser contenido cargado por JS, o vivir en otra
+      sección del sitio); falta investigar a fondo dónde están y si tienen
+      suficiente valor estructurado como para justificar un
+      `read_pdf`/extracción dedicada, o si conviene esperar al pendiente
+      general de `read_pdf(url, pages)`.
 - [ ] **Cuenca en Datos** (`https://cuencaendatos.cuenca.gob.ec`) — CKAN 2.9.6,
       92 datasets, portal municipal independiente del nacional. Sin probar.
 - [ ] **Sitios de ministerios individuales** — sin alcance definido; falta
@@ -91,6 +106,15 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       (base64, hasta 5 MB) para que se pueda usar fuera del MCP.
 - [ ] **Recursos sin extensión** — requieren sniffing de content-type; sin
       implementar ni probar.
+- [ ] **Soporte `.tar.gz`** — encontrado real durante la verificación e2e
+      (2026-08-16): el dataset `contribuyentes-activos-catastro-2025` del
+      SRI (declarado formato CSV en CKAN) en realidad se descarga como
+      `sri_activos_2025.tar.gz`. Hoy `preview_resource_data` no lo reconoce
+      (ni siquiera está en la lista de "conocidos mal soportados" junto a
+      `.rar`/`.xls`) y cae en el genérico "formato no soportado" —
+      `download_resource` sí lo baja crudo. Descomprimirlo (`tarfile`,
+      stdlib, sin dependencia nueva) y previsualizar el CSV interno sería
+      relativamente simple si se decide hacerlo.
 - [~] **Soporte `.xls` legacy** — `preview_resource_data` sigue sin parsear
       `.xls` como tabla (`xls_no_soportado`), pero ahora se puede bajar el
       archivo completo con `download_resource(resource_id)` para abrirlo
@@ -103,14 +127,36 @@ Cifras de referencia contra el mismo portal (`www.datosabiertos.gob.ec`),
 para confirmar que los tools devuelven los números correctos, no solo que no
 truenan:
 
-- [ ] **SRI** `contribuyentes-activos-catastro-2025` → 2,904,355
+- [x] **SRI** `contribuyentes-activos-catastro-2025` → 2,904,355
       contribuyentes en el mes más reciente vía `sum(TOTAL)`, **no**
-      `count(*)` (que da 405,794).
-- [ ] **IESS** `base-de-datos-seguro-desempleo`, junio 2026 → 2,561
+      `count(*)` (que da 405,794). **Verificado 2026-08-16 contra el portal
+      real (con VPN a LatAm, ver nota de bloqueo geográfico):** cifras
+      exactas — noviembre (mes más reciente) `sum(TOTAL)` = 2,904,355,
+      `count(*)` total = 405,794. **Hallazgo nuevo:** el único recurso CSV
+      del dataset (`sri_activos_2025.csv`) en realidad se descarga como
+      `sri_activos_2025.tar.gz` (5.4 MB comprimido) — `preview_resource_data`
+      no soporta `.tar.gz` hoy (ver pendiente nuevo arriba).
+- [x] **IESS** `base-de-datos-seguro-desempleo`, junio 2026 → 2,561
       beneficiarios, USD 836,716.99, excluyendo la fila `TOTAL:` embebida en
-      el archivo (incluirla da exactamente el doble).
-- [ ] **MPCEIP** cacao → junio 2026, Grado 1 semanal: 174.77 / 168.15 /
-      166.28 / 188.07, usando solo el archivo más reciente.
+      el archivo (incluirla da exactamente el doble). **Verificado
+      2026-08-16:** cifras exactas. **Hallazgo nuevo:** el dataset tiene
+      *dos* recursos distintos con nombres casi idénticos para el mismo mes
+      ("Pagos Desempleo Junio 2026" y "Numero de beneficiarios y montos
+      pagados... a Junio 2026") — el primero es un resumen mensual acumulado
+      del año completo (una fila por mes desde enero), el segundo es el
+      detalle por provincia/género con la fila `TOTAL:` real. Mismo tipo de
+      ambigüedad de nombres que ya motivó el pendiente de detección
+      acumulado-vs-incremental — confirma que ese pendiente sigue siendo
+      necesario, no es un caso aislado.
+- [x] **MPCEIP** cacao → junio 2026, Grado 1 semanal: 174.77 / 168.15 /
+      166.28 / 188.07, usando solo el archivo más reciente. **Verificado
+      2026-08-16:** cifras exactas contra
+      `6.-MPCEIP_PRECIO_FOB_EXPORTACIONES-CACAO_JUN_2026.xlsx`. **Hallazgo
+      nuevo:** ese recurso está declarado `format: CSV` en la metadata de
+      CKAN pero la URL real es `.xlsx` — `preview_resource_data` ya
+      resuelve esto bien porque tiene fallback por extensión de URL cuando
+      el formato declarado no calza, pero confirma que confiar solo en el
+      campo `format` de CKAN no alcanza.
 - [ ] Cobertura real de formatos: `.xls`, `.zip`, `.rar` y una URL sin
       extensión, probados de punta a punta.
 - [ ] Degradación cuando el portal no responde — confirmar que el error que
