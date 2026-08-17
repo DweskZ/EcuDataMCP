@@ -323,7 +323,7 @@ Casi todos los tools aceptan `format="json"` además de texto.
 
 ### Prompts MCP
 
-Plantillas listas para el cliente (Claude/Cursor): `explorar_datos`, `consultar_tramite`, `investigar_contrato`, `buscar_regulacion`, `monitorear_riesgos`.
+Plantillas listas para el cliente (Claude/Cursor): `explorar_datos`, `explorar_tema`, `consultar_tramite`, `investigar_contrato`, `buscar_regulacion`, `monitorear_riesgos`.
 
 ### Resources MCP
 

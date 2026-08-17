@@ -71,6 +71,31 @@ def register_workflow_prompts(mcp: FastMCP) -> None:
         )
 
     @mcp.prompt(
+        name="explorar_tema",
+        title="Explorar un tema a través de todas las fuentes",
+        description="Guía para recorrer datasets, trámites, regulaciones, contratos y riesgos de un tema en una sola pasada.",
+    )
+    def explorar_tema(tema: str = "empleo") -> str:
+        """Prompt para exploración temática transversal a todas las fuentes del MCP."""
+        return (
+            f"Quiero un panorama completo sobre '{tema}' en Ecuador, cruzando "
+            "todas las fuentes disponibles en este MCP.\n"
+            f"1) Empieza con search_ecuador('{tema}') para ver qué hay en cada fuente "
+            "(datasets, trámites, regulaciones, contratos, riesgos) de un vistazo.\n"
+            "2) Si hay datasets relevantes, profundiza con get_dataset_info y "
+            "list_dataset_resources; usa query_resource_data o preview_resource_data "
+            "para traer cifras concretas.\n"
+            "3) Si hay trámites relacionados, usa get_tramite_info para requisitos y costos.\n"
+            "4) Si hay regulaciones o contratos públicos relevantes, detállalos con "
+            "get_regulacion_info / get_contrato_info.\n"
+            "5) Si el tema toca riesgos o emergencias, revisa search_eventos_riesgo "
+            "o search_sismos según aplique.\n"
+            "Organiza la respuesta en español por fuente (Datos Abiertos, Trámites, "
+            "Regulaciones, Contratos, Riesgos), citando IDs y URLs, y omite las "
+            "secciones sin resultados relevantes."
+        )
+
+    @mcp.prompt(
         name="monitorear_riesgos",
         title="Monitorear riesgos / emergencias",
         description="Guía para consultar eventos SGR COE y estaciones SAT tsunami.",

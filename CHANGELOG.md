@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- Prompt MCP `explorar_tema`: exploración temática transversal (datasets,
+  trámites, regulaciones, contratos y riesgos) en una sola guía, en vez de
+  requerir un prompt por fuente
+
 ## 0.5.1 — 2026-08-13
 
 ### Added
