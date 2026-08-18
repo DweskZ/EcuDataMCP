@@ -247,7 +247,7 @@ uv run python main.py --transport stdio
 
 ---
 
-## Herramientas disponibles (31 tools)
+## Herramientas disponibles
 
 Casi todos los tools aceptan `format="json"` además de texto.
 

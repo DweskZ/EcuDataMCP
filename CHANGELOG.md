@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.5.2 — 2026-08-16
+## Unreleased
 
 ### Added
 - Integración con el Banco Central del Ecuador vía BCEData
