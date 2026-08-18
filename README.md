@@ -55,6 +55,7 @@ Este MCP unifica **fuentes gubernamentales** en un solo servidor:
 | Fuente | Datos | Cobertura |
 |--------|-------|-----------|
 | **Datos Abiertos** (CKAN) | Catálogo nacional + DataStore + preview CSV/JSON/XLSX | www.datosabiertos.gob.ec |
+| **SRI Datasets** | ~130 archivos (CSV/XLSX/ZIP) fuera del portal CKAN: RUC por provincia, recaudación, ventas/compras, vehículos, CEL | www.sri.gob.ec/datasets |
 | **Trámites e instituciones** (Gob.ec) | Procedimientos, requisitos, costos | gob.ec/api/v1 |
 | **Regulaciones** (Gob.ec) | Normas, acuerdos, Registro Oficial | gob.ec/api/v1/regulaciones |
 | **Contratos públicos** (SERCOP/OCDS) | Licitaciones, compradores, proveedores | datosabiertos.compraspublicas.gob.ec |
@@ -62,6 +63,7 @@ Este MCP unifica **fuentes gubernamentales** en un solo servidor:
 | **Sismos** (IG-EPN) | Catálogo sísmico del Instituto Geofísico | www.igepn.edu.ec |
 | **Geografía** (DPA) | 24 provincias + 224 cantones (códigos INEC) | referencia offline |
 | **ANDA** (NADA/IHSN) | Catálogo de encuestas y censos del INEC | anda.inec.gob.ec |
+| **BCE** (BCEData) | Catálogo estadístico completo: monetario/financiero, finanzas públicas, sector externo, sector real (PIB, empleo, confianza del consumidor) | contenido.bce.fin.ec |
 
 **Sin API key. Sin restricciones de acceso. 100% datos públicos.**
 
@@ -245,7 +247,7 @@ uv run python main.py --transport stdio
 
 ---
 
-## Herramientas disponibles (28 tools)
+## Herramientas disponibles
 
 Casi todos los tools aceptan `format="json"` además de texto.
 
@@ -268,6 +270,7 @@ Casi todos los tools aceptan `format="json"` además de texto.
 | `get_resource_info` | Información detallada de un archivo específico. |
 | `preview_resource_data` | Preview de CSV/TSV, JSON/GeoJSON o XLSX como tabla (máx. 5 MB). |
 | `query_resource_data` | Consulta tabular vía CKAN DataStore (filtros, texto, paginación) sin descargar el archivo. |
+| `search_sri_datasets` | Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN (sri.gob.ec/datasets): catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables. |
 
 ### Trámites Gubernamentales
 
@@ -285,6 +288,13 @@ Casi todos los tools aceptan `format="json"` además de texto.
 | `search_anda` | Buscar encuestas y censos en el catálogo ANDA del INEC (NADA/IHSN). Indica si cada encuesta tiene microdatos descargables. |
 | `get_anda_survey_info` | Metadata completa de una encuesta ANDA: resumen, variables, confidencialidad y contacto. |
 | `download_anda_microdata` | Links directos de descarga de los archivos de microdatos de una encuesta ANDA. |
+
+### Macroeconomía (BCE)
+
+| Tool | Descripción |
+|------|-------------|
+| `search_indicadores_bce` | Buscar en el catálogo estadístico del Banco Central del Ecuador (monetario/financiero, finanzas públicas, sector externo, sector real). |
+| `get_indicador_bce` | Serie de tiempo de un indicador por `id_grupo`: período, frecuencia y unidad configurables (defaults según el grupo). |
 
 ### Regulaciones y contratos
 

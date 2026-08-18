@@ -5,6 +5,7 @@ from tools.get_anda_survey_info import register_get_anda_survey_info_tool
 from tools.get_category_info import register_get_category_info_tool
 from tools.get_contrato_info import register_get_contrato_info_tool
 from tools.get_dataset_info import register_get_dataset_info_tool
+from tools.get_indicador_bce import register_get_indicador_bce_tool
 from tools.get_institucion_info import register_get_institucion_info_tool
 from tools.get_organization_info import register_get_organization_info_tool
 from tools.get_regulacion_info import register_get_regulacion_info_tool
@@ -24,9 +25,11 @@ from tools.search_contratos import register_search_contratos_tool
 from tools.search_datasets import register_search_datasets_tool
 from tools.search_ecuador import register_search_ecuador_tool
 from tools.search_eventos_riesgo import register_search_eventos_riesgo_tool
+from tools.search_indicadores_bce import register_search_indicadores_bce_tool
 from tools.search_organizations import register_search_organizations_tool
 from tools.search_regulaciones import register_search_regulaciones_tool
 from tools.search_sismos import register_search_sismos_tool
+from tools.search_sri_datasets import register_search_sri_datasets_tool
 from tools.search_tramites import register_search_tramites_tool
 
 
@@ -50,6 +53,7 @@ def register_tools(mcp: FastMCP) -> None:
     register_get_organization_info_tool(mcp)
     register_list_categories_tool(mcp)
     register_get_category_info_tool(mcp)
+    register_search_sri_datasets_tool(mcp)
 
     register_search_tramites_tool(mcp)
     register_get_tramite_info_tool(mcp)
@@ -65,3 +69,6 @@ def register_tools(mcp: FastMCP) -> None:
 
     register_search_contratos_tool(mcp)
     register_get_contrato_info_tool(mcp)
+
+    register_search_indicadores_bce_tool(mcp)
+    register_get_indicador_bce_tool(mcp)
