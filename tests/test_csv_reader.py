@@ -1,4 +1,11 @@
-from helpers.csv_reader import normalize_eu_decimal_columns, strip_geometry_columns
+import socket
+
+from helpers.csv_reader import (
+    MAX_DOWNLOAD_BYTES,
+    download_bytes,
+    normalize_eu_decimal_columns,
+    strip_geometry_columns,
+)
 
 
 def test_strip_geometry_columns_by_name():
@@ -65,3 +72,32 @@ def test_normalize_eu_decimal_columns_leaves_ambiguous_columns():
 
     assert converted == []
     assert new_rows == rows
+
+
+async def test_download_bytes_exactly_at_limit_is_not_truncated(httpx_mock, monkeypatch):
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+    body = b"x" * MAX_DOWNLOAD_BYTES
+    url = "https://example.com/exact.bin"
+    httpx_mock.add_response(url=url, content=body)
+
+    content, truncated = await download_bytes(url)
+
+    assert len(content) == MAX_DOWNLOAD_BYTES
+    assert truncated is False
+
+
+async def test_download_bytes_over_limit_is_truncated(httpx_mock, monkeypatch):
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+    body = b"x" * (MAX_DOWNLOAD_BYTES + 1)
+    url = "https://example.com/over.bin"
+    httpx_mock.add_response(url=url, content=body)
+
+    _content, truncated = await download_bytes(url)
+
+    assert truncated is True

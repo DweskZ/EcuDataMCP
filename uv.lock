@@ -225,7 +225,7 @@ wheels = [
 
 [[package]]
 name = "ecuador-mcp"
-version = "0.5.3"
+version = "0.5.1"
 source = { editable = "." }
 dependencies = [
     { name = "httpx" },

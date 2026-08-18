@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 _INSECURE_TLS_HOST_SUFFIXES = (
     "datosabiertos.gob.ec",
     "datosabiertos.presidencia.gob.ec",
+    "mercadodevalores.supercias.gob.ec",
 )
 
 
@@ -58,3 +59,40 @@ def is_cert_verification_error(exc: BaseException) -> bool:
 def should_retry_insecure(exc: BaseException, url: str) -> bool:
     """True when a cert failure on an allowlisted host may be retried insecurely."""
     return host_allows_insecure_tls(url) and is_cert_verification_error(exc)
+
+
+# Hosts that fail the TLS handshake outright under OpenSSL 3's default
+# SECLEVEL=2 (SSLV3_ALERT_HANDSHAKE_FAILURE) because they only offer legacy
+# cipher suites — a different failure mode than an expired/invalid cert
+# (should_retry_insecure, above). Verified against
+# appscvsmovil.supercias.gob.ec: default httpx/OpenSSL settings fail the
+# handshake before a certificate is ever presented; lowering the cipher
+# security level to 1 connects fine and still verifies the certificate
+# normally. Keep this list separate from _INSECURE_TLS_HOST_SUFFIXES — the
+# two are not interchangeable and must not be merged into one allowlist.
+_LEGACY_CIPHER_HOST_SUFFIXES = ("appscvsmovil.supercias.gob.ec",)
+
+
+def host_needs_legacy_ciphers(url: str) -> bool:
+    """Return True only for hosts known to require SECLEVEL=1 to negotiate TLS."""
+    host = (urlparse(url).hostname or "").lower()
+    if not host:
+        return False
+    return any(
+        host == suffix or host.endswith("." + suffix)
+        for suffix in _LEGACY_CIPHER_HOST_SUFFIXES
+    )
+
+
+def legacy_cipher_context() -> ssl.SSLContext:
+    """SSLContext accepting legacy cipher suites, for hosts with old TLS configs.
+
+    Unlike the insecure-retry fallback above, this does not skip certificate
+    verification — it only lowers OpenSSL's minimum cipher strength
+    requirement (SECLEVEL) so the handshake with an old server config
+    completes at all. Build fresh per use; ssl.SSLContext is not guaranteed
+    safe to share/reuse across concurrent connections.
+    """
+    ctx = ssl.create_default_context()
+    ctx.set_ciphers("DEFAULT@SECLEVEL=1")
+    return ctx

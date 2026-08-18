@@ -125,7 +125,7 @@ async def _download(session: httpx.AsyncClient, url: str) -> tuple[bytes, bool]:
         async for chunk in resp.aiter_bytes(chunk_size=64 * 1024):
             chunks.append(chunk)
             total += len(chunk)
-            if total >= MAX_DOWNLOAD_BYTES:
+            if total > MAX_DOWNLOAD_BYTES:
                 truncated = True
                 break
 

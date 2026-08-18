@@ -2,19 +2,101 @@
 
 ## Unreleased
 
-Endurecimiento de seguridad e infraestructura, producto de un review externo
-de producción sobre este repo. Sin cambios de tools/capacidades — sigue
-siendo un PR independiente del resto.
+Integración con el Banco Central del Ecuador (BCEData) y datasets del SRI,
+más integración completa de la Superintendencia de Compañías (Supercías):
+directorio, ranking financiero, y registro de auditores externos. Prompt
+`explorar_tema`, tool `download_resource`, y verificación e2e de cifras de
+referencia del roadmap. Endurecimiento de seguridad e infraestructura
+(guardia SSRF, uv.lock, Dockerfile, CI).
 
 ### Added
+- Integración con el Banco Central del Ecuador vía BCEData
+  (`contenido.bce.fin.ec/wp-json/bcedata/v1/`): API REST pública y sin
+  autenticación, no documentada oficialmente pero descubierta inspeccionando
+  el tráfico de red de la app JS del propio BCE (`contenido.bce.fin.ec/bcedata/`)
+  y verificada con `curl` plano. Nuevos tools `search_indicadores_bce` (busca
+  en el catálogo de ~78 grupos de indicadores: monetario/financiero, finanzas
+  públicas, sector externo, sector real) y `get_indicador_bce` (serie de
+  tiempo de un grupo, con frecuencia/unidad/rango configurables y defaults
+  tomados de la metadata propia del grupo).
+- `helpers/bce_client.py`: cachea el árbol completo del catálogo en memoria
+  (~98 nodos, TTL 24h — es efectivamente estático) y cada bundle de metadata
+  por grupo consultado; la serie de tiempo en sí no se cachea, se pide fresca
+  cada vez.
+- `search_indicadores_bce` también busca en los nombres de las series
+  individuales dentro de cada grupo, no solo en el título del grupo —
+  verificado que "desempleo" no aparece en ningún título de grupo (vive
+  como serie dentro de "Indicadores del mercado laboral..."), así que una
+  búsqueda por título solo se lo hubiera perdido. Arma un índice
+  consultando el bundle de los ~78 grupos concurrentemente (primer uso
+  tras expirar el caché de 24h tarda ~10-15s), deduplicando series con
+  nombre idéntico repetido entre desagregaciones (ej. "DESEMPLEO" aparece
+  igual en nacional/urbano/rural).
+- Integración con el SRI: tool `search_sri_datasets` sobre `helpers/sri_client.py`,
+  que indexa los ~130 archivos (catastro RUC por provincia, recaudación,
+  ventas/compras, vehículos, CEL, diccionarios de variables) que el SRI
+  publica en su propia página (`sri.gob.ec/datasets`), fuera del portal
+  CKAN, por lo que `search_datasets` no los encuentra. Esa página es un
+  CMS Liferay sin API — cada archivo vive en un `<p>` con una etiqueta
+  corta junto al link de descarga; **ojo:** el agrupamiento por sección que
+  ofrece el HTML no es confiable (al menos una sección está mal titulada:
+  "Prueba" contiene en realidad los archivos reales de Recaudación), así
+  que el parser indexa cada archivo por su propia etiqueta/URL en vez de
+  confiar en el título de la sección que lo contiene. Caché de 6h.
+- Fuente `sri` en `ecuador://fuentes`
+- **Directorio de compañías** (`search_companias`/`get_compania_info`):
+  el directorio nacional de compañías (226k+, actualizado a diario) —
+  situación legal, representante legal, capital suscrito, CIIU, dirección.
+  `helpers/supercias_client.py` parsea el export Excel del portal con
+  `ElementTree.iterparse` (el `<dimension>` del archivo viene mal
+  declarado y rompe el modo `read_only` de openpyxl), cacheado en memoria
+  6h (parseo CPU-bound corre en `asyncio.to_thread` para no bloquear el
+  event loop con clientes HTTP concurrentes).
+- **Ranking financiero** (`search_ranking`/`get_financials`): segundo
+  dataset de Supercías (`bi_ranking.csv`, ~356 MB / ~9M filas) — ingresos,
+  activos, patrimonio y ~38 ratios financieros por compañía y año fiscal,
+  derivados de balances reales. `helpers/supercias_financials.py` consulta
+  un SQLite local construido de antemano por
+  `scripts/build_supercias_financials_db.py` (recortado a los últimos 5
+  años fiscales, autoajustable), con su propia tabla `companias`
+  (expediente, ruc, nombre) cargada desde `bi_compania.csv` — resuelve
+  nombre/RUC sin depender del directorio, que se cachea y refresca por
+  separado. El build es atómico: construye en `<db>.building`, verifica
+  integridad y columnas requeridas, y recién entonces reemplaza la base
+  que ya funciona — un build fallido nunca la deja sin datos.
+  `helpers/tls.py` gana `legacy_cipher_context()` para el handshake TLS de
+  `appscvsmovil.supercias.gob.ec` (host distinto del directorio, exige un
+  mínimo de cifrado que OpenSSL 3 rechaza por defecto — mecanismo separado
+  del fallback de certificados vencidos).
+- **Registro de auditores externos** (`search_auditores`/`get_auditor_info`):
+  tercer dataset de Supercías, el registro de firmas/personas autorizadas
+  para actuar como auditores externos (1,447 filas, ~190 KB, mismo host y
+  patrón de refresco diario que el directorio). `_parse_xlsx` generalizado
+  para aceptar `header_markers` configurables, ya que este export usa
+  `IDENTIFICACION` como columna de identificación en vez de `RUC`.
+- Prompt MCP `explorar_tema`: exploración temática transversal (datasets,
+  trámites, regulaciones, contratos y riesgos) en una sola guía, en vez de
+  requerir un prompt por fuente
+- Tool `download_resource(resource_id, format="json")`: baja el archivo
+  crudo de un recurso en base64 (máx. 5 MB, mismo límite que
+  `preview_resource_data`) para formatos que no se pueden previsualizar
+  como tabla — pensado sobre todo para `.rar`, `.tar.gz` y `.xls` legacy,
+  pero sirve para cualquier resource_id. `format="text"` (el default) solo
+  confirma la descarga; hace falta `format="json"` para recibir
+  `content_base64`
+- `preview_resource_data` señala `.rar`, `.tar.gz` y `.xls` explícitamente
+  (`rar_no_soportado`, `tar_gz_no_soportado`, `xls_no_soportado`, antes
+  algunos de estos caían en el genérico "formato no soportado" o incluso
+  se intentaban parsear como CSV — ver fix debajo), y esos mensajes apuntan
+  a `download_resource`
 - `helpers/safe_download.py`: guardia SSRF centralizada (`assert_public_url`,
   `safe_stream`) para descargas cuya URL viene de metadata externa no
-  confiable — hoy solo `preview_resource_data` (URLs de recursos CKAN,
-  definidas por quien publica el dataset, no por este código). Valida la URL
-  inicial y cada hop de redirección contra IPs privadas/loopback/link-local/
-  multicast/reservadas/no especificadas antes de conectar; tope de 5
-  redirecciones. No cubre DNS rebinding (documentado explícitamente en el
-  docstring del módulo).
+  confiable — hoy `preview_resource_data` y `download_resource` (URLs de
+  recursos CKAN, definidas por quien publica el dataset, no por este código).
+  Valida la URL inicial y cada hop de redirección contra IPs
+  privadas/loopback/link-local/multicast/reservadas/no especificadas antes
+  de conectar; tope de 5 redirecciones. No cubre DNS rebinding (documentado
+  explícitamente en el docstring del módulo).
 - `helpers/csv_reader.py`: `download_bytes()` ahora usa `safe_stream()` en
   vez de `httpx` con `follow_redirects=True`.
 
@@ -31,6 +113,19 @@ siendo un PR independiente del resto.
   copiado antes.
 - Nuevo `.dockerignore` (`.git/`, `.env`, caches, `tests/` no entraban al
   build context antes).
+
+### Fixed
+- `preview_resource_data` evaluaba el `format` declarado por CKAN *antes*
+  que la extensión de la URL del recurso. Un recurso declarado `CSV` en
+  CKAN pero servido como `.tar.gz` o `.xlsx` (ambos casos reales,
+  encontrados en SRI y MPCEIP durante la verificación e2e) terminaba
+  enviado al parser de CSV en vez de a un mensaje de error o al parser
+  correcto. Ahora una extensión de URL reconocible tiene prioridad sobre
+  un `format` declarado inconsistente
+- Límite de descarga de 5 MB inconsistente: el chequeo de `Content-Length`
+  usaba `>` pero el acumulador de bytes en streaming usaba `>=`, así que un
+  archivo de exactamente 5 MB podía marcarse como truncado pese a que la
+  documentación dice "máx. 5 MB". Ambos chequeos ahora usan `>`
 
 ## 0.5.1 — 2026-08-13
 

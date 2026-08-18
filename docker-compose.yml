@@ -13,3 +13,12 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    volumes:
+      # Persists data/supercias_financials.sqlite3 across container
+      # recreates -- without this, every redeploy loses it and
+      # search_ranking/get_financials go back to "run the build script"
+      # until someone re-runs scripts/build_supercias_financials_db.py.
+      - supercias_data:/app/data
+
+volumes:
+  supercias_data:

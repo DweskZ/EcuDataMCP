@@ -8,7 +8,42 @@ from helpers.logging import log_tool
 
 _CSV_FORMATS = {"CSV", "TSV", "TXT", ""}
 _JSON_FORMATS = {"JSON", "GEOJSON"}
-_XLSX_FORMATS = {"XLSX", "XLS", "EXCEL"}
+_XLSX_FORMATS = {"XLSX", "EXCEL"}
+
+
+def classify_resource_format(fmt: str, url: str) -> str:
+    """Classify a resource as RAR/TARGZ/XLS/XLSX/JSON/CSV/UNKNOWN.
+
+    CKAN's declared `format` is frequently wrong (e.g. a .tar.gz or .xlsx
+    file tagged "CSV" by whoever published it), so a recognizable URL
+    extension always wins over a conflicting declared format. Only when
+    the extension itself is not diagnostic do we fall back to `fmt`.
+    """
+    url_lower = url.lower()
+    if url_lower.endswith(".rar"):
+        return "RAR"
+    if url_lower.endswith((".tar.gz", ".tgz")):
+        return "TARGZ"
+    if url_lower.endswith(".xlsx"):
+        return "XLSX"
+    if url_lower.endswith(".xls"):
+        return "XLS"
+    if url_lower.endswith((".json", ".geojson")):
+        return "JSON"
+    if url_lower.endswith((".csv", ".tsv", ".txt")):
+        return "CSV"
+
+    if fmt == "RAR":
+        return "RAR"
+    if fmt == "XLS":
+        return "XLS"
+    if fmt in _XLSX_FORMATS:
+        return "XLSX"
+    if fmt in _JSON_FORMATS:
+        return "JSON"
+    if fmt in _CSV_FORMATS:
+        return "CSV"
+    return "UNKNOWN"
 
 
 def register_preview_resource_data_tool(mcp: FastMCP) -> None:
@@ -69,29 +104,61 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
 
         fmt = (res.get("format") or "").upper()
         name = res.get("name") or res.get("description") or "Sin título"
+        kind = classify_resource_format(fmt, url)
 
         try:
-            if fmt in _CSV_FORMATS or (
-                not fmt and url.lower().endswith((".csv", ".tsv", ".txt"))
-            ):
-                result = await preview_csv(url, max_rows=rows)
-            elif fmt in _JSON_FORMATS or url.lower().endswith((".json", ".geojson")):
-                result = await preview_json(url, max_rows=rows)
-            elif fmt in _XLSX_FORMATS or url.lower().endswith((".xlsx", ".xls")):
-                if fmt == "XLS" or url.lower().endswith(".xls"):
-                    return render_output(
-                        {
-                            "error": "xls_no_soportado",
-                            "url": url,
-                            "resource_id": resource_id,
-                        },
-                        format,
-                        text_builder=lambda d: (
-                            "Este recurso es Excel legacy (.xls). "
-                            f"Convierte a XLSX o descárgalo desde: {d['url']}"
-                        ),
-                    )
+            if kind == "RAR":
+                return render_output(
+                    {
+                        "error": "rar_no_soportado",
+                        "url": url,
+                        "resource_id": resource_id,
+                    },
+                    format,
+                    text_builder=lambda d: (
+                        "Este recurso es un archivo .rar. Todavía no lo previsualizamos como "
+                        "tabla (requeriría una dependencia/backend externo para extracción RAR), "
+                        f"pero puedes bajar el archivo completo con "
+                        f"download_resource('{d['resource_id']}', format=\"json\"), "
+                        f"o directamente desde: {d['url']}"
+                    ),
+                )
+            if kind == "TARGZ":
+                return render_output(
+                    {
+                        "error": "tar_gz_no_soportado",
+                        "url": url,
+                        "resource_id": resource_id,
+                    },
+                    format,
+                    text_builder=lambda d: (
+                        "Este recurso es un archivo .tar.gz. Todavía no lo previsualizamos "
+                        "como tabla, pero puedes bajar el archivo completo con "
+                        f"download_resource('{d['resource_id']}', format=\"json\"), "
+                        f"o directamente desde: {d['url']}"
+                    ),
+                )
+            if kind == "XLS":
+                return render_output(
+                    {
+                        "error": "xls_no_soportado",
+                        "url": url,
+                        "resource_id": resource_id,
+                    },
+                    format,
+                    text_builder=lambda d: (
+                        "Este recurso es Excel legacy (.xls), que no previsualizamos como "
+                        f"tabla. Puedes bajarlo con "
+                        f"download_resource('{d['resource_id']}', format=\"json\") "
+                        f"y abrirlo localmente, o desde: {d['url']}"
+                    ),
+                )
+            if kind == "XLSX":
                 result = await preview_xlsx(url, max_rows=rows)
+            elif kind == "JSON":
+                result = await preview_json(url, max_rows=rows)
+            elif kind == "CSV":
+                result = await preview_csv(url, max_rows=rows)
             else:
                 return render_output(
                     {
