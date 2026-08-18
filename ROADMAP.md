@@ -9,15 +9,23 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
 
 ## Nuevas conexiones de datos
 
-- [ ] **Página de datasets del SRI** (`https://www.sri.gob.ec/datasets`) — 131
-      enlaces directos a archivos (93 CSV, 24 ZIP, 13 XLSX) más diccionarios
-      `*_DD.xlsx`, en una sola página estable. Mejor relación valor/esfuerzo de
-      la lista: el SRI hoy solo aparece parcialmente vía el portal CKAN
-      genérico.
-- [ ] **Banco Central del Ecuador (BCE)** — el portal CKAN solo publica 4
-      datasets del BCE; su data real vive en su propio sistema de
-      estadísticas. Requiere un diseño de conexión aparte (API/sistema propio
-      del BCE, no CKAN).
+- [x] **Página de datasets del SRI** (`https://www.sri.gob.ec/datasets`) —
+      hecho: tool `search_sri_datasets` + `helpers/sri_client.py`. Verificado
+      en vivo (2026-08-16, con acceso real al portal): 130 enlaces directos
+      (71 CSV, 46 ZIP, 13 XLSX — el desglose por formato cambió un poco vs.
+      la cifra original de este ítem, pero el total ronda igual ~130; el
+      portal se actualiza con nuevos años). La página es un CMS Liferay sin
+      API — cada archivo vive en un `<p>` con una etiqueta corta junto al
+      link de descarga; **ojo:** el agrupamiento por sección
+      (`data-analytics-asset-title`) no es confiable — la sección de
+      Recaudación real está mal titulada "Prueba" en el HTML — así que el
+      parser indexa cada archivo por su propia etiqueta/URL en vez de
+      confiar en el título de la sección que lo contiene. Caché de 6h.
+- [x] **Banco Central del Ecuador (BCE)** — hecho: tools
+      `search_indicadores_bce`/`get_indicador_bce` + `helpers/bce_client.py`
+      sobre la API pública sin autenticación de BCEData
+      (`contenido.bce.fin.ec/wp-json/bcedata/v1/`), no documentada
+      oficialmente pero confirmada con `curl` plano.
 - [ ] **Superintendencia de Compañías (Supercías)** — el portal CKAN solo
       publica 1 dataset; tiene portal propio sin investigar.
 - [ ] **Instituto Geofísico (IG-EPN)** — pedido explícitamente por Daniel.
