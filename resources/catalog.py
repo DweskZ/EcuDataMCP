@@ -36,6 +36,12 @@ def register_catalog_resources(mcp: FastMCP) -> None:
                     ],
                 },
                 {
+                    "id": "sri",
+                    "nombre": "SRI Datasets (fuera del portal CKAN)",
+                    "base": "https://www.sri.gob.ec/datasets",
+                    "tools": ["search_sri_datasets"],
+                },
+                {
                     "id": "gobec",
                     "nombre": "gob.ec trámites / instituciones / regulaciones",
                     "base": "https://www.gob.ec/api/v1/",
@@ -68,6 +74,12 @@ def register_catalog_resources(mcp: FastMCP) -> None:
                     "id": "geo",
                     "nombre": "DPA provincias, cantones y parroquias (referencia offline INEC)",
                     "tools": ["lookup_ubicacion"],
+                },
+                {
+                    "id": "bce",
+                    "nombre": "Banco Central del Ecuador (BCEData, catálogo estadístico)",
+                    "base": "https://contenido.bce.fin.ec/wp-json/bcedata/v1/",
+                    "tools": ["search_indicadores_bce", "get_indicador_bce"],
                 },
                 {
                     "id": "supercias",

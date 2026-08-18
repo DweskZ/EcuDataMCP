@@ -14,6 +14,7 @@ _CAPABILITIES = {
         "IG-EPN Instituto Geofísico (sismos)",
         "DPA provincias/cantones/parroquias (offline INEC)",
         "ANDA (NADA/IHSN) catálogo de encuestas y censos del INEC",
+        "BCE (BCEData) catálogo estadístico: monetario, fiscal, externo, real",
         "Supercías directorio de compañías",
         "Supercías registro de auditores externos autorizados",
         "Supercías ranking financiero (últimos años, requiere build local)",
@@ -41,6 +42,7 @@ _CAPABILITIES = {
         "riesgos": ["search_eventos_riesgo", "list_sat_tsunami", "search_sismos"],
         "geo": ["lookup_ubicacion"],
         "encuestas": ["search_anda", "get_anda_survey_info", "download_anda_microdata"],
+        "macro": ["search_indicadores_bce", "get_indicador_bce"],
         "companias": [
             "search_companias",
             "get_compania_info",
@@ -66,6 +68,12 @@ _CAPABILITIES = {
             "no sustituye canales oficiales de alerta"
         ),
         "lookup_ubicacion(nivel='parroquia') requiere query, canton o provincia",
+        (
+            "search_indicadores_bce: primer uso tras expirar el caché (24h) "
+            "puede tardar ~10-15s (arma el índice de búsqueda sobre ~78 "
+            "grupos); no cubre inflación (CPI) ni pobreza de Ecuador, eso es "
+            "INEC vía search_anda"
+        ),
         (
             "search_companias/get_compania_info: primer uso tras expirar el "
             "caché (6h) puede tardar ~30-40s (descarga y parsea ~35 MB, 226k filas)"
