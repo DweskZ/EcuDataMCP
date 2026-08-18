@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.5.3 — 2026-08-16
+## Unreleased
 
 Endurecimiento de seguridad e infraestructura, producto de un review externo
 de producción sobre este repo. Sin cambios de tools/capacidades — sigue
