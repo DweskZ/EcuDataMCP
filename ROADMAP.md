@@ -26,8 +26,14 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       sobre la API pública sin autenticación de BCEData
       (`contenido.bce.fin.ec/wp-json/bcedata/v1/`), no documentada
       oficialmente pero confirmada con `curl` plano.
-- [ ] **Superintendencia de Compañías (Supercías)** — el portal CKAN solo
-      publica 1 dataset; tiene portal propio sin investigar.
+- [x] **Superintendencia de Compañías (Supercías)** — hecho: directorio de
+      compañías (`search_companias`/`get_compania_info`, 226k+ compañías,
+      actualizado a diario, parseado desde el export Excel estático del
+      portal), ranking financiero (`search_ranking`/`get_financials`, ~38
+      ratios financieros por compañía y año fiscal, sobre un SQLite local
+      construido de antemano con `scripts/build_supercias_financials_db.py`)
+      y registro de auditores externos
+      (`search_auditores`/`get_auditor_info`).
 - [ ] **Instituto Geofísico (IG-EPN)** — pedido explícitamente por Daniel.
       Verificar qué cubren ya `search_organizations`, `list_instituciones`,
       `search_eventos_riesgo` y `list_sat_tsunami`, y si falta, diseñar una
@@ -88,13 +94,6 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       `CKAN_INSECURE_TLS` que desactiva la verificación quedó documentado como
       temporal — apagar el default inseguro en cuanto el gobierno renueve el
       certificado.
-- [ ] **Borrar la rama ya mergeada `fix/ckan-domain-and-readme`** (local y en
-      el fork) — el intento quedó bloqueado por el classifier de seguridad;
-      sigue viva sin necesidad.
-- [ ] **Decidir sobre los dos `Manual de Usuarios Portal.pdf` duplicados** en
-      `reference-docs/` del fork de Daniel (395 KB vs 2.5 MB) — nunca se
-      aclaró si son versiones distintas o si uno sobra.
-
 ---
 
 ## Calidad de búsqueda y detección de series
@@ -225,16 +224,4 @@ truenan:
 bloqueo geográfico/upstream era en realidad un bug de vhost — el apex
 `datosabiertos.gob.ec` y el subdominio `presidencia` resuelven a la misma IP
 pero devuelven 403; solo `www.datosabiertos.gob.ec` está conectado. Ya
-corregido en el repo; los 27 tools funcionan.
-
-**Repo hermano:** [`datosec-mcp`](../datosec-mcp) es un MCP propio de Daniel
-sobre la misma fuente de datos (portal CKAN de Ecuador). Su `ROADMAP.md`
-(2026-08-13) era mucho más extenso porque partía de cero: incluía trámites,
-SERCOP, ANDA, SAT tsunami, eventos de riesgo y ubicaciones DPA, que aquí en
-EcuDataMCP ya están resueltos y por eso no se repiten en esta lista. Todo lo
-demás que sí seguía pendiente ahí — búsqueda semántica, expansión de
-consultas, detección acumulado/incremental, formatos de archivo, verificación
-end-to-end y arquitectura — se consolidó arriba en este archivo el
-2026-08-13, y el `ROADMAP.md` de `datosec-mcp` se eliminó para no mantener dos
-listas por separado. Este archivo es ahora la única fuente de pendientes para
-ambos.
+corregido en el repo; los 38 tools funcionan.
