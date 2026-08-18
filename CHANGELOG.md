@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.5.4 — 2026-08-16
+## Unreleased
 
 Integración completa de la Superintendencia de Compañías (Supercías):
 directorio, ranking financiero, y registro de auditores externos.
