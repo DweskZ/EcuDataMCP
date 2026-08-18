@@ -40,6 +40,31 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       suficiente valor estructurado como para justificar un
       `read_pdf`/extracción dedicada, o si conviene esperar al pendiente
       general de `read_pdf(url, pages)`.
+- [~] **SENESCYT** — pedido explícitamente por Daniel. Datos de educación
+      superior, becas, registro de títulos. **Revisado 2026-08-16: ya
+      reachable hoy, sin código nuevo,** vía los tools CKAN genéricos
+      (`organization="secretaria-de-educacion-superior-ciencia-tecnologia-e-innovacion-senescyt"`
+      en `datosabiertos.gob.ec`) — 13 datasets: matrícula de universidades
+      particulares (UEP) 2015-2023, docentes de UEP 2015-2022, oferta
+      académica de las IES, artículos en revistas indexadas, y varias
+      versiones fechadas de la base de becarios (agosto 2024, marzo 2024,
+      diciembre 2023, agosto 2023, sin fecha ×2) — esta última con
+      versiones repetidas sugiere que conviene usar solo la más reciente o
+      investigar si son acumulativas. **Ojo, no cubre registro de títulos**
+      (lo pedido explícitamente por Daniel) — ese dato no aparece en el
+      CKAN. Portal propio también encontrado, "Portal de Indicadores de
+      Educación Superior" (SIAU,
+      `https://siau.senescyt.gob.ec/portal-de-indicadores-de-educacion-superior/`)
+      — WordPress con 5 secciones temáticas (Estudiantes, Oferta Académica,
+      Docentes, Títulos, Becas, ej. `/indicador-docentes/`), pero **cada
+      sección es un dashboard de Power BI embebido**
+      (`app.powerbi.com/view?r=...`), no una API ni archivos descargables —
+      mismo problema que Superbancos: visual-only, sin endpoint consultable
+      programáticamente. Si el registro de títulos vive en algún lado
+      estructurado, probablemente sea ahí (sección "Títulos" del SIAU) o en
+      un portal de verificación de títulos aparte, todavía sin identificar
+      — pendiente investigar específicamente eso, ya que el CKAN no lo
+      resuelve.
 - [ ] **Cuenca en Datos** (`https://cuencaendatos.cuenca.gob.ec`) — CKAN 2.9.6,
       92 datasets, portal municipal independiente del nacional. Sin probar.
 - [ ] **Sitios de ministerios individuales** — sin alcance definido; falta
