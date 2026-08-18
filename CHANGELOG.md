@@ -6,13 +6,31 @@
 - Prompt MCP `explorar_tema`: exploración temática transversal (datasets,
   trámites, regulaciones, contratos y riesgos) en una sola guía, en vez de
   requerir un prompt por fuente
-- Tool `download_resource(resource_id)`: baja el archivo crudo de un
-  recurso en base64 (máx. 5 MB, mismo límite que `preview_resource_data`)
-  para formatos que no se pueden previsualizar como tabla — pensado sobre
-  todo para `.rar` y `.xls` legacy, pero sirve para cualquier resource_id
-- `preview_resource_data` señala `.rar` explícitamente (`rar_no_soportado`,
-  antes caía en el genérico "formato no soportado") y tanto ese mensaje
-  como el de `.xls` (`xls_no_soportado`) ahora apuntan a `download_resource`
+- Tool `download_resource(resource_id, format="json")`: baja el archivo
+  crudo de un recurso en base64 (máx. 5 MB, mismo límite que
+  `preview_resource_data`) para formatos que no se pueden previsualizar
+  como tabla — pensado sobre todo para `.rar`, `.tar.gz` y `.xls` legacy,
+  pero sirve para cualquier resource_id. `format="text"` (el default) solo
+  confirma la descarga; hace falta `format="json"` para recibir
+  `content_base64`
+- `preview_resource_data` señala `.rar`, `.tar.gz` y `.xls` explícitamente
+  (`rar_no_soportado`, `tar_gz_no_soportado`, `xls_no_soportado`, antes
+  algunos de estos caían en el genérico "formato no soportado" o incluso
+  se intentaban parsear como CSV — ver fix debajo), y esos mensajes apuntan
+  a `download_resource`
+
+### Fixed
+- `preview_resource_data` evaluaba el `format` declarado por CKAN *antes*
+  que la extensión de la URL del recurso. Un recurso declarado `CSV` en
+  CKAN pero servido como `.tar.gz` o `.xlsx` (ambos casos reales,
+  encontrados en SRI y MPCEIP durante la verificación e2e) terminaba
+  enviado al parser de CSV en vez de a un mensaje de error o al parser
+  correcto. Ahora una extensión de URL reconocible tiene prioridad sobre
+  un `format` declarado inconsistente
+- Límite de descarga de 5 MB inconsistente: el chequeo de `Content-Length`
+  usaba `>` pero el acumulador de bytes en streaming usaba `>=`, así que un
+  archivo de exactamente 5 MB podía marcarse como truncado pese a que la
+  documentación dice "máx. 5 MB". Ambos chequeos ahora usan `>`
 
 ## 0.5.1 — 2026-08-13
 

@@ -98,28 +98,34 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
 - [x] **Parseo de decimales en formato europeo** (`7.760,2` = 7760.20) — ya
       hecho (ver CHANGELOG 0.5.1): se detecta y convierte a notación estándar
       en CSV. Este ítem había quedado desactualizado en el roadmap.
-- [~] **Soporte `.rar`** — todavía sin preview como tabla (necesitaría el
-      binario `unrar` como dependencia externa; puerta abierta si el volumen
-      de casos lo justifica). Mientras tanto, `preview_resource_data` señala
-      el caso explícitamente (`rar_no_soportado`) y ahora hay un tool nuevo,
-      `download_resource(resource_id)`, que baja el archivo completo
-      (base64, hasta 5 MB) para que se pueda usar fuera del MCP.
+- [~] **Soporte `.rar`** — todavía sin preview como tabla (necesitaría una
+      dependencia/backend externo para extracción RAR, p. ej. `rarfile` con
+      `unrar`/`unar`/7-Zip/`bsdtar`; puerta abierta si el volumen de casos
+      lo justifica). Mientras tanto, `preview_resource_data` señala el caso
+      explícitamente (`rar_no_soportado`) y ahora hay un tool nuevo,
+      `download_resource(resource_id, format="json")`, que baja el archivo
+      completo (base64, hasta 5 MB) para que se pueda usar fuera del MCP.
 - [ ] **Recursos sin extensión** — requieren sniffing de content-type; sin
       implementar ni probar.
-- [ ] **Soporte `.tar.gz`** — encontrado real durante la verificación e2e
-      (2026-08-16): el dataset `contribuyentes-activos-catastro-2025` del
-      SRI (declarado formato CSV en CKAN) en realidad se descarga como
-      `sri_activos_2025.tar.gz`. Hoy `preview_resource_data` no lo reconoce
-      (ni siquiera está en la lista de "conocidos mal soportados" junto a
-      `.rar`/`.xls`) y cae en el genérico "formato no soportado" —
-      `download_resource` sí lo baja crudo. Descomprimirlo (`tarfile`,
-      stdlib, sin dependencia nueva) y previsualizar el CSV interno sería
-      relativamente simple si se decide hacerlo.
+- [x] **Detección de `.tar.gz`** — encontrado real durante la verificación
+      e2e (2026-08-16): el dataset `contribuyentes-activos-catastro-2025`
+      del SRI (declarado formato CSV en CKAN) en realidad se descarga como
+      `sri_activos_2025.tar.gz`. **Corregido 2026-08-17:** el bug real era
+      que `preview_resource_data` confiaba en el `format` declarado por
+      CKAN *antes* que en la extensión de la URL, así que un `.tar.gz`
+      declarado CSV terminaba enviado al parser de CSV en vez de cualquier
+      mensaje de error. Ahora la extensión de URL (cuando es reconocible)
+      tiene prioridad sobre el `format` declarado, y `.tar.gz` tiene su
+      propio caso (`tar_gz_no_soportado`) que apunta a `download_resource`.
+      Sigue pendiente: **previsualizar el contenido** del `.tar.gz`
+      (descomprimir con `tarfile`, stdlib, sin dependencia nueva, y mostrar
+      el CSV interno) — hoy solo se detecta y se ofrece la descarga cruda.
 - [~] **Soporte `.xls` legacy** — `preview_resource_data` sigue sin parsear
       `.xls` como tabla (`xls_no_soportado`), pero ahora se puede bajar el
-      archivo completo con `download_resource(resource_id)` para abrirlo
-      localmente. Preview real (vía `xlrd`, que es pura Python, sin binario
-      externo) queda como posible siguiente paso si hace falta.
+      archivo completo con `download_resource(resource_id, format="json")`
+      para abrirlo localmente. Preview real (vía `xlrd`, que es pura
+      Python, sin binario externo) queda como posible siguiente paso si
+      hace falta.
 
 ## Verificación end-to-end pendiente
 
@@ -135,7 +141,9 @@ truenan:
       `count(*)` total = 405,794. **Hallazgo nuevo:** el único recurso CSV
       del dataset (`sri_activos_2025.csv`) en realidad se descarga como
       `sri_activos_2025.tar.gz` (5.4 MB comprimido) — `preview_resource_data`
-      no soporta `.tar.gz` hoy (ver pendiente nuevo arriba).
+      ahora lo detecta correctamente (ver ítem `.tar.gz` arriba), pero
+      todavía no lo previsualiza como tabla, solo lo ofrece vía
+      `download_resource`.
 - [x] **IESS** `base-de-datos-seguro-desempleo`, junio 2026 → 2,561
       beneficiarios, USD 836,716.99, excluyendo la fila `TOTAL:` embebida en
       el archivo (incluirla da exactamente el doble). **Verificado
@@ -153,10 +161,13 @@ truenan:
       2026-08-16:** cifras exactas contra
       `6.-MPCEIP_PRECIO_FOB_EXPORTACIONES-CACAO_JUN_2026.xlsx`. **Hallazgo
       nuevo:** ese recurso está declarado `format: CSV` en la metadata de
-      CKAN pero la URL real es `.xlsx` — `preview_resource_data` ya
-      resuelve esto bien porque tiene fallback por extensión de URL cuando
-      el formato declarado no calza, pero confirma que confiar solo en el
-      campo `format` de CKAN no alcanza.
+      CKAN pero la URL real es `.xlsx`. **Corrección 2026-08-17:** a pesar
+      de lo que decía esta nota antes, `preview_resource_data` *no*
+      resolvía esto — el `format` declarado (`CSV`) se evaluaba antes que
+      la extensión de la URL, así que este recurso también terminaba en el
+      parser de CSV en vez del de XLSX. Mismo fix que el caso `.tar.gz` del
+      SRI arriba: ahora la extensión de URL tiene prioridad. Confirma que
+      confiar solo en el campo `format` de CKAN no alcanza.
 - [ ] Cobertura real de formatos: `.xls`, `.zip`, `.rar` y una URL sin
       extensión, probados de punta a punta.
 - [ ] Degradación cuando el portal no responde — confirmar que el error que
