@@ -1,4 +1,9 @@
-from helpers.csv_reader import normalize_eu_decimal_columns, strip_geometry_columns
+from helpers.csv_reader import (
+    MAX_DOWNLOAD_BYTES,
+    download_bytes,
+    normalize_eu_decimal_columns,
+    strip_geometry_columns,
+)
 
 
 def test_strip_geometry_columns_by_name():
@@ -65,3 +70,22 @@ def test_normalize_eu_decimal_columns_leaves_ambiguous_columns():
 
     assert converted == []
     assert new_rows == rows
+
+
+async def test_download_bytes_exactly_at_limit_is_not_truncated(httpx_mock):
+    body = b"x" * MAX_DOWNLOAD_BYTES
+    httpx_mock.add_response(url="https://x/exact.bin", content=body)
+
+    content, truncated = await download_bytes("https://x/exact.bin")
+
+    assert len(content) == MAX_DOWNLOAD_BYTES
+    assert truncated is False
+
+
+async def test_download_bytes_over_limit_is_truncated(httpx_mock):
+    body = b"x" * (MAX_DOWNLOAD_BYTES + 1)
+    httpx_mock.add_response(url="https://x/over.bin", content=body)
+
+    _content, truncated = await download_bytes("https://x/over.bin")
+
+    assert truncated is True
