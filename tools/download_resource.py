@@ -17,14 +17,20 @@ def register_download_resource_tool(mcp: FastMCP) -> None:
         Download a resource's raw bytes from Ecuador's open data portal, base64-encoded.
 
         Use this for formats preview_resource_data can't parse into a table
-        (.rar, legacy .xls, or anything unrecognized) — it fetches the file
-        as-is instead of trying to read it. Max size: 5 MB (same cap as
-        preview_resource_data). Larger files come back with an error and the
-        direct URL instead, since they'd be too big to embed in a response.
+        (.rar, .tar.gz, legacy .xls, or anything unrecognized) — it fetches
+        the file as-is instead of trying to read it. Max size: 5 MB (same
+        cap as preview_resource_data). Larger files come back with an error
+        and the direct URL instead, since they'd be too big to embed in a
+        response.
+
+        Call with format="json" to get the actual file content — the
+        default format="text" only confirms the download and tells you to
+        retry with json; it never includes content_base64.
 
         Args:
             resource_id: The resource UUID (get it from list_dataset_resources)
-            format: text | json (json includes content_base64)
+            format: text | json (json includes content_base64; use this to
+                actually retrieve the file)
         """
         try:
             res = await ckan_client.get_resource(resource_id)
