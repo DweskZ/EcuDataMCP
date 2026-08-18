@@ -34,10 +34,8 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       construido de antemano con `scripts/build_supercias_financials_db.py`)
       y registro de auditores externos
       (`search_auditores`/`get_auditor_info`).
-- [ ] **Instituto Geofísico (IG-EPN)** — pedido explícitamente por Daniel.
-      Verificar qué cubren ya `search_organizations`, `list_instituciones`,
-      `search_eventos_riesgo` y `list_sat_tsunami`, y si falta, diseñar una
-      conexión dedicada. Búsqueda quedada interrumpida sin retomar.
+- [x] **Instituto Geofísico (IG-EPN)** — hecho: tool `search_sismos` sobre el
+      catálogo sísmico público, con caché TTL y parseo tolerante del CSV.
 - [ ] **Ecuador en Cifras / portal BI del INEC** — sin investigar todavía.
 - [~] **IESS (Instituto Ecuatoriano de Seguridad Social)** — **agregado
       2026-08-16, pedido por Daniel: tienen boletines/reportes en PDF en su
@@ -94,6 +92,7 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       `CKAN_INSECURE_TLS` que desactiva la verificación quedó documentado como
       temporal — apagar el default inseguro en cuanto el gobierno renueve el
       certificado.
+
 ---
 
 ## Calidad de búsqueda y detección de series
