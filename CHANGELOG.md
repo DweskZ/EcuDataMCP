@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.6.0 — 2026-08-18
 
 Integración con el Banco Central del Ecuador (BCEData) y datasets del SRI,
 más integración completa de la Superintendencia de Compañías (Supercías):
