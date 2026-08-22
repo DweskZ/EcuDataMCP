@@ -1,5 +1,37 @@
 # Changelog
 
+## Unreleased
+
+Soporte de preview para dos formatos que antes solo se podían descargar
+crudos: Excel legacy (`.xls`) y `.tar.gz` que envuelve un CSV/TSV/TXT.
+Confirmación de renovación del certificado TLS del portal.
+
+### Added
+- **Soporte `.xls` legacy en `preview_resource_data`**: previsualiza el
+  archivo como tabla vía `xlrd` (pura Python, sin binario externo) en vez de
+  solo señalar `xls_no_soportado` y apuntar a `download_resource`. Nueva
+  función `helpers/csv_reader.preview_xls`, misma forma que `preview_xlsx`.
+- **Previsualización de `.tar.gz` en `preview_resource_data`**: descomprime
+  el archivo (`tarfile` + `zlib`, stdlib, sin dependencia nueva) y muestra el
+  CSV/TSV/TXT interno como tabla. Si el archivo contiene varios miembros,
+  prioriza `.csv` > `.tsv` > `.txt` en vez de tomar el primero del archivo
+  (evita que un `readme.txt` empaquetado gane sobre el dato real — bug real
+  encontrado escribiendo el test de esta función). La descompresión tiene un
+  tope de 20 MB para acotar el impacto de un archivo diseñado para expandirse
+  desproporcionadamente al descomprimirlo. Nueva función
+  `helpers/csv_reader.preview_targz`.
+
+### Fixed
+- Refactor interno: la lógica de parseo de CSV se extrajo a
+  `helpers/csv_reader._parse_csv_bytes`, compartida entre `preview_csv` y
+  `preview_targz`, sin cambios de comportamiento en `preview_csv`.
+
+### Confirmed
+- **Certificado TLS de `www.datosabiertos.gob.ec` renovado** (Let's Encrypt,
+  válido 2026-08-07 a 2026-11-05) — verificado contra el portal real.
+  `CKAN_INSECURE_TLS` ya estaba en su default seguro (`0`) desde antes; no
+  se requirió ningún cambio de código.
+
 ## 0.6.0 — 2026-08-18
 
 Integración con el Banco Central del Ecuador (BCEData) y datasets del SRI,

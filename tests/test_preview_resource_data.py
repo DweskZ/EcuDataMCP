@@ -64,7 +64,7 @@ def test_classify_json_and_geojson():
 # -- dispatch through the tool ------------------------------------------------
 
 
-async def test_sri_tar_gz_declared_csv_is_not_sent_to_csv_parser(monkeypatch):
+async def test_sri_tar_gz_declared_csv_is_routed_to_targz_parser(monkeypatch):
     async def fake_get_resource(resource_id, session=None):
         return {
             "url": "https://sri.example/sri_activos_2025.tar.gz",
@@ -72,16 +72,31 @@ async def test_sri_tar_gz_declared_csv_is_not_sent_to_csv_parser(monkeypatch):
             "name": "SRI activos",
         }
 
+    calls = []
+
+    async def fake_preview_targz(url, max_rows=20, session=None):
+        calls.append(url)
+        return {
+            "headers": ["ruc", "total"],
+            "rows": [["1234567890001", "100"]],
+            "total_rows_in_preview": 1,
+            "format": "tar_gz",
+            "member_name": "sri_activos_2025.csv",
+        }
+
     async def fail_preview_csv(*args, **kwargs):
         raise AssertionError("preview_csv should not be called for a .tar.gz resource")
 
     monkeypatch.setattr(ckan_client, "get_resource", fake_get_resource)
+    monkeypatch.setattr(preview_resource_data_module, "preview_targz", fake_preview_targz)
     monkeypatch.setattr(preview_resource_data_module, "preview_csv", fail_preview_csv)
 
     tool = _make_tool()
     result = await tool(resource_id="abc123", format="json")
     payload = json.loads(result)
-    assert payload["error"] == "tar_gz_no_soportado"
+    assert payload["headers"] == ["ruc", "total"]
+    assert payload["member_name"] == "sri_activos_2025.csv"
+    assert calls == ["https://sri.example/sri_activos_2025.tar.gz"]
 
 
 async def test_mpceip_xlsx_declared_csv_is_routed_to_xlsx_parser(monkeypatch):
@@ -128,15 +143,33 @@ async def test_rar_message_does_not_overclaim_unrar_requirement(monkeypatch):
     assert "download_resource('abc123', format=\"json\")" in result
 
 
-async def test_xls_message_points_to_download_resource_with_json_format(monkeypatch):
+async def test_xls_is_routed_to_xls_parser(monkeypatch):
     async def fake_get_resource(resource_id, session=None):
         return {"url": "https://x/reporte.xls", "format": "XLS", "name": "Reporte"}
 
+    calls = []
+
+    async def fake_preview_xls(url, max_rows=20, session=None):
+        calls.append(url)
+        return {
+            "headers": ["producto", "precio"],
+            "rows": [["cacao", "174.77"]],
+            "total_rows_in_preview": 1,
+            "format": "xls",
+        }
+
+    async def fail_preview_csv(*args, **kwargs):
+        raise AssertionError("preview_csv should not be called for a .xls resource")
+
     monkeypatch.setattr(ckan_client, "get_resource", fake_get_resource)
+    monkeypatch.setattr(preview_resource_data_module, "preview_xls", fake_preview_xls)
+    monkeypatch.setattr(preview_resource_data_module, "preview_csv", fail_preview_csv)
 
     tool = _make_tool()
-    result = await tool(resource_id="abc123", format="text")
-    assert "download_resource('abc123', format=\"json\")" in result
+    result = await tool(resource_id="abc123", format="json")
+    payload = json.loads(result)
+    assert payload["headers"] == ["producto", "precio"]
+    assert calls == ["https://x/reporte.xls"]
 
 
 async def test_resource_not_found_returns_error(monkeypatch):

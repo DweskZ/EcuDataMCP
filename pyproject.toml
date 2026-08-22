@@ -11,6 +11,7 @@ dependencies = [
     "mcp>=1.25.0,<2",
     "openpyxl>=3.1.0",
     "uvicorn>=0.30.0",
+    "xlrd>=2.0.2",
 ]
 
 [build-system]

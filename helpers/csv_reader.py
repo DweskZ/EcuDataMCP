@@ -3,6 +3,8 @@ import io
 import json
 import logging
 import re
+import tarfile
+import zlib
 from typing import Any
 
 import httpx
@@ -177,16 +179,7 @@ def _decode_text(raw: bytes) -> str:
     return raw.decode("utf-8", errors="replace")
 
 
-async def preview_csv(
-    url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
-) -> dict[str, Any]:
-    """
-    Download a CSV file and return the first N rows parsed.
-
-    Returns:
-        dict with 'headers', 'rows', 'total_rows_in_preview', 'truncated'
-    """
-    raw, truncated = await download_bytes(url, session=session)
+def _parse_csv_bytes(raw: bytes, max_rows: int, truncated: bool = False) -> dict[str, Any]:
     text = _decode_text(raw)
 
     sample = text[:2000]
@@ -204,7 +197,7 @@ async def preview_csv(
             break
 
     if not rows_read:
-        return {"headers": [], "rows": [], "total_rows_in_preview": 0, "truncated": False}
+        return {"headers": [], "rows": [], "total_rows_in_preview": 0, "truncated": truncated}
 
     headers = rows_read[0]
     data_rows = rows_read[1 : max_rows + 1]
@@ -217,12 +210,26 @@ async def preview_csv(
         "rows": data_rows,
         "total_rows_in_preview": len(data_rows),
         "truncated": truncated,
-        "format": "csv",
     }
     if dropped_geom:
         result["dropped_columns"] = dropped_geom
     if converted_decimals:
         result["converted_decimal_columns"] = converted_decimals
+    return result
+
+
+async def preview_csv(
+    url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
+) -> dict[str, Any]:
+    """
+    Download a CSV file and return the first N rows parsed.
+
+    Returns:
+        dict with 'headers', 'rows', 'total_rows_in_preview', 'truncated'
+    """
+    raw, truncated = await download_bytes(url, session=session)
+    result = _parse_csv_bytes(raw, max_rows, truncated=truncated)
+    result["format"] = "csv"
     return result
 
 
@@ -365,6 +372,111 @@ async def preview_xlsx(
         }
     finally:
         wb.close()
+
+
+async def preview_xls(
+    url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
+) -> dict[str, Any]:
+    """Preview the first sheet of a legacy Excel (.xls) workbook."""
+    import xlrd
+
+    raw, truncated = await download_bytes(url, session=session)
+    wb = xlrd.open_workbook(file_contents=raw)
+    ws = wb.sheet_by_index(0)
+
+    if ws.nrows == 0:
+        return {
+            "headers": [],
+            "rows": [],
+            "total_rows_in_preview": 0,
+            "truncated": truncated,
+            "format": "xls",
+        }
+
+    def cell_str(value: Any) -> str:
+        return "" if value is None else str(value)
+
+    headers = [cell_str(v) for v in ws.row_values(0)]
+    data_rows: list[list[str]] = []
+    for i in range(1, ws.nrows):
+        if len(data_rows) >= max_rows:
+            truncated = True
+            break
+        data_rows.append([cell_str(v) for v in ws.row_values(i)])
+
+    return {
+        "headers": headers,
+        "rows": data_rows,
+        "total_rows_in_preview": len(data_rows),
+        "truncated": truncated,
+        "format": "xls",
+        "sheet": ws.name,
+    }
+
+
+_MAX_DECOMPRESSED_BYTES = 20 * 1024 * 1024  # 20 MB
+
+
+def _gunzip_capped(raw: bytes, cap: int = _MAX_DECOMPRESSED_BYTES) -> tuple[bytes, bool]:
+    """Decompress gzip bytes, stopping once `cap` output bytes are produced.
+
+    Bounds memory use against a decompression bomb: a small, highly
+    compressible .tar.gz (already capped at MAX_DOWNLOAD_BYTES on the wire)
+    could otherwise expand to gigabytes once decompressed.
+    """
+    decompressor = zlib.decompressobj(16 + zlib.MAX_WBITS)
+    out = bytearray()
+    chunk_size = 64 * 1024
+    for i in range(0, len(raw), chunk_size):
+        out += decompressor.decompress(raw[i : i + chunk_size])
+        if len(out) > cap:
+            return bytes(out[:cap]), True
+    out += decompressor.flush()
+    return bytes(out[:cap]), len(out) > cap
+
+
+async def preview_targz(
+    url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
+) -> dict[str, Any]:
+    """Preview the first CSV/TSV-like member inside a .tar.gz archive."""
+    raw, truncated = await download_bytes(url, session=session)
+    decompressed, capped = _gunzip_capped(raw)
+    truncated = truncated or capped
+
+    try:
+        with tarfile.open(fileobj=io.BytesIO(decompressed), mode="r:") as tar:
+            members = [m for m in tar.getmembers() if m.isfile()]
+            if not members:
+                return {
+                    "headers": [],
+                    "rows": [],
+                    "total_rows_in_preview": 0,
+                    "truncated": truncated,
+                    "format": "tar_gz",
+                }
+            # Prefer .csv over .tsv over .txt: a bundled readme.txt should not
+            # win over the actual data file just because it comes first.
+            member = None
+            for ext in (".csv", ".tsv", ".txt"):
+                member = next(
+                    (m for m in members if m.name.lower().endswith(ext)), None
+                )
+                if member is not None:
+                    break
+            if member is None:
+                member = members[0]
+            extracted = tar.extractfile(member)
+            inner_raw = extracted.read(MAX_DOWNLOAD_BYTES) if extracted else b""
+    except tarfile.TarError as e:
+        raise ValueError(
+            "El archivo .tar.gz no se pudo leer: puede exceder el límite de "
+            "previsualización una vez descomprimido, o estar corrupto"
+        ) from e
+
+    result = _parse_csv_bytes(inner_raw, max_rows, truncated=truncated)
+    result["format"] = "tar_gz"
+    result["member_name"] = member.name
+    return result
 
 
 def format_table(headers: list[str], rows: list[list[str]], max_col_width: int = 40) -> str:
