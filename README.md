@@ -18,7 +18,7 @@ En lugar de navegar manualmente por portales gubernamentales, simplemente pregun
 
 - **Acceso instantáneo a datos públicos**: Pregunta en lenguaje natural y obtén datos de 98 instituciones del Estado ecuatoriano sin navegar portales, descargar archivos ni lidiar con formatos.
 - **Unifica múltiples fuentes en un solo punto**: Datos abiertos (CKAN), trámites gubernamentales (gob.ec) y categorías temáticas, todo accesible desde una sola conversación con tu IA.
-- **Preview de datos sin descargas**: `preview_resource_data` parsea CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX) y `.tar.gz` (si envuelve un CSV/TSV/TXT) en memoria; `query_resource_data` consulta el DataStore CKAN sin bajar el archivo completo.
+- **Preview de datos sin descargas**: `preview_resource_data` parsea CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX) y `.tar.gz`/`.zip` (si envuelven un CSV/TSV/TXT) en memoria; `query_resource_data` consulta el DataStore CKAN sin bajar el archivo completo.
 - **Cero fricción**: No necesitas API key, no necesitas cuenta, no necesitas permisos especiales. 100% datos públicos bajo licencia abierta.
 - **Compatible con cualquier cliente MCP**: Claude, ChatGPT, Gemini, Cursor, VS Code, Windsurf, Le Chat, HuggingChat y más.
 - **Listo para producción**: Docker, health checks, logging estructurado, y un servidor HTTP Streamable que sigue la especificación MCP al pie de la letra.
@@ -294,7 +294,7 @@ Casi todos los tools aceptan `format="json"` además de texto.
 | `get_dataset_info` | Metadata detallada de un dataset: título, descripción, organización, tags, licencia, fechas. |
 | `list_dataset_resources` | Listar todos los archivos (recursos) de un dataset con formato, tamaño, URL y fechas de creación/modificación. |
 | `get_resource_info` | Información detallada de un archivo específico. |
-| `preview_resource_data` | Preview de CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX) o `.tar.gz` (si envuelve un CSV/TSV/TXT) como tabla (máx. 5 MB). |
+| `preview_resource_data` | Preview de CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX) o `.tar.gz`/`.zip` (si envuelven un CSV/TSV/TXT) como tabla (máx. 5 MB). |
 | `download_resource` | Baja el archivo crudo de un recurso en base64 (máx. 5 MB) — para formatos que no se pueden previsualizar como tabla (`.rar`, etc.). Usa `format="json"` para recibir `content_base64`. |
 | `query_resource_data` | Consulta tabular vía CKAN DataStore (filtros, texto, paginación) sin descargar el archivo. |
 | `search_sri_datasets` | Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN (sri.gob.ec/datasets): catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables. |

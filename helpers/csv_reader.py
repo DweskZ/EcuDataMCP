@@ -4,6 +4,7 @@ import json
 import logging
 import re
 import tarfile
+import zipfile
 import zlib
 from typing import Any
 
@@ -435,6 +436,21 @@ def _gunzip_capped(raw: bytes, cap: int = _MAX_DECOMPRESSED_BYTES) -> tuple[byte
     return bytes(out[:cap]), len(out) > cap
 
 
+def _pick_member(names: list[str]) -> str | None:
+    """Pick the best-priority member name: .csv > .tsv > .txt > first available.
+
+    Prevents a bundled readme.txt from winning over the actual data file
+    just because it comes first in the archive.
+    """
+    if not names:
+        return None
+    for ext in (".csv", ".tsv", ".txt"):
+        match = next((n for n in names if n.lower().endswith(ext)), None)
+        if match is not None:
+            return match
+    return names[0]
+
+
 async def preview_targz(
     url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
 ) -> dict[str, Any]:
@@ -445,7 +461,7 @@ async def preview_targz(
 
     try:
         with tarfile.open(fileobj=io.BytesIO(decompressed), mode="r:") as tar:
-            members = [m for m in tar.getmembers() if m.isfile()]
+            members = {m.name: m for m in tar.getmembers() if m.isfile()}
             if not members:
                 return {
                     "headers": [],
@@ -454,28 +470,61 @@ async def preview_targz(
                     "truncated": truncated,
                     "format": "tar_gz",
                 }
-            # Prefer .csv over .tsv over .txt: a bundled readme.txt should not
-            # win over the actual data file just because it comes first.
-            member = None
-            for ext in (".csv", ".tsv", ".txt"):
-                member = next(
-                    (m for m in members if m.name.lower().endswith(ext)), None
-                )
-                if member is not None:
-                    break
-            if member is None:
-                member = members[0]
-            extracted = tar.extractfile(member)
-            inner_raw = extracted.read(MAX_DOWNLOAD_BYTES) if extracted else b""
+            member_name = _pick_member(list(members))
+            extracted = tar.extractfile(members[member_name])
+            inner_raw = extracted.read(MAX_DOWNLOAD_BYTES + 1) if extracted else b""
     except tarfile.TarError as e:
         raise ValueError(
             "El archivo .tar.gz no se pudo leer: puede exceder el límite de "
             "previsualización una vez descomprimido, o estar corrupto"
         ) from e
 
+    truncated = truncated or len(inner_raw) > MAX_DOWNLOAD_BYTES
+    inner_raw = inner_raw[:MAX_DOWNLOAD_BYTES]
+
     result = _parse_csv_bytes(inner_raw, max_rows, truncated=truncated)
     result["format"] = "tar_gz"
-    result["member_name"] = member.name
+    result["member_name"] = member_name
+    return result
+
+
+async def preview_zip(
+    url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
+) -> dict[str, Any]:
+    """Preview the first CSV/TSV-like member inside a .zip archive.
+
+    Unlike .tar.gz, a .zip's central directory lists members without
+    decompressing anything, so there is no need for a capped-decompression
+    pass up front — bounding the single chosen member's `.read()` call is
+    enough to keep a decompression bomb from blowing up memory.
+    """
+    raw, truncated = await download_bytes(url, session=session)
+
+    try:
+        with zipfile.ZipFile(io.BytesIO(raw)) as zf:
+            names = [n for n in zf.namelist() if not n.endswith("/")]
+            if not names:
+                return {
+                    "headers": [],
+                    "rows": [],
+                    "total_rows_in_preview": 0,
+                    "truncated": truncated,
+                    "format": "zip",
+                }
+            member_name = _pick_member(names)
+            with zf.open(member_name) as f:
+                inner_raw = f.read(MAX_DOWNLOAD_BYTES + 1)
+    except zipfile.BadZipFile as e:
+        raise ValueError(
+            "El archivo .zip no se pudo leer: está corrupto o incompleto"
+        ) from e
+
+    truncated = truncated or len(inner_raw) > MAX_DOWNLOAD_BYTES
+    inner_raw = inner_raw[:MAX_DOWNLOAD_BYTES]
+
+    result = _parse_csv_bytes(inner_raw, max_rows, truncated=truncated)
+    result["format"] = "zip"
+    result["member_name"] = member_name
     return result
 
 

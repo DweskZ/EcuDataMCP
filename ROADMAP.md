@@ -161,6 +161,16 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       solo devolvía `xls_no_soportado` con un puntero a `download_resource`;
       ahora usa `helpers/csv_reader.preview_xls`, misma forma que
       `preview_xlsx`.
+- [x] **Soporte `.zip`** — hecho: `preview_resource_data` descomprime el
+      `.zip` (`zipfile`, stdlib, sin dependencia nueva) y muestra el
+      CSV/TSV/TXT interno como tabla, con la misma prioridad `.csv` > `.tsv`
+      > `.txt` que `.tar.gz`. A diferencia de `.tar.gz`, el directorio
+      central de un `.zip` lista los miembros sin descomprimir nada, así que
+      no hace falta un paso de descompresión con tope por adelantado —
+      basta con acotar la lectura del único miembro elegido para evitar que
+      un archivo diseñado para expandirse desproporcionadamente agote
+      memoria. Lógica de selección de miembro compartida con `.tar.gz` vía
+      `helpers/csv_reader._pick_member`.
 
 ## Verificación end-to-end pendiente
 
@@ -203,8 +213,11 @@ truenan:
       parser de CSV en vez del de XLSX. Mismo fix que el caso `.tar.gz` del
       SRI arriba: ahora la extensión de URL tiene prioridad. Confirma que
       confiar solo en el campo `format` de CKAN no alcanza.
-- [ ] Cobertura real de formatos: `.xls`, `.zip`, `.rar` y una URL sin
-      extensión, probados de punta a punta.
+- [ ] Cobertura real de formatos contra el portal en vivo: `.xls`, `.zip` y
+      una URL sin extensión, probados de punta a punta (hoy `.xls`/`.zip`
+      solo tienen cobertura con archivos sintéticos en los tests, no contra
+      un recurso real del portal). `.rar` queda fuera porque sigue sin
+      preview (ver ítem de soporte `.rar` arriba).
 - [ ] Degradación cuando el portal no responde — confirmar que el error que
       recibe el modelo es accionable (indica el host correcto), no genérico.
 

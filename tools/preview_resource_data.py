@@ -9,6 +9,7 @@ from helpers.csv_reader import (
     preview_targz,
     preview_xls,
     preview_xlsx,
+    preview_zip,
 )
 from helpers.format_out import render_output
 from helpers.logging import log_tool
@@ -19,7 +20,7 @@ _XLSX_FORMATS = {"XLSX", "EXCEL"}
 
 
 def classify_resource_format(fmt: str, url: str) -> str:
-    """Classify a resource as RAR/TARGZ/XLS/XLSX/JSON/CSV/UNKNOWN.
+    """Classify a resource as RAR/TARGZ/ZIP/XLS/XLSX/JSON/CSV/UNKNOWN.
 
     CKAN's declared `format` is frequently wrong (e.g. a .tar.gz or .xlsx
     file tagged "CSV" by whoever published it), so a recognizable URL
@@ -31,6 +32,8 @@ def classify_resource_format(fmt: str, url: str) -> str:
         return "RAR"
     if url_lower.endswith((".tar.gz", ".tgz")):
         return "TARGZ"
+    if url_lower.endswith(".zip"):
+        return "ZIP"
     if url_lower.endswith(".xlsx"):
         return "XLSX"
     if url_lower.endswith(".xls"):
@@ -42,6 +45,8 @@ def classify_resource_format(fmt: str, url: str) -> str:
 
     if fmt == "RAR":
         return "RAR"
+    if fmt == "ZIP":
+        return "ZIP"
     if fmt == "XLS":
         return "XLS"
     if fmt in _XLSX_FORMATS:
@@ -64,9 +69,9 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
         """
         Download and preview a resource from Ecuador's open data portal.
 
-        Supports CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX), and .tar.gz archives that
-        wrap a CSV/TSV/TXT file. Returns the first N rows as a formatted table so
-        the model can inspect data without a local download. Geometry/WKT columns
+        Supports CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX), and .tar.gz/.zip archives
+        that wrap a CSV/TSV/TXT file. Returns the first N rows as a formatted table
+        so the model can inspect data without a local download. Geometry/WKT columns
         are dropped from the table (they can be tens of KB per cell); CSV columns
         in European decimal notation (7.760,2) are normalized to standard notation
         (7760.2). Max download size: 5 MB. For large tabular DataStore resources
@@ -133,6 +138,8 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
                 )
             if kind == "TARGZ":
                 result = await preview_targz(url, max_rows=rows)
+            elif kind == "ZIP":
+                result = await preview_zip(url, max_rows=rows)
             elif kind == "XLS":
                 result = await preview_xls(url, max_rows=rows)
             elif kind == "XLSX":
@@ -153,7 +160,7 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
                     text_builder=lambda d: (
                         f"Este recurso tiene formato '{d.get('format_detectado') or 'desconocido'}'. "
                         "preview_resource_data soporta CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX) "
-                        "y .tar.gz (si envuelve un CSV/TSV/TXT). "
+                        "y .tar.gz/.zip (si envuelven un CSV/TSV/TXT). "
                         "Si está en DataStore prueba query_resource_data. "
                         f"Descarga directa: {d['url']}"
                     ),
@@ -210,7 +217,7 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
             if data.get("sheet"):
                 parts.append(f"Hoja: {data['sheet']}")
             if data.get("member_name"):
-                parts.append(f"Archivo interno (.tar.gz): {data['member_name']}")
+                parts.append(f"Archivo interno: {data['member_name']}")
             if data.get("total_records") is not None:
                 parts.append(f"Registros totales (en archivo): {data['total_records']}")
             if data.get("truncated"):

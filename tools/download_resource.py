@@ -17,8 +17,8 @@ def register_download_resource_tool(mcp: FastMCP) -> None:
         Download a resource's raw bytes from Ecuador's open data portal, base64-encoded.
 
         Use this for formats preview_resource_data can't parse into a table
-        (.rar, .tar.gz, legacy .xls, or anything unrecognized) — it fetches
-        the file as-is instead of trying to read it. Max size: 5 MB (same
+        (.rar, or anything unrecognized) — it fetches the file as-is instead
+        of trying to read it. Max size: 5 MB (same
         cap as preview_resource_data). Larger files come back with an error
         and the direct URL instead, since they'd be too big to embed in a
         response.

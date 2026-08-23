@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-Soporte de preview para dos formatos que antes solo se podían descargar
-crudos: Excel legacy (`.xls`) y `.tar.gz` que envuelve un CSV/TSV/TXT.
-Confirmación de renovación del certificado TLS del portal.
+Soporte de preview para tres formatos que antes solo se podían descargar
+crudos: Excel legacy (`.xls`), `.tar.gz` y `.zip` que envuelven un
+CSV/TSV/TXT. Confirmación de renovación del certificado TLS del portal.
 
 ### Added
 - **Soporte `.xls` legacy en `preview_resource_data`**: previsualiza el
@@ -20,11 +20,28 @@ Confirmación de renovación del certificado TLS del portal.
   tope de 20 MB para acotar el impacto de un archivo diseñado para expandirse
   desproporcionadamente al descomprimirlo. Nueva función
   `helpers/csv_reader.preview_targz`.
+- **Soporte `.zip` en `preview_resource_data`**: descomprime el archivo
+  (`zipfile`, stdlib, sin dependencia nueva) y muestra el CSV/TSV/TXT interno
+  como tabla, con la misma prioridad `.csv` > `.tsv` > `.txt` que `.tar.gz`
+  al elegir el miembro. A diferencia de `.tar.gz`, el directorio central de
+  un `.zip` no requiere descomprimir nada para listar los miembros, así que
+  basta con acotar la lectura del miembro elegido (sin el paso de
+  descompresión con tope que sí hace falta para `.tar.gz`). Lógica de
+  selección de miembro extraída a `helpers/csv_reader._pick_member`,
+  compartida entre `preview_targz` y el nuevo `preview_zip`.
 
 ### Fixed
 - Refactor interno: la lógica de parseo de CSV se extrajo a
   `helpers/csv_reader._parse_csv_bytes`, compartida entre `preview_csv` y
   `preview_targz`, sin cambios de comportamiento en `preview_csv`.
+- `preview_targz` no marcaba `truncated=True` cuando el CSV/TSV/TXT interno
+  superaba los 5 MB por sí solo (solo consideraba la descarga y la
+  descompresión externas) — el contenido se cortaba igual, pero el preview
+  no avisaba. Corregido leyendo un byte de más para detectar el corte, igual
+  que ya hacía la descarga original.
+- `tools/download_resource.py`: el docstring seguía listando `.tar.gz` y
+  `.xls` legacy como formatos que hay que descargar crudos, desactualizado
+  desde que `preview_resource_data` empezó a previsualizarlos.
 
 ### Confirmed
 - **Certificado TLS de `www.datosabiertos.gob.ec` renovado** (Let's Encrypt,

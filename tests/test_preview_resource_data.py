@@ -37,13 +37,18 @@ def test_classify_rar_by_extension_even_if_declared_csv():
 
 def test_classify_falls_back_to_declared_format_without_recognizable_extension():
     assert classify_resource_format("RAR", "https://x/download?id=123") == "RAR"
+    assert classify_resource_format("ZIP", "https://x/download?id=123") == "ZIP"
     assert classify_resource_format("XLS", "https://x/download?id=123") == "XLS"
     assert classify_resource_format("JSON", "https://x/download?id=123") == "JSON"
     assert classify_resource_format("CSV", "https://x/download?id=123") == "CSV"
     # No format declared and no recognizable extension: same "assume CSV"
     # default the tool has always used (empty format is treated as CSV).
     assert classify_resource_format("", "https://x/download?id=123") == "CSV"
-    assert classify_resource_format("ZIP", "https://x/download?id=123") == "UNKNOWN"
+    assert classify_resource_format("7Z", "https://x/download?id=123") == "UNKNOWN"
+
+
+def test_classify_zip_by_extension_even_if_declared_csv():
+    assert classify_resource_format("CSV", "https://x/archivo.zip") == "ZIP"
 
 
 def test_classify_plain_csv():
@@ -97,6 +102,41 @@ async def test_sri_tar_gz_declared_csv_is_routed_to_targz_parser(monkeypatch):
     assert payload["headers"] == ["ruc", "total"]
     assert payload["member_name"] == "sri_activos_2025.csv"
     assert calls == ["https://sri.example/sri_activos_2025.tar.gz"]
+
+
+async def test_zip_declared_csv_is_routed_to_zip_parser(monkeypatch):
+    async def fake_get_resource(resource_id, session=None):
+        return {
+            "url": "https://x/precios_cacao.zip",
+            "format": "CSV",
+            "name": "Precios cacao",
+        }
+
+    calls = []
+
+    async def fake_preview_zip(url, max_rows=20, session=None):
+        calls.append(url)
+        return {
+            "headers": ["producto", "precio"],
+            "rows": [["cacao", "174.77"]],
+            "total_rows_in_preview": 1,
+            "format": "zip",
+            "member_name": "precios_cacao.csv",
+        }
+
+    async def fail_preview_csv(*args, **kwargs):
+        raise AssertionError("preview_csv should not be called for a .zip resource")
+
+    monkeypatch.setattr(ckan_client, "get_resource", fake_get_resource)
+    monkeypatch.setattr(preview_resource_data_module, "preview_zip", fake_preview_zip)
+    monkeypatch.setattr(preview_resource_data_module, "preview_csv", fail_preview_csv)
+
+    tool = _make_tool()
+    result = await tool(resource_id="abc123", format="json")
+    payload = json.loads(result)
+    assert payload["headers"] == ["producto", "precio"]
+    assert payload["member_name"] == "precios_cacao.csv"
+    assert calls == ["https://x/precios_cacao.zip"]
 
 
 async def test_mpceip_xlsx_declared_csv_is_routed_to_xlsx_parser(monkeypatch):
