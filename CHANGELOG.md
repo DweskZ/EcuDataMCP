@@ -3,8 +3,11 @@
 ## Unreleased
 
 Soporte de preview para tres formatos que antes solo se podían descargar
-crudos: Excel legacy (`.xls`), `.tar.gz` y `.zip` que envuelven un
-CSV/TSV/TXT. Confirmación de renovación del certificado TLS del portal.
+crudos (Excel legacy `.xls`, `.tar.gz` y `.zip` que envuelven un
+CSV/TSV/TXT), expansión de siglas y sniffing de Content-Type en la
+búsqueda/previsualización, y varios fixes de confiabilidad encontrados
+verificando contra el portal real. Confirmación de renovación del
+certificado TLS del portal.
 
 ### Added
 - **Soporte `.xls` legacy en `preview_resource_data`**: previsualiza el
@@ -29,6 +32,18 @@ CSV/TSV/TXT. Confirmación de renovación del certificado TLS del portal.
   descompresión con tope que sí hace falta para `.tar.gz`). Lógica de
   selección de miembro extraída a `helpers/csv_reader._pick_member`,
   compartida entre `preview_targz` y el nuevo `preview_zip`.
+- **Expansión de siglas/acrónimos en `search_datasets`**: `helpers/acronyms.expand_acronyms`
+  agrega el nombre completo de ~13 siglas comunes (ENEMDU, ENSANUT, ENIGHUR,
+  ECV, RUC, IESS, SRI, INEC, BCE, SERCOP, SENESCYT, SUPERCIAS, SGR) a la
+  consulta antes de mandarla a CKAN. El operador default de Solr en CKAN es
+  OR entre términos, así que esto amplía el recall sin restringir el match
+  original.
+- **Sniffing de Content-Type para recursos sin extensión**: cuando ni la
+  extensión de la URL ni el `format` declarado por CKAN son reconocibles,
+  `preview_resource_data` hace un sniff best-effort del header HTTP
+  `Content-Type` (`helpers/csv_reader.sniff_content_type`, solo lee headers,
+  no descarga el body) antes de rendirse. Marca `sniffed_content_type: true`
+  en la respuesta cuando esto se activó.
 
 ### Fixed
 - Refactor interno: la lógica de parseo de CSV se extrajo a
@@ -42,6 +57,30 @@ CSV/TSV/TXT. Confirmación de renovación del certificado TLS del portal.
 - `tools/download_resource.py`: el docstring seguía listando `.tar.gz` y
   `.xls` legacy como formatos que hay que descargar crudos, desactualizado
   desde que `preview_resource_data` empezó a previsualizarlos.
+- **`helpers/ckan_client._fetch_json` no nombraba el host en fallas de
+  conexión.** Un `httpx.ConnectTimeout`/`ConnectError` real se puede
+  stringificar como `""` o `"timed out"` sin mencionar qué host falló.
+  Ahora `HTTPStatusError` (ya trae URL+status) y `RequestError` (timeouts,
+  conexión rechazada) se distinguen; el segundo caso levanta un
+  `RuntimeError` explícito con el host y el tipo de fallo.
+- **Tres bugs reales encontrados verificando `.xls`/`.zip` contra el portal
+  en vivo** (no solo con archivos sintéticos):
+  1. Un `.zip`/`.tar.gz` real más grande que el límite de 5 MB de descarga
+     se corta antes de llegar al directorio central (que vive al final del
+     archivo en `.zip`), así que `zipfile`/`tarfile` fallan por completo, no
+     de forma parcial. Antes esto daba el genérico "está corrupto o
+     incompleto"; ahora se detecta la truncación *antes* de intentar
+     parsear y se da un mensaje específico apuntando a `download_resource`.
+  2. Un `.zip` real sin ningún archivo tabular (paquete GIS raster:
+     `.lyr`/`.tif`/`.tif.aux.xml`) hacía que la selección de miembro cayera
+     al primer archivo del `.zip` y lo forzara al parser de CSV, crasheando
+     con un `csv.Error` sin capturar. `_pick_member` ya no cae a "el primero
+     que sea": devuelve `None` cuando ningún miembro parece tabular, y
+     ambos previews (`.tar.gz`/`.zip`) dan un mensaje claro listando los
+     archivos reales encontrados.
+  3. `_parse_csv_bytes` no capturaba `csv.Error` en absoluto (repro real: un
+     `\r` suelto sin comillas dentro de un campo) — ahora se traduce a un
+     `ValueError` accionable.
 
 ### Confirmed
 - **Certificado TLS de `www.datosabiertos.gob.ec` renovado** (Let's Encrypt,

@@ -10,6 +10,7 @@ from helpers.csv_reader import (
     preview_xls,
     preview_xlsx,
     preview_zip,
+    sniff_content_type,
 )
 from helpers.format_out import render_output
 from helpers.logging import log_tool
@@ -56,6 +57,34 @@ def classify_resource_format(fmt: str, url: str) -> str:
     if fmt in _CSV_FORMATS:
         return "CSV"
     return "UNKNOWN"
+
+
+_CONTENT_TYPE_KIND = {
+    "text/csv": "CSV",
+    "text/plain": "CSV",
+    "application/csv": "CSV",
+    "application/json": "JSON",
+    "application/geo+json": "JSON",
+    "application/vnd.ms-excel": "XLS",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "XLSX",
+    "application/zip": "ZIP",
+    "application/x-zip-compressed": "ZIP",
+    "application/gzip": "TARGZ",
+    "application/x-gzip": "TARGZ",
+    "application/x-rar-compressed": "RAR",
+    "application/vnd.rar": "RAR",
+}
+
+
+def classify_from_content_type(content_type: str | None) -> str:
+    """Map an HTTP Content-Type header to the same kind vocabulary as
+    classify_resource_format. Used as a last-resort fallback for resources
+    with neither a recognizable URL extension nor a useful declared format
+    (e.g. a download endpoint like `/download?id=123`)."""
+    if not content_type:
+        return "UNKNOWN"
+    mime = content_type.split(";", 1)[0].strip().lower()
+    return _CONTENT_TYPE_KIND.get(mime, "UNKNOWN")
 
 
 def register_preview_resource_data_tool(mcp: FastMCP) -> None:
@@ -118,6 +147,13 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
         fmt = (res.get("format") or "").upper()
         name = res.get("name") or res.get("description") or "Sin título"
         kind = classify_resource_format(fmt, url)
+        sniffed = False
+        if kind == "UNKNOWN":
+            content_type = await sniff_content_type(url)
+            sniffed_kind = classify_from_content_type(content_type)
+            if sniffed_kind != "UNKNOWN":
+                kind = sniffed_kind
+                sniffed = True
 
         try:
             if kind == "RAR":
@@ -204,6 +240,7 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
             "total_records": result.get("total_records"),
             "dropped_columns": result.get("dropped_columns"),
             "converted_decimal_columns": result.get("converted_decimal_columns"),
+            "sniffed_content_type": sniffed,
         }
 
         def to_text(data: dict) -> str:
@@ -214,6 +251,11 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
                 f"Columnas: {len(data.get('headers') or [])}",
                 f"Filas mostradas: {data['total_rows_in_preview']}",
             ]
+            if data.get("sniffed_content_type"):
+                parts.append(
+                    "ℹ Formato detectado por Content-Type HTTP (la URL no tenía "
+                    "extensión reconocible ni CKAN declaraba un formato útil)"
+                )
             if data.get("sheet"):
                 parts.append(f"Hoja: {data['sheet']}")
             if data.get("member_name"):
