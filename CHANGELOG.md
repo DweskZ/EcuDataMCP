@@ -1,5 +1,54 @@
 # Changelog
 
+## Unreleased
+
+Soporte de preview para tres formatos que antes solo se podían descargar
+crudos: Excel legacy (`.xls`), `.tar.gz` y `.zip` que envuelven un
+CSV/TSV/TXT. Confirmación de renovación del certificado TLS del portal.
+
+### Added
+- **Soporte `.xls` legacy en `preview_resource_data`**: previsualiza el
+  archivo como tabla vía `xlrd` (pura Python, sin binario externo) en vez de
+  solo señalar `xls_no_soportado` y apuntar a `download_resource`. Nueva
+  función `helpers/csv_reader.preview_xls`, misma forma que `preview_xlsx`.
+- **Previsualización de `.tar.gz` en `preview_resource_data`**: descomprime
+  el archivo (`tarfile` + `zlib`, stdlib, sin dependencia nueva) y muestra el
+  CSV/TSV/TXT interno como tabla. Si el archivo contiene varios miembros,
+  prioriza `.csv` > `.tsv` > `.txt` en vez de tomar el primero del archivo
+  (evita que un `readme.txt` empaquetado gane sobre el dato real — bug real
+  encontrado escribiendo el test de esta función). La descompresión tiene un
+  tope de 20 MB para acotar el impacto de un archivo diseñado para expandirse
+  desproporcionadamente al descomprimirlo. Nueva función
+  `helpers/csv_reader.preview_targz`.
+- **Soporte `.zip` en `preview_resource_data`**: descomprime el archivo
+  (`zipfile`, stdlib, sin dependencia nueva) y muestra el CSV/TSV/TXT interno
+  como tabla, con la misma prioridad `.csv` > `.tsv` > `.txt` que `.tar.gz`
+  al elegir el miembro. A diferencia de `.tar.gz`, el directorio central de
+  un `.zip` no requiere descomprimir nada para listar los miembros, así que
+  basta con acotar la lectura del miembro elegido (sin el paso de
+  descompresión con tope que sí hace falta para `.tar.gz`). Lógica de
+  selección de miembro extraída a `helpers/csv_reader._pick_member`,
+  compartida entre `preview_targz` y el nuevo `preview_zip`.
+
+### Fixed
+- Refactor interno: la lógica de parseo de CSV se extrajo a
+  `helpers/csv_reader._parse_csv_bytes`, compartida entre `preview_csv` y
+  `preview_targz`, sin cambios de comportamiento en `preview_csv`.
+- `preview_targz` no marcaba `truncated=True` cuando el CSV/TSV/TXT interno
+  superaba los 5 MB por sí solo (solo consideraba la descarga y la
+  descompresión externas) — el contenido se cortaba igual, pero el preview
+  no avisaba. Corregido leyendo un byte de más para detectar el corte, igual
+  que ya hacía la descarga original.
+- `tools/download_resource.py`: el docstring seguía listando `.tar.gz` y
+  `.xls` legacy como formatos que hay que descargar crudos, desactualizado
+  desde que `preview_resource_data` empezó a previsualizarlos.
+
+### Confirmed
+- **Certificado TLS de `www.datosabiertos.gob.ec` renovado** (Let's Encrypt,
+  válido 2026-08-07 a 2026-11-05) — verificado contra el portal real.
+  `CKAN_INSECURE_TLS` ya estaba en su default seguro (`0`) desde antes; no
+  se requirió ningún cambio de código.
+
 ## 0.6.0 — 2026-08-18
 
 Integración con el Banco Central del Ecuador (BCEData) y datasets del SRI,

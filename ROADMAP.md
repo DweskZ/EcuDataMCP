@@ -87,11 +87,12 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
 
 ## Cabos operativos sueltos
 
-- [ ] **Revisar renovación del certificado TLS** de
-      `www.datosabiertos.gob.ec` (venció 2026-07-28). El fallback
-      `CKAN_INSECURE_TLS` que desactiva la verificación quedó documentado como
-      temporal — apagar el default inseguro en cuanto el gobierno renueve el
-      certificado.
+- [x] **Renovación del certificado TLS** de `www.datosabiertos.gob.ec` (había
+      vencido 2026-07-28). **Confirmado 2026-08-22 contra el portal real:**
+      certificado renovado (Let's Encrypt, válido 2026-08-07 a 2026-11-05).
+      `CKAN_INSECURE_TLS` ya vuelve a su default seguro (`0`, desactivado) —
+      ver `helpers/tls.py`. Próximo corte de renovación: antes de
+      2026-11-05.
 
 ---
 
@@ -147,16 +148,29 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       declarado CSV terminaba enviado al parser de CSV en vez de cualquier
       mensaje de error. Ahora la extensión de URL (cuando es reconocible)
       tiene prioridad sobre el `format` declarado, y `.tar.gz` tiene su
-      propio caso (`tar_gz_no_soportado`) que apunta a `download_resource`.
-      Sigue pendiente: **previsualizar el contenido** del `.tar.gz`
-      (descomprimir con `tarfile`, stdlib, sin dependencia nueva, y mostrar
-      el CSV interno) — hoy solo se detecta y se ofrece la descarga cruda.
-- [~] **Soporte `.xls` legacy** — `preview_resource_data` sigue sin parsear
-      `.xls` como tabla (`xls_no_soportado`), pero ahora se puede bajar el
-      archivo completo con `download_resource(resource_id, format="json")`
-      para abrirlo localmente. Preview real (vía `xlrd`, que es pura
-      Python, sin binario externo) queda como posible siguiente paso si
-      hace falta.
+      propio caso. **Previsualización de contenido agregada:**
+      `preview_resource_data` descomprime el `.tar.gz` (`tarfile` + `zlib`,
+      stdlib, sin dependencia nueva) y muestra el CSV/TSV/TXT interno como
+      tabla — si hay varios archivos dentro, prioriza `.csv` > `.tsv` >
+      `.txt` en vez del primero del archivo (evita que un `readme.txt`
+      empaquetado gane sobre el dato real). La descompresión tiene un tope
+      de 20 MB para acotar el impacto de un archivo diseñado para expandirse
+      desproporcionadamente al descomprimirlo.
+- [x] **Soporte `.xls` legacy** — hecho: `preview_resource_data` previsualiza
+      `.xls` como tabla vía `xlrd` (pura Python, sin binario externo). Antes
+      solo devolvía `xls_no_soportado` con un puntero a `download_resource`;
+      ahora usa `helpers/csv_reader.preview_xls`, misma forma que
+      `preview_xlsx`.
+- [x] **Soporte `.zip`** — hecho: `preview_resource_data` descomprime el
+      `.zip` (`zipfile`, stdlib, sin dependencia nueva) y muestra el
+      CSV/TSV/TXT interno como tabla, con la misma prioridad `.csv` > `.tsv`
+      > `.txt` que `.tar.gz`. A diferencia de `.tar.gz`, el directorio
+      central de un `.zip` lista los miembros sin descomprimir nada, así que
+      no hace falta un paso de descompresión con tope por adelantado —
+      basta con acotar la lectura del único miembro elegido para evitar que
+      un archivo diseñado para expandirse desproporcionadamente agote
+      memoria. Lógica de selección de miembro compartida con `.tar.gz` vía
+      `helpers/csv_reader._pick_member`.
 
 ## Verificación end-to-end pendiente
 
@@ -199,8 +213,11 @@ truenan:
       parser de CSV en vez del de XLSX. Mismo fix que el caso `.tar.gz` del
       SRI arriba: ahora la extensión de URL tiene prioridad. Confirma que
       confiar solo en el campo `format` de CKAN no alcanza.
-- [ ] Cobertura real de formatos: `.xls`, `.zip`, `.rar` y una URL sin
-      extensión, probados de punta a punta.
+- [ ] Cobertura real de formatos contra el portal en vivo: `.xls`, `.zip` y
+      una URL sin extensión, probados de punta a punta (hoy `.xls`/`.zip`
+      solo tienen cobertura con archivos sintéticos en los tests, no contra
+      un recurso real del portal). `.rar` queda fuera porque sigue sin
+      preview (ver ítem de soporte `.rar` arriba).
 - [ ] Degradación cuando el portal no responde — confirmar que el error que
       recibe el modelo es accionable (indica el host correcto), no genérico.
 
