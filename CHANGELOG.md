@@ -59,12 +59,14 @@
 - **`detect_series_pattern` verificado de punta a punta, sin argumentos
   adicionales, contra los dos datasets reales que motivaron este
   pendiente:**
-  - **MPCEIP cacao** (dataset `96f97d5c-394f-4be6-8046-3266d0cd5711`, no
-    encontrable vía `search_datasets`/`package_search` por el problema de
-    búsqueda débil ya conocido — encontrado en cambio vía `resource_search`
-    de CKAN directamente): auto-detectó el par AGOSTO→SEPTIEMBRE 2023 y
-    clasificó correctamente `acumulado` (34/34 períodos = 100%),
-    coincidiendo con la cifra de verificación e2e ya documentada más abajo.
+  - **MPCEIP cacao** (dataset `96f97d5c-394f-4be6-8046-3266d0cd5711`):
+    auto-detectó el par AGOSTO→SEPTIEMBRE 2023 y clasificó correctamente
+    `acumulado` (34/34 períodos = 100%), coincidiendo con la cifra de
+    verificación e2e ya documentada más abajo. (Nota de corrección: se
+    afirmó por error durante esta verificación que `search_datasets` no
+    encontraba este dataset — era un bug en el script de diagnóstico
+    usado, no un problema real; `search_datasets(query="cacao"/"MPCEIP")`
+    sí lo encuentra. Ver ROADMAP.md, sección "Calidad de búsqueda".)
   - **IESS desempleo** (`base-de-datos-seguro-desempleo`): auto-detectó el
     par Junio→Julio 2026 y clasificó correctamente `acumulado` (13/13
     períodos = 100%).

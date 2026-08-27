@@ -99,10 +99,22 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
 ## Calidad de búsqueda y detección de series
 
 - [ ] **Búsqueda semántica** — `search_datasets` pasa directo a búsqueda por
-      palabra clave de CKAN, que es débil frente al catálogo completo (ejemplo
-      real contra el mismo portal: "cacao" devuelve muy pocos resultados).
-      Falta una capa de similitud/embeddings que mejore el recall sin
-      reemplazar la búsqueda en vivo.
+      palabra clave de CKAN, que en general es débil frente al catálogo
+      completo (consultas de una sola palabra sin sinónimos ni relación
+      semántica con el contenido real). Falta una capa de
+      similitud/embeddings que mejore el recall sin reemplazar la búsqueda
+      en vivo. **Corrección 2026-08-27:** el ejemplo original de este ítem
+      ("cacao" devuelve muy pocos resultados) no se reprodujo verificando
+      de nuevo contra el portal real — `search_datasets(query="cacao")` y
+      `search_datasets(query="MPCEIP")` devuelven correctamente los 3 y 8
+      datasets relevantes respectivamente, incluyendo el dataset de precios
+      FOB de cacao del MPCEIP. La afirmación de que esta consulta específica
+      fallaba había quedado desactualizada (o nunca se verificó
+      correctamente) y de paso se repitió sin verificar en las notas de
+      `detect_series_pattern` más abajo — corregido ahí también. El
+      problema de fondo (búsqueda por palabra clave sin comprensión
+      semántica) sigue siendo real y motiva el ítem, solo que sin este
+      ejemplo concreto.
 - [x] **Expansión de siglas/acrónimos en la consulta** — hecho:
       `helpers/acronyms.expand_acronyms` reconoce ~13 siglas comunes
       (ENEMDU, ENSANUT, ENIGHUR, ECV, RUC, IESS, SRI, INEC, BCE, SERCOP,
@@ -150,14 +162,21 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
          `indeterminado` con motivo `esquema_distinto_entre_archivos` en
          vez de adivinar.
 
-      **Verificado también contra MPCEIP cacao (el otro caso motivador):**
-      `search_datasets`/`package_search` no encontró el dataset ni buscando
-      "cacao" ni "MPCEIP" (el problema de búsqueda débil ya conocido — ver
-      "Calidad de búsqueda" — resulta que también afecta descubrir datasets,
-      no solo priorizar resultados); encontrado en cambio vía el endpoint
-      CKAN `resource_search` directo, dataset `96f97d5c-394f-4be6-8046-3266d0cd5711`
-      ("Precios referenciales FOB para la exportación de cacao en grano").
-      Comparando los recursos reales `MPCEIP_PRECIO FOB_EXPORTACIONES
+      **Verificado también contra MPCEIP cacao (el otro caso motivador),**
+      dataset `96f97d5c-394f-4be6-8046-3266d0cd5711` ("Precios
+      referenciales FOB para la exportación de cacao en grano"). **Nota de
+      corrección:** durante esta verificación se afirmó por error que
+      `search_datasets` no encontraba este dataset ni con "cacao" ni con
+      "MPCEIP" — resultó ser un bug en el script de diagnóstico usado
+      (indexaba un `result` extra que no existe en lo que ya devuelve
+      `ckan_client.search_datasets`), no un problema real del tool.
+      Re-verificado: `search_datasets(query="cacao")` y
+      `search_datasets(query="MPCEIP")` encuentran este dataset
+      correctamente entre sus resultados. El dataset se ubicó originalmente
+      vía el endpoint CKAN `resource_search` directo mientras se investigaba
+      el falso problema — dato irrelevante ya para el resultado final, pero
+      documentado por transparencia. Comparando los recursos reales
+      `MPCEIP_PRECIO FOB_EXPORTACIONES
       CACAO_2023_AGOSTO.csv` vs `..._2023_SEPTIEMBRE.csv`:
       `detect_series_pattern` encontró la columna de período compuesta
       (AÑO, MES, SEMANA, FECHAS) y clasificó correctamente como `acumulado`
