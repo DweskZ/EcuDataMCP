@@ -20,6 +20,8 @@ env/
 .DS_Store
 Thumbs.db
 
+CLAUDE.md
+
 # Built locally by scripts/build_supercias_financials_db.py -- large (~cientos
 # de MB), refreshed periodically, not static reference data like helpers/data/.
 /data/

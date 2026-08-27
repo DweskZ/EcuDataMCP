@@ -17,7 +17,7 @@ from tools import register_tools
 setup_logging()
 
 SERVER_START_TIME = datetime.now(UTC)
-VERSION = "0.6.0"
+VERSION = "0.7.0"
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 

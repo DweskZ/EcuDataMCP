@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.7.0 — 2026-08-26
+
 Soporte de preview para tres formatos que antes solo se podían descargar
 crudos (Excel legacy `.xls`, `.tar.gz` y `.zip` que envuelven un
 CSV/TSV/TXT), expansión de siglas y sniffing de Content-Type en la

@@ -1,6 +1,6 @@
 [project]
 name = "ecuador-mcp"
-version = "0.6.0"
+version = "0.7.0"
 description = "Model Context Protocol (MCP) server for Ecuador open government data: CKAN, gob.ec, SERCOP OCDS, SGR risk events, and DPA geography."
 authors = [{ name = "Ecuador MCP Contributors" }]
 readme = "README.md"
