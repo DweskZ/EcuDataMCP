@@ -8,12 +8,53 @@ from helpers.logging import log_tool
 
 _DIGIT_RE = re.compile(r"\d+")
 
+# Confirmed live against MPCEIP's cacao price dataset: monthly resources
+# named "..._2023_AGOSTO.csv" / "..._2023_SEPTIEMBRE.csv" differ by a
+# Spanish month *word*, not a digit, so the digit-only template above never
+# grouped them -- detect_series_pattern couldn't auto-pick a pair from a
+# textbook periodic series. Folding month names into the same placeholder
+# as digits fixes that without touching the digit logic.
+_MONTH_NUMBERS = {
+    "enero": 1, "febrero": 2, "marzo": 3, "abril": 4, "mayo": 5, "junio": 6,
+    "julio": 7, "agosto": 8, "septiembre": 9, "setiembre": 9, "octubre": 10,
+    "noviembre": 11, "diciembre": 12,
+}
+# Lookaround on plain letters rather than \b: resource names are commonly
+# underscore-separated ("cacao_2023_agosto.csv"), and \b treats "_" as a
+# word character, so "_agosto" would never see a boundary and the month
+# would go unmatched right where it matters most.
+_MONTH_RE = re.compile(
+    r"(?<![a-z])(?:" + "|".join(_MONTH_NUMBERS) + r")(?![a-z])"
+)
+
 
 def _name_template(name: str) -> str:
-    return _DIGIT_RE.sub("#", name.strip().lower())
+    normalized = _DIGIT_RE.sub("#", name.strip().lower())
+    return _MONTH_RE.sub("#", normalized)
 
 
-def _detect_periodic_series(resources: list[dict]) -> list[str]:
+def period_sort_key(name: str) -> tuple[int, int, tuple[int, ...]]:
+    """Best-effort chronological key for a periodic resource name.
+
+    Confirmed live against MPCEIP's cacao price dataset: CKAN's
+    last_modified/created on a resource doesn't reliably track the period
+    in its name -- a January file re-uploaded (e.g. a correction) after a
+    September one sorts "newer" by timestamp while covering an earlier
+    period. Sorting by the largest digit run (usually the year) and any
+    Spanish month word found in the name is a better proxy for callers
+    picking "the most recent N resources" from a periodic-name group.
+    Falls back to (0, 0, ()) when nothing period-like is found, in which
+    case a caller should fall back to a timestamp-based tiebreaker.
+    """
+    lowered = name.strip().lower()
+    digits = tuple(int(d) for d in _DIGIT_RE.findall(lowered))
+    month_match = _MONTH_RE.search(lowered)
+    month_num = _MONTH_NUMBERS[month_match.group()] if month_match else 0
+    year = max(digits) if digits else 0
+    return (year, month_num, digits)
+
+
+def detect_periodic_series(resources: list[dict]) -> list[str]:
     """Group resource names that differ only by digits (dates, week numbers, etc).
 
     Returns the names in the largest such group, if it has 3+ members — a
@@ -97,7 +138,7 @@ def register_list_dataset_resources_tool(mcp: FastMCP) -> None:
             "title": dataset.get("title", "Desconocido"),
             "total": len(resources),
             "resources": resource_rows,
-            "possible_periodic_series": _detect_periodic_series(resource_rows),
+            "possible_periodic_series": detect_periodic_series(resource_rows),
         }
 
         def to_text(data: dict) -> str:

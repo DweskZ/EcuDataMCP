@@ -2,6 +2,77 @@
 
 ## Unreleased
 
+### Added
+- **Nuevo tool `detect_series_pattern`**: dado un dataset con un grupo de
+  recursos de nombre periódico (el mismo que ya detecta
+  `list_dataset_resources` como `possible_periodic_series`), descarga los
+  dos recursos más recientes, ubica una columna de fecha/período por nombre
+  de encabezado, y clasifica el par como `acumulado` (el archivo nuevo
+  incluye los períodos del viejo), `incremental` (períodos disjuntos, hay
+  que combinar todos los archivos) o `indeterminado` (sin columna de
+  período reconocible o solapamiento ambiguo) según cuánto se solapan sus
+  valores de período. `tools/list_dataset_resources._detect_periodic_series`
+  se volvió pública (`detect_periodic_series`) para poder reutilizarse
+  desde este tool.
+
+### Fixed
+- **Dos bugs reales encontrados verificando `detect_series_pattern` contra
+  `base-de-datos-seguro-desempleo` (IESS) en el portal real**, no solo con
+  datos sintéticos:
+  1. Varios CSV de IESS traen 1-3 filas de título/banner antes del
+     encabezado real (`preview_csv` siempre asume que la fila 0 es el
+     encabezado), así que la columna de período quedaba invisible. Nueva
+     función `_locate_header_row` escanea las primeras filas después del
+     encabezado declarado buscando una que luzca a encabezado real
+     (2+ celdas no vacías) y contenga una palabra clave de período.
+  2. Recursos con nombre casi idéntico (`Pagos Desempleo Marzo/Abril/Mayo/
+     Junio 2026`) cambian de formato interno entre meses sin aviso —
+     mismo problema de fondo que motivó este pendiente, pero peor de lo
+     documentado: no solo hay ambigüedad acumulado-vs-incremental, el
+     *esquema de columnas en sí* cambia. Comparar períodos entre dos
+     archivos con esquemas distintos daba 0% de solapamiento, que la
+     heurística original reportaba como `incremental` con confianza — una
+     conclusión calculada correctamente pero engañosa. Nueva función
+     `_schema_mismatch` compara los encabezados de ambos archivos antes de
+     confiar en el solapamiento de períodos; con menos de 50% de columnas
+     en común, la clasificación se fuerza a `indeterminado`
+     (`esquema_distinto_entre_archivos`) en vez de adivinar.
+- **`detect_periodic_series` no agrupaba resúmenes que difieren en el
+  nombre de mes en español** (`..._2023_AGOSTO.csv` vs
+  `..._2023_SEPTIEMBRE.csv`) — encontrado verificando `detect_series_pattern`
+  contra MPCEIP cacao, mismo tipo de bug que motivó este pendiente pero en
+  el auto-detect del par a comparar, no en la clasificación en sí. Los
+  nombres de mes ahora se normalizan al mismo placeholder que los dígitos
+  antes de agrupar por plantilla (con lookaround sobre letras, no `\b`, ya
+  que `_` cuenta como carácter de palabra y estos nombres suelen venir
+  separados por guion bajo).
+- **`_pick_pair` elegía "el más reciente" por `last_modified` de CKAN,
+  que resultó no ser confiable** — mismo dataset MPCEIP: el recurso de
+  enero 2023 tenía `last_modified` posterior al de septiembre 2023
+  (probable corrección/re-subida), así que el auto-pick invertía el orden
+  cronológico real por 8 meses. Nueva función pública `period_sort_key`
+  (`list_dataset_resources.py`) extrae año/mes del propio nombre del
+  recurso y ordena por eso primero, usando el timestamp de CKAN solo como
+  desempate.
+
+### Confirmed
+- **`detect_series_pattern` verificado de punta a punta, sin argumentos
+  adicionales, contra los dos datasets reales que motivaron este
+  pendiente:**
+  - **MPCEIP cacao** (dataset `96f97d5c-394f-4be6-8046-3266d0cd5711`, no
+    encontrable vía `search_datasets`/`package_search` por el problema de
+    búsqueda débil ya conocido — encontrado en cambio vía `resource_search`
+    de CKAN directamente): auto-detectó el par AGOSTO→SEPTIEMBRE 2023 y
+    clasificó correctamente `acumulado` (34/34 períodos = 100%),
+    coincidiendo con la cifra de verificación e2e ya documentada más abajo.
+  - **IESS desempleo** (`base-de-datos-seguro-desempleo`): auto-detectó el
+    par Junio→Julio 2026 y clasificó correctamente `acumulado` (13/13
+    períodos = 100%).
+  Primera confirmación de que la clasificación en sí acierta contra el
+  portal real —y ahora también el auto-detect del par, sin pasar
+  `resource_id_new`/`resource_id_old` a mano— no solo que el tool se
+  abstiene con seguridad en datos ambiguos.
+
 ## 0.7.0 — 2026-08-26
 
 Soporte de preview para tres formatos que antes solo se podían descargar

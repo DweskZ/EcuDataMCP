@@ -1,5 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 
+from tools.detect_series_pattern import register_detect_series_pattern_tool
 from tools.download_anda_microdata import register_download_anda_microdata_tool
 from tools.download_resource import register_download_resource_tool
 from tools.get_anda_survey_info import register_get_anda_survey_info_tool
@@ -55,6 +56,7 @@ def register_tools(mcp: FastMCP) -> None:
     register_list_dataset_resources_tool(mcp)
     register_get_resource_info_tool(mcp)
     register_preview_resource_data_tool(mcp)
+    register_detect_series_pattern_tool(mcp)
     register_download_resource_tool(mcp)
     register_query_resource_data_tool(mcp)
     register_search_organizations_tool(mcp)

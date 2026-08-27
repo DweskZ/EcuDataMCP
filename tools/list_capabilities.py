@@ -29,6 +29,7 @@ _CAPABILITIES = {
             "search_datasets",
             "query_resource_data",
             "preview_resource_data",
+            "detect_series_pattern",
             "list_categories",
         ],
         "tramites": [

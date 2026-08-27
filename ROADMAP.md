@@ -111,13 +111,95 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       OR entre términos, así que agregar palabras solo amplía el recall, no
       lo restringe — un documento que matchea la sigla, el nombre completo,
       o ambos, sigue apareciendo. Aplicado en `ckan_client.search_datasets`.
-- [ ] **Detección real acumulado-vs-incremental** entre archivos de un mismo
-      dataset — cuando un dataset publica un archivo por período (ej. precios
-      semanales de cacao del MPCEIP), falta distinguir si cada archivo nuevo
-      reemplaza a los anteriores (acumulado, solo hay que leer el más
-      reciente) o los complementa (incremental, hay que sumarlos todos).
-      Confundirlo trunca o duplica una serie silenciosamente. Hoy no hay
-      ninguna heurística para esto.
+- [x] **Detección real acumulado-vs-incremental** entre archivos de un mismo
+      dataset — **agregado 2026-08-27:** nuevo tool `detect_series_pattern`.
+      Toma el grupo de recursos con nombre de serie periódica que ya detecta
+      `list_dataset_resources` (`possible_periodic_series`), descarga los dos
+      más recientes (hasta 500 filas c/u), busca una columna de
+      fecha/período por nombre de encabezado (`fecha`, `mes`, `año`,
+      `periodo`, `semana`, ...) y compara qué valores de período aparecen en
+      ambos archivos. Solapamiento alto → `acumulado` (el archivo nuevo ya
+      incluye los períodos del anterior, basta con leer el más reciente);
+      solapamiento casi nulo → `incremental` (cada archivo cubre un período
+      distinto, hay que combinarlos); si no hay solapamiento claro o no se
+      detecta ninguna columna de período, devuelve `indeterminado` en vez de
+      adivinar. **Verificado 2026-08-27 contra el portal real**
+      (`base-de-datos-seguro-desempleo` de IESS) — encontrados y corregidos
+      dos bugs reales durante la verificación, no solo confirmación:
+      1. Los CSV de IESS traen 1-3 filas de título/banner antes del
+         encabezado real (ej. `Monto pagado y numero de beneficiarios 2026`
+         en la fila 1, encabezado real `Mes,Monto pagado,...` en la fila 2).
+         `preview_csv` siempre trata la fila 0 como encabezado, así que la
+         columna de período quedaba invisible. Nueva función
+         `_locate_header_row` escanea las primeras filas buscando una que
+         luzca a encabezado real y contenga una palabra clave de período.
+      2. **Hallazgo más serio:** recursos con nombre casi idéntico
+         (`Pagos Desempleo Marzo/Abril/Mayo/Junio 2026`) cambian de formato
+         interno entre meses sin aviso — unos meses traen el detalle por
+         provincia/género (`Mes,Tipo Pago,Provincia,Genero,...`, mes como
+         código numérico `"5"`), otros el resumen mensual acumulado
+         (`Mes,Monto pagado,...`, mes como palabra `"junio"`). Comparar
+         períodos entre dos archivos así da 0% de solapamiento — la
+         heurística original lo hubiera reportado como `incremental` con
+         confianza, una conclusión técnicamente calculada pero engañosa
+         (el problema real es que no son el mismo tipo de reporte, no que
+         cubran períodos distintos). Nueva función `_schema_mismatch`
+         compara el conjunto de encabezados de ambos archivos antes de
+         confiar en el solapamiento de períodos; si comparten menos de la
+         mitad de sus columnas, la clasificación se fuerza a
+         `indeterminado` con motivo `esquema_distinto_entre_archivos` en
+         vez de adivinar.
+
+      **Verificado también contra MPCEIP cacao (el otro caso motivador):**
+      `search_datasets`/`package_search` no encontró el dataset ni buscando
+      "cacao" ni "MPCEIP" (el problema de búsqueda débil ya conocido — ver
+      "Calidad de búsqueda" — resulta que también afecta descubrir datasets,
+      no solo priorizar resultados); encontrado en cambio vía el endpoint
+      CKAN `resource_search` directo, dataset `96f97d5c-394f-4be6-8046-3266d0cd5711`
+      ("Precios referenciales FOB para la exportación de cacao en grano").
+      Comparando los recursos reales `MPCEIP_PRECIO FOB_EXPORTACIONES
+      CACAO_2023_AGOSTO.csv` vs `..._2023_SEPTIEMBRE.csv`:
+      `detect_series_pattern` encontró la columna de período compuesta
+      (AÑO, MES, SEMANA, FECHAS) y clasificó correctamente como `acumulado`
+      (34/34 períodos de agosto = 100% también en septiembre) — coincide
+      exactamente con la nota de verificación e2e de más abajo (el archivo
+      de junio 2026 ya trae las 4 semanas de junio *y* los meses previos
+      del año, "usando solo el archivo más reciente"). Primera confirmación
+      real de que la clasificación en sí (no solo el rechazo seguro a
+      adivinar) acierta contra el portal real.
+
+      **Dos limitaciones reales de auto-detección, encontradas y corregidas
+      en la misma sesión de verificación:**
+      1. `detect_periodic_series` agrupaba solo por plantilla de dígitos,
+         así que no agrupaba `..._AGOSTO.csv`/`..._SEPTIEMBRE.csv`
+         (difieren en una palabra, no en un número) — hubo que pasar
+         `resource_id_new`/`resource_id_old` explícitos en la primera
+         verificación. Corregido: los nombres de mes en español ahora se
+         normalizan al mismo placeholder que los dígitos antes de agrupar.
+      2. Con el agrupamiento ya corregido, `_pick_pair` (para elegir "los
+         dos más recientes" del grupo) ordenaba por `last_modified` de
+         CKAN, que resultó no ser confiable: el recurso de enero 2023 tenía
+         un `last_modified` *posterior* al de septiembre 2023 (probable
+         corrección/re-subida), así que el auto-pick elegía enero como "más
+         reciente" — 8 meses al revés. Corregido: nueva función
+         `period_sort_key` (en `list_dataset_resources.py`, pública para
+         reutilizarse) extrae año/mes del propio nombre del recurso y
+         ordena por eso primero, usando el timestamp de CKAN solo como
+         desempate.
+
+      **Con ambos fixes, `detect_series_pattern(dataset_id=...)` sin
+      argumentos adicionales ya funciona de punta a punta contra los dos
+      datasets reales que motivaron este ítem:** MPCEIP cacao
+      (AGOSTO→SEPTIEMBRE 2023, `acumulado`, 34/34 períodos) e IESS
+      desempleo (Junio→Julio 2026, `acumulado`, 13/13 períodos) — ambos
+      auto-detectados y clasificados correctamente sin pasar IDs a mano.
+
+      Sigue siendo una heurística de nombre de columna + solapamiento de
+      valores; no garantiza acierto en datasets con columnas de período con
+      nombres atípicos (ej. meses abreviados como "JUN"/"ABR" en vez de
+      "junio"/"abril", vistos en recursos MPCEIP más recientes y aún sin
+      cubrir), y no detecta cambios de esquema más sutiles que el umbral de
+      50% de columnas en común.
 
 ## Formatos y tipos de recursos
 
