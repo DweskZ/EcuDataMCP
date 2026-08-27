@@ -273,7 +273,7 @@ más abajo.
 
 ---
 
-## Herramientas disponibles (38 tools)
+## Herramientas disponibles
 
 Casi todos los tools aceptan `format="json"` además de texto.
 
