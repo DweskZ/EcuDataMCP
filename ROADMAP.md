@@ -103,10 +103,14 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       real contra el mismo portal: "cacao" devuelve muy pocos resultados).
       Falta una capa de similitud/embeddings que mejore el recall sin
       reemplazar la búsqueda en vivo.
-- [ ] **Expansión de siglas/acrónimos en la consulta** — los usuarios escriben
-      "ENEMDU", "ENSANUT", "RUC"; el catálogo los tiene deletreados completos
-      en los metadatos. Falta expandir la consulta antes de buscar (por
-      keyword o por embeddings).
+- [x] **Expansión de siglas/acrónimos en la consulta** — hecho:
+      `helpers/acronyms.expand_acronyms` reconoce ~13 siglas comunes
+      (ENEMDU, ENSANUT, ENIGHUR, ECV, RUC, IESS, SRI, INEC, BCE, SERCOP,
+      SENESCYT, SUPERCIAS, SGR) y agrega el nombre completo a la consulta
+      antes de mandarla a CKAN. El operador por default de Solr en CKAN es
+      OR entre términos, así que agregar palabras solo amplía el recall, no
+      lo restringe — un documento que matchea la sigla, el nombre completo,
+      o ambos, sigue apareciendo. Aplicado en `ckan_client.search_datasets`.
 - [ ] **Detección real acumulado-vs-incremental** entre archivos de un mismo
       dataset — cuando un dataset publica un archivo por período (ej. precios
       semanales de cacao del MPCEIP), falta distinguir si cada archivo nuevo
@@ -137,8 +141,15 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       explícitamente (`rar_no_soportado`) y ahora hay un tool nuevo,
       `download_resource(resource_id, format="json")`, que baja el archivo
       completo (base64, hasta 5 MB) para que se pueda usar fuera del MCP.
-- [ ] **Recursos sin extensión** — requieren sniffing de content-type; sin
-      implementar ni probar.
+- [x] **Recursos sin extensión** — hecho: cuando ni la extensión de URL ni el
+      `format` declarado por CKAN son reconocibles, `preview_resource_data`
+      hace un sniff best-effort del header HTTP `Content-Type`
+      (`helpers/csv_reader.sniff_content_type`, solo lee headers, no baja el
+      body) antes de rendirse con `formato_no_soportado`. Solo se activa
+      cuando la clasificación normal da `UNKNOWN` — un `format` vacío ya
+      caía en el default histórico de "asumir CSV", así que el sniff cubre
+      el caso más angosto de un `format` declarado pero irreconocible
+      (ej. `PDF`) combinado con una URL sin extensión.
 - [x] **Detección de `.tar.gz`** — encontrado real durante la verificación
       e2e (2026-08-16): el dataset `contribuyentes-activos-catastro-2025`
       del SRI (declarado formato CSV en CKAN) en realidad se descarga como
@@ -213,13 +224,43 @@ truenan:
       parser de CSV en vez del de XLSX. Mismo fix que el caso `.tar.gz` del
       SRI arriba: ahora la extensión de URL tiene prioridad. Confirma que
       confiar solo en el campo `format` de CKAN no alcanza.
-- [ ] Cobertura real de formatos contra el portal en vivo: `.xls`, `.zip` y
-      una URL sin extensión, probados de punta a punta (hoy `.xls`/`.zip`
-      solo tienen cobertura con archivos sintéticos en los tests, no contra
-      un recurso real del portal). `.rar` queda fuera porque sigue sin
-      preview (ver ítem de soporte `.rar` arriba).
-- [ ] Degradación cuando el portal no responde — confirmar que el error que
-      recibe el modelo es accionable (indica el host correcto), no genérico.
+- [x] **Cobertura real de formatos contra el portal en vivo: `.xls`/`.zip`.**
+      **Verificado 2026-08-26 contra el portal real:** `.xls` funciona limpio
+      — `agrocalidad_centros-de-faenamiento-certificados-con-mabio_dd_2021.xls`
+      (resource `4d756998-8f91-4bf9-9edd-6395bac99dfe`) se previsualiza con
+      acentos correctamente decodificados (`ó` = `0xf3`, confirmado a nivel
+      de code point — lo que parecía verse mal era solo la consola de
+      Windows, no un bug de decodificación real). **Tres hallazgos reales de
+      `.zip` que llevaron a fixes, no solo confirmación:**
+      1. Un `.zip` real de 17 MB (`organizacion-territorial-cantonal.zip` y
+         `mag_estimacionesprimerperiodo_2020.zip`) truncado a los 5 MB de
+         descarga falla *por completo* al abrir (`zipfile.BadZipFile: File
+         is not a zip file`), no de forma parcial — el directorio central de
+         un `.zip` vive al final del archivo. Antes esto daba un genérico
+         "está corrupto o incompleto"; ahora `preview_zip`/`preview_targz`
+         detectan la verdad (`truncated=True` de la descarga) *antes* de
+         intentar parsear y dan un mensaje específico apuntando a
+         `download_resource`.
+      2. Un `.zip` real sin ningún archivo tabular
+         (`mag_carbonoorganico_2021junio.zip`: solo `.lyr`/`.tif`/`.tif.aux.xml`,
+         paquete GIS raster) hacía que `_pick_member` cayera de vuelta al
+         primer archivo del `.zip` y lo forzara al parser de CSV, crasheando
+         con un `csv.Error` crudo sin capturar. `_pick_member` ya no cae a
+         "el primero que sea"; devuelve `None` cuando ningún miembro parece
+         tabular, y ambos previews dan un mensaje claro listando los
+         archivos reales encontrados.
+      3. `_parse_csv_bytes` no capturaba `csv.Error` en absoluto (repro real:
+         un `\r` suelto sin comillas dentro de un campo) — ahora se captura
+         y se traduce a un `ValueError` accionable en vez de una excepción
+         cruda de Python.
+- [x] **Degradación cuando el portal no responde.** **Confirmado y
+      corregido 2026-08-26:** un `httpx.ConnectTimeout`/`ConnectError` real
+      se puede stringificar como `""` o `"timed out"`, sin mencionar el host
+      — confirmado con `str(httpx.ConnectTimeout(...))`. `helpers/ckan_client._fetch_json`
+      ahora distingue `HTTPStatusError` (ya trae URL+status vía
+      `raise_for_status()`) de `RequestError` (fallos de conexión/timeout),
+      y en el segundo caso levanta un `RuntimeError` que sí nombra el host y
+      el tipo de fallo.
 
 ## Arquitectura, más adelante
 

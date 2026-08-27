@@ -169,6 +169,31 @@ async def download_bytes(
             await session.aclose()
 
 
+async def sniff_content_type(
+    url: str, session: httpx.AsyncClient | None = None
+) -> str | None:
+    """Best-effort Content-Type sniff for a resource with no recognizable
+    URL extension and no useful declared CKAN format.
+
+    Opens the same safe_stream() a real download would use but returns as
+    soon as headers arrive, without reading the body -- costs a connection,
+    not a download. Best-effort: any failure just means no hint, callers
+    fall back to their existing "unsupported format" handling.
+    """
+    own = session is None
+    if own:
+        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
+    assert session is not None
+    try:
+        async with safe_stream(session, url, timeout=_TIMEOUT) as resp:
+            return resp.headers.get("content-type")
+    except httpx.HTTPError:
+        return None
+    finally:
+        if own:
+            await session.aclose()
+
+
 def _decode_text(raw: bytes) -> str:
     if raw.startswith(b"\xef\xbb\xbf"):
         raw = raw[3:]
@@ -191,11 +216,23 @@ def _parse_csv_bytes(raw: bytes, max_rows: int, truncated: bool = False) -> dict
 
     reader = csv.reader(io.StringIO(text), delimiter=delimiter)
     rows_read: list[list[str]] = []
-    for row in reader:
-        rows_read.append(row)
-        if len(rows_read) > max_rows + 1:
-            truncated = True
-            break
+    try:
+        for row in reader:
+            rows_read.append(row)
+            if len(rows_read) > max_rows + 1:
+                truncated = True
+                break
+    except csv.Error as e:
+        # Found for real: a .zip's picked "first tabular-looking member" can
+        # still turn out to be a binary file misidentified by its extension,
+        # or a genuinely malformed export. Keep whatever rows parsed cleanly
+        # before the bad one rather than losing the whole preview to it.
+        truncated = True
+        if not rows_read:
+            raise ValueError(
+                "El contenido no se pudo parsear como CSV (formato inválido "
+                f"o no es realmente texto tabular): {e}"
+            ) from e
 
     if not rows_read:
         return {"headers": [], "rows": [], "total_rows_in_preview": 0, "truncated": truncated}
@@ -437,18 +474,22 @@ def _gunzip_capped(raw: bytes, cap: int = _MAX_DECOMPRESSED_BYTES) -> tuple[byte
 
 
 def _pick_member(names: list[str]) -> str | None:
-    """Pick the best-priority member name: .csv > .tsv > .txt > first available.
+    """Pick the best-priority member name: .csv > .tsv > .txt, or None if no
+    member looks tabular.
 
     Prevents a bundled readme.txt from winning over the actual data file
-    just because it comes first in the archive.
+    just because it comes first in the archive. Deliberately does NOT fall
+    back to "just take the first file" -- confirmed against a real GIS
+    raster .zip on the live portal (.lyr/.tif/.tif.aux.xml, no CSV at all)
+    that a naive first-file fallback force-feeds a binary file into the CSV
+    parser, which fails with a confusing raw csv.Error instead of a message
+    that explains there's simply no tabular content in the archive.
     """
-    if not names:
-        return None
     for ext in (".csv", ".tsv", ".txt"):
         match = next((n for n in names if n.lower().endswith(ext)), None)
         if match is not None:
             return match
-    return names[0]
+    return None
 
 
 async def preview_targz(
@@ -471,12 +512,29 @@ async def preview_targz(
                     "format": "tar_gz",
                 }
             member_name = _pick_member(list(members))
+            if member_name is None:
+                sample = ", ".join(list(members)[:10])
+                raise ValueError(
+                    "Este .tar.gz no contiene ningún archivo .csv/.tsv/.txt "
+                    f"identificable (archivos internos: {sample}). Puede que "
+                    "no sea un dataset tabular. Usa download_resource para "
+                    "bajarlo completo."
+                )
             extracted = tar.extractfile(members[member_name])
             inner_raw = extracted.read(MAX_DOWNLOAD_BYTES + 1) if extracted else b""
     except tarfile.TarError as e:
+        if truncated:
+            # Confirmed against a real 17MB .zip on the live portal (same
+            # failure mode applies here): a real archive larger than the 5MB
+            # download cap gets cut off mid-stream, which reads as corrupt to
+            # tarfile. We already know why, so say that instead of guessing.
+            raise ValueError(
+                "El archivo .tar.gz descomprimido supera el límite de 5 MB de "
+                "este preview y se cortó a la mitad. Usa download_resource "
+                "para bajarlo completo, o el enlace directo."
+            ) from e
         raise ValueError(
-            "El archivo .tar.gz no se pudo leer: puede exceder el límite de "
-            "previsualización una vez descomprimido, o estar corrupto"
+            "El archivo .tar.gz no se pudo leer: está corrupto"
         ) from e
 
     truncated = truncated or len(inner_raw) > MAX_DOWNLOAD_BYTES
@@ -499,6 +557,19 @@ async def preview_zip(
     enough to keep a decompression bomb from blowing up memory.
     """
     raw, truncated = await download_bytes(url, session=session)
+    if truncated:
+        # A .zip's central directory lives at the end of the file, so a
+        # download cut off at MAX_DOWNLOAD_BYTES is missing it entirely --
+        # zipfile can't open it at all, not even partially. Confirmed
+        # against a real 17MB resource on the live portal: parsing wasn't
+        # just degraded, it failed outright with "File is not a zip file".
+        # Skip the doomed parse attempt and say what actually happened.
+        raise ValueError(
+            "El archivo .zip supera el límite de 5 MB de este preview, así "
+            "que se descargó incompleto y no se puede abrir (el índice del "
+            ".zip vive al final del archivo). Usa download_resource para "
+            "bajarlo completo, o el enlace directo."
+        )
 
     try:
         with zipfile.ZipFile(io.BytesIO(raw)) as zf:
@@ -512,11 +583,19 @@ async def preview_zip(
                     "format": "zip",
                 }
             member_name = _pick_member(names)
+            if member_name is None:
+                sample = ", ".join(names[:10])
+                raise ValueError(
+                    "Este .zip no contiene ningún archivo .csv/.tsv/.txt "
+                    f"identificable (archivos internos: {sample}). Puede que "
+                    "no sea un dataset tabular (ej. un paquete GIS/raster). "
+                    "Usa download_resource para bajarlo completo."
+                )
             with zf.open(member_name) as f:
                 inner_raw = f.read(MAX_DOWNLOAD_BYTES + 1)
     except zipfile.BadZipFile as e:
         raise ValueError(
-            "El archivo .zip no se pudo leer: está corrupto o incompleto"
+            "El archivo .zip no se pudo leer: está corrupto"
         ) from e
 
     truncated = truncated or len(inner_raw) > MAX_DOWNLOAD_BYTES

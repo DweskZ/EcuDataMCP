@@ -6,6 +6,7 @@ from mcp.server.fastmcp import FastMCP
 import tools.preview_resource_data as preview_resource_data_module
 from helpers import ckan_client
 from tools.preview_resource_data import (
+    classify_from_content_type,
     classify_resource_format,
     register_preview_resource_data_tool,
 )
@@ -64,6 +65,32 @@ def test_classify_legacy_xls_distinct_from_xlsx():
 def test_classify_json_and_geojson():
     assert classify_resource_format("", "https://x/datos.json") == "JSON"
     assert classify_resource_format("", "https://x/mapa.geojson") == "JSON"
+
+
+# -- classify_from_content_type ----------------------------------------------
+
+
+def test_classify_from_content_type_strips_charset_param():
+    assert classify_from_content_type("text/csv; charset=utf-8") == "CSV"
+
+
+def test_classify_from_content_type_maps_common_mimes():
+    assert classify_from_content_type("application/json") == "JSON"
+    assert classify_from_content_type("application/zip") == "ZIP"
+    assert classify_from_content_type("application/gzip") == "TARGZ"
+    assert (
+        classify_from_content_type(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+        == "XLSX"
+    )
+    assert classify_from_content_type("application/vnd.ms-excel") == "XLS"
+
+
+def test_classify_from_content_type_unknown_or_missing():
+    assert classify_from_content_type("application/octet-stream") == "UNKNOWN"
+    assert classify_from_content_type(None) == "UNKNOWN"
+    assert classify_from_content_type("") == "UNKNOWN"
 
 
 # -- dispatch through the tool ------------------------------------------------
@@ -236,3 +263,64 @@ async def test_resource_without_url_returns_error(monkeypatch):
     result = await tool(resource_id="abc123", format="json")
     payload = json.loads(result)
     assert payload["error"] == "sin_url"
+
+
+# -- extensionless resource: content-type sniffing fallback ------------------
+
+
+async def test_extensionless_resource_is_routed_via_sniffed_content_type(monkeypatch):
+    async def fake_get_resource(resource_id, session=None):
+        return {
+            "url": "https://x/download?id=123",
+            "format": "PDF",
+            "name": "Sin extension",
+        }
+
+    async def fake_sniff_content_type(url, session=None):
+        return "text/csv; charset=utf-8"
+
+    calls = []
+
+    async def fake_preview_csv(url, max_rows=20, session=None):
+        calls.append(url)
+        return {
+            "headers": ["a", "b"],
+            "rows": [["1", "2"]],
+            "total_rows_in_preview": 1,
+            "format": "csv",
+        }
+
+    monkeypatch.setattr(ckan_client, "get_resource", fake_get_resource)
+    monkeypatch.setattr(
+        preview_resource_data_module, "sniff_content_type", fake_sniff_content_type
+    )
+    monkeypatch.setattr(preview_resource_data_module, "preview_csv", fake_preview_csv)
+
+    tool = _make_tool()
+    result = await tool(resource_id="abc123", format="json")
+    payload = json.loads(result)
+    assert payload["headers"] == ["a", "b"]
+    assert payload["sniffed_content_type"] is True
+    assert calls == ["https://x/download?id=123"]
+
+
+async def test_extensionless_resource_falls_back_when_sniff_is_inconclusive(monkeypatch):
+    async def fake_get_resource(resource_id, session=None):
+        return {
+            "url": "https://x/download?id=123",
+            "format": "PDF",
+            "name": "Sin extension",
+        }
+
+    async def fake_sniff_content_type(url, session=None):
+        return "application/octet-stream"
+
+    monkeypatch.setattr(ckan_client, "get_resource", fake_get_resource)
+    monkeypatch.setattr(
+        preview_resource_data_module, "sniff_content_type", fake_sniff_content_type
+    )
+
+    tool = _make_tool()
+    result = await tool(resource_id="abc123", format="json")
+    payload = json.loads(result)
+    assert payload["error"] == "formato_no_soportado"

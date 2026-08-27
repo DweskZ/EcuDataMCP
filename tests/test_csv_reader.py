@@ -4,15 +4,18 @@ import socket
 import tarfile
 import zipfile
 
+import httpx
 import pytest
 
 from helpers.csv_reader import (
     MAX_DOWNLOAD_BYTES,
     _gunzip_capped,
+    _parse_csv_bytes,
     download_bytes,
     normalize_eu_decimal_columns,
     preview_targz,
     preview_zip,
+    sniff_content_type,
     strip_geometry_columns,
 )
 
@@ -242,3 +245,100 @@ async def test_preview_zip_rejects_corrupt_archive(httpx_mock, monkeypatch):
 
     with pytest.raises(ValueError, match="no se pudo leer"):
         await preview_zip(url)
+
+
+async def test_sniff_content_type_returns_header(httpx_mock, monkeypatch):
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+
+    url = "https://example.com/download?id=123"
+    httpx_mock.add_response(
+        url=url, headers={"content-type": "text/csv; charset=utf-8"}, content=b"a,b\n1,2\n"
+    )
+
+    content_type = await sniff_content_type(url)
+
+    assert content_type == "text/csv; charset=utf-8"
+
+
+async def test_sniff_content_type_returns_none_on_connection_failure(httpx_mock, monkeypatch):
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+
+    url = "https://example.com/download?id=123"
+    httpx_mock.add_exception(httpx.ConnectError("boom", request=httpx.Request("GET", url)))
+
+    assert await sniff_content_type(url) is None
+
+
+async def test_preview_zip_over_5mb_gives_actionable_truncation_message(httpx_mock, monkeypatch):
+    # Confirmed against a real 17MB .zip on the live portal: a download cut
+    # off at MAX_DOWNLOAD_BYTES is missing the zip's central directory
+    # (always at the end of the file), so zipfile fails outright with "File
+    # is not a zip file" -- not a partial/degraded read. This reproduces
+    # that with a real (uncompressed, so size is predictable) zip padded
+    # past the cap, and checks we say why instead of just "corrupt".
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+
+    padding = b"1,2\n" * (MAX_DOWNLOAD_BYTES // 4 + 10)
+    big_zip = _make_zip({"datos.csv": b"a,b\n" + padding})
+    assert len(big_zip) > MAX_DOWNLOAD_BYTES
+
+    url = "https://example.com/grande.zip"
+    httpx_mock.add_response(url=url, content=big_zip)
+
+    with pytest.raises(ValueError, match="supera el límite de 5 MB"):
+        await preview_zip(url)
+
+
+async def test_preview_zip_with_no_tabular_member_gives_clear_message(httpx_mock, monkeypatch):
+    # Confirmed against a real GIS raster .zip on the live portal
+    # (.lyr/.tif/.tif.aux.xml, no CSV at all): silently parsing the first
+    # binary file as CSV crashed with a raw csv.Error. Now it should say
+    # plainly that there's no tabular content, listing what is actually
+    # inside.
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+
+    zip_bytes = _make_zip({"mapa.tif": b"\x00\x01\x02not really a tiff"})
+    url = "https://example.com/raster.zip"
+    httpx_mock.add_response(url=url, content=zip_bytes)
+
+    with pytest.raises(ValueError, match="no contiene ningún archivo"):
+        await preview_zip(url)
+
+
+async def test_preview_targz_with_no_tabular_member_gives_clear_message(
+    httpx_mock, monkeypatch
+):
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+
+    gz_bytes = _make_targz({"mapa.tif": b"\x00\x01\x02not really a tiff"})
+    url = "https://example.com/raster.tar.gz"
+    httpx_mock.add_response(url=url, content=gz_bytes)
+
+    with pytest.raises(ValueError, match="no contiene ningún archivo"):
+        await preview_targz(url)
+
+
+def test_parse_csv_bytes_raises_actionable_error_for_malformed_csv():
+    # Real repro of a bare, unquoted carriage return inside a field --
+    # Python's csv module refuses to parse this at all. Found for real
+    # while investigating why a live-portal .zip's picked member crashed
+    # with a raw, unhandled csv.Error instead of a message.
+    raw = b'a,b\r"x\ry,2\r'
+
+    with pytest.raises(ValueError, match="no se pudo parsear como CSV"):
+        _parse_csv_bytes(raw, max_rows=20)

@@ -5,6 +5,7 @@ from typing import Any
 import httpx
 
 from helpers import env_config
+from helpers.acronyms import expand_acronyms
 from helpers.cache import categories_cache
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.tls import should_retry_insecure
@@ -61,9 +62,21 @@ async def _fetch_json(
             error = data.get("error", {})
             raise ValueError(f"CKAN API error: {error}")
         return data["result"]
-    except httpx.HTTPError as exc:
+    except httpx.HTTPStatusError as exc:
+        # Already actionable: raise_for_status()'s own message includes the
+        # URL and status code, and 403 is special-cased above.
         logger.error("CKAN request failed for %s: %s", url, exc)
         raise
+    except httpx.RequestError as exc:
+        # A bare ConnectTimeout/ConnectError often stringifies to "" or
+        # "timed out" with no host in it, leaving the model unable to tell
+        # the caller anything useful. Name the host and the failure kind.
+        logger.error("CKAN request failed for %s: %s", url, exc)
+        raise RuntimeError(
+            f"No se pudo conectar a {exc.request.url} ({type(exc).__name__}). "
+            "El portal de Datos Abiertos podría estar caído, lento, o "
+            "bloqueando la conexión; reintenta en unos minutos."
+        ) from exc
     finally:
         if own:
             await session.aclose()
@@ -81,7 +94,11 @@ async def search_datasets(
     sort: str = "",
     session: httpx.AsyncClient | None = None,
 ) -> dict[str, Any]:
-    params: dict[str, Any] = {"q": query, "rows": min(rows, 100), "start": start}
+    params: dict[str, Any] = {
+        "q": expand_acronyms(query),
+        "rows": min(rows, 100),
+        "start": start,
+    }
     if category:
         params["fq"] = f"groups:{category}"
     if sort:
