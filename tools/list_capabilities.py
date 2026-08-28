@@ -7,7 +7,11 @@ _CAPABILITIES = {
     "name": "Ecuador MCP",
     "version": "0.7.0",
     "fuentes": [
-        "CKAN datos abiertos",
+        "CKAN datos abiertos (nacional, www.datosabiertos.gob.ec)",
+        (
+            "Cuenca en Datos (portal municipal CKAN independiente, "
+            "source='cuenca' en los mismos tools CKAN)"
+        ),
         "gob.ec trámites/instituciones/regulaciones",
         "SERCOP OCDS contratos",
         "SGR COE eventos de riesgo + SAT tsunami",
@@ -84,6 +88,11 @@ _CAPABILITIES = {
             "servidor haya corrido scripts/build_supercias_financials_db.py "
             "de antemano (no se construye solo); cubren solo los últimos "
             "años cacheados, no el histórico completo desde 2008"
+        ),
+        (
+            "Cuenca en Datos publica varios recursos como .ods (OpenDocument "
+            "spreadsheet), formato que preview_resource_data todavía no "
+            "soporta como tabla; usa download_resource para esos casos"
         ),
     ],
 }

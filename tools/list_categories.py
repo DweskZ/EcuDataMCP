@@ -8,7 +8,7 @@ from helpers.logging import log_tool
 def register_list_categories_tool(mcp: FastMCP) -> None:
     @mcp.tool()
     @log_tool
-    async def list_categories(format: str = "text") -> str:
+    async def list_categories(source: str = "nacional", format: str = "text") -> str:
         """
         List all thematic categories of Ecuador's open data portal.
 
@@ -20,10 +20,11 @@ def register_list_categories_tool(mcp: FastMCP) -> None:
         to filter results by topic.
 
         Args:
+            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
             format: text | json
         """
         try:
-            groups = await ckan_client.list_groups()
+            groups = await ckan_client.list_groups(source=source)
         except Exception as e:
             return render_output(
                 {"error": str(e)},

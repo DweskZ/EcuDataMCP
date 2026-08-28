@@ -3,6 +3,23 @@
 ## Unreleased
 
 ### Added
+- **Integración de Cuenca en Datos** (`cuencaendatos.cuenca.gob.ec`), el
+  portal municipal CKAN de Cuenca (92 datasets, verificado en vivo).
+  Mismo shape de API que el portal nacional, así que en vez de un cliente y
+  tools nuevos y paralelos, los ~10 tools CKAN genéricos (`search_datasets`,
+  `list_recent_datasets`, `get_dataset_info`, `list_dataset_resources`,
+  `get_resource_info`, `preview_resource_data`, `download_resource`,
+  `query_resource_data`, `search_organizations`, `get_organization_info`,
+  `list_categories`, `get_category_info`, `detect_series_pattern`) ganaron
+  un parámetro `source="nacional"|"cuenca"`. `helpers/ckan_client.py`
+  resuelve la URL base según `source` (`_ckan_url`/`site_url` nuevos), con
+  caché de categorías separada por fuente para no mezclar ambos portales.
+  Nuevas variables de entorno opcionales `CUENCA_API_URL`/`CUENCA_SITE_URL`.
+  Verificado en vivo end-to-end (search, categorías, organizaciones,
+  metadata de dataset/recurso, y preview de un CSV real). Varios recursos
+  de Cuenca son `.ods`, formato que `preview_resource_data` no soporta
+  todavía como tabla — degrada con gracia a `download_resource` en vez de
+  fallar.
 - **Nuevo tool `detect_series_pattern`**: dado un dataset con un grupo de
   recursos de nombre periódico (el mismo que ya detecta
   `list_dataset_resources` como `possible_periodic_series`), descarga los

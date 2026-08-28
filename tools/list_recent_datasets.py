@@ -1,6 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 
-from helpers import ckan_client, env_config
+from helpers import ckan_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
@@ -9,7 +9,7 @@ def register_list_recent_datasets_tool(mcp: FastMCP) -> None:
     @mcp.tool()
     @log_tool
     async def list_recent_datasets(
-        page: int = 1, page_size: int = 15, format: str = "text"
+        page: int = 1, page_size: int = 15, source: str = "nacional", format: str = "text"
     ) -> str:
         """
         List the most recently updated datasets on Ecuador's open data portal.
@@ -20,6 +20,7 @@ def register_list_recent_datasets_tool(mcp: FastMCP) -> None:
         Args:
             page: Page number (1-based, default 1)
             page_size: Results per page (default 15, max 50)
+            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
             format: text | json
         """
         page = max(page, 1)
@@ -27,7 +28,9 @@ def register_list_recent_datasets_tool(mcp: FastMCP) -> None:
         start = (page - 1) * page_size
 
         try:
-            result = await ckan_client.recent_datasets(rows=page_size, start=start)
+            result = await ckan_client.recent_datasets(
+                rows=page_size, start=start, source=source
+            )
         except Exception as e:
             return render_output(
                 {"error": str(e)},
@@ -37,7 +40,7 @@ def register_list_recent_datasets_tool(mcp: FastMCP) -> None:
 
         datasets = result.get("results") or []
         total = result.get("count", 0)
-        site = env_config.get_base_url("ckan_site").rstrip("/")
+        site = ckan_client.site_url(source).rstrip("/")
         payload = {
             "total": total,
             "page": page,

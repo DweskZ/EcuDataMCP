@@ -12,6 +12,7 @@ def register_search_organizations_tool(mcp: FastMCP) -> None:
         query: str = "",
         page: int = 1,
         page_size: int = 20,
+        source: str = "nacional",
         format: str = "text",
     ) -> str:
         """
@@ -23,13 +24,14 @@ def register_search_organizations_tool(mcp: FastMCP) -> None:
             query: Optional search term (e.g. "salud", "SRI", "INEC")
             page: Page number (1-based, default: 1)
             page_size: Results per page (default: 20, max: 100)
+            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
             format: text | json
         """
         page_size = min(max(page_size, 1), 100)
         offset = (max(page, 1) - 1) * page_size
         try:
             orgs = await ckan_client.list_organizations(
-                query=query, limit=page_size, offset=offset
+                query=query, limit=page_size, offset=offset, source=source
             )
         except Exception as e:
             return render_output(

@@ -87,7 +87,9 @@ def _format_size(size: int | None) -> str:
 def register_list_dataset_resources_tool(mcp: FastMCP) -> None:
     @mcp.tool()
     @log_tool
-    async def list_dataset_resources(dataset_id: str, format: str = "text") -> str:
+    async def list_dataset_resources(
+        dataset_id: str, source: str = "nacional", format: str = "text"
+    ) -> str:
         """
         List all resources (files) in a dataset with their metadata.
 
@@ -105,10 +107,11 @@ def register_list_dataset_resources_tool(mcp: FastMCP) -> None:
 
         Args:
             dataset_id: The dataset ID or slug
+            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
             format: text | json
         """
         try:
-            dataset = await ckan_client.get_dataset(dataset_id)
+            dataset = await ckan_client.get_dataset(dataset_id, source=source)
         except Exception as e:
             return render_output(
                 {"error": str(e)},

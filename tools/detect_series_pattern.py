@@ -195,6 +195,7 @@ def register_detect_series_pattern_tool(mcp: FastMCP) -> None:
         dataset_id: str,
         resource_id_new: str | None = None,
         resource_id_old: str | None = None,
+        source: str = "nacional",
         format: str = "text",
     ) -> str:
         """
@@ -220,6 +221,7 @@ def register_detect_series_pattern_tool(mcp: FastMCP) -> None:
             resource_id_old: Optional -- older resource ID to compare (auto-detected
                 if omitted). Both resource_id_new/resource_id_old must be given
                 together, or neither.
+            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
             format: text | json
         """
         if bool(resource_id_new) != bool(resource_id_old):
@@ -236,8 +238,12 @@ def register_detect_series_pattern_tool(mcp: FastMCP) -> None:
         try:
             if resource_id_new and resource_id_old:
                 try:
-                    res_new = await ckan_client.get_resource(resource_id_new, session=session)
-                    res_old = await ckan_client.get_resource(resource_id_old, session=session)
+                    res_new = await ckan_client.get_resource(
+                        resource_id_new, source=source, session=session
+                    )
+                    res_old = await ckan_client.get_resource(
+                        resource_id_old, source=source, session=session
+                    )
                 except Exception as e:
                     return render_output(
                         {"error": str(e)},
@@ -246,7 +252,9 @@ def register_detect_series_pattern_tool(mcp: FastMCP) -> None:
                     )
             else:
                 try:
-                    dataset = await ckan_client.get_dataset(dataset_id, session=session)
+                    dataset = await ckan_client.get_dataset(
+                        dataset_id, source=source, session=session
+                    )
                 except Exception as e:
                     return render_output(
                         {"error": str(e)},

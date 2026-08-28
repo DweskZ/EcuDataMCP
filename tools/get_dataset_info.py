@@ -1,7 +1,7 @@
 import httpx
 from mcp.server.fastmcp import FastMCP
 
-from helpers import ckan_client, env_config
+from helpers import ckan_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
@@ -9,7 +9,9 @@ from helpers.logging import log_tool
 def register_get_dataset_info_tool(mcp: FastMCP) -> None:
     @mcp.tool()
     @log_tool
-    async def get_dataset_info(dataset_id: str, format: str = "text") -> str:
+    async def get_dataset_info(
+        dataset_id: str, source: str = "nacional", format: str = "text"
+    ) -> str:
         """
         Get detailed metadata about a specific dataset from Ecuador's open data portal.
 
@@ -20,10 +22,11 @@ def register_get_dataset_info_tool(mcp: FastMCP) -> None:
 
         Args:
             dataset_id: The dataset ID or slug (e.g. "registro-estadistico-de-recursos-y-actividades-de-salud-2019")
+            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
             format: text | json
         """
         try:
-            data = await ckan_client.get_dataset(dataset_id)
+            data = await ckan_client.get_dataset(dataset_id, source=source)
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
                 return render_output(
@@ -45,7 +48,7 @@ def register_get_dataset_info_tool(mcp: FastMCP) -> None:
                 text_builder=lambda d: f"Error: {d['error']}",
             )
 
-        site = env_config.get_base_url("ckan_site").rstrip("/")
+        site = ckan_client.site_url(source).rstrip("/")
         slug = data.get("name", "")
         resources = data.get("resources") or []
         extras = {

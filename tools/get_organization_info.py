@@ -1,6 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 
-from helpers import ckan_client, env_config
+from helpers import ckan_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
@@ -9,7 +9,7 @@ def register_get_organization_info_tool(mcp: FastMCP) -> None:
     @mcp.tool()
     @log_tool
     async def get_organization_info(
-        organization_id: str, format: str = "text"
+        organization_id: str, source: str = "nacional", format: str = "text"
     ) -> str:
         """
         Get detailed information about a public institution and its published datasets.
@@ -18,10 +18,11 @@ def register_get_organization_info_tool(mcp: FastMCP) -> None:
 
         Args:
             organization_id: The organization slug (e.g. "sri-servicio-de-rentas-internas")
+            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
             format: text | json
         """
         try:
-            org = await ckan_client.get_organization(organization_id)
+            org = await ckan_client.get_organization(organization_id, source=source)
         except Exception as e:
             return render_output(
                 {"error": str(e), "organization_id": organization_id},
@@ -29,7 +30,7 @@ def register_get_organization_info_tool(mcp: FastMCP) -> None:
                 text_builder=lambda d: f"Error: {d['error']}",
             )
 
-        site = env_config.get_base_url("ckan_site")
+        site = ckan_client.site_url(source)
         datasets = org.get("packages") or []
         payload = {
             "name": org.get("name"),

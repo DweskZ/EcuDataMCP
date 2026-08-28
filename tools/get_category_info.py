@@ -1,7 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 
 from helpers import ckan_client
-from helpers.env_config import get_base_url
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
@@ -12,6 +11,7 @@ def register_get_category_info_tool(mcp: FastMCP) -> None:
     async def get_category_info(
         category: str,
         include_datasets: bool = True,
+        source: str = "nacional",
         format: str = "text",
     ) -> str:
         """
@@ -23,11 +23,12 @@ def register_get_category_info_tool(mcp: FastMCP) -> None:
         Args:
             category: Category slug/name from list_categories
             include_datasets: Include sample datasets in the category (default True)
+            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
             format: text | json
         """
         try:
             group = await ckan_client.get_group(
-                category, include_datasets=include_datasets
+                category, include_datasets=include_datasets, source=source
             )
         except Exception as e:
             return render_output(
@@ -40,7 +41,7 @@ def register_get_category_info_tool(mcp: FastMCP) -> None:
 
         title = group.get("title") or group.get("display_name") or category
         name = group.get("name", category)
-        site = get_base_url("ckan_site").rstrip("/")
+        site = ckan_client.site_url(source).rstrip("/")
         packages = group.get("packages") or []
         payload = {
             "name": name,

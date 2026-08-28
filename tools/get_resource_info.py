@@ -1,7 +1,7 @@
 import httpx
 from mcp.server.fastmcp import FastMCP
 
-from helpers import ckan_client, env_config
+from helpers import ckan_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
@@ -21,7 +21,9 @@ def _format_size(size: int | None) -> str:
 def register_get_resource_info_tool(mcp: FastMCP) -> None:
     @mcp.tool()
     @log_tool
-    async def get_resource_info(resource_id: str, format: str = "text") -> str:
+    async def get_resource_info(
+        resource_id: str, source: str = "nacional", format: str = "text"
+    ) -> str:
         """
         Get detailed information about a specific resource (file) from Ecuador's open data portal.
 
@@ -30,10 +32,11 @@ def register_get_resource_info_tool(mcp: FastMCP) -> None:
 
         Args:
             resource_id: The resource UUID
+            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
             format: text | json
         """
         try:
-            res = await ckan_client.get_resource(resource_id)
+            res = await ckan_client.get_resource(resource_id, source=source)
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
                 return render_output(
@@ -55,7 +58,7 @@ def register_get_resource_info_tool(mcp: FastMCP) -> None:
                 text_builder=lambda d: f"Error: {d['error']}",
             )
 
-        site = env_config.get_base_url("ckan_site")
+        site = ckan_client.site_url(source)
         name = res.get("name") or res.get("description") or "Sin título"
         package_id = res.get("package_id")
         payload = {

@@ -19,6 +19,7 @@ def register_query_resource_data_tool(mcp: FastMCP) -> None:
         rows: int = 20,
         offset: int = 0,
         sort: str = "",
+        source: str = "nacional",
         format: str = "text",
     ) -> str:
         """
@@ -36,6 +37,7 @@ def register_query_resource_data_tool(mcp: FastMCP) -> None:
             rows: Number of records to return (default 20, max 100)
             offset: Pagination offset (default 0)
             sort: Optional sort expression, e.g. "anio desc"
+            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
             format: text | json
         """
         rows = min(max(rows, 1), 100)
@@ -71,6 +73,7 @@ def register_query_resource_data_tool(mcp: FastMCP) -> None:
                 limit=rows,
                 offset=offset,
                 sort=sort,
+                source=source,
             )
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:

@@ -170,7 +170,7 @@ async def test_classifies_acumulado_when_newer_file_covers_older_periods(monkeyp
     res_new = _resource("pagos_junio.csv", "https://x/junio.csv")
     res_old = _resource("pagos_mayo.csv", "https://x/mayo.csv")
 
-    async def fake_get_resource(resource_id, session=None):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
         return res_new if resource_id == "pagos_junio.csv" else res_old
 
     async def fake_fetch_table(res, session):
@@ -208,7 +208,7 @@ async def test_classifies_incremental_when_periods_dont_overlap(monkeypatch):
     res_new = _resource("semana_26.csv", "https://x/26.csv")
     res_old = _resource("semana_25.csv", "https://x/25.csv")
 
-    async def fake_get_resource(resource_id, session=None):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
         return res_new if resource_id == "semana_26.csv" else res_old
 
     async def fake_fetch_table(res, session):
@@ -244,7 +244,7 @@ async def test_classifies_indeterminado_without_period_column(monkeypatch):
     res_new = _resource("a.csv", "https://x/a.csv")
     res_old = _resource("b.csv", "https://x/b.csv")
 
-    async def fake_get_resource(resource_id, session=None):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
         return res_new if resource_id == "a.csv" else res_old
 
     async def fake_fetch_table(res, session):
@@ -276,7 +276,7 @@ async def test_flags_schema_mismatch_instead_of_misreading_as_incremental(monkey
     res_new = _resource("pagos_junio.csv", "https://x/junio.csv")
     res_old = _resource("pagos_mayo.csv", "https://x/mayo.csv")
 
-    async def fake_get_resource(resource_id, session=None):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
         return res_new if resource_id == "pagos_junio.csv" else res_old
 
     async def fake_fetch_table(res, session):
@@ -348,7 +348,7 @@ async def test_autodetects_pair_from_dataset_when_no_ids_given(monkeypatch):
         },
     ]
 
-    async def fake_get_dataset(dataset_id, session=None):
+    async def fake_get_dataset(dataset_id, source="nacional", session=None):
         return {"resources": resources}
 
     async def fake_fetch_table(res, session):
@@ -370,7 +370,7 @@ async def test_autodetects_pair_from_dataset_when_no_ids_given(monkeypatch):
 
 
 async def test_no_series_detected_without_ids(monkeypatch):
-    async def fake_get_dataset(dataset_id, session=None):
+    async def fake_get_dataset(dataset_id, source="nacional", session=None):
         return {"resources": [{"id": "r1", "name": "unico.csv"}]}
 
     monkeypatch.setattr(ckan_client, "get_dataset", fake_get_dataset)

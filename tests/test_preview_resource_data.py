@@ -97,7 +97,7 @@ def test_classify_from_content_type_unknown_or_missing():
 
 
 async def test_sri_tar_gz_declared_csv_is_routed_to_targz_parser(monkeypatch):
-    async def fake_get_resource(resource_id, session=None):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
         return {
             "url": "https://sri.example/sri_activos_2025.tar.gz",
             "format": "CSV",
@@ -132,7 +132,7 @@ async def test_sri_tar_gz_declared_csv_is_routed_to_targz_parser(monkeypatch):
 
 
 async def test_zip_declared_csv_is_routed_to_zip_parser(monkeypatch):
-    async def fake_get_resource(resource_id, session=None):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
         return {
             "url": "https://x/precios_cacao.zip",
             "format": "CSV",
@@ -167,7 +167,7 @@ async def test_zip_declared_csv_is_routed_to_zip_parser(monkeypatch):
 
 
 async def test_mpceip_xlsx_declared_csv_is_routed_to_xlsx_parser(monkeypatch):
-    async def fake_get_resource(resource_id, session=None):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
         return {
             "url": "https://mpceip.example/precios_cacao.xlsx",
             "format": "CSV",
@@ -199,7 +199,7 @@ async def test_mpceip_xlsx_declared_csv_is_routed_to_xlsx_parser(monkeypatch):
 
 
 async def test_rar_message_does_not_overclaim_unrar_requirement(monkeypatch):
-    async def fake_get_resource(resource_id, session=None):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
         return {"url": "https://x/archivo.rar", "format": "RAR", "name": "Archivo"}
 
     monkeypatch.setattr(ckan_client, "get_resource", fake_get_resource)
@@ -211,7 +211,7 @@ async def test_rar_message_does_not_overclaim_unrar_requirement(monkeypatch):
 
 
 async def test_xls_is_routed_to_xls_parser(monkeypatch):
-    async def fake_get_resource(resource_id, session=None):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
         return {"url": "https://x/reporte.xls", "format": "XLS", "name": "Reporte"}
 
     calls = []
@@ -240,7 +240,7 @@ async def test_xls_is_routed_to_xls_parser(monkeypatch):
 
 
 async def test_resource_not_found_returns_error(monkeypatch):
-    async def fake_get_resource(resource_id, session=None):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
         request = httpx.Request("GET", "https://x/resource_show")
         response = httpx.Response(404, request=request)
         raise httpx.HTTPStatusError("not found", request=request, response=response)
@@ -254,7 +254,7 @@ async def test_resource_not_found_returns_error(monkeypatch):
 
 
 async def test_resource_without_url_returns_error(monkeypatch):
-    async def fake_get_resource(resource_id, session=None):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
         return {"format": "CSV", "name": "Sin URL"}
 
     monkeypatch.setattr(ckan_client, "get_resource", fake_get_resource)
@@ -269,7 +269,7 @@ async def test_resource_without_url_returns_error(monkeypatch):
 
 
 async def test_extensionless_resource_is_routed_via_sniffed_content_type(monkeypatch):
-    async def fake_get_resource(resource_id, session=None):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
         return {
             "url": "https://x/download?id=123",
             "format": "PDF",
@@ -305,7 +305,7 @@ async def test_extensionless_resource_is_routed_via_sniffed_content_type(monkeyp
 
 
 async def test_extensionless_resource_falls_back_when_sniff_is_inconclusive(monkeypatch):
-    async def fake_get_resource(resource_id, session=None):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
         return {
             "url": "https://x/download?id=123",
             "format": "PDF",

@@ -93,6 +93,7 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
     async def preview_resource_data(
         resource_id: str,
         rows: int = 20,
+        source: str = "nacional",
         format: str = "text",
     ) -> str:
         """
@@ -109,12 +110,13 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
         Args:
             resource_id: The resource UUID (get it from list_dataset_resources)
             rows: Number of data rows to preview (default: 20, max: 100)
+            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
             format: text | json
         """
         rows = min(max(rows, 1), 100)
 
         try:
-            res = await ckan_client.get_resource(resource_id)
+            res = await ckan_client.get_resource(resource_id, source=source)
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
                 return render_output(

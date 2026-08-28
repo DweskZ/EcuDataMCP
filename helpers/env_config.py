@@ -9,6 +9,8 @@ _API_URLS = {
     "sercop_site": "https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/",
     "anda": "https://anda.inec.gob.ec/anda5/index.php/api/",
     "anda_site": "https://anda.inec.gob.ec/anda5/",
+    "cuenca": "https://cuencaendatos.cuenca.gob.ec/api/3/action/",
+    "cuenca_site": "https://cuencaendatos.cuenca.gob.ec/",
 }
 
 _ENV_OVERRIDES = {
@@ -20,6 +22,8 @@ _ENV_OVERRIDES = {
     "sercop_site": "SERCOP_SITE_URL",
     "anda": "ANDA_API_URL",
     "anda_site": "ANDA_SITE_URL",
+    "cuenca": "CUENCA_API_URL",
+    "cuenca_site": "CUENCA_SITE_URL",
 }
 
 

@@ -12,7 +12,9 @@ from helpers.logging import log_tool
 def register_download_resource_tool(mcp: FastMCP) -> None:
     @mcp.tool()
     @log_tool
-    async def download_resource(resource_id: str, format: str = "text") -> str:
+    async def download_resource(
+        resource_id: str, source: str = "nacional", format: str = "text"
+    ) -> str:
         """
         Download a resource's raw bytes from Ecuador's open data portal, base64-encoded.
 
@@ -29,11 +31,12 @@ def register_download_resource_tool(mcp: FastMCP) -> None:
 
         Args:
             resource_id: The resource UUID (get it from list_dataset_resources)
+            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
             format: text | json (json includes content_base64; use this to
                 actually retrieve the file)
         """
         try:
-            res = await ckan_client.get_resource(resource_id)
+            res = await ckan_client.get_resource(resource_id, source=source)
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
                 return render_output(

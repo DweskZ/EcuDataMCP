@@ -19,7 +19,7 @@ def _make_tool():
 def _mock_resource(
     monkeypatch, *, url="https://x/archivo.rar", fmt="RAR", name="Archivo"
 ):
-    async def fake_get_resource(resource_id, session=None):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
         return {"url": url, "format": fmt, "name": name}
 
     monkeypatch.setattr(ckan_client, "get_resource", fake_get_resource)
@@ -61,7 +61,7 @@ async def test_text_format_does_not_leak_base64_and_points_to_json(monkeypatch):
 
 
 async def test_resource_not_found(monkeypatch):
-    async def fake_get_resource(resource_id, session=None):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
         request = httpx.Request("GET", "https://x/resource_show")
         response = httpx.Response(404, request=request)
         raise httpx.HTTPStatusError("not found", request=request, response=response)
@@ -75,7 +75,7 @@ async def test_resource_not_found(monkeypatch):
 
 
 async def test_resource_without_url(monkeypatch):
-    async def fake_get_resource(resource_id, session=None):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
         return {"format": "RAR", "name": "Sin URL"}
 
     monkeypatch.setattr(ckan_client, "get_resource", fake_get_resource)

@@ -36,6 +36,18 @@ def register_catalog_resources(mcp: FastMCP) -> None:
                     ],
                 },
                 {
+                    "id": "cuenca",
+                    "nombre": "Cuenca en Datos (portal municipal CKAN, independiente del nacional)",
+                    "base": "https://cuencaendatos.cuenca.gob.ec/",
+                    "tools": (
+                        "Mismos tools CKAN de arriba con source='cuenca' "
+                        "(search_datasets, get_dataset_info, list_dataset_resources, "
+                        "preview_resource_data, download_resource, query_resource_data, "
+                        "search_organizations, get_organization_info, list_categories, "
+                        "get_category_info)"
+                    ),
+                },
+                {
                     "id": "sri",
                     "nombre": "SRI Datasets (fuera del portal CKAN)",
                     "base": "https://www.sri.gob.ec/datasets",

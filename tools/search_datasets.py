@@ -1,6 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 
-from helpers import ckan_client, env_config
+from helpers import ckan_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
@@ -13,6 +13,7 @@ def register_search_datasets_tool(mcp: FastMCP) -> None:
         page: int = 1,
         page_size: int = 20,
         category: str = "",
+        source: str = "nacional",
         format: str = "text",
     ) -> str:
         """
@@ -29,12 +30,15 @@ def register_search_datasets_tool(mcp: FastMCP) -> None:
             page_size: Results per page (default: 20, max: 100)
             category: Optional category filter (e.g. "sal" for Salud, "edu" for Educación).
                       Use list_categories to see all available categories.
+            source: "nacional" (www.datosabiertos.gob.ec, default) or "cuenca"
+                    (cuencaendatos.cuenca.gob.ec, the Cuenca municipal open-data
+                    portal — a separate, smaller CKAN catalog)
             format: text | json
         """
         start = (max(page, 1) - 1) * page_size
         try:
             result = await ckan_client.search_datasets(
-                query=query, rows=page_size, start=start, category=category
+                query=query, rows=page_size, start=start, category=category, source=source
             )
         except Exception as e:
             return render_output(
@@ -45,7 +49,7 @@ def register_search_datasets_tool(mcp: FastMCP) -> None:
 
         datasets = result.get("results", [])
         total = result.get("count", 0)
-        site = env_config.get_base_url("ckan_site").rstrip("/")
+        site = ckan_client.site_url(source).rstrip("/")
         payload = {
             "query": query,
             "total": total,

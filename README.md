@@ -55,6 +55,7 @@ Este MCP unifica **fuentes gubernamentales** en un solo servidor:
 | Fuente | Datos | Cobertura |
 |--------|-------|-----------|
 | **Datos Abiertos** (CKAN) | Catálogo nacional + DataStore + preview CSV/JSON/XLSX | www.datosabiertos.gob.ec |
+| **Cuenca en Datos** (CKAN) | Portal municipal independiente (92 datasets); mismos tools con `source="cuenca"` | cuencaendatos.cuenca.gob.ec |
 | **SRI Datasets** | ~130 archivos (CSV/XLSX/ZIP) fuera del portal CKAN: RUC por provincia, recaudación, ventas/compras, vehículos, CEL | www.sri.gob.ec/datasets |
 | **Trámites e instituciones** (Gob.ec) | Procedimientos, requisitos, costos | gob.ec/api/v1 |
 | **Regulaciones** (Gob.ec) | Normas, acuerdos, Registro Oficial | gob.ec/api/v1/regulaciones |
@@ -295,9 +296,15 @@ Casi todos los tools aceptan `format="json"` además de texto.
 | `list_dataset_resources` | Listar todos los archivos (recursos) de un dataset con formato, tamaño, URL y fechas de creación/modificación. |
 | `get_resource_info` | Información detallada de un archivo específico. |
 | `preview_resource_data` | Preview de CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX) o `.tar.gz`/`.zip` (si envuelven un CSV/TSV/TXT) como tabla (máx. 5 MB). |
-| `download_resource` | Baja el archivo crudo de un recurso en base64 (máx. 5 MB) — para formatos que no se pueden previsualizar como tabla (`.rar`, etc.). Usa `format="json"` para recibir `content_base64`. |
+| `download_resource` | Baja el archivo crudo de un recurso en base64 (máx. 5 MB) — para formatos que no se pueden previsualizar como tabla (`.rar`, `.ods`, etc.). Usa `format="json"` para recibir `content_base64`. |
 | `query_resource_data` | Consulta tabular vía CKAN DataStore (filtros, texto, paginación) sin descargar el archivo. |
+| `detect_series_pattern` | Para datasets que publican un archivo por período (semanal/mensual): compara los dos más recientes y determina si cada archivo nuevo reemplaza a los anteriores (`acumulado`) o los complementa (`incremental`), en vez de tener que adivinar antes de sumar/comparar valores entre archivos. |
 | `search_sri_datasets` | Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN (sri.gob.ec/datasets): catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables. |
+
+Todos los tools CKAN de esta sección y de "Exploración" más abajo (`search_organizations`,
+`get_organization_info`, `list_categories`, `get_category_info`) aceptan `source="nacional"`
+(default, www.datosabiertos.gob.ec) o `source="cuenca"` (cuencaendatos.cuenca.gob.ec, portal
+municipal independiente, 92 datasets) — mismo tool, otro catálogo CKAN.
 
 ### Trámites Gubernamentales
 

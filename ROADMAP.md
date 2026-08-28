@@ -77,8 +77,35 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       un portal de verificación de títulos aparte, todavía sin identificar
       — pendiente investigar específicamente eso, ya que el CKAN no lo
       resuelve.
-- [ ] **Cuenca en Datos** (`https://cuencaendatos.cuenca.gob.ec`) — CKAN 2.9.6,
-      92 datasets, portal municipal independiente del nacional. Sin probar.
+- [x] **Cuenca en Datos** (`https://cuencaendatos.cuenca.gob.ec`) — **hecho
+      2026-08-28.** Verificado en vivo: CKAN 2.9.6, 92 datasets, 13
+      categorías temáticas, un solo publicador (GAD Municipal del cantón
+      Cuenca). Mismo shape de API que el portal nacional
+      (`package_search`/`package_show`/`resource_show`/...), así que en vez
+      de un cliente/tools nuevos y paralelos, los ~10 tools CKAN genéricos
+      (`search_datasets`, `list_recent_datasets`, `get_dataset_info`,
+      `list_dataset_resources`, `get_resource_info`, `preview_resource_data`,
+      `download_resource`, `query_resource_data`, `search_organizations`,
+      `get_organization_info`, `list_categories`, `get_category_info`, y
+      `detect_series_pattern`) ahora aceptan `source="nacional"|"cuenca"`.
+      `helpers/ckan_client.py` resuelve la URL base según `source`
+      (`_resolve_source`/`_ckan_url`/`site_url`, nuevos), con caché de
+      categorías separada por fuente (`group_list:{source}`) para no
+      mezclar las categorías de ambos portales. Nuevas variables de entorno
+      opcionales `CUENCA_API_URL`/`CUENCA_SITE_URL`.
+      Verificado en vivo end-to-end: `search_datasets`, `list_categories`,
+      `search_organizations`, `get_dataset_info`, `list_dataset_resources`,
+      `get_resource_info` y `preview_resource_data` (CSV real: actas de
+      sesiones del Concejo Cantonal) devuelven datos correctos contra
+      `source="cuenca"`; confirmado también que una búsqueda `source`
+      nacional no encuentra contenido específico de Cuenca (los catálogos
+      están genuinamente separados, no es un fallback silencioso). **Gap
+      encontrado, no resuelto:** varios recursos de Cuenca son `.ods`
+      (OpenDocument spreadsheet) — `preview_resource_data` no lo soporta
+      como tabla (degrada con gracia al mensaje de formato no soportado,
+      apuntando a `download_resource`, no truena). Soporte `.ods` queda
+      pendiente si el volumen de casos lo justifica, mismo criterio que
+      `.rar`.
 - [ ] **Sitios de ministerios individuales** — sin alcance definido; falta
       decidir cuáles justifican una conexión propia en vez de depender del
       portal CKAN central.
