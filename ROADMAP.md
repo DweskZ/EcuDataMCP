@@ -948,6 +948,41 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
         e IPCO de INEC) — CAMICON aparece citando/analizando esos datos,
         no publicándolos como fuente primaria propia. No se encontró
         una sección de estadísticas/descargas en su sitio.
+- [ ] **Recaudación arancelaria/tributos aduaneros — investigado a fondo
+      2026-08-29,** pedido explícito de Daniel de profundizar en Aduana
+      específicamente para ingresos por aranceles. **Dos fuentes reales,
+      con un matiz importante entre ellas:**
+      - **`aduana.gob.ec/de-interes/tributos-recaudados/`** — página
+        propia de SENAE, acordeón con el mismo patrón WordPress
+        `download-monitor` ya confirmado en otros sitios. Desglosa por
+        **ADVALOREM** (el arancel propiamente dicho), **FODINFA**, IVA,
+        ICE, OTROS, y TOTALES — 60 archivos Excel reales confirmados
+        (descargado uno: ADVALOREM 2020, 67 KB real). **Pero está
+        desactualizada: solo cubre 2012-2021**, nada más reciente (mismo
+        patrón de abandono ya visto en la página de boletines de
+        comercio exterior de Producción). La página propia de "Rendición
+        de Cuentas 2024" de SENAE existe pero está vacía, sin informe
+        adjunto.
+      - **Ministerio de Economía y Finanzas (ahora bajo MDEP) — la
+        fuente realmente vigente.** `finanzas.gob.ec/estadistica-nueva-
+        metodologia-2017-2022/` (URL vieja, contenido real dice "2013 –
+        2026") tiene un archivo Excel real y **actualizado mensualmente
+        hasta mayo 2026** ("Operaciones de Ingresos y Gastos SPNF
+        2013-2026", descargado y confirmado real, 2.4 MB), con la
+        metodología GFSM del FMI (misma que usa el BCE en su IEM). En
+        la hoja "GC" (Gobierno Central), fila `1214 Arancelarios`
+        (dentro de `121 Ingresos tributarios`), **serie anual completa
+        2013-2025 más desglose trimestral**: 2023 = USD 1,180.4M, 2024
+        = USD 1,117.3M, 2025 = USD 1,231.4M. **Ojo con la diferencia de
+        alcance:** esta cifra ("Arancelarios") es *solo* el arancel/
+        derecho aduanero propiamente dicho — más chica que los ~USD
+        3,776M que cita la prensa para "recaudación aduanera" 2024,
+        porque esa cifra de prensa (y la de SENAE) suma también IVA e
+        ICE cobrados en frontera, no solo el arancel. Para "ingresos por
+        aranceles" en sentido estricto, la cifra de Finanzas es la
+        correcta; para "todo lo que recauda Aduana" (arancel + IVA +
+        ICE + FODINFA + otros), la serie histórica de SENAE (aunque
+        desactualizada) tiene el desglose completo por tipo.
 - [x] **Registro Civil y datos demográficos/salud — revisado 2026-08-29,
       cobertura ya sólida, sin gaps encontrados.** `organization=registro-civil`
       en CKAN, 6 datasets reales (transacciones de cedulación, pasaportes
