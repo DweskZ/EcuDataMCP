@@ -1,4 +1,4 @@
-FROM python:3.13-slim
+FROM python:3.14-slim
 
 # Runs as this instead of root -- the server only reads outbound HTTP and
 # holds in-memory caches, no reason for it to run with root's filesystem
