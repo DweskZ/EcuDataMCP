@@ -253,6 +253,21 @@ ambientales/de residuos, vale la pena un scraper puntual y chico para esas
 construirlo ya no es "requiere investigación de sesión aparte" como se dijo
 antes, es conocido y acotado (~4 pasos de postback JSF por archivo).
 
+**Construido 2026-08-29 (pedido de Daniel: versión "targeted", con aviso de
+búsqueda manual si no se encuentra):** en vez de ese scraper de sesión,
+`helpers/biinec_extras.py` + `helpers/data/biinec_extras.json` +
+`search_biinec_extras` — una lista pequeña y verificada a mano (sin llamada
+HTTP, mismo patrón que `lookup_ubicacion`/`geo_data.py`) con los 3 registros
+confirmados como exclusivos. Costo real de la alternativa completa vs. esto:
+la versión JSF completa hubiera sido varios días de trabajo frágil (IDs de
+componente PrimeFaces generados por fila, sesión con cookies, 5 POSTs
+encadenados por archivo) para desbloquear ~3 datasets de bajo tráfico (119
+descargas/año el más grande) que nadie ha pedido todavía — la versión
+curada cuesta una fracción de eso y dice explícitamente "no encontrado en
+este conjunto pequeño, busca manualmente" en vez de fingir cobertura
+completa. `buscar_inec` (prompt) ahora llama a este tool en su paso 3 en vez
+de solo mencionar BIINEC en prosa.
+
 **Corrección 2026-08-28:** una conclusión anterior el mismo día ("callejón
 sin salida") era falsa. El primer pase entró por
 `ecuadorencifras.gob.ec/institucional/home/` (un subsitio institucional

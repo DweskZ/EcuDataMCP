@@ -1,0 +1,32 @@
+[
+  {
+    "nombre": "Módulo de Desechos Peligrosos en Establecimientos de Salud – Registro Administrativo de Salud",
+    "rama": "Ambiente y Otras Estadísticas",
+    "categoria": "Ambiente",
+    "descripcion": "Registro administrativo sobre generación y manejo de desechos peligrosos en establecimientos de salud. No está en ANDA ni en las páginas de tema de ecuadorencifras.gob.ec/estadisticas/.",
+    "anios_vistos": ["2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020"],
+    "formatos_confirmados": ["SPSS", "Tabulados y series históricas (XLSX)", "Formularios (PDF)"],
+    "verificado": "2026-08-29: año 2020 confirmado con archivos reales (SPSS 703 KB, tabulados 185 KB, formularios 685 KB) y 119 descargas ese año."
+  },
+  {
+    "nombre": "Información Ambiental en Hogares – Encuesta Nacional de Empleo, Desempleo y Subempleo (ENEMDU)",
+    "rama": "Ambiente y Otras Estadísticas",
+    "categoria": "Ambiente",
+    "descripcion": "Módulo ambiental anexo a la ENEMDU. No aparece como entidad propia en ANDA ni en /estadisticas/.",
+    "anios_vistos": [
+      "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2018", "2019",
+      "2022", "2023", "2024", "2025"
+    ],
+    "formatos_confirmados": [],
+    "verificado": "2026-08-29: existencia y años confirmados vía el desplegable de año; contenido de archivos no confirmado (no se expandió el período)."
+  },
+  {
+    "nombre": "Información Ambiental en Hogares – Encuesta de Condiciones de Vida (ECV)",
+    "rama": "Ambiente y Otras Estadísticas",
+    "categoria": "Ambiente",
+    "descripcion": "Módulo ambiental anexo a la ECV. No aparece como entidad propia en ANDA ni en /estadisticas/.",
+    "anios_vistos": ["2014"],
+    "formatos_confirmados": [],
+    "verificado": "2026-08-29: existencia y año confirmados vía el desplegable de año; contenido de archivos no confirmado."
+  }
+]

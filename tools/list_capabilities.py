@@ -5,7 +5,7 @@ from helpers.logging import log_tool
 
 _CAPABILITIES = {
     "name": "Ecuador MCP",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "fuentes": [
         "CKAN datos abiertos (nacional, www.datosabiertos.gob.ec)",
         (
@@ -18,6 +18,7 @@ _CAPABILITIES = {
         "IG-EPN Instituto Geofísico (sismos)",
         "DPA provincias/cantones/parroquias (offline INEC)",
         "ANDA (NADA/IHSN) catálogo de encuestas y censos del INEC",
+        "Ecuador en Cifras (INEC): boletines/metodología/series históricas por tema",
         "BCE (BCEData) catálogo estadístico: monetario, fiscal, externo, real",
         "Supercías directorio de compañías",
         "Supercías registro de auditores externos autorizados",
@@ -26,7 +27,7 @@ _CAPABILITIES = {
     "entrada": [
         "list_capabilities",
         "search_ecuador",
-        "prompts: explorar_datos / consultar_tramite / investigar_contrato / buscar_regulacion / monitorear_riesgos",
+        "prompts: explorar_datos / consultar_tramite / investigar_contrato / buscar_regulacion / buscar_inec / monitorear_riesgos",
     ],
     "tools_clave": {
         "datos": [
@@ -48,6 +49,11 @@ _CAPABILITIES = {
         "riesgos": ["search_eventos_riesgo", "list_sat_tsunami", "search_sismos"],
         "geo": ["lookup_ubicacion"],
         "encuestas": ["search_anda", "get_anda_survey_info", "download_anda_microdata"],
+        "inec_estadisticas": [
+            "search_inec_estadisticas",
+            "get_inec_estadistica_files",
+            "search_biinec_extras",
+        ],
         "macro": ["search_indicadores_bce", "get_indicador_bce"],
         "companias": [
             "search_companias",
@@ -77,8 +83,16 @@ _CAPABILITIES = {
         (
             "search_indicadores_bce: primer uso tras expirar el caché (24h) "
             "puede tardar ~10-15s (arma el índice de búsqueda sobre ~78 "
-            "grupos); no cubre inflación (CPI) ni pobreza de Ecuador, eso es "
-            "INEC vía search_anda"
+            "grupos); no cubre inflación (CPI) ni pobreza de Ecuador — eso es "
+            "INEC: search_anda para metadata/microdatos, "
+            "search_inec_estadisticas para el boletín y la serie histórica "
+            "real de índices como el IPC (ANDA los cataloga sin microdatos)"
+        ),
+        (
+            "search_biinec_extras no busca en vivo dentro de BIINEC "
+            "(aplicaciones3.ecuadorencifras.gob.ec) — es una lista pequeña y "
+            "verificada a mano de los pocos registros confirmados exclusivos "
+            "ahí; sin resultado no implica que BIINEC no tenga el dato"
         ),
         (
             "search_companias/get_compania_info: primer uso tras expirar el "

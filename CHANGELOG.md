@@ -2,7 +2,22 @@
 
 ## Unreleased
 
+## 0.8.0 — 2026-08-29
+
 ### Added
+- **Nuevo tool `search_biinec_extras`** (`helpers/biinec_extras.py` +
+  `helpers/data/biinec_extras.json`): la versión "targeted" de BIINEC que sí
+  se justificaba construir. En vez de automatizar el flujo JSF completo
+  (5 postbacks con ViewState por archivo, sin URLs estáticas — ver análisis
+  de costo/beneficio abajo), es una lista pequeña y verificada a mano de los
+  3 registros confirmados como exclusivos de BIINEC (módulo de desechos
+  peligrosos en establecimientos de salud, módulos ambientales de
+  ENEMDU/ECV). Si la búsqueda no encuentra nada en esa lista, el tool lo dice
+  explícitamente y no lo confunde con "BIINEC no tiene el dato" — instruye
+  buscar directamente en el sitio. Mismo patrón que `lookup_ubicacion` /
+  `helpers/geo_data.py` (referencia offline, sin llamada HTTP). `buscar_inec`
+  actualizado para llamar a este tool en su paso 3 en vez de solo mencionar
+  BIINEC en prosa.
 - **Nuevo prompt `buscar_inec`** (`prompts/workflows.py`): guía al agente para
   recorrer las tres fuentes del INEC en el orden correcto — ANDA primero (el
   catálogo más amplio, y te dice si una operación es "solo agregados"),
