@@ -268,13 +268,23 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       recurso real de Cuenca en Datos (actas del Concejo Cantonal,
       `gadcuenca_actas_pm_2026julio.ods`): headers y filas correctos,
       tildes incluidas.
-- [~] **Soporte `.rar`** — todavía sin preview como tabla (necesitaría una
-      dependencia/backend externo para extracción RAR, p. ej. `rarfile` con
-      `unrar`/`unar`/7-Zip/`bsdtar`; puerta abierta si el volumen de casos
-      lo justifica). Mientras tanto, `preview_resource_data` señala el caso
-      explícitamente (`rar_no_soportado`) y ahora hay un tool nuevo,
-      `download_resource(resource_id, format="json")`, que baja el archivo
-      completo (base64, hasta 5 MB) para que se pueda usar fuera del MCP.
+- [x] **Soporte `.rar`** — **decidido en contra, 2026-08-28.** A diferencia
+      de CSV/XLS/XLSX/ODS/ZIP/TAR.GZ (todos parseables con una librería
+      Python pura sobre bytes en memoria), RAR usa compresión propietaria
+      sin decodificador Python — la única forma de abrirlo es invocar un
+      binario externo (`unrar`/`unar`/`bsdtar`) como subproceso sobre un
+      archivo descargado de una fuente no confiable. Eso es una categoría
+      de riesgo distinta a la que tiene el resto del proyecto, no solo más
+      código: una imagen Docker más pesada, una dependencia de sistema que
+      mantener, y superficie de ataque de un binario de extracción con
+      CVEs históricos reales, todo para un tool de solo-lectura. Se llegó a
+      implementar (`preview_rar` vía `rarfile`) y se revirtió antes de
+      mergear. `download_resource(resource_id, format="json")` ya cubre el
+      caso de uso real: baja el archivo `.rar` completo (base64, hasta
+      5 MB) para que se abra con las herramientas que ya tenga quien esté
+      usando el cliente MCP, sin correr nada en el servidor.
+      `preview_resource_data` sigue señalando el caso explícitamente
+      (`rar_no_soportado`) y apuntando a `download_resource`.
 - [x] **Recursos sin extensión** — hecho: cuando ni la extensión de URL ni el
       `format` declarado por CKAN son reconocibles, `preview_resource_data`
       hace un sniff best-effort del header HTTP `Content-Type`
