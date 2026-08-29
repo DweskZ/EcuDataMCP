@@ -73,6 +73,35 @@ y parseo tolerante del CSV.
 
 ### Ecuador en Cifras / portal BI del INEC
 
+**Construido 2026-08-29:** `helpers/inec_client.py` +
+`search_inec_estadisticas`/`get_inec_estadistica_files`. Confirmado en vivo
+que cada página de tema (~75 en total) es HTML plano de WordPress, sin JS —
+los links a boletín/metodología/series históricas están directamente en el
+HTML servido (`<a href=".../documentos/web-inec/.../archivo.pdf">`, a veces
+envolviendo solo un `<img>` de ícono, sin texto — por eso las etiquetas se
+derivan del nombre de archivo, no del texto del link).
+
+**Sin API ni sitemap de temas — se usa el menú de navegación en su lugar.**
+Cada página de tema trae embebido el mismo menú "mega-menu" de ~75 links
+(`<a class="mega-menu-link" href="...">Nombre</a>`), así que basta con
+descargar *cualquier* página de tema para extraer la lista completa; se
+usó la del IPC (`indice-de-precios-al-consumidor`) como semilla por ser un
+tema insignia poco probable de renombrarse. **Importante — ni la raíz del
+dominio ni `/estadisticas/` sirven para esto, confirmado en vivo:**
+- `https://www.ecuadorencifras.gob.ec/` sirve un shell de meta-refresh
+  (`<meta http-equiv="Refresh" content="0; url=.../institucional/home/">`)
+  cacheado por W3 Total Cache **desde 2021-06-16** — un `GET` plano (sin
+  navegador) nunca ve el sitio real, solo ese shell viejo.
+- `https://www.ecuadorencifras.gob.ec/estadisticas/` sirve una vista
+  Liferay completamente distinta y no relacionada (`generator 2018.1.1.386`,
+  clase `nojs`) — un navegador real termina mostrando el home moderno ahí
+  (probablemente por JS del lado del cliente), pero un `GET` plano solo ve
+  el shell viejo, igual que la raíz.
+- Las páginas de tema individuales (`/actividades-y-recursos-de-salud/`,
+  `/indice-de-precios-al-consumidor/`, etc.) sí son 100% reales y frescas
+  vía `GET` plano — el problema es específico de esas dos URLs "índice",
+  no del sitio en general.
+
 **Comparado contra ANDA, 2026-08-29 (pedido de Daniel: "analiza contra
 ANDA").** `/estadisticas/` no es redundante con ANDA (`helpers/anda_client.py`,
 ya construido) — son capas distintas de lo que publica el INEC:

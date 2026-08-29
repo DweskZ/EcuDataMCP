@@ -64,6 +64,7 @@ Este MCP unifica **fuentes gubernamentales** en un solo servidor:
 | **Sismos** (IG-EPN) | Catálogo sísmico del Instituto Geofísico | www.igepn.edu.ec |
 | **Geografía** (DPA) | 24 provincias + 224 cantones (códigos INEC) | referencia offline |
 | **ANDA** (NADA/IHSN) | Catálogo de encuestas y censos del INEC | anda.inec.gob.ec |
+| **Ecuador en Cifras** (INEC) | ~75 temas estadísticos: boletines, metodología y series históricas (IPC, ENEMDU, ENSANUT, pobreza, comercio exterior, censos...) | www.ecuadorencifras.gob.ec |
 | **BCE** (BCEData) | Catálogo estadístico completo: monetario/financiero, finanzas públicas, sector externo, sector real (PIB, empleo, confianza del consumidor) | contenido.bce.fin.ec |
 | **Supercías** | Directorio de compañías (226k+): representante legal, capital, CIIU | mercadodevalores.supercias.gob.ec |
 | **Supercías Ranking** | Financieros por balance (ingresos, activos, ROE, ~38 ratios), últimos años; requiere build local | appscvsmovil.supercias.gob.ec |
@@ -322,6 +323,13 @@ municipal independiente, 92 datasets) — mismo tool, otro catálogo CKAN.
 | `search_anda` | Buscar encuestas y censos en el catálogo ANDA del INEC (NADA/IHSN). Indica si cada encuesta tiene microdatos descargables. |
 | `get_anda_survey_info` | Metadata completa de una encuesta ANDA: resumen, variables, confidencialidad y contacto. |
 | `download_anda_microdata` | Links directos de descarga de los archivos de microdatos de una encuesta ANDA. |
+
+### Ecuador en Cifras (INEC)
+
+| Tool | Descripción |
+|------|-------------|
+| `search_inec_estadisticas` | Buscar temas estadísticos en ecuadorencifras.gob.ec (IPC, ENEMDU, ENSANUT, pobreza...). |
+| `get_inec_estadistica_files` | Links directos (boletín, metodología, series históricas) de un tema. |
 
 ### Macroeconomía (BCE)
 

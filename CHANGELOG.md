@@ -3,6 +3,26 @@
 ## Unreleased
 
 ### Added
+- **Nueva fuente: Ecuador en Cifras / INEC** (`helpers/inec_client.py` +
+  `search_inec_estadisticas` / `get_inec_estadistica_files`). Cubre las ~75
+  páginas de tema de `ecuadorencifras.gob.ec` (IPC, ENEMDU, ENSANUT,
+  pobreza, comercio exterior, censos...): boletín técnico, metodología y
+  series históricas completas en PDF/XLSX/CSV/ZIP, todo con links planos
+  sin JS. Complementa (no duplica) a `search_anda`: ANDA cataloga estas
+  mismas operaciones con metadata pero sin microdatos para el tipo
+  índice/agregado (el IPC, por ejemplo, aparece en ANDA como "solo
+  agregados" sin nada descargable) — este es el tool que sí tiene el
+  contenido real para ese caso. El listado de temas se obtiene del menú de
+  navegación embebido en cualquier página de tema (`mega-menu-link`); el
+  dominio raíz (`/`) y `/estadisticas/` no sirven como fuente — el primero
+  es un shell de redirección cacheado desde 2021, el segundo una vista
+  Liferay vieja no relacionada. **Verificado en vivo:** búsqueda por
+  "precios" y descarga de la página del IPC, con boletín técnico de julio
+  2026 y tabulados históricos en CSV/Excel reales. Ver RESEARCH.md §
+  Ecuador en Cifras. BIINEC (`aplicaciones3.../BIINEC-war`), la otra app
+  del INEC investigada en paralelo, se descartó como fuente separada por
+  solaparse con ANDA en microdatos y requerir sesión JSF más cara de
+  scrapear.
 - **Nuevo tool `read_pdf(url, pages)`**: extrae texto de un PDF en una URL
   directa, vía `pypdf` (pura Python). `pages` acepta un rango 1-indexado
   ("3", "1-5", "1,4,9"); vacío significa todo el documento, tope de 20
