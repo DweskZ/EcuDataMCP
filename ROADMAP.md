@@ -254,9 +254,79 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       encontrado y cerrado 2026-08-28:** varios recursos de Cuenca son
       `.ods` (OpenDocument spreadsheet) — ahora soportado, ver ítem `.ods`
       en "Formatos y tipos de recursos" más abajo.
-- [ ] **Sitios de ministerios individuales** — sin alcance definido; falta
-      decidir cuáles justifican una conexión propia en vez de depender del
-      portal CKAN central.
+- [~] **Sitios de ministerios individuales** — **investigado 2026-08-29**
+      (pedido de Daniel: justicia/seguridad — Fiscalía, Judicatura,
+      Ministerio de Gobierno, Policía, ECU911 — y luego SEPS, Defensa/
+      cartografía, ambiente, salud). Resultado principal: **la gran
+      mayoría ya está cubierta por el portal CKAN nacional que este
+      proyecto ya integra** — no hacía falta ninguna conexión nueva para
+      confirmarlo, solo verificar que la organización CKAN existe y tiene
+      contenido real:
+      - **Consejo de la Judicatura** (`organization=cj`) — causas
+        ingresadas/resueltas/en trámite por materia, provincia, cantón,
+        desde 2017, en ODS/XLSX, actualizado dic. 2025. El soporte `.ods`
+        agregado esta misma sesión aplica directo aquí.
+      - **Ministerio del Interior / Ministerio de Gobierno**
+        (`organization=ministerio-del-interior`; el ministerio ya se
+        renombró a "Ministerio de Gobierno" en su sitio propio
+        `ministeriodegobierno.gob.ec`, pero el slug de CKAN sigue con el
+        nombre viejo — mismo patrón de rezago que SENESCYT/MINEDEC) —
+        homicidios intencionales, personas desaparecidas, detenidos/
+        aprehendidas, armas incautadas, trata de personas.
+      - **ECU911** (`organization=ecu-911`) — bases de emergencias
+        mensuales (CSV/ODS), con recursos hasta al menos febrero 2025.
+      - **IGM / Ministerio de Defensa** (`organization=igm`) — 25
+        datasets. Además tiene su propio Geoportal
+        (`geoportaligm.gob.ec`) con cartografía descargable — la primera
+        fuente real y concreta que motivaría el pendiente de "Manejo
+        geoespacial de recursos" (arquitectura, más abajo), sin explorar
+        a fondo todavía.
+      - **MAATE (Ambiente, Agua y Transición Ecológica)**
+        (`organization=ministerio-del-ambiente-agua-y-transicion-ecologica`)
+        — indicadores ambientales y de recurso hídrico (SINIAS), CSV/ODS,
+        actualizado jul. 2025.
+      - **Ministerio de Salud Pública**
+        (`organization=ministerio-de-salud-publica`) — 8 datasets
+        (defunciones generales, matrimonios, divorcios y más vía
+        Registro Civil). También tiene su propio
+        `salud.gob.ec/datos-abiertos-2/` y dashboards "Salud en Cifras"/
+        "GeoSalud en Cifras" (sin confirmar si son API o solo visuales).
+
+      **Casos que sí necesitan un sitio propio** (no cubiertos por CKAN,
+      con contenido real confirmado fuera de él):
+      - **SEPS** (Superintendencia de Economía Popular y Solidaria) — el
+        sitio principal `seps.gob.ec` **bloquea activamente** las
+        conexiones automatizadas (título "Blocked" al navegar, 404 vía
+        `httpx` plano — a diferencia del 403 "fuera de Latinoamérica" ya
+        documentado para `datosabiertos.gob.ec`, este parece un bloqueo
+        distinto, posiblemente por huella de bot). Pero el subdominio
+        **`estadisticas.seps.gob.ec` sí es alcanzable** (200 vía `httpx`
+        plano) y tiene boletines reales (calificadoras de riesgo de
+        cooperativas, PDF, hasta dic. 2025).
+      - **Fiscalía General del Estado** — no tiene organización CKAN
+        propia identificada. Su sección "Estadísticas FGE" (violencia de
+        género, robos) está **abandonada desde 2021** (última entrada:
+        "Cifras femicidio corte 07 de noviembre 2021"); su "Analítica
+        cifras de robo" es un dashboard Power BI embebido, visual-only,
+        mismo problema recurrente que Superbancos/SENESCYT. No se
+        encontró un dataset descargable real y vigente.
+      - **Policía Nacional** — tiene una página "Conjunto de datos"
+        (`policia.gob.ec/wpfd_file/conjunto-de-datos/`) pero el único
+        archivo real ahí es un CSV de contactos LOTAIP (responsables de
+        acceso a información pública), no datos operativos. Los datos de
+        seguridad reales de Policía viven en el CKAN de Ministerio del
+        Interior de arriba, no en el sitio propio de la Policía.
+
+      **Conclusión:** para este dominio (justicia/seguridad + ambiente +
+      salud), la estrategia correcta no es "conexión nueva por
+      institución" sino **verificar cobertura CKAN primero** — la mayoría
+      ya está ahí, sin código nuevo. Los únicos candidatos reales a
+      conexión propia son SEPS (vía el subdominio de estadísticas, ya que
+      el sitio principal bloquea) y, más adelante, el Geoportal del IGM
+      si se decide encarar el pendiente geoespacial. Marcado como parcial,
+      no cerrado — quedan más ministerios sin revisar (educación básica/
+      MINEDEC más allá de lo ya visto, trabajo, turismo, agricultura,
+      producción, etc.) si se quiere ampliar el barrido.
 
 ---
 
