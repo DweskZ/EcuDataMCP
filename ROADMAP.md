@@ -19,7 +19,7 @@ Leyenda: `[ ]` sin empezar · `[~]` parcial · `[x]` hecho
 - [~] IESS — boletines/auditorías/actuariales scrapeables y confirmados, sin construir tool nuevo. → RESEARCH.md § IESS
 - [~] SENESCYT/Educación Superior — cubierto vía CKAN; registro de títulos bloqueado por captcha (no automatizable). → RESEARCH.md § SENESCYT
 - [ ] BCE — Información Estadística Mensual (IEM/IEEM), boletín mensual mucho más rico que BCEData. → RESEARCH.md § BCE
-- [ ] SIPA (Ministerio de Agricultura) — **prioridad máxima**, 12+ Excel reales sin fricción, reemplaza la cobertura actual de cacao/MPCEIP. → RESEARCH.md § Sitios de ministerios individuales
+- [x] SIPA (Ministerio de Agricultura) — `list_sipa_modulos`/`get_sipa_modulo_archivos`, 30 archivos Excel reales en 4 módulos (económico/productivo/social/censos), verificado en vivo. → RESEARCH.md § Sitios de ministerios individuales
 - [ ] Contraloría General del Estado — informes de auditoría nacionales, mecanismo de descarga ya resuelto (CSV real vía `WFDescarga.aspx`). → RESEARCH.md § Sitios de ministerios individuales
 - [ ] Registro Oficial (gaceta oficial) — candidato de alta prioridad para búsqueda por fecha; posiblemente no relevante, ver nota de alcance. → RESEARCH.md § Datos legislativos
 - [ ] INEVAL — exámenes nacionales (Ser Bachiller/ENES, Ser Estudiante, Ser Maestro...), archivo real sin login/captcha. → RESEARCH.md § INEVAL

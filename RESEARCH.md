@@ -716,17 +716,37 @@ agroquímicos/fertilizantes, IPC alimentos/inflación, índices de sector.
 Confirmado descargando uno real: `precios-productor-ponderado.xlsx`, **41.4
 MB** — muy por encima del tope de 5 MB que usan los tools de preview de
 este proyecto (mismo problema de escala que el PDF actuarial de 14.6 MB de
-IESS; necesitaría `download_resource` o un tope más alto, no
-`preview_resource_data` tal cual). Y eso es solo un módulo — el sitio
-además tiene "Cifras Agroproductivas" y "Cifras Territoriales" (tableros
-dinámicos, probablemente Power BI, sin confirmar), boletines nacionales
-(Panorama Agroestadístico, Precios Mayoristas, Precios Internacionales,
-Precios Productor), boletines situacionales por cultivo (ej. papa), un
-Panorama Agroeconómico anual, y un geoportal propio de ortofotos
+IESS). Y eso es solo un módulo — el sitio además tiene "Cifras
+Agroproductivas" y "Cifras Territoriales" (tableros dinámicos,
+probablemente Power BI, sin confirmar), boletines nacionales (Panorama
+Agroestadístico, Precios Mayoristas, Precios Internacionales, Precios
+Productor), boletines situacionales por cultivo (ej. papa), un Panorama
+Agroeconómico anual, y un geoportal propio de ortofotos
 (`geoportal.agricultura.gob.ec`) — más geoespacial, sin explorar. Esto
 reemplaza por completo la cobertura actual de `detect_series_pattern`/
 cacao vía MPCEIP: es la fuente real y mucho más rica para todo lo
-agropecuario. Candidato de máxima prioridad para una integración nueva.
+agropecuario.
+
+**Integrado 2026-08-29** (`helpers/sipa_client.py`,
+`tools/list_sipa_modulos.py`, `tools/get_sipa_modulo_archivos.py`). No solo
+el módulo económico tiene descargas directas — los otros tres
+("estadisticas-productivas", "estadisticas-social",
+"censos-y-registros-administrativos") comparten exactamente la misma
+página Joomla + acordeón UIKit, así que se cubrieron los 4 de una vez: **30
+archivos reales verificados en vivo** (13 económico, 9 productivo, 4
+social, 4 censos). Cada módulo es una página fija (no hay que buscarla,
+son 4 URLs hardcodeadas) con items `<div class="el-item">` — título
+numerado, descripción opcional, link de descarga directo — confirmado por
+scraping en vivo, no solo mirando el HTML. **Gotcha real encontrado
+recién al verificar los 4 módulos en vivo (no solo el económico que ya
+estaba documentado arriba):** el módulo de censos tiene items sin párrafo
+de descripción — un regex que asumía la descripción como obligatoria
+matcheaba 0 archivos ahí silenciosamente. Corregido parseando cada item
+por separado (split en `el-item`) con descripción opcional en vez de un
+regex secuencial estricto; cubierto por test. Los archivos no se
+descargan a través de este MCP (varios superan los 41 MB) — los tools
+solo devuelven metadata + URL directa, igual que
+`get_inec_estadistica_files`.
 
 **Ministerio de Finanzas se fusionó/renombró** — otro caso como
 SENESCYT→MINEDEC. `finanzas.gob.ec` redirige a `economicoproductivo.gob.ec`,

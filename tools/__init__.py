@@ -16,6 +16,7 @@ from tools.get_institucion_info import register_get_institucion_info_tool
 from tools.get_organization_info import register_get_organization_info_tool
 from tools.get_regulacion_info import register_get_regulacion_info_tool
 from tools.get_resource_info import register_get_resource_info_tool
+from tools.get_sipa_modulo_archivos import register_get_sipa_modulo_archivos_tool
 from tools.get_tramite_info import register_get_tramite_info_tool
 from tools.list_capabilities import register_list_capabilities_tool
 from tools.list_categories import register_list_categories_tool
@@ -23,6 +24,7 @@ from tools.list_dataset_resources import register_list_dataset_resources_tool
 from tools.list_instituciones import register_list_instituciones_tool
 from tools.list_recent_datasets import register_list_recent_datasets_tool
 from tools.list_sat_tsunami import register_list_sat_tsunami_tool
+from tools.list_sipa_modulos import register_list_sipa_modulos_tool
 from tools.lookup_ubicacion import register_lookup_ubicacion_tool
 from tools.preview_resource_data import register_preview_resource_data_tool
 from tools.query_resource_data import register_query_resource_data_tool
@@ -85,6 +87,9 @@ def register_tools(mcp: FastMCP) -> None:
 
     register_search_regulaciones_tool(mcp)
     register_get_regulacion_info_tool(mcp)
+
+    register_list_sipa_modulos_tool(mcp)
+    register_get_sipa_modulo_archivos_tool(mcp)
 
     register_search_contratos_tool(mcp)
     register_get_contrato_info_tool(mcp)

@@ -23,6 +23,11 @@ _CAPABILITIES = {
         "Supercías directorio de compañías",
         "Supercías registro de auditores externos autorizados",
         "Supercías ranking financiero (últimos años, requiere build local)",
+        (
+            "SIPA (Ministerio de Agricultura, Ganadería y Pesca): series "
+            "agropecuarias reales — precios, comercio exterior, crédito, "
+            "producción, censos — organizadas en 4 módulos"
+        ),
     ],
     "entrada": [
         "list_capabilities",
@@ -62,6 +67,7 @@ _CAPABILITIES = {
             "get_auditor_info",
         ],
         "financieros": ["search_ranking", "get_financials"],
+        "agropecuario": ["list_sipa_modulos", "get_sipa_modulo_archivos"],
     },
     "resources": [
         "ecuador://fuentes",
@@ -108,6 +114,13 @@ _CAPABILITIES = {
             "Cuenca en Datos publica varios recursos como .ods (OpenDocument "
             "spreadsheet), formato que preview_resource_data todavía no "
             "soporta como tabla; usa download_resource para esos casos"
+        ),
+        (
+            "SIPA es Ministerio de Agricultura, Ganadería y Pesca — distinto de "
+            "MPCEIP (Producción/Comercio Exterior); get_sipa_modulo_archivos "
+            "solo devuelve metadata + URL directa, nunca el archivo (algunos "
+            "superan 41 MB, muy por encima del tope de 5 MB de "
+            "download_resource/preview_resource_data)"
         ),
     ],
 }

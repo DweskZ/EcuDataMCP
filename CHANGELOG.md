@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Added
+
+- **SIPA (Sistema de Información Pública Agropecuaria) integration** —
+  `list_sipa_modulos`/`get_sipa_modulo_archivos` (`helpers/sipa_client.py`).
+  Ministry of Agriculture, Livestock and Fisheries statistics portal,
+  distinct from MPCEIP: 30 real Excel files across four modules (económico,
+  productivo, social, censos y registros administrativos) — prices, trade,
+  credit, production, and census series back to the early 2000s. Replaces
+  the old cacao/MPCEIP-only coverage `detect_series_pattern` relied on.
+  Tools return metadata + direct URL only, never the file bytes (some
+  exceed 41 MB, well over the 5 MB download/preview cap).
+
 ## 0.8.1 — 2026-08-29
 
 ### Security
