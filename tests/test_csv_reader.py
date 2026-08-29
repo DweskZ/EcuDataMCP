@@ -345,6 +345,28 @@ def test_parse_csv_bytes_raises_actionable_error_for_malformed_csv():
         _parse_csv_bytes(raw, max_rows=20)
 
 
+def test_parse_csv_bytes_picks_semicolon_over_comma_heavy_prose_field():
+    # Real repro against Contraloría's audit-report CSVs: a naive whole-
+    # sample character count picked ',' because free-text description
+    # fields (Spanish prose) contained more commas than the file's actual
+    # ';' delimiter had occurrences, splitting every row into one giant
+    # unparsed field instead of real columns.
+    raw = (
+        b"id;entidad;diligencia\r\n"
+        b"1;MINISTERIO A;Examen sobre procesos, contratos, convenios y anexos\r\n"
+        b"2;MINISTERIO B;Auditoria de gastos, ingresos, activos y pasivos\r\n"
+    )
+
+    result = _parse_csv_bytes(raw, max_rows=20)
+
+    assert result["headers"] == ["id", "entidad", "diligencia"]
+    assert result["rows"][0] == [
+        "1",
+        "MINISTERIO A",
+        "Examen sobre procesos, contratos, convenios y anexos",
+    ]
+
+
 def _make_ods(rows: list[list[str]], pad_columns: int = 0, pad_rows: int = 0) -> bytes:
     """Build a real .ods file with `rows`, optionally followed by a padded
     trailing empty column (on the header row) and/or a padded trailing block

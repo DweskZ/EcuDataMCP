@@ -205,14 +205,35 @@ def _decode_text(raw: bytes) -> str:
     return raw.decode("utf-8", errors="replace")
 
 
+def _sniff_delimiter(sample: str) -> str:
+    """Guess the field delimiter from a text sample.
+
+    Prefers csv.Sniffer (which weighs consistency across rows, not just raw
+    counts) since a naive whole-sample character count is skewed by
+    comma-heavy free-text fields (e.g. Spanish prose descriptions) that can
+    outnumber a real ';'/tab delimiter — confirmed live against Contraloría's
+    audit-report CSVs, where "," (30 occurrences, mostly inside description
+    text) narrowly beat ";" (29, the actual delimiter) in a 2000-char
+    sample. Falls back to counting occurrences in just the header line
+    (first row only, not the whole sample) when Sniffer can't decide.
+    """
+    try:
+        return csv.Sniffer().sniff(sample, delimiters=",;\t|").delimiter
+    except csv.Error:
+        pass
+    first_line = sample.split("\n", 1)[0]
+    delimiter = ","
+    for candidate in (";", "\t", "|"):
+        if first_line.count(candidate) > first_line.count(delimiter):
+            delimiter = candidate
+    return delimiter
+
+
 def _parse_csv_bytes(raw: bytes, max_rows: int, truncated: bool = False) -> dict[str, Any]:
     text = _decode_text(raw)
 
     sample = text[:2000]
-    delimiter = ","
-    for candidate in (";", "\t", "|"):
-        if sample.count(candidate) > sample.count(delimiter):
-            delimiter = candidate
+    delimiter = _sniff_delimiter(sample)
 
     reader = csv.reader(io.StringIO(text), delimiter=delimiter)
     rows_read: list[list[str]] = []

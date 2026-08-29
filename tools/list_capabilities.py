@@ -28,6 +28,10 @@ _CAPABILITIES = {
             "agropecuarias reales — precios, comercio exterior, crédito, "
             "producción, censos — organizadas en 4 módulos"
         ),
+        (
+            "Contraloría General del Estado: CSV trimestrales de informes de "
+            "auditoría aprobados a cualquier institución pública del país"
+        ),
     ],
     "entrada": [
         "list_capabilities",
@@ -68,6 +72,7 @@ _CAPABILITIES = {
         ],
         "financieros": ["search_ranking", "get_financials"],
         "agropecuario": ["list_sipa_modulos", "get_sipa_modulo_archivos"],
+        "auditoria": ["list_contraloria_informes", "get_contraloria_informe"],
     },
     "resources": [
         "ecuador://fuentes",

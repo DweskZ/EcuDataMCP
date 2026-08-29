@@ -811,6 +811,31 @@ de cada trimestre, visibles en el HTML de la página). Probablemente el
 hallazgo más *inmediatamente accionable* de toda la investigación — sin
 JS, sin login, sin captcha, datos estructurados de verdad.
 
+**Integrado 2026-08-29** (`helpers/contraloria_client.py`,
+`tools/list_contraloria_informes.py`, `tools/get_contraloria_informe.py`).
+El `id`/`tipo` de cada trimestre se scrapea en vivo desde
+`contraloria.gob.ec/Portal/24287` (no hardcodeado, a diferencia de SIPA —
+aquí sí se agrega un trimestre nuevo cada ~3 meses, confirmado por el
+propio historial: 9 documentos disponibles a la fecha, del rango
+ene-mar-2023 a abr-jun-2024). La descarga+parseo reutiliza
+`helpers/csv_reader.preview_csv` en vez de reimplementar el manejo de CSV.
+
+**Bug real encontrado y corregido de paso, en infraestructura
+compartida:** `helpers/csv_reader.py`'s `_parse_csv_bytes` adivinaba el
+delimitador contando ocurrencias de `,`/`;`/tab/`|` en los primeros 2000
+caracteres del archivo — funciona para la mayoría de CSVs, pero **falla
+en vivo contra los CSV reales de Contraloría**: sus columnas `Diligencia`
+son prosa en español ("Examen sobre procesos, contratos, convenios...")
+con varias comas por fila, y en una muestra de ~5 filas el conteo de comas
+(30) superó por poco al de punto y coma (29, el delimitador real),
+partiendo cada fila en un solo campo gigante en vez de 9 columnas. Se
+reemplazó por `csv.Sniffer` (que pondera consistencia entre filas, no solo
+conteo bruto) con fallback a contar solo en la primera línea (encabezado)
+si Sniffer no logra decidir. Corregido y verificado en vivo — este bug
+afecta a `preview_csv`/`preview_resource_data` en general, no solo a
+Contraloría, así que cualquier CSV de otra fuente con texto libre
+comma-heavy en las primeras filas se beneficia de la corrección.
+
 **Desnutrición — ya cubierta, confirmado que no hay gap.** La Secretaría
 Técnica "Ecuador Crece Sin Desnutrición Infantil" (`organization=stecsdi`
 en CKAN, 3 datasets de alertas cantonales en tiempo real) no tiene sitio

@@ -13,6 +13,27 @@
   the old cacao/MPCEIP-only coverage `detect_series_pattern` relied on.
   Tools return metadata + direct URL only, never the file bytes (some
   exceed 41 MB, well over the 5 MB download/preview cap).
+- **Contraloría General del Estado integration** —
+  `list_contraloria_informes`/`get_contraloria_informe`
+  (`helpers/contraloria_client.py`). Quarterly CSV exports of audit reports
+  approved for any public institution in the country, scraped live from
+  `contraloria.gob.ec/Portal/24287` (id/tipo pairs aren't hardcoded — a new
+  quarter is published roughly every 3 months). Reuses
+  `helpers/csv_reader.preview_csv` for the actual download+parse.
+
+### Fixed
+
+- **CSV delimiter sniffing picked the wrong delimiter on comma-heavy prose
+  fields.** `helpers/csv_reader.py`'s `_parse_csv_bytes` guessed the
+  delimiter by counting raw character occurrences across a 2000-char
+  sample — found for real against Contraloría's audit-report CSVs, whose
+  free-text `Diligencia` column (Spanish prose full of commas) made `,`
+  narrowly outnumber the file's actual `;` delimiter in a 5-row sample (30
+  vs 29), splitting every row into one unparsed field instead of 9 real
+  columns. Replaced with `csv.Sniffer` (weighs consistency across rows,
+  not raw counts), falling back to counting within just the header line
+  when Sniffer can't decide. Affects `preview_csv`/`preview_resource_data`
+  generally, not just Contraloría.
 
 ## 0.8.1 — 2026-08-29
 

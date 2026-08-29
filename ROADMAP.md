@@ -20,7 +20,7 @@ Leyenda: `[ ]` sin empezar · `[~]` parcial · `[x]` hecho
 - [~] SENESCYT/Educación Superior — cubierto vía CKAN; registro de títulos bloqueado por captcha (no automatizable). → RESEARCH.md § SENESCYT
 - [ ] BCE — Información Estadística Mensual (IEM/IEEM), boletín mensual mucho más rico que BCEData. → RESEARCH.md § BCE
 - [x] SIPA (Ministerio de Agricultura) — `list_sipa_modulos`/`get_sipa_modulo_archivos`, 30 archivos Excel reales en 4 módulos (económico/productivo/social/censos), verificado en vivo. → RESEARCH.md § Sitios de ministerios individuales
-- [ ] Contraloría General del Estado — informes de auditoría nacionales, mecanismo de descarga ya resuelto (CSV real vía `WFDescarga.aspx`). → RESEARCH.md § Sitios de ministerios individuales
+- [x] Contraloría General del Estado — `list_contraloria_informes`/`get_contraloria_informe`, CSV trimestrales reales de informes de auditoría aprobados a cualquier institución pública, verificado en vivo. De paso corrigió un bug real en el sniffing de delimitador CSV compartido (`helpers/csv_reader.py`). → RESEARCH.md § Sitios de ministerios individuales
 - [ ] Registro Oficial (gaceta oficial) — candidato de alta prioridad para búsqueda por fecha; posiblemente no relevante, ver nota de alcance. → RESEARCH.md § Datos legislativos
 - [ ] INEVAL — exámenes nacionales (Ser Bachiller/ENES, Ser Estudiante, Ser Maestro...), archivo real sin login/captcha. → RESEARCH.md § INEVAL
 - [ ] Superbancos — Portal Estadístico con boletines financieros mensuales desde 1997. → RESEARCH.md § Sitios de ministerios individuales

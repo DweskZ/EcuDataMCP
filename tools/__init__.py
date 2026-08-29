@@ -7,6 +7,7 @@ from tools.get_anda_survey_info import register_get_anda_survey_info_tool
 from tools.get_auditor_info import register_get_auditor_info_tool
 from tools.get_category_info import register_get_category_info_tool
 from tools.get_compania_info import register_get_compania_info_tool
+from tools.get_contraloria_informe import register_get_contraloria_informe_tool
 from tools.get_contrato_info import register_get_contrato_info_tool
 from tools.get_dataset_info import register_get_dataset_info_tool
 from tools.get_financials import register_get_financials_tool
@@ -20,6 +21,7 @@ from tools.get_sipa_modulo_archivos import register_get_sipa_modulo_archivos_too
 from tools.get_tramite_info import register_get_tramite_info_tool
 from tools.list_capabilities import register_list_capabilities_tool
 from tools.list_categories import register_list_categories_tool
+from tools.list_contraloria_informes import register_list_contraloria_informes_tool
 from tools.list_dataset_resources import register_list_dataset_resources_tool
 from tools.list_instituciones import register_list_instituciones_tool
 from tools.list_recent_datasets import register_list_recent_datasets_tool
@@ -90,6 +92,9 @@ def register_tools(mcp: FastMCP) -> None:
 
     register_list_sipa_modulos_tool(mcp)
     register_get_sipa_modulo_archivos_tool(mcp)
+
+    register_list_contraloria_informes_tool(mcp)
+    register_get_contraloria_informe_tool(mcp)
 
     register_search_contratos_tool(mcp)
     register_get_contrato_info_tool(mcp)
