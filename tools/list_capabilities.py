@@ -35,6 +35,7 @@ _CAPABILITIES = {
             "preview_resource_data",
             "detect_series_pattern",
             "list_categories",
+            "read_pdf",
         ],
         "tramites": [
             "search_tramites",

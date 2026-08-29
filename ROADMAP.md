@@ -37,21 +37,24 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
 - [x] **Instituto Geofísico (IG-EPN)** — hecho: tool `search_sismos` sobre el
       catálogo sísmico público, con caché TTL y parseo tolerante del CSV.
 - [ ] **Ecuador en Cifras / portal BI del INEC** — sin investigar todavía.
-- [~] **IESS (Instituto Ecuatoriano de Seguridad Social)** — **agregado
+- [x] **IESS (Instituto Ecuatoriano de Seguridad Social)** — **agregado
       2026-08-16, pedido por Daniel: tienen boletines/reportes en PDF en su
       propio portal.** Ya reachable hoy vía CKAN genérico
       (`organization="instituto-ecuatoriano-de-seguridad-social"`) — 3
       datasets: afiliados activos del Seguro General Obligatorio y Régimen
       Especial Voluntario, pagos y beneficiarios del Seguro de Desempleo
       (verificado en la sección de verificación e2e de abajo), encuesta
-      familiar del Seguro Social Campesino. **Sin confirmar todavía:** los
-      PDFs (boletines estadísticos) que Daniel menciona — una revisión
-      rápida de `iess.gob.ec/es/estadisticas` no encontró links `.pdf` en el
-      HTML plano (puede ser contenido cargado por JS, o vivir en otra
-      sección del sitio); falta investigar a fondo dónde están y si tienen
-      suficiente valor estructurado como para justificar un
-      `read_pdf`/extracción dedicada, o si conviene esperar al pendiente
-      general de `read_pdf(url, pages)`.
+      familiar del Seguro Social Campesino. **PDFs confirmados 2026-08-28:**
+      una revisión anterior con HTTP plano no encontró links `.pdf` porque
+      el navegador real primero renderiza JS; con el browser real se
+      encontró la sección "Boletines Estadísticos"
+      (`iess.gob.ec/es/estadisticas`), con boletines anuales desde 2006
+      hasta 2024 (el más reciente: 142 páginas, 4.16 MB). Cada entrada es
+      una vista Liferay `document_library_display` (HTML, no el PDF en sí);
+      el PDF real vive en `iess.gob.ec/documents/10162/<id>/<nombre>.pdf`,
+      extraído del `href` en esa página. `read_pdf` (ver más abajo) lo lee
+      correctamente — 40 caracteres de texto en la portada, confirmado en
+      vivo.
 - [~] **SENESCYT** — pedido explícitamente por Daniel. Datos de educación
       superior, becas, registro de títulos. **Revisado 2026-08-16: ya
       reachable hoy, sin código nuevo,** vía los tools CKAN genéricos
@@ -246,9 +249,12 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
 
 ## Formatos y tipos de recursos
 
-- [ ] **Tool `read_pdf(url, pages)`** — no hay soporte para leer PDFs del
-      portal. Pocos casos hoy, pero es el desbloqueo para fuentes curadas más
-      adelante.
+- [x] **Tool `read_pdf(url, pages)`** — hecho 2026-08-28: extrae texto de un
+      PDF vía `pypdf` (pura Python), `pages` como rango 1-indexado ("1-5",
+      "3", "1,4,9"), tope de 20 páginas por llamada. Sin OCR. Verificado en
+      vivo contra dos fuentes reales: un PDF del Registro Oficial linkeado
+      desde `get_regulacion_info` (77 páginas) y un boletín estadístico del
+      IESS (142 páginas) — ver detalle en la nota de IESS más abajo.
 - [x] **Prompts de flujo de trabajo adicionales** (`@mcp.prompt()`) — agregado
       `explorar_tema`, guía transversal a todas las fuentes (datasets,
       trámites, regulaciones, contratos, riesgos) en una sola pasada.

@@ -11,6 +11,7 @@ dependencies = [
     "mcp>=1.25.0,<2",
     "odfpy>=1.4.1",
     "openpyxl>=3.1.0",
+    "pypdf>=6.16.2",
     "uvicorn>=0.30.0",
     "xlrd>=2.0.2",
 ]
@@ -31,6 +32,7 @@ dev = [
     "pytest-httpx>=0.35.0",
     "pytest-asyncio>=0.23.0",
     "ruff>=0.14.0",
+    "fpdf2>=2.8.8",
 ]
 
 [tool.ruff.lint]

@@ -25,6 +25,7 @@ from tools.list_sat_tsunami import register_list_sat_tsunami_tool
 from tools.lookup_ubicacion import register_lookup_ubicacion_tool
 from tools.preview_resource_data import register_preview_resource_data_tool
 from tools.query_resource_data import register_query_resource_data_tool
+from tools.read_pdf import register_read_pdf_tool
 from tools.search_anda import register_search_anda_tool
 from tools.search_auditores import register_search_auditores_tool
 from tools.search_companias import register_search_companias_tool
@@ -64,6 +65,7 @@ def register_tools(mcp: FastMCP) -> None:
     register_list_categories_tool(mcp)
     register_get_category_info_tool(mcp)
     register_search_sri_datasets_tool(mcp)
+    register_read_pdf_tool(mcp)
 
     register_search_tramites_tool(mcp)
     register_get_tramite_info_tool(mcp)

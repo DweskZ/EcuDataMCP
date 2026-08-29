@@ -3,6 +3,25 @@
 ## Unreleased
 
 ### Added
+- **Nuevo tool `read_pdf(url, pages)`**: extrae texto de un PDF en una URL
+  directa, vía `pypdf` (pura Python). `pages` acepta un rango 1-indexado
+  ("3", "1-5", "1,4,9"); vacío significa todo el documento, tope de 20
+  páginas por llamada en ambos casos (llamar de nuevo con otro rango para el
+  resto). Sin OCR: un PDF escaneado sin capa de texto vuelve vacío, con un
+  mensaje explícito en vez de fallar en silencio. Maneja PDFs corruptos,
+  protegidos con contraseña vacía (los descifra igual que la mayoría de
+  visores) y con contraseña real (error explícito, no se puede leer sin
+  ella). Descubre/desbloquea PDFs ya alcanzables desde otros tools —
+  `get_regulacion_info` siempre linkeó al PDF del Registro Oficial sin que
+  nada pudiera leerlo. **Verificado en vivo contra dos fuentes reales:**
+  un reglamento de `get_regulacion_info` (77 páginas, Registro Oficial) y
+  un boletín estadístico del IESS (142 páginas, `iess.gob.ec/es/estadisticas`
+  — antes marcado como "sin confirmar" en el roadmap porque los links a
+  PDF no aparecían en el HTML plano; resultaron estar detrás de una vista
+  Liferay `document_library_display`, el PDF real vive en
+  `iess.gob.ec/documents/...`). Ambos con texto genuinamente extraíble y
+  bien por encima del tope de 20 páginas, confirmando que el parámetro
+  `pages` es necesario, no especulativo.
 - **Soporte `.ods` (OpenDocument Spreadsheet)** en `preview_resource_data`:
   nueva `helpers/csv_reader.preview_ods` (vía `odfpy`, pura Python, sin
   dependencia externa), mismo patrón que `preview_xls`/`preview_xlsx`.
