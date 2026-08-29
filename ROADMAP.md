@@ -161,8 +161,11 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       Docentes, Títulos, Becas, ej. `/indicador-docentes/`), pero **cada
       sección es un dashboard de Power BI embebido**
       (`app.powerbi.com/view?r=...`), no una API ni archivos descargables —
-      mismo problema que Superbancos: visual-only, sin endpoint consultable
-      programáticamente. Si el registro de títulos vive en algún lado
+      mismo problema visual-only ya visto en varios portales de este
+      repo (nota: la comparación original con Superbancos ya no aplica —
+      ver corrección 2026-08-29 en "Sitios de ministerios individuales",
+      Superbancos sí tiene boletines reales descargables). Si el registro
+      de títulos vive en algún lado
       estructurado, probablemente sea ahí (sección "Títulos" del SIAU) o en
       un portal de verificación de títulos aparte, todavía sin identificar
       — pendiente investigar específicamente eso, ya que el CKAN no lo
@@ -257,15 +260,24 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
 - [~] **Sitios de ministerios individuales** — **investigado 2026-08-29**
       (pedido de Daniel: justicia/seguridad — Fiscalía, Judicatura,
       Ministerio de Gobierno, Policía, ECU911 — y luego SEPS, Defensa/
-      cartografía, ambiente, salud). Resultado principal: **la gran
-      mayoría ya está cubierta por el portal CKAN nacional que este
-      proyecto ya integra** — no hacía falta ninguna conexión nueva para
+      cartografía, ambiente, salud; **segunda pasada el mismo día:**
+      insistir en Fiscalía, agregar Superbancos, seguir el barrido, y
+      revisar si las organizaciones CKAN ya confirmadas tienen además
+      sitios propios con datos que no están en CKAN). Resultado
+      principal: **la gran mayoría ya está cubierta por el portal CKAN
+      nacional que este proyecto ya integra** — no hacía falta ninguna
+      conexión nueva para
       confirmarlo, solo verificar que la organización CKAN existe y tiene
       contenido real:
       - **Consejo de la Judicatura** (`organization=cj`) — causas
         ingresadas/resueltas/en trámite por materia, provincia, cantón,
         desde 2017, en ODS/XLSX, actualizado dic. 2025. El soporte `.ods`
-        agregado esta misma sesión aplica directo aquí.
+        agregado esta misma sesión aplica directo aquí. También tiene su
+        propio "Portal de Estadística Judicial"
+        (`fsweb.funcionjudicial.gob.ec/estadisticas/datoscj/portalestadistica.html`)
+        — revisado y **parece roto o mal configurado** (página casi en
+        blanco, sin iframe ni contenido visible). El dataset CKAN sigue
+        siendo el camino real.
       - **Ministerio del Interior / Ministerio de Gobierno**
         (`organization=ministerio-del-interior`; el ministerio ya se
         renombró a "Ministerio de Gobierno" en su sitio propio
@@ -303,30 +315,73 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
         **`estadisticas.seps.gob.ec` sí es alcanzable** (200 vía `httpx`
         plano) y tiene boletines reales (calificadoras de riesgo de
         cooperativas, PDF, hasta dic. 2025).
-      - **Fiscalía General del Estado** — no tiene organización CKAN
-        propia identificada. Su sección "Estadísticas FGE" (violencia de
-        género, robos) está **abandonada desde 2021** (última entrada:
-        "Cifras femicidio corte 07 de noviembre 2021"); su "Analítica
-        cifras de robo" es un dashboard Power BI embebido, visual-only,
-        mismo problema recurrente que Superbancos/SENESCYT. No se
-        encontró un dataset descargable real y vigente.
+      - **Fiscalía General del Estado** — **revisado de nuevo 2026-08-29**
+        (pedido explícito de Daniel de incluirla igual). No tiene
+        organización CKAN propia — confirmado con `search_datasets`
+        directo contra el portal (0 resultados relevantes), no solo por
+        ausencia de link en su sitio. Su sección "Estadísticas FGE"
+        (violencia de género, robos) sigue **abandonada desde 2021**
+        (última entrada: "Cifras femicidio corte 07 de noviembre 2021");
+        su "Analítica cifras de robo" es un dashboard Power BI embebido,
+        visual-only. Su "Consulta de Noticias del Delito"
+        (`gestiondefiscalias.gob.ec/siaf/...`) es real y funcional, pero
+        es una **búsqueda de un caso a la vez por nombre/placa/número de
+        denuncia** — aunque no tiene captcha, no encaja como tool de este
+        proyecto por la misma razón que un registro de títulos
+        individual: es una herramienta de consulta de expedientes
+        personales, no un dataset agregado, y automatizarla como
+        búsqueda de personas se sale del propósito de este servidor
+        (datos abiertos/estadísticas, no investigación de individuos).
+        **Sí se encontró algo real y útil, adyacente a Fiscalía:** el
+        organismo forense que trabaja con ella tiene su propia
+        organización CKAN, `servicio-nacional-de-medicina-legal-y-
+        ciencias-forenses` (10 datasets, incl. "Pericias realizadas en
+        Ciencias Forenses y Medicina Legal 2024") — ya alcanzable con
+        los tools genéricos existentes, sin código nuevo.
       - **Policía Nacional** — tiene una página "Conjunto de datos"
         (`policia.gob.ec/wpfd_file/conjunto-de-datos/`) pero el único
         archivo real ahí es un CSV de contactos LOTAIP (responsables de
         acceso a información pública), no datos operativos. Los datos de
         seguridad reales de Policía viven en el CKAN de Ministerio del
         Interior de arriba, no en el sitio propio de la Policía.
+      - **Superintendencia de Bancos** — **corrección 2026-08-29 a una
+        nota anterior en este mismo archivo** que la comparaba con
+        SENESCYT como "visual-only, sin endpoint consultable": eso era
+        cierto solo para sus "Visualizadores" (Power BI), pero el sitio
+        tiene un **Portal Estadístico separado**
+        (`superbancos.gob.ec/estadisticas/portalestudios/`) con
+        **boletines financieros mensuales reales en `.zip`, con
+        histórico completo desde 1997** (`BOL_FIN_BCOS_{año}.zip`,
+        confirmado descargando el de 2003, 2.8 MB real). Sin
+        organización CKAN propia (confirmado con `search_datasets`). El
+        boletín del mes/año actual se sirve vía un widget OneDrive
+        embebido (requiere JS), pero el archivo histórico completo
+        (1997 en adelante) son links estáticos, alcanzables con `httpx`
+        plano. **Ojo:** este subdominio necesita `verify=False` en la
+        descarga — certificado TLS mal configurado, mismo tipo de
+        problema (no el mismo host) que ya maneja `helpers/tls.py` para
+        `datosabiertos.gob.ec`.
+      - **Trabajo, Turismo, Producción/Comercio Exterior/Pesca** — las
+        tres tienen organización CKAN propia y ya alcanzable:
+        `ministerio-del-trabajo` (5 datasets), `ministerio-de-turismo`
+        (5 datasets), `ministerio-de-produccion-comercio-exterior-
+        inversiones-y-pesca-mpceip` (8 datasets — el mismo MPCEIP que ya
+        motivó `detect_series_pattern` con los precios de cacao). Sin
+        código nuevo.
 
       **Conclusión:** para este dominio (justicia/seguridad + ambiente +
-      salud), la estrategia correcta no es "conexión nueva por
-      institución" sino **verificar cobertura CKAN primero** — la mayoría
-      ya está ahí, sin código nuevo. Los únicos candidatos reales a
-      conexión propia son SEPS (vía el subdominio de estadísticas, ya que
-      el sitio principal bloquea) y, más adelante, el Geoportal del IGM
-      si se decide encarar el pendiente geoespacial. Marcado como parcial,
-      no cerrado — quedan más ministerios sin revisar (educación básica/
-      MINEDEC más allá de lo ya visto, trabajo, turismo, agricultura,
-      producción, etc.) si se quiere ampliar el barrido.
+      salud + trabajo/turismo/producción), la estrategia correcta no es
+      "conexión nueva por institución" sino **verificar cobertura CKAN
+      primero** — la mayoría ya está ahí, sin código nuevo. Los
+      candidatos reales a conexión propia son **SEPS** (vía el subdominio
+      de estadísticas, ya que el sitio principal bloquea), **Superbancos**
+      (boletines `.zip` reales desde 1997, fuera de CKAN) y, más
+      adelante, el **Geoportal del IGM** si se decide encarar el
+      pendiente geoespacial. Marcado como parcial, no cerrado — quedan
+      más ministerios sin revisar (educación básica/MINEDEC más allá de
+      lo ya visto, agricultura fuera de MPCEIP, salud más a fondo más
+      allá de la organización CKAN ya confirmada, etc.) si se quiere
+      ampliar el barrido.
 
 ---
 
