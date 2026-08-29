@@ -15,7 +15,7 @@ Leyenda: `[ ]` sin empezar · `[~]` parcial · `[x]` hecho
 - [x] IG-EPN — catálogo sísmico (`search_sismos`).
 - [x] Cuenca en Datos — CKAN municipal vía `source="cuenca"` en los tools genéricos.
 - [x] Registro Civil / demográfico-salud — cobertura sólida vía CKAN, sin gaps.
-- [x] Ecuador en Cifras / INEC — `search_inec_estadisticas`/`get_inec_estadistica_files` (~75 temas: boletines + series históricas agregadas). BIINEC (`aplicaciones3.../BIINEC-war`) descartado como objetivo separado: se solapa con ANDA (ya construido) en microdatos y su descarga vía ViewState de JSF es mucho más cara de scrapear. → RESEARCH.md § Ecuador en Cifras
+- [x] Ecuador en Cifras / INEC — `search_inec_estadisticas`/`get_inec_estadistica_files` (~75 temas: boletines + series históricas agregadas). BIINEC (`aplicaciones3.../BIINEC-war`) descartado como integración completa (se solapa con ANDA/`/estadisticas/` en casi todo, JSF postback ~4x más caro de scrapear que ANDA); su rama Ambiente sí tiene 2-3 registros exclusivos (desechos peligrosos en salud, módulos ambientales ENEMDU/ECV) — candidato a scraper puntual, no a cliente genérico. → RESEARCH.md § Ecuador en Cifras
 - [~] IESS — boletines/auditorías/actuariales scrapeables y confirmados, sin construir tool nuevo. → RESEARCH.md § IESS
 - [~] SENESCYT/Educación Superior — cubierto vía CKAN; registro de títulos bloqueado por captcha (no automatizable). → RESEARCH.md § SENESCYT
 - [ ] BCE — Información Estadística Mensual (IEM/IEEM), boletín mensual mucho más rico que BCEData. → RESEARCH.md § BCE

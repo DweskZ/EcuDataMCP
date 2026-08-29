@@ -180,6 +180,79 @@ que se solapan con ANDA. Lo único potencialmente útil sería perseguir casos
 puntuales de años faltantes (como ENSANUT 2014/2019) uno por uno, no una
 integración completa del catálogo BIINEC.
 
+**Análisis a fondo, 2026-08-29 (pedido explícito de Daniel: "analiza a
+fondo si el otro sitio de banco de datos abiertos es útil").** Se revisó
+en vivo la sesión JSF real (no solo se asumió), y se recorrieron a fondo
+las tres ramas (Sociodemográficas, Económicas, Ambiente) para buscar
+contenido genuinamente exclusivo, no solo repetir la comparación de la
+pasada anterior.
+
+1. **El flujo JSF resultó más simple de lo asumido — corrección a la nota
+   de fricción de arriba.** Inspeccionando la respuesta real del POST del
+   selector de año: no es un ajax parcial de PrimeFaces (XML
+   `<partial-response>`), es un **postback completo clásico de JSF** — cada
+   cambio de dropdown reenvía el formulario entero y el servidor devuelve
+   la página HTML completa de nuevo, con un `javax.faces.ViewState` nuevo
+   embebido (formato `-652696757013912769:-2931437765435945654`, sesión
+   server-side vía `JSESSIONID`). Esto es mecánicamente idéntico al patrón
+   ya implementado para ANDA (`list_microdata_files`: GET por el token,
+   POST para aceptar) salvo que en vez de 1 paso son ~4 (rama → tema →
+   año → período → botón "Descargar"), cada uno reanalizando el HTML
+   completo (~70-80 KB) para extraer los campos ocultos y el ViewState del
+   siguiente paso. Es más código que ANDA o `/estadisticas/`, pero no es
+   un problema exótico — es un "JSF form walker" genérico, factible en una
+   sesión de trabajo si algún día se justifica por el contenido.
+
+2. **Rama Sociodemográficas (Salud) y Económicas (Cuentas Económicas):
+   solapamiento casi total confirmado, cero contenido nuevo.** Las
+   operaciones bajo "Cuentas Económicas" en BIINEC (Cuentas Satélite de
+   Trabajo No Remunerado, de Educación, de Salud) son exactamente las
+   mismas 3 páginas ya cubiertas por `/estadisticas/`. La taxonomía de
+   BIINEC es, en la práctica, un espejo de la de `/estadisticas/` — mismo
+   INEC, mismas operaciones, dos apps distintas exponiendo el mismo
+   catálogo.
+
+3. **Rama Ambiente y Otras Estadísticas — aquí sí aparece contenido que no
+   está ni en ANDA ni en `/estadisticas/`.** De 10 operaciones listadas
+   bajo "Ambiente", la mayoría vuelve a solaparse (Encuesta de Información
+   Ambiental Económica en Empresas → "Módulo de Información Económica
+   Ambiental en Empresas" en ANDA; GAD Municipales/Provinciales, ESPAC,
+   Censo Agropecuario → ya cubiertos). Pero dos no aparecieron en ninguna
+   búsqueda de ANDA ni en los 74 temas de `/estadisticas/` ya scrapeados:
+   - **"Módulo de Desechos Peligrosos en Establecimientos de Salud –
+     Registro Administrativo de Salud"** — confirmado real y vivo:
+     seleccionando 2020 aparecen archivos reales (Base de Datos SPSS 703
+     KB, Tabulados y series históricas 185 KB, Formularios 685 KB) y "119
+     descargas para el año seleccionado". Es un registro chico y de nicho
+     (bajo volumen de descargas), pero es un dataset real que no vive en
+     ningún otro lado ya integrado.
+   - **"Información Ambiental en Hogares"** — dos variantes, una atada a
+     ENEMDU (años 2010-2025) y otra a ECV (solo 2014); son módulos
+     ambientales anexos a esas encuestas, no encontrados como entidad
+     propia en ANDA ni en `/estadisticas/`. No se confirmó el contenido de
+     archivos (no se llegó a expandir el período), pero el patrón de años
+     disponibles sugiere que es real, igual que el caso anterior.
+
+4. **Diferenciadores de metadata que ningún otro tool expone:** BIINEC
+   muestra un contador de descargas por año-operación (útil como señal de
+   popularidad — ej. ENEMDU 2018 lidera con 15,160 descargas de un total
+   sitewide de 365,374) y clasifica cada archivo con el esquema
+   internacional de "5 estrellas de datos abiertos" (Tim Berners-Lee: 1★
+   PDF/DOC/JPG con licencia abierta, 2★ XLS, 3★ CSV/XML no propietario...).
+   Ninguna de las dos cosas es contenido de datos en sí, pero son señales
+   que ni ANDA ni `/estadisticas/` exponen.
+
+**Veredicto final:** BIINEC como integración *completa* sigue sin
+justificarse — el grueso de su contenido duplica ANDA o `/estadisticas/`
+tras una capa de scraping más cara. Pero no es "inútil" sin matices: la
+rama Ambiente tiene un puñado de registros administrativos genuinamente
+exclusivos (desechos peligrosos en salud, módulos ambientales de
+ENEMDU/ECV). Si en algún momento hay interés específico en datos
+ambientales/de residuos, vale la pena un scraper puntual y chico para esas
+2-3 operaciones (no un cliente genérico de todo BIINEC) — el costo de
+construirlo ya no es "requiere investigación de sesión aparte" como se dijo
+antes, es conocido y acotado (~4 pasos de postback JSF por archivo).
+
 **Corrección 2026-08-28:** una conclusión anterior el mismo día ("callejón
 sin salida") era falsa. El primer pase entró por
 `ecuadorencifras.gob.ec/institucional/home/` (un subsitio institucional

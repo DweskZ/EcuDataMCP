@@ -3,6 +3,14 @@
 ## Unreleased
 
 ### Added
+- **Nuevo prompt `buscar_inec`** (`prompts/workflows.py`): guía al agente para
+  recorrer las tres fuentes del INEC en el orden correcto — ANDA primero (el
+  catálogo más amplio, y te dice si una operación es "solo agregados"),
+  Ecuador en Cifras segundo (donde vive el archivo real para ese caso), y
+  BIINEC solo como mención manual de último recurso (sin tool propio, cubre
+  un puñado de registros ambientales exclusivos). `search_anda` ahora
+  también referencia `search_inec_estadisticas` directamente en su docstring
+  para el caso "solo agregados", sin depender de que se invoque el prompt.
 - **Nueva fuente: Ecuador en Cifras / INEC** (`helpers/inec_client.py` +
   `search_inec_estadisticas` / `get_inec_estadistica_files`). Cubre las ~75
   páginas de tema de `ecuadorencifras.gob.ec` (IPC, ENEMDU, ENSANUT,

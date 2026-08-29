@@ -37,6 +37,10 @@ def register_search_anda_tool(mcp: FastMCP) -> None:
         It catalogs 437+ INEC surveys/censuses with metadata (title, year,
         authoring entity). Not every entry has downloadable microdata — many are
         aggregate-only publications (e.g. price indices); each result says so.
+        Start any INEC search here — it's the broadest index. When a result
+        shows microdatos_disponibles=false, the operation exists but its actual
+        published data lives on ecuadorencifras.gob.ec instead: try
+        search_inec_estadisticas with the same query.
 
         Follow up with get_anda_survey_info(idno) for full metadata on one survey.
 

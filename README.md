@@ -386,7 +386,7 @@ municipal independiente, 92 datasets) — mismo tool, otro catálogo CKAN.
 
 ### Prompts MCP
 
-Plantillas listas para el cliente (Claude/Cursor): `explorar_datos`, `explorar_tema`, `consultar_tramite`, `investigar_contrato`, `buscar_regulacion`, `monitorear_riesgos`.
+Plantillas listas para el cliente (Claude/Cursor): `explorar_datos`, `explorar_tema`, `consultar_tramite`, `investigar_contrato`, `buscar_regulacion`, `buscar_inec`, `monitorear_riesgos`.
 
 ### Resources MCP
 

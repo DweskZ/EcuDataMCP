@@ -96,6 +96,42 @@ def register_workflow_prompts(mcp: FastMCP) -> None:
         )
 
     @mcp.prompt(
+        name="buscar_inec",
+        title="Buscar datos del INEC en sus tres fuentes",
+        description="Guía para buscar una operación estadística del INEC probando ANDA, Ecuador en Cifras y, como último recurso, el Banco de Datos Abiertos (BIINEC).",
+    )
+    def buscar_inec(tema: str = "empleo") -> str:
+        """Prompt para recorrer las fuentes del INEC en el orden correcto."""
+        return (
+            f"Busca información del INEC sobre '{tema}'. El INEC publica sus datos "
+            "en tres sitios distintos que no son intercambiables — sigue este orden, "
+            "no pares en el primer resultado sin revisar si responde la pregunta:\n\n"
+            f"1) **ANDA (search_anda('{tema}'))** — el catálogo más amplio (437+ "
+            "encuestas/censos/registros). Empieza aquí siempre: te dice si la "
+            "operación existe y si tiene microdatos descargables "
+            "(`microdatos_disponibles`). Si el resultado dice 'no (solo agregados)' "
+            "(típico de índices como IPC), la operación existe pero el archivo real "
+            "no está aquí — sigue al paso 2, no lo reportes como 'sin datos'. Si sí "
+            "tiene microdatos, usa get_anda_survey_info y download_anda_microdata.\n"
+            f"2) **Ecuador en Cifras (search_inec_estadisticas('{tema}'))** — ~75 "
+            "temas con boletines, metodología y series históricas agregadas "
+            "(Excel/CSV/PDF). Es la fuente correcta para el caso 'solo agregados' del "
+            "paso 1, y también para cifras publicadas recientes (inflación, pobreza, "
+            "empleo). Sigue con get_inec_estadistica_files sobre el tema que "
+            "coincida.\n"
+            "3) **BIINEC (aplicaciones3.ecuadorencifras.gob.ec/BIINEC-war/) — sin "
+            "tool propio todavía, no lo automatices.** Solo menciónalo si los pasos "
+            "1 y 2 no encontraron nada: cubre casi lo mismo que ANDA/Ecuador en "
+            "Cifras, pero tiene un puñado de registros administrativos exclusivos "
+            "de la rama Ambiente (desechos peligrosos en salud, módulos ambientales "
+            "de ENEMDU/ECV) que no viven en ningún otro lado. Si el tema suena "
+            "ambiental/de residuos y los pasos anteriores fallaron, dirige al "
+            "usuario a revisar ese sitio manualmente.\n\n"
+            "Responde en español, indicando de cuál de las tres fuentes viene cada "
+            "dato."
+        )
+
+    @mcp.prompt(
         name="monitorear_riesgos",
         title="Monitorear riesgos / emergencias",
         description="Guía para consultar eventos SGR COE y estaciones SAT tsunami.",
