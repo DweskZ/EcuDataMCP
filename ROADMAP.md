@@ -607,13 +607,117 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       construir una integración nueva a partir de esta investigación,
       por delante de BCE/IEM, Superbancos y SEPS. Segundo en la lista:
       **Contraloría** (archivo nacional de auditorías, alcance
-      transversal a todo el Estado) si se resuelve cómo se sirven los
-      archivos. Sin explorar todavía: el dominio real y actual de
-      **Turismo**, el resto de las secciones del boletín IEM del BCE
-      (sector externo, cuentas nacionales, precios), si "Estadísticas
-      Fiscales" del MDEP tiene series descargables más allá de PDFs
-      puntuales, y los tableros dinámicos de SIPA. Marcado como parcial,
-      no cerrado.
+      transversal a todo el Estado) — **resuelto en la sexta pasada, ver
+      abajo.**
+
+      **Sexta pasada, mismo día** (Daniel: profundizar Contraloría "no
+      queremos perdernos nada", más desnutrición/INEC/Presupuesto
+      General del Estado/CNE, luego SRI/ENES/IEPI/cultura/mujeres):
+      - **Contraloría — resuelto de punta a punta.** El botón de
+        descarga de "Informes aprobados" llama a una función JS
+        (`down('pesdoc', 67)`) que arma la URL
+        `contraloria.gob.ec/WFDescarga.aspx?id={id}&tipo=pesdoc&op=d` —
+        **confirmado real, sin necesidad de browser**: descargué el de
+        enero-marzo 2023 y es un **CSV real de 155 KB**, no un PDF —
+        columnas `Unidad de Control; Entidad; Diligencia; Periodo Desde;
+        Periodo Hasta; Tipo de informe; N° Informe; Fecha Aprobación`,
+        una fila por informe de auditoría aprobado a *cualquier*
+        institución pública del país. Totalmente scrapeable con `httpx`
+        una vez que se conoce el patrón de URL (falta solo mapear los
+        `id` de cada trimestre, visibles en el HTML de la página). Este
+        es probablemente el hallazgo más *inmediatamente accionable* de
+        toda la investigación — sin JS, sin login, sin captcha, datos
+        estructurados de verdad.
+      - **Desnutrición — ya cubierta, confirmado que no hay gap.** La
+        Secretaría Técnica "Ecuador Crece Sin Desnutrición Infantil"
+        (`organization=stecsdi` en CKAN, 3 datasets de alertas
+        cantonales en tiempo real) no tiene sitio propio (opera vía
+        redes sociales y páginas de MSP/MEF) — su organización CKAN es
+        el único punto de acceso real, y ya es alcanzable. `search_datasets(query="desnutricion")`
+        además encuentra ENSANUT 2012/2018, ECV, y "MSP_Nutrición" — 8
+        datasets en total, todos ya reachable.
+      - **Presupuesto General del Estado — ya cubierto, muy a fondo.**
+        `organization=ministerio-de-economia-y-finanzas` en CKAN tiene
+        **97 datasets** (confirmado en vivo), incluyendo ejecución
+        presupuestaria mensual a nivel de Unidad de Administración
+        Financiera. El slug CKAN conserva el nombre viejo del ministerio
+        pese a la fusión a "Desarrollo Económico y Productivo" ya
+        documentada — mismo patrón de rezago que otros casos.
+      - **CNE — sigue bloqueado, confirmado con un segundo método.**
+        `cne.gob.ec/estadisticas/bases-de-datos/` da página en blanco
+        también vía el browser real (no solo `httpx`) — el WAF Incapsula
+        bloquea ambos caminos. Datos electorales quedan genuinamente
+        fuera de alcance sin resolver eso.
+      - **SRI — CKAN tiene mucho más de lo que ya scrapea este proyecto.**
+        `organization=sri-servicio-de-rentas-internas` tiene **127
+        datasets** (recaudación de impuestos por año 2017-2024,
+        prestadores de servicios digitales, catastro de agregadores de
+        pago, autorizados para facturación electrónica...) — esto es
+        aparte del scraper propio de `search_sri_datasets` (que lee la
+        página Liferay `sri.gob.ec/datasets` directamente, ~130
+        archivos). Puede haber traslape, pero el catálogo CKAN es rico
+        por sí solo y ya reachable con los tools genéricos.
+      - **SENESCYT/Educación Superior — un segundo archivo real, aparte
+        de la "Biblioteca" ya documentada.**
+        `siau.senescyt.gob.ec/estadisticas-de-educacion-superior-ciencia-tecnologia-e-innovacion/`
+        tiene su propio archivo de reportes reales (mismo patrón
+        WordPress `download-monitor`): Reporte PND, indicadores de
+        educación superior/CTI, índice de competitividad del Ecuador,
+        inventario de indicadores CTI y saberes ancestrales,
+        caracterización de la demanda laboral — algunos enlazan a
+        instancias Nextcloud propias (`cloud-00.senescyt.gob.ec`,
+        `cloud-pro.senescyt.gob.ec`), igual que el manual del Geoportal
+        del IGM. No encontré una sección específica de resultados del
+        examen ENES/SNNA por nombre — puede estar dentro de estos
+        reportes agregados, sin confirmar.
+      - **IEPI se convirtió en SENADI en 2018** (bajo el paraguas de
+        SENESCYT). Su dominio real y vivo es
+        `derechosintelectuales.gob.ec` (`propiedadintelectual.gob.ec`
+        redirige ahí). Existe un dataset CKAN real
+        ("Base de datos de propiedad intelectual aprobadas y
+        solicitadas a la SENADI") pero está **mal catalogado bajo la
+        organización equivocada** (`instituto-de-investigacion-
+        geologico-y-energetico-iige`, el instituto geológico — no
+        SENADI) — un defecto de calidad de datos del portal en sí, no
+        del scraping. La página de estadísticas propia de SENADI que
+        encontré es un artículo de noticia de 2017, no un portal de
+        datos vivo — sin confirmar si existe uno más actual.
+      - **Cultura** — `organization=mcyp` (Ministerio de Cultura y
+        Patrimonio) ya tiene 6 datasets reales en CKAN (visitantes de
+        museos, usuarios de bibliotecas/archivos históricos,
+        beneficiarios de fondos de patrimonio cultural, Registro Único
+        de Artistas y Gestores Culturales - RUAC). Ya reachable, sin
+        gap identificado.
+      - **Mujeres/Género — hallazgo real.** El **Consejo Nacional para
+        la Igualdad de Género (CNIG)**, `igualdadgenero.gob.ec`, tiene
+        una sección "Violencia" con el mismo patrón de acordeón
+        `download-monitor` ya confirmado scrapeable en otros sitios:
+        "Femicidios y Homicidios Intencionales de Mujeres" (según
+        búsqueda web, una "Matriz de Femicidios" actualizada
+        **semanalmente** desde agosto 2014 — la periodicidad más alta
+        encontrada en toda esta investigación) y series de violencia de
+        género desagregadas por provincia, etnia, discapacidad, edad y
+        quintil de ingreso. También coordina con INEC la encuesta
+        ENVIGMU (2019, ya en CKAN) y publica la serie "Mujeres y
+        Hombres en Cifras". No confirmé el link de descarga exacto de
+        la matriz de femicidios (no llegué a expandir el acordeón), pero
+        el patrón ya probado en otros sitios da alta confianza de que es
+        real y accesible sin fricción.
+
+      **Conclusión de esta pasada:** el hallazgo más *inmediatamente
+      accionable* es **Contraloría** — patrón de URL resuelto
+      completamente, CSV real, sin ninguna barrera técnica. **CNIG**
+      (femicidios semanales) es el segundo más prometedor por
+      periodicidad. Todo lo demás en la lista de Daniel (desnutrición,
+      PGE, SRI, Cultura) ya estaba cubierto por el CKAN nacional, sin
+      gaps reales encontrados. CNE sigue siendo el único bloqueo genuino
+      y confirmado dos veces. Sin explorar todavía: el patrón exacto de
+      `id` en las descargas de Contraloría para los demás trimestres, el
+      link real de la matriz de femicidios de CNIG, si ENES/SNNA tiene
+      una sección de resultados propia dentro de los reportes de SIAU,
+      el dominio real y actual de **Turismo**, el resto de las secciones
+      del boletín IEM del BCE, y los tableros dinámicos de SIPA. Marcado
+      como parcial, no cerrado.
 
 ---
 
