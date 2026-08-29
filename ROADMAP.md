@@ -870,6 +870,16 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
         confirmó el mecanismo de acceso a datos crudos en ninguna. Igual
         que los observatorios de FCD: son organizaciones privadas/gremiales,
         no gobierno — mismo matiz de alcance.
+- [x] **Registro Civil y datos demográficos/salud — revisado 2026-08-29,
+      cobertura ya sólida, sin gaps encontrados.** `organization=registro-civil`
+      en CKAN, 6 datasets reales (transacciones de cedulación, pasaportes
+      electrónicos, copias de actas registrales, catálogo de agencias,
+      certificado de firma electrónica). INEC aparte publica registros
+      estadísticos anuales de matrimonios y divorcios (2022-2024,
+      confirmados). Sumado a lo ya encontrado en pasadas anteriores
+      (ENSANUT, MSP_Nutrición, ECV, desnutrición vía `stecsdi`), la
+      cobertura demográfica/salud vía CKAN es ya bastante completa — no
+      se encontró ningún portal propio con datos que falten ahí.
 - [ ] **Vivienda (MIDUVI) — confirmado que el dominio está caído, no
       investigado más profundo.** `miduvi.gob.ec` falla a nivel TLS
       tanto con `httpx` como con el browser real — no es un problema de
