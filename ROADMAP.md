@@ -100,12 +100,9 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       `source="cuenca"`; confirmado también que una búsqueda `source`
       nacional no encuentra contenido específico de Cuenca (los catálogos
       están genuinamente separados, no es un fallback silencioso). **Gap
-      encontrado, no resuelto:** varios recursos de Cuenca son `.ods`
-      (OpenDocument spreadsheet) — `preview_resource_data` no lo soporta
-      como tabla (degrada con gracia al mensaje de formato no soportado,
-      apuntando a `download_resource`, no truena). Soporte `.ods` queda
-      pendiente si el volumen de casos lo justifica, mismo criterio que
-      `.rar`.
+      encontrado y cerrado 2026-08-28:** varios recursos de Cuenca son
+      `.ods` (OpenDocument spreadsheet) — ahora soportado, ver ítem `.ods`
+      en "Formatos y tipos de recursos" más abajo.
 - [ ] **Sitios de ministerios individuales** — sin alcance definido; falta
       decidir cuáles justifican una conexión propia en vez de depender del
       portal CKAN central.
@@ -262,6 +259,15 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
 - [x] **Parseo de decimales en formato europeo** (`7.760,2` = 7760.20) — ya
       hecho (ver CHANGELOG 0.5.1): se detecta y convierte a notación estándar
       en CSV. Este ítem había quedado desactualizado en el roadmap.
+- [x] **Soporte `.ods`** (OpenDocument Spreadsheet) — hecho 2026-08-28:
+      `preview_resource_data` previsualiza `.ods` como tabla vía `odfpy`
+      (pura Python, sin binario externo), mismo patrón que
+      `preview_xls`/`preview_xlsx`. `helpers/csv_reader.preview_ods` filtra
+      el padding de columnas/filas vacías repetidas que ODS usa para
+      rellenar la grilla fija de la hoja. Verificado en vivo contra un
+      recurso real de Cuenca en Datos (actas del Concejo Cantonal,
+      `gadcuenca_actas_pm_2026julio.ods`): headers y filas correctos,
+      tildes incluidas.
 - [~] **Soporte `.rar`** — todavía sin preview como tabla (necesitaría una
       dependencia/backend externo para extracción RAR, p. ej. `rarfile` con
       `unrar`/`unar`/7-Zip/`bsdtar`; puerta abierta si el volumen de casos

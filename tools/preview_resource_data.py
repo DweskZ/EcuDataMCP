@@ -6,6 +6,7 @@ from helpers.csv_reader import (
     format_table,
     preview_csv,
     preview_json,
+    preview_ods,
     preview_targz,
     preview_xls,
     preview_xlsx,
@@ -39,6 +40,8 @@ def classify_resource_format(fmt: str, url: str) -> str:
         return "XLSX"
     if url_lower.endswith(".xls"):
         return "XLS"
+    if url_lower.endswith(".ods"):
+        return "ODS"
     if url_lower.endswith((".json", ".geojson")):
         return "JSON"
     if url_lower.endswith((".csv", ".tsv", ".txt")):
@@ -50,6 +53,8 @@ def classify_resource_format(fmt: str, url: str) -> str:
         return "ZIP"
     if fmt == "XLS":
         return "XLS"
+    if fmt == "ODS":
+        return "ODS"
     if fmt in _XLSX_FORMATS:
         return "XLSX"
     if fmt in _JSON_FORMATS:
@@ -67,6 +72,7 @@ _CONTENT_TYPE_KIND = {
     "application/geo+json": "JSON",
     "application/vnd.ms-excel": "XLS",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "XLSX",
+    "application/vnd.oasis.opendocument.spreadsheet": "ODS",
     "application/zip": "ZIP",
     "application/x-zip-compressed": "ZIP",
     "application/gzip": "TARGZ",
@@ -99,7 +105,8 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
         """
         Download and preview a resource from Ecuador's open data portal.
 
-        Supports CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX), and .tar.gz/.zip archives
+        Supports CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX), OpenDocument (ODS),
+        and .tar.gz/.zip archives
         that wrap a CSV/TSV/TXT file. Returns the first N rows as a formatted table
         so the model can inspect data without a local download. Geometry/WKT columns
         are dropped from the table (they can be tens of KB per cell); CSV columns
@@ -182,6 +189,8 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
                 result = await preview_xls(url, max_rows=rows)
             elif kind == "XLSX":
                 result = await preview_xlsx(url, max_rows=rows)
+            elif kind == "ODS":
+                result = await preview_ods(url, max_rows=rows)
             elif kind == "JSON":
                 result = await preview_json(url, max_rows=rows)
             elif kind == "CSV":
@@ -197,8 +206,8 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
                     format,
                     text_builder=lambda d: (
                         f"Este recurso tiene formato '{d.get('format_detectado') or 'desconocido'}'. "
-                        "preview_resource_data soporta CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX) "
-                        "y .tar.gz/.zip (si envuelven un CSV/TSV/TXT). "
+                        "preview_resource_data soporta CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX), "
+                        "OpenDocument (ODS) y .tar.gz/.zip (si envuelven un CSV/TSV/TXT). "
                         "Si está en DataStore prueba query_resource_data. "
                         f"Descarga directa: {d['url']}"
                     ),

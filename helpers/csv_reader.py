@@ -452,6 +452,71 @@ async def preview_xls(
     }
 
 
+async def preview_ods(
+    url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
+) -> dict[str, Any]:
+    """Preview the first sheet of an OpenDocument Spreadsheet (.ods)."""
+    from odf.opendocument import load
+    from odf.table import Table, TableCell, TableRow
+    from odf.teletype import extractText
+
+    raw, truncated = await download_bytes(url, session=session)
+    doc = load(io.BytesIO(raw))
+    tables = doc.spreadsheet.getElementsByType(Table)
+    empty = {
+        "headers": [],
+        "rows": [],
+        "total_rows_in_preview": 0,
+        "truncated": truncated,
+        "format": "ods",
+    }
+    if not tables:
+        return empty
+    sheet = tables[0]
+
+    def row_values(row: TableRow) -> list[str]:
+        values: list[str] = []
+        for cell in row.getElementsByType(TableCell):
+            # ODS pads trailing empty columns with huge repeat counts (e.g.
+            # 1024) to fill the sheet's fixed grid -- cap it, real header/data
+            # rows never need more than a handful of repeated cells.
+            repeat = min(int(cell.getAttribute("numbercolumnsrepeated") or 1), 50)
+            values.extend([extractText(cell).strip()] * repeat)
+        while values and values[-1] == "":
+            values.pop()
+        return values
+
+    all_rows: list[list[str]] = []
+    for row in sheet.getElementsByType(TableRow):
+        values = row_values(row)
+        if not values:
+            continue
+        repeat = min(int(row.getAttribute("numberrowsrepeated") or 1), max_rows + 2)
+        for _ in range(repeat):
+            all_rows.append(values)
+            if len(all_rows) > max_rows + 1:
+                break
+        if len(all_rows) > max_rows + 1:
+            break
+
+    if not all_rows:
+        return empty
+
+    headers = all_rows[0]
+    data_rows = all_rows[1 : max_rows + 1]
+    if len(all_rows) - 1 > max_rows:
+        truncated = True
+
+    return {
+        "headers": headers,
+        "rows": data_rows,
+        "total_rows_in_preview": len(data_rows),
+        "truncated": truncated,
+        "format": "ods",
+        "sheet": sheet.getAttribute("name"),
+    }
+
+
 _MAX_DECOMPRESSED_BYTES = 20 * 1024 * 1024  # 20 MB
 
 

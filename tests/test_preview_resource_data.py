@@ -62,6 +62,11 @@ def test_classify_legacy_xls_distinct_from_xlsx():
     assert classify_resource_format("", "https://x/reporte.xlsx") == "XLSX"
 
 
+def test_classify_ods_by_extension_even_if_declared_csv():
+    assert classify_resource_format("CSV", "https://x/reporte.ods") == "ODS"
+    assert classify_resource_format("ODS", "https://x/download?id=123") == "ODS"
+
+
 def test_classify_json_and_geojson():
     assert classify_resource_format("", "https://x/datos.json") == "JSON"
     assert classify_resource_format("", "https://x/mapa.geojson") == "JSON"
@@ -85,6 +90,10 @@ def test_classify_from_content_type_maps_common_mimes():
         == "XLSX"
     )
     assert classify_from_content_type("application/vnd.ms-excel") == "XLS"
+    assert (
+        classify_from_content_type("application/vnd.oasis.opendocument.spreadsheet")
+        == "ODS"
+    )
 
 
 def test_classify_from_content_type_unknown_or_missing():
@@ -237,6 +246,35 @@ async def test_xls_is_routed_to_xls_parser(monkeypatch):
     payload = json.loads(result)
     assert payload["headers"] == ["producto", "precio"]
     assert calls == ["https://x/reporte.xls"]
+
+
+async def test_ods_is_routed_to_ods_parser(monkeypatch):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
+        return {"url": "https://x/reporte.ods", "format": "ODS", "name": "Reporte"}
+
+    calls = []
+
+    async def fake_preview_ods(url, max_rows=20, session=None):
+        calls.append(url)
+        return {
+            "headers": ["producto", "precio"],
+            "rows": [["cacao", "174.77"]],
+            "total_rows_in_preview": 1,
+            "format": "ods",
+        }
+
+    async def fail_preview_csv(*args, **kwargs):
+        raise AssertionError("preview_csv should not be called for a .ods resource")
+
+    monkeypatch.setattr(ckan_client, "get_resource", fake_get_resource)
+    monkeypatch.setattr(preview_resource_data_module, "preview_ods", fake_preview_ods)
+    monkeypatch.setattr(preview_resource_data_module, "preview_csv", fail_preview_csv)
+
+    tool = _make_tool()
+    result = await tool(resource_id="abc123", format="json")
+    payload = json.loads(result)
+    assert payload["headers"] == ["producto", "precio"]
+    assert calls == ["https://x/reporte.ods"]
 
 
 async def test_resource_not_found_returns_error(monkeypatch):

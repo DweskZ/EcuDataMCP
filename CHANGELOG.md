@@ -3,6 +3,19 @@
 ## Unreleased
 
 ### Added
+- **Soporte `.ods` (OpenDocument Spreadsheet)** en `preview_resource_data`:
+  nueva `helpers/csv_reader.preview_ods` (vía `odfpy`, pura Python, sin
+  dependencia externa), mismo patrón que `preview_xls`/`preview_xlsx`.
+  Descarta el padding de columnas/filas vacías repetidas que ODS usa para
+  rellenar la grilla fija de la hoja (`numbercolumnsrepeated`/
+  `numberrowsrepeated`, a veces con conteos de 1000+), en vez de mostrarlas
+  como columnas vacías o filas de datos en blanco. Verificado en vivo contra
+  un recurso real de Cuenca en Datos
+  (`gadcuenca_actas_pm_2026julio.ods`, actas del Concejo Cantonal): headers y
+  filas correctos, incluyendo tildes (confirmado a nivel de code point — lo
+  que se ve como `�` en la consola de Windows es el mismo falso positivo ya
+  documentado para `.xls`, no un bug de decodificación real). Cierra el gap
+  que dejó pendiente la integración de Cuenca en Datos.
 - **Integración de Cuenca en Datos** (`cuencaendatos.cuenca.gob.ec`), el
   portal municipal CKAN de Cuenca (92 datasets, verificado en vivo).
   Mismo shape de API que el portal nacional, así que en vez de un cliente y
@@ -17,9 +30,7 @@
   Nuevas variables de entorno opcionales `CUENCA_API_URL`/`CUENCA_SITE_URL`.
   Verificado en vivo end-to-end (search, categorías, organizaciones,
   metadata de dataset/recurso, y preview de un CSV real). Varios recursos
-  de Cuenca son `.ods`, formato que `preview_resource_data` no soporta
-  todavía como tabla — degrada con gracia a `download_resource` en vez de
-  fallar.
+  de Cuenca son `.ods` — ver soporte `.ods` más abajo.
 - **Nuevo tool `detect_series_pattern`**: dado un dataset con un grupo de
   recursos de nombre periódico (el mismo que ya detecta
   `list_dataset_resources` como `possible_periodic_series`), descarga los

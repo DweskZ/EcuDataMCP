@@ -13,6 +13,7 @@ from helpers.csv_reader import (
     _parse_csv_bytes,
     download_bytes,
     normalize_eu_decimal_columns,
+    preview_ods,
     preview_targz,
     preview_zip,
     sniff_content_type,
@@ -342,3 +343,109 @@ def test_parse_csv_bytes_raises_actionable_error_for_malformed_csv():
 
     with pytest.raises(ValueError, match="no se pudo parsear como CSV"):
         _parse_csv_bytes(raw, max_rows=20)
+
+
+def _make_ods(rows: list[list[str]], pad_columns: int = 0, pad_rows: int = 0) -> bytes:
+    """Build a real .ods file with `rows`, optionally followed by a padded
+    trailing empty column (on the header row) and/or a padded trailing block
+    of empty rows -- both are how real spreadsheet editors encode unused
+    grid space, via numbercolumnsrepeated/numberrowsrepeated attributes."""
+    from odf.opendocument import OpenDocumentSpreadsheet
+    from odf.table import Table, TableCell, TableRow
+    from odf.text import P
+
+    doc = OpenDocumentSpreadsheet()
+    table = Table(name="Hoja1")
+    for i, row_values in enumerate(rows):
+        row = TableRow()
+        for value in row_values:
+            cell = TableCell(valuetype="string")
+            cell.addElement(P(text=value))
+            row.addElement(cell)
+        if i == 0 and pad_columns:
+            row.addElement(TableCell(valuetype="string", numbercolumnsrepeated=pad_columns))
+        table.addElement(row)
+    if pad_rows:
+        blank_row = TableRow(numberrowsrepeated=pad_rows)
+        blank_row.addElement(TableCell(valuetype="string", numbercolumnsrepeated=10))
+        table.addElement(blank_row)
+    doc.spreadsheet.addElement(table)
+    buf = io.BytesIO()
+    doc.write(buf)
+    return buf.getvalue()
+
+
+async def test_preview_ods_reads_header_and_rows(httpx_mock, monkeypatch):
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+
+    ods_bytes = _make_ods([["producto", "precio"], ["cacao", "174.77"], ["banano", "12.5"]])
+    url = "https://example.com/precios.ods"
+    httpx_mock.add_response(url=url, content=ods_bytes)
+
+    result = await preview_ods(url)
+
+    assert result["headers"] == ["producto", "precio"]
+    assert result["rows"] == [["cacao", "174.77"], ["banano", "12.5"]]
+    assert result["format"] == "ods"
+    assert result["sheet"] == "Hoja1"
+    assert result["truncated"] is False
+
+
+async def test_preview_ods_strips_padded_trailing_columns_and_rows(httpx_mock, monkeypatch):
+    # Real-world ODS files pad unused grid space with huge repeat counts on
+    # trailing empty cells/rows (spreadsheet editors reserve a full grid,
+    # e.g. 1000+ columns/rows) -- these must not leak into the preview as
+    # bogus empty columns or blank data rows.
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+
+    ods_bytes = _make_ods(
+        [["producto", "precio"], ["cacao", "174.77"]],
+        pad_columns=1000,
+        pad_rows=500,
+    )
+    url = "https://example.com/padded.ods"
+    httpx_mock.add_response(url=url, content=ods_bytes)
+
+    result = await preview_ods(url)
+
+    assert result["headers"] == ["producto", "precio"]
+    assert result["rows"] == [["cacao", "174.77"]]
+
+
+async def test_preview_ods_truncates_at_max_rows(httpx_mock, monkeypatch):
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+
+    rows = [["producto", "precio"]] + [[f"item{i}", str(i)] for i in range(5)]
+    ods_bytes = _make_ods(rows)
+    url = "https://example.com/muchas_filas.ods"
+    httpx_mock.add_response(url=url, content=ods_bytes)
+
+    result = await preview_ods(url, max_rows=3)
+
+    assert result["total_rows_in_preview"] == 3
+    assert result["truncated"] is True
+
+
+async def test_preview_ods_empty_sheet(httpx_mock, monkeypatch):
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+
+    ods_bytes = _make_ods([])
+    url = "https://example.com/vacio.ods"
+    httpx_mock.add_response(url=url, content=ods_bytes)
+
+    result = await preview_ods(url)
+
+    assert result["headers"] == []
+    assert result["rows"] == []
