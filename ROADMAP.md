@@ -36,7 +36,27 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       (`search_auditores`/`get_auditor_info`).
 - [x] **Instituto Geofísico (IG-EPN)** — hecho: tool `search_sismos` sobre el
       catálogo sísmico público, con caché TTL y parseo tolerante del CSV.
-- [ ] **Ecuador en Cifras / portal BI del INEC** — sin investigar todavía.
+- [x] **Ecuador en Cifras / portal BI del INEC** — **investigado
+      2026-08-28: callejón sin salida.** `ecuadorencifras.gob.ec` resultó
+      ser un subsitio institucional viejo/abandonado (plantilla de ~2017,
+      lista de enlaces a secretarías que ya no existen con ese nombre, sin
+      contenido estadístico real ni portal BI visible). `inec.gob.ec` no
+      resuelve (DNS falla). No se encontró el "portal BI" que motivó este
+      ítem. Los datos reales del INEC ya alcanzables hoy siguen siendo los
+      ~13 datasets vía CKAN genérico bajo SENESCYT/ANDA (ver más abajo) y
+      el catálogo NADA/IHSN de `search_anda`. Cerrado como investigado, no
+      como pendiente.
+- [ ] **LOTAIP como fuente transversal** — **candidato nuevo, 2026-08-28,**
+      encontrado investigando IESS (ver nota de Transparencia más abajo).
+      Ley Orgánica de Transparencia y Acceso a la Información Pública:
+      obligatoria para toda institución pública ecuatoriana, cada una
+      publica su propio portal LOTAIP (resoluciones, contratación,
+      balances, exámenes de Contraloría...). Si la estructura resulta
+      suficientemente uniforme entre instituciones, podría ser una fuente
+      transversal reutilizable en vez de una integración por institución.
+      Sin investigar más allá de confirmar que existe en IESS — falta
+      revisar si el formato/URL se repite en otras instituciones antes de
+      decidir si vale la pena.
 - [x] **IESS (Instituto Ecuatoriano de Seguridad Social)** — **agregado
       2026-08-16, pedido por Daniel: tienen boletines/reportes en PDF en su
       propio portal.** Ya reachable hoy vía CKAN genérico
@@ -55,6 +75,52 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       extraído del `href` en esa página. `read_pdf` (ver más abajo) lo lee
       correctamente — 40 caracteres de texto en la portada, confirmado en
       vivo.
+
+      **Investigación más a fondo del portal, 2026-08-28** (pedido
+      explícito de Daniel: "investigar boletines del IESS y otro material
+      más allá de los portales que tenemos"):
+      - **Estudios Actuariales** (`iess.gob.ec/estudios-actuariales/`) —
+        mismo patrón Liferay que los boletines (vista `guest/estudios-
+        actuariales-{año}`, PDF real en `iess.gob.ec/documents/10162/...`).
+        Confirmados sets completos para 2010, 2013, 2018 y 2020 — el de
+        2020 solo trae 14 PDFs reales (valuación actuarial y su
+        aprobación por fondo: IVM, Salud, Riesgos del Trabajo, Seguro
+        Social Campesino, Cesantía, Desempleo, más tablas de mortalidad).
+        **Bug real encontrado y corregido en el mismo pase:** el PDF de
+        valuación del fondo IVM pesa 14.6 MB, casi 3× el tope de 5 MB de
+        `read_pdf` — la descarga truncada producía un mensaje engañoso
+        ("está corrupto") en vez de explicar que se cortó a la mitad.
+        Corregido: `read_pdf` ahora detecta la descarga truncada *antes*
+        de intentar parsear (mismo patrón que `.zip`/`.tar.gz` truncados)
+        y da un mensaje accionable. El resto de PDFs del set 2020 (0.29–1.7
+        MB) están dentro del tope y se leen bien — verificado en vivo.
+      - **Informes de Auditoría** (`iess.gob.ec/es/informes-de-auditoria`)
+        — archivo real y grande: carpetas por año 2007–2025, entre 1 y 42
+        documentos por año (~344 documentos en total). El listado de
+        carpetas y el listado de documentos dentro de cada carpeta **sí
+        son HTML servido por el servidor** (confirmado con `httpx` plano,
+        sin browser) — un tool de enumeración sería viable. **Pero** el
+        link real al PDF de cada documento individual solo aparece
+        después de que el navegador ejecuta JS (confirmado: la página del
+        documento vía `httpx` plano no contiene ningún link `.pdf`, pero
+        sí aparece al renderizar con browser real). Ese último salto
+        necesitaría un backend con navegador headless (Playwright/
+        Selenium) — una dependencia de infraestructura nueva y bastante
+        más grande que cualquier otra de este proyecto (categoría similar
+        a la razón por la que se descartó soporte `.rar`), así que no se
+        construyó nada aquí. Queda como hallazgo documentado, no como
+        tool.
+      - **Transparencia / LOTAIP** (`iess.gob.ec/transparencia/`) —
+        confirmado: IESS publica su portal LOTAIP (Ley Orgánica de
+        Transparencia y Acceso a la Información Pública) con secciones de
+        resoluciones, exámenes de Contraloría, contratación pública,
+        balance financiero del BIESS, etc. **Nota importante:** LOTAIP es
+        obligatorio por ley para *toda* institución pública ecuatoriana,
+        no solo IESS — si este patrón resulta automatizable en algún
+        portal, probablemente se repite en decenas de instituciones. No
+        investigado más a fondo esta sesión (fuera del pedido específico
+        sobre IESS); candidato a su propio ítem de investigación si se
+        decide perseguirlo.
 - [~] **SENESCYT** — pedido explícitamente por Daniel. Datos de educación
       superior, becas, registro de títulos. **Revisado 2026-08-16: ya
       reachable hoy, sin código nuevo,** vía los tools CKAN genéricos
@@ -79,7 +145,13 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       estructurado, probablemente sea ahí (sección "Títulos" del SIAU) o en
       un portal de verificación de títulos aparte, todavía sin identificar
       — pendiente investigar específicamente eso, ya que el CKAN no lo
-      resuelve.
+      resuelve. **Re-revisado 2026-08-28** (de paso, investigando IESS): la
+      página principal del SIAU ya no muestra un link directo a "Títulos"
+      entre sus indicadores destacados (solo "Indicadores matrícula" es
+      visible ahora) — el sitio cambió desde la revisión anterior. No se
+      encontró un portal de verificación de títulos aparte en este pase.
+      La conclusión de fondo no cambia: sigue sin haber una fuente
+      estructurada y consultable para registro de títulos.
 - [x] **Cuenca en Datos** (`https://cuencaendatos.cuenca.gob.ec`) — **hecho
       2026-08-28.** Verificado en vivo: CKAN 2.9.6, 92 datasets, 13
       categorías temáticas, un solo publicador (GAD Municipal del cantón

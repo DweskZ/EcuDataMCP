@@ -21,8 +21,10 @@ def register_read_pdf_tool(mcp: FastMCP) -> None:
         Useful for PDFs linked from other tools' results, e.g. get_regulacion_info's
         Registro Oficial file, or a dataset resource that turned out to be a PDF
         bulletin instead of a tabular file. No OCR: a scanned PDF with no embedded
-        text layer will come back empty. Max download size: 5 MB, max 20 pages
-        extracted per call (call again with a different `pages` range for the rest).
+        text layer will come back empty. Max download size: 5 MB (larger files
+        return an explicit error instead of a partial read -- PDFs can't be
+        parsed from a truncated download); max 20 pages extracted per call
+        (call again with a different `pages` range for the rest).
 
         Args:
             url: Direct URL to the PDF file
@@ -72,7 +74,6 @@ def register_read_pdf_tool(mcp: FastMCP) -> None:
             "url": url,
             "total_pages": result["total_pages"],
             "pages": result["pages"],
-            "truncated": result["truncated"],
             "pages_capped": result["pages_capped"],
         }
 
@@ -82,11 +83,6 @@ def register_read_pdf_tool(mcp: FastMCP) -> None:
                 f"Total de páginas: {data['total_pages']}",
                 f"Páginas extraídas: {len(data['pages'])}",
             ]
-            if data.get("truncated"):
-                parts.append(
-                    "⚠ Descarga truncada (el archivo excede el límite de 5 MB); "
-                    "el texto extraído puede estar incompleto."
-                )
             if data.get("pages_capped"):
                 parts.append(
                     f"⚠ Se pidieron más de {MAX_PAGES_PER_CALL} páginas; solo se "

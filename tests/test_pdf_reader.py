@@ -2,6 +2,7 @@ import socket
 
 import pytest
 
+from helpers.csv_reader import MAX_DOWNLOAD_BYTES
 from helpers.pdf_reader import MAX_PAGES_PER_CALL, _parse_pages, read_pdf
 
 
@@ -87,7 +88,6 @@ async def test_read_pdf_extracts_text_per_page(httpx_mock, monkeypatch):
         {"page": 1, "text": "Primera pagina"},
         {"page": 2, "text": "Segunda pagina"},
     ]
-    assert result["truncated"] is False
     assert result["pages_capped"] is False
 
 
@@ -114,6 +114,21 @@ async def test_read_pdf_flags_pages_capped_for_long_documents(httpx_mock, monkey
     assert result["total_pages"] == 25
     assert len(result["pages"]) == MAX_PAGES_PER_CALL
     assert result["pages_capped"] is True
+
+
+async def test_read_pdf_over_5mb_gives_actionable_truncation_message(httpx_mock, monkeypatch):
+    # Confirmed against a real 14.6 MB IESS actuarial-study PDF: a download
+    # cut off at MAX_DOWNLOAD_BYTES can't be parsed at all, even in pypdf's
+    # non-strict mode ("Stream has ended unexpectedly") -- a PDF's xref
+    # table lives at the end of the file, same structural issue as .zip.
+    _fake_dns(monkeypatch)
+    real_pdf = _make_pdf(["Contenido"])
+    padding = b"\x00" * (MAX_DOWNLOAD_BYTES + 10)
+    url = "https://example.com/enorme.pdf"
+    httpx_mock.add_response(url=url, content=real_pdf + padding)
+
+    with pytest.raises(ValueError, match="supera el límite de 5 MB"):
+        await read_pdf(url)
 
 
 async def test_read_pdf_rejects_corrupt_file(httpx_mock, monkeypatch):

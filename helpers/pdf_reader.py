@@ -59,6 +59,20 @@ async def read_pdf(
     from pypdf.errors import PdfReadError, PyPdfError
 
     raw, truncated = await download_bytes(url, session=session)
+    if truncated:
+        # A PDF's xref table and trailer live at the end of the file (same
+        # structural issue as .zip), so a download cut off at
+        # MAX_DOWNLOAD_BYTES can't be parsed at all -- confirmed against a
+        # real 14.6 MB IESS actuarial-study PDF: pypdf fails even in
+        # non-strict mode ("Stream has ended unexpectedly"), not just a
+        # missing-EOF warning. Skip the doomed parse and say what happened.
+        raise ValueError(
+            "El archivo PDF supera el límite de 5 MB de este tool, así que "
+            "se descargó incompleto y no se puede leer (la tabla de "
+            "referencias de un PDF vive al final del archivo). Prueba "
+            "download_resource si el PDF viene de un recurso CKAN, o el "
+            "enlace directo."
+        )
 
     try:
         reader = PdfReader(io.BytesIO(raw))
@@ -83,12 +97,7 @@ async def read_pdf(
 
     total_pages = len(reader.pages)
     if total_pages == 0:
-        return {
-            "total_pages": 0,
-            "pages": [],
-            "truncated": truncated,
-            "pages_capped": False,
-        }
+        return {"total_pages": 0, "pages": [], "pages_capped": False}
 
     selected, pages_capped = _parse_pages(pages, total_pages)
 
@@ -100,6 +109,5 @@ async def read_pdf(
     return {
         "total_pages": total_pages,
         "pages": page_results,
-        "truncated": truncated,
         "pages_capped": pages_capped,
     }

@@ -21,7 +21,15 @@
   Liferay `document_library_display`, el PDF real vive en
   `iess.gob.ec/documents/...`). Ambos con texto genuinamente extraíble y
   bien por encima del tope de 20 páginas, confirmando que el parámetro
-  `pages` es necesario, no especulativo.
+  `pages` es necesario, no especulativo. **Corregido 2026-08-28,**
+  investigando más PDFs reales de IESS: un PDF real de 14.6 MB (estudio
+  actuarial 2020, ver ROADMAP) expuso que una descarga truncada al tope de
+  5 MB daba un mensaje engañoso ("está corrupto") en vez de explicar que
+  se cortó a la mitad — un PDF, como un `.zip`, tiene su tabla de
+  referencias al final del archivo, así que no hay lectura parcial
+  posible. `read_pdf` ahora detecta la descarga truncada antes de
+  intentar parsear y da un mensaje accionable, mismo patrón ya usado para
+  `.zip`/`.tar.gz` truncados.
 - **Soporte `.ods` (OpenDocument Spreadsheet)** en `preview_resource_data`:
   nueva `helpers/csv_reader.preview_ods` (vía `odfpy`, pura Python, sin
   dependencia externa), mismo patrón que `preview_xls`/`preview_xlsx`.

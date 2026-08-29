@@ -42,7 +42,6 @@ async def test_read_pdf_returns_page_text_as_json(httpx_mock, monkeypatch):
 
     assert payload["total_pages"] == 2
     assert payload["pages"][0]["text"] == "Reglamento articulo 1"
-    assert payload["truncated"] is False
     assert payload["pages_capped"] is False
 
 
