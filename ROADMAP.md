@@ -787,6 +787,12 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
 - [ ] **Datos legislativos/normativos para uso legal profesional —
       investigado 2026-08-29,** pedido de Daniel desde la perspectiva de
       un profesional del derecho: regulaciones, circulares y similares.
+      **Nota explícita de Daniel (mismo día): posible que este dominio
+      completo (legislación/normativa/Registro Oficial/jurisprudencia)
+      termine no siendo relevante para el proyecto.** Todo lo de abajo
+      quedó investigado porque se pidió explícitamente, no porque haya
+      una decisión de construir nada — no asumir que esto es prioridad
+      solo por el volumen de la investigación.
       - **`search_regulaciones`/`get_regulacion_info` ya cubren mucho más
         de lo documentado hasta ahora.** Conteo real de `tipo` sobre
         ~2000 regulaciones del endpoint gob.ec (confirmado en vivo):
@@ -853,23 +859,65 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
         del sistema de proyectos de ley.
       - **Gremios/asociaciones privadas con datos sectoriales reales —
         pedido de Daniel ("car salesmen", bancos, "cualquier otro que
-        valga la pena").** **AEADE** (Asociación de Empresas
-        Automotrices del Ecuador, `aeade.net`) publica "Boletines de
-        prensa: venta de vehículos" — página real confirmada, pero no
-        se encontró un archivo `.pdf/.xlsx` con link directo en el HTML
-        de esa página (puede estar en una galería/widget JS, sin
-        confirmar el mecanismo real de descarga). **ASOBANCA**
-        (Asociación de Bancos Privados del Ecuador,
-        `asobanca.org.ec/plataformas-de-datos/`) tiene tres
-        plataformas propias reales: **Datalab** ("primera herramienta
-        de inteligencia financiera gratuita en América Latina"),
-        **Mapa de Inclusión** (acceso/uso de servicios financieros), y
-        **ClicStat** (datos económicos desagregados) — más una sección
-        "Legal Normativa" separada. Suenan a aplicaciones web/paneles
-        interactivos, no archivos descargables simples — no se
-        confirmó el mecanismo de acceso a datos crudos en ninguna. Igual
-        que los observatorios de FCD: son organizaciones privadas/gremiales,
-        no gobierno — mismo matiz de alcance.
+        valga la pena"). **Corrección/profundización 2026-08-29 (mismo
+        día):** revisadas a fondo, no solo la página de aterrizaje.
+        **AEADE** (Asociación de Empresas Automotrices del Ecuador,
+        `aeade.net`) — **confirmado real con archivo real:** "Boletines
+        de prensa: venta de vehículos" tiene un boletín mensual real y
+        vigente (Julio 2026, el mes más reciente, PDF de 9.76 MB,
+        descargado y confirmado, patrón de URL
+        `aeade.net/?sdm_process_download=1&download_id={id}`, plugin
+        WordPress "Simple Download Monitor"). El sitio tiene además:
+        **Anuarios** (informes anuales reales desde 2016), **Boletín de
+        facturación del sector automotor**, **Informe Macroeconómico
+        Ecuador**, **Aranceles vigentes**, homologación vehicular, mapa
+        de puntos de carga para vehículos eléctricos — un archivo
+        genuinamente rico, mismo patrón de descarga en todos (sin
+        verificar cada uno individualmente, pero con alta confianza dado
+        el mecanismo ya confirmado). **ASOBANCA** (Asociación de Bancos
+        Privados del Ecuador) — **Datalab**
+        (`datalab.asobanca.org.ec/datalab/home.html`) es una SPA real y
+        extensa: categorías completas para Bancos, Cooperativas, Tasas
+        de Interés, Servicios Financieros, Sistema Internacional, Sector
+        Real — con sub-secciones explícitamente llamadas **"Base de
+        datos - Cuentas"**, **"Base de datos - Indicadores"**, **"Base
+        de datos - Tasas de Interés"**, **"Base de Datos - Sistema
+        Financiero"** (PIB por componentes/industrias, inflación por
+        ciudad/división de consumo/histórica, tarjetas de crédito/débito,
+        cajeros, puntos de venta). Navegación 100% vía JS (anchors `#`,
+        sin URLs propias por sección) — **no se llegó a rastrear el
+        endpoint de datos real** detrás de la SPA (revisé network
+        requests tras un clic y solo vi assets estáticos, no una
+        llamada a API/JSON identificable en el tiempo disponible).
+        Contenido real y rico confirmado, mecanismo de extracción
+        todavía sin resolver. Igual que los observatorios de FCD: son
+        organizaciones privadas/gremiales, no gobierno — mismo matiz de
+        alcance.
+- [ ] **INEVAL (Instituto Nacional de Evaluación Educativa) — hallazgo
+      grande, 2026-08-29, a partir de un link que Daniel dio
+      directamente** (`evaluaciones.evaluacion.gob.ec/BI/historico-ser-
+      bachiller/`) preguntando si ya se había encontrado la data del
+      examen ENES de SENESCYT — **no se había encontrado; es una
+      institución totalmente distinta de SENESCYT/MINEDEC.** INEVAL
+      administra "Ser Bachiller" (examen de grado, se fusionó con el
+      ENES en 2017 para el proceso de admisión a educación superior,
+      corrió 2013-2020) y **toda una familia de evaluaciones
+      nacionales**: Ser Estudiante (+ variantes "en la Infancia", "en
+      la Mitad del Mundo", "Galápagos"), Ser Maestro (+
+      Recategorización), Ser Profesional, más la evaluación
+      internacional LLECE. Cada evaluación tiene una página con
+      acordeón por año lectivo (mismo patrón Bootstrap ya confirmado
+      scrapeable en otros sitios — contenido ya en el DOM, solo
+      colapsado por CSS) con múltiples archivos reales por año
+      (`evaluaciones.evaluacion.gob.ec/BI/download/{id}/`, confirmado
+      descargando uno: ZIP real de 79.5 KB para el año lectivo
+      2018-2019 de Ser Bachiller — 10 archivos solo para ese año). Sin
+      login, sin captcha. **Candidato real y directo** para responder
+      exactamente el tipo de pregunta que motivó esta búsqueda
+      ("¿dónde están los resultados históricos del examen de admisión a
+      la universidad?") — mucho más específico y rico que cualquier
+      cosa encontrada hasta ahora en SENESCYT/Educación Superior para
+      ese propósito puntual.
 - [x] **Registro Civil y datos demográficos/salud — revisado 2026-08-29,
       cobertura ya sólida, sin gaps encontrados.** `organization=registro-civil`
       en CKAN, 6 datasets reales (transacciones de cedulación, pasaportes
