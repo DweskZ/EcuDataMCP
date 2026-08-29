@@ -917,7 +917,37 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       ("¿dónde están los resultados históricos del examen de admisión a
       la universidad?") — mucho más específico y rico que cualquier
       cosa encontrada hasta ahora en SENESCYT/Educación Superior para
-      ese propósito puntual.
+      ese propósito puntual. **Páginas extra confirmadas en el mismo
+      dominio:** `evaluacion.gob.ec` (el sitio institucional, distinto
+      del subdominio `evaluaciones.evaluacion.gob.ec` del Banco de
+      Información) tiene su propia sección "Resoluciones del Ineval"
+      — mismo patrón de archivo real, vigente hasta 2026 — pero es
+      normativa/administrativa, no datos de exámenes.
+- [ ] **Más gremios/asociaciones privadas — continuación 2026-08-29,**
+      pedido explícito de Daniel de seguir con gremios comerciales.
+      - **FEDEXPOR (Federación Ecuatoriana de Exportadores) — hallazgo
+        real y directamente relevante:** "Reporte Estadístico Expordata"
+        (`fedexpor.com/inteligencia-comercial/reporte-expordata/`) es un
+        **reporte mensual de comercio exterior, real y vigente — la
+        edición de agosto 2026 (el mes actual) ya está publicada**,
+        con histórico completo mes a mes desde al menos 2022. Alojado
+        en Google Drive (links `drive.google.com/file/d/.../view`, no
+        en el propio dominio), sin login ni suscripción para ver/
+        descargar — confirmado navegando directo al link de agosto
+        2026. **Esto llena exactamente el hueco que dejó Aduana/SENAE**
+        (comercio exterior no publicado en portal abierto, solo por
+        oficio) — el sector privado sí lo publica, mensualmente, gratis.
+        Candidato real fuerte si el interés en comercio exterior sigue
+        en pie.
+      - **CAMICON (Cámara de la Industria de la Construcción)** —
+        revisado, sin hallazgo propio. La búsqueda web indica que el
+        índice de confianza/expectativas del sector construcción que
+        se le suele atribuir en prensa en realidad **lo publica el BCE**
+        (Índice de Expectativas Económicas) y **el INEC** (Índice de
+        Precios de la Construcción, ya visto vía `datosabiertos.gob.ec`
+        e IPCO de INEC) — CAMICON aparece citando/analizando esos datos,
+        no publicándolos como fuente primaria propia. No se encontró
+        una sección de estadísticas/descargas en su sitio.
 - [x] **Registro Civil y datos demográficos/salud — revisado 2026-08-29,
       cobertura ya sólida, sin gaps encontrados.** `organization=registro-civil`
       en CKAN, 6 datasets reales (transacciones de cedulación, pasaportes
