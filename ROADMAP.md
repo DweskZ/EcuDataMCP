@@ -718,6 +718,144 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       el dominio real y actual de **Turismo**, el resto de las secciones
       del boletín IEM del BCE, y los tableros dinámicos de SIPA. Marcado
       como parcial, no cerrado.
+- [ ] **Fuentes externas de sociedad civil (no gubernamentales) —
+      investigado 2026-08-29,** pedido explícito de Daniel: Observatorio
+      Legislativo, Observatorio de los GADs, Observatorio de Gasto
+      Público "y otros observatorios de la misma organización/fundación".
+      **Nota de alcance:** este proyecto se describe (CLAUDE.md) como
+      datos *del gobierno* ecuatoriano vía CKAN/gob.ec/SRI/BCE/etc. —
+      estas fuentes son de una fundación de sociedad civil, no del
+      Estado. Investigado igual porque se pidió explícitamente, pero
+      decidir si integrarlas es una decisión de alcance del proyecto,
+      no solo técnica.
+      - **Fundación Ciudadanía y Desarrollo (FCD)** es la organización
+        detrás de todos los observatorios que Daniel nombró. Mantiene
+        una red de observatorios temáticos, cada uno con su propio
+        dominio: **Observatorio Legislativo**
+        (`observatoriolegislativo.ec`, monitorea la Asamblea Nacional,
+        miembro de la Red Latinoamericana de Transparencia Legislativa),
+        **Observatorio Judicial** (`observatoriojudicial.ec`, control
+        ciudadano a la Función Judicial), **Observatorio de Gasto
+        Público** (`gastopublico.org`, presupuesto/gasto/déficit fiscal,
+        incluye análisis del gasto municipal de Quito/Guayaquil/Cuenca —
+        esto parece cubrir lo que Daniel busca como "Observatorio de los
+        GADs", no encontré un observatorio de GADs con dominio propio y
+        separado), más observatorios de anticorrupción y de
+        financiamiento político (sin dominio propio confirmado, viven
+        dentro de `ciudadaniaydesarrollo.org`). **Naturaleza del
+        contenido:** son informes de análisis (PDF narrativos) y notas
+        de prensa, no datasets tabulares descargables — `gastopublico.org/indicadores`
+        no tiene ningún archivo `.csv/.xlsx/.pdf` enlazado directo
+        (confirmado revisando el HTML), así que el valor está en la
+        interpretación/narrativa, no en datos crudos reutilizables
+        programáticamente. Distinto en naturaleza a todo lo demás en
+        este roadmap.
+      - **Grupo FARO** (`grupofaro.org`) — think tank de política
+        pública más grande de Ecuador en este espacio, calcula el
+        Índice de Presupuesto Abierto de Ecuador (Open Budget Survey),
+        más de 200 publicaciones en 15 años. Mismo perfil que FCD:
+        análisis e investigación, no un catálogo de datos crudos.
+      - **"Gobierno Abierto Ecuador"** (`gobiernoabierto.ec`) — portal
+        multi-actor (aparece firmando compromisos junto a CNE y FCD) —
+        mencionado en la búsqueda pero no visitado todavía.
+      - **Nota aparte, no de sociedad civil:** Cuenca (el cantón, ya
+        integrado en este proyecto vía `source="cuenca"`) tiene además
+        un portal propio de transparencia,
+        `transparencia.cuenca.gob.ec/es/datos-abiertos`, **distinto** del
+        CKAN "Cuenca en Datos" ya integrado — sin visitar, podría
+        complementar o solapar con lo que ya se tiene.
+      - **Conclusión:** estas fuentes son reales y de buena reputación
+        (FCD es el punto de contacto nacional de Transparencia
+        Internacional), pero en esta investigación no encontré datasets
+        tabulares crudos comparables a SIPA, la IEM del BCE, o
+        Contraloría — es contenido editorial/analítico sobre datos
+        gubernamentales, no una fuente primaria alternativa. Si el
+        interés es citarlos como análisis/contexto (no como fuente de
+        datos estructurados), sí valdría la pena un tool tipo
+        `search_analisis_civico` o similar más adelante — pero eso es
+        una decisión de producto distinta a "encontrar más datos", y
+        toca decidir si encaja con el alcance de "datos abiertos de
+        gobierno" que define este proyecto hoy.
+- [ ] **Datos legislativos/normativos para uso legal profesional —
+      investigado 2026-08-29,** pedido de Daniel desde la perspectiva de
+      un profesional del derecho: regulaciones, circulares y similares.
+      - **`search_regulaciones`/`get_regulacion_info` ya cubren mucho más
+        de lo documentado hasta ahora.** Conteo real de `tipo` sobre
+        ~2000 regulaciones del endpoint gob.ec (confirmado en vivo):
+        Resolución (575), Acuerdo ministerial (442), Ordenanza municipal
+        (394), Decreto ejecutivo (169), **Ley orgánica (164)**, **Ley
+        ordinaria (73)**, Norma internacional (69), Reglamento de ley
+        (58), Código Orgánico (52), Carta Suprema (4). Es decir, **la
+        legislación primaria (leyes) ya está cubierta**, no solo
+        normativa del ejecutivo — confirmado descargando una Ley
+        Orgánica real (Ley Orgánica de Eficiencia Económica y Generación
+        de Empleo, R.O. 461, PDF real). `read_pdf` ya puede leer estos
+        archivos. **Lo único que falta: "Circular" no aparece como
+        `tipo`** — no está en este endpoint.
+      - **Hallazgo grande: el Registro Oficial real y completo, gratis,
+        sin paywall.** `registroficial.gob.ec` es el sitio oficial de la
+        Corte Constitucional que edita la Gaceta Oficial de Ecuador.
+        Publica **una edición diaria** (confirmado: Nº 357, viernes 28
+        de agosto de 2026, 43 páginas — el día hábil más reciente),
+        archivo completo por año desde 2001, cada edición con botón de
+        descarga real. **Confirmado descargando una edición real: PDF
+        gratis, sin ningún paywall** (a pesar de que fuentes de terceros
+        mencionan una "suscripción anual" para la edición digital fuera
+        de Quito/Guayaquil — no aplicó en la prueba real). El sitio
+        mismo describe su contenido como "leyes, decretos, resoluciones,
+        acuerdos, **circulares**, comunicados, proclamas y despachos de
+        los ministerios" — **esto sí incluye circulares**, a diferencia
+        del endpoint de regulaciones de gob.ec. Es la fuente más
+        completa y canónica posible: todo lo que se publica
+        oficialmente en Ecuador pasa por aquí. También tiene Suplemento,
+        Edición Especial, Edición Constitucional, Edición Jurídica, e
+        Índice Mensual — sin explorar cada una todavía. **Candidato de
+        altísima prioridad**: un tool `search_registro_oficial(fecha)` o
+        similar, ligado a `read_pdf`, cubriría de punta a punta el caso
+        de uso "¿qué se publicó/qué circular/qué resolución salió tal
+        día", algo que ningún tool actual resuelve bien (la búsqueda de
+        `search_regulaciones` es por palabra clave sobre un índice
+        curado, no por fecha de gaceta).
+      - **Circulares por institución — no investigado a fondo todavía**
+        más allá de confirmar que el Registro Oficial las incluye. Si se
+        necesitan indexadas por institución emisora (ej. circulares
+        tributarias del SRI, circulares de Superbancos/SEPS/BCE) en vez
+        de solo por fecha de gaceta, haría falta revisar la sección de
+        "Normativa" propia de cada regulador — sin hacerlo en esta
+        pasada.
+- [ ] **Vivienda (MIDUVI) — confirmado que el dominio está caído, no
+      investigado más profundo.** `miduvi.gob.ec` falla a nivel TLS
+      tanto con `httpx` como con el browser real — no es un problema de
+      geografía ni de WAF, el sitio simplemente no responde bien ahora
+      mismo. Los datos ya alcanzables sin código nuevo:
+      `organization=miduvi` en CKAN, **5 datasets reales** (proyectos de
+      vivienda financiados por BID, Banco de Desarrollo de China, Banco
+      de Desarrollo del Ecuador). No se encontró un dominio alternativo
+      vigente en la búsqueda web — a diferencia de otros casos
+      (SENESCYT→MINEDEC, Finanzas→MDEP), no hay evidencia de que MIDUVI
+      se haya renombrado, solo de que su sitio está caído.
+- [ ] **Prensa — dos fuentes reales, sin profundizar.** Del lado
+      gubernamental, SECOM (Secretaría Nacional de Comunicación) fue
+      eliminada en 2018 y sus funciones pasaron a la **Secretaría
+      General de Comunicación de la Presidencia**
+      (`comunicacion.gob.ec`), que publica boletines de prensa
+      descargables. Del lado de sociedad civil, **Fundamedios**
+      (`fundamedios.org.ec`) lleva 17 años monitoreando agresiones a la
+      libertad de prensa/expresión en Ecuador, con reportes anuales
+      reales (231 agresiones y 6 periodistas asesinados en 2025, según
+      su reporte). Ninguno de los dos visitado a fondo para confirmar
+      si hay datasets descargables o solo boletines/reportes narrativos
+      — mismo patrón que se vio en los observatorios de FCD.
+- [ ] **Permisos y portales municipales — sin investigar, alcance
+      grande.** Pedido de Daniel, no resuelto en esta sesión. Cuenca (vía
+      `source="cuenca"`) es el único GAD municipal integrado hoy;
+      permisos de construcción/uso de suelo y portales de otros
+      municipios grandes (Quito, Guayaquil, y los ~221 GADs municipales
+      restantes) no se investigaron — cada uno probablemente tiene su
+      propio sitio y formato, así que esto es una investigación (y
+      posible integración) bastante más grande que cualquier ítem
+      individual de este roadmap. Empezar por Quito y Guayaquil si se
+      decide perseguir esto, dado su tamaño relativo.
 
 ---
 
