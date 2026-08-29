@@ -191,6 +191,43 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       "secretaria-de-educacion-superior..."`, 13 datasets) sigue
       funcionando sin cambios pese al renombramiento — confirmado en
       vivo.
+
+      **Investigación adicional, mismo día** (Daniel: "investigate elsewhere,
+      and see what other senescyt data we can find"): la Educación Superior
+      pasó a ser un **Viceministerio dentro de `educacion.gob.ec`**
+      (`educacionsuperior.gob.ec` redirige a `educacion.gob.ec/edusuperior/`)
+      — confirma la fusión institucional apuntada arriba. Su página
+      "Biblioteca" (`educacion.gob.ec/edusuperior/biblioteca/`) es un
+      **archivo real y enorme: 1,259 documentos descargables**, en un árbol
+      de categorías anidadas por año/tema desde 2013 hasta 2025 (PAC,
+      Exámenes Especiales/auditoría, Normativa, LOES, SNNA, Acuerdos,
+      Indicadores ACTI, y una sección completa "Dirección de Registro de
+      Títulos" con manuales de proceso para títulos nacionales/extranjeros
+      y codificación SNIESE). **Todo servido por el servidor, sin JS** — el
+      acordeón visual está colapsado por CSS (`display:none`), pero el HTML
+      completo con los 1,259 links reales (plugin WordPress
+      `download-monitor`) ya está en la respuesta de `httpx` plano;
+      confirmado descargando uno (`Indicadores de Ciencia, Tecnología e
+      Innovación del Ecuador (ACTI)`, PDF real). **Mismo patrón que la
+      Transparencia/LOTAIP de IESS** (PAC, exámenes de auditoría, normativa)
+      pero en una plataforma totalmente distinta (WordPress vs. Liferay de
+      IESS) — refuerza la hipótesis de que estas categorías se repiten
+      entre instituciones no por compartir tecnología sino porque las
+      exige la ley (LOTAIP, PAC), así que un scraper genérico "categorías
+      legales comunes" podría generalizar mejor que uno por-institución.
+      **Sobre el registro de títulos específicamente:** la carpeta
+      correspondiente contiene manuales/instructivos/acuerdos sobre *cómo
+      funciona* el proceso de registro (ej. "ACUERDO NO. 2015-106
+      INSTRUCTIVO PARA LA CODIFICACIÓN DE TÍTULOS... DENTRO DEL SNIESE",
+      "Manual de procesos gestión de títulos extranjeros"), no una base
+      descargable de títulos individuales — coherente con que ese dato es
+      personal/sensible y por eso solo se expone vía la consulta captcha
+      uno-a-uno de arriba, no como dataset masivo. Confirma (con evidencia
+      real esta vez, no solo ausencia de un link) que no existe un dataset
+      masivo de títulos, sin cerrar la puerta a que la documentación de
+      proceso en sí sea útil como referencia.
+      **Sin explorar todavía:** `eod-prett.senescyt.gob.ec` (linkeado desde
+      la página del Viceministerio, propósito no investigado).
 - [x] **Cuenca en Datos** (`https://cuencaendatos.cuenca.gob.ec`) — **hecho
       2026-08-28.** Verificado en vivo: CKAN 2.9.6, 92 datasets, 13
       categorías temáticas, un solo publicador (GAD Municipal del cantón
