@@ -23,6 +23,7 @@ directly rather than routing it through download_resource/preview_resource_data.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
 from html import unescape
@@ -64,25 +65,34 @@ _MODULOS: list[dict[str, str]] = [
 _MODULOS_BY_KEY = {m["modulo"]: m for m in _MODULOS}
 
 # Module pages are refreshed rarely (new series added a few times a year).
-_files_cache = TtlCache(ttl_seconds=21600.0, max_entries=16)
+# max_entries matches the fixed key space (one slot per module in _MODULOS).
+_files_cache = TtlCache(ttl_seconds=21600.0, max_entries=len(_MODULOS))
+_fetch_lock = asyncio.Lock()
 
 _TAG_RE = re.compile(r"<[^>]+>")
+_KNOWN_FORMATS = {"XLSX", "XLS", "CSV", "PDF", "ZIP", "DOCX", "DOC"}
 # Each accordion item is a numbered title followed by the download link;
 # the description paragraph in between is common but NOT guaranteed — the
 # censos module's items skip it entirely (confirmed live), so title/link
 # are matched independently per item chunk rather than as one strict
-# sequence, and the description is optional.
+# sequence, and the description is optional. Attribute matching is
+# deliberately loose ([^>]* around href/class) rather than requiring an
+# exact adjacency, so a routine CMS re-save that reorders or adds an
+# attribute (e.g. target="_blank") doesn't silently drop the item — same
+# tolerant style as helpers/sri_client.py's anchor-tag regex. \s* is used
+# around every optional-whitespace boundary (matching _TITLE_RE's existing
+# style) so indentation changes in the source HTML don't break matches.
 _ITEM_SPLIT_RE = re.compile(r'<div class="el-item">')
 _TITLE_RE = re.compile(
     r'<h3 class="el-title uk-accordion-title">\s*(?P<numero>\d+)\.\s*(?P<titulo>.*?)\s*</h3>',
     re.DOTALL,
 )
 _DESC_RE = re.compile(
-    r'<div class="uk-margin el-content"><p[^>]*>(?P<descripcion>.*?)</p></div>',
+    r'<div class="uk-margin el-content">\s*<p[^>]*>(?P<descripcion>.*?)</p>\s*</div>',
     re.DOTALL,
 )
 _LINK_RE = re.compile(
-    r'<a\s+href="(?P<url>https://sipa\.agricultura\.gob\.ec/descargas/[^"]+)"\s+class="el-link'
+    r'<a\s+[^>]*href="(?P<url>https://sipa\.agricultura\.gob\.ec/descargas/[^"]+)"[^>]*class="el-link'
 )
 
 
@@ -95,24 +105,36 @@ def list_modulos() -> list[dict[str, str]]:
     return [dict(m) for m in _MODULOS]
 
 
-def _parse_archivos(html: str) -> list[dict[str, Any]]:
+def _clean_formato(url: str) -> str:
+    ext = url.rsplit(".", 1)[-1].upper() if "." in url.rsplit("/", 1)[-1] else ""
+    return ext if ext in _KNOWN_FORMATS else "DESCONOCIDO"
+
+
+def _parse_archivos(html: str, modulo: str) -> list[dict[str, Any]]:
     archivos = []
     # First chunk (before any "el-item") is page chrome, not an item.
-    for chunk in _ITEM_SPLIT_RE.split(html)[1:]:
+    for i, chunk in enumerate(_ITEM_SPLIT_RE.split(html)[1:], start=1):
         title_m = _TITLE_RE.search(chunk)
         link_m = _LINK_RE.search(chunk)
         if title_m is None or link_m is None:
+            logger.warning(
+                "SIPA módulo %s: item #%d no matcheó el patrón esperado "
+                "(title=%s, link=%s) — la página pudo haber cambiado de formato.",
+                modulo,
+                i,
+                title_m is not None,
+                link_m is not None,
+            )
             continue
         desc_m = _DESC_RE.search(chunk)
         url = link_m.group("url")
-        formato = url.rsplit(".", 1)[-1].upper()
         archivos.append(
             {
                 "numero": int(title_m.group("numero")),
                 "titulo": _clean(title_m.group("titulo")),
                 "descripcion": _clean(desc_m.group("descripcion")) if desc_m else "",
                 "url": url,
-                "formato": formato,
+                "formato": _clean_formato(url),
             }
         )
     return archivos
@@ -135,18 +157,30 @@ async def get_modulo_archivos(modulo: str) -> dict[str, Any]:
     if cached is not None:
         return cached
 
-    logger.info("Descargando página del módulo SIPA: %s", modulo)
-    content, truncated = await download_bytes(info["url"])
-    if truncated:
-        raise ValueError(f"La página de {info['url']} superó el límite de descarga.")
-    html = content.decode("utf-8", errors="replace")
+    async with _fetch_lock:
+        # Re-check: another caller may have populated the cache while we
+        # were waiting for the lock.
+        cached = _files_cache.get(modulo)
+        if cached is not None:
+            return cached
 
-    archivos = _parse_archivos(html)
-    result = {
-        "modulo": modulo,
-        "nombre": info["nombre"],
-        "url": info["url"],
-        "archivos": archivos,
-    }
-    _files_cache.set(modulo, result)
-    return result
+        logger.info("Descargando página del módulo SIPA: %s", modulo)
+        content, truncated = await download_bytes(info["url"])
+        if truncated:
+            raise ValueError(f"La página de {info['url']} superó el límite de descarga.")
+        html = content.decode("utf-8", errors="replace")
+
+        archivos = _parse_archivos(html, modulo)
+        result = {
+            "modulo": modulo,
+            "nombre": info["nombre"],
+            "url": info["url"],
+            "archivos": archivos,
+        }
+        if archivos:
+            # Don't cache an apparently-empty result for 6h — it's
+            # indistinguishable from a transient failure (maintenance page,
+            # stripped accordion) that would otherwise self-correct on the
+            # next call.
+            _files_cache.set(modulo, result)
+        return result
