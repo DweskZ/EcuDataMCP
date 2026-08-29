@@ -832,7 +832,8 @@ que es real y accesible sin fricción.
 
 ## Fuentes externas de sociedad civil (no gubernamentales)
 
-**Investigado 2026-08-29,** pedido explícito de Daniel: Observatorio
+**Investigado 2026-08-29, corregido y profundizado 2026-08-29** (misma
+fecha, segunda pasada) tras pedido explícito de Daniel: Observatorio
 Legislativo, Observatorio de los GADs, Observatorio de Gasto Público "y
 otros observatorios de la misma organización/fundación".
 
@@ -842,48 +843,224 @@ una fundación de sociedad civil, no del Estado. Investigado igual porque se
 pidió explícitamente, pero decidir si integrarlas es una decisión de
 alcance del proyecto, no solo técnica.
 
-**Fundación Ciudadanía y Desarrollo (FCD)** es la organización detrás de
-todos los observatorios que Daniel nombró. Mantiene una red de
-observatorios temáticos, cada uno con su propio dominio: **Observatorio
-Legislativo** (`observatoriolegislativo.ec`, monitorea la Asamblea
-Nacional, miembro de la Red Latinoamericana de Transparencia Legislativa),
-**Observatorio Judicial** (`observatoriojudicial.ec`, control ciudadano a
-la Función Judicial), **Observatorio de Gasto Público**
-(`gastopublico.org`, presupuesto/gasto/déficit fiscal, incluye análisis del
-gasto municipal de Quito/Guayaquil/Cuenca — esto parece cubrir lo que
-Daniel busca como "Observatorio de los GADs", no se encontró un
-observatorio de GADs con dominio propio y separado), más observatorios de
-anticorrupción y de financiamiento político (sin dominio propio
-confirmado, viven dentro de `ciudadaniaydesarrollo.org`).
+**Corrección importante:** la primera pasada de esta investigación
+concluyó "no hay datasets tabulares, solo análisis narrativo" a partir de
+revisar únicamente `gastopublico.org/indicadores`. Esa conclusión era
+incorrecta como generalización — se aplicaba a `gastopublico.org`, pero no
+se había visitado ninguno de los otros ocho dominios de la red FCD. Daniel
+señaló directamente que el Observatorio Legislativo sí tabula las
+votaciones de la Asamblea, lo cual llevó a una segunda pasada visitando
+cada dominio de la red y probando en vivo cada botón de descarga/API
+encontrado (no solo mirando el HTML).
 
-**Naturaleza del contenido:** son informes de análisis (PDF narrativos) y
-notas de prensa, no datasets tabulares descargables —
-`gastopublico.org/indicadores` no tiene ningún archivo `.csv/.xlsx/.pdf`
-enlazado directo (confirmado revisando el HTML), así que el valor está en
-la interpretación/narrativa, no en datos crudos reutilizables
-programáticamente. Distinto en naturaleza a todo lo demás en este
-documento.
+### Fundación Ciudadanía y Desarrollo (FCD) — mapa completo de la red
 
-**Grupo FARO** (`grupofaro.org`) — think tank de política pública más
-grande de Ecuador en este espacio, calcula el Índice de Presupuesto
-Abierto de Ecuador (Open Budget Survey), más de 200 publicaciones en 15
-años. Mismo perfil que FCD: análisis e investigación, no un catálogo de
-datos crudos.
+FCD mantiene **nueve dominios propios**, todos enlazados desde
+`ciudadaniaydesarrollo.org/iniciativas/`:
+
+| Dominio | Tema | Datos tabulares reales |
+|---|---|---|
+| `observatoriolegislativo.ec` | Asamblea Nacional | **Sí — verificado en vivo** |
+| `observatoriojudicial.ec` | Función Judicial | Sí, pero congelado desde 2019 |
+| `radiografiapolitica.org` | Declaraciones patrimoniales de funcionarios | **Sí — verificado en vivo** |
+| `judicial.radiografiapolitica.org` | Ídem, alcance judicial | Sí (misma plataforma) |
+| `ojoalconcejo.org` | Concejos de Quito/Guayaquil/Cuenca | **Sí — verificado en vivo** |
+| `contratostransparentes.ec` | Contratación pública (banderas rojas) | Parcial — app Shiny, no HTTP simple |
+| `observatorioanticorrupcion.ec` | Casos de corrupción | Botón real, endpoint roto (500) |
+| `gastopublico.org` | Gasto público / fiscal | No — solo cifras puntuales |
+| `cuentasclaras.org` | Financiamiento político | **⚠️ sitio comprometido, ver abajo** |
+| `libertadesciudadanas.org` | Alertas de derechos civiles | No — solo notas narrativas |
+
+**Patrón técnico común:** varios de estos sitios (Legislativo, Judicial,
+Radiografía Política, Ojo al Concejo) comparten el mismo desarrollador y
+la misma arquitectura WordPress: un plugin custom que expone descargas via
+`wp-admin/admin-ajax.php?action=<nombre>` (CSV/XLS generados
+server-side) y, en dos casos, una página "Datos Abiertos" dedicada con
+endpoints REST bajo `/api/<formato>-<dataset>`. Vale la pena tenerlo en
+cuenta: si se encuentra un dataset interesante en un dominio de este grupo
+que aún no se ha revisado a fondo, buscar primero un botón "Descargar
+Excel/CSV" o una página "Datos Abiertos" antes de asumir que no hay nada
+— el HTML estático a veces ni siquiera contiene el link correcto (ver bug
+de dominio truncado abajo), hay que mirar el JS.
+
+**Observatorio Legislativo (`observatoriolegislativo.ec`) — hallazgo
+grande, corrige la conclusión anterior.**
+`/analisis-de-voto/` es un registro voto-por-voto del pleno de la Asamblea
+Nacional: **408 votaciones** (a la fecha de verificación) con texto de la
+moción/proyecto, sesión, fecha, resultado (Aprobado/Rechazado), filtrable
+por año, ~90 etiquetas temáticas y tipo de votación (aprobación de leyes,
+resoluciones, fiscalización, etc.). Tiene botones CSV/XLS reales:
+verificado en vivo contra
+`wp-admin/admin-ajax.php?action=ol_generate_csv_general_votaciones` → 200,
+`text/csv;charset=UTF-8`, ~143 KB (UTF-16). Columnas: Fecha, Sesión,
+Votación, Nombre corto, Tema, Subtema, Categorías Generales. Además,
+`/perfil/` (nav "Asambleístas") lista los 151 legisladores actuales,
+filtrable por provincia/distrito, género, bancada y comisión, con su
+propio export CSV/XLS verificado
+(`action=ol_generate_csv_legisladores` → 200, ~42 KB). **No confirmado:**
+un desglose de voto individual por asambleísta (quién votó sí/no/abstención
+por moción) — se revisó el perfil de una asambleísta y la pestaña "Análisis
+del voto" ahí está vacía (solo un título, sin contenido cargado); el
+mecanismo real para comparar votos parece ser seleccionar 2+ votaciones en
+el archivo y enviarlas a un formulario de análisis, no una descarga directa
+por persona. Si se persigue integración, el registro agregado de
+votaciones ya es un dataset sólido por sí solo.
+
+**Radiografía Política (`radiografiapolitica.org` +
+`judicial.radiografiapolitica.org`) — hallazgo nuevo, no estaba en el mapa
+de "Iniciativas" leído la primera vez.** Base de datos de **381+
+funcionarios públicos** (Ejecutivo, Legislativo, Judicial, Electoral,
+Transparencia y Control Social, otras instituciones) con perfil individual:
+patrimonio declarado, activos/pasivos, número de casas/carros/compañías,
+formación académica, declaración de impuesto a la renta (SRI), género.
+Tiene una página `/datos-abiertos` con API REST real, **verificada en
+vivo:** `GET /api/json-patrimonio` → 200, `application/json`, ~119 KB,
+estructura `{metaDatos, datosPatrimonioPersona: [{patrimonio, activos,
+pasivos, numero_casas, numero_carros, numero_companias,
+fecha_declaracion, nombres_persona, apellidos_persona, cargo, ...}]}`.
+También expone `/api/json-genero`, `/api/json-sri`, `/api/json-estudio`.
+**Bug de UI:** el HTML de la página `/datos-abiertos` muestra los links
+como texto plano con el dominio truncado
+(`https://radiografiapolitica/api/...`, sin `.org` ni `www`) — hay que
+construir la URL real (`https://www.radiografiapolitica.org/api/...`) a
+mano o extraerla del DOM (`<a href>`), no copiar el texto visible. El
+subdominio `judicial.radiografiapolitica.org/datos-abiertos` replica
+exactamente la misma estructura de API, con alcance acotado a funcionarios
+del sector justicia — mismo bug de dominio truncado en el texto visible.
+Licencia declarada: CC-BY-SA-4.0. Sin fecha de última actualización visible
+en los metadatos (a diferencia de Judicial, que si la declara). Este es
+probablemente el hallazgo más valioso de toda la red FCD para este
+proyecto: no hay ninguna otra fuente ya integrada con declaraciones
+patrimoniales de funcionarios públicos.
+
+**Ojo al Concejo (`ojoalconcejo.org`) — confirma la hipótesis de "GADs".**
+Monitorea los concejos municipales de **Quito, Guayaquil y Cuenca**
+(Cuenca ya cubierto vía CKAN `source="cuenca"`, pero con datos distintos
+— aquí es seguimiento legislativo municipal, no datasets generales del
+GAD). Cada ciudad tiene páginas de "Proyectos de ordenanza" y "Proyectos
+de resolución", filtrables por tema/organización política/comisión/estado
+del trámite/fecha, con el mismo patrón de exportación
+`admin-ajax.php?action=oda_generate_csv_listado_ordenanzas&city={id}` —
+**verificado en vivo:** 200, `text/csv;charset=UTF-8` (con `city=1`
+devolvió CSV vacío de 157 bytes, así que falta identificar el `city id`
+correcto por ciudad — probablemente 1/2/3 o un slug, no se determinó cuál
+mapea a Quito). La página "Tu Concejo en cifras" de Quito devolvió un
+error crítico de WordPress al visitarla (sitio parcialmente roto, no solo
+esa página — riesgo de que otras secciones también fallen intermitente).
+Empezar por Quito si se integra, dado que Guayaquil es el otro grande sin
+cobertura y Cuenca ya tiene una vía alterna.
+
+**Observatorio Judicial (`observatoriojudicial.ec`) — real pero
+congelado.** Tiene una página "Datos Abiertos"
+(`/datos-abiertos-observatorio-judicial`) con 6 datasets vía API REST:
+movimiento de causas en la Corte Nacional de Justicia, destituciones de
+jueces/servidores judiciales, estándares de accesibilidad en edificios,
+consultorios jurídicos gratuitos, número de funcionarios/establecimientos
+de acceso a la justicia. **Verificado en vivo:**
+`GET /api/json-movimientos-causas-consolidado` → 200, `application/json`,
+6.2 KB, con metadatos embebidos (`fecha_modificacion: "2019-10-23"`). Solo
+los endpoints `json-*` están vivos — los `excel-*` correspondientes
+devuelven 404 (el HTML los muestra como texto, no como links reales,
+mismo patrón de "domain truncado" que Radiografía Política). **La fecha de
+modificación de 2019 es real y coincide con lo que se ve**: esto es un
+dataset histórico congelado, no una fuente que se actualice — útil como
+snapshot puntual, no como serie viva.
+
+**Contratación pública (`contratostransparentes.ec`) — dato derivado
+valioso, pero difícil de extraer.** Observatorio de Contratación Pública:
+calcula un score de "banderas rojas" (transparencia, temporalidad,
+trazabilidad, competitividad, confiabilidad) por entidad contratante a
+partir de datos OCDS de SERCOP, usando una herramienta propia llamada
+"Flagfetti" (código en
+`github.com/datasketch/banderas-ecuador-back` — es el pipeline/motor de
+reglas, no un dataset; requiere ElasticSearch y un feed de contratos OCDS
+para correr, no sirve como fuente de datos en sí). La página de inicio
+incrusta un ranking top-10 estático por año (2022/2023/2024) en el HTML
+— visible sin fricción. El explorador completo ("Ver todas las
+entidades") es un **iframe de una app R Shiny**
+(`services.datasketch.co/banderas-app/`, confirmado por el patrón SockJS
++ Highcharts + Selectize en las peticiones de red) — mismo problema que
+ASOBANCA Datalab en el roadmap: sin API REST limpia, solo websocket de
+Shiny, extracción no trivial. Si el interés es solo el ranking anual
+top-10, ya está en el HTML estático de la home; para el dataset completo
+habría que replicar la lógica de Flagfetti sobre datos de SERCOP
+directamente (que este proyecto ya tiene vía `search_contratos`) en vez de
+depender del sitio de FCD.
+
+**Observatorio Anticorrupción (`observatorioanticorrupcion.ec`) — botón
+real, backend roto.** Rastrea 42 casos de corrupción con desglose por
+función del Estado (Ejecutiva: 22, IESS: 7, Legislativa: 5, GAD: 4,
+Judicial: 3, mixta: 1) y etapa procesal (sentencia, archivo, sobreseimiento,
+etc.), con un botón "Descargar Excel" apuntando a
+`/estadisticas/excel`. **Verificado en vivo: devuelve HTTP 500** —
+el mecanismo existe en el frontend pero el backend está caído. No hay
+fallback (no se probó JSON directo, no existe una página "Datos Abiertos"
+separada en este dominio).
+
+**⚠️ Cuentas Claras (`cuentasclaras.org`) — sitio comprometido, no
+integrar sin antes verificar con Daniel.** Observatorio de financiamiento
+político (Fondo Partidario Permanente, Fondo de Promoción Electoral,
+patrimonio de candidatos). Al extraer el texto de la página de inicio
+aparecen, mezclados con el contenido real, varios párrafos de **spam de
+casinos/apuestas en línea en holandés, ruso, árabe, eslovaco, húngaro y
+español** (ej. "casino zonder cruks", "hondubet liga", enlaces a dominios
+de apuestas) — patrón clásico de inyección SEO en un WordPress
+comprometido. No se navegó más allá de la portada para evitar interactuar
+con contenido inyectado. **Recomendación: reportarle esto a FCD si se
+tiene contacto, y no construir ningún tool sobre este dominio hasta que se
+confirme que está limpio.**
+
+**Observatorio a las Libertades Ciudadanas (`libertadesciudadanas.org`) —
+sin datos tabulares.** Feed de alertas narrativas sobre amenazas a
+derechos civiles y políticos (prensa, libertad de expresión, presos
+políticos, etc.) más informes en PDF. Confirmado: no tiene sección de
+datos abiertos ni exports, mismo perfil que Gasto Público.
+
+**Gasto Público (`gastopublico.org`) — conclusión original confirmada,
+esta vez revisando también `/visualizaciones` y tráfico de red.** Las
+tarjetas de `/indicadores` (Deuda Pública, PIB Nominal, saldo de deuda
+interna/externa, etc.) son cifras puntuales sin click-through ni archivo
+asociado — confirmado que ninguna tarjeta tiene `href` ni `onclick`. La
+página `/visualizaciones` promete un "set de visualizaciones interactivas"
+pero no renderiza ninguna (contenido vacío/roto). El sitio es server-side
+render tradicional (no SPA), sin llamadas a una API JSON detectables en
+las peticiones de red — a diferencia de otros dominios FCD, aquí no había
+un mecanismo oculto por encontrar.
+
+### Grupo FARO
+
+`grupofaro.org` — confirmado de nuevo: sin nav de datos/estadísticas, solo
+"Quiénes somos / Áreas de acción / Publicaciones / Equipo / Contacto".
+Calcula el Índice de Presupuesto Abierto de Ecuador (Open Budget Survey),
+pero no aloja un portal de datos propio — es la fuente primaria detrás del
+índice (International Budget Partnership) la que tendría los
+microdatos, no FARO directamente. Mismo perfil que la primera pasada:
+análisis e investigación, no catálogo de datos crudos. No se investigó a
+fondo la iniciativa "Ecuador Decide" mencionada en su home (posible
+proyecto de datos electorales) — queda pendiente si se retoma esta línea.
 
 **"Gobierno Abierto Ecuador"** (`gobiernoabierto.ec`) — portal multi-actor
 (aparece firmando compromisos junto a CNE y FCD) — mencionado en la
-búsqueda pero no visitado.
+búsqueda pero no visitado en ninguna de las dos pasadas.
 
-**Conclusión:** estas fuentes son reales y de buena reputación (FCD es el
-punto de contacto nacional de Transparencia Internacional), pero en esta
-investigación no se encontraron datasets tabulares crudos comparables a
-SIPA, la IEM del BCE, o Contraloría — es contenido editorial/analítico
-sobre datos gubernamentales, no una fuente primaria alternativa. Si el
-interés es citarlos como análisis/contexto (no como fuente de datos
-estructurados), valdría la pena un tool tipo `search_analisis_civico` más
-adelante — pero eso es una decisión de producto distinta a "encontrar más
-datos", y toca decidir si encaja con el alcance de "datos abiertos de
-gobierno" que define este proyecto hoy.
+### Conclusión revisada
+
+A diferencia de la primera pasada, **sí existen datasets tabulares reales
+y descargables sin fricción** dentro de la red FCD — la generalización
+"todo es análisis narrativo" era incorrecta. Los tres candidatos sólidos
+son: **votaciones de la Asamblea** (Observatorio Legislativo),
+**declaraciones patrimoniales de funcionarios** (Radiografía Política, sin
+comparable en ninguna otra fuente ya integrada) y **ordenanzas/resoluciones
+municipales de Quito/Guayaquil** (Ojo al Concejo). Judicial aporta un
+snapshot histórico útil pero congelado en 2019. Contratación pública y
+Anticorrupción tienen mecanismos reales pero rotos o de difícil extracción
+(Shiny, 500). Gasto Público, Libertades Ciudadanas y FARO siguen sin
+datasets tabulares — ahí sí se sostiene la conclusión original. Cuentas
+Claras necesita atención de seguridad antes de cualquier otra cosa. Sigue
+pendiente la decisión de alcance: son fuentes de sociedad civil, no de
+gobierno, así que integrarlas implica ampliar lo que CLAUDE.md define como
+el alcance del proyecto — pero técnicamente, a diferencia de lo que se
+pensó inicialmente, sí hay con qué construir tools reales aquí.
 
 ---
 
