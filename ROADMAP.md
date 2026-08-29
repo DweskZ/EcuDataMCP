@@ -36,16 +36,32 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       (`search_auditores`/`get_auditor_info`).
 - [x] **Instituto Geofísico (IG-EPN)** — hecho: tool `search_sismos` sobre el
       catálogo sísmico público, con caché TTL y parseo tolerante del CSV.
-- [x] **Ecuador en Cifras / portal BI del INEC** — **investigado
-      2026-08-28: callejón sin salida.** `ecuadorencifras.gob.ec` resultó
-      ser un subsitio institucional viejo/abandonado (plantilla de ~2017,
-      lista de enlaces a secretarías que ya no existen con ese nombre, sin
-      contenido estadístico real ni portal BI visible). `inec.gob.ec` no
-      resuelve (DNS falla). No se encontró el "portal BI" que motivó este
-      ítem. Los datos reales del INEC ya alcanzables hoy siguen siendo los
-      ~13 datasets vía CKAN genérico bajo SENESCYT/ANDA (ver más abajo) y
-      el catálogo NADA/IHSN de `search_anda`. Cerrado como investigado, no
-      como pendiente.
+- [ ] **Ecuador en Cifras / portal BI del INEC** — **corrección 2026-08-28:
+      la conclusión anterior de este mismo día ("callejón sin salida") era
+      falsa.** El primer pase entró por `ecuadorencifras.gob.ec/institucional/home/`
+      (un subsitio institucional viejo con navegación de ~2017) y por
+      `inec.gob.ec` sin `www` (dominio distinto, nunca fue el sitio real) —
+      ninguno de los dos es el portal real, y de ahí salió la conclusión
+      errónea de que el dominio estaba abandonado. **Re-investigado con
+      más cuidado:** `www.ecuadorencifras.gob.ec` es el sitio oficial del
+      INEC, activo y publicando en 2026 (confirmado con búsqueda web y en
+      vivo — última publicación al momento de revisar: "IPCO - julio
+      2026", 21/08/2026). La página `/estadisticas/` es un catálogo
+      enorme y genuinamente vivo: decenas de temas (IPC, ENEMDU, ENSANUT,
+      pobreza, comercio exterior, cuentas nacionales, construcción,
+      REBPE...), cada uno con su propia página. Por ejemplo, la del IPC
+      (`/indice-de-precios-al-consumidor-ipc/`) linkea, para julio 2026,
+      boletín técnico en PDF, presentación de resultados en PDF,
+      metodología en PDF, y series históricas completas en Excel y CSV
+      (`Tabulados_y_series_historicas_CSV.zip`) — **todos son links HTML
+      planos, sin JS de por medio**, confirmado bajando el PDF y el ZIP
+      directo con `httpx` sin browser. Esto es exactamente el tipo de
+      fuente pública, estructurada y automatizable que motivó este ítem
+      originalmente — candidato fuerte para una integración real (`helpers/inec_client.py`
+      + tools de búsqueda/descarga), simplemente no se construyó nada
+      todavía porque el alcance (decenas de categorías × años de
+      histórico) es más grande que una sesión de investigación. Reabierto
+      como pendiente, ya no cerrado.
 - [ ] **LOTAIP como fuente transversal** — **candidato nuevo, 2026-08-28,**
       encontrado investigando IESS (ver nota de Transparencia más abajo).
       Ley Orgánica de Transparencia y Acceso a la Información Pública:
@@ -97,19 +113,24 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       - **Informes de Auditoría** (`iess.gob.ec/es/informes-de-auditoria`)
         — archivo real y grande: carpetas por año 2007–2025, entre 1 y 42
         documentos por año (~344 documentos en total). El listado de
-        carpetas y el listado de documentos dentro de cada carpeta **sí
-        son HTML servido por el servidor** (confirmado con `httpx` plano,
-        sin browser) — un tool de enumeración sería viable. **Pero** el
-        link real al PDF de cada documento individual solo aparece
-        después de que el navegador ejecuta JS (confirmado: la página del
-        documento vía `httpx` plano no contiene ningún link `.pdf`, pero
-        sí aparece al renderizar con browser real). Ese último salto
-        necesitaría un backend con navegador headless (Playwright/
-        Selenium) — una dependencia de infraestructura nueva y bastante
-        más grande que cualquier otra de este proyecto (categoría similar
-        a la razón por la que se descartó soporte `.rar`), así que no se
-        construyó nada aquí. Queda como hallazgo documentado, no como
-        tool.
+        carpetas, el listado de documentos dentro de cada carpeta, **y la
+        página de detalle de cada documento son HTML servido por el
+        servidor** — confirmado con `httpx` plano, sin browser, en los
+        tres niveles. **Corrección 2026-08-28 (mismo día):** una nota
+        anterior decía que el link al PDF real "solo aparece después de
+        JS" y que haría falta un browser headless — eso era un falso
+        negativo: el primer intento buscaba únicamente URLs que terminan
+        en `.pdf`, pero el link real no tiene extensión en la URL
+        (`iess.gob.ec/documents/10162/25751514/DNA7-SySS-0001-2024?version=1.0`,
+        `Content-Type: application/pdf` confirmado por header, 9.2 MB).
+        Con un regex que no exige extensión, el link aparece directo en
+        el HTML plano de la página de detalle. **Conclusión correcta: los
+        344 documentos son enumerables y descargables sin ningún browser,
+        headless o no** — candidato real para un tool de búsqueda/lectura
+        (`search_iess_auditorias` o similar) encadenado con `read_pdf`.
+        No construido todavía en esta sesión (el volumen — año → carpeta
+        → documento → versión — es más que una verificación puntual),
+        pero ya no hay ninguna barrera técnica identificada.
       - **Transparencia / LOTAIP** (`iess.gob.ec/transparencia/`) —
         confirmado: IESS publica su portal LOTAIP (Ley Orgánica de
         Transparencia y Acceso a la Información Pública) con secciones de
@@ -145,13 +166,31 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       estructurado, probablemente sea ahí (sección "Títulos" del SIAU) o en
       un portal de verificación de títulos aparte, todavía sin identificar
       — pendiente investigar específicamente eso, ya que el CKAN no lo
-      resuelve. **Re-revisado 2026-08-28** (de paso, investigando IESS): la
-      página principal del SIAU ya no muestra un link directo a "Títulos"
-      entre sus indicadores destacados (solo "Indicadores matrícula" es
-      visible ahora) — el sitio cambió desde la revisión anterior. No se
-      encontró un portal de verificación de títulos aparte en este pase.
-      La conclusión de fondo no cambia: sigue sin haber una fuente
-      estructurada y consultable para registro de títulos.
+      resuelve. **Corrección 2026-08-28 (mismo día):** una nota anterior
+      decía "sigue sin haber una fuente para registro de títulos" después
+      de solo mirar de nuevo la página principal del SIAU — conclusión
+      apresurada, no una investigación real. **Investigado a fondo con
+      búsqueda web:** SENESCYT como marca prácticamente desapareció —
+      `senescyt.gob.ec/web/guest/consultas` redirige hoy a
+      `titulos-edusuperior.minedec.gob.ec` (Ministerio de Educación,
+      Deporte y Cultura — MINEDEC), lo que sugiere una fusión o
+      renombramiento institucional no reflejado hasta ahora en este repo.
+      Esa URL **sí es el portal oficial de "Consulta de Títulos
+      Registrados"** que motivó este ítem desde el principio: busca por
+      apellidos + cédula/pasaporte, cita el Reglamento General a la LOES
+      (Art. 56) como único medio oficial de verificación. Confirmado en
+      vivo que es real y funcional. **Por qué sigue sin ser candidato a
+      tool:** el formulario exige un captcha ("Ingrese los caracteres")
+      antes de buscar — completar o evadir captchas está explícitamente
+      prohibido para este asistente (no es una limitación técnica de
+      scraping, es una regla operativa). La conclusión de fondo cambia de
+      "no existe" a "existe, es real, pero está detrás de un captcha por
+      diseño (verificación de identidad uno-a-uno, no un dataset
+      masivo)" — no automatizable bajo ninguna circunstancia, no por
+      falta de esfuerzo. El dato de la organización CKAN (`organization=
+      "secretaria-de-educacion-superior..."`, 13 datasets) sigue
+      funcionando sin cambios pese al renombramiento — confirmado en
+      vivo.
 - [x] **Cuenca en Datos** (`https://cuencaendatos.cuenca.gob.ec`) — **hecho
       2026-08-28.** Verificado en vivo: CKAN 2.9.6, 92 datasets, 13
       categorías temáticas, un solo publicador (GAD Municipal del cantón
