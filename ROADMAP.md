@@ -369,19 +369,86 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
         motivó `detect_series_pattern` con los precios de cacao). Sin
         código nuevo.
 
+      **Tercera pasada, mismo día** (Daniel: explícitamente no le
+      interesa qué instituciones tienen organización CKAN — le interesa
+      identificar *portales y páginas de estadísticas propias, más allá
+      de lo que ya está en CKAN*):
+      - **MAATE — hallazgo real e inesperado:** su dominio histórico
+        `ambiente.gob.ec` **ya no le pertenece** — redirige a
+        `atencionintegral.gob.ec`, el sitio del **SNAI** (Servicio
+        Nacional de Atención Integral a Personas Privadas de la
+        Libertad, el sistema penitenciario), una institución totalmente
+        distinta. El sitio real actual del ministerio es
+        **`ambienteyenergia.gob.ec`** — confirma que el ministerio se
+        renombró (o se fusionó con Energía) sin que este repo lo supiera
+        todavía. Su Transparencia/LOTAIP (mismo patrón WordPress
+        `download-monitor` ya visto en IESS y el Viceministerio de
+        Educación Superior) reveló algo nuevo: **Minería está ahora bajo
+        el mismo ministerio** ("Viceministerio de Minas"), con
+        "Reportes Semanales Sector Minero" — datos reales, de
+        periodicidad semanal, sin explorar más a fondo todavía.
+        `sinias.ambiente.gob.ec` (el sistema de indicadores ambientales
+        mencionado en la pasada anterior) resultó ser una **página de
+        bienvenida por defecto de JBoss sin aplicación desplegada** —
+        infraestructura muerta, no una fuente real.
+      - **`turismo.gob.ec` tiene el mismo problema de redirección** que
+        `ambiente.gob.ec` — también termina en `atencionintegral.gob.ec`.
+        Probablemente un vhost por defecto mal configurado en hosting
+        compartido (mismo tipo de bug de vhost ya documentado en este
+        repo para `datosabiertos.gob.ec`), no una fuente de datos real;
+        no investigado más a fondo — no se encontró el dominio actual
+        real de Turismo en esta pasada.
+      - **ECU911** (`ecu911.gob.ec/Datos/`, sin `www`) — solo un
+        dashboard Power BI embebido (`app.powerbi.com/reportEmbed`).
+        Curiosamente la página expone en HTML plano un usuario/contraseña
+        de acceso compartido al reporte — irrelevante de todos modos,
+        porque incluso con acceso solo es un visor de reporte, no una
+        API. Nada más allá de lo que ya está en CKAN.
+      - **Ministerio de Salud** — revisadas las tres páginas propias
+        encontradas antes: `datos-abiertos-2/` es solo un texto
+        promocional que apunta de vuelta a `datosabiertos.gob.ec` (nada
+        adicional); `salud-en-cifras/` resultó ser una **categoría de
+        noticias/boletines de prensa**, no un repositorio de datos, pese
+        al nombre; `geosalud-en-cifras/` ya no existe (redirige al
+        inicio). Nada más allá de CKAN.
+      - **Ministerio de Gobierno** (`ministeriodegobierno.gob.ec`) y
+        **Ministerio de Defensa** (`defensa.gob.ec`) — revisados, sin
+        páginas de estadísticas/datos propias más allá de lo que ya
+        enlazan directo a `datosabiertos.gob.ec`. Defensa además ofrece
+        un formulario de "Transparencia Colaborativa" para pedir
+        información puntual (`servicios.midena.gob.ec/Transparencia/`),
+        no un dataset descargable.
+      - **Geoportal del IGM** — investigado más a fondo: la cartografía
+        de libre acceso está detrás de un **formulario de registro**
+        (`geoportaligm.gob.ec/formulario3/...`), y los datos GNSS/red
+        gravimétrica requieren **crear una cuenta gratuita** para poder
+        descargar (login real, no solo un captcha). Ambos caen en la
+        misma categoría que el registro de títulos: no son gratuitos en
+        el sentido de "sin fricción", y crear cuentas no es algo que
+        este asistente haga — así que sigue siendo un pendiente real
+        (arquitectura geoespacial), no algo bloqueado por falta de
+        esfuerzo, pero tampoco automatizable tal cual está.
+      - **Producción** (`produccion.gob.ec`) — nada de estadísticas
+        propias en la navegación principal, pero enlaza a
+        **`aduana.gob.ec`/ECUAPASS** (la Ventanilla Única de Comercio
+        Exterior) — pista nueva, sin explorar todavía, con potencial
+        real (datos de importaciones/exportaciones).
+
       **Conclusión:** para este dominio (justicia/seguridad + ambiente +
       salud + trabajo/turismo/producción), la estrategia correcta no es
       "conexión nueva por institución" sino **verificar cobertura CKAN
       primero** — la mayoría ya está ahí, sin código nuevo. Los
       candidatos reales a conexión propia son **SEPS** (vía el subdominio
       de estadísticas, ya que el sitio principal bloquea), **Superbancos**
-      (boletines `.zip` reales desde 1997, fuera de CKAN) y, más
-      adelante, el **Geoportal del IGM** si se decide encarar el
-      pendiente geoespacial. Marcado como parcial, no cerrado — quedan
-      más ministerios sin revisar (educación básica/MINEDEC más allá de
-      lo ya visto, agricultura fuera de MPCEIP, salud más a fondo más
-      allá de la organización CKAN ya confirmada, etc.) si se quiere
-      ampliar el barrido.
+      (boletines `.zip` reales desde 1997, fuera de CKAN), y el
+      **"Reportes Semanales Sector Minero"** recién encontrado en
+      Ambiente y Energía. El **Geoportal del IGM** sigue siendo un
+      candidato real para el pendiente geoespacial, pero requiere
+      resolver primero el registro/login que no se puede automatizar sin
+      intervención humana. Sin explorar todavía: **Aduana/ECUAPASS**
+      (comercio exterior), el dominio real y actual de **Turismo**, y
+      educación básica/MINEDEC más allá de lo ya visto. Marcado como
+      parcial, no cerrado.
 
 ---
 
