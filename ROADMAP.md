@@ -831,6 +831,45 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
         de solo por fecha de gaceta, haría falta revisar la sección de
         "Normativa" propia de cada regulador — sin hacerlo en esta
         pasada.
+      - **Jurisprudencia — categoría real y separada de "normativa",
+        confirmada.** La Corte Constitucional tiene un buscador de
+        sentencias real (`buscador.corteconstitucional.gob.ec`, más de
+        91,406 sentencias, cada una con URL propia por número de causa,
+        ej. `.../fichaSentencia?numero=001-14-PJO-CC`). La Corte
+        Nacional de Justicia (justicia ordinaria, distinta de la
+        Constitucional) tiene su **propio** buscador separado
+        (`busquedasentencias.cortenacional.gob.ec`). Ninguno de los dos
+        se exploró a fondo (estructura de resultados, si hay API o solo
+        HTML) — confirmado que existen y son reales, no más.
+      - **Proyectos de ley (proceso legislativo en curso) — confirmado
+        real y separado de las leyes ya aprobadas.** La Asamblea
+        Nacional tiene "Consulta de Proyectos de Ley"
+        (`proyectosdeley.asambleanacional.gob.ec/report`, sistema propio
+        con su subdominio) y una página aparte de "Leyes aprobadas
+        (publicadas en el Registro Oficial)" — el matiz correcto es que
+        `search_regulaciones` (y el Registro Oficial) cubren leyes *ya
+        aprobadas y publicadas*, no el trámite legislativo en curso
+        (primer/segundo debate, comisiones). Sin explorar la estructura
+        del sistema de proyectos de ley.
+      - **Gremios/asociaciones privadas con datos sectoriales reales —
+        pedido de Daniel ("car salesmen", bancos, "cualquier otro que
+        valga la pena").** **AEADE** (Asociación de Empresas
+        Automotrices del Ecuador, `aeade.net`) publica "Boletines de
+        prensa: venta de vehículos" — página real confirmada, pero no
+        se encontró un archivo `.pdf/.xlsx` con link directo en el HTML
+        de esa página (puede estar en una galería/widget JS, sin
+        confirmar el mecanismo real de descarga). **ASOBANCA**
+        (Asociación de Bancos Privados del Ecuador,
+        `asobanca.org.ec/plataformas-de-datos/`) tiene tres
+        plataformas propias reales: **Datalab** ("primera herramienta
+        de inteligencia financiera gratuita en América Latina"),
+        **Mapa de Inclusión** (acceso/uso de servicios financieros), y
+        **ClicStat** (datos económicos desagregados) — más una sección
+        "Legal Normativa" separada. Suenan a aplicaciones web/paneles
+        interactivos, no archivos descargables simples — no se
+        confirmó el mecanismo de acceso a datos crudos en ninguna. Igual
+        que los observatorios de FCD: son organizaciones privadas/gremiales,
+        no gobierno — mismo matiz de alcance.
 - [ ] **Vivienda (MIDUVI) — confirmado que el dominio está caído, no
       investigado más profundo.** `miduvi.gob.ec` falla a nivel TLS
       tanto con `httpx` como con el browser real — no es un problema de
