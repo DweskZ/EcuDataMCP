@@ -431,23 +431,97 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       - **Producción** (`produccion.gob.ec`) — nada de estadísticas
         propias en la navegación principal, pero enlaza a
         **`aduana.gob.ec`/ECUAPASS** (la Ventanilla Única de Comercio
-        Exterior) — pista nueva, sin explorar todavía, con potencial
-        real (datos de importaciones/exportaciones).
+        Exterior) — ver hallazgo de comercio exterior más abajo.
+
+      **Cuarta pasada, mismo día** (Daniel pidió específicamente:
+      Educación, Aduana, Ministerio de Gobierno, Ministerio del Interior
+      — investigar su dominio real —, y más de BCE más allá de BCEData;
+      mencionó que hay interés en el catálogo IEEM con publicaciones
+      mensuales):
+      - **BCE — hallazgo grande: la "Información Estadística Mensual"
+        (IEM/IEEM)**, el boletín insignia del Banco Central, mucho más
+        allá de lo que cubre la API BCEData ya integrada.
+        `contenido.bce.fin.ec/documentos/informacioneconomica/
+        PublicacionesGenerales/IndiceIEM.html` lista los boletines desde
+        hace décadas (numerados; No. 2087-2092 = enero-junio 2026, uno
+        por mes, confirmado en vivo — **es exactamente el "catálogo con
+        publicaciones mensuales" que Daniel pidió encontrar**). Cada
+        boletín (`.../IEMensual/m{n}/IEM{n}.zip`, patrón de URL
+        predecible por número) es un ZIP real y descargable — confirmado
+        el de junio 2026 (No. 2092): **11.5 MB**, contiene docenas de
+        cuadros: estadísticas monetarias y financieras (M1/M2, tasas de
+        interés, reservas internacionales, balance sectorial por tipo de
+        entidad), finanzas públicas (operaciones del SPNF, base
+        devengado, % del PIB), y más secciones no leídas todavía
+        (probablemente sector externo, cuentas nacionales, precios,
+        sector real — el índice truncó antes de listarlas todas). Mucho
+        más rico que los indicadores curados de BCEData. También hay un
+        PDF de la publicación completa por boletín
+        (`IEM{n}.pdf`). Candidato real y fuerte para una integración
+        nueva (`helpers/bce_iem_client.py` o similar) — el volumen de
+        cuadros por boletín es grande, no es trivial, pero el acceso en
+        sí no tiene fricción (sin registro, sin captcha).
+      - **Ministerio del Interior vs. Ministerio de Gobierno — son dos
+        sitios reales y distintos, no un simple renombramiento** (a
+        diferencia de SENESCYT→MINEDEC). `ministeriodelinterior.gob.ec`
+        y `ministeriodegobierno.gob.ec` **ambos resuelven, ambos
+        responden 200, con títulos y contenido distintos** — confirmado
+        en vivo, no es un caso de dominio viejo redirigiendo al nuevo.
+        Interior tiene su propio **"Micrositio de Estadísticas de
+        Seguridad"** (`cifras.ministeriodelinterior.gob.ec`) — una app
+        Angular real (necesita JS, `httpx` plano solo devuelve el shell
+        vacío) protegida por **Incapsula** (WAF anti-bot). Una vez
+        renderizada muestra "Visualizadores" para homicidios, armas
+        ilícitas, desaparecidos, trata de personas, detenidos —
+        **exactamente las mismas categorías que ya están en el CKAN de
+        `ministerio-del-interior`**, sin links de descarga visibles (solo
+        visualizadores) — duplicado del dato ya cubierto, no una fuente
+        nueva. Ministerio de Gobierno, revisado a fondo: su página de
+        "Indicador PND 2025-2029 MAPIs" (MAPIs = Medidas de Amparo o
+        Protección Inmediata, violencia de género) solo tiene documentos
+        metodológicos/normativos (norma jurídica, manual, ficha
+        metodológica) — no la serie de datos en sí. Ninguno de los dos
+        aporta algo descargable más allá de CKAN.
+      - **Educación básica / MINEDEC — hallazgo real:**
+        `educacion.gob.ec/datos-abiertos-minedec/` tiene un **registro
+        administrativo histórico de matrícula 2009-2025** en Excel real
+        (`Registro-Administrativo-Historico_2009-202X-{Inicio,Fin}.xlsx`,
+        más diccionario de datos y metadatos, actualizado abril 2026,
+        confirmado con `HEAD` real). Esto es más rico que los 2 datasets
+        que ya tiene `organization=ministerio-de-educacion` en CKAN —
+        candidato real a mirar más de cerca si se decide un tool de
+        educación básica.
+      - **Aduana/comercio exterior — dead end confirmado, no solo
+        supuesto.** Tanto `aduana.gob.ec/estadisticas/` como
+        `produccion.gob.ec/boletines-mensuales-de-comercio-exterior/`
+        son páginas reales pero **vacías** (la de Producción muestra
+        pestañas por año 2021-2026 sin ningún archivo real detrás,
+        confirmado buscando enlaces `.pdf/.xlsx/.zip` en el HTML plano:
+        cero). La búsqueda web confirma por qué: las estadísticas de
+        comercio exterior de SENAE **se piden por oficio o correo al
+        Service Desk**, no se publican en un portal abierto. No es una
+        limitación técnica de scraping — el dato simplemente no está
+        publicado así.
 
       **Conclusión:** para este dominio (justicia/seguridad + ambiente +
-      salud + trabajo/turismo/producción), la estrategia correcta no es
-      "conexión nueva por institución" sino **verificar cobertura CKAN
-      primero** — la mayoría ya está ahí, sin código nuevo. Los
-      candidatos reales a conexión propia son **SEPS** (vía el subdominio
-      de estadísticas, ya que el sitio principal bloquea), **Superbancos**
-      (boletines `.zip` reales desde 1997, fuera de CKAN), y el
-      **"Reportes Semanales Sector Minero"** recién encontrado en
-      Ambiente y Energía. El **Geoportal del IGM** sigue siendo un
+      salud + trabajo/turismo/producción + educación básica + banca
+      central), la estrategia correcta no es "conexión nueva por
+      institución" sino **verificar cobertura CKAN primero** — la mayoría
+      ya está ahí, sin código nuevo. Los candidatos reales a conexión
+      propia, en orden de valor: **BCE/IEM** (el hallazgo más grande de
+      esta ronda — boletín mensual completo, sin fricción de acceso),
+      **Superbancos** (boletines `.zip` reales desde 1997), **SEPS** (vía
+      el subdominio de estadísticas), el **"Reportes Semanales Sector
+      Minero"** de Ambiente y Energía, y el **registro histórico de
+      matrícula de MINEDEC**. El **Geoportal del IGM** sigue siendo un
       candidato real para el pendiente geoespacial, pero requiere
       resolver primero el registro/login que no se puede automatizar sin
-      intervención humana. Sin explorar todavía: **Aduana/ECUAPASS**
-      (comercio exterior), el dominio real y actual de **Turismo**, y
-      educación básica/MINEDEC más allá de lo ya visto. Marcado como
+      intervención humana. **Descartado con evidencia, no por
+      abandono:** comercio exterior/Aduana (no se publica abiertamente,
+      confirmado). Sin explorar todavía: el dominio real y actual de
+      **Turismo** (su dominio viejo redirige a otra institución, igual
+      que Ambiente), y el resto de las secciones del boletín IEM del BCE
+      (sector externo, cuentas nacionales, precios). Marcado como
       parcial, no cerrado.
 
 ---
