@@ -673,15 +673,23 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       - **IEPI se convirtió en SENADI en 2018** (bajo el paraguas de
         SENESCYT). Su dominio real y vivo es
         `derechosintelectuales.gob.ec` (`propiedadintelectual.gob.ec`
-        redirige ahí). Existe un dataset CKAN real
-        ("Base de datos de propiedad intelectual aprobadas y
-        solicitadas a la SENADI") pero está **mal catalogado bajo la
-        organización equivocada** (`instituto-de-investigacion-
-        geologico-y-energetico-iige`, el instituto geológico — no
-        SENADI) — un defecto de calidad de datos del portal en sí, no
-        del scraping. La página de estadísticas propia de SENADI que
-        encontré es un artículo de noticia de 2017, no un portal de
-        datos vivo — sin confirmar si existe uno más actual.
+        redirige ahí). **Corrección 2026-08-29 (mismo día), a raíz de
+        que Daniel preguntó específicamente por patentes:** la nota
+        anterior decía que el único dataset de SENADI estaba mal
+        catalogado bajo el instituto geológico — resultó ser una
+        búsqueda incompleta. `search_datasets(query="patentes")`
+        encuentra **4** resultados: 2 sí están mal catalogados bajo
+        `instituto-de-investigacion-geologico-y-energetico-iige` (el
+        instituto geológico), pero los otros 2 ("Número de solicitudes
+        de Patentes de Invención", con una versión con corte a
+        jun-2022) están correctamente bajo su propia organización,
+        **`servicio-nacional-de-derechos-intelectuales-senadi`, con 8
+        datasets en total** — ya alcanzable con los tools genéricos
+        existentes, sin código nuevo. Patentes de invención específicamente
+        ya cubiertas. La página de estadísticas propia de SENADI que
+        encontré antes es un artículo de noticia de 2017, no un portal
+        de datos vivo — sin confirmar si existe uno más actual, pero ya
+        no hace falta para patentes dado que CKAN lo resuelve.
       - **Cultura** — `organization=mcyp` (Ministerio de Cultura y
         Patrimonio) ya tiene 6 datasets reales en CKAN (visitantes de
         museos, usuarios de bibliotecas/archivos históricos,
