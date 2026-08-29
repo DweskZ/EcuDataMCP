@@ -518,11 +518,102 @@ Leyenda de estado: **[ ]** sin empezar · **[~]** parcial · **[x]** hecho
       resolver primero el registro/login que no se puede automatizar sin
       intervención humana. **Descartado con evidencia, no por
       abandono:** comercio exterior/Aduana (no se publica abiertamente,
-      confirmado). Sin explorar todavía: el dominio real y actual de
-      **Turismo** (su dominio viejo redirige a otra institución, igual
-      que Ambiente), y el resto de las secciones del boletín IEM del BCE
-      (sector externo, cuentas nacionales, precios). Marcado como
-      parcial, no cerrado.
+      confirmado).
+
+      **Quinta pasada, mismo día** (Daniel: "investigar aún más profundo,
+      no queremos perdernos nada" — Ministerio de Industria/Producción,
+      Ambiente, Agricultura, y lo que aparezca):
+      - **SIPA (Sistema de Información Pública Agropecuaria) — el
+        hallazgo más grande de toda esta investigación.**
+        `sipa.agricultura.gob.ec`, del **Ministerio de Agricultura,
+        Ganadería y Pesca** (`agricultura.gob.ec`, real, vivo, **distinto
+        de MPCEIP** — Agricultura y Comercio Exterior/Producción son dos
+        ministerios separados, no uno solo pese al traslape de "Pesca"
+        en ambos nombres). Solo el módulo económico
+        (`sipa-estadisticas/estadisticas-descargas/estadisticas-
+        economicas`) tiene **12 archivos Excel reales y de descarga
+        directa, sin registro ni login**: valor agregado bruto
+        agropecuario, comercio exterior agropecuario/agroindustrial,
+        crédito público y privado agropecuario, sector silvícola,
+        precios productor ponderado, precios mercados mayoristas,
+        precios agroindustria, precios pecuarios, precios
+        internacionales, precios agroquímicos/fertilizantes, IPC
+        alimentos/inflación, índices de sector. **Confirmado
+        descargando uno real: `precios-productor-ponderado.xlsx`, 41.4
+        MB** — muy por encima del tope de 5 MB que usan los tools de
+        preview de este proyecto (mismo problema de escala que el PDF
+        actuarial de 14.6 MB de IESS; necesitaría `download_resource` o
+        un tope más alto, no `preview_resource_data` tal cual). Y eso es
+        solo un módulo — el sitio además tiene "Cifras Agroproductivas"
+        y "Cifras Territoriales" (tableros dinámicos, probablemente
+        Power BI, sin confirmar), boletines nacionales (Panorama
+        Agroestadístico, Precios Mayoristas, Precios Internacionales,
+        Precios Productor), boletines situacionales por cultivo (ej.
+        papa), un Panorama Agroeconómico anual, y un geoportal propio de
+        ortofotos (`geoportal.agricultura.gob.ec`) — más geoespacial,
+        sin explorar. Esto reemplaza por completo la cobertura actual de
+        `detect_series_pattern`/cacao vía MPCEIP: **es la fuente real y
+        mucho más rica** para todo lo agropecuario. Candidato de máxima
+        prioridad para una integración nueva.
+      - **Ministerio de Finanzas se fusionó/renombró** — otro caso como
+        SENESCYT→MINEDEC. `finanzas.gob.ec` redirige a
+        `economicoproductivo.gob.ec`, el **"Ministerio de Desarrollo
+        Económico y Productivo" (MDEP)** — sugiere que Finanzas,
+        Producción/Industrias (`industrias.gob.ec` ya no resuelve por
+        DNS, consistente con que se fusionó para acá) y quizás más
+        quedaron bajo un solo ministerio nuevo. Tiene una página real
+        **"Estadísticas Fiscales"** (`finanzas.gob.ec/estadisticas-
+        fiscales/`, las URLs internas siguen con el dominio viejo) con
+        calendario de publicación de estadísticas de finanzas públicas
+        2026 y documentos de deuda pública — confirmé el calendario y la
+        estrategia de deuda como PDFs/XLS reales, pero no llegué a
+        confirmar si hay series de tiempo fiscales descargables ahí
+        mismo o si redirige a otro lado (sin terminar de revisar).
+      - **Contraloría General del Estado — hallazgo real y grande:** su
+        página "Datos Abiertos" (`contraloria.gob.ec/Portal/24287`) aloja
+        **"Informes aprobados"**, un archivo trimestral de *todos* los
+        informes de auditoría aprobados a *cualquier* institución
+        pública del país (enero-marzo 2023 en adelante, confirmado en
+        vivo) — mucho más amplio que el archivo de auditorías que ya se
+        encontró solo para IESS. También hay "Consulta de declaraciones
+        patrimoniales" (declaraciones patrimoniales de funcionarios
+        públicos) y "Plan anual de control". **Sin confirmar todavía:**
+        los links de "Informes aprobados" no exponen un `href` de
+        archivo directo en el HTML — parecen abrirse vía JS/visor de
+        documentos, no confirmé si son escalables con `httpx` plano o
+        necesitan browser. Pendiente de profundizar.
+      - **Patrón sistémico confirmado de dominios `.gob.ec` viejos
+        redirigiendo al mismo lugar equivocado:** además de
+        `ambiente.gob.ec` y `turismo.gob.ec` (pasada anterior),
+        **`arcsa.gob.ec` (regulador de medicamentos/alimentos) también
+        redirige a `atencionintegral.gob.ec`** (SNAI, sistema
+        penitenciario) — tercer caso confirmado. Fuerte indicio de un
+        vhost por defecto mal configurado en infraestructura de hosting
+        compartida del Estado, no una serie de coincidencias. No vale la
+        pena seguir intentando adivinar el dominio real de cada uno uno
+        por uno — mejor buscar el dominio correcto por separado cuando
+        haga falta una institución específica.
+      - **Dos sitios más protegidos por Incapsula (WAF anti-bot),** además
+        del micrositio de Interior ya visto: **CNE** (Consejo Nacional
+        Electoral, `cne.gob.ec`, 403 directo a `httpx` con firma
+        Incapsula en el body) — datos electorales quedan fuera de
+        alcance sin resolver el WAF. **MIDUVI** (`miduvi.gob.ec`) falla
+        directo a nivel TLS (`SSL: UNEXPECTED_EOF_WHILE_READING`),
+        síntoma distinto, tampoco resuelto.
+
+      **Conclusión:** el hallazgo que más cambia el mapa de este barrido
+      es **SIPA** — una fuente agropecuaria real, rica, y sin fricción de
+      acceso, que debería ser la prioridad número uno si se decide
+      construir una integración nueva a partir de esta investigación,
+      por delante de BCE/IEM, Superbancos y SEPS. Segundo en la lista:
+      **Contraloría** (archivo nacional de auditorías, alcance
+      transversal a todo el Estado) si se resuelve cómo se sirven los
+      archivos. Sin explorar todavía: el dominio real y actual de
+      **Turismo**, el resto de las secciones del boletín IEM del BCE
+      (sector externo, cuentas nacionales, precios), si "Estadísticas
+      Fiscales" del MDEP tiene series descargables más allá de PDFs
+      puntuales, y los tableros dinámicos de SIPA. Marcado como parcial,
+      no cerrado.
 
 ---
 
