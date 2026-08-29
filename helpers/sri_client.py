@@ -18,12 +18,12 @@ import asyncio
 import logging
 import re
 from typing import Any
-from unicodedata import category, normalize
 
 import httpx
 
 from helpers.cache import TtlCache
 from helpers.logging import MAIN_LOGGER_NAME
+from helpers.text_utils import strip_accents as _strip
 from helpers.tls import should_retry_insecure
 from helpers.user_agent import USER_AGENT
 
@@ -45,11 +45,6 @@ _FILE_LINK_RE = re.compile(
 )
 _TAG_RE = re.compile(r"<[^>]+>")
 _WS_RE = re.compile(r"\s+")
-
-
-def _strip(text: str) -> str:
-    nfkd = normalize("NFKD", text or "")
-    return "".join(c for c in nfkd if category(c) != "Mn").lower()
 
 
 def _clean_label(fragment: str, url: str) -> str:

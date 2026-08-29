@@ -24,12 +24,12 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime, timedelta, timezone
 from typing import Any
-from unicodedata import category, normalize
 
 import httpx
 
 from helpers.cache import TtlCache
 from helpers.logging import MAIN_LOGGER_NAME
+from helpers.text_utils import strip_accents as _strip
 from helpers.user_agent import USER_AGENT
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
@@ -58,11 +58,6 @@ _COLUMN_SYNONYMS: dict[str, set[str]] = {
 _HEADER_MATCH_THRESHOLD = 4  # min recognized columns to trust a row as a header
 
 _events_cache = TtlCache(ttl_seconds=120.0, max_entries=4)
-
-
-def _strip(text: str) -> str:
-    nfkd = normalize("NFKD", text or "")
-    return "".join(c for c in nfkd if category(c) != "Mn").lower()
 
 
 def _match_column(token: str) -> str | None:

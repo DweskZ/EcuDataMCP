@@ -1,4 +1,4 @@
-import unicodedata
+from functools import partial
 
 import httpx
 from mcp.server.fastmcp import FastMCP
@@ -15,6 +15,7 @@ from helpers.csv_reader import (
 )
 from helpers.format_out import render_output
 from helpers.logging import log_tool
+from helpers.text_utils import strip_accents
 from tools.list_dataset_resources import detect_periodic_series, period_sort_key
 from tools.preview_resource_data import (
     classify_from_content_type,
@@ -48,10 +49,7 @@ _CUMULATIVE_COVERAGE = 0.8
 _INCREMENTAL_COVERAGE = 0.2
 
 
-def _strip_accents(value: str) -> str:
-    return "".join(
-        c for c in unicodedata.normalize("NFKD", value) if not unicodedata.combining(c)
-    )
+_strip_accents = partial(strip_accents, lower=False)
 
 
 def _find_period_columns(headers: list[str]) -> list[int]:

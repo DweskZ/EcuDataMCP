@@ -1,10 +1,11 @@
-from unicodedata import category, normalize
+from functools import partial
 
 from mcp.server.fastmcp import FastMCP
 
 from helpers import anda_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
+from helpers.text_utils import strip_accents
 
 # ANDA's own full-text search (`sk`) is loose — it ranks by relevance across
 # a broad blob of fields rather than requiring every query word to match, so
@@ -12,10 +13,7 @@ from helpers.logging import log_tool
 # candidate batch and filter locally so results actually contain the query.
 _FETCH_SIZE = 100
 
-
-def _strip_accents(text: str) -> str:
-    nfkd = normalize("NFKD", text or "")
-    return "".join(c for c in nfkd if category(c) != "Mn")
+_strip_accents = partial(strip_accents, lower=False)
 
 
 def _matches_query(row: dict, words: list[str]) -> bool:

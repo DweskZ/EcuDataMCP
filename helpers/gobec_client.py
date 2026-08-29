@@ -7,6 +7,7 @@ import httpx
 
 from helpers import env_config
 from helpers.logging import MAIN_LOGGER_NAME
+from helpers.text_utils import strip_accents as _strip
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
@@ -197,13 +198,7 @@ async def find_regulaciones(
     session: httpx.AsyncClient | None = None,
 ) -> list[dict[str, Any]]:
     """Client-side search across regulation pages (gob.ec has no search param)."""
-    from unicodedata import category, normalize
-
-    def strip(text: str) -> str:
-        nfkd = normalize("NFKD", text or "")
-        return "".join(c for c in nfkd if category(c) != "Mn").lower()
-
-    words = [strip(w) for w in query.split() if len(w) >= 2]
+    words = [_strip(w) for w in query.split() if len(w) >= 2]
     if not words:
         return []
 
@@ -221,7 +216,7 @@ async def find_regulaciones(
             if not items:
                 break
             for reg in items:
-                blob = strip(
+                blob = _strip(
                     f"{reg.get('regulacion', '')} {reg.get('descripcion', '')} "
                     f"{reg.get('tipo', '')} {reg.get('institucion_emisora', '')} "
                     f"{reg.get('registro_oficial_numero', '')}"

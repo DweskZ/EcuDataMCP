@@ -1,4 +1,4 @@
-from unicodedata import category, normalize
+from functools import partial
 
 from mcp.server.fastmcp import FastMCP
 
@@ -6,12 +6,9 @@ from helpers import gobec_client
 from helpers.format_out import render_output
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
+from helpers.text_utils import strip_accents
 
-
-def _strip_accents(text: str) -> str:
-    """Remove diacritical marks: inscripción → inscripcion, cédula → cedula."""
-    nfkd = normalize("NFKD", text)
-    return "".join(c for c in nfkd if category(c) != "Mn")
+_strip_accents = partial(strip_accents, lower=False)
 
 
 def _matches_query(tramite: dict, words: list[str]) -> bool:

@@ -2,6 +2,54 @@
 
 ## Unreleased
 
+## 0.8.1 — 2026-08-29
+
+### Security
+
+- **`inec_client.py` now goes through the shared SSRF guard.** Its two page
+  fetches used a raw `httpx.AsyncClient().get()` with `follow_redirects=True`
+  and no per-hop validation — harmless for the hardcoded seed-page constant,
+  but `get_topic_files(topic_url)` takes a URL that ultimately traces back to
+  the calling model (via `search_topics`'s scraped results), which is exactly
+  the class of input `helpers/safe_download.py`'s `assert_public_url`/
+  `safe_stream` guard exists for (blocks non-http(s) schemes, private/
+  loopback/link-local IPs, and unvalidated redirect hops). Switched both
+  fetches to `helpers.csv_reader.download_bytes`, which already wraps that
+  guard (and the shared TLS-fallback retry) — removed ~15 lines of duplicate
+  TLS-retry logic in the process. Verified live: real INEC pages still
+  fetch correctly, and a crafted `169.254.169.254`/`localhost` URL is now
+  rejected before any request leaves the process.
+
+### Changed
+
+- **Consolidated 13 copy-pasted accent-stripping functions into
+  `helpers/text_utils.strip_accents`.** Every one of `bce_client`,
+  `biinec_extras`, `geo_data`, `gobec_client` (a nested local def inside
+  `find_regulaciones`), `igepn_client`, `inec_client`, `sgr_client`,
+  `sri_client`, `supercias_client`, `search_anda`, `search_ecuador`,
+  `search_tramites`, and `detect_series_pattern` had their own inline
+  NFKD-normalize implementation — three subtly different variants (some
+  lowercase, some not; `search_tramites`'s lacked the `text or ""` guard the
+  others have, so it would crash on `None`). One shared function now, with a
+  `lower` kwarg for the two behaviors; existing call sites unchanged via
+  `from helpers.text_utils import strip_accents as _strip_accents` (or
+  `functools.partial(strip_accents, lower=False)` where case was preserved).
+- **Non-root Docker user.** The image ran as root with no `USER` directive;
+  added a dedicated `appuser` and switched to it after `uv sync`. Caught a
+  real regression while doing this: `docker-compose.yml` mounts a named
+  volume at `/app/data` (used by `scripts/build_supercias_financials_db.py`
+  via `docker compose exec`), which doesn't exist in the image at build
+  time — a fresh named volume takes its initial ownership from whatever's
+  already at that path in the image, so without `mkdir -p /app/data &&
+  chown` *before* dropping to `appuser`, that volume would come up
+  root-owned and the build script would fail to write to it as a non-root
+  user on first run.
+- **Dependabot enabled** (`.github/dependabot.yml`): weekly PRs for `uv`
+  (pyproject.toml/uv.lock), GitHub Actions, and the Dockerfile's base image.
+  Previously a `pypdf`/`httpx`/`uvicorn`/`mcp` CVE had no automated path to
+  surface — CI runs tests on push but nothing flagged an outdated or
+  vulnerable pin.
+
 ## 0.8.0 — 2026-08-29
 
 ### Added

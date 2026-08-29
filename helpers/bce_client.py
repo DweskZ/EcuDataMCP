@@ -48,12 +48,12 @@ from __future__ import annotations
 import asyncio
 import logging
 from typing import Any
-from unicodedata import category, normalize
 
 import httpx
 
 from helpers.cache import TtlCache
 from helpers.logging import MAIN_LOGGER_NAME
+from helpers.text_utils import strip_accents as _strip
 from helpers.user_agent import USER_AGENT
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
@@ -71,11 +71,6 @@ _bundle_cache = TtlCache(ttl_seconds=86400.0, max_entries=256)
 # built from, cached separately since building it costs ~78 concurrent
 # bundle fetches, not worth repeating per search.
 _catalog_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
-
-
-def _strip(text: str) -> str:
-    nfkd = normalize("NFKD", text or "")
-    return "".join(c for c in nfkd if category(c) != "Mn").lower()
 
 
 async def _get_json(

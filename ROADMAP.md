@@ -61,6 +61,16 @@ Leyenda: `[ ]` sin empezar · `[~]` parcial · `[x]` hecho
 - [ ] `outputSchema` en los tools MCP.
 - [ ] Manejo geoespacial (WKT/GeoJSON más allá del stripping actual).
 - [ ] Tool de investigación "one-shot" (una sola llamada que combine búsqueda + preview + detección de serie).
+- [ ] Rate limiting / cap de concurrencia en el servidor HTTP — hoy no hay
+      auth ni throttle en `/mcp`; nada impide N requests concurrentes cada
+      una disparando una descarga de 5 MB o el parseo de 35 MB de Supercías.
+      Requiere decidir el diseño (¿por IP? ¿global? ¿qué límites?), no es
+      mecánico — pendiente de una sesión propia.
+- [ ] Type-checking en CI (mypy/pyright) — ruff cubre estilo/imports pero no
+      errores de tipo; el repo ya está tipado casi en su totalidad. Riesgo:
+      podría destapar errores preexistentes en los 40+ archivos que
+      necesitarían triage antes de que CI pase en verde — no es un cambio
+      chico, evaluar alcance antes de prender el gate.
 
 ## Notas
 

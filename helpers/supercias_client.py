@@ -46,13 +46,13 @@ import logging
 import re
 import zipfile
 from typing import Any
-from unicodedata import category, normalize
 from xml.etree import ElementTree as ET
 
 import httpx
 
 from helpers.cache import TtlCache
 from helpers.logging import MAIN_LOGGER_NAME
+from helpers.text_utils import strip_accents as _strip
 from helpers.tls import should_retry_insecure
 from helpers.user_agent import USER_AGENT
 
@@ -84,11 +84,6 @@ _ruc_index_state: tuple[list[tuple[str, ...]], dict[str, tuple[str, ...]]] | Non
 _expediente_index_state: (
     tuple[list[tuple[str, ...]], dict[str, tuple[str, ...]]] | None
 ) = None
-
-
-def _strip(text: str) -> str:
-    nfkd = normalize("NFKD", text or "")
-    return "".join(c for c in nfkd if category(c) != "Mn").lower()
 
 
 def _normalize_header(header: str) -> str:

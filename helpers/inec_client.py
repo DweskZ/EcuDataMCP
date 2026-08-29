@@ -25,14 +25,11 @@ import logging
 import re
 from html import unescape
 from typing import Any
-from unicodedata import category, normalize
-
-import httpx
 
 from helpers.cache import TtlCache
+from helpers.csv_reader import download_bytes
 from helpers.logging import MAIN_LOGGER_NAME
-from helpers.tls import should_retry_insecure
-from helpers.user_agent import USER_AGENT
+from helpers.text_utils import strip_accents as _strip_accents
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
@@ -40,7 +37,6 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 # to be renamed or retired.
 _SEED_PAGE_URL = "https://www.ecuadorencifras.gob.ec/indice-de-precios-al-consumidor/"
 _SITE_PREFIX = "https://www.ecuadorencifras.gob.ec/"
-_DOWNLOAD_TIMEOUT = 30.0
 
 # Topic list changes only when INEC restructures its nav (rare); topic pages
 # themselves are refreshed with new bulletins roughly monthly.
@@ -60,37 +56,21 @@ _FILE_LINK_RE = re.compile(
 _TITLE_RE = re.compile(r"<title>(.*?)</title>", re.IGNORECASE | re.DOTALL)
 
 
-def _strip_accents(text: str) -> str:
-    nfkd = normalize("NFKD", text or "")
-    return "".join(c for c in nfkd if category(c) != "Mn").lower()
-
-
 def _label_from_url(url: str) -> str:
     name = url.rstrip("/").rsplit("/", 1)[-1]
     name = name.rsplit(".", 1)[0]
     return name.replace("_", " ").replace("-", " ").strip()
 
 
-async def _get_page(url: str, verify: bool = True) -> str:
-    async with httpx.AsyncClient(
-        headers={"User-Agent": USER_AGENT},
-        follow_redirects=True,
-        timeout=_DOWNLOAD_TIMEOUT,
-        verify=verify,
-    ) as session:
-        resp = await session.get(url)
-        resp.raise_for_status()
-        return resp.text
-
-
-async def _fetch_page_with_tls_fallback(url: str) -> str:
-    try:
-        return await _get_page(url)
-    except httpx.ConnectError as exc:
-        if not should_retry_insecure(exc, url):
-            raise
-        logger.warning("Falló la verificación TLS para %s; reintentando sin verificación", url)
-        return await _get_page(url, verify=False)
+async def _get_page(url: str) -> str:
+    # download_bytes is SSRF-guarded (validates the URL and every redirect
+    # hop resolve to a public IP) and already retries insecurely on the
+    # shared TLS-fallback allowlist -- needed here because get_topic_files
+    # takes a URL from the model, not just the hardcoded seed page constant.
+    content, truncated = await download_bytes(url)
+    if truncated:
+        raise ValueError(f"La página en {url} superó el límite de descarga.")
+    return content.decode("utf-8", errors="replace")
 
 
 def _parse_topics(html: str) -> list[dict[str, str]]:
@@ -114,7 +94,7 @@ async def _fetch_topics() -> list[dict[str, str]]:
             return cached
 
         logger.info("Descargando el menú de temas de Ecuador en Cifras (INEC)")
-        html = await _fetch_page_with_tls_fallback(_SEED_PAGE_URL)
+        html = await _get_page(_SEED_PAGE_URL)
         topics = _parse_topics(html)
         _topics_cache.set("topics", topics)
         logger.info("Menú de temas de Ecuador en Cifras cargado: %d temas", len(topics))
@@ -173,7 +153,7 @@ async def get_topic_files(topic_url: str) -> dict[str, Any]:
     if cached is not None:
         return cached
 
-    html = await _fetch_page_with_tls_fallback(topic_url)
+    html = await _get_page(topic_url)
     result = _parse_topic_files(html, topic_url)
     _topic_files_cache.set(topic_url, result)
     return result

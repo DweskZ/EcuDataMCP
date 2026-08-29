@@ -6,17 +6,13 @@ import json
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
-from unicodedata import category, normalize
+
+from helpers.text_utils import strip_accents as _strip
 
 _DATA_DIR = Path(__file__).resolve().parent / "data"
 _PROVINCIAS_PATH = _DATA_DIR / "provincias.json"
 _CANTONES_PATH = _DATA_DIR / "cantones.json"
 _PARROQUIAS_PATH = _DATA_DIR / "parroquias.json"
-
-
-def _strip(text: str) -> str:
-    nfkd = normalize("NFKD", text or "")
-    return "".join(c for c in nfkd if category(c) != "Mn").lower()
 
 
 @lru_cache(maxsize=1)

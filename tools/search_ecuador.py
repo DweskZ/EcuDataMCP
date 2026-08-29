@@ -1,6 +1,6 @@
 import asyncio
 from datetime import UTC, datetime
-from unicodedata import category, normalize
+from functools import partial
 
 from mcp.server.fastmcp import FastMCP
 
@@ -8,11 +8,9 @@ from helpers import ckan_client, gobec_client, sercop_client, sgr_client
 from helpers.format_out import render_output
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
+from helpers.text_utils import strip_accents
 
-
-def _strip_accents(text: str) -> str:
-    nfkd = normalize("NFKD", text or "")
-    return "".join(c for c in nfkd if category(c) != "Mn")
+_strip_accents = partial(strip_accents, lower=False)
 
 
 def register_search_ecuador_tool(mcp: FastMCP) -> None:

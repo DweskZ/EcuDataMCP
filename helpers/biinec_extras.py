@@ -16,16 +16,12 @@ import json
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
-from unicodedata import category, normalize
+
+from helpers.text_utils import strip_accents as _strip_accents
 
 BIINEC_URL = "https://aplicaciones3.ecuadorencifras.gob.ec/BIINEC-war/index.xhtml"
 
 _DATA_PATH = Path(__file__).resolve().parent / "data" / "biinec_extras.json"
-
-
-def _strip_accents(text: str) -> str:
-    nfkd = normalize("NFKD", text or "")
-    return "".join(c for c in nfkd if category(c) != "Mn").lower()
 
 
 @lru_cache(maxsize=1)
