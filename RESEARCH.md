@@ -73,6 +73,84 @@ y parseo tolerante del CSV.
 
 ### Ecuador en Cifras / portal BI del INEC
 
+**Comparado contra ANDA, 2026-08-29 (pedido de Daniel: "analiza contra
+ANDA").** `/estadisticas/` no es redundante con ANDA (`helpers/anda_client.py`,
+ya construido) — son capas distintas de lo que publica el INEC:
+
+- **IPC** está catalogado en ANDA para cada año 2020-2026, pero cada entrada
+  dice explícitamente `microdatos disponibles: no (solo agregados)` — es un
+  registro de metadata sin nada descargable detrás. Lo que sí existe —
+  boletín técnico, metodología, y sobre todo la serie histórica completa en
+  Excel/CSV — vive únicamente en `/estadisticas/`. Confirmado en vivo vía
+  `search_anda(query="indice precios consumidor")` contra el servidor MCP en
+  producción.
+- Esto generaliza a cualquier operación de tipo índice/agregado (comercio
+  exterior, cuentas nacionales, construcción...): ANDA cataloga la operación
+  como referencia bibliográfica pero no carga microdatos porque no los hay
+  por diseño — el agregado publicado es el dato en sí, y ese agregado solo
+  está en `/estadisticas/`.
+- **Conclusión: `/estadisticas/` sigue siendo el objetivo correcto y de
+  mayor prioridad** para `helpers/inec_client.py` — es la única fuente para
+  el tipo de contenido que ANDA estructuralmente no puede tener (series
+  agregadas publicadas + boletines/metodología), no algo que se pueda cubrir
+  ampliando ANDA.
+
+**Banco de Datos Abiertos (BIINEC), aportado por Daniel 2026-08-29:**
+`aplicaciones3.ecuadorencifras.gob.ec/BIINEC-war/index.xhtml` — una
+aplicación JSF/PrimeFaces separada de las páginas `/estadisticas/` de abajo,
+con su propio catálogo categorizado: tres ramas (Sociodemográficas y
+Sociales, Económicas, Ambiente y Otras Estadísticas), cada una con un árbol
+de temas (Población y Migración, Pobreza, Trabajo, Educación, Salud,
+Ingresos y Consumo, Protección Social, Asentamientos Humanos y Viviendas,
+Justicia y Crimen, Condiciones de Vida y Problemas Sociales, Uso del
+Tiempo...). Cada tema lista sus "operaciones estadísticas" (p. ej. bajo
+Salud: ENSANUT, ENDI, Camas Hospitalarias, Egresos Hospitalarios, Registro
+de Recursos y Actividades de Salud); cada operación tiene un selector de
+año y luego de período (ANUAL en los casos probados), y al fijar ambos
+aparece la lista de archivos descargables (Base de Datos STATA, Datos
+Abiertos CSV, a veces XLSX/ZIP/PDF según el ícono de tipo) con su peso en
+MB, un rating en estrellas y un contador de descargas acumuladas por año
+(confirmado en vivo: ENSANUT 2019 con 3,420 descargas, "Datos Abiertos CSV"
+de 30.8 MB). La barra lateral "Top Descargas" del home ya adelanta los
+datasets más pedidos (ENEMDU 2018/2019, ECV 2014...).
+
+**Fricción real:** a diferencia de los links planos `<a href>` de
+`/estadisticas/`, el botón "Descargar" aquí es un `p:commandButton
+ajax="false"` de PrimeFaces (`PrimeFaces.monitorDownload` +
+`PrimeFaces.bcn`) — el clic hace un POST a `index.xhtml` que arrastra el
+`javax.faces.ViewState` de la sesión y el árbol de selección acumulado
+(rama → tema → operación → año → período), no una URL fija reusable.
+Replicar esto sin browser requeriría reconstruir esa secuencia de POSTs con
+`httpx` (cookie de sesión + ViewState re-leído en cada paso), no un simple
+`GET` a una URL de archivo — bastante más fricción que el resto del
+catálogo de `ecuadorencifras.gob.ec`. Sin confirmar todavía si el
+ViewState es estable entre pasos o cambia por cada postback (lo normal en
+JSF es que cambie), lo cual determinaría si vale la pena automatizarlo.
+Candidato interesante por el volumen y la organización taxonómica, pero
+requiere una investigación de sesión aparte antes de decidir construir
+`helpers/inec_client.py` contra este endpoint en vez de (o además de)
+`/estadisticas/`.
+
+**BIINEC contra ANDA, 2026-08-29:** en su mayoría es redundante. Probado en
+vivo contra el servidor MCP en producción:
+
+- "Camas Hospitalarias" + "Egresos Hospitalarios" (dos temas separados en
+  BIINEC) ya están en ANDA como una sola serie combinada "Estadísticas
+  Hospitalarias Camas y Egresos", con microdatos sí disponibles, 2015-2024
+  completo.
+- ENDI (desnutrición infantil) ya está en ANDA, 2022 y 2023-2024.
+- ENSANUT solo está en ANDA para 2018; el desplegable de año en BIINEC solo
+  ofrecía 2014 y 2019 — mismo censo/encuesta, cero años en común entre las
+  dos fuentes. Ninguna es superconjunto de la otra.
+- Donde el contenido se solapa, ANDA se descarga con un link directo sin
+  sesión; BIINEC exige repetir la secuencia de POSTs con ViewState de JSF
+  (ver fricción arriba) para llegar al mismo archivo.
+
+**Veredicto:** no vale la pena construir contra BIINEC para las operaciones
+que se solapan con ANDA. Lo único potencialmente útil sería perseguir casos
+puntuales de años faltantes (como ENSANUT 2014/2019) uno por uno, no una
+integración completa del catálogo BIINEC.
+
 **Corrección 2026-08-28:** una conclusión anterior el mismo día ("callejón
 sin salida") era falsa. El primer pase entró por
 `ecuadorencifras.gob.ec/institucional/home/` (un subsitio institucional
