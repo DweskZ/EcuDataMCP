@@ -350,6 +350,8 @@ municipal independiente, 92 datasets) — mismo tool, otro catálogo CKAN.
 |------|-------------|
 | `search_inec_estadisticas` | Buscar temas estadísticos en ecuadorencifras.gob.ec (IPC, ENEMDU, ENSANUT, pobreza...). |
 | `get_inec_estadistica_files` | Links directos (boletín, metodología, series históricas) de un tema. |
+| `search_inec_publicaciones` | Búsqueda de texto completo sobre todas las publicaciones de INEC vía su API REST de WordPress — siempre vigente, ideal para "cuál es el último boletín de X". |
+| `get_inec_publicacion_archivos` | Links directos de una publicación específica encontrada con `search_inec_publicaciones`. |
 | `search_biinec_extras` | Lista curada (no scraping en vivo) de los pocos registros exclusivos del Banco de Datos Abiertos (BIINEC) — último recurso si ANDA y Ecuador en Cifras no tienen el dato. |
 
 ### Macroeconomía (BCE)

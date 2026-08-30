@@ -104,6 +104,8 @@ def _fuentes_payload() -> dict:
                 "tools": [
                     "search_inec_estadisticas",
                     "get_inec_estadistica_files",
+                    "search_inec_publicaciones",
+                    "get_inec_publicacion_archivos",
                 ],
             },
             {

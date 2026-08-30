@@ -15,6 +15,9 @@ from tools.get_dataset_info import register_get_dataset_info_tool
 from tools.get_financials import register_get_financials_tool
 from tools.get_indicador_bce import register_get_indicador_bce_tool
 from tools.get_inec_estadistica_files import register_get_inec_estadistica_files_tool
+from tools.get_inec_publicacion_archivos import (
+    register_get_inec_publicacion_archivos_tool,
+)
 from tools.get_institucion_info import register_get_institucion_info_tool
 from tools.get_organization_info import register_get_organization_info_tool
 from tools.get_regulacion_info import register_get_regulacion_info_tool
@@ -44,6 +47,7 @@ from tools.search_ecuador import register_search_ecuador_tool
 from tools.search_eventos_riesgo import register_search_eventos_riesgo_tool
 from tools.search_indicadores_bce import register_search_indicadores_bce_tool
 from tools.search_inec_estadisticas import register_search_inec_estadisticas_tool
+from tools.search_inec_publicaciones import register_search_inec_publicaciones_tool
 from tools.search_organizations import register_search_organizations_tool
 from tools.search_ranking import register_search_ranking_tool
 from tools.search_regulaciones import register_search_regulaciones_tool
@@ -88,6 +92,8 @@ def register_tools(mcp: FastMCP) -> None:
 
     register_search_inec_estadisticas_tool(mcp)
     register_get_inec_estadistica_files_tool(mcp)
+    register_search_inec_publicaciones_tool(mcp)
+    register_get_inec_publicacion_archivos_tool(mcp)
     register_search_biinec_extras_tool(mcp)
 
     register_search_regulaciones_tool(mcp)

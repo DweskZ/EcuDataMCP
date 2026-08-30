@@ -61,6 +61,8 @@ _CAPABILITIES = {
         "inec_estadisticas": [
             "search_inec_estadisticas",
             "get_inec_estadistica_files",
+            "search_inec_publicaciones",
+            "get_inec_publicacion_archivos",
             "search_biinec_extras",
         ],
         "macro": [

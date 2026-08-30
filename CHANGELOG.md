@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+### Added
+
+- **`search_inec_publicaciones`/`get_inec_publicacion_archivos`** —
+  INEC/Ecuador en Cifras' publications, discovered via the site's public
+  WordPress REST API (`/wp-json/wp/v2/posts`) instead of HTML scraping.
+  Started from a report that ANDA lacked ENEMDU 2025; traced through ANDA,
+  CKAN, and INEC's own "Empleo" topic page all capping around 2021-2023,
+  then found the real cause: `search_inec_estadisticas`'s topic list is
+  scraped from one seed page's nav menu, and the site's menu isn't the same
+  on every page — `enemdu-anual/`/`enemdu-trimestral/` (which had the full
+  2025 annual dataset the whole time) live in a submenu that page never
+  exposes. The REST API sidesteps the whole problem: 1,707 posts, real
+  full-text search (confirmed matching body content, not just titles),
+  honest pagination via `X-WP-Total`, newest post within days of being
+  checked. `/institucional/noticias/` and `/institucional/boletines/`
+  turned out to be category-filtered views of this same collection, not a
+  separate source — no HTML scraper needed for discovery at all. Verified
+  end-to-end through the actual registered MCP tool, not just the client
+  layer: `get_inec_publicacion_archivos` on the ENEMDU anual page returns
+  the real 2025 dataset (11 files: BDD SPSS/CSV, boletín técnico,
+  tabulados). See RESEARCH.md § Novena pasada.
+- `search_inec_estadisticas`'s topic-page discovery now merges two seed
+  pages instead of one, and also picks up dropdown submenu items (a
+  different HTML shape than the top-level mega-menu links it already
+  parsed) — topic count went from 74 to 89, including the ENEMDU pages
+  above. Reduces the single-seed-page gap; doesn't eliminate it, which is
+  why the REST API layer above exists as the authoritative fallback.
+
 ### Fixed
 
 - **`get_organization`/`get_organization_info` silently truncated large
@@ -12,12 +40,7 @@
   self-contradictory "Total de datasets: 94" next to "Datasets publicados
   (10)". Now fetches the true package list via
   `package_search?fq=organization:{id}` instead; verified live returning
-  94/94. Found while investigating a report that ANDA lacked ENEMDU 2025 —
-  see RESEARCH.md § Novena pasada for the full trail (ANDA/CKAN/INEC's own
-  topic page all cap around 2021-2023 for ENEMDU specifically, but INEC is
-  still publishing it monthly via a Noticias post INEC's own site menu
-  never linked — a discovery gap, not a missing source, tracked in
-  ROADMAP.md).
+  94/94. Found during the ENEMDU investigation above.
 
 ## 0.8.2 — 2026-08-29
 
