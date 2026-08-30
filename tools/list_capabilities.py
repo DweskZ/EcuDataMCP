@@ -66,6 +66,7 @@ _CAPABILITIES = {
         "macro": [
             "search_indicadores_bce",
             "get_indicador_bce",
+            "audit_bce_catalog",
             "search_bce_iem",
             "get_bce_iem_table",
         ],
@@ -103,6 +104,12 @@ _CAPABILITIES = {
             "INEC: search_anda para metadata/microdatos, "
             "search_inec_estadisticas para el boletín y la serie histórica "
             "real de índices como el IPC (ANDA los cataloga sin microdatos)"
+        ),
+        (
+            "audit_bce_catalog consulta el árbol y los metadatos de todos los "
+            "grupos BCEData; no descarga todos los valores de todas las series. "
+            "Usa get_indicador_bce para pedir los valores de un grupo, frecuencia "
+            "y unidad concretos."
         ),
         (
             "search_biinec_extras no busca en vivo dentro de BIINEC "

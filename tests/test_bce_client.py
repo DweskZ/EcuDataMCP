@@ -221,25 +221,62 @@ async def test_get_indicador_respects_explicit_frecuencia_and_unidad(httpx_mock)
     assert result["hasta"] == "2025"
 
 
-async def test_get_indicador_falls_back_to_first_option_on_unknown_frecuencia(
+async def test_get_indicador_rejects_unknown_frecuencia(
     httpx_mock,
 ):
     httpx_mock.add_response(
         url="https://contenido.bce.fin.ec/wp-json/bcedata/v1/bundle/10",
         json=_BUNDLE_10,
     )
+
+    with pytest.raises(ValueError, match="Frecuencia inválida"):
+        await bce_client.get_indicador(id_grupo=10, frecuencia="Semanal")
+
+
+async def test_audit_catalog_reports_all_groups_and_series(httpx_mock):
     httpx_mock.add_response(
-        url=(
-            "https://contenido.bce.fin.ec/wp-json/bcedata/v1/grid"
-            "?id_grupo=10&frecuencia=Mensual&unidad=Millones+de+USD"
-            "&desde=2020-01&hasta=2026-06"
-        ),
-        json=_GRID_10,
+        url="https://contenido.bce.fin.ec/wp-json/bcedata/v1/tree", json=_TREE
+    )
+    _mock_all_bundles(httpx_mock)
+
+    result = await bce_client.audit_catalog(incluir_grupos=True)
+
+    assert result["total_nodos"] == len(_TREE)
+    assert result["total_grupos"] == 3
+    assert result["grupos_exitosos"] == 3
+    assert result["grupos_con_error"] == 0
+    assert result["total_series"] == 4
+    assert result["secciones"] == {"1.  SECCION A": 2, "2.  SECCION B": 1}
+    assert result["grupos"][0]["frecuencias"] == ["Mensual", "Anual"]
+    assert result["grupos"][0]["rango_por_frecuencia"]["Anual"] == {
+        "minYm": "2020",
+        "maxYm": "2025",
+    }
+
+
+async def test_audit_catalog_records_bundle_failures(httpx_mock):
+    httpx_mock.add_response(
+        url="https://contenido.bce.fin.ec/wp-json/bcedata/v1/tree", json=_TREE
+    )
+    httpx_mock.add_response(
+        url="https://contenido.bce.fin.ec/wp-json/bcedata/v1/bundle/10",
+        json=_BUNDLE_10,
+    )
+    httpx_mock.add_response(
+        url="https://contenido.bce.fin.ec/wp-json/bcedata/v1/bundle/11",
+        status_code=503,
+        json={"message": "Servicio temporalmente no disponible"},
+    )
+    httpx_mock.add_response(
+        url="https://contenido.bce.fin.ec/wp-json/bcedata/v1/bundle/20",
+        json=_BUNDLE_20,
     )
 
-    result = await bce_client.get_indicador(id_grupo=10, frecuencia="Semanal")
+    result = await bce_client.audit_catalog()
 
-    assert result["frecuencia"] == "Mensual"
+    assert result["grupos_exitosos"] == 2
+    assert result["grupos_con_error"] == 1
+    assert result["errores"][0]["id_grupo"] == 11
 
 
 async def test_get_indicador_surfaces_api_error_message(httpx_mock):

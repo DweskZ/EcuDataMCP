@@ -65,7 +65,7 @@ Este MCP unifica **fuentes gubernamentales** en un solo servidor:
 | **Geografía** (DPA) | 24 provincias + 224 cantones (códigos INEC) | referencia offline |
 | **ANDA** (NADA/IHSN) | Catálogo de encuestas y censos del INEC | anda.inec.gob.ec |
 | **Ecuador en Cifras** (INEC) | ~75 temas estadísticos: boletines, metodología y series históricas (IPC, ENEMDU, ENSANUT, pobreza, comercio exterior, censos...) | www.ecuadorencifras.gob.ec |
-| **BCE** (BCEData) | Catálogo estadístico completo: monetario/financiero, finanzas públicas, sector externo, sector real (PIB, empleo, confianza del consumidor) | contenido.bce.fin.ec |
+| **BCE** (BCEData) | Catálogo BCEData: monetario/financiero, finanzas públicas, sector externo y sector real (PIB, empleo, confianza del consumidor); no representa todo el portal estadístico del BCE | contenido.bce.fin.ec |
 | **Supercías** | Directorio de compañías (226k+): representante legal, capital, CIIU | mercadodevalores.supercias.gob.ec |
 | **Supercías Ranking** | Financieros por balance (ingresos, activos, ROE, ~38 ratios), últimos años; requiere build local | appscvsmovil.supercias.gob.ec |
 
@@ -358,6 +358,7 @@ municipal independiente, 92 datasets) — mismo tool, otro catálogo CKAN.
 |------|-------------|
 | `search_indicadores_bce` | Buscar en el catálogo estadístico del Banco Central del Ecuador (monetario/financiero, finanzas públicas, sector externo, sector real). |
 | `get_indicador_bce` | Serie de tiempo de un indicador por `id_grupo`: período, frecuencia y unidad configurables (defaults según el grupo). |
+| `audit_bce_catalog` | Auditar el catálogo BCEData completo: grupos, series, secciones, frecuencias, unidades, rangos de fechas y errores de carga. `incluir_grupos=true` devuelve el inventario detallado. |
 | `search_bce_iem` | Buscar tablas XLSX individuales del último boletín Información Estadística Mensual (IEM) del BCE: detalle de deuda, comercio, PIB, petróleo, finanzas públicas y más. `historico=true` o `desde_anio`/`hasta_anio` busca versiones en el archivo mensual. |
 | `get_bce_iem_table` | Leer una tabla XLSX IEM con filtro `desde`/`hasta`; `boletin_numero` permite elegir una versión histórica concreta. Conserva el diseño original cuando no es seguro normalizarlo. |
 

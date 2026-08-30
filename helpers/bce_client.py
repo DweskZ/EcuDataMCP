@@ -47,6 +47,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from datetime import UTC, datetime
 from typing import Any
 
 import httpx
@@ -71,6 +72,9 @@ _bundle_cache = TtlCache(ttl_seconds=86400.0, max_entries=256)
 # built from, cached separately since building it costs ~78 concurrent
 # bundle fetches, not worth repeating per search.
 _catalog_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
+
+_SOURCE_NAME = "Banco Central del Ecuador — BCEData"
+_TREE_URL = f"{_BASE_URL}/tree"
 
 
 async def _get_json(
@@ -155,13 +159,14 @@ async def _fetch_bundle(
     return bundle
 
 
-async def _fetch_catalog_with_series() -> list[dict[str, Any]]:
+async def _fetch_catalog_snapshot() -> dict[str, Any]:
     """Leaf groups from the tree, each enriched with its series labels.
 
     One bundle fetch per leaf group (~78), done concurrently over a shared
     session -- a group whose bundle fails to load (network hiccup, or a
-    genuinely empty group) just gets an empty series list rather than
-    failing the whole search.
+    genuinely empty group) is recorded in ``errores`` rather than failing the
+    whole search. The complete snapshot is also used by the BCEData audit
+    tool, so it retains metadata that normal search results omit.
     """
     cached = _catalog_cache.get("catalog")
     if cached is not None:
@@ -179,14 +184,44 @@ async def _fetch_catalog_with_series() -> list[dict[str, Any]]:
         )
 
     enriched: list[dict[str, Any]] = []
+    errors: list[dict[str, Any]] = []
     for group, bundle in zip(groups, bundles, strict=True):
-        series_labels: list[str] = []
         if isinstance(bundle, dict):
+            rows = bundle.get("rows")
+            bundle_ok = isinstance(rows, list)
+            if not isinstance(rows, list):
+                errors.append(
+                    {
+                        "id_grupo": group["id_grupo"],
+                        "tipo": "schema",
+                        "detalle": "BCEData /bundle no devolvió una lista de filas",
+                    }
+                )
+                rows = []
             series_labels = [
                 row.get("label", "")
-                for row in bundle.get("rows", [])
-                if row.get("tipo") == "Series"
+                for row in rows
+                if isinstance(row, dict)
+                and row.get("tipo") == "Series"
+                and row.get("label")
             ]
+            context = bundle.get("context") or {}
+            frecuencias = bundle.get("frecuencias") or []
+            unidades = bundle.get("unidades") or {}
+            range_by_freq = bundle.get("range_by_freq") or {}
+            enriched.append(
+                {
+                    **group,
+                    "nombre": context.get("nom_grupo", ""),
+                    "series": series_labels,
+                    "total_series": len(series_labels),
+                    "frecuencias": frecuencias,
+                    "unidades": unidades,
+                    "rango": bundle.get("range") or {},
+                    "rango_por_frecuencia": range_by_freq,
+                    "bundle_ok": bundle_ok,
+                }
+            )
         elif isinstance(bundle, BaseException):
             logger.warning(
                 "No se pudo cargar el bundle del grupo %d para el índice de "
@@ -194,10 +229,76 @@ async def _fetch_catalog_with_series() -> list[dict[str, Any]]:
                 group["id_grupo"],
                 bundle,
             )
-        enriched.append({**group, "series": series_labels})
+            errors.append(
+                {
+                    "id_grupo": group["id_grupo"],
+                    "descripcion": group["descripcion"],
+                    "tipo": "solicitud",
+                    "detalle": str(bundle),
+                }
+            )
+            enriched.append(
+                {
+                    **group,
+                    "nombre": "",
+                    "series": [],
+                    "total_series": 0,
+                    "frecuencias": [],
+                    "unidades": {},
+                    "rango": {},
+                    "rango_por_frecuencia": {},
+                    "bundle_ok": False,
+                }
+            )
 
-    _catalog_cache.set("catalog", enriched)
-    return enriched
+    snapshot = {
+        "source": _SOURCE_NAME,
+        "url_fuente": _TREE_URL,
+        "consultado_en": datetime.now(UTC).isoformat(),
+        "total_nodos": len(tree),
+        "total_grupos": len(groups),
+        "grupos": enriched,
+        "errores": errors,
+    }
+    _catalog_cache.set("catalog", snapshot)
+    return snapshot
+
+
+async def _fetch_catalog_with_series() -> list[dict[str, Any]]:
+    snapshot = await _fetch_catalog_snapshot()
+    return snapshot["grupos"]
+
+
+async def audit_catalog(incluir_grupos: bool = False) -> dict[str, Any]:
+    """Return a compact, reproducible coverage report for the BCEData API.
+
+    The audit fetches the tree and every leaf group's bundle. It does not
+    download every grid value, because grids can contain many years of data;
+    ``get_indicador`` remains the complete value retrieval path for any group,
+    frequency, unit and requested period.
+    """
+    snapshot = await _fetch_catalog_snapshot()
+    groups = snapshot["grupos"]
+    successful = [group for group in groups if group["bundle_ok"]]
+    sections: dict[str, int] = {}
+    for group in groups:
+        sections[group["seccion"]] = sections.get(group["seccion"], 0) + 1
+
+    result = {
+        "source": snapshot["source"],
+        "url_fuente": snapshot["url_fuente"],
+        "consultado_en": snapshot["consultado_en"],
+        "total_nodos": snapshot["total_nodos"],
+        "total_grupos": snapshot["total_grupos"],
+        "grupos_exitosos": len(successful),
+        "grupos_con_error": len(snapshot["errores"]),
+        "total_series": sum(group["total_series"] for group in successful),
+        "secciones": sections,
+        "errores": snapshot["errores"],
+    }
+    if incluir_grupos:
+        result["grupos"] = groups
+    return result
 
 
 async def search_indicadores(
@@ -252,7 +353,15 @@ async def search_indicadores(
             matched.append(entry)
 
     page = matched[offset : offset + limit]
-    return {"total": len(matched), "offset": offset, "indicadores": page}
+    snapshot = await _fetch_catalog_snapshot()
+    return {
+        "source": snapshot["source"],
+        "url_fuente": snapshot["url_fuente"],
+        "consultado_en": snapshot["consultado_en"],
+        "total": len(matched),
+        "offset": offset,
+        "indicadores": page,
+    }
 
 
 async def get_indicador(
@@ -288,7 +397,13 @@ async def get_indicador(
             "grupo": context.get("nom_grupo"),
         }
 
-    freq = frecuencia if frecuencia in frecuencias else frecuencias[0]
+    if frecuencia and frecuencia not in frecuencias:
+        disponibles = ", ".join(frecuencias)
+        raise ValueError(
+            f"Frecuencia inválida '{frecuencia}' para el grupo {id_grupo}. "
+            f"Disponibles: {disponibles}"
+        )
+    freq = frecuencia or frecuencias[0]
     unidades_disponibles: list[str] = (bundle.get("unidades") or {}).get(freq, [])
     if not unidades_disponibles:
         return {
@@ -297,7 +412,13 @@ async def get_indicador(
             "grupo": context.get("nom_grupo"),
             "frecuencia": freq,
         }
-    unit = unidad if unidad in unidades_disponibles else unidades_disponibles[0]
+    if unidad and unidad not in unidades_disponibles:
+        disponibles = ", ".join(unidades_disponibles)
+        raise ValueError(
+            f"Unidad inválida '{unidad}' para el grupo {id_grupo} y frecuencia "
+            f"{freq}. Disponibles: {disponibles}"
+        )
+    unit = unidad or unidades_disponibles[0]
 
     range_for_freq = (bundle.get("range_by_freq") or {}).get(
         freq, bundle.get("range") or {}
@@ -316,17 +437,28 @@ async def get_indicador(
         },
     )
 
+    if not isinstance(grid, dict):
+        raise TypeError("BCEData /grid devolvió un formato inesperado")
+
+    rows = grid.get("rows") or []
+    if not isinstance(rows, list):
+        raise TypeError("BCEData /grid no devolvió una lista de filas")
+
     series = [
         {
             "label": row.get("label"),
             "ruta": row.get("ruta", ""),
             "valores": row.get("values", {}),
         }
-        for row in grid.get("rows", [])
+        for row in rows
+        if isinstance(row, dict)
         if row.get("tipo") == "Series"
     ]
 
     return {
+        "source": _SOURCE_NAME,
+        "url_fuente": f"{_BASE_URL}/grid",
+        "consultado_en": datetime.now(UTC).isoformat(),
         "id_grupo": id_grupo,
         "grupo": context.get("nom_grupo"),
         "frecuencia": freq,
