@@ -31,13 +31,30 @@ IEM_INDEX_URL = (
     "https://contenido.bce.fin.ec/documentos/informacioneconomica/"
     "PublicacionesGenerales/IndiceIEM.html"
 )
+_SOURCE_NAME = "Banco Central del Ecuador — Información Estadística Mensual"
 
 _catalog_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
 _bulletins_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
 _bulletin_tables_cache = TtlCache(ttl_seconds=86400.0, max_entries=512)
 _fetch_lock = asyncio.Lock()
-_bulletin_fetch_lock = asyncio.Lock()
+# Keyed per bulletin number so concurrent historical fetches (bounded by
+# _HISTORY_CONCURRENCY below) actually run in parallel instead of serializing
+# on one shared lock. Safe to populate via plain dict access -- asyncio is
+# single-threaded and no await happens between the get and the set.
+_bulletin_fetch_locks: dict[int, asyncio.Lock] = {}
 _HISTORY_CONCURRENCY = 12
+# Caps the fan-out for an unbounded historico=True search (no desde_anio/
+# hasta_anio): otherwise every bulletin the IEM index has ever listed would
+# be fetched in one call. ~5 years of monthly bulletins.
+_MAX_HISTORICAL_BULLETINS = 60
+
+
+def _bulletin_lock(key: int) -> asyncio.Lock:
+    lock = _bulletin_fetch_locks.get(key)
+    if lock is None:
+        lock = asyncio.Lock()
+        _bulletin_fetch_locks[key] = lock
+    return lock
 _LINK_RE = re.compile(
     r'<a\s+[^>]*href=["\'](?P<url>[^"\']+)["\'][^>]*>(?P<label>.*?)</a>',
     re.IGNORECASE | re.DOTALL,
@@ -153,7 +170,7 @@ async def _fetch_tables_for_bulletin(bulletin: dict[str, Any]) -> list[dict[str,
     if cached is not None:
         return cached
 
-    async with _bulletin_fetch_lock:
+    async with _bulletin_lock(key):
         cached = _bulletin_tables_cache.get(key)
         if cached is not None:
             return cached
@@ -170,16 +187,23 @@ async def _fetch_tables_for_bulletin(bulletin: dict[str, Any]) -> list[dict[str,
         return tables
 
 
-def _catalog_result(
-    bulletin: dict[str, Any], tables: list[dict[str, Any]]
+def _build_catalog(
+    bulletin: dict[str, Any], tables: list[dict[str, Any]], **extra: Any
 ) -> dict[str, Any]:
-    result = {
-        "source": "Banco Central del Ecuador — Información Estadística Mensual",
+    return {
+        "source": _SOURCE_NAME,
         "url_fuente": IEM_INDEX_URL,
         "boletin": bulletin,
+        **extra,
         "total_tablas": len(tables),
         "tablas": tables,
     }
+
+
+def _catalog_result(
+    bulletin: dict[str, Any], tables: list[dict[str, Any]]
+) -> dict[str, Any]:
+    result = _build_catalog(bulletin, tables)
     _catalog_cache.set("catalog", result)
     logger.info("IEM BCE indexado: boletín %d, %d tablas", bulletin["numero"], len(tables))
     return result
@@ -196,7 +220,15 @@ def _within_years(
 
 async def _fetch_historical_tables(
     bulletins: list[dict[str, Any]], desde_anio: int, hasta_anio: int
-) -> tuple[list[dict[str, Any]], int]:
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], int]:
+    """Fetch tables for every bulletin in range, capped only when unbounded.
+
+    Returns (tables, selected_bulletins, loaded_count). A caller who passes
+    an explicit desde_anio/hasta_anio is trusted to have bounded their own
+    request; only a bare historico=True (no bounds at all) is capped, since
+    that would otherwise fetch every bulletin ever published. ``bulletins``
+    is already newest-first, so capping keeps the most recent ones.
+    """
     selected_bulletins = [
         bulletin
         for bulletin in bulletins
@@ -204,6 +236,8 @@ async def _fetch_historical_tables(
     ]
     if not selected_bulletins:
         raise ValueError("No hay boletines IEM en el rango solicitado")
+    if not desde_anio and not hasta_anio:
+        selected_bulletins = selected_bulletins[:_MAX_HISTORICAL_BULLETINS]
 
     semaphore = asyncio.Semaphore(_HISTORY_CONCURRENCY)
 
@@ -228,7 +262,7 @@ async def _fetch_historical_tables(
         tables.extend(batch)
     if not tables:
         raise ValueError("Ningún boletín IEM del rango expuso tablas XLSX")
-    return tables, loaded
+    return tables, selected_bulletins, loaded
 
 
 def _merge_historical_tables(tables: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -268,24 +302,16 @@ async def search_tables(
         raise ValueError("desde_anio no puede ser mayor que hasta_anio")
     if historico or desde_anio or hasta_anio:
         bulletins = await _fetch_bulletins()
-        selected_bulletins = [
-            bulletin
-            for bulletin in bulletins
-            if _within_years(bulletin, desde_anio, hasta_anio)
-        ]
-        all_tables, loaded_bulletins = await _fetch_historical_tables(
+        all_tables, selected_bulletins, loaded_bulletins = await _fetch_historical_tables(
             bulletins, desde_anio, hasta_anio
         )
         tables = _merge_historical_tables(all_tables)
-        catalog = {
-            "source": "Banco Central del Ecuador — Información Estadística Mensual",
-            "url_fuente": IEM_INDEX_URL,
-            "boletin": selected_bulletins[0],
-            "boletines_consultados": loaded_bulletins,
-            "boletines_sin_tablas": len(selected_bulletins) - loaded_bulletins,
-            "total_tablas": len(tables),
-            "tablas": tables,
-        }
+        catalog = _build_catalog(
+            selected_bulletins[0],
+            tables,
+            boletines_consultados=loaded_bulletins,
+            boletines_sin_tablas=len(selected_bulletins) - loaded_bulletins,
+        )
     else:
         catalog = await _fetch_catalog()
     q = _strip(query)
@@ -366,16 +392,22 @@ def _extract_wide_series(
 
     selected = _selected_columns(all_rows[header_index], desde, hasta)
     if not selected:
-        raise ValueError("La tabla no tiene períodos en el rango solicitado")
+        # The table has periods, just not any within desde/hasta -- let the
+        # caller fall back to _extract_long_table / the raw preview instead
+        # of failing outright.
+        return None
 
     blocks: list[dict[str, Any]] = []
     current: dict[str, Any] | None = None
     for row in all_rows[header_index + 1 :]:
         label = str(row[0]).strip() if row and row[0] is not None else ""
-        values = [row[index] if index < len(row) else None for index, _ in selected]
         if not label:
             continue
-        if not any(value is not None for value in values):
+        # Check the whole row, not just the desde/hasta-selected columns --
+        # a series with no data in the requested range would otherwise look
+        # like a unit-block header and swallow every row after it.
+        row_values = row[1:] if row else ()
+        if not any(value is not None for value in row_values):
             # A one-cell row names a unit block, such as "Millones de USD".
             current = {"unidad": label, "series": [], "truncada": False}
             blocks.append(current)
@@ -522,13 +554,7 @@ async def get_table(
         if bulletin is None:
             raise ValueError(f"Boletín IEM '{boletin_numero}' no encontrado")
         tables = await _fetch_tables_for_bulletin(bulletin)
-        catalog = {
-            "source": "Banco Central del Ecuador — Información Estadística Mensual",
-            "url_fuente": IEM_INDEX_URL,
-            "boletin": bulletin,
-            "total_tablas": len(tables),
-            "tablas": tables,
-        }
+        catalog = _build_catalog(bulletin, tables)
     else:
         catalog = await _fetch_catalog()
     wanted = table_id.strip().lower()
@@ -550,7 +576,7 @@ async def get_table(
         workbook.close()
 
     result = {
-        "source": "Banco Central del Ecuador — Información Estadística Mensual",
+        "source": _SOURCE_NAME,
         "tabla": table,
         "archivo_truncado": False,
     }

@@ -142,11 +142,18 @@ async def test_search_ranking_filters_by_ciiu(db_path):
 
 
 async def test_search_ranking_rejects_unknown_order_by(db_path):
-    # Falls back to posicion_general instead of raising/injecting SQL.
+    with pytest.raises(ValueError, match="order_by inválido"):
+        await supercias_financials.search_ranking(
+            anio=2025, order_by="DROP TABLE ranking;--"
+        )
+
+
+async def test_search_ranking_descending_sorts_highest_first(db_path):
     result = await supercias_financials.search_ranking(
-        anio=2025, order_by="DROP TABLE ranking;--"
+        anio=2025, order_by="posicion_general", descending=True
     )
-    assert result["total"] == 3
+    positions = [c["posicion_general"] for c in result["companias"]]
+    assert positions == sorted(positions, reverse=True)
 
 
 async def test_get_sector_benchmark(db_path):

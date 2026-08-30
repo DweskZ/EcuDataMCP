@@ -133,16 +133,16 @@ async def find_institucion(
         )
     assert session is not None
     try:
-        query_lower = query.lower()
+        query_lower = _strip(query).lower()
         matches: list[dict[str, Any]] = []
         for page in range(3):  # Max 3 pages (~1500 institutions)
             items = await list_instituciones(page=page, session=session)
             if not items:
                 break
             for inst in items:
-                name = inst.get("institucion", "").lower()
-                siglas = inst.get("siglas", "").lower()
-                desc = inst.get("descripcion", "").lower()
+                name = _strip(inst.get("institucion", "")).lower()
+                siglas = _strip(inst.get("siglas", "")).lower()
+                desc = _strip(inst.get("descripcion", "")).lower()
                 if query_lower in name or query_lower in siglas or query_lower in desc:
                     matches.append(inst)
         return matches

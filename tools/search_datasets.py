@@ -35,6 +35,7 @@ def register_search_datasets_tool(mcp: FastMCP) -> None:
                     portal — a separate, smaller CKAN catalog)
             format: text | json
         """
+        page_size = min(max(page_size, 1), 100)
         start = (max(page, 1) - 1) * page_size
         try:
             result = await ckan_client.search_datasets(

@@ -30,12 +30,12 @@ def register_get_organization_info_tool(mcp: FastMCP) -> None:
                 text_builder=lambda d: f"Error: {d['error']}",
             )
 
-        site = ckan_client.site_url(source)
+        site = ckan_client.site_url(source).rstrip("/")
         datasets = org.get("packages") or []
         payload = {
             "name": org.get("name"),
             "title": org.get("title"),
-            "url": f"{site}organization/{org['name']}" if org.get("name") else None,
+            "url": f"{site}/organization/{org['name']}" if org.get("name") else None,
             "description": org.get("description"),
             "package_count": org.get("package_count", 0),
             "state": org.get("state"),

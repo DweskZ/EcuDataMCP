@@ -59,8 +59,9 @@ def with_http_security(
 
         if auth_token:
             authorization = _header(scope, b"authorization") or ""
-            expected = f"Bearer {auth_token}"
-            if not hmac.compare_digest(authorization, expected):
+            scheme, _, token = authorization.partition(" ")
+            valid = scheme.lower() == "bearer" and hmac.compare_digest(token, auth_token)
+            if not valid:
                 await _json_response(
                     send,
                     401,

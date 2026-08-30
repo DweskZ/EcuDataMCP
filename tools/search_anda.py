@@ -47,9 +47,10 @@ def register_search_anda_tool(mcp: FastMCP) -> None:
             limit: Max results (default: 10, max: 50)
             format: text | json
         """
+        limit = min(max(limit, 1), 50)
         words = [_strip_accents(w.lower()) for w in query.split() if len(w) >= 2]
         try:
-            if words:
+            if query:
                 result = await anda_client.search_catalog(query=query, limit=_FETCH_SIZE)
                 candidates = result.get("rows", [])
                 matched = [r for r in candidates if _matches_query(r, words)]

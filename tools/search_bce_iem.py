@@ -45,7 +45,11 @@ def register_search_bce_iem_tool(mcp: FastMCP) -> None:
             )
         except Exception as exc:
             logger.exception("search_bce_iem failed (query=%r)", query)
-            return render_output({"error": str(exc)}, format)
+            return render_output(
+                {"error": str(exc)},
+                format,
+                text_builder=lambda d: f"Error: {d['error']}",
+            )
 
         def to_text(data: dict) -> str:
             bulletin = data["boletin"]

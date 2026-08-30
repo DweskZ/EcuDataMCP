@@ -182,9 +182,14 @@ def _query_search_ranking(
     anio: int | None,
     ciiu_n1: str,
     order_by: str,
+    descending: bool,
     limit: int,
     offset: int,
 ) -> tuple[int, list[dict[str, Any]]]:
+    if order_by not in _ORDERABLE_COLUMNS:
+        disponibles = ", ".join(sorted(_ORDERABLE_COLUMNS))
+        raise ValueError(f"order_by inválido '{order_by}'. Disponibles: {disponibles}")
+
     conn = _connect()
     try:
         clauses: list[str] = []
@@ -201,7 +206,7 @@ def _query_search_ranking(
             f"SELECT COUNT(*) FROM ranking r {where}", params
         ).fetchone()[0]
 
-        sort_col = order_by if order_by in _ORDERABLE_COLUMNS else "posicion_general"
+        direction = "DESC" if descending else "ASC"
         # LEFT JOIN, not INNER: a ranking row missing from companias should
         # still come back (with ruc/nombre as None) rather than silently
         # vanish from results.
@@ -211,7 +216,7 @@ def _query_search_ranking(
             FROM ranking r
             LEFT JOIN companias c ON c.expediente = r.expediente
             {where}
-            ORDER BY r.{sort_col} ASC
+            ORDER BY r.{order_by} {direction}
             LIMIT ? OFFSET ?
             """,
             (*params, limit, offset),
@@ -253,6 +258,7 @@ async def search_ranking(
     anio: int | None = None,
     ciiu_n1: str = "",
     order_by: str = "posicion_general",
+    descending: bool = False,
     limit: int = 20,
     offset: int = 0,
 ) -> dict[str, Any]:
@@ -262,13 +268,15 @@ async def search_ranking(
     Args:
         anio: Optional fiscal year filter.
         ciiu_n1: Optional CIIU level-1 economic activity filter (single letter).
-        order_by: Column to sort by (any ranking column; defaults to the
-            dataset's own precomputed posicion_general).
+        order_by: Column to sort by (any ranking column). Raises if unknown.
+        descending: Sort highest-first (e.g. top revenue/profit) instead of
+            ascending. posicion_general is already rank-ordered ascending
+            (1 = best), so leave this False when sorting by it.
         limit: Max results.
         offset: Pagination offset.
     """
     total, rows = await asyncio.to_thread(
-        _query_search_ranking, anio, ciiu_n1, order_by, limit, offset
+        _query_search_ranking, anio, ciiu_n1, order_by, descending, limit, offset
     )
     return {"total": total, "offset": offset, "companias": rows}
 

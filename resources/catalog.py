@@ -21,6 +21,8 @@ _CKAN_TOOLS = [
     "preview_resource_data",
     "download_resource",
     "query_resource_data",
+    "detect_series_pattern",
+    "read_pdf",
     "search_organizations",
     "get_organization_info",
     "list_categories",
@@ -119,6 +121,7 @@ def _fuentes_payload() -> dict:
                     "get_indicador_bce",
                     "search_bce_iem",
                     "get_bce_iem_table",
+                    "audit_bce_catalog",
                 ],
             },
             {

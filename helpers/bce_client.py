@@ -301,6 +301,14 @@ async def audit_catalog(incluir_grupos: bool = False) -> dict[str, Any]:
     return result
 
 
+_SEARCH_RESULT_FIELDS = ("id_grupo", "descripcion", "seccion", "subseccion")
+
+
+def _public_entry(item: dict[str, Any]) -> dict[str, Any]:
+    """Strip the audit-only fields _fetch_catalog_snapshot adds for audit_catalog."""
+    return {key: item[key] for key in _SEARCH_RESULT_FIELDS}
+
+
 async def search_indicadores(
     query: str = "", limit: int = 20, offset: int = 0
 ) -> dict[str, Any]:
@@ -323,9 +331,7 @@ async def search_indicadores(
 
     q = _strip(query)
     if not q:
-        matched = [
-            {k: v for k, v in item.items() if k != "series"} for item in catalog
-        ]
+        matched = [_public_entry(item) for item in catalog]
     else:
         matched = []
         for item in catalog:
@@ -344,7 +350,7 @@ async def search_indicadores(
             )
             if not group_hit and not series_hits:
                 continue
-            entry = {k: v for k, v in item.items() if k != "series"}
+            entry = _public_entry(item)
             if series_hits and not group_hit:
                 # Only attach when the group title itself didn't match, so
                 # a plain group-title hit doesn't get cluttered with every
@@ -397,12 +403,17 @@ async def get_indicador(
             "grupo": context.get("nom_grupo"),
         }
 
-    if frecuencia and frecuencia not in frecuencias:
-        disponibles = ", ".join(frecuencias)
-        raise ValueError(
-            f"Frecuencia inválida '{frecuencia}' para el grupo {id_grupo}. "
-            f"Disponibles: {disponibles}"
+    if frecuencia:
+        match = next(
+            (f for f in frecuencias if f.casefold() == frecuencia.casefold()), None
         )
+        if match is None:
+            disponibles = ", ".join(frecuencias)
+            raise ValueError(
+                f"Frecuencia inválida '{frecuencia}' para el grupo {id_grupo}. "
+                f"Disponibles: {disponibles}"
+            )
+        frecuencia = match
     freq = frecuencia or frecuencias[0]
     unidades_disponibles: list[str] = (bundle.get("unidades") or {}).get(freq, [])
     if not unidades_disponibles:
@@ -412,12 +423,18 @@ async def get_indicador(
             "grupo": context.get("nom_grupo"),
             "frecuencia": freq,
         }
-    if unidad and unidad not in unidades_disponibles:
-        disponibles = ", ".join(unidades_disponibles)
-        raise ValueError(
-            f"Unidad inválida '{unidad}' para el grupo {id_grupo} y frecuencia "
-            f"{freq}. Disponibles: {disponibles}"
+    if unidad:
+        match = next(
+            (u for u in unidades_disponibles if u.casefold() == unidad.casefold()),
+            None,
         )
+        if match is None:
+            disponibles = ", ".join(unidades_disponibles)
+            raise ValueError(
+                f"Unidad inválida '{unidad}' para el grupo {id_grupo} y frecuencia "
+                f"{freq}. Disponibles: {disponibles}"
+            )
+        unidad = match
     unit = unidad or unidades_disponibles[0]
 
     range_for_freq = (bundle.get("range_by_freq") or {}).get(

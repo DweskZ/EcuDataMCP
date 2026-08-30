@@ -546,16 +546,36 @@ def _gunzip_capped(raw: bytes, cap: int = _MAX_DECOMPRESSED_BYTES) -> tuple[byte
 
     Bounds memory use against a decompression bomb: a small, highly
     compressible .tar.gz (already capped at MAX_DOWNLOAD_BYTES on the wire)
-    could otherwise expand to gigabytes once decompressed.
+    could otherwise expand to gigabytes once decompressed. Passing
+    max_length to decompress() is essential here -- a single 64 KB
+    compressed chunk can still expand far past `cap` in one call, so the
+    cap must be enforced *within* a chunk, not just checked between chunks.
     """
     decompressor = zlib.decompressobj(16 + zlib.MAX_WBITS)
     out = bytearray()
     chunk_size = 64 * 1024
-    for i in range(0, len(raw), chunk_size):
-        out += decompressor.decompress(raw[i : i + chunk_size])
-        if len(out) > cap:
+    pos = 0
+    pending = b""
+    while True:
+        if not pending:
+            if pos >= len(raw):
+                break
+            pending = raw[pos : pos + chunk_size]
+            pos += chunk_size
+        budget = cap - len(out)
+        if budget <= 0:
             return bytes(out[:cap]), True
-    out += decompressor.flush()
+        piece = decompressor.decompress(pending, budget)
+        out += piece
+        new_pending = decompressor.unconsumed_tail
+        if not piece and new_pending == pending:
+            # No forward progress possible (truncated/malformed stream) --
+            # stop instead of looping forever on the same unconsumed bytes.
+            break
+        pending = new_pending
+    budget = cap - len(out)
+    if budget > 0:
+        out += decompressor.flush(budget)
     return bytes(out[:cap]), len(out) > cap
 
 

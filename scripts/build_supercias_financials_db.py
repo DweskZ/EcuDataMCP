@@ -41,6 +41,7 @@ import httpx
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from helpers.csv_reader import _EU_DECIMAL_RE, _convert_eu_decimal
 from helpers.tls import legacy_cipher_context
 from helpers.user_agent import USER_AGENT
 
@@ -97,12 +98,19 @@ def _column_type(name: str, int_cols: set[str], text_cols: set[str]) -> str:
     return "REAL"
 
 
+def _quote_ident(name: str) -> str:
+    """Safely quote a SQL identifier that may come from an external CSV header."""
+    return '"' + name.replace('"', '""') + '"'
+
+
 def _convert(value: str, sql_type: str) -> object:
     value = value.strip()
     if not value:
         return None
     if sql_type == "TEXT":
         return value
+    if _EU_DECIMAL_RE.match(value):
+        value = _convert_eu_decimal(value)
     try:
         return int(value) if sql_type == "INTEGER" else float(value)
     except ValueError:
@@ -121,11 +129,14 @@ def _load_csv_table(
         header = [h.strip() for h in next(reader)]
         types = [_column_type(h, int_cols, text_cols) for h in header]
 
-        cols_sql = ", ".join(f'"{h}" {t}' for h, t in zip(header, types, strict=True))
-        conn.execute(f'DROP TABLE IF EXISTS "{table}"')
-        conn.execute(f'CREATE TABLE "{table}" ({cols_sql})')
+        cols_sql = ", ".join(
+            f"{_quote_ident(h)} {t}" for h, t in zip(header, types, strict=True)
+        )
+        table_ident = _quote_ident(table)
+        conn.execute(f"DROP TABLE IF EXISTS {table_ident}")
+        conn.execute(f"CREATE TABLE {table_ident} ({cols_sql})")
         placeholders = ", ".join("?" for _ in header)
-        insert_sql = f'INSERT INTO "{table}" VALUES ({placeholders})'
+        insert_sql = f"INSERT INTO {table_ident} VALUES ({placeholders})"
 
         batch: list[tuple] = []
         n = 0
@@ -166,7 +177,9 @@ def _verify_build(db_path: Path) -> None:
             ("ciiu", {"ciiu", "descripcion"}),
             ("indicadores_sector", {"anio", "ciiu_n1"}),
         ):
-            cols = {row[1] for row in conn.execute(f'PRAGMA table_info("{table}")')}
+            cols = {
+                row[1] for row in conn.execute(f"PRAGMA table_info({_quote_ident(table)})")
+            }
             missing = required_cols - cols
             if missing:
                 raise RuntimeError(f"Tabla '{table}' sin columnas {missing}")

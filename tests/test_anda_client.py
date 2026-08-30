@@ -52,6 +52,10 @@ def test_has_microdata_from_detail_field():
     assert anda_client.has_microdata({"data_access_type": "data_na"}) is False
 
 
+def test_has_microdata_defaults_false_when_fields_missing():
+    assert anda_client.has_microdata({}) is False
+
+
 @pytest.mark.asyncio
 async def test_get_survey(httpx_mock):
     httpx_mock.add_response(

@@ -83,7 +83,7 @@ def register_search_tramites_tool(mcp: FastMCP) -> None:
         )
 
         try:
-            if query_words and institution_id:
+            if query and institution_id:
                 all_tramites: list[dict] = []
                 for api_page in range(10):
                     batch = await gobec_client.search_tramites(
@@ -94,7 +94,7 @@ def register_search_tramites_tool(mcp: FastMCP) -> None:
                     all_tramites.extend(batch)
                 tramites = [t for t in all_tramites if _matches_query(t, query_words)]
                 total_scanned = len(all_tramites)
-            elif query_words and not institution_id:
+            elif query and not institution_id:
                 all_tramites = []
                 for api_page in range(5):
                     batch = await gobec_client.search_tramites(page=api_page)
@@ -142,7 +142,7 @@ def register_search_tramites_tool(mcp: FastMCP) -> None:
                     msg_parts.append(f"que coincidan con '{data['query']}'")
                 if data.get("institution_id"):
                     msg_parts.append(f"en la institución ID {data['institution_id']}")
-                if query_words and data.get("total_scanned", 0) > 0:
+                if query and data.get("total_scanned", 0) > 0:
                     msg_parts.append(
                         f"(se revisaron {data['total_scanned']} trámites en total)"
                     )

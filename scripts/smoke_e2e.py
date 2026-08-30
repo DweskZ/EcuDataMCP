@@ -94,9 +94,21 @@ async def call_tool(client: httpx.AsyncClient, name: str, args: dict) -> str:
 def ok(label: str, text: str) -> None:
     if "Traceback" in text[:200]:
         raise AssertionError(f"{label}: traceback in response")
-    if text.startswith(("Error:", "ERROR:")):
+    stripped = text.strip()
+    if stripped.startswith(("Error:", "ERROR:")):
         print(f"  WARN {label}: {text[:160]}")
         return
+    if stripped.startswith("{"):
+        # format="json" tools return an {"error": ...} payload on failure
+        # instead of an "Error:"-prefixed string -- catch those too, or a
+        # tool that silently starts erroring reads as a passing smoke test.
+        try:
+            payload = json.loads(stripped)
+        except json.JSONDecodeError:
+            payload = None
+        if isinstance(payload, dict) and "error" in payload:
+            print(f"  WARN {label}: {text[:160]}")
+            return
     print(f"  OK   {label} ({len(text)} chars)")
 
 

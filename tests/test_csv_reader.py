@@ -3,10 +3,12 @@ import io
 import socket
 import tarfile
 import zipfile
+import zlib
 
 import httpx
 import pytest
 
+import helpers.csv_reader as csv_reader_module
 from helpers.csv_reader import (
     MAX_DOWNLOAD_BYTES,
     _gunzip_capped,
@@ -143,6 +145,54 @@ def test_gunzip_capped_stops_at_cap():
 
     assert capped is True
     assert len(decompressed) == 1024
+
+
+class _SpyDecompressor:
+    """Wraps a real zlib decompressor (a C type -- its methods can't be
+    monkeypatched directly) to record the largest single decompress() output.
+    """
+
+    def __init__(self, real):
+        self._real = real
+        self.max_seen = 0
+
+    def decompress(self, data, max_length=0):
+        out = self._real.decompress(data, max_length)
+        self.max_seen = max(self.max_seen, len(out))
+        return out
+
+    def flush(self, length=None):
+        return self._real.flush(length) if length is not None else self._real.flush()
+
+    @property
+    def unconsumed_tail(self):
+        return self._real.unconsumed_tail
+
+
+def test_gunzip_capped_never_decompresses_past_cap_in_one_call(monkeypatch):
+    # A single highly-compressible chunk can expand far past `cap` in one
+    # zlib.decompress() call unless max_length is passed -- the bug this
+    # regression test targets. 50 MB of zeros compresses to well under one
+    # 64 KB chunk, so if the cap isn't enforced *within* that one call, this
+    # would fully materialize 50 MB before the length check ever runs.
+    payload = gzip.compress(b"\x00" * (50 * 1024 * 1024))
+    assert len(payload) < 65536
+
+    real_decompressobj = zlib.decompressobj
+    spies: list[_SpyDecompressor] = []
+
+    def spy_decompressobj(*args, **kwargs):
+        spy = _SpyDecompressor(real_decompressobj(*args, **kwargs))
+        spies.append(spy)
+        return spy
+
+    monkeypatch.setattr(csv_reader_module.zlib, "decompressobj", spy_decompressobj)
+
+    decompressed, capped = _gunzip_capped(payload, cap=1024)
+
+    assert capped is True
+    assert len(decompressed) == 1024
+    assert spies[0].max_seen <= 1024
 
 
 async def test_preview_targz_reads_embedded_csv(httpx_mock, monkeypatch):

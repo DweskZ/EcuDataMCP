@@ -34,6 +34,30 @@ def _valid_db(path: Path) -> None:
     conn.close()
 
 
+def test_quote_ident_escapes_embedded_double_quote():
+    assert build_script._quote_ident('bad"col') == '"bad""col"'
+
+
+def test_load_csv_table_handles_header_with_embedded_quote(tmp_path):
+    # A CSV header field of "weird""col" is standard CSV escaping for a
+    # literal double quote inside the column name -- exactly the character
+    # that would break an unescaped f-string-built CREATE TABLE statement.
+    csv_path = tmp_path / "weird.csv"
+    csv_path.write_text('anio,"weird""col"\n2025,5\n', encoding="utf-8")
+    conn = sqlite3.connect(tmp_path / "out.sqlite3")
+
+    header = build_script._load_csv_table(conn, csv_path, "t", {"anio"}, set())
+
+    assert header == ["anio", 'weird"col']
+    rows = conn.execute('SELECT anio, "weird""col" FROM t').fetchall()
+    assert rows == [(2025, 5.0)]
+
+
+def test_convert_parses_european_decimal_notation():
+    assert build_script._convert("7.760,2", "REAL") == 7760.2
+    assert build_script._convert("1500", "REAL") == 1500.0
+
+
 def test_verify_build_accepts_well_formed_db(tmp_path):
     path = tmp_path / "ok.sqlite3"
     _valid_db(path)

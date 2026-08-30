@@ -151,4 +151,6 @@ def has_microdata(row: dict[str, Any]) -> bool:
     `data_access_type` instead. Check whichever is present.
     """
     value = row.get("form_model", row.get("data_access_type"))
-    return value != NO_MICRODATA_VALUE
+    # Absent on both fields is "unknown", not "yes" -- default to False so a
+    # caller isn't pointed at a survey that turns out to have no microdata.
+    return value is not None and value != NO_MICRODATA_VALUE

@@ -233,6 +233,28 @@ async def test_get_indicador_rejects_unknown_frecuencia(
         await bce_client.get_indicador(id_grupo=10, frecuencia="Semanal")
 
 
+async def test_get_indicador_frecuencia_and_unidad_are_case_insensitive(httpx_mock):
+    httpx_mock.add_response(
+        url="https://contenido.bce.fin.ec/wp-json/bcedata/v1/bundle/10",
+        json=_BUNDLE_10,
+    )
+    httpx_mock.add_response(
+        url=(
+            "https://contenido.bce.fin.ec/wp-json/bcedata/v1/grid"
+            "?id_grupo=10&frecuencia=Anual&unidad=Millones+de+USD"
+            "&desde=2020&hasta=2025"
+        ),
+        json={"columns": ["2025"], "rows": []},
+    )
+
+    result = await bce_client.get_indicador(
+        id_grupo=10, frecuencia="anual", unidad="millones de usd"
+    )
+
+    assert result["frecuencia"] == "Anual"
+    assert result["unidad"] == "Millones de USD"
+
+
 async def test_audit_catalog_reports_all_groups_and_series(httpx_mock):
     httpx_mock.add_response(
         url="https://contenido.bce.fin.ec/wp-json/bcedata/v1/tree", json=_TREE

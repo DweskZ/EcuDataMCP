@@ -41,9 +41,10 @@ def register_get_anda_survey_info_tool(mcp: FastMCP) -> None:
                 text_builder=lambda d: f"Error al obtener la encuesta: {d['error']}",
             )
 
-        study_desc = dataset.get("metadata", {}).get("study_desc", {})
-        study_info = study_desc.get("study_info", {})
-        dataset_use = study_desc.get("data_access", {}).get("dataset_use", {})
+        metadata = dataset.get("metadata") or {}
+        study_desc = metadata.get("study_desc") or {}
+        study_info = study_desc.get("study_info") or {}
+        dataset_use = (study_desc.get("data_access") or {}).get("dataset_use") or {}
 
         conf_dec = dataset_use.get("conf_dec") or []
         contacts = dataset_use.get("contact") or []

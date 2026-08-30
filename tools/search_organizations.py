@@ -44,7 +44,10 @@ def register_search_organizations_tool(mcp: FastMCP) -> None:
             "query": query or None,
             "page": page,
             "page_size": page_size,
-            "total": len(orgs),
+            # CKAN's organization_list has no total-count field to report --
+            # this is the page size actually returned, not a corpus total.
+            "count_esta_pagina": len(orgs),
+            "posiblemente_hay_mas": len(orgs) == page_size,
             "results": [
                 {
                     "name": org.get("name"),

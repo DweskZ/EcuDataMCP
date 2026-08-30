@@ -100,8 +100,8 @@ def main(argv: list[str] | None = None) -> None:
         mcp.run(transport="stdio")
         return
 
-    host = args.host or get_mcp_host()
-    port = args.port or get_mcp_port()
+    host = args.host if args.host is not None else get_mcp_host()
+    port = args.port if args.port is not None else get_mcp_port()
 
     logger.info(
         "Starting Ecuador MCP server v%s on %s:%d",

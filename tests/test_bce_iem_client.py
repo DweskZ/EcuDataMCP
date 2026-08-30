@@ -21,9 +21,19 @@ _BULLETIN_HTML = """
 """
 
 
+_PARSED_BULLETINS = bce_iem_client._parse_bulletins(_INDEX_HTML)
+_NEW_BULLETIN_URL = _PARSED_BULLETINS[0]["url"]
+_OLD_BULLETIN_URL = _PARSED_BULLETINS[1]["url"]
+_PARSED_TABLES = bce_iem_client._parse_tables(_BULLETIN_HTML, _PARSED_BULLETINS[0])
+_PIB_TABLE_URL = _PARSED_TABLES[0]["url"]
+
+
 @pytest.fixture(autouse=True)
 def _reset_cache():
     bce_iem_client._catalog_cache = TtlCache(ttl_seconds=60)
+    bce_iem_client._bulletins_cache = TtlCache(ttl_seconds=60)
+    bce_iem_client._bulletin_tables_cache = TtlCache(ttl_seconds=60, max_entries=512)
+    bce_iem_client._bulletin_fetch_locks = {}
     yield
 
 
@@ -50,6 +60,19 @@ def _long_xlsx() -> bytes:
     sheet.append(["Año", "Indicador", "Valor"])
     sheet.append([2024, "PIB", 100])
     sheet.append([2025, "PIB", 110])
+    out = io.BytesIO()
+    workbook.save(out)
+    return out.getvalue()
+
+
+def _wide_xlsx_with_gap() -> bytes:
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.append(["Período", 2024, 2025])
+    sheet.append(["Variable", "(prev)", "(prev)"])
+    sheet.append(["Millones USD", None, None])
+    sheet.append(["PIB", 123.4, 130.2])
+    sheet.append(["PIB Nuevo", 50.0, None])
     out = io.BytesIO()
     workbook.save(out)
     return out.getvalue()
@@ -87,6 +110,65 @@ def test_merge_historical_tables_keeps_all_versions():
     ]
 
 
+def test_extract_wide_series_returns_none_when_range_not_covered():
+    workbook = openpyxl.load_workbook(io.BytesIO(_xlsx()), read_only=True, data_only=True)
+    result = bce_iem_client._extract_wide_series(workbook.active, "1990", "1990", 20)
+    workbook.close()
+
+    assert result is None
+
+
+def test_extract_wide_series_keeps_row_with_no_data_in_selected_range():
+    workbook = openpyxl.load_workbook(
+        io.BytesIO(_wide_xlsx_with_gap()), read_only=True, data_only=True
+    )
+    result = bce_iem_client._extract_wide_series(workbook.active, "2025", "2025", 20)
+    workbook.close()
+
+    assert result is not None
+    names = [series["nombre"] for series in result["bloques"][0]["series"]]
+    assert names == ["PIB", "PIB Nuevo"]
+
+
+@pytest.mark.asyncio
+async def test_fetch_historical_tables_caps_unbounded_fanout(monkeypatch):
+    bulletins = [
+        {"numero": n, "mes": 1, "anio": 2000 + n, "url": f"http://x/{n}"}
+        for n in range(bce_iem_client._MAX_HISTORICAL_BULLETINS + 20)
+    ]
+
+    async def fake_fetch(bulletin: dict) -> list[dict]:
+        return [{"table_id": f"t{bulletin['numero']}"}]
+
+    monkeypatch.setattr(bce_iem_client, "_fetch_tables_for_bulletin", fake_fetch)
+
+    _, selected, loaded = await bce_iem_client._fetch_historical_tables(bulletins, 0, 0)
+
+    assert len(selected) == bce_iem_client._MAX_HISTORICAL_BULLETINS
+    assert loaded == bce_iem_client._MAX_HISTORICAL_BULLETINS
+
+
+@pytest.mark.asyncio
+async def test_fetch_historical_tables_respects_explicit_range_beyond_cap(monkeypatch):
+    total = bce_iem_client._MAX_HISTORICAL_BULLETINS + 20
+    bulletins = [
+        {"numero": n, "mes": 1, "anio": 2000 + n, "url": f"http://x/{n}"}
+        for n in range(total)
+    ]
+
+    async def fake_fetch(bulletin: dict) -> list[dict]:
+        return [{"table_id": f"t{bulletin['numero']}"}]
+
+    monkeypatch.setattr(bce_iem_client, "_fetch_tables_for_bulletin", fake_fetch)
+
+    _, selected, loaded = await bce_iem_client._fetch_historical_tables(
+        bulletins, 2000, 2000 + total - 1
+    )
+
+    assert len(selected) == total
+    assert loaded == total
+
+
 def test_extract_long_table_filters_rows_by_year():
     workbook = openpyxl.load_workbook(io.BytesIO(_long_xlsx()), read_only=True, data_only=True)
     result = bce_iem_client._extract_long_table(workbook.active, "2025", "2025", 20)
@@ -102,14 +184,9 @@ def test_extract_long_table_filters_rows_by_year():
 
 
 @pytest.mark.asyncio
-async def test_search_tables_indexes_latest_bulletin_and_filters(monkeypatch):
-    async def fake_download(url: str):
-        if url == bce_iem_client.IEM_INDEX_URL:
-            return _INDEX_HTML.encode(), False
-        assert url.endswith("m2092062026.html")
-        return _BULLETIN_HTML.encode(), False
-
-    monkeypatch.setattr(bce_iem_client, "download_bytes", fake_download)
+async def test_search_tables_indexes_latest_bulletin_and_filters(httpx_mock):
+    httpx_mock.add_response(url=bce_iem_client.IEM_INDEX_URL, html=_INDEX_HTML)
+    httpx_mock.add_response(url=_NEW_BULLETIN_URL, html=_BULLETIN_HTML)
 
     result = await bce_iem_client.search_tables("exportaciones")
 
@@ -119,13 +196,10 @@ async def test_search_tables_indexes_latest_bulletin_and_filters(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_search_tables_historical_merges_versions(monkeypatch):
-    async def fake_download(url: str):
-        if url == bce_iem_client.IEM_INDEX_URL:
-            return _INDEX_HTML.encode(), False
-        return _BULLETIN_HTML.encode(), False
-
-    monkeypatch.setattr(bce_iem_client, "download_bytes", fake_download)
+async def test_search_tables_historical_merges_versions(httpx_mock):
+    httpx_mock.add_response(url=bce_iem_client.IEM_INDEX_URL, html=_INDEX_HTML)
+    httpx_mock.add_response(url=_NEW_BULLETIN_URL, html=_BULLETIN_HTML)
+    httpx_mock.add_response(url=_OLD_BULLETIN_URL, html=_BULLETIN_HTML)
 
     result = await bce_iem_client.search_tables("PIB", historico=True)
 
@@ -136,16 +210,10 @@ async def test_search_tables_historical_merges_versions(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_get_table_returns_layout_preview(monkeypatch):
-    async def fake_download(url: str):
-        if url == bce_iem_client.IEM_INDEX_URL:
-            return _INDEX_HTML.encode(), False
-        if url.endswith("m2092062026.html"):
-            return _BULLETIN_HTML.encode(), False
-        assert url.endswith("IEM-431-e.xlsx")
-        return _xlsx(), False
-
-    monkeypatch.setattr(bce_iem_client, "download_bytes", fake_download)
+async def test_get_table_returns_layout_preview(httpx_mock):
+    httpx_mock.add_response(url=bce_iem_client.IEM_INDEX_URL, html=_INDEX_HTML)
+    httpx_mock.add_response(url=_NEW_BULLETIN_URL, html=_BULLETIN_HTML)
+    httpx_mock.add_response(url=_PIB_TABLE_URL, content=_xlsx())
 
     result = await bce_iem_client.get_table("iem-431-e", desde="2025", max_rows=3)
 

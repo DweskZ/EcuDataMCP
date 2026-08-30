@@ -58,14 +58,14 @@ def register_get_resource_info_tool(mcp: FastMCP) -> None:
                 text_builder=lambda d: f"Error: {d['error']}",
             )
 
-        site = ckan_client.site_url(source)
+        site = ckan_client.site_url(source).rstrip("/")
         name = res.get("name") or res.get("description") or "Sin título"
         package_id = res.get("package_id")
         payload = {
             "id": res.get("id"),
             "name": name,
             "package_id": package_id,
-            "dataset_url": f"{site}dataset/{package_id}" if package_id else None,
+            "dataset_url": f"{site}/dataset/{package_id}" if package_id else None,
             "format": res.get("format"),
             "size": res.get("size"),
             "size_label": _format_size(res.get("size")),

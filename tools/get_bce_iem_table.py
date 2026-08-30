@@ -36,7 +36,11 @@ def register_get_bce_iem_table_tool(mcp: FastMCP) -> None:
             )
         except Exception as exc:
             logger.exception("get_bce_iem_table failed (table_id=%r)", table_id)
-            return render_output({"error": str(exc), "table_id": table_id}, format)
+            return render_output(
+                {"error": str(exc), "table_id": table_id},
+                format,
+                text_builder=lambda d: f"Error: {d['error']}",
+            )
 
         def to_text(data: dict) -> str:
             table = data["tabla"]

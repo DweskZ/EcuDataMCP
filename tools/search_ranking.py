@@ -16,6 +16,7 @@ def register_search_ranking_tool(mcp: FastMCP) -> None:
         anio: int | None = None,
         ciiu_n1: str = "",
         order_by: str = "posicion_general",
+        descending: bool = False,
         limit: int = 20,
         offset: int = 0,
         format: str = "text",
@@ -34,8 +35,12 @@ def register_search_ranking_tool(mcp: FastMCP) -> None:
         Args:
             anio: Optional fiscal year filter.
             ciiu_n1: Optional CIIU level-1 filter, e.g. "C", "G", "I".
-            order_by: Column to sort ascending by (e.g. "posicion_general",
-                "activos", "roe"). Falls back to posicion_general if unknown.
+            order_by: Column to sort by (e.g. "posicion_general", "activos",
+                "roe"). Raises an error listing valid columns if unknown.
+            descending: Set true for "top N" style queries (e.g. highest
+                ingresos_ventas/roe first). posicion_general is already
+                rank-ordered ascending (1 = best), so leave this false when
+                sorting by it.
             limit: Max results (default 20, max 100).
             offset: Pagination offset.
             format: text | json
@@ -48,12 +53,19 @@ def register_search_ranking_tool(mcp: FastMCP) -> None:
                 anio=anio,
                 ciiu_n1=ciiu_n1,
                 order_by=order_by,
+                descending=descending,
                 limit=limit,
                 offset=offset,
             )
         except supercias_financials.FinancialsDbUnavailable as e:
             return render_output(
                 {"error": str(e), "anio": anio, "ciiu_n1": ciiu_n1 or None},
+                format,
+                text_builder=lambda d: d["error"],
+            )
+        except ValueError as e:
+            return render_output(
+                {"error": str(e)},
                 format,
                 text_builder=lambda d: d["error"],
             )
