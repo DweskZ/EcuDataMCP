@@ -2365,6 +2365,60 @@ bd-censo/...` — mismo dominio principal, solo una ruta que ningún tema de
 los 74 alcanza. Mucho más completo que el tema "Censo de Población y
 Vivienda" ya indexado (16 archivos, 2024).
 
+**Las 4 categorías "macro" vacías: confirmado que son BCE, no INEC
+(2026-08-30).** Búsqueda dirigida vía `search_inec_publicaciones` con
+"cuentas nacionales", "cuentas económicas", "PIB producto interno bruto",
+"balanza de pagos", "comercio exterior", "finanzas públicas",
+"estadísticas macroeconómicas" y "deuda pública": en cada caso los únicos
+resultados relevantes son las páginas hub vacías mismas (fechadas
+2016-09-15, categoría "Sin categoría") o contenido tangencial
+(certificaciones de calidad, historia institucional, comisiones). El
+único contenido económico real bajo la categoría "Estadísticas
+Económicas" son las Cuentas Satélite (Salud 2007-2023, Educación
+2007-2023, Trabajo No Remunerado 2016-2017, Energía) y el Registro
+Estadístico de Empresas — nunca Cuentas Nacionales (PIB), Balanza de
+Pagos ni deuda pública. Confirma la hipótesis: esa es responsabilidad del
+BCE en el sistema estadístico ecuatoriano (ya cubierto por
+`search_indicadores_bce`/IEM), no un gap de descubrimiento como ENEMDU.
+
+**Verificación de varias encuestas específicas, pedido de Daniel
+2026-08-30 (probando el tool nuevo con casos reales conocidos):**
+
+- **ENEMDU histórico**: patrón de nomenclatura mapeado probando slugs
+  directos — 2017-2020 usa `enemdu-YYYY` (`enemdu-2017/`: 52 archivos
+  reales), 2021-2024 usa `enemdu-anual-YYYY` (`enemdu-anual-2021/` a
+  `-2024/`: 11 archivos cada uno), 2025+ vive en la página evergreen
+  `enemdu-anual/` sin sufijo de año. **No existe un anual 2020
+  consolidado**: `enemdu-2020/` es en realidad una nota metodológica que
+  explica el cambio de diseño muestral por COVID (desde 2020 hasta mayo
+  2021) y remite a las ediciones mensuales (`enemdu-septiembre-2020/`,
+  `empleo-dic-2020/`, ambas con 22 archivos reales) en vez de un
+  consolidado anual.
+- **Encuesta Nacional Multipropósito de Hogares**: sin ronda nueva
+  confirmada — ni en `search_inec_publicaciones` (buscado "multiproposito
+  2021/2023/2024", "ENM 2023/2024") ni en ANDA. El tema y la última
+  ronda en ANDA siguen en diciembre 2020/2019.
+- **SABE (Salud, Bienestar y Envejecimiento)**: **2 rondas, ambas de
+  2009**, empaquetadas en un solo archivo (`SABE1_SABE2_2009.zip`, en la
+  página de tema "Encuesta de Salud, Bienestar del Adulto Mayor"). ANDA
+  la cataloga como `SABE I-2012` (año de catalogación 2012, año de
+  encuesta 2009). Sin SABE III ni ronda posterior encontrada.
+- **REESS (Registro Estadístico de Empleo en la Seguridad Social)**: bien
+  cubierto, cadencia mensual real confirmada hasta abril 2026 (publicado
+  2026-07-29), con archivos BDD en tres niveles de madurez
+  (`PROVISIONALES`, `SEMIDEFINITIVAS`, y un histórico `DEFINITIVAS` que
+  cubre 200901-202412, 15+ años). La página de tema estática va un mes
+  detrás de la publicación más reciente encontrada vía
+  `search_inec_publicaciones` — mismo patrón ya documentado arriba.
+  El ZIP `DEFINITIVAS` es genuinamente grande: no terminó de descargar
+  los primeros 100 MB en 60 segundos en una prueba en vivo, muy por
+  encima del cap de 5 MB usado en el resto del proyecto — ver el ítem de
+  ROADMAP.md sobre falta de preview para archivos grandes de INEC.
+- **ENSANUT**: confirmado sin rondas nuevas desde 2018 (coincide con lo
+  que Daniel ya sabía) — la página de tema solo tiene archivos
+  `ENSANUT_2018`, y buscar "ensanut 2023/2024/ii" no encontró nada
+  relevante más nuevo.
+
 ---
 
 ## Notas históricas
