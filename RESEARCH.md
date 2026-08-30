@@ -2419,6 +2419,46 @@ BCE en el sistema estadístico ecuatoriano (ya cubierto por
   `ENSANUT_2018`, y buscar "ensanut 2023/2024/ii" no encontró nada
   relevante más nuevo.
 
+**Construido 2026-08-30: `search_censo_recursos` (censoecuador.gob.ec) y
+descubrimiento del Clasificador Geográfico vía la infraestructura ya
+existente.** El Clasificador no necesitó un cliente nuevo — solo dos
+arreglos a `inec_client.py`: agregarlo a `_EXTRA_TOPICS` (no está en el
+menú de ningún seed) y corregir `_FILE_LINK_RE` para tolerar el doble
+slash real que usa el sitio (`.ec//documentos/...`), lo que llevó los
+archivos encontrados en esa página de 19 a 115.
+
+El censo sí necesitó cliente nuevo (`helpers/censo_client.py`) por dos
+problemas reales de host, ambos resueltos en `helpers/tls.py`/
+`helpers/csv_reader.py` en vez de en el cliente: el chain TLS de
+`www.censoecuador.gob.ec` verifica contra el almacén del SO pero no
+contra `certifi` (confirmado con un handshake `ssl.create_default_context()`
+crudo que sí funciona) — nuevo nivel `should_retry_with_os_trust`/
+`os_trust_context`, sin perder verificación real, a diferencia del
+reintento inseguro existente; y `/data-y-resultados/` devuelve HTTP 404
+con contenido real (bug de plugin) — `download_bytes` gana
+`raise_for_status=False`, opt-in, default `True` sin tocar ningún otro
+caller.
+
+**Drift real encontrado y corregido en `helpers/data/{cantones,parroquias}.json`
+comparando contra `CLASIFICADOR_GEOGRAFICO_2026.zip` (el oficial, recién
+publicado):** La Concordia estaba con el código viejo `0808`/Esmeraldas;
+el oficial la tiene como `2302`/Santo Domingo de los Tsáchilas desde hace
+años (la reasignación de provincia es un hecho ya resuelto, no algo en
+disputa). Faltaba por completo el cantón `1413` Sevilla Don Bosco
+(Morona Santiago), creado por la Asamblea Nacional el 2024-11-05 — el
+cantón más nuevo de Ecuador (área 2,246.35 km², población 18,647 según
+censo 2022; fuentes: Asamblea Nacional, El Universo, Primicias). Antes
+solo existía como parroquia de Morona (código `140157`), que el
+clasificador oficial ya no lista — retirada correctamente al crear el
+nuevo cantón. Total de cantones pasó de 224 a 225 (222 con provincia
+real + 3 "zona en estudio"), coincidiendo con la cifra pública citada de
+Sevilla Don Bosco como "cantón 222 de Ecuador". Sin resolver: los
+cantones de la provincia especial `90 ZONA EN ESTUDIO` no coinciden
+exactamente entre lo que ya teníamos (`9001`/`9003`/`9004`) y lo que
+dice el clasificador 2026 (`9006`/`9009`) — son zonas en disputa
+territorial cuyo estado cambia con el tiempo; no investigado a fondo
+cuál lista es la vigente hoy.
+
 ---
 
 ## Notas históricas

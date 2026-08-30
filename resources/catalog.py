@@ -115,6 +115,12 @@ def _fuentes_payload() -> dict:
                 "tools": ["search_biinec_extras"],
             },
             {
+                "id": "inec-censo",
+                "nombre": "Censo Ecuador 2022 / INEC (microdatos completos del censo)",
+                "base": "https://www.censoecuador.gob.ec/",
+                "tools": ["search_censo_recursos"],
+            },
+            {
                 "id": "bce",
                 "nombre": "Banco Central del Ecuador (BCEData + Información Estadística Mensual)",
                 "base": "https://contenido.bce.fin.ec/",

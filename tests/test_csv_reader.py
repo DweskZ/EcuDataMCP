@@ -1,6 +1,7 @@
 import gzip
 import io
 import socket
+import ssl
 import tarfile
 import zipfile
 import zlib
@@ -312,6 +313,59 @@ async def test_sniff_content_type_returns_header(httpx_mock, monkeypatch):
     content_type = await sniff_content_type(url)
 
     assert content_type == "text/csv; charset=utf-8"
+
+
+async def test_download_bytes_retries_with_os_trust_on_cert_error(httpx_mock, monkeypatch):
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+
+    url = "https://www.censoecuador.gob.ec/data-y-resultados/"
+    exc = httpx.ConnectError("cert failure", request=httpx.Request("GET", url))
+    exc.__context__ = ssl.SSLCertVerificationError(
+        "unable to get local issuer certificate"
+    )
+    httpx_mock.add_exception(exc)
+    httpx_mock.add_response(url=url, content=b"real page content")
+
+    content, truncated = await download_bytes(url, raise_for_status=False)
+
+    assert content == b"real page content"
+    assert truncated is False
+
+
+async def test_download_bytes_raise_for_status_false_tolerates_error_status(
+    httpx_mock, monkeypatch
+):
+    # censoecuador.gob.ec's /data-y-resultados/ page returns HTTP 404 (a
+    # WordPress/Elementor bug) while still serving its real page content --
+    # confirmed live. Every other caller keeps the default (raise on error).
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+
+    url = "https://example.com/broken-status-real-content"
+    httpx_mock.add_response(url=url, status_code=404, content=b"real content anyway")
+
+    content, truncated = await download_bytes(url, raise_for_status=False)
+
+    assert content == b"real content anyway"
+    assert truncated is False
+
+
+async def test_download_bytes_default_still_raises_on_error_status(httpx_mock, monkeypatch):
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+
+    url = "https://example.com/genuinely-missing"
+    httpx_mock.add_response(url=url, status_code=404, content=b"not found")
+
+    with pytest.raises(httpx.HTTPStatusError):
+        await download_bytes(url)
 
 
 async def test_sniff_content_type_returns_none_on_connection_failure(httpx_mock, monkeypatch):

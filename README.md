@@ -353,6 +353,7 @@ municipal independiente, 92 datasets) — mismo tool, otro catálogo CKAN.
 | `search_inec_publicaciones` | Búsqueda de texto completo sobre todas las publicaciones de INEC vía su API REST de WordPress — siempre vigente, ideal para "cuál es el último boletín de X". |
 | `get_inec_publicacion_archivos` | Links directos de una publicación específica encontrada con `search_inec_publicaciones`. |
 | `search_biinec_extras` | Lista curada (no scraping en vivo) de los pocos registros exclusivos del Banco de Datos Abiertos (BIINEC) — último recurso si ANDA y Ecuador en Cifras no tienen el dato. |
+| `search_censo_recursos` | Microdatos completos del Censo 2022 (censoecuador.gob.ec): sector/cantón/manzana en CSV/SPSS/REDATAM, más 2010 y 2001 recodificados a la geografía 2022. |
 
 ### Macroeconomía (BCE)
 

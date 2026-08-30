@@ -657,10 +657,10 @@
     "poblacion": 32157
   },
   {
-    "codigo": "0808",
+    "codigo": "2302",
     "nombre": "La Concordia",
-    "provincia_codigo": "08",
-    "provincia": "Esmeraldas",
+    "provincia_codigo": "23",
+    "provincia": "Santo Domingo de los Tsáchilas",
     "region": "Costa",
     "area_km2": 324.2985204106211,
     "poblacion": null
@@ -1510,6 +1510,15 @@
     "region": "Amazonía",
     "area_km2": 1169.5531387106362,
     "poblacion": 11415
+  },
+  {
+    "codigo": "1413",
+    "nombre": "Sevilla Don Bosco",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago",
+    "region": "Amazonía",
+    "area_km2": 2246.35,
+    "poblacion": 18647
   },
   {
     "codigo": "1501",

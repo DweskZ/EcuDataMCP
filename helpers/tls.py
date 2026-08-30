@@ -61,6 +61,44 @@ def should_retry_insecure(exc: BaseException, url: str) -> bool:
     return host_allows_insecure_tls(url) and is_cert_verification_error(exc)
 
 
+# Hosts whose certificate chain verifies fine against the OS trust store but
+# not against httpx's bundled certifi CAs -- a missing intermediate CA in
+# certifi, not a broken/expired/self-signed cert. Verified for
+# www.censoecuador.gob.ec: a raw ssl.create_default_context() (which reads
+# the OS store, no cafile override) handshake succeeds where httpx's
+# certifi-only default fails with CERTIFICATE_VERIFY_FAILED. Unlike
+# _INSECURE_TLS_HOST_SUFFIXES, this keeps full certificate verification on --
+# not a security downgrade, so it isn't gated behind CKAN_INSECURE_TLS and
+# is kept in its own list rather than merged with either existing one.
+_OS_TRUST_HOST_SUFFIXES = ("censoecuador.gob.ec",)
+
+
+def host_needs_os_trust_store(url: str) -> bool:
+    """Return True only for hosts known to need the OS trust store instead
+    of httpx's bundled certifi CAs (still fully verified either way)."""
+    host = (urlparse(url).hostname or "").lower()
+    if not host:
+        return False
+    return any(
+        host == suffix or host.endswith("." + suffix) for suffix in _OS_TRUST_HOST_SUFFIXES
+    )
+
+
+def should_retry_with_os_trust(exc: BaseException, url: str) -> bool:
+    """True when a cert failure on an allowlisted host may be retried against
+    the OS trust store -- still fully verified, just a different CA bundle."""
+    return host_needs_os_trust_store(url) and is_cert_verification_error(exc)
+
+
+def os_trust_context() -> ssl.SSLContext:
+    """Full certificate verification via the OS trust store instead of
+    httpx's bundled certifi CAs. Build fresh per use, same reasoning as
+    legacy_cipher_context(): SSLContext isn't guaranteed safe to share
+    across concurrent connections.
+    """
+    return ssl.create_default_context()
+
+
 # Hosts that fail the TLS handshake outright under OpenSSL 3's default
 # SECLEVEL=2 (SSLV3_ALERT_HANDSHAKE_FAILURE) because they only offer legacy
 # cipher suites — a different failure mode than an expired/invalid cert

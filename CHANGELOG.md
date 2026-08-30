@@ -4,6 +4,28 @@
 
 ### Added
 
+- **`search_censo_recursos`** — INEC's dedicated Census 2022 microsite
+  (censoecuador.gob.ec): full microdata at sector/cantón/city-block level
+  in CSV/SPSS/REDATAM, plus the 2010 and 2001 censuses recoded onto 2022
+  geography. Metadata and direct URLs only, same pattern as SIPA/Supercías
+  financials — these are multi-hundred-MB archives. Needed two new,
+  reusable host-quirk fixes rather than anything ad hoc in the client:
+  `helpers/tls.py` gained a third TLS-retry tier
+  (`should_retry_with_os_trust`/`os_trust_context`) for hosts whose cert
+  chain verifies against the OS trust store but not httpx's bundled
+  certifi CAs — unlike the existing insecure-retry fallback, this keeps
+  full certificate verification on; and `download_bytes` gained an opt-in
+  `raise_for_status=False` for a confirmed WordPress/Elementor bug where
+  one page serves real content under an HTTP 404.
+- The Geografia Estadistica geoportal (INEC's official yearly DPA
+  classifier, 2001-2026) is now discoverable via the existing
+  `search_inec_estadisticas`/`get_inec_estadistica_files` — no new client
+  needed, just added to a small curated list of pages unreachable from
+  either seed page's menu. Fixed a real regex bug in the process:
+  `_FILE_LINK_RE` required a single slash after `.ec`, missing every real
+  link on the site that has a doubled slash (`.ec//documentos/...`) —
+  went from 19 to 115 files found on that one page alone, and the fix
+  applies to every topic page, not just this one.
 - **`search_inec_publicaciones`/`get_inec_publicacion_archivos`** —
   INEC/Ecuador en Cifras' publications, discovered via the site's public
   WordPress REST API (`/wp-json/wp/v2/posts`) instead of HTML scraping.
@@ -32,6 +54,17 @@
 
 ### Fixed
 
+- **`helpers/data/{cantones,parroquias}.json` had real drift against INEC's
+  official Clasificador Geográfico Estadístico**, found while integrating
+  it above. La Concordia was coded as cantón `0808` of Esmeraldas; the
+  official 2026 classifier has it as `2302` of Santo Domingo de los
+  Tsáchilas (an already-resolved provincial reassignment our data hadn't
+  picked up). Cantón `1413` Sevilla Don Bosco (Morona Santiago) was
+  missing entirely — created 2024-11-05, Ecuador's newest cantón; it
+  previously existed in our data only as a parroquia of Morona, which the
+  official classifier no longer lists. Both corrected, including the
+  affected parroquia records. `lookup_ubicacion` now returns the current,
+  correct province/cantón assignments for both.
 - **`get_organization`/`get_organization_info` silently truncated large
   organizations' dataset lists.** `organization_show?include_datasets=true`
   caps its own `packages` field at the portal's per-page default —

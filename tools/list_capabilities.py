@@ -64,6 +64,7 @@ _CAPABILITIES = {
             "search_inec_publicaciones",
             "get_inec_publicacion_archivos",
             "search_biinec_extras",
+            "search_censo_recursos",
         ],
         "macro": [
             "search_indicadores_bce",

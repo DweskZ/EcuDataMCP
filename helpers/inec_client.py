@@ -67,6 +67,22 @@ _SEED_PAGE_URLS = (
     "https://www.ecuadorencifras.gob.ec/indice-de-precios-al-consumidor/",
     "https://www.ecuadorencifras.gob.ec/estadisticas-laborales-enemdu/",
 )
+
+# Confirmed-real pages that aren't reachable from either seed page's menu at
+# all (same "menu isn't the same on every page" gap the seeds above exist to
+# reduce) -- added by hand as they're found rather than hunting for a third
+# seed page every time. The geoportal micrositio hosts the official
+# Clasificador Geográfico Estadístico (DPA codes/shapefiles) for every year
+# 2001-2026; confirmed live it has no menu entry pointing to it anywhere.
+_EXTRA_TOPICS = (
+    {
+        "nombre": "Geoportal / Clasificador Geográfico Estadístico (DPA)",
+        "url": (
+            "https://www.ecuadorencifras.gob.ec/documentos/web-inec/"
+            "Geografia_Estadistica/Micrositio_geoportal/index.html"
+        ),
+    },
+)
 _SITE_PREFIX = "https://www.ecuadorencifras.gob.ec/"
 _API_BASE = "https://www.ecuadorencifras.gob.ec/wp-json/wp/v2"
 
@@ -93,7 +109,10 @@ _SUBMENU_LINK_RE = re.compile(
     r"([^<]+)"
 )
 _FILE_LINK_RE = re.compile(
-    r'href="(https://www\.ecuadorencifras\.gob\.ec/documentos/'
+    # Confirmed live on the Geografia_Estadistica micrositio: some real
+    # links have a doubled slash (".ec//documentos/...") that browsers/
+    # servers normalize but a literal single "/" here would miss entirely.
+    r'href="(https://www\.ecuadorencifras\.gob\.ec/+documentos/'
     r'[^"]+\.(pdf|xlsx|xls|csv|zip|docx?))"',
     re.IGNORECASE,
 )
@@ -153,6 +172,8 @@ async def _fetch_topics() -> list[dict[str, str]]:
                 seen.setdefault(topic["url"], topic["nombre"])
         if not loaded:
             raise ValueError("No se pudo cargar el menú de temas de Ecuador en Cifras")
+        for topic in _EXTRA_TOPICS:
+            seen.setdefault(topic["url"], topic["nombre"])
 
         topics = [{"nombre": name, "url": url} for url, name in seen.items()]
         _topics_cache.set("topics", topics)

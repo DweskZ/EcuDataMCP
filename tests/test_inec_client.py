@@ -72,6 +72,17 @@ async def test_search_topics(httpx_mock):
 
 
 @pytest.mark.asyncio
+async def test_search_topics_includes_curated_extra_topics(httpx_mock):
+    httpx_mock.add_response(url=_IPC_SEED, html=_MENU_HTML)
+    httpx_mock.add_response(url=_ENEMDU_SEED, html=_ENEMDU_MENU_HTML)
+
+    result = await inec_client.search_topics(query="clasificador")
+
+    assert len(result["temas"]) == 1
+    assert result["temas"][0]["url"] == inec_client._EXTRA_TOPICS[0]["url"]
+
+
+@pytest.mark.asyncio
 async def test_search_topics_merges_both_seed_pages(httpx_mock):
     httpx_mock.add_response(url=_IPC_SEED, html=_MENU_HTML)
     httpx_mock.add_response(url=_ENEMDU_SEED, html=_ENEMDU_MENU_HTML)
@@ -141,6 +152,26 @@ async def test_get_topic_files(httpx_mock):
     assert formats[
         "https://www.ecuadorencifras.gob.ec/documentos/web-inec/Boletin_Tecnico_2026.pdf"
     ] == "PDF"
+
+
+@pytest.mark.asyncio
+async def test_get_topic_files_tolerates_doubled_slash_in_file_links(httpx_mock):
+    # Confirmed live on the Geografia_Estadistica micrositio: real links
+    # look like "ecuadorencifras.gob.ec//documentos/..." (doubled slash) --
+    # a literal single "/" in the regex missed these entirely (19 files
+    # found instead of the real 115 on that page).
+    topic_url = "https://www.ecuadorencifras.gob.ec/geoportal/"
+    html = (
+        '<html><body><a href="https://www.ecuadorencifras.gob.ec//documentos/'
+        'web-inec/Cartografia/Clasificador_Geografico/2001/SHP.zip">2001</a>'
+        "</body></html>"
+    )
+    httpx_mock.add_response(url=topic_url, html=html)
+
+    result = await inec_client.get_topic_files(topic_url)
+
+    assert len(result["archivos"]) == 1
+    assert result["archivos"][0]["url"].endswith("2001/SHP.zip")
 
 
 @pytest.mark.asyncio

@@ -12,7 +12,11 @@ import httpx
 
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.safe_download import safe_stream
-from helpers.tls import should_retry_insecure
+from helpers.tls import (
+    os_trust_context,
+    should_retry_insecure,
+    should_retry_with_os_trust,
+)
 from helpers.user_agent import USER_AGENT
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
@@ -111,13 +115,16 @@ def normalize_eu_decimal_columns(
     return new_rows, [headers[i] for i in idxs]
 
 
-async def _download(session: httpx.AsyncClient, url: str) -> tuple[bytes, bool]:
+async def _download(
+    session: httpx.AsyncClient, url: str, *, raise_for_status: bool = True
+) -> tuple[bytes, bool]:
     truncated = False
     # `url` comes from CKAN resource metadata -- external, not first-party --
     # so every hop (including redirects) must be checked against the SSRF
     # guard rather than trusting httpx's own follow_redirects.
     async with safe_stream(session, url, timeout=_TIMEOUT) as resp:
-        resp.raise_for_status()
+        if raise_for_status:
+            resp.raise_for_status()
 
         content_length = resp.headers.get("content-length")
         if content_length and int(content_length) > MAX_DOWNLOAD_BYTES:
@@ -136,9 +143,19 @@ async def _download(session: httpx.AsyncClient, url: str) -> tuple[bytes, bool]:
 
 
 async def download_bytes(
-    url: str, session: httpx.AsyncClient | None = None
+    url: str,
+    session: httpx.AsyncClient | None = None,
+    *,
+    raise_for_status: bool = True,
 ) -> tuple[bytes, bool]:
-    """Download up to MAX_DOWNLOAD_BYTES with TLS fallback for portal hosts."""
+    """Download up to MAX_DOWNLOAD_BYTES with TLS fallback for portal hosts.
+
+    raise_for_status=False is a narrow escape hatch for a confirmed host
+    quirk (a WordPress/Elementor bug on censoecuador.gob.ec's
+    /data-y-resultados/ page serves a real, substantial page under an HTTP
+    404) -- default stays True so every other caller keeps failing loudly
+    on a genuine error response.
+    """
     own = session is None
     if own:
         # follow_redirects is deliberately not set here: safe_stream() always
@@ -150,8 +167,22 @@ async def download_bytes(
     try:
         logger.debug("Downloading from %s (max %d bytes)", url, MAX_DOWNLOAD_BYTES)
         try:
-            return await _download(session, url)
+            return await _download(session, url, raise_for_status=raise_for_status)
         except httpx.ConnectError as exc:
+            if should_retry_with_os_trust(exc, url):
+                logger.warning(
+                    "TLS verification failed for %s against the bundled CA "
+                    "store; retrying against the OS trust store (still "
+                    "fully verified)",
+                    url,
+                )
+                async with httpx.AsyncClient(
+                    headers={"User-Agent": USER_AGENT},
+                    verify=os_trust_context(),
+                ) as os_trust_session:
+                    return await _download(
+                        os_trust_session, url, raise_for_status=raise_for_status
+                    )
             if not should_retry_insecure(exc, url):
                 raise
             logger.warning(
@@ -163,7 +194,9 @@ async def download_bytes(
                 headers={"User-Agent": USER_AGENT},
                 verify=False,
             ) as insecure_session:
-                return await _download(insecure_session, url)
+                return await _download(
+                    insecure_session, url, raise_for_status=raise_for_status
+                )
     finally:
         if own:
             await session.aclose()

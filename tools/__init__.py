@@ -40,6 +40,7 @@ from tools.search_anda import register_search_anda_tool
 from tools.search_auditores import register_search_auditores_tool
 from tools.search_bce_iem import register_search_bce_iem_tool
 from tools.search_biinec_extras import register_search_biinec_extras_tool
+from tools.search_censo_recursos import register_search_censo_recursos_tool
 from tools.search_companias import register_search_companias_tool
 from tools.search_contratos import register_search_contratos_tool
 from tools.search_datasets import register_search_datasets_tool
@@ -95,6 +96,7 @@ def register_tools(mcp: FastMCP) -> None:
     register_search_inec_publicaciones_tool(mcp)
     register_get_inec_publicacion_archivos_tool(mcp)
     register_search_biinec_extras_tool(mcp)
+    register_search_censo_recursos_tool(mcp)
 
     register_search_regulaciones_tool(mcp)
     register_get_regulacion_info_tool(mcp)

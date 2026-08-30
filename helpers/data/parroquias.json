@@ -3112,36 +3112,36 @@
     "provincia": "Esmeraldas"
   },
   {
-    "codigo": "080850",
+    "codigo": "230250",
     "nombre": "La Concordia",
-    "canton_codigo": "0808",
+    "canton_codigo": "2302",
     "canton": "La Concordia",
-    "provincia_codigo": "08",
-    "provincia": "Esmeraldas"
+    "provincia_codigo": "23",
+    "provincia": "Santo Domingo de los Tsáchilas"
   },
   {
-    "codigo": "080851",
+    "codigo": "230251",
     "nombre": "Monterrey",
-    "canton_codigo": "0808",
+    "canton_codigo": "2302",
     "canton": "La Concordia",
-    "provincia_codigo": "08",
-    "provincia": "Esmeraldas"
+    "provincia_codigo": "23",
+    "provincia": "Santo Domingo de los Tsáchilas"
   },
   {
-    "codigo": "080852",
+    "codigo": "230252",
     "nombre": "La Villegas",
-    "canton_codigo": "0808",
+    "canton_codigo": "2302",
     "canton": "La Concordia",
-    "provincia_codigo": "08",
-    "provincia": "Esmeraldas"
+    "provincia_codigo": "23",
+    "provincia": "Santo Domingo de los Tsáchilas"
   },
   {
-    "codigo": "080853",
+    "codigo": "230253",
     "nombre": "Plan Piloto",
-    "canton_codigo": "0808",
+    "canton_codigo": "2302",
     "canton": "La Concordia",
-    "provincia_codigo": "08",
-    "provincia": "Esmeraldas"
+    "provincia_codigo": "23",
+    "provincia": "Santo Domingo de los Tsáchilas"
   },
   {
     "codigo": "090150",
@@ -5536,14 +5536,6 @@
     "provincia": "Morona Santiago"
   },
   {
-    "codigo": "140157",
-    "nombre": "Sevilla Don Bosco",
-    "canton_codigo": "1401",
-    "canton": "Morona",
-    "provincia_codigo": "14",
-    "provincia": "Morona Santiago"
-  },
-  {
     "codigo": "140158",
     "nombre": "Sinai",
     "canton_codigo": "1401",
@@ -5964,6 +5956,14 @@
     "nombre": "San Jose De Morona",
     "canton_codigo": "1412",
     "canton": "Tiwintza",
+    "provincia_codigo": "14",
+    "provincia": "Morona Santiago"
+  },
+  {
+    "codigo": "141350",
+    "nombre": "Sevilla Don Bosco",
+    "canton_codigo": "1413",
+    "canton": "Sevilla Don Bosco",
     "provincia_codigo": "14",
     "provincia": "Morona Santiago"
   },
