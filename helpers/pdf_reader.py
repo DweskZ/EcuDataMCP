@@ -1,6 +1,7 @@
 import io
 import re
 from typing import Any
+from urllib.parse import urlsplit
 
 import httpx
 
@@ -8,11 +9,20 @@ import httpx
 # TLS-fallback, size-capped) despite living in csv_reader.py -- every other
 # non-tabular download in this project (xls/xlsx/ods/zip/tar.gz previews)
 # reuses them the same way rather than duplicating the download logic here.
-from helpers.csv_reader import download_bytes
+from helpers.csv_reader import download_bytes, sniff_content_type
 
 MAX_PAGES_PER_CALL = 20
 
 _PAGE_RANGE_RE = re.compile(r"(\d+)(?:-(\d+))?")
+
+# Known-large/non-PDF formats seen in the wild pointed at this tool by
+# mistake (survey microdata ZIPs, tabulados XLSX...) -- rejecting on
+# extension avoids burning a doomed 5 MB partial download before pypdf
+# would fail on it anyway.
+_NON_PDF_EXTENSIONS = (
+    ".zip", ".tar.gz", ".tgz", ".rar", ".7z",
+    ".xlsx", ".xls", ".csv", ".docx", ".doc",
+)
 
 
 def _parse_pages(pages: str, total_pages: int) -> tuple[list[int], bool]:
@@ -57,6 +67,26 @@ async def read_pdf(
     """
     from pypdf import PdfReader
     from pypdf.errors import PdfReadError, PyPdfError
+
+    path = urlsplit(url).path.lower()
+    if path.endswith(_NON_PDF_EXTENSIONS):
+        ext = path.rsplit(".", 1)[-1]
+        raise ValueError(
+            f"La URL termina en .{ext}, no en .pdf -- read_pdf solo lee PDFs. "
+            "Si el archivo viene de un recurso CKAN, prueba download_resource "
+            "o preview_resource_data; si no, descárgalo directamente desde el enlace."
+        )
+    if not path.endswith(".pdf"):
+        # No recognizable extension either way (e.g. a query-string-only
+        # URL) -- same priority order as csv_reader's format detection:
+        # URL extension first, Content-Type sniff only when that's
+        # inconclusive, cheap because it only reads headers.
+        content_type = await sniff_content_type(url, session=session)
+        if content_type and "pdf" not in content_type.lower():
+            raise ValueError(
+                f"La URL no parece ser un PDF (Content-Type: {content_type}); "
+                "read_pdf solo lee PDFs."
+            )
 
     raw, truncated = await download_bytes(url, session=session)
     if truncated:

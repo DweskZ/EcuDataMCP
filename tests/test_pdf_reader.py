@@ -140,6 +140,33 @@ async def test_read_pdf_rejects_corrupt_file(httpx_mock, monkeypatch):
         await read_pdf(url)
 
 
+async def test_read_pdf_rejects_zip_extension_without_downloading(httpx_mock, monkeypatch):
+    # No httpx_mock response is registered for this URL -- if read_pdf tried
+    # to download it, httpx_mock would raise for the unmatched request,
+    # failing this test. The extension check must reject it first.
+    _fake_dns(monkeypatch)
+    url = "https://www.ecuadorencifras.gob.ec/documentos/web-inec/REESS_BDD.zip"
+
+    with pytest.raises(ValueError, match=r"termina en \.zip"):
+        await read_pdf(url)
+
+
+async def test_read_pdf_rejects_non_pdf_content_type_when_extension_ambiguous(
+    httpx_mock, monkeypatch
+):
+    # No extension in the URL at all -- falls through to a Content-Type
+    # sniff (headers only, no body download) before committing to the
+    # full download.
+    _fake_dns(monkeypatch)
+    url = "https://example.com/descarga?id=123"
+    httpx_mock.add_response(
+        url=url, headers={"content-type": "application/zip"}, content=b"PK\x03\x04"
+    )
+
+    with pytest.raises(ValueError, match="no parece ser un PDF"):
+        await read_pdf(url)
+
+
 async def test_read_pdf_empty_document_returns_no_pages(httpx_mock, monkeypatch):
     _fake_dns(monkeypatch)
     import io
