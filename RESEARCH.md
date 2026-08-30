@@ -1921,6 +1921,292 @@ renderizado JS o formularios ASP.NET, no de autenticación.
 
 ---
 
+## Octava pasada — Trabajo/SUT, electricidad a fondo, CNT/ARCOTEL, archivo de cortes 2024, endpoints muertos
+
+**Investigado 2026-08-29 (misma fecha, tercera pasada del día),** pedido
+de Daniel: Ministerio del Trabajo/SUT, profundizar más el sector
+eléctrico ("cenace arconel y similares"), CNT/telefonía, un archivo real
+de los cortes de luz programados de la crisis de fines de 2024 (nivel
+barrio/semana), y un barrido de endpoints "muertos" o renombrados sin
+avisar entre ministerios/Presidencia/Vicepresidencia/Asamblea/Judicatura/
+TCE. Todo verificado en vivo.
+
+### Ministerio del Trabajo / SUT — sin gap, ya cubierto vía CKAN
+
+El SUT (`sut.trabajo.gob.ec`, app JSF con dashboards públicos de
+indicadores) es la **fuente declarada** de los 5 datasets que ya existen
+bajo la organización CKAN `ministerio-del-trabajo` (verificado en vivo vía
+`get_dataset_info`): Contratos Vigentes en el SUT (CSV, actualizado
+2026-08-17), tres CSV de Red Socio Empleo (registrados/colocados/
+capacitados), Estrategias para la Empleabilidad, Denuncias del Sector
+Público, y Servidores Públicos Registrados (SIITH). Todo CSV/ODS
+estático, ya alcanzable con `search_datasets`/`download_resource`. **No
+hace falta ningún cliente nuevo.**
+
+**Patrón nuevo de falla, distinto al de dominio renombrado:**
+`www.trabajo.gob.ec` resuelve y acepta la conexión TCP, pero sus páginas
+dinámicas (home, `/salario-basico/`, `/tablas-sectoriales/`) **nunca
+responden** — timeout de 45s+ sin datos, confirmado repetidas veces con
+WebFetch y curl crudo. En cambio, archivos estáticos bajo
+`/wp-content/uploads/...` cargan rápido y confiable (1.2-1.8s). Conclusión
+práctica: el sitio solo sirve para bajar un PDF específico ya conocido
+(vía buscador), no para navegar/scrapear su propio menú.
+
+**Dead ends confirmados:** registro de organizaciones sindicales (trámite
+presencial/Quipux, sin registro público agregable), inspecciones
+laborales/sanciones (notificación individual por caso, mismo patrón que
+Fiscalía ya documentado como fuera de alcance), Consejo Nacional de
+Salarios (`consejosalarios.gob.ec` no resuelve, NXDOMAIN), tablas
+salariales sectoriales (PDFs sueltos con URLs impredecibles, sin tabla
+2026 publicada según cobertura de prensa — el ministerio simplemente no
+actualizó). Las cifras de empleo/desempleo que aparecen en PDFs del
+ministerio son downstream de la ENEMDU de INEC, no una encuesta propia —
+confirma que es un duplicado, no un gap.
+
+### Sector eléctrico — segunda pasada, mucho más profunda
+
+**CNEL EP tiene 40 datasets en CKAN** (org `cnel-ep`, verificado vía la
+API del propio MCP desplegado del proyecto) — no los 5 que mostraba una
+vista filtrada. Cubre facturación/venta de energía (MWh+USD),
+infraestructura eléctrica, reclamos, expansión de alumbrado público,
+información financiera/contable, actas de directorio, trámites
+ciudadanos. Es, con diferencia, la mejor fuente del lado distribución —
+ya alcanzable hoy sin código nuevo.
+
+**`reportes.arconel.gob.ec` — descifrado.** La pasada anterior lo dejó
+como "necesita browser". Esta vez se llegó al mecanismo completo: es
+ASP.NET WebForms con un control **Microsoft ReportViewer 11.0.3452.0**.
+Cada dropdown (Tipo de Reporte / Año / Grupo Empresa) dispara su propio
+`__doPostBack` → POST AJAX a un `UpdatePanel` con `__VIEWSTATE` fresco;
+hay que enviarlos **secuencialmente** (uno invalida el estado del
+siguiente, no se pueden mandar en paralelo). Después de fijar los tres,
+"Generar Reporte" renderiza el reporte SSRS como una **tabla HTML real en
+el DOM** — no hace falta tocar el export. Verificado de punta a punta en
+vivo: Tipo=`Balance Energía`, Año=2023, Grupo=`Todos` → tabla mensual real
+(Id Empresa, Empresa, Año, Mes, Energía Recibida MEM MWh, Recibida de
+Terceros...) para cada distribuidora, paginada. El dropdown de exportar
+(Excel/PDF/Word) existe pero sus links son `javascript:void(0)` — dispara
+otro postback completo, no hay atajo de URL estática tipo
+`&rs:Format=EXCEL`. Un scraper necesita: `requests.Session()`, GET para
+sembrar `__VIEWSTATE`/`__EVENTVALIDATION`, tres POST secuenciales
+imitando cada `onchange`, POST del botón generar, parsear la tabla HTML.
+La matriz es grande (~30 tipos de reporte × 29 años × 3 filtros de grupo,
+algunos también piden mes) pero cada celda es dato limpio, cero login/
+captcha. **Sigue siendo la fuente más rica de todo el proyecto, y ahora
+está resuelta técnicamente, solo falta construirla.**
+`sisdatbi.arconel.gob.ec` resultó ser un sistema BI interno **con login**
+(`sisdat.soporte@controlelectrico.gob.ec`) — sistema distinto, no una
+puerta alterna a los reportes públicos, descartar.
+
+**CENACE — Biblioteca revela documentos de planificación no
+documentados antes:** Plan Maestro de Electricidad 2023-2032 (link roto
+por mismatch de certificado TLS — el host `recursosyenergia.gob.ec` no
+está en el SAN del certificado que sí cubre `ambienteyenergia.gob.ec` y
+~25 ministerios más; reintentar bajo `www.ambienteyenergia.gob.ec`
+directamente), Planes Operativos Anuales 2016-2026, Plan Estratégico
+Institucional 2015-2029, factores de emisión CO₂ 2011-2024, informes
+semestrales de indisponibilidad de transmisión 2018-2026. También un
+índice pequeño y útil: `cenace.gob.ec/wp-content/plugins/ez-addons/
+data/boletines.xlsx` (14 KB) mapea cada boletín mensual (ene-2019 a hoy)
+a su link individual de `fliphtml5.com` — sirve para enumerar los ~90
+boletines programáticamente, pero no resuelve la fricción del flipbook
+por boletín. Confirmado de nuevo (esta vez inspeccionando la red del
+browser durante la carga): el dashboard en tiempo real no dispara **ni
+una sola petición XHR/JSON** — los datos están en el HTML servido por el
+servidor, ni siquiera es "Plotly JSON embebido", es más directo que eso.
+
+**Otras organizaciones CKAN nuevas encontradas en el sector:** ARCERNNR
+(BNEE) es en realidad **1 dataset pero 54 recursos** — más rico de lo que
+sugería "1 dataset". **IIGE** (Instituto de Investigación Geológico y
+Energético), org `instituto-de-investigacion-geologico-y-energetico-iige`,
+**19 datasets** — investigación geológica/energética y portafolios de
+patentes, tangencial pero real, no catalogada antes. **Ministerio de
+Energía y Minas** (org separada, `ministerio-de-energia`, 14 datasets) es
+data **legacy de petróleo/minería** (precios de crudo, perforación de
+pozos) — no confundir con el ministerio fusionado de Ambiente y Energía
+que cubre electricidad hoy.
+
+**Distribuidoras sin presencia CKAN propia:** EEQ, Centrosur, EERSA,
+EEASA — cero. EEQ tiene "EEQ en Cifras" pero es solo prosa/HTML (99.30%
+cobertura, 1.25M cuentas), sin archivo descargable. Centrosur
+(`centrosur.gob.ec/estadisticas-centrosur/`) sí tiene 2 PDFs reales
+(`Estadistica-2023.pdf`, `Informacion_pagina_web_2025_3T.pdf`) más un
+Power BI de generación distribuida (mismo patrón de fricción ya visto en
+ASOBANCA/SERCOP) y un geoportal ArcGIS. EERSA dio 403 a un fetch simple
+(posible filtro de User-Agent, sin confirmar con browser real). EEASA sin
+explorar más allá del redirect. **Tarifa de la Dignidad**: no hay dataset
+estructurado en el ministerio fusionado — la fuente estructurada real es
+el reporte "Subsidio Tarifa Dignidad" (por parroquia/año/mes) dentro de
+`reportes.arconel.gob.ec`, no un archivo separado del MAE.
+
+**Ranking actualizado:** (1) `reportes.arconel.gob.ec` — descifrado,
+máxima profundidad histórica (1998-2026), necesita un scraper con replay
+de ViewState; (2) los datasets CKAN ya vivos — CNEL EP (40), CENACE (45),
+ARCONEL BNEE (54 recursos); (3) PDFs estáticos de Centrosur/CNEL y los
+documentos de planificación de la Biblioteca de CENACE (Plan Maestro,
+indisponibilidad, factores CO₂); (4) geoportales/Power BI de EEQ/
+Centrosur, misma fricción JS de siempre, baja prioridad; (5)
+`sisdatbi.arconel.gob.ec`, login-gated, descartar. Ningún bloqueo por
+login/captcha en todo el sector excepto ese último — toda la fricción
+sigue siendo renderizado JS o formularios ASP.NET postback, no
+autenticación.
+
+### CNT / ARCOTEL (telecomunicaciones) — dominio nuevo
+
+**ARCOTEL** ya tiene organización CKAN (`arcotel`, 9 datasets CSV/ODS:
+líneas activas por tecnología, densidad/participación de mercado,
+portabilidad numérica, internet fijo/móvil, TV paga, cable submarino,
+satélite) — pero **congelada desde nov-2021/nov-2022**, sin recursos
+nuevos desde entonces (gap de frescura, no de existencia). El hallazgo
+real está en el sitio institucional (`www.arcotel.gob.ec`, fuera de
+CKAN): **Reportes Estadísticos Mensuales** (`/reportes-estadisticos-
+mensuales/`), PDF, serie mensual completa 2023-2026 con ~4 meses de
+rezago (el más actual y accionable), y **Boletines Estadísticos**
+(anuales, hasta 2015). Ambos solo PDF, sin CSV/XLSX ni API, sin login/
+captcha. **CNT EP** (dominio comercial real es `cnt.com.ec`, no
+`cnt.gob.ec`) tiene su propia organización CKAN (`cntep`, solo 2 datasets
+pero frescos, feb-2026: ubicaciones de centros de atención, cobertura
+móvil por provincia) — como operador comercial (aunque estatal) publica
+mucho menos que el regulador, como se esperaba. Portal LOTAIP de CNT no
+se pudo verificar (parece SPA/JS, WebFetch devolvió vacío). Sin API
+abierta en ninguno de los dos.
+
+### Archivo histórico de cortes de luz programados (crisis sep-dic 2024)
+
+**Pedido explícito de Daniel:** un registro estructurado real (barrio ×
+semana × horas sin luz) de la crisis eléctrica de fines de 2024. Este es
+un tipo de dato distinto a todo lo demás en este documento — no es una
+fuente que se publique continuamente, es un incidente histórico que hay
+que rescatar antes de que desaparezca.
+
+**EEQ (Quito) — el hallazgo grande: el archivo sigue vivo, no hace falta
+Wayback Machine.** El CMS documental de EEQ
+(`eeq.com.ec/documents/d/empresa-electrica-quito/{slug}`) **todavía sirve
+los PDFs de la crisis en vivo**, confirmado descargando uno real:
+`.../04-al-06-oct` — PDF de 5 páginas, "Programación cortes del servicio
+de energía eléctrica," viernes 4 a domingo 6 de octubre de 2024,
+estructura exacta subestación → lista exhaustiva de calles/sectores →
+bloque horario (ej. `04:00-08:00 / 18:00-19:00`). Exactamente la
+granularidad barrio/hora pedida. Otros slugs confirmados existentes:
+`23-al-29-09-24`, `26-04-2024`, `29_04_2024`, `mf-09-10-nov` (abril a
+noviembre 2024). **Problema:** el naming de los slugs es manual e
+inconsistente, no hay patrón de fecha predecible — hay que enumerarlos
+vía búsqueda (Google `site:eeq.com.ec/documents`, o una API de búsqueda
+del propio CMS si existe) en vez de adivinar URLs. Un espejo de tercero
+(`ecuador221.com.ec`, un medio local) también aloja copias de al menos un
+PDF (29 nov - 1 dic 2024) — útil como respaldo si algún slug de EEQ no es
+descubrible. Los PDFs están además co-marcados "Ministerio de Energía y
+Minas" — vale la pena revisar si el ministerio también los espeja en su
+propio sitio.
+
+**CNEL (Guayaquil/costa, el objetivo más grande y más difícil) —
+probablemente perdido del sitio en vivo.** El archivo por tag
+(`/tag/corte-de-energia/`) hoy solo muestra artículos de 2026, nada de
+2024 — la página fue sobrescrita. CNEL usa el mismo patrón WordPress
+`wp-content/uploads/{año}/{mes}/` que EEQ para otros documentos actuales,
+así que los PDFs de sep-dic 2024 podrían seguir en rutas adivinables
+`wp-content/uploads/2024/09-12/...` — no confirmado, vale una pasada
+dirigida. CNEL también publicó links cortos (t.co) desde su cuenta
+oficial de X con PDFs separados por "Unidad de Negocio" (provincia) —
+no se pudieron resolver (X devolvió 402, paywall).
+
+**CENACE/ARCONEL — como se esperaba, solo la capa regulatoria/de
+coordinación, no horarios por barrio.** ARCONEL emitió la Resolución
+006/2024 (8-sep-2024, marco técnico-comercial para generadores de
+emergencia bajo racionamiento); CENACE determinó y comunicó los períodos
+de déficit/racionamiento a nivel de sistema (vigente desde 16-oct-2023)
+pero delegó a cada distribuidora decidir quién pierde luz cuándo. Nada
+que rescatar aquí más allá de lo ya documentado.
+
+**Wayback Machine — no disponible en esta sesión** (web.archive.org
+devolvió "Temporarily Offline" tanto a fetch directo como a browser) —
+una caída real del servicio, no un bloqueo. Baja prioridad reintentar
+dado que el archivo de EEQ ya cubre el período sin necesidad de archive;
+más relevante para CNEL una vez que el servicio vuelva.
+
+**Prensa (Primicias, La República "Datos LR")** cubrió el período casi a
+diario, pero republicando los mismos PDFs de CNEL/EEQ en prosa, sin
+construir su propio tracker estructurado — confirma el formato de tabla
+PDF pero no aporta dato independiente.
+
+**Conclusión:** esto es más rescatable de lo esperado. EEQ es el caso
+fuerte (archivo en vivo, sin arqueología necesaria); CNEL es el caso
+difícil (probablemente hay que combinar reintento de Wayback + adivinar
+rutas de upload + rescatar los links de X). Vale la pena tratarlo como un
+ítem de roadmap distinto al del sector eléctrico general — es un registro
+de un incidente histórico, no una fuente de datos continua.
+
+### Barrido de endpoints muertos o renombrados sin avisar
+
+**Pedido explícito de Daniel,** extendiendo el patrón ya documentado
+varias veces (SENESCYT→MINEDEC, Finanzas→MDEP, MAATE hijackeado por
+SNAI, MIDUVI muerto a nivel TLS, `industrias.gob.ec` sin DNS) a
+instituciones no auditadas individualmente todavía: ministerios
+restantes, Presidencia, Vicepresidencia, Asamblea Nacional (sitio propio),
+Consejo de la Judicatura, TCE.
+
+**Dos renombres nuevos confirmados, ambos vía falla TLS (no redirect):**
+
+- **Transporte y Obras Públicas → MIT.** `obraspublicas.gob.ec` muere por
+  mismatch de certificado (host no está en el SAN del servidor). Sucesor
+  real: `mit.gob.ec`, "Ministerio de Infraestructura y Tecnología",
+  confirmado vivo, referencia explícitamente su branding anterior de
+  "Transporte y Obras Públicas".
+- **MIES → fusionado en "Ministerio de Trabajo y Desarrollo Humano".**
+  `inclusion.gob.ec` muere por certificado expirado; `mies.gob.ec` ni
+  siquiera resuelve. Sucesor real: `www.desarrollohumano.gob.ec`,
+  confirmado vivo, referencia a MIES directamente, y tiene un **"InfoDH"
+  — Portal de Información Estadística** sin explorar todavía (pendiente
+  de pasada de contenido).
+
+**Un redirect nuevo, correcto (no es el bug de vhost por defecto):**
+Planificación (`planificacion.gob.ec`) → 301 a
+`planificacion.presidencia.gob.ec` ("Ex Secretaría Nacional de
+Planificación"), portal LOTAIP real con matrices mensuales por año
+(presupuestos, personal, contratos, auditorías).
+
+**Confirmación directa del bug de hosting compartido, por primera vez
+sin inferencia:** el error de certificado de `obraspublicas.gob.ec` filtró
+la lista completa de SAN del certificado compartido. Dominios que
+comparten ese certificado (todos bajo `www.<nombre>.gob.ec`):
+agricultura, ambienteyenergia, atencionintegral (SNAI), codigopostal,
+comunicacion, consejodiscapacidades, controlsanitario, defensa,
+desarrollohumano, economiasolidaria, finanzas, geoenergia,
+gestionderiesgos, gobiernoabierto, igualdad, igualdadgenero,
+ministeriodegobierno, ministeriodelinterior, **mit**, presidencia,
+produccion, salud, secretariadelamazonia, softwarepublico,
+telecomunicaciones, vicepresidencia. Nota: `obraspublicas` y `mies`/
+`inclusion` **no** están en esa lista aunque sus instituciones siguen
+operando bajo otro nombre (`mit`, `desarrollohumano`) — es decir, los
+dominios viejos simplemente se sacaron del certificado compartido en vez
+de redirigirse, por eso fallan en el TLS handshake en lugar de servir
+contenido equivocado como los casos de hijack de SNAI.
+
+**Todo lo demás confirmado vivo con contenido real, sin dominio
+muerto/hijackeado:** Salud Pública (`salud.gob.ec`), Cancillería
+(`cancilleria.gob.ec`), Defensa (`defensa.gob.ec`), Telecomunicaciones
+(`telecomunicaciones.gob.ec`), Presidencia (`presidencia.gob.ec`),
+Vicepresidencia (`vicepresidencia.gob.ec`), Asamblea Nacional — sitio
+propio (`asambleanacional.gob.ec`, distinto de observatoriolegislativo.ec),
+Consejo de la Judicatura (`funcionjudicial.gob.ec`), TCE (`tce.gob.ec`,
+alcanzable, a diferencia de CNE que sigue bloqueado por WAF Incapsula).
+
+**Pistas nuevas marcadas para una pasada de contenido futura (dominio
+confirmado vivo, contenido sin verificar todavía):** "Estadísticas de
+proceso de regularización" en Cancillería (migración); "Observatorio
+Ecuador Digital" en Telecomunicaciones; "InfoDH — Portal de Información
+Estadística" en Desarrollo Humano/MIES; "VISOCIAL" (Sistema de
+Visualización Social) en Vicepresidencia, que también menciona un
+"Sistema Nacional de Información (SNI)"; "Sistema de Consulta de Datos
+Parlamentarios" y sección "ESTADO ABIERTO"/"PARLAMENTO ABIERTO" en el
+sitio propio de la Asamblea Nacional (contraparte oficial del dataset de
+votaciones de FCD ya documentado); "Portal de Estadísticas Judiciales" en
+Consejo de la Judicatura (podría ser el mismo `fsweb.funcionjudicial.
+gob.ec/estadisticas/...` que RESEARCH.md ya encontró roto/en blanco, o
+uno distinto — falta confirmar).
+
+---
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un
