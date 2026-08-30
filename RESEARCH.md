@@ -1571,6 +1571,356 @@ levanta un `RuntimeError` que sí nombra el host y el tipo de fallo.
 
 ---
 
+## Séptima pasada — Superbancos, electricidad, y revisión de fuentes ya integradas
+
+**Investigado 2026-08-29,** pedido de Daniel: escaneo profundo de
+Superbancos ("dep scan de todo el material que tienen") más una segunda
+mirada a *todas* las fuentes ya integradas como cliente propio (excepto
+INEC, ya investigado a fondo) para ver si hay más material del que se
+capturó la primera vez — con Registro Civil como ejemplo explícito de algo
+que se había dado por "sin gaps" sin mirar más allá de CKAN. Después
+Daniel agregó CENACE y el sector eléctrico como dominio nuevo. Todo lo de
+abajo se verificó en vivo (fetch real, no solo lectura de un menú).
+
+### Superbancos — el hallazgo más grande de esta pasada
+
+Dominio real y funcionando: `www.superbancos.gob.ec` (no hace falta
+redirect, a diferencia de MAATE/SENESCYT/Finanzas). Dos sitios conviven
+en el mismo dominio: el institucional (`/bancos/`) y un portal
+estadístico separado (`/estadisticas/portalestudios/`, otra instancia
+WordPress). Hay además un subdominio `catastrocompanias.superbancos.gob.ec`
+(app JSF aparte).
+
+**Boletines Financieros Mensuales — confirmado real, el ítem que ya
+estaba en el roadmap.** `estadisticas/portalestudios/bancos/` lista un ZIP
+por año desde 1997. Ojo: la URL no sigue una fórmula limpia — el path usa
+la carpeta de *fecha de subida* del WordPress, no el año de los datos
+(`BOL_FIN_BCOS_2007.zip` vive en `.../2018/03/`, no `.../2019/03/` como
+sugeriría un patrón ingenuo) — hay que scrapear la página índice, no
+adivinar la URL. Descargas confirmadas: 1997 (5.2 MB), 2007 (6.2 MB), 2008
+(6.7 MB), todas `application/zip`, sin login. El boletín del mes/año
+actual carga vía un widget AJAX aparte en la misma página (dinámico, no
+en la lista estática) — revisar por separado si importa la actualidad.
+
+**Servicios Financieros — hallazgo nuevo, mismo patrón.**
+`estadisticas/portalestudios/servicios-financieros/` — ZIPs mensuales de
+estadísticas de tarjetas de crédito/débito y de cajeros/oficinas/
+corresponsales no bancarios, desde ~2011-2015 según la serie. Confirmado
+en vivo: `tarjetas-mar-2021.zip` (1.47 MB). Mismo esquema de URL
+(carpeta de fecha de subida) que los boletines financieros.
+
+**Calendario Estadístico — hallazgo menor, útil como índice.** Los links
+de "descarga" (`.../download/8970/`, `/9817/`) no son PDF como sugiere la
+etiqueta — son XLSX reales (confirmado por `Content-Type`), 93.7 KB. Sirve
+como índice legible de qué se publica y cuándo.
+
+**Balances Generales / Patrimonio Técnico / Sistema Financiero Público y
+Privado — probablemente el contenido más rico, pero no resuelto.** Estas
+tres secciones (que cubren exactamente lo pedido: indicadores de
+morosidad/liquidez/solvencia por institución) no son listas de archivos
+estáticos — cada página apunta a una herramienta de consulta externa cuya
+URL real no apareció en el HTML plano (probablemente cargada por JS o
+requiere parámetros de formulario). Necesita una pasada con browser real
+antes de saber si es extraíble.
+
+**Resoluciones y Circulares — bloqueado por AJAX, no resuelto.** La
+página muestra tres placeholders "Cargando…" que se llenan vía
+`admin-ajax.php` (confirmado en el HTML crudo — tokens `ajax`/`iframe`
+presentes, página Elementor) — la lista de documentos no está en el HTML
+plano. Hace falta el nombre de la acción AJAX/nonce, o un browser, para
+enumerar. Relacionado: las resoluciones de la Junta de Política y
+Regulación Financiera y Monetaria viven en el sitio del BCE
+(`bce.fin.ec/junta-de-politica-y-regulacion-financiera-y-monetaria/resoluciones/`).
+
+**Visualizadores — sospecha de dashboard JS, sin confirmar.** Es un índice
+de "reportes dinámicos" (inclusión/uso financiero, protección al
+consumidor) — no se encontró iframe/Power BI en el HTML de esta pasada,
+pero la etiqueta sugiere que el dashboard real está un click más adentro.
+Tratar como sospechoso de SPA hasta verificar con browser.
+
+**Catastro Público / Catastro de Compañías — mixto.** El catastro público
+(`bancos/catastro-publico/`) lista bancos por categoría en HTML plano
+(nombres solamente, sin metadata), y dice que el detalle completo
+(oficinas, representantes legales, directorio, accionistas, auditores)
+está en una herramienta interactiva no resuelta. El subdominio separado
+`catastrocompanias.superbancos.gob.ec/catastro/` es una **app JSF con
+login obligatorio** ("Usuario/Contraseña") — mismo patrón que el
+Geoportal del IGM y el registro de títulos de SENESCYT ya documentados
+como no automatizables.
+
+**Entidades No Autorizadas — real pero de bajo valor.** Listas por año
+(2017-2026, 44-90 nombres/año) de entidades advertidas — solo nombres, sin
+fecha ni motivo por entrada, sin archivo descargable. Fácil de scrapear
+como HTML si algún día vale la pena, pero poco valor como dato
+estructurado.
+
+**Sin datos abiertos ni API.** No hay sección "datos abiertos" en ningún
+nav (sitio principal ni portal estadístico), y **Superbancos no tiene
+organización en CKAN** (a diferencia de SRI/IESS/SENESCYT).
+
+**Ranking de qué construir primero:** (1) Boletines Financieros Mensuales
++ (2) Servicios Financieros — mismo scraper de página-índice, mismo patrón
+ya usado en SIPA; (3) Calendario Estadístico como añadido trivial; (4)
+Entidades No Autorizadas / Catastro Público como HTML scrapes de bajo
+esfuerzo y bajo valor; (5) Resoluciones y Circulares y (6) Balances
+Generales/indicadores necesitan una pasada con browser antes de decidir
+si son viables — probablemente lo más valioso del sitio, pero no
+verificado; (7) Visualizadores, sospecha de Power BI/JS, despriorizar; (8)
+Catastro de Compañías, bloqueado por login, no automatizable.
+
+### Revisión de fuentes ya integradas — ¿qué más tienen?
+
+**SRI — un gap real más allá de `/datasets`.**
+`sri.gob.ec/estadisticas-generales-de-recaudacion-sri` es una página de
+"Estadísticas de Recaudación" separada de `/datasets` (ya cubierta por
+`helpers/sri_client.py`): reportes XLSX mensuales pre-agregados por
+impuesto/provincia/cantón y por actividad económica, actualizados cada
+mes (verificado con la edición de julio 2026), más una "Bitácora de
+control y registro estadístico", un ZIP de indicadores históricos (2025),
+boletín técnico anual en PDF, e infografías. Es un nivel de agregación
+distinto (resumen geográfico/sectorial) al de los CSV de declaración cruda
+por año que ya scrapea `/datasets` — no es un duplicado.
+`sri.gob.ec/estudios-investigaciones-e-indicadores` es otro hub aparte,
+pero todo en PDF (gasto tributario, presión fiscal, brechas tributarias,
+radiografía económica) — necesitaría extracción de PDF, no CSV. Hay
+también un portal OLAP en vivo (`srienlinea.sri.gob.ec/saiku-ui`, 5 cubos,
+actualiza el día 15 de cada mes) que no se pudo verificar si requiere
+login (carga vía JS) — pendiente de confirmar con browser.
+
+**BCE — el IEM es más rico de lo que decía el roadmap.** Confirmado en
+vivo: cada boletín mensual del IEM (índice completo desde el No. 1727 de
+enero 1996 hasta el No. 2092 de junio 2026 — 30 años de archivo) tiene, además
+del ZIP/PDF completo, **~60+ archivos XLSX individuales por tabla**
+(`IEM-XXX-e.xlsx`, ej. `IEM-431-e.xlsx` = PIB por enfoque del gasto,
+confirmado descargando uno real de 100 KB). Cubre balanza de pagos,
+posición de inversión internacional, deuda externa, PIB por los tres
+enfoques, previsiones macroeconómicas — series mucho más granulares que
+las ~78 que expone BCEData hoy. Candidato fuerte para scrapear tabla por
+tabla en vez de solo el ZIP monolítico. Ojo: el índice del boletín de
+junio 2026 apuntaba todavía a la carpeta de mayo — puede ser rezago de
+publicación o plantilla desactualizada, revisar antes de construir sobre
+ello. Aparte, BCE tiene una organización CKAN con solo 4 datasets
+(espejo rezagado de un subconjunto del IEM) — ya alcanzable con los tools
+genéricos existentes, sin valor agregado.
+
+**Supercías — casi todo lo demás es un callejón sin salida.** El Anuario
+Estadístico de Mercado de Valores dejó de publicarse en 2015 (no es una
+fuente viva). Valores y Seguros (que esta superintendencia también
+regula desde 2015) son dominios reales pero casi todo vive detrás de apps
+ZK/JSF con login obligatorio (`appscvsmovil`, `seguros.supercias.gob.ec`).
+Único archivo estático encontrado: un PDF de reaseguradores extranjeros
+registrados, actualizado (junio 2026), sin poder enumerar archivos
+hermanos (el listado de carpeta da 403). Sanciones/resoluciones existen
+como sistema real pero vía apps ZK con ViewState — mismo tipo de fricción
+que BIINEC, que este proyecto sí llegó a scrapear, pero no es un quick
+win.
+
+**SERCOP — nada nuevo aprovechable, con una pregunta abierta.** RUP es
+solo FAQ. "Contratación Pública en Cifras" es un PDF estático + un
+dashboard Power BI embebido. El catálogo electrónico es navegable pero
+sin precios ni API. La consulta de órdenes de compra del catálogo está
+bloqueada por **CAPTCHA** — descartado. La única pista real: un formulario
+legado (`EmpReporteIncumplidos.cpe`, sistema SOCE viejo) para consultar
+proveedores incumplidos/adjudicatarios fallidos — dato que no existe en
+los registros OCDS ya integrados — pero no se probó si acepta POST sin
+sesión/captcha; queda como pregunta abierta, no confirmado ni descartado.
+
+**SGR — hay un archivo histórico real fuera del snapshot ArcGIS ya
+integrado.** El sitio principal (`gestionderiesgos.gob.ec`, WordPress,
+separado del backend ArcGIS que ya usa `helpers/sgr_client.py`) tiene un
+archivo de "Informes de Situación" (SITREP) 2016-2026 — terremotos,
+incendios forestales, temporada de lluvias, actividad volcánica — y una
+"Biblioteca" con mapas de amenaza/vulnerabilidad, rutas de evacuación por
+tsunami, y planes de contingencia volcánica por cantón. Contenido real,
+multi-año, no tocado por el snapshot COE2 actual (que solo tiene eventos
+recientes/en curso). Formato exacto por confirmar en una pasada
+siguiente.
+
+**IG-EPN — la data profunda está bloqueada, pero hay un buscador de
+boletines que parece abierto.** `igepn.edu.ec/descarga-de-datos` (catálogos
+sísmicos completos, registros acelerográficos, mecanismos focales, mapas
+de amenaza volcánica por volcán) **requiere crear cuenta/login** — mismo
+patrón que el Geoportal del IGM, descartado. Pero
+`igepn.edu.ec/servicios/busqueda-informes` es un formulario de búsqueda
+real (confirmado interactuando con él) para el archivo de informes
+sísmicos y volcánicos, filtrable por tipo/volcán/fecha, **sin login
+visible** — el candidato más prometedor de esta pasada para IG-EPN,
+formato de resultado (PDF vs. página) sin confirmar todavía. También hay
+un catálogo histórico "Sismicidad Tectónica de 1587 a 2021" bajo "Mapas
+Interactivos", no explorado a fondo.
+
+**gob.ec — un endpoint de transparencia real y sin explotar.**
+`www.gob.ec/api/v1/tramites-transparencia/{tramite_id}` devuelve una
+serie mensual real (atenciones/quejas por trámite) desde 2021, en vivo,
+sin auth (confirmado con el trámite de Cédula de Identidad: 253,729
+atenciones / 6 quejas en julio 2026). No es un dataset masivo — hay que
+pedirlo trámite por trámite, no existe un endpoint masivo — pero es dato
+de uso/satisfacción real que hoy no expone ningún tool. El resto de la
+API (`tramites-canales`, `tramites-costo`, `tramites-categorias`,
+`retroalimentacion`, `planificacion-estado`) o ya está embebido en lo que
+`get_tramite_info` devuelve, o es de bajo valor. El "catálogo de datos
+abiertos" en la home de gob.ec resulta ser solo un link directo a la
+misma CKAN de `datosabiertos.gob.ec` que este proyecto ya integra por
+separado — no hay catálogo propio escondido.
+
+**ANDA — cobertura confirmada completa, sin gap.** El catálogo en vivo
+tiene 437 entradas, coincide exacto con lo que ya documenta
+`search_anda`. Hay facetas de UI (colección temática, rango de año) no
+expuestas como parámetro de búsqueda hoy, pero es una limitación de UX
+menor (no se puede filtrar por tema del lado del servidor), no un gap de
+cobertura — nada es inalcanzable, solo no filtrable por tema.
+
+**SIPA — más boletines reales, un geoportal más rico de lo pensado, y dos
+dashboards confirmados rotos.** "Cifras Agroproductivas"/"Cifras
+Territoriales" (los tableros dinámicos mencionados en la integración
+original) están **confirmados rotos en producción** — cero peticiones de
+red se disparan en 8+ segundos de observación, no es JS-renderizado-pero-
+alcanzable, simplemente no cargan nada. Ídem se sospecha (no verificado
+uno por uno) del resto de tableros bajo la misma sección (Indicadores
+Sectoriales, Soberanía Alimentaria, Seguro Agropecuario, etc.). En
+cambio, los "Boletines nacionales" (Panorama Agroestadístico, Precios
+Mayoristas/Internacionales/Productor, Comercio Exterior,
+Agroquímicos/Fertilizantes, Crédito Público/Privado) sí son PDFs
+mensuales reales y directos (`sipa.agricultura.gob.ec/boletines/.../pdf`,
+confirmado 2016-2026 para Panorama Agroestadístico), y los "Boletines
+Situacionales" (por provincia/cultivo/sector) existen con el mismo
+patrón de sitio. El "Panorama Agroeconómico" anual está atrapado en un
+flipbook JS, sin link directo a PDF encontrado. El hallazgo más grande:
+`geoportal.agricultura.gob.ec` (solo `http://`, `https://` no carga —
+brecha real de protocolo) corre un **backend GeoServer WMS completo** con
+workspaces reales (`registros`, `demarcacion`, `infraestructura`,
+`tematicas`, `cobertura`, `fisiografia`, `sigtierras` — incluyendo
+**catastro rural** —, `agroestadistica` con riesgos agroclimáticos) mucho
+más allá de las ortofotos ya anotadas — pero falta confirmar si expone
+WFS `GetFeature` (necesario para exportar datos vectoriales reales, no
+solo teselas de mapa). RENAGRO-EC es solo una página informativa, sin
+dato ni descarga.
+
+**Contraloría — un ítem casi gratis, uno bloqueado por verificación de
+identidad, uno inalcanzable por ahora.** "Plan anual de control" usa el
+**mismo patrón `WFDescarga.aspx?id={id}&tipo=doc`** ya implementado en
+`helpers/contraloria_client.py` (ahí con `tipo=pesdoc`) — IDs confirmados
+para 2025 (`id=2812`) y 2024 (`id=2775`) — esfuerzo casi nulo, mismo
+cliente ya sirve. "Consulta de declaraciones patrimoniales" es un lookup
+real por funcionario, pero está detrás de verificación de identidad
+(cédula + email + código enviado al correo) antes de mostrar resultados —
+mismo tipo de brecha estructural que `radiografiapolitica.org` (que sí
+tiene bulk export vía JSON, esta versión de Contraloría no). "Resoluciones
+confirmadas" vive en un subdominio distinto
+(`servicios.contraloria.gob.ec`) que falló las 3 veces que se intentó
+alcanzar (mientras `www.contraloria.gob.ec` respondía sin problema) — falla
+de conectividad/SSL real en ese subdominio específico, vale la pena
+reintentar más adelante en vez de descartarlo. "Órdenes de trabajo" es
+alcanzable pero es un formulario HTML con un dropdown de cientos de
+unidades de control — más fricción que el CSV de un solo click ya
+integrado, mecanismo de envío (GET simple vs. ASP.NET postback) sin
+confirmar.
+
+**Registro Civil — el "sin gaps" del roadmap era incorrecto.** La primera
+conclusión ("cobertura sólida vía CKAN, sin gaps") se basaba solo en
+revisar la organización CKAN (6 datasets: cedulación, pasaportes
+electrónicos, copias de actas, certificados de agencia, catálogo de
+agencias, certificados de firma electrónica) sin mirar el sitio propio de
+la institución. `registrocivil.gob.ec/registro-civil-del-ecuador-cifras-
+de-defunciones/` publica un dataset real a nivel de registro individual:
+**"Defunciones Generales" 2020-05-2025, archivo `.xlsb` de 9.3 MB**
+(confirmado por HEAD: `Content-Type:
+application/vnd.ms-excel.sheet.binary.macroEnabled.12`,
+`Last-Modified: 2025-05-12`), acompañado de un diccionario de variables y
+una ficha de metadatos — tratado como una publicación de datos formal, no
+un boletín de prensa. No está en ninguno de los 6 datasets CKAN
+(confirmado consultando la API de CKAN en vivo). Distinto de lo que INEC
+ya publica (matrimonios/divorcios anuales *agregados*, 2022-2024) — esto
+es defunciones, a nivel de registro individual, publicado por el propio
+Registro Civil. **Corrección pendiente en ROADMAP.md.** Nota técnica: el
+formato `.xlsb` (Excel Binary Workbook) no está soportado hoy por
+`helpers/csv_reader.py` (que maneja XLSX/XLS/ODS pero no XLSB) — haría
+falta agregar soporte para ese formato antes de poder previsualizarlo
+como tabla, o como mínimo exponerlo como descarga directa igual que SIPA
+hace con archivos grandes.
+
+### Sector eléctrico (CENACE, ARCONEL/ARCERNNR, Ministerio de
+Ambiente y Energía) — dominio completamente nuevo para el proyecto
+
+**Pedido explícito de Daniel** tras el escaneo de fuentes ya integradas.
+Sin ninguna mención previa en este documento.
+
+**CENACE** (Operador Nacional de Electricidad) — dominio real
+`cenace.gob.ec` (no `.org.ec`). **Ya tiene organización en CKAN** (`cenace`,
+**45 datasets**: producción del parque generador, potencia efectiva,
+exportaciones de energía, potencia despachada, actualizado hasta agosto
+2026) — alcanzable hoy con los tools genéricos, sin necesidad de cliente
+nuevo para eso. Aparte, un dashboard en tiempo real
+(`cenace.gob.ec/info-operativa/InformacionOperativa.htm`) con 5 pestañas
+(producción/demanda en tiempo real, diaria, acumulada mensual/anual) —
+confirmado que **los datos vienen embebidos como JSON de Plotly
+(`Plotly.newPlot(...)`) directo en el HTML**, sin llamada a API separada,
+extraíble con regex, sin login — pero "Acumulada Anual" solo muestra el
+año en curso, el histórico profundo vive en los datasets CKAN. El
+Boletín/Estadística Mensual de Transacciones Comerciales (costos
+marginales, enero 2019 - junio 2026) está atrapado en un flipbook
+FlipHTML5 de terceros — mismo tipo de fricción que otros embeds JS ya
+documentados, sin archivo estático encontrado.
+
+**ARCONEL/ARCERNNR** — el sitio en vivo sigue en `arconel.gob.ec` y
+sigue branding "Agencia de Regulación y Control de Electricidad";
+`arcernnr.gob.ec` no resuelve — la fusión/renombre a ARCERNNR (Energía y
+Recursos Naturales No Renovables) existe a nivel legal/institucional pero
+el dominio operativo no cambió. **Ya tiene organización CKAN** (slug largo
+`agencia-de-regulacion-y-control-de-energia-y-recursos-naturales-no-
+renovables`, 1 dataset: Balance Nacional de Energía Eléctrica en ODS/XLS/
+CSV, actualizado agosto 2025) — alcanzable ya. Más allá de eso, archivos
+estáticos reales confirmados en el patrón WordPress
+`wp-content/uploads/downloads/YYYY/MM/` ya visto en otros ministerios:
+BNEE mensual en XLS, "Cobertura 2015-2024" en un solo XLSX, anuarios
+estadísticos del sector eléctrico 2011-2025 en PDF (detrás de un
+acordeón por año). El hallazgo más profundo:
+**`reportes.arconel.gob.ec`**, un sistema de reportes parametrizados (por
+parroquia: medidores/facturación/subsidio Tarifa Dignidad; por
+infraestructura: centrales/transformadores/líneas; transacciones: balance
+de energía/pérdidas; indicadores: reclamos/calidad de servicio) con
+**selector de año 1998-2026** — la fuente más profunda y granular
+encontrada en todo el sector, pero es una app ASP.NET WebForms +
+SSRS ReportViewer (`__VIEWSTATE`/`__EVENTVALIDATION`), necesita un flujo
+de scraping por POST de formulario, no un GET simple — sin login, pero
+con fricción técnica real. "Pérdidas de energía eléctrica por
+distribuidora" está en un dashboard Power BI embebido — mismo patrón de
+fricción visto en Contratación Pública/ASOBANCA. `sisdatbi.arconel.gob.ec`
+existe (nombre sugiere otro dashboard BI) — no explorado a fondo, marcar
+para una pasada futura. `arconel.gob.ec/tarifas-del-sector-electrico/`
+dio 403 a un fetch simple pero cargó bien en browser real — probable
+filtro de User-Agent, no un bloqueo real; un scraper necesitaría headers
+realistas.
+
+**Balance Energético Nacional (BEN)** — el antiguo Ministerio de
+Electricidad y Energía Renovable ya no existe como sitio propio
+(`historico.energia.gob.ec` es un remanente archivado, claramente
+etiquetado como histórico); la competencia se fusionó al actual
+Ministerio de Ambiente y Energía
+(`ambienteyenergia.gob.ec`/`recursosyenergia.gob.ec`, ambos activos y
+sirviendo el mismo ministerio fusionado — confirma y extiende el hallazgo
+ya anotado sobre MAATE en la investigación de dominios perdidos). El BEN
+(balance energético nacional, todas las fuentes de energía, no solo
+electricidad) se publica como PDFs directos por capítulo
+(`ambienteyenergia.gob.ec/wp-content/uploads/.../BEN_24-CAPITULO_N.pdf`),
+con archivo histórico desde 2012 — mismo patrón WordPress ya visto en
+otros ministerios, pero en PDF (necesitaría extracción de texto/tablas,
+no CSV/XLSX directo).
+
+**Ranking de qué construir primero en electricidad:** (1) archivos
+estáticos sin fricción — BNEE mensual XLS de ARCONEL, Cobertura XLSX,
+anuarios PDF, más los datasets CKAN de CENACE/ARCONEL que ya son
+alcanzables hoy sin código nuevo; (2) dashboard en tiempo real de CENACE
+(JSON de Plotly embebido, extraíble pero solo año en curso) y
+`reportes.arconel.gob.ec` (1998-2026 de profundidad, pero formulario
+ASP.NET postback, más esfuerzo); (3) boletín de transacciones de CENACE
+(flipbook) y pérdidas de energía (Power BI) — baja prioridad, mismo tipo
+de fricción JS ya visto repetidamente en este proyecto. Ningún bloqueo
+por login/captcha se encontró en todo el sector — toda la fricción es de
+renderizado JS o formularios ASP.NET, no de autenticación.
+
+---
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un
