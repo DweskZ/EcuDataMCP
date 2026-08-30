@@ -5,6 +5,7 @@ from tools.download_anda_microdata import register_download_anda_microdata_tool
 from tools.download_resource import register_download_resource_tool
 from tools.get_anda_survey_info import register_get_anda_survey_info_tool
 from tools.get_auditor_info import register_get_auditor_info_tool
+from tools.get_bce_iem_table import register_get_bce_iem_table_tool
 from tools.get_category_info import register_get_category_info_tool
 from tools.get_compania_info import register_get_compania_info_tool
 from tools.get_contraloria_informe import register_get_contraloria_informe_tool
@@ -33,6 +34,7 @@ from tools.query_resource_data import register_query_resource_data_tool
 from tools.read_pdf import register_read_pdf_tool
 from tools.search_anda import register_search_anda_tool
 from tools.search_auditores import register_search_auditores_tool
+from tools.search_bce_iem import register_search_bce_iem_tool
 from tools.search_biinec_extras import register_search_biinec_extras_tool
 from tools.search_companias import register_search_companias_tool
 from tools.search_contratos import register_search_contratos_tool
@@ -101,6 +103,8 @@ def register_tools(mcp: FastMCP) -> None:
 
     register_search_indicadores_bce_tool(mcp)
     register_get_indicador_bce_tool(mcp)
+    register_search_bce_iem_tool(mcp)
+    register_get_bce_iem_table_tool(mcp)
 
     register_search_companias_tool(mcp)
     register_get_compania_info_tool(mcp)

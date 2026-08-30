@@ -1,0 +1,88 @@
+import logging
+
+from mcp.server.fastmcp import FastMCP
+
+from helpers import bce_iem_client
+from helpers.format_out import render_output
+from helpers.logging import MAIN_LOGGER_NAME, log_tool
+
+logger = logging.getLogger(MAIN_LOGGER_NAME)
+
+
+def register_search_bce_iem_tool(mcp: FastMCP) -> None:
+    @mcp.tool()
+    @log_tool
+    async def search_bce_iem(
+        query: str = "",
+        limit: int = 20,
+        offset: int = 0,
+        historico: bool = False,
+        desde_anio: int = 0,
+        hasta_anio: int = 0,
+        format: str = "text",
+    ) -> str:
+        """Search individual Excel tables in the BCE's latest IEM bulletin.
+
+        Use this for detailed BCE tables not conveniently available through
+        search_indicadores_bce/BCEData: trade by country, debt, public
+        finance by government level, oil, GDP breakdowns, and more. It lists
+        tables from the current monthly bulletin; use get_bce_iem_table with
+        a returned table_id to inspect one official XLSX file. Set
+        historico=true (or provide desde_anio/hasta_anio) to search across
+        all matching monthly bulletin pages; this is slower on the first call
+        because the archive pages must be read.
+        """
+        limit = min(max(limit, 1), 100)
+        offset = max(offset, 0)
+        try:
+            result = await bce_iem_client.search_tables(
+                query,
+                limit,
+                offset,
+                historico,
+                desde_anio,
+                hasta_anio,
+            )
+        except Exception as exc:
+            logger.exception("search_bce_iem failed (query=%r)", query)
+            return render_output({"error": str(exc)}, format)
+
+        def to_text(data: dict) -> str:
+            bulletin = data["boletin"]
+            tables = data["tablas"]
+            parts = [
+                f"BCE IEM — boletín {bulletin['numero']} ({bulletin['titulo']})",
+                f"{data['total']} tabla(s) encontrada(s); mostrando {len(tables)}.",
+                "",
+            ]
+            if data.get("historico"):
+                parts.insert(
+                    1,
+                    f"Búsqueda histórica: {data.get('boletines_consultados', '?')} boletines.",
+                )
+                if data.get("boletines_sin_tablas"):
+                    parts.insert(
+                        2,
+                        f"Boletines omitidos sin XLSX individual: {data['boletines_sin_tablas']}.",
+                    )
+            for index, table in enumerate(tables, 1):
+                parts.extend(
+                    [
+                        f"{index}. {table['titulo']}",
+                        f"   table_id: {table['table_id']}",
+                        (
+                            f"   boletines disponibles: {table['boletines_disponibles']}"
+                            if table.get("boletines_disponibles")
+                            else ""
+                        ),
+                        f"   {table['seccion']}" if table["seccion"] else "",
+                        "",
+                    ]
+                )
+            if not tables:
+                parts.append("Sin resultados.")
+            else:
+                parts.append("Usa get_bce_iem_table(table_id=...) para leer una tabla.")
+            return "\n".join(part for part in parts if part is not None)
+
+        return render_output(result, format, text_builder=to_text)

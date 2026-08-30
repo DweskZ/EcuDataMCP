@@ -63,7 +63,12 @@ _CAPABILITIES = {
             "get_inec_estadistica_files",
             "search_biinec_extras",
         ],
-        "macro": ["search_indicadores_bce", "get_indicador_bce"],
+        "macro": [
+            "search_indicadores_bce",
+            "get_indicador_bce",
+            "search_bce_iem",
+            "get_bce_iem_table",
+        ],
         "companias": [
             "search_companias",
             "get_compania_info",

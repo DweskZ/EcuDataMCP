@@ -112,9 +112,14 @@ def _fuentes_payload() -> dict:
             },
             {
                 "id": "bce",
-                "nombre": "Banco Central del Ecuador (BCEData, catálogo estadístico)",
-                "base": "https://contenido.bce.fin.ec/wp-json/bcedata/v1/",
-                "tools": ["search_indicadores_bce", "get_indicador_bce"],
+                "nombre": "Banco Central del Ecuador (BCEData + Información Estadística Mensual)",
+                "base": "https://contenido.bce.fin.ec/",
+                "tools": [
+                    "search_indicadores_bce",
+                    "get_indicador_bce",
+                    "search_bce_iem",
+                    "get_bce_iem_table",
+                ],
             },
             {
                 "id": "sipa",

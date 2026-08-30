@@ -358,6 +358,8 @@ municipal independiente, 92 datasets) — mismo tool, otro catálogo CKAN.
 |------|-------------|
 | `search_indicadores_bce` | Buscar en el catálogo estadístico del Banco Central del Ecuador (monetario/financiero, finanzas públicas, sector externo, sector real). |
 | `get_indicador_bce` | Serie de tiempo de un indicador por `id_grupo`: período, frecuencia y unidad configurables (defaults según el grupo). |
+| `search_bce_iem` | Buscar tablas XLSX individuales del último boletín Información Estadística Mensual (IEM) del BCE: detalle de deuda, comercio, PIB, petróleo, finanzas públicas y más. `historico=true` o `desde_anio`/`hasta_anio` busca versiones en el archivo mensual. |
+| `get_bce_iem_table` | Leer una tabla XLSX IEM con filtro `desde`/`hasta`; `boletin_numero` permite elegir una versión histórica concreta. Conserva el diseño original cuando no es seguro normalizarlo. |
 
 ### Compañías (Supercías)
 
