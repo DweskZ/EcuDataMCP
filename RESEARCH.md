@@ -2452,12 +2452,48 @@ solo existía como parroquia de Morona (código `140157`), que el
 clasificador oficial ya no lista — retirada correctamente al crear el
 nuevo cantón. Total de cantones pasó de 224 a 225 (222 con provincia
 real + 3 "zona en estudio"), coincidiendo con la cifra pública citada de
-Sevilla Don Bosco como "cantón 222 de Ecuador". Sin resolver: los
-cantones de la provincia especial `90 ZONA EN ESTUDIO` no coinciden
-exactamente entre lo que ya teníamos (`9001`/`9003`/`9004`) y lo que
-dice el clasificador 2026 (`9006`/`9009`) — son zonas en disputa
-territorial cuyo estado cambia con el tiempo; no investigado a fondo
-cuál lista es la vigente hoy.
+Sevilla Don Bosco como "cantón 222 de Ecuador".
+
+**Zona 90 (zonas en disputa territorial), investigado a fondo 2026-08-30 —
+no fue un simple reemplazo de códigos.** La discrepancia inicial
+(`9001`/`9003`/`9004` nuestros vs `9006`/`9009` del clasificador 2026) se
+investigó caso por caso en vez de asumir que "lo oficial reemplaza lo
+nuestro":
+
+- **`9006` Juval** (disputa real Cañar-Chimborazo, con código propio desde
+  un decreto de 2017 según registro oficial): confirmado como zona
+  legítima y activa, con su propia parroquia en el clasificador
+  (`900651`). Agregado a nuestros datos — la única adición real.
+- **`9009` "Morona"** en el clasificador: casi seguro un error de captura
+  de la propia hoja de cálculo oficial — su columna de provincia dice
+  "MORONA SANTIAGO", no "ZONA EN ESTUDIO" (inconsistente con su propio
+  código 90), no tiene ninguna parroquia listada, y "Morona" ya existe
+  como cantón real y consolidado (`1401`) en la misma provincia. No
+  agregado.
+- **`9001` Las Golondrinas**: búsqueda externa confirma que se resolvió a
+  favor de Cotacachi/Imbabura por consulta popular en 2026 — pero el
+  propio clasificador oficial 2026 todavía no le asigna ningún código de
+  parroquia bajo Cotacachi (búsqueda de texto completo por "GOLONDRINA"
+  en las hojas CANTONES y PARROQUIAS del clasificador: cero resultados).
+  La resolución política es más reciente que la publicación estadística
+  formal — no se puede inventar un código que INEC mismo no ha asignado
+  todavía. Dejado sin cambios.
+- **`9003` Manga Del Cura y `9004` El Piedrero**: búsqueda externa confirma
+  que ambas siguen genuinamente en disputa/sin resolver a la fecha
+  (fuentes de 2024: un decreto de 2017 que asignaba El Piedrero a Guayas
+  "quedó en el papel", nunca se implementó). Su ausencia en la hoja
+  CANTONES del clasificador no es evidencia de que se resolvieron —
+  aparentemente nunca recibieron un código formal de cantón como sí lo
+  tuvo Juval (una vía administrativa distinta, no necesariamente ligada
+  al estado de la disputa). Dejadas sin cambios.
+
+Lección: cuando una fuente "oficial" nueva no coincide con un dato
+existente, la corrección correcta no siempre es "usar la fuente nueva" —
+a veces la fuente nueva tiene sus propios errores de captura (Morona) o
+simplemente no cubre casos que la fuente vieja sí cubre por una razón
+administrativa distinta (Manga Del Cura, El Piedrero), o la realidad
+política va más rápido que la codificación estadística formal
+(Las Golondrinas).
 
 ---
 

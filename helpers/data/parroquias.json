@@ -8318,5 +8318,13 @@
     "canton": "El Piedrero",
     "provincia_codigo": "90",
     "provincia": "Zona No Delimitada"
+  },
+  {
+    "codigo": "900651",
+    "nombre": "Juval",
+    "canton_codigo": "9006",
+    "canton": "Juval",
+    "provincia_codigo": "90",
+    "provincia": "Zona No Delimitada"
   }
 ]

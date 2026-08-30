@@ -65,6 +65,21 @@
   official classifier no longer lists. Both corrected, including the
   affected parroquia records. `lookup_ubicacion` now returns the current,
   correct province/cantón assignments for both.
+- **Follow-up on the "zona en disputa" cantones** flagged above but left
+  unresolved: added cantón `9006` Juval (Cañar-Chimborazo, a genuinely
+  active disputed zone with its own official code since a 2017 decree).
+  After individually researching each mismatch, deliberately did *not*
+  touch the other three: the official classifier's `9009` "Morona" row
+  looks like a data-entry error in INEC's own spreadsheet (labeled
+  province "MORONA SANTIAGO" despite its 90 code, no parroquias under it,
+  and "Morona" already exists as a real, separate cantón); Las Golondrinas
+  was resolved to Cantón Cotacachi/Imbabura by a 2026 popular vote, but
+  INEC's own classifier hasn't assigned it a parroquia code yet, so there
+  was nothing correct to substitute; Manga del Cura and El Piedrero remain
+  genuinely disputed/unresolved as of 2024 sources -- their absence from
+  the classifier reflects never having gotten a formal cantón code, not a
+  resolved dispute. A newer "official" source doesn't always mean an
+  existing data point is wrong.
 - **`get_organization`/`get_organization_info` silently truncated large
   organizations' dataset lists.** `organization_show?include_datasets=true`
   caps its own `packages` field at the portal's per-page default —

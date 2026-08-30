@@ -2023,5 +2023,14 @@
     "region": "Sierra",
     "area_km2": 170.1631455813902,
     "poblacion": null
+  },
+  {
+    "codigo": "9006",
+    "nombre": "Juval",
+    "provincia_codigo": "90",
+    "provincia": "Zona No Delimitada",
+    "region": "Sierra",
+    "area_km2": null,
+    "poblacion": null
   }
 ]
