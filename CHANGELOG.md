@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- **`get_organization`/`get_organization_info` silently truncated large
+  organizations' dataset lists.** `organization_show?include_datasets=true`
+  caps its own `packages` field at the portal's per-page default —
+  confirmed live returning only 10 of 94 real datasets for
+  `instituto-nacional-de-estadisticas-y-censos`, with the tool printing a
+  self-contradictory "Total de datasets: 94" next to "Datasets publicados
+  (10)". Now fetches the true package list via
+  `package_search?fq=organization:{id}` instead; verified live returning
+  94/94. Found while investigating a report that ANDA lacked ENEMDU 2025 —
+  see RESEARCH.md § Novena pasada for the full trail (ANDA/CKAN/INEC's own
+  topic page all cap around 2021-2023 for ENEMDU specifically, but INEC is
+  still publishing it monthly via a Noticias post INEC's own site menu
+  never linked — a discovery gap, not a missing source, tracked in
+  ROADMAP.md).
+
 ## 0.8.2 — 2026-08-29
 
 ### Added

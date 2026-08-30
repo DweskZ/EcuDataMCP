@@ -2207,6 +2207,72 @@ uno distinto — falta confirmar).
 
 ---
 
+## Novena pasada — ENEMDU 2024-2026 y bug de paginación en `get_organization`
+
+**Investigado 2026-08-30, pedido de Daniel:** un agente externo usando una
+versión anterior de este servidor reportó que ANDA no tenía todavía la
+ENEMDU anual 2025. Daniel dudó que el archivo hubiera llegado a CKAN;
+verificado en vivo (con VPN a LatAm, ya que `datosabiertos.gob.ec` bloquea
+IPs fuera de la región) que tenía razón, pero el hallazgo real es otro:
+**INEC nunca dejó de publicar ENEMDU — dejó de actualizar la página
+estática de tema que este proyecto scrapea, y ahora solo anuncia los
+boletines nuevos vía su sección de Noticias.**
+
+Verificado en vivo, en orden:
+
+1. **ANDA** (`anda_client.search_catalog(query="ENEMDU")`): la edición más
+   reciente es 2023 (`ECU-INEC-CGTPE-DIES-ENEMDU-2023-v1.3`). Nada de 2024
+   o 2025.
+2. **`ecuadorencifras.gob.ec/empleo-marzo-2018/`** (la página de tema que
+   `search_inec_estadisticas`/`get_inec_estadistica_files` indexa vía el
+   menú del sitio): su propio `<title>` dice "Estadísticas Laborales —
+   abril 2023" y el archivo más nuevo listado es de abril 2023. Confirmado
+   con un fetch independiente de la página (no solo vía nuestro scraper).
+   Existe una segunda entrada del menú, "Trabajo" →
+   `sistema-estadisticas-laborales-empresariales/`, que también cubre
+   ENEMDU pero está más vieja todavía (julio 2022, y es un visualizador
+   interactivo, no una página de archivos).
+3. **CKAN** (`instituto-nacional-de-estadisticas-y-censos`, 94 datasets):
+   buscar "ENEMDU"/"empleo"/"mercado laboral" solo devuelve datasets de
+   2021 o antes. La organización sí tiene actividad reciente real (mayo
+   2026: registros de entradas/salidas internacionales, defunciones,
+   nacidos vivos), pero ninguna en la familia ENEMDU desde 2021 — INEC
+   simplemente no alimenta ese dataset específico a CKAN.
+4. **La sección de Noticias sí tiene el boletín vigente.**
+   `ecuadorencifras.gob.ec/institucional/noticias/` (paginada, ~43 links
+   por página) tiene un comunicado real: "Ecuador registra 86 mil personas
+   menos en situación de desempleo en mayo de 2026 frente a mayo de 2025",
+   que enlaza `documentos/web-inec/EMPLEO/2026/Mayo_2026/
+   202605_MercadoLaboral.pdf` — mismo patrón de ruta
+   (`EMPLEO/{año}/{Mes}_{año}/...`) que los boletines antiguos ya
+   conocidos de la página de tema. El boletín de mayo 2026 es real y
+   descargable; el problema es puramente de descubrimiento, no de que la
+   fuente haya dejado de publicar.
+
+**Implicación para el roadmap:** el patrón "página de tema estática +
+menú del sitio" que `inec_client.py` usa para descubrir contenido puede
+quedar desactualizado por tema sin que el sitio lo señale de ninguna
+forma — la página de Empleo simplemente dejó de recibir enlaces nuevos
+mientras el propio INEC seguía publicando el boletín mensual real, solo
+que anunciado por otro canal. No se auditó si otros de los ~74 temas de
+`search_inec_estadisticas` tienen el mismo problema; sospecha alta dado
+que el mecanismo de publicación (Noticias) es genérico, no específico de
+Empleo.
+
+**Bug real encontrado de pasada:** `helpers/ckan_client.get_organization`
+usaba `organization_show?include_datasets=true`, cuyo campo `packages`
+resultó estar *capado por el tamaño de página por defecto del portal* —
+confirmado en vivo devolviendo solo 10 de 94 datasets reales para
+`instituto-nacional-de-estadisticas-y-censos`, con `get_organization_info`
+mostrando además un "Total de datasets: 94" contradictorio con
+"Datasets publicados (10)" en el mismo texto. Corregido: ahora usa
+`package_search?fq=organization:{id}&rows=1000&sort=metadata_modified
+desc` para el listado real de paquetes, verificado devolviendo 94/94 en
+vivo. Afecta a cualquier organización con más datasets que el tamaño de
+página del portal, no solo a INEC.
+
+---
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

@@ -189,18 +189,40 @@ async def list_organizations(
     )
 
 
+async def _list_organization_packages(
+    org_id: str, source: str, session: httpx.AsyncClient | None
+) -> list[dict[str, Any]]:
+    """Full package list for one organization.
+
+    organization_show's own `packages` field is capped by the portal's
+    per-page default -- confirmed live against a real 94-dataset
+    organization, it silently returned only 10. package_search with an
+    organization filter and an explicit high `rows` returns the true set.
+    """
+    result = await _fetch_json(
+        _ckan_url("package_search", source),
+        params={
+            "fq": f"organization:{org_id}",
+            "rows": 1000,
+            "sort": "metadata_modified desc",
+        },
+        session=session,
+    )
+    return result.get("results", [])
+
+
 async def get_organization(
     org_id: str,
     include_datasets: bool = True,
     source: str = "nacional",
     session: httpx.AsyncClient | None = None,
 ) -> dict[str, Any]:
-    params: dict[str, Any] = {"id": org_id}
-    if include_datasets:
-        params["include_datasets"] = "true"
-    return await _fetch_json(
-        _ckan_url("organization_show", source), params=params, session=session
+    org = await _fetch_json(
+        _ckan_url("organization_show", source), params={"id": org_id}, session=session
     )
+    if include_datasets:
+        org["packages"] = await _list_organization_packages(org_id, source, session)
+    return org
 
 
 async def list_groups(

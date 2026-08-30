@@ -29,6 +29,59 @@ async def test_http_status_error_is_not_wrapped(httpx_mock):
         await ckan_client._fetch_json(url)
 
 
+# -- get_organization (full package list, not organization_show's capped one) -
+
+
+async def test_get_organization_fetches_full_package_list_via_search(httpx_mock):
+    # organization_show's own `packages` field is capped by the portal's
+    # per-page default (confirmed live: 10 of 94 for a real organization) --
+    # this must come from package_search instead, not organization_show.
+    httpx_mock.add_response(
+        url="https://www.datosabiertos.gob.ec/api/3/action/organization_show?id=test-org",
+        json={
+            "success": True,
+            "result": {
+                "name": "test-org",
+                "title": "Test Org",
+                "package_count": 2,
+                "packages": [{"name": "stale-truncated-entry"}],
+            },
+        },
+    )
+    httpx_mock.add_response(
+        url=(
+            "https://www.datosabiertos.gob.ec/api/3/action/package_search"
+            "?fq=organization%3Atest-org&rows=1000&sort=metadata_modified+desc"
+        ),
+        json={
+            "success": True,
+            "result": {
+                "count": 2,
+                "results": [
+                    {"name": "dataset-a", "metadata_modified": "2026-01-01"},
+                    {"name": "dataset-b", "metadata_modified": "2020-01-01"},
+                ],
+            },
+        },
+    )
+
+    org = await ckan_client.get_organization("test-org")
+
+    assert org["package_count"] == 2
+    assert [p["name"] for p in org["packages"]] == ["dataset-a", "dataset-b"]
+
+
+async def test_get_organization_skips_package_search_when_not_requested(httpx_mock):
+    httpx_mock.add_response(
+        url="https://www.datosabiertos.gob.ec/api/3/action/organization_show?id=test-org",
+        json={"success": True, "result": {"name": "test-org", "package_count": 2}},
+    )
+
+    org = await ckan_client.get_organization("test-org", include_datasets=False)
+
+    assert "packages" not in org
+
+
 # -- source routing (nacional vs cuenca) -------------------------------------
 
 
