@@ -2322,6 +2322,49 @@ desc` para el listado real de paquetes, verificado devolviendo 94/94 en
 vivo. Afecta a cualquier organización con más datasets que el tamaño de
 página del portal, no solo a INEC.
 
+**Corrección importante (mismo día, mismo pedido): la conclusión "INEC
+solo anuncia ENEMDU vía Noticias" de arriba estaba mal — Daniel aportó
+URLs reales que la refutaron.** `estadisticas-laborales-enemdu/`,
+`enemdu-trimestral/` y `enemdu-anual/` son páginas reales y vigentes en
+`ecuadorencifras.gob.ec` que **no estaban en la lista de 74 temas** que
+usa `search_inec_estadisticas`, y tienen ENEMDU mensual hasta mayo 2026,
+trimestral hasta 2026-I, y **el anual 2025 completo** (BDD SPSS/CSV,
+boletín técnico, tabulados) — es decir, ENEMDU 2025 sí está publicado en
+el sitio principal de INEC, sin necesidad de Noticias. El motivo de que
+nuestro scraper no las encontrara: **el mega-menú del sitio no es el
+mismo en cada página.** La página `estadisticas-laborales-enemdu/` tiene
+su propio menú de ~109 links (incluye las 3 URLs de arriba más
+`enemdu-telefonica/`, `empleo-y-condicion-de-actividad/`,
+`trabajo-y-empleo/`, `matrices-de-transicion-laboral/`, ninguna
+alcanzable desde la página semilla `indice-de-precios-al-consumidor/`
+que usa `_fetch_topics()`). No hay `sitemap.xml`/`wp-sitemap.xml` en el
+dominio (confirmado, 404 en los tres paths estándar), pero sí existe
+`/wp-json/wp/v2/posts` — la **API REST pública de WordPress**, sin
+autenticación: `X-WP-Total: 1707`, post más nuevo del 2026-08-25,
+soporta `search`/`orderby`/paginación, y el HTML de cada post
+(`content.rendered`) trae los enlaces a archivos directamente —
+confirmado extrayendo 11 archivos reales del post `enemdu-anual-2024`
+consultando solo `GET /wp-json/wp/v2/posts?slug=enemdu-anual-2024`, sin
+tocar ninguna página HTML. `/institucional/noticias/` y
+`/institucional/boletines/` son solo vistas filtradas por categoría de
+esta misma colección de posts — la API es la fuente de verdad real, y
+reemplaza la necesidad de un scraper de Noticias aparte. Ver el ítem
+corregido en ROADMAP.md.
+
+**`censoecuador.gob.ec`** (enlazado por Daniel el mismo día): micrositio
+propio de INEC para el Censo 2022, WordPress, mismo patrón de certificado
+TLS que otros `.gob.ec` (necesita `verify=False`). Su página
+`/data-y-resultados/` devuelve HTTP 404 pero sirve 163 KB de contenido
+real (bug de plugin/tema, no ausencia de contenido) con enlaces reales a
+microdatos censales por sector/cantón/manzana en CSV/SPSS/REDATAM,
+diccionarios de variables, y los censos 2010 y 2001 re-codificados a la
+geografía 2022. Verificado con HEAD sobre 3 archivos de muestra (un XLSX
+y dos ZIP): status 200, content-type correcto en los tres. Todos los
+archivos reales viven en `ecuadorencifras.gob.ec/documentos/web-inec/
+bd-censo/...` — mismo dominio principal, solo una ruta que ningún tema de
+los 74 alcanza. Mucho más completo que el tema "Censo de Población y
+Vivienda" ya indexado (16 archivos, 2024).
+
 ---
 
 ## Notas históricas
