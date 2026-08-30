@@ -34,8 +34,52 @@ Leyenda: `[ ]` sin empezar · `[~]` parcial · `[x]` hecho
 
 ## Nuevas conexiones de datos
 
+### Objetivo prioritario: cobertura completa del BCEData y del IEM
+
+“Completa” aquí significa que el servidor descubre automáticamente todo lo
+que la fuente expone, no que solo conozca los indicadores más conocidos. La
+integración debe poder demostrar qué grupos, series, frecuencias, unidades,
+fechas, boletines y archivos encontró, y cuáles no pudo leer.
+
+- [ ] **BCEData completo — catálogo y series**: cubrir todos los nodos hoja de
+      `/tree`, el metadata de cada `/bundle/{id_grupo}` y todos los valores
+      disponibles en `/grid`; conservar etiquetas, rutas, secciones,
+      frecuencias, unidades, rango de fechas y revisiones. La búsqueda debe
+      encontrar tanto grupos como series internas y la consulta debe permitir
+      seleccionar explícitamente cualquier frecuencia, unidad y período.
+- [~] **BCEData completo — verificación de cobertura**: `audit_bce_catalog`
+      ya consulta el árbol y los metadatos de todos los grupos, y registra
+      cuántos grupos y series fueron descubiertos, qué solicitudes fallaron y
+      cuándo se consultó la API. Pendiente: persistir snapshots y comparar
+      automáticamente grupos nuevos, retirados o modificados. No depender de
+      una lista fija de IDs.
+- [ ] **IEM completo — archivo y archivos fuente**: descubrir todos los
+      boletines desde enero de 1996 hasta el más reciente, reconciliando el
+      índice histórico con “Últimas publicaciones”; catalogar cada XLSX,
+      además del PDF y ZIP completos, con boletín, fecha, sección, título, URL
+      y hash/fecha de consulta.
+- [ ] **IEM completo — lectura de tablas**: hacer buscables los valores de
+      todas las tablas individuales, no solo sus títulos. Añadir lectores para
+      las familias de formatos que difieren del diseño común; conservar también
+      una copia/vista fiel del archivo original cuando no sea seguro
+      normalizarlo. Una vista de las primeras filas cuenta como diagnóstico,
+      no como cobertura completa.
+- [ ] **BCEData ↔ IEM — mapa de equivalencias**: identificar qué tabla IEM
+      duplica una serie BCEData, cuál la amplía y cuál existe solo en una de las
+      dos fuentes. Mantener la definición original, unidad, frecuencia, fecha
+      de corte y notas de revisión para evitar combinar series incompatibles.
+- [ ] **BCE — prueba de completitud y frescura**: ejecutar una comprobación
+      programada que compare el catálogo descubierto con el anterior, confirme
+      que el boletín más reciente está presente y deje visible el último período
+      disponible por fuente. Un fallo de la web no debe borrar la última versión
+      válida.
+
 - [x] SRI — datasets page (`search_sri_datasets`).
-- [x] BCE — indicadores vía BCEData (`search_indicadores_bce`/`get_indicador_bce`).
+- [~] BCE — indicadores vía BCEData (`search_indicadores_bce`/`get_indicador_bce`).
+      La cobertura confirmada es el catálogo BCEData que expone sus cuatro
+      secciones principales (monetaria/financiera, finanzas públicas, sector
+      externo y sector real); no debe describirse como todo el sistema de
+      información del BCE.
 - [~] Supercías — compañías, ranking financiero, auditores. La integración
       funciona, pero el ranking financiero todavía depende de una base SQLite
       local construida manualmente; la portabilidad y actualización automática
@@ -92,8 +136,17 @@ Leyenda: `[ ]` sin empezar · `[~]` parcial · `[x]` hecho
 - [x] Ecuador en Cifras / INEC — `search_inec_estadisticas`/`get_inec_estadistica_files` (~75 temas: boletines + series históricas agregadas) + `search_biinec_extras` (lista curada de los 2-3 registros de BIINEC que sí son exclusivos — desechos peligrosos en salud, módulos ambientales ENEMDU/ECV; no un cliente genérico, ver análisis de costo/beneficio en RESEARCH.md). → RESEARCH.md § Ecuador en Cifras
 - [~] IESS — boletines/auditorías/actuariales scrapeables y confirmados, sin construir tool nuevo. → RESEARCH.md § IESS
 - [~] SENESCYT/Educación Superior — cubierto vía CKAN; registro de títulos bloqueado por captcha (no automatizable). → RESEARCH.md § SENESCYT
-- [~] BCE — Información Estadística Mensual (IEM/IEEM), boletín mensual mucho más rico que BCEData. `search_bce_iem` indexa en vivo las tablas XLSX individuales del boletín vigente y, con `historico=true` o un rango de años, agrupa versiones de la misma tabla en el archivo mensual. `get_bce_iem_table` devuelve series con filtro anual cuando detecta el formato tabular ancho, y reconoce también tablas largas; si no, preserva una vista segura sin inventar columnas. Pendiente: normalizadores dedicados y la comparación explícita con BCEData. **Profundizado 2026-08-29**: cada boletín (archivo completo desde ene-1996) tiene ~60+ XLSX individuales por tabla, no solo el ZIP. → RESEARCH.md § Séptima pasada
+- [~] BCE — Información Estadística Mensual (IEM/IEEM), boletín mensual mucho más rico que BCEData. `search_bce_iem` indexa en vivo las tablas XLSX individuales del boletín vigente y, con `historico=true` o un rango de años, agrupa versiones de la misma tabla en el archivo mensual. `get_bce_iem_table` devuelve series con filtro anual cuando detecta el formato tabular ancho, y reconoce también tablas largas; si no, preserva una vista segura sin inventar columnas. **Auditoría 2026-08-29**: la lógica cubre correctamente las páginas y tablas que encuentra, pero el índice maestro visible del BCE llega al IEM 2092 (junio 2026), mientras que el IEM 2093 (julio 2026) ya existe en una página de índice enlazada desde “Últimas publicaciones”; hay que hacer el descubrimiento resistente a índices atrasados. Pendiente: normalizadores dedicados, comparación explícita con BCEData y catálogo histórico completo. **Profundizado 2026-08-29**: cada boletín (archivo completo desde ene-1996) tiene ~60+ XLSX individuales por tabla, no solo el ZIP. → RESEARCH.md § Séptima pasada
+- [ ] BCE — **BCEData: auditoría viva de cobertura y metadatos**: comparar periódicamente `/tree`, cada `/bundle/{id_grupo}` y las series devueltas por `/grid` con el catálogo visible del BCE; detectar grupos nuevos, grupos retirados, cambios de nombre, rangos de fechas, frecuencias y unidades. Mantener la búsqueda por etiquetas de series y documentar que esta API pública no está formalmente documentada por el BCE.
+- [ ] BCE — **IEM: descubrimiento y catálogo histórico resistente**: no depender únicamente de `IndiceIEM.html`; reconciliarlo con “Últimas publicaciones”, detectar boletines nuevos no listados, comprobar que cada boletín tenga sus XLSX individuales, registrar boletines faltantes y añadir normalizadores para las familias de tablas de mayor valor. No presentar el IEM más reciente encontrado como “actual” sin informar su fecha de corte.
 - [ ] BCE — **búsqueda ampliada y mapa completo de fuentes**: revisar más allá de BCEData e IEM el sitio institucional, publicaciones temáticas, catálogos, archivos históricos y descargas por sector. Inventariar cada fuente, su cobertura, frecuencia, formato, API/archivo y traslape con lo ya integrado; priorizar únicamente tablas que añadan detalle ecuatoriano verificable, no duplicados de una misma serie. El resultado debe ser un mapa de cobertura y una lista corta de integraciones justificadas.
+- [ ] BCE — **Remesas de trabajadores**: investigar e integrar el portal específico con resultados agregados, serie histórica y bases mensuales, incluida la desagregación por entidad disponible desde julio de 2025. Mantener separadas las series anteriores y posteriores al cambio metodológico y conservar las notas de comparabilidad. → https://contenido.bce.fin.ec/series-de-datos-remesas-de-trabajadores/
+- [ ] BCE — **medios y sistemas de pago**: integrar, si el acceso automatizable se confirma, SPI, SCI, SPL, cámara de cheques y recaudación de recursos públicos, con montos, número de operaciones, frecuencia, historia y unidad. Es una colección separada de BCEData/IEM y no debe confundirse con “pagos” en otras instituciones. → https://contenido.bce.fin.ec/estadisticas-del-sector-medios-y-sistemas-de-pagos/
+- [ ] BCE — **Cuentas Nacionales completas**: investigar los paquetes anual, trimestral y regional, retropolación, Tabla Oferta-Utilización, Cuadro Económico Integrado y Matriz de Empleo e Ingresos. IEM/BCEData pueden contener partes, pero la integración debe conservar la metodología de base móvil, revisiones, frecuencia y carácter provisional/definitivo. → https://contenido.bce.fin.ec/estadisticas-de-cuentas-nacionales/
+- [ ] BCE — **EMOE y coyuntura**: investigar el Estudio Mensual de Opinión Empresarial, metodologías, expectativas económicas, confianza del consumidor, ciclo económico, inflación, mercado laboral, pobreza/desigualdad y crédito. Reutilizar BCEData/IEM cuando ya sean la misma serie; añadir solo archivos, cortes o metadatos que falten. → https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Indicador_coy.html
+- [ ] BCE — **paquetes sectoriales**: auditar por separado petróleo, minería, cemento, agricultura y compra/venta de divisas. Para cada uno, decidir si basta BCEData/IEM o si hace falta un cliente de publicaciones/archivos; conservar frecuencia, fecha de corte y revisión. → https://contenido.bce.fin.ec/ultimas-publicaciones/
+- [ ] BCE — **índices de precios de comercio exterior**: verificar si las series IPX/IPM/ITI que aparecen en BCEData tienen la misma cobertura que la página dedicada; integrar la metodología, series históricas y archivos de exportación/importación solo si aportan detalle adicional. → https://contenido.bce.fin.ec/estadisticas-de-indice-de-precios-de-comercio-exterior/
+- [ ] BCE — **catálogo de publicaciones, calendario y archivo histórico**: añadir búsqueda de “Últimas publicaciones”, Cifras Económicas del Ecuador, boletines monetarios/financieros, informes y metodologías, con fecha de publicación, período cubierto, formato y URL. Esto complementa las series de BCEData y las tablas IEM. → https://contenido.bce.fin.ec/ultimas-publicaciones/
 - [x] SIPA (Ministerio de Agricultura) — `list_sipa_modulos`/`get_sipa_modulo_archivos`, 30 archivos Excel reales en 4 módulos (económico/productivo/social/censos), verificado en vivo. → RESEARCH.md § Sitios de ministerios individuales
 - [x] Contraloría General del Estado — `list_contraloria_informes`/`get_contraloria_informe`, CSV trimestrales reales de informes de auditoría aprobados a cualquier institución pública, verificado en vivo. De paso corrigió un bug real en el sniffing de delimitador CSV compartido (`helpers/csv_reader.py`). → RESEARCH.md § Sitios de ministerios individuales
 - [ ] Contraloría — "Plan anual de control", mismo patrón `WFDescarga.aspx` ya implementado en `helpers/contraloria_client.py` (solo cambia `tipo`) — esfuerzo casi nulo, se puede sumar al cliente ya existente. → RESEARCH.md § Séptima pasada
