@@ -5,7 +5,7 @@ from helpers.logging import log_tool
 
 _CAPABILITIES = {
     "name": "Ecuador MCP",
-    "version": "0.8.1",
+    "version": "0.8.2",
     "fuentes": [
         "CKAN datos abiertos (nacional, www.datosabiertos.gob.ec)",
         (

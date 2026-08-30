@@ -119,10 +119,15 @@ async def _fetch_tree() -> list[dict[str, Any]]:
 def _index_tree(tree: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Flatten the tree to its leaf groups, each tagged with its section/subsection.
 
-    The tree is a flat list ordered depth-first, with `num_nivel` (1/2/3)
-    the only signal of hierarchy -- there are no parent pointers. Walking
-    it in order and remembering the last-seen nivel-1/nivel-2 labels
-    reconstructs the breadcrumb each leaf belongs to.
+    The tree is a flat list ordered depth-first, with `num_nivel` the only
+    signal of hierarchy -- there are no parent pointers. Most leaves sit at
+    nivel 3, but a handful (verified live: 10 of the 78 groups) sit directly
+    at nivel 2 with no nivel-3 sub-branch, and a couple sit one level deeper
+    at nivel 4 (e.g. group 96/99 under "4.1.2 Exportaciones de petróleo
+    crudo..."). `id_grupo` presence, not a fixed nivel, is what makes a node
+    a leaf here -- walking in order and remembering the last-seen
+    nivel-1/nivel-2 labels reconstructs the breadcrumb each leaf belongs to
+    regardless of which nivel it's actually at.
     """
     section = ""
     subsection = ""

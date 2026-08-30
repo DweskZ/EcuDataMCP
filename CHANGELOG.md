@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.8.2 — 2026-08-29
 
 ### Added
 
@@ -20,6 +20,21 @@
   `contraloria.gob.ec/Portal/24287` (id/tipo pairs aren't hardcoded — a new
   quarter is published roughly every 3 months). Reuses
   `helpers/csv_reader.preview_csv` for the actual download+parse.
+- **BCE IEM (Información Estadística Mensual) integration** —
+  `search_bce_iem`/`get_bce_iem_table` (`helpers/bce_iem_client.py`). Indexes
+  the BCE's monthly bulletin live: current-bulletin table search, plus
+  `historico=true`/`desde_anio`/`hasta_anio` to merge table versions across
+  bulletins. `get_bce_iem_table` returns structured, date-filterable series
+  for the common wide (periods-across-columns) and long (one-row-per-period)
+  table layouts, falling back to a layout-preserving raw preview otherwise
+  rather than guessing columns.
+- **`audit_bce_catalog`** (`helpers/bce_client.py`, `tools/audit_bce_catalog.py`)
+  — reports live coverage of the BCEData catalog: tree nodes, leaf groups,
+  per-group bundle fetch success/failure, series discovered per section.
+  Verified live: 78/78 leaf groups fetch successfully today (2,360 series
+  across the 4 BCEData sections) — see the caveat in ROADMAP.md that this
+  covers BCEData's own catalog, not the Central Bank's full publication set
+  (IEM alone is documented as richer than all of BCEData combined).
 
 ### Fixed
 
@@ -34,6 +49,25 @@
   not raw counts), falling back to counting within just the header line
   when Sniffer can't decide. Affects `preview_csv`/`preview_resource_data`
   generally, not just Contraloría.
+- **26 correctness bugs from an adversarial review of the BCE IEM/audit
+  work above and a full-repo pass**, including: a global lock that
+  serialized "concurrent" IEM bulletin downloads; an unbounded
+  `historico=true` fetch with no year range; audit-only metadata leaking
+  into `search_indicadores` results; a wide-format table raising instead
+  of falling back on a date-range miss; a unit-header misclassification
+  when a series has no data in the requested range; case-sensitive
+  `frecuencia`/`unidad` matching; a case-sensitive Bearer-auth scheme
+  check; unescaped CSV headers interpolated into `CREATE TABLE` DDL in the
+  Supercías financials build script; the 20MB gzip-decompression cap only
+  being checked between chunks instead of within one `zlib` call;
+  `search_ranking` having no descending-sort option; short (<2 char)
+  queries silently bypassing filtering in `search_anda`/`search_tramites`;
+  unclamped `page_size`/`limit` in `search_datasets`/`search_anda`; and
+  several smaller issues (see git log for the full list). Full test suite
+  (276 tests) and lint pass.
+- **`bce_iem_client` tests rewritten to mock via `pytest-httpx`** instead of
+  monkeypatching `download_bytes` directly, matching every other client's
+  test convention.
 
 ## 0.8.1 — 2026-08-29
 
