@@ -245,16 +245,36 @@ uv run main.py
 
 | Variable | Descripción | Default |
 |----------|-------------|---------|
-| `MCP_HOST` | Dirección de bind | `0.0.0.0` |
+| `MCP_HOST` | Dirección de bind | `127.0.0.1` |
 | `MCP_PORT` | Puerto del servidor | `8000` |
 | `MCP_TRANSPORT` | Transporte: `http` o `stdio` | `http` |
 | `LOG_LEVEL` | Nivel de log (DEBUG, INFO, WARNING, ERROR) | `INFO` |
+| `MCP_AUTH_TOKEN` | Token Bearer opcional requerido por `/mcp` | vacío |
+| `MCP_MAX_CONCURRENT_REQUESTS` | Máximo de solicitudes MCP simultáneas | `8` |
 | `CKAN_INSECURE_TLS` | Reintento TLS inseguro solo para el portal de datos (`1`/`0`); poner en `1` solo si el certificado del portal vuelve a fallar | `0` |
 
 Stdio local:
 
 ```bash
 uv run python main.py --transport stdio
+```
+
+**Seguridad del endpoint HTTP:** las instalaciones manuales escuchan solo en
+`127.0.0.1` por defecto. Si lo expones en otra interfaz, define
+`MCP_AUTH_TOKEN` y conserva el límite de concurrencia. Docker usa
+`0.0.0.0` dentro del contenedor para permitir el mapeo de puertos; el token se
+puede pasar con `MCP_AUTH_TOKEN=... docker compose up -d`.
+
+Si pytest falla con `PermissionError` al crear `pytest-of-...` en Windows, es
+un problema de permisos del directorio temporal del usuario, no de los tests.
+Cierra procesos que estén usando esa carpeta o ejecuta pytest con una carpeta
+temporal nueva y escribible, por ejemplo:
+
+```powershell
+$env:TEMP = "$PWD\\.pytest-temp"
+$env:TMP = $env:TEMP
+New-Item -ItemType Directory -Force $env:TEMP
+.\\.venv\\Scripts\\python.exe -m pytest -q
 ```
 
 **Opcional — datos financieros de Supercías** (`search_ranking`/`get_financials`):
@@ -407,6 +427,10 @@ Plantillas listas para el cliente (Claude/Cursor): `explorar_datos`, `explorar_t
 |----------|-------------|
 | `POST /mcp` | Mensajes JSON-RPC (cliente → servidor) |
 | `GET /health` | Health check: `{"status":"ok","uptime_since":"...","version":"..."}` |
+
+Cuando `MCP_AUTH_TOKEN` está definido, `POST /mcp` y las demás operaciones MCP
+requieren el encabezado `Authorization: Bearer <token>`. `/health` permanece
+sin autenticación para que Docker pueda comprobar el servicio.
 
 ---
 

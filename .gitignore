@@ -12,6 +12,7 @@ venv/
 env/
 .ruff_cache/
 .pytest_cache/
+.pytest-temp/
 .mypy_cache/
 *.lock
 # uv.lock pins the exact dependency graph CI/Docker build against; without

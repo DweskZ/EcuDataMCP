@@ -50,7 +50,9 @@ def get_base_url(api_name: str) -> str:
 
 
 def get_mcp_host() -> str:
-    return os.getenv("MCP_HOST", "0.0.0.0")
+    # Local installs should not expose the server to the whole network by
+    # default. Docker Compose explicitly overrides this to 0.0.0.0.
+    return os.getenv("MCP_HOST", "127.0.0.1")
 
 
 def get_mcp_port() -> int:
@@ -65,3 +67,16 @@ def get_transport() -> str:
     """Return 'stdio' or 'http'. Env MCP_TRANSPORT overrides default http."""
     raw = os.getenv("MCP_TRANSPORT", "http").strip().lower()
     return "stdio" if raw == "stdio" else "http"
+
+
+def get_mcp_auth_token() -> str | None:
+    token = os.getenv("MCP_AUTH_TOKEN", "").strip()
+    return token or None
+
+
+def get_mcp_max_concurrent_requests() -> int:
+    raw = os.getenv("MCP_MAX_CONCURRENT_REQUESTS", "8")
+    try:
+        return min(256, max(1, int(raw)))
+    except ValueError:
+        return 8

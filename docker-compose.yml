@@ -7,6 +7,8 @@ services:
       - MCP_HOST=0.0.0.0
       - MCP_PORT=${MCP_PORT:-8000}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - MCP_AUTH_TOKEN=${MCP_AUTH_TOKEN:-}
+      - MCP_MAX_CONCURRENT_REQUESTS=${MCP_MAX_CONCURRENT_REQUESTS:-8}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:${MCP_PORT:-8000}/health')"]

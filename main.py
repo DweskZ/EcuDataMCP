@@ -8,7 +8,14 @@ from datetime import UTC, datetime
 import uvicorn
 from mcp.server.fastmcp import FastMCP
 
-from helpers.env_config import get_mcp_host, get_mcp_port, get_transport
+from helpers.env_config import (
+    get_mcp_auth_token,
+    get_mcp_host,
+    get_mcp_max_concurrent_requests,
+    get_mcp_port,
+    get_transport,
+)
+from helpers.http_security import with_http_security
 from helpers.logging import MAIN_LOGGER_NAME, UVICORN_LOGGING_CONFIG, setup_logging
 from prompts import register_prompts
 from resources import register_resources
@@ -62,7 +69,13 @@ def with_health_endpoint(
     return app
 
 
-asgi_app = with_health_endpoint(mcp.streamable_http_app())
+asgi_app = with_health_endpoint(
+    with_http_security(
+        mcp.streamable_http_app(),
+        auth_token=get_mcp_auth_token(),
+        max_concurrent_requests=get_mcp_max_concurrent_requests(),
+    )
+)
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -93,6 +106,17 @@ def main(argv: list[str] | None = None) -> None:
     logger.info(
         "Starting Ecuador MCP server v%s on %s:%d",
         VERSION, host, port,
+    )
+    if get_mcp_auth_token():
+        logger.info("MCP HTTP authentication: Bearer token enabled")
+    elif host not in {"127.0.0.1", "localhost", "::1"}:
+        logger.warning(
+            "MCP HTTP endpoint is externally bound without MCP_AUTH_TOKEN; "
+            "set a token before exposing it beyond a trusted network"
+        )
+    logger.info(
+        "MCP HTTP concurrency limit: %d",
+        get_mcp_max_concurrent_requests(),
     )
     logger.info("CKAN API: www.datosabiertos.gob.ec")
     logger.info("GobEC API: gob.ec/api/v1")
