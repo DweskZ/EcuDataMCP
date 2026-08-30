@@ -2254,10 +2254,61 @@ menú del sitio" que `inec_client.py` usa para descubrir contenido puede
 quedar desactualizado por tema sin que el sitio lo señale de ninguna
 forma — la página de Empleo simplemente dejó de recibir enlaces nuevos
 mientras el propio INEC seguía publicando el boletín mensual real, solo
-que anunciado por otro canal. No se auditó si otros de los ~74 temas de
-`search_inec_estadisticas` tienen el mismo problema; sospecha alta dado
-que el mecanismo de publicación (Noticias) es genérico, no específico de
-Empleo.
+que anunciado por otro canal.
+
+**Auditadas las 74 páginas de tema completas (pedido explícito de Daniel:
+"ayúdame a completar los scrapes del INEC"), no solo Empleo.** Script
+puntual: para cada tema, `get_topic_files` + año más reciente mencionado
+en cualquier label/URL de archivo. Resultado:
+
+- **26 de 74 temas devuelven 0 archivos.** Leyendo el HTML crudo de varios
+  (Estadísticas Macroeconómicas, Cuentas económicas, Comercio
+  internacional y balanza de pagos, Finanzas públicas/fiscales, Precios,
+  Estadísticas sectoriales, Estadísticas de las empresas, Ambiente y
+  Agropecuario, Ciencia tecnología e innovación, Sociedad de la
+  información - TIC, Eventos extremos y desastres, Anuarios Estadísticos,
+  Censo Nacional Económico, Censo Nacional Agropecuario, Trabajo,
+  Requerimiento de Información, entre otros): son páginas "hub" que
+  **repiten exactamente el mismo menú de ~100 links del sitio entero**, sin
+  ningún archivo propio — no es un fallo de nuestro regex, la página en sí
+  no tiene contenido descargable. Cada una de estas categorías del menú
+  superior parece ser solo un contenedor visual para sus subtemas reales
+  (ej. "Precios" no tiene archivos propios, pero "Índice de Precios al
+  Consumidor" — un tema separado en la misma lista — sí tiene 17 archivos
+  actualizados a 2026).
+- **De los 48 temas restantes que sí tienen archivos**, la mayoría está
+  razonablemente al día (IPC/INPP/Precios de la Construcción: 2026;
+  Ingresos y Gastos, ESPAC, Edificaciones, Entradas y Salidas
+  Internacionales: 2025), pero varios llevan años sin tocarse mientras el
+  sitio sigue vivo en general: Alquileres (2013), Educación y
+  Asentamientos humanos y vivienda (2017), Protección social (2018),
+  Trabajo Infantil/Encuesta Multipropósito/Uso del Tiempo/Violencia de
+  Género/ACTI/Índice de Industria Manufacturera/Comercio
+  Interno/Manufactura y Minería/Hoteles-Restaurantes-Servicios (todos
+  2020), Empleo (2023, ver arriba).
+- **`/institucional/noticias/` sí tiene boletines reales y recientes**
+  fuera del caso de Empleo: inflación (IPC) de julio 2026, Índice Nacional
+  de Precios Productor de julio 2026, resultados de la ENIGHUR 2024-2025,
+  todos con PDF/XLSX adjuntos bajo el mismo patrón de ruta
+  `documentos/web-inec/{TEMA}/{año}/{Mes}_{año}/...`. Confirma que el
+  mecanismo de publicación real de INEC hoy es Noticias, no las páginas de
+  tema — el gap de Empleo no es un caso aislado, es el mismo patrón que
+  aplica (en menor o mayor grado) a buena parte del sitio.
+- **Descartado un atajo:** existe también `/institucional/boletines/`,
+  que suena como el índice general que necesitábamos, pero resultó ser
+  exclusivamente la campaña de prensa del Censo de Población y Vivienda
+  2022 (comunicados de socialización por provincia) — no sirve como fuente
+  genérica de boletines mensuales.
+- **Hipótesis sin confirmar sobre las 4 categorías "macro" vacías**
+  (Estadísticas Macroeconómicas, Cuentas económicas, Comercio
+  internacional y balanza de pagos, Finanzas públicas/fiscales): a
+  diferencia de Empleo/Precios (que sí tienen contenido real, solo mal
+  enlazado), estas 4 podrían estar vacías *por diseño* — Cuentas
+  Nacionales y Balanza de Pagos son responsabilidad del BCE en el sistema
+  estadístico ecuatoriano (ya cubierto por `search_indicadores_bce`/IEM en
+  este mismo proyecto), así que es plausible que INEC nunca haya publicado
+  nada propio ahí. No confirmado contra Noticias todavía — pendiente antes
+  de asumir que es el mismo bug que Empleo.
 
 **Bug real encontrado de pasada:** `helpers/ckan_client.get_organization`
 usaba `organization_show?include_datasets=true`, cuyo campo `packages`
