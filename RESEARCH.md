@@ -2784,6 +2784,48 @@ inspecciones laborales). **Conclusión: no queda ningún dashboard o
 sección de datos sin explorar en `sut.trabajo.gob.ec`** más allá de los
 8 ya catalogados en `helpers/sut_powerbi_client.py`.
 
+### Superbancos — los 3 widgets OneDrive de `servicios_financieros`
+
+**2026-08-31.** El tercer widget de la página (sin encabezado identificable
+en la primera pasada) resultó tener uno real, "Estadísticas Generales" —
+solo hacía falta ampliar la ventana de búsqueda hacia atrás de 3000 a
+5000 caracteres. Su árbol es mucho más profundo que el de boletines: 9
+categorías numeradas (A06 Servicios Financieros Reportados, A09
+Adquirencia, A10 Avances en Efectivo, A12 Tarjetas, A13 POS, C71 Puntos
+de Atención, Gestión de Cobranzas, Recaudación de Pagos a Terceros,
+Retiros de Dinero), cada una con su propia carpeta "Otros Años" y, en
+algunos casos, sub-subcarpetas por año o por tipo de canal (ej. "Puntos
+de Atención" → "Otros Años" → Cajeros/Corresponsales/Oficinas). Es la
+consolidación real "Estadísticas Puntos de Atención" que la página ya
+mencionaba en su nota de mayo 2021.
+
+Confirmado en vivo (no asumido): la llamada raíz del widget devuelve el
+**árbol completo** con punteros a padre en una sola respuesta, no solo
+los hijos inmediatos — se pudo construir el breadcrumb completo de cada
+carpeta sin llamadas adicionales, solo con el campo `parent` de cada
+nodo. El costo real está en listar los ARCHIVOS de cada carpeta, no en
+descubrir la estructura: ~40 llamadas HTTP para los 3 widgets combinados
+(ejecutadas en paralelo con `asyncio.gather`, no en serie).
+
+**Bug real encontrado por discrepancia entre "archivos esperados" y
+"archivos devueltos", no por un error explícito:** el primer intento
+devolvió 111 archivos pero registró 172 advertencias de "no matcheó el
+patrón esperado" — una proporción demasiado alta para ignorar. La causa:
+el enlace que el parser usaba (`entry_link entry_action_download`) solo
+existe con esa clase exacta para archivos que OneDrive NO puede
+previsualizar (los ZIP de boletines). Para tipos previsualizables —la
+mayoría de archivos en `servicios_financieros` son XLSX— esa misma
+posición usa `entry_link ilightbox-group` en su lugar. La solución no fue
+añadir una segunda variante de clase al regex, sino cambiar de ancla por
+completo: cada entrada de archivo también tiene un botón de descarga
+dedicado (`class='entry_action_download '`, sin el prefijo "entry_link"),
+presente y con la misma forma para cualquier tipo de archivo, con su
+propio atributo `download='...'` dando el nombre con extensión
+directamente — más simple y más robusto que perseguir cada variante de
+clase que OneDrive pueda usar. Total final: 312 archivos en
+`servicios_financieros` (frente a 111 con el bug, y ~68 solo con las
+tablas estáticas antes de conectar OneDrive). → ROADMAP.md
+
 ### MIES/Ministerio de Desarrollo Humano, portal `infoMIES`
 
 **Investigado 2026-08-30, pedido explícito de Daniel** después de haber

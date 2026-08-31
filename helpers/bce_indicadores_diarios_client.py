@@ -19,6 +19,14 @@ Each JSON file is a flat array of rows shaped like:
     {"Indicador": "Riesgo País", "Código Variable Dinámica": "val_ind_0003",
      "Fecha": "2026-08-28", "Carga": "2026-08-29", "Periodicidad": "D",
      "Valor": "438", "Medida": "Puntos Básicos", "Segmento": "..."}
+...except datos_ipc.json (Inflación), which has no "Valor" field at all --
+just three parallel series "Mensual"/"Anual"/"Acumulada" (confirmed
+against the indicator's own widget, which charts all three, not one
+"the" value). get_indicador_diario handles both shapes: one value field
+comes back as {"fecha", "valor"}; anything else comes back as
+{"fecha", "valores": {...}} with every non-metadata field included,
+rather than assuming "Valor" and silently returning None where it
+doesn't exist.
 
 "Código Variable Dinámica" is only unique WITHIN one file, not across
 files (val_ind_0001 means "Precio Petróleo (WTI)" in datos_diarios.json
@@ -74,6 +82,34 @@ _ARCHIVOS: list[str] = [
 _ARCHIVOS_SET = set(_ARCHIVOS)
 
 _MAX_VENTANA = 366  # a year of daily data -- keeps responses agent-sized
+
+# Every non-value field seen across all 9 files -- used to find the actual
+# value column(s) generically instead of assuming every file uses "Valor".
+# datos_ipc.json (Inflación) doesn't: it has no "Valor" at all, only three
+# parallel series "Mensual"/"Anual"/"Acumulada" (confirmed against the
+# indicator's own widget JS, which charts all three as separate lines --
+# there's no single "the" value to pick). Blindly reading row["Valor"]
+# there silently returned None for every single observation; caught by
+# checking this file's actual field set instead of trusting the 8-file
+# pattern to hold universally.
+_METADATA_FIELDS = {
+    "Indicador",
+    "Código Variable Dinámica",
+    "Fecha",
+    "Carga",
+    "Periodicidad",
+    "Medida",
+    "Segmento",
+    "Estado",
+    "Sector",
+}
+
+
+def _datapoint(row: dict[str, Any]) -> dict[str, Any]:
+    valores = {k: v for k, v in row.items() if k not in _METADATA_FIELDS}
+    if list(valores.keys()) == ["Valor"]:
+        return {"fecha": row["Fecha"], "valor": valores["Valor"]}
+    return {"fecha": row["Fecha"], "valores": valores}
 
 # Files change at most once a day (some less often); cache accordingly.
 _files_cache = TtlCache(ttl_seconds=21600.0, max_entries=len(_ARCHIVOS))
@@ -193,5 +229,5 @@ async def get_indicador_diario(
         "periodicidad": first.get("Periodicidad"),
         "unidad": first.get("Medida"),
         "rango_completo": {"desde": first["Fecha"], "hasta": last["Fecha"], "n_datos": len(matching)},
-        "datos": [{"fecha": r["Fecha"], "valor": r.get("Valor")} for r in ventana],
+        "datos": [_datapoint(r) for r in ventana],
     }

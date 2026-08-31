@@ -22,7 +22,16 @@
   original investigation. `get_indicador_diario` never returns a full
   series (Riesgo País alone is 7,369+ rows) — only a bounded window
   (most recent N or an explicit date range, capped at 366) plus the
-  series' true full range as metadata.
+  series' true full range as metadata. One file (`datos_ipc.json`,
+  Inflación) doesn't have a "Valor" field at all -- three parallel series
+  ("Mensual"/"Anual"/"Acumulada" instead, confirmed against the
+  indicator's own widget, which charts all three) -- caught before this
+  shipped by re-inspecting every file's actual fields rather than
+  trusting the 8-file pattern to hold universally; a naive `row["Valor"]`
+  would have silently returned `None` for every inflation observation.
+  `get_indicador_diario` now returns `{"fecha", "valor"}` for the common
+  single-value case and `{"fecha", "valores": {...}}` when a file has no
+  single value field.
 - **`list_sut_indicadores`/`get_sut_indicador_schema`/`query_sut_indicador`** —
   Ministerio del Trabajo/SUT's public Power BI "Indicadores" dashboards
   (`helpers/sut_powerbi_client.py`). These are live semantic models, not
@@ -77,10 +86,24 @@
   stable same-site proxy, not short-lived Graph tokens as first assumed.
   `boletines_financieros` now returns 224 archivos, 1997-2026, merging the
   static "OTROS AÑOS" table with every OneDrive year folder found live.
-  `servicios_financieros` was NOT extended the same way — that page embeds
-  three separate OneDrive widgets with distinct tokens, and mapping each to
-  its section needs a closer look before wiring it up; it still returns
-  only its static archive tables (through ~2021), documented as a known gap.
+  `servicios_financieros`'s three OneDrive widgets (distinct token each)
+  are now wired up too: a generalized crawler (`_wpcp_crawl_tree`) walks a
+  tree of arbitrary depth instead of assuming boletines' flat "Año NNNN"
+  folders — the root call returns the whole tree with parent pointers in
+  one response, confirmed live, so no extra round trip is needed to learn
+  the structure, only to list each folder's files (~40 requests total,
+  run concurrently). One widget turned out to be the "Estadísticas
+  Generales" consolidation (9 categories organized by year); another is
+  "Resoluciones de Servicios Financieros, Tarjetas y Canales", closing a
+  long-standing roadmap item ("Resoluciones y Circulares, AJAX-blocked").
+  Along the way, a regex anchored to one file-preview-link class variant
+  was silently dropping ~35% of real entries (most of this section's
+  files are XLSX, previewable, and use a different class than the ZIPs
+  boletines is mostly made of) — caught by the warning-to-result ratio
+  looking wrong, not by an exception. Fixed by targeting a different,
+  type-invariant anchor (the dedicated download button) instead of
+  chasing every preview-class variant. `servicios_financieros` now
+  returns 312 archivos, up from ~68 static-only.
 - **`list_zip_contents`** — lists a .zip archive's members (name, size,
   compression) from a direct URL via HTTP Range requests, without
   downloading the archive. Reads only the End Of Central Directory record

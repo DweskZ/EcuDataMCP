@@ -107,6 +107,45 @@ async def test_get_indicador_diario_filters_by_date_range(httpx_mock):
 
 
 @pytest.mark.asyncio
+async def test_get_indicador_diario_handles_files_with_no_valor_field(httpx_mock):
+    # datos_ipc.json (Inflación) has no "Valor" field at all -- three
+    # parallel series "Mensual"/"Anual"/"Acumulada" instead, confirmed
+    # against the indicator's own widget JS (charts all three, not one).
+    # Blindly reading row["Valor"] here silently returned None for every
+    # observation until this was caught by inspecting the real file.
+    ipc_url = f"{bce._BASE}/datos_ipc.json"
+    ipc_json = {
+        "view_ind_ipc": [
+            {
+                "Indicador": "Inflación",
+                "Código Variable Dinámica": "val_var5",
+                "Fecha": "2026-07-01",
+                "Carga": "2026-08-01",
+                "Periodicidad": "M",
+                "Mensual": -0.09,
+                "Anual": 1.39,
+                "Acumulada": 1.3,
+                "Medida": "Porcentaje",
+                "Segmento": "Inflación",
+            }
+        ]
+    }
+    httpx_mock.add_response(url=ipc_url, json=ipc_json)
+
+    result = await bce.get_indicador_diario("datos_ipc.json", "val_var5")
+
+    assert result["datos"] == [
+        {"fecha": "2026-07-01", "valores": {"Mensual": -0.09, "Anual": 1.39, "Acumulada": 1.3}}
+    ]
+    # And the common case is untouched: a single "Valor" field still comes
+    # back as the simple {"fecha", "valor"} shape, not a "valores" dict.
+    assert bce._datapoint(_FORMULARIO_JSON["view_ind_formulario"][0]) == {
+        "fecha": "2026-08-26",
+        "valor": "419",
+    }
+
+
+@pytest.mark.asyncio
 async def test_get_indicador_diario_caps_window_at_max(httpx_mock):
     rows = [
         {

@@ -29,6 +29,10 @@ def register_get_bce_indicador_diario_tool(mcp: FastMCP) -> None:
         within the range if it's larger). The response always includes
         rango_completo (the series' true full date range and row count)
         so the window returned is never mistaken for the whole series.
+        Each point in "datos" has "valor" (one number) for almost every
+        indicator, except Inflación (datos_ipc.json), which has no single
+        value — its points carry "valores": {"Mensual":..., "Anual":...,
+        "Acumulada":...} instead.
 
         Args:
             archivo: A file name from list_bce_indicadores_diarios.
@@ -63,7 +67,11 @@ def register_get_bce_indicador_diario_tool(mcp: FastMCP) -> None:
                 return "\n".join(parts)
             parts.append(f"Ventana devuelta ({len(datos)} dato(s)):")
             for d in datos:
-                parts.append(f"  {d['fecha']}: {d['valor']}")
+                if "valor" in d:
+                    parts.append(f"  {d['fecha']}: {d['valor']}")
+                else:
+                    valores = ", ".join(f"{k}={v}" for k, v in d["valores"].items())
+                    parts.append(f"  {d['fecha']}: {valores}")
             return "\n".join(parts)
 
         return render_output(result, format, text_builder=to_text)

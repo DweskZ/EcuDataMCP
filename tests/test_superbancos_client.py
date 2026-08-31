@@ -9,18 +9,26 @@ _WPCP_WIDGET_HTML = """
 <script>var ShareoneDrive_vars = {"refresh_nonce":"9924993739"};</script>
 """
 
-# Real shape captured live from the widget's own AJAX response: the outer
-# entry div's data-name has NO extension, only the download <a>'s data-name
-# does -- a real bug (name pulled from the wrong attribute) was caught by
-# checking live output, not by these regexes matching successfully.
+# Real shape captured live from the widget's own AJAX response. Two real
+# bugs were caught here by checking live output, not just by the regexes
+# matching successfully: (1) the outer entry div's data-name has NO
+# extension, only the download <a>'s does; (2) the display "entry_link"
+# anchor's class varies by file type (entry_action_download for ZIPs,
+# ilightbox-group for previewable types like XLSX -- confirmed on
+# servicios_financieros, where most files are XLSX) while the separate
+# download-button anchor (class='entry_action_download ', no "entry_link"
+# prefix) is present and identically shaped for every file type -- that's
+# the one the parser targets now, not the type-varying display link.
 _WPCP_FILES_HTML = """
 <div class='files-container'>
 <div class='entry file ' data-id='ID1' data-name='7. BOLETIN BANCOS JULIO 2026'>
-<div class='entry-info-name'><a href='https://www.superbancos.gob.ec/estadisticas/portalestudios/wp-admin/admin-ajax.php?action=shareonedrive-download&id=ID1' class='entry_link entry_action_download' title='7. BOLETIN BANCOS JULIO 2026.zip (722 KB)' data-name='7. BOLETIN BANCOS JULIO 2026.zip' data-entry-id='ID1'><span>7. BOLETIN BANCOS JULIO 2026.zip</span></a></div>
+<div class='entry-info-name'><a href='https://www.superbancos.gob.ec/estadisticas/portalestudios/wp-admin/admin-ajax.php?action=shareonedrive-preview&id=ID1' class='entry_link ilightbox-group' title='7. BOLETIN BANCOS JULIO 2026.zip (722 KB)' data-name='7. BOLETIN BANCOS JULIO 2026.zip' data-entry-id='ID1'><span>7. BOLETIN BANCOS JULIO 2026.zip</span></a></div>
+<a class='entry_action_download ' href='https://www.superbancos.gob.ec/estadisticas/portalestudios/wp-admin/admin-ajax.php?action=shareonedrive-download&dl=1&id=ID1' download='7. BOLETIN BANCOS JULIO 2026.zip' data-name='7. BOLETIN BANCOS JULIO 2026.zip' title='Descargar fichero'></a>
 <div class='entry-info-modified-date entry-info-metadata'>11 agosto</div><div class='entry-info-size entry-info-metadata'>722 KB</div>
 </div>
 <div class='entry file ' data-id='ID2' data-name='6. BOLETIN BANCOS JUNIO 2026'>
-<div class='entry-info-name'><a href='httpas://w-group.tech/fake/id=ID2' class='entry_link entry_action_download' title='fake' data-name='6. BOLETIN BANCOS JUNIO 2026.zip' data-entry-id='ID2'><span>x</span></a></div>
+<div class='entry-info-name'><a href='https://www.superbancos.gob.ec/estadisticas/portalestudios/wp-admin/admin-ajax.php?action=shareonedrive-preview&id=ID2' class='entry_link ilightbox-group' title='fake' data-name='6. BOLETIN BANCOS JUNIO 2026.zip' data-entry-id='ID2'><span>x</span></a></div>
+<a class='entry_action_download ' href='httpas://w-group.tech/fake/id=ID2' download='6. BOLETIN BANCOS JUNIO 2026.zip' title='Descargar fichero'></a>
 </div>
 </div>
 """

@@ -32,22 +32,40 @@ short-lived Microsoft Graph signed URLs -- they are stable, confirmed by
 requesting the same URL twice. See _wpcp_list_year_folders/_wpcp_get_filelist
 below.
 
-servicios_financieros has NOT been extended the same way: unlike bancos/
-(one widget), that page embeds *three* separate OneDrive widgets (distinct
-listtoken per widget -- confirmed live) sitting under different headings
-("Solicitudes de Servicios Financieros, Canales y Medios de Pago",
-"Resoluciones de Servicios Financieros, Tarjetas y Canales", and a third
-with no heading found in the 3000 chars before it, likely the "Estadísticas
-Puntos de Atención" consolidation the page's own text mentions) -- the
-protocol is the same, but mapping widget -> section label needs a closer
-look at that page specifically before wiring it up. So for
-servicios_financieros this client still only returns the static
-TablePress archive tables (through ~abril 2021); informacion_historica has
-no such widget at all. Do not describe boletines_financieros' coverage as
-complete/unbounded either -- it now spans the static "OTROS AÑOS" table
-(1997-2008) plus every OneDrive year folder found live (2009 through the
-current year), which is still whatever the portal has actually uploaded,
-not a guarantee of month-by-month completeness within a year.
+servicios_financieros embeds *three* separate OneDrive widgets (distinct
+listtoken per widget), extended 2026-08-31 via _wpcp_servicios_financieros_recientes/
+_wpcp_crawl_tree, a generalization of the boletines logic for trees of
+unknown depth: "Estadísticas Generales" (the richest -- 9 numbered
+categories, each organized by year; this is the "Estadísticas Puntos de
+Atención" consolidation the page's own text says superseded the static
+tables from mayo 2021), "Solicitudes de Servicios Financieros, Canales y
+Medios de Pago" (service registration form templates, not statistics),
+and "Resoluciones de Servicios Financieros, Tarjetas y Canales"
+(regulatory resolutions -- this was the roadmap's long-standing
+"Resoluciones y Circulares, AJAX-blocked" item). Unlike
+boletines_financieros' flat "Año NNNN" folders, the root call here
+already returns the FULL tree flattened with parent pointers (confirmed
+live), so the crawler queries every node it reveals rather than assuming
+one level of nesting, and tags each result's "grupo" with the full
+breadcrumb path (categories repeat child folder names like "Otros Años"
+across multiple branches, so the bare name alone would collide).
+informacion_historica has no such widget at all. Do not describe
+boletines_financieros' or servicios_financieros' coverage as
+complete/unbounded -- both now span their static archive tables plus
+every OneDrive folder found live, which is still whatever the portal has
+actually uploaded, not a guarantee of month-by-month completeness.
+
+A second real bug was caught the same way as the data-name one below,
+by inspecting live output rather than trusting the regex match count:
+the "entry_link" display anchor's class depends on whether OneDrive can
+preview the file inline (entry_action_download for non-previewable types
+like ZIP; ilightbox-group for previewable ones like XLSX/PDF -- most of
+servicios_financieros' files are XLSX). A regex anchored to one class
+variant silently dropped ~35% of real files with a logged-but-easy-to-miss
+warning per entry. Fixed by targeting the OTHER anchor every file entry
+has regardless of type: a dedicated download-button
+(class='entry_action_download ', no "entry_link" prefix) whose own
+"download='...'" attribute gives the filename with extension directly.
 
 Files are never downloaded here — only metadata and the direct URL, same
 pattern as helpers/sipa_client.py (some boletines are 5+ MB ZIPs, well over
@@ -86,8 +104,9 @@ _SECCIONES: list[dict[str, str]] = [
     {
         "seccion": "servicios_financieros",
         "nombre": (
-            "Servicios Financieros — tarjetas, oficinas, cajeros y corresponsales "
-            "(hasta ~abril 2021; ver docstring)"
+            "Servicios Financieros — tarjetas, oficinas, cajeros, corresponsales "
+            "(estático hasta ~abril 2021) + Estadísticas Generales/Solicitudes/"
+            "Resoluciones vía OneDrive (más recientes)"
         ),
         "url": f"{_BASE}/servicios-financieros/",
     },
@@ -141,6 +160,7 @@ _WPCP_ACCOUNT_RE = re.compile(r"data-account-id='([0-9a-f-]{36})'")
 _WPCP_DRIVE_RE = re.compile(r"data-drive-id='([^']+)'")
 _WPCP_NONCE_RE = re.compile(r'"refresh_nonce":"(\d+)"')
 _WPCP_YEAR_FOLDER_RE = re.compile(r"^Año \d{4}$")
+_WPCP_HEADING_RE = re.compile(r'<h3 class="elementor-heading-title[^"]*">(?P<heading>[^<]*)</h3>')
 
 _WPCP_AJAX_URL = f"{_BASE}/wp-admin/admin-ajax.php"
 
@@ -150,16 +170,27 @@ _WPCP_AJAX_URL = f"{_BASE}/wp-admin/admin-ajax.php"
 # monolithic regex across an <a> tag that itself contains other quoted
 # attributes in an unpredictable order.
 #
-# The name comes from this <a> tag's OWN data-name (e.g. "BOLETIN....zip"),
-# not the outer <div class='entry file' data-name='...'> a few chars
-# earlier -- that outer one is missing the extension (confirmed live), so
-# pulling from there silently broke format detection for every OneDrive
-# entry until caught by inspecting real output, not just by the regex
-# matching successfully.
+# Every file entry has (at least) two download-ish anchors: an
+# "entry_link" one whose class varies by whether OneDrive can preview the
+# file inline (entry_action_download for non-previewable types like ZIP;
+# ilightbox-group for previewable ones like XLSX/PDF -- confirmed live on
+# servicios_financieros, where most files are XLSX), and a second,
+# dedicated download-button anchor (class='entry_action_download ', note
+# the leading space before the closing quote, no "entry_link" prefix)
+# that's present and identically shaped across every file type observed.
+# Targeting the entry_link anchor first meant a class-variant regex would
+# need to chase every file type Superbancos ever uses; targeting the
+# always-present download-button anchor instead needs only one pattern.
+# Its own "download='...'" attribute gives the filename WITH extension
+# directly -- simpler than the entry_link anchor's data-name, and not the
+# outer <div class='entry file' data-name='...'> a few chars earlier,
+# which is missing the extension (confirmed live) and silently broke
+# format detection for every OneDrive entry until caught by inspecting
+# real output, not just by the regex matching successfully.
 _WPCP_FILE_ENTRY_SPLIT_RE = re.compile(r"<div class='entry file '")
 _WPCP_FILE_LINK_RE = re.compile(
-    r"<a href='(?P<url>[^']+)'\s+class='entry_link entry_action_download'"
-    r"[^>]*?data-name='(?P<name>[^']*)'"
+    r"<a class='entry_action_download '\s+href='(?P<url>[^']+)'"
+    r"[^>]*?download='(?P<name>[^']*)'"
 )
 _WPCP_FILE_MODIFIED_RE = re.compile(
     r"<div class='entry-info-modified-date entry-info-metadata'>(?P<modified>[^<]*)</div>"
@@ -207,6 +238,52 @@ def _extract_wpcp_params(html: str) -> dict[str, str] | None:
         "drive_id": drive_m.group(1),
         "nonce": nonce_m.group(1),
     }
+
+
+def _extract_all_wpcp_widgets(html: str) -> list[dict[str, Any]]:
+    """Like _extract_wpcp_params, but for a page with more than one OneDrive
+    widget (servicios_financieros has three, distinct listtoken per widget,
+    confirmed live). account_id/drive_id are pulled from a window right
+    after each widget's own data-token (they're on the same container div,
+    in that order) rather than page-wide, so each widget gets its own
+    values instead of accidentally reusing the first widget's. The nonce
+    is shared page-wide (one inline ShareoneDrive_vars script for the whole
+    page), unlike the per-widget token/account/drive.
+
+    Each entry also carries "heading": the nearest
+    <h3 class="elementor-heading-title...">...</h3> found before the
+    widget in the page -- None if none precedes it (the page's first
+    widget, confirmed live to sit under a generic "Estadísticas Generales"
+    heading rather than no heading at all, but treat this defensively
+    since page structure can change)."""
+    nonce_m = _WPCP_NONCE_RE.search(html)
+    if nonce_m is None:
+        return []
+    nonce = nonce_m.group(1)
+
+    headings = list(_WPCP_HEADING_RE.finditer(html))
+    widgets = []
+    for token_m in _WPCP_TOKEN_RE.finditer(html):
+        window = html[token_m.end() : token_m.end() + 800]
+        account_m = _WPCP_ACCOUNT_RE.search(window)
+        drive_m = _WPCP_DRIVE_RE.search(window)
+        if not (account_m and drive_m):
+            continue
+        heading = None
+        for h in headings:
+            if h.start() >= token_m.start():
+                break
+            heading = _clean(h.group("heading"))
+        widgets.append(
+            {
+                "listtoken": token_m.group(1),
+                "account_id": account_m.group(1),
+                "drive_id": drive_m.group(1),
+                "nonce": nonce,
+                "heading": heading,
+            }
+        )
+    return widgets
 
 
 async def _wpcp_get_filelist(params: dict[str, str], folder_id: str, page_url: str) -> dict[str, Any]:
@@ -317,6 +394,97 @@ async def _wpcp_boletines_recientes(html: str, page_url: str, seccion: str) -> l
         for archivo in _parse_wpcp_files(year_result.get("html") or "", seccion):
             archivo["grupo"] = folder["text"]
             archivos.append(archivo)
+    return archivos
+
+
+def _wpcp_node_path(by_id: dict[str, dict[str, Any]], node_id: str) -> str:
+    """Full breadcrumb for one tree node, e.g. "4. Estadísticas de
+    Tarjetas (crédito, débito, prepago) (A12) / Otros Años" -- needed
+    because a bare node name like "Otros Años" repeats under multiple
+    categories in servicios_financieros' deeper trees (confirmed live:
+    at least 5 categories each have their own "Otros Años" child), unlike
+    boletines_financieros' flat "Año NNNN" folders where the name alone
+    was already unambiguous."""
+    parts = []
+    node = by_id.get(node_id)
+    while node is not None:
+        text = node.get("text")
+        if text and text != "Inicio":
+            parts.append(text)
+        parent_id = node.get("parent")
+        node = by_id.get(parent_id) if parent_id not in (None, "#") else None
+    return " / ".join(reversed(parts))
+
+
+async def _wpcp_crawl_tree(params: dict[str, str], page_url: str, seccion: str) -> list[dict[str, Any]]:
+    """Generic OneDrive-widget crawler for a tree of unknown depth --
+    unlike _wpcp_boletines_recientes' flat "Año NNNN" special case, this
+    queries every node the root call reveals (root call returns the
+    entire tree already flattened with parent pointers, not just
+    immediate children -- confirmed live), since a category folder can
+    hold files directly as well as have subfolders. Concurrent, not
+    sequential: servicios_financieros' three widgets combine for ~40
+    folder queries, and this result is cached for 6h afterward, but the
+    first call shouldn't serialize that many round trips one at a time.
+    Same graceful-degradation contract as _wpcp_boletines_recientes --
+    never raises, a single folder failing just means that folder's files
+    are missing from the result, not the whole section failing."""
+    try:
+        root = await _wpcp_get_filelist(params, "", page_url)
+    except Exception:
+        logger.warning(
+            "Superbancos sección %s: no se pudo listar la raíz del widget OneDrive.",
+            seccion,
+            exc_info=True,
+        )
+        return []
+
+    tree = root.get("tree") or []
+    by_id = {n["id"]: n for n in tree}
+    archivos = list(_parse_wpcp_files(root.get("html") or "", seccion))
+
+    child_nodes = [n for n in tree if n.get("parent") not in (None, "#")]
+    results = await asyncio.gather(
+        *(_wpcp_get_filelist(params, n["id"], page_url) for n in child_nodes),
+        return_exceptions=True,
+    )
+    for node, result in zip(child_nodes, results):
+        if isinstance(result, BaseException):
+            logger.warning(
+                "Superbancos sección %s: no se pudo listar la carpeta OneDrive '%s'.",
+                seccion,
+                node.get("text"),
+                exc_info=result,
+            )
+            continue
+        path = _wpcp_node_path(by_id, node["id"])
+        for archivo in _parse_wpcp_files(result.get("html") or "", seccion):
+            archivo["grupo"] = path
+            archivos.append(archivo)
+    return archivos
+
+
+async def _wpcp_servicios_financieros_recientes(html: str, page_url: str, seccion: str) -> list[dict[str, Any]]:
+    """servicios_financieros embeds three separate OneDrive widgets (one
+    per heading), confirmed live 2026-08-31: "Estadísticas Generales" (the
+    richest -- 9 numbered categories each with year-organized files, this
+    is the "Estadísticas Puntos de Atención" consolidation the page's own
+    text says superseded the static tables from mayo 2021), "Solicitudes
+    de Servicios Financieros, Canales y Medios de Pago" (service
+    registration form templates, not statistics), and "Resoluciones de
+    Servicios Financieros, Tarjetas y Canales" (regulatory resolutions --
+    this is the "Resoluciones y Circulares" the roadmap had marked
+    AJAX-blocked). Each widget's files get a grupo prefixed with its own
+    heading so results from different widgets never collide even where
+    their internal folder names repeat (e.g. "Otros Años" under multiple
+    categories in different widgets)."""
+    archivos: list[dict[str, Any]] = []
+    for widget in _extract_all_wpcp_widgets(html):
+        heading = widget.get("heading") or "Sin encabezado"
+        widget_archivos = await _wpcp_crawl_tree(widget, page_url, seccion)
+        for archivo in widget_archivos:
+            archivo["grupo"] = f"{heading} / {archivo['grupo']}" if archivo["grupo"] else heading
+        archivos.extend(widget_archivos)
     return archivos
 
 
@@ -446,6 +614,8 @@ async def get_seccion_archivos(seccion: str) -> dict[str, Any]:
             archivos = _parse_tablepress_archivos(html, seccion)
             if seccion == "boletines_financieros":
                 archivos = archivos + await _wpcp_boletines_recientes(html, info["url"], seccion)
+            elif seccion == "servicios_financieros":
+                archivos = archivos + await _wpcp_servicios_financieros_recientes(html, info["url"], seccion)
 
         result = {
             "seccion": seccion,
