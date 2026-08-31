@@ -3026,6 +3026,71 @@ devolvieron exactamente 100) — así que un conteo de 100 se reporta como
 
 ---
 
+## Undécima pasada — IG-EPN Búsqueda de Informes
+
+**Pedido de Daniel:** construir el ítem del roadmap marcado como "el más
+simple" de la lista de pendientes. Resultó serlo mucho menos de lo que su
+propia descripción sugería.
+
+**Lo que se sabía antes de esta pasada** (Séptima pasada): que
+`igepn.edu.ec/servicios/busqueda-informes` era "un formulario de búsqueda
+real... filtrable por tipo/volcán/fecha, sin login visible", sin haber
+confirmado el formato de resultado.
+
+**Lo que se descubrió al construirlo:**
+
+1. **No es la página que parece.** `www.igepn.edu.ec/servicios/busqueda-informes`
+   solo incrusta un `<iframe>` — el formulario real vive en un subdominio y
+   una app completamente distintos: `informes.igepn.edu.ec/igepn-registro-web/pages/public/Informes.jsf`,
+   una app JSF/PrimeFaces con su propia sesión.
+2. **Sin URL estable por documento**, a diferencia de cualquier otra fuente
+   ya integrada en este proyecto. El flujo real: GET inicial (cookie de
+   sesión + `javax.faces.ViewState`, un token opaco de estado guardado en
+   el servidor) → POST AJAX del botón "Buscar" (`Faces-Request:
+   partial/ajax`, responde con XML `partial-response` que re-renderiza
+   todo el formulario, incluida la lista de resultados y un ViewState
+   nuevo) → POST plano (sin AJAX; en el browser real esto se ve como
+   `net::ERR_ABORTED` porque el navegador lo trata como descarga de
+   archivo, no como navegación) del botón "Descargar Informe" de una fila
+   específica, reusando la misma sesión y el ViewState de la búsqueda.
+   Confirmado real de punta a punta: PDF de 137 KB descargado y con texto
+   extraíble (el informe diario del volcán Sangay del 31-dic-2022).
+3. **Los filtros "Tipo de informe" y "Volcán" del propio sitio no acotan
+   resultados en el servidor — bug real de la aplicación, no error de
+   scraping.** Se confirmó de la forma más rigurosa posible: se abrió la
+   página en un browser real, se hizo un hook a `jQuery.ajax` para capturar
+   el payload exacto que el propio widget envía al elegir un volcán y
+   pulsar "Buscar", y se repitió ese payload byte-a-byte vía `httpx` —
+   incluidos los campos de rango de fechas que el tab "AÑO" deja con
+   valores por defecto ocultos (`fechaInicioId`/`fechaFinId`, últimos 365
+   días desde hoy) que no eran obvios sin capturar el tráfico real. Aun así,
+   `volcanId_input=83` (Tungurahua) devolvía una mezcla de Cotopaxi, El
+   Reventador, Sangay, Cuicocha... Probado también con departamento +
+   volcán sin tipo, con tipo + volcán, con año distinto — mismo resultado
+   en todos los casos. Solo "Tipo" (`departamentoId`, Sísmico=78/Volcánico=79)
+   y "Año" filtran de verdad.
+4. **Decisión de diseño resultante:** `search_informes_igepn` solo envía
+   Tipo y Año al servidor (los dos únicos filtros reales), pide la página
+   más reciente (hasta 30 filas, orden descendente por fecha de
+   publicación — confirmado, no asumido) y filtra "Volcán"/texto libre
+   client-side sobre esa página, con el mismo enfoque de "reciente y no
+   exhaustivo" que ya usa `search_sismos` sobre el feed CSV de sismos — no
+   una promesa de cobertura completa del archivo histórico.
+5. **Nombres de informe duplicados el mismo día.** Los informes diarios
+   volcánicos de una misma fecha pueden compartir exactamente el mismo
+   "Nombre" para volcanes distintos (ej. "Informe Diario 2022-365" para
+   El Reventador y para Sangay el mismo día) — `get_informe_igepn` exige
+   `volcan` para desambiguar cuando eso ocurre, en vez de descargar el
+   primero que encuentre silenciosamente.
+6. **Reutilización de código:** `helpers/pdf_reader.py` no tenía forma de
+   extraer texto de bytes ya descargados (todo pasaba por `download_bytes`
+   con una URL) — se separó `extract_text_from_bytes()` de `read_pdf()`
+   para que `get_informe_igepn` reutilice el manejo de pypdf/rangos de
+   página en vez de duplicarlo, ya que aquí no hay URL que descargar con
+   `download_bytes`.
+
+---
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

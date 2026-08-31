@@ -58,51 +58,15 @@ def _parse_pages(pages: str, total_pages: int) -> tuple[list[int], bool]:
     return matched[:MAX_PAGES_PER_CALL], was_capped
 
 
-async def read_pdf(
-    url: str, pages: str = "", session: httpx.AsyncClient | None = None
-) -> dict[str, Any]:
-    """Extract text from a PDF at `url`. `pages` is a 1-indexed range spec
-    ("3", "1-5", "1,4,9"); empty means the whole document, capped at
-    MAX_PAGES_PER_CALL pages per call either way.
+def extract_text_from_bytes(raw: bytes, pages: str = "") -> dict[str, Any]:
+    """Extract text from already-downloaded PDF bytes. Shared by `read_pdf`
+    (URL-based) and any caller that fetches PDF bytes through a mechanism
+    `download_bytes` can't express (e.g. a session-bound POST download with
+    no stable URL) -- `pages` has the same 1-indexed range-spec semantics as
+    `read_pdf`, capped at MAX_PAGES_PER_CALL pages per call either way.
     """
     from pypdf import PdfReader
     from pypdf.errors import PdfReadError, PyPdfError
-
-    path = urlsplit(url).path.lower()
-    if path.endswith(_NON_PDF_EXTENSIONS):
-        ext = path.rsplit(".", 1)[-1]
-        raise ValueError(
-            f"La URL termina en .{ext}, no en .pdf -- read_pdf solo lee PDFs. "
-            "Si el archivo viene de un recurso CKAN, prueba download_resource "
-            "o preview_resource_data; si no, descárgalo directamente desde el enlace."
-        )
-    if not path.endswith(".pdf"):
-        # No recognizable extension either way (e.g. a query-string-only
-        # URL) -- same priority order as csv_reader's format detection:
-        # URL extension first, Content-Type sniff only when that's
-        # inconclusive, cheap because it only reads headers.
-        content_type = await sniff_content_type(url, session=session)
-        if content_type and "pdf" not in content_type.lower():
-            raise ValueError(
-                f"La URL no parece ser un PDF (Content-Type: {content_type}); "
-                "read_pdf solo lee PDFs."
-            )
-
-    raw, truncated = await download_bytes(url, session=session)
-    if truncated:
-        # A PDF's xref table and trailer live at the end of the file (same
-        # structural issue as .zip), so a download cut off at
-        # MAX_DOWNLOAD_BYTES can't be parsed at all -- confirmed against a
-        # real 14.6 MB IESS actuarial-study PDF: pypdf fails even in
-        # non-strict mode ("Stream has ended unexpectedly"), not just a
-        # missing-EOF warning. Skip the doomed parse and say what happened.
-        raise ValueError(
-            "El archivo PDF supera el límite de 5 MB de este tool, así que "
-            "se descargó incompleto y no se puede leer (la tabla de "
-            "referencias de un PDF vive al final del archivo). Prueba "
-            "download_resource si el PDF viene de un recurso CKAN, o el "
-            "enlace directo."
-        )
 
     try:
         reader = PdfReader(io.BytesIO(raw))
@@ -141,3 +105,49 @@ async def read_pdf(
         "pages": page_results,
         "pages_capped": pages_capped,
     }
+
+
+async def read_pdf(
+    url: str, pages: str = "", session: httpx.AsyncClient | None = None
+) -> dict[str, Any]:
+    """Extract text from a PDF at `url`. `pages` is a 1-indexed range spec
+    ("3", "1-5", "1,4,9"); empty means the whole document, capped at
+    MAX_PAGES_PER_CALL pages per call either way.
+    """
+    path = urlsplit(url).path.lower()
+    if path.endswith(_NON_PDF_EXTENSIONS):
+        ext = path.rsplit(".", 1)[-1]
+        raise ValueError(
+            f"La URL termina en .{ext}, no en .pdf -- read_pdf solo lee PDFs. "
+            "Si el archivo viene de un recurso CKAN, prueba download_resource "
+            "o preview_resource_data; si no, descárgalo directamente desde el enlace."
+        )
+    if not path.endswith(".pdf"):
+        # No recognizable extension either way (e.g. a query-string-only
+        # URL) -- same priority order as csv_reader's format detection:
+        # URL extension first, Content-Type sniff only when that's
+        # inconclusive, cheap because it only reads headers.
+        content_type = await sniff_content_type(url, session=session)
+        if content_type and "pdf" not in content_type.lower():
+            raise ValueError(
+                f"La URL no parece ser un PDF (Content-Type: {content_type}); "
+                "read_pdf solo lee PDFs."
+            )
+
+    raw, truncated = await download_bytes(url, session=session)
+    if truncated:
+        # A PDF's xref table and trailer live at the end of the file (same
+        # structural issue as .zip), so a download cut off at
+        # MAX_DOWNLOAD_BYTES can't be parsed at all -- confirmed against a
+        # real 14.6 MB IESS actuarial-study PDF: pypdf fails even in
+        # non-strict mode ("Stream has ended unexpectedly"), not just a
+        # missing-EOF warning. Skip the doomed parse and say what happened.
+        raise ValueError(
+            "El archivo PDF supera el límite de 5 MB de este tool, así que "
+            "se descargó incompleto y no se puede leer (la tabla de "
+            "referencias de un PDF vive al final del archivo). Prueba "
+            "download_resource si el PDF viene de un recurso CKAN, o el "
+            "enlace directo."
+        )
+
+    return extract_text_from_bytes(raw, pages=pages)

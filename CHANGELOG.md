@@ -4,6 +4,31 @@
 
 ### Added
 
+- **`search_informes_igepn`/`get_informe_igepn`** — the IG-EPN PDF report
+  archive (`https://www.igepn.edu.ec/servicios/busqueda-informes`, backed
+  by a separate JSF/PrimeFaces app at `informes.igepn.edu.ec`), distinct
+  from `search_sismos` (raw earthquake catalog feed): daily/weekly/special
+  seismic bulletins, volcanic "IG Al Instante" alerts, annual/field
+  reports. Unlike every other integration in this project, IG-EPN has no
+  stable per-document URL — each report only downloads via a session-bound
+  PrimeFaces AJAX flow (GET for a `javax.faces.ViewState` token tied to the
+  session cookie, an AJAX POST of the "Buscar" button that re-renders the
+  result list with a fresh ViewState, then a plain POST of that row's own
+  "Descargar Informe" submit button reusing the same session). Confirmed
+  live end-to-end, including a real PDF download and text extraction.
+  `helpers/pdf_reader.py` gained `extract_text_from_bytes()`, splitting the
+  page-extraction logic out of `read_pdf()` so `get_informe_igepn` reuses
+  it instead of duplicating pypdf handling for a byte stream that (unlike
+  every other PDF this project reads) never had a URL to begin with.
+  Two of the site's own filters ("Tipo de informe", "Volcán") were
+  confirmed live to not narrow results server-side even replaying a real
+  browser's exact AJAX payload byte-for-byte — only "Tipo"
+  (Sísmico/Volcánico) and "Año" do. `search_informes_igepn` only sends
+  those two and does the rest of the filtering client-side against the
+  newest page of results (same recency-biased, non-exhaustive approach
+  `search_sismos` already uses), and documents the limitation in its own
+  response rather than silently under-filtering.
+
 - **`list_bce_indicadores_diarios`/`get_bce_indicador_diario`** —
   BCE's family of daily/monthly "indicador" widgets living outside both
   BCEData and IEM (`helpers/bce_indicadores_diarios_client.py`). Built to
