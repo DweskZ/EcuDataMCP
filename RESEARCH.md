@@ -1683,9 +1683,9 @@ por año que ya scrapea `/datasets` — no es un duplicado.
 `sri.gob.ec/estudios-investigaciones-e-indicadores` es otro hub aparte,
 pero todo en PDF (gasto tributario, presión fiscal, brechas tributarias,
 radiografía económica) — necesitaría extracción de PDF, no CSV. Hay
-también un portal OLAP en vivo (`srienlinea.sri.gob.ec/saiku-ui`, 5 cubos,
-actualiza el día 15 de cada mes) que no se pudo verificar si requiere
-login (carga vía JS) — pendiente de confirmar con browser.
+también un portal OLAP en vivo (`srienlinea.sri.gob.ec/saiku-ui`) — no es
+una fuente de datos para este proyecto, ver notas de la sesión
+2026-08-31 fuera de este repositorio.
 
 **BCE — el IEM es más rico de lo que decía el roadmap.** Confirmado en
 vivo: cada boletín mensual del IEM (índice completo desde el No. 1727 de
@@ -1962,6 +1962,68 @@ salariales sectoriales (PDFs sueltos con URLs impredecibles, sin tabla
 actualizó). Las cifras de empleo/desempleo que aparecen en PDFs del
 ministerio son downstream de la ENEMDU de INEC, no una encuesta propia —
 confirma que es un duplicado, no un gap.
+
+**Pasada adicional 2026-08-30 (pedido explícito de Daniel: profundizar
+más allá de CKAN sobre `sut.trabajo.gob.ec` mismo, no solo confirmar que
+es "la fuente declarada").** Se navegó en vivo el propio portal SUT (app
+JSF, `/mrl/contenido/...`) en vez de solo leer los metadatos de CKAN.
+Las 8 páginas de "Indicadores" del menú
+(`indiContratos`, `indiDenunciasPublico`, `indiEstrategiasEmpleabilidad`,
+`indiCapacitacionCertificacion`, `indiEncuentraEmpleo`,
+`indiEncuestaDemandaLaboral`, `indiPlanNacionalDesarrollo`,
+`indiSentencia`) son, sin excepción, un iframe embebido de Power BI
+público (`app.powerbi.com/view?r=...`) — visualización interactiva, no
+tabla exportable ni CSV/API detrás del embed. Los tres nombres que
+corresponden 1:1 a datasets CKAN existentes (Contratos, Denuncias del
+Sector Público, Estrategias de Empleabilidad) confirman que el dashboard
+visualiza el mismo dato que ya se exporta a CKAN, no uno adicional.
+`indiEncuestaDemandaLaboral` e `indiPlanNacionalDesarrollo` son los únicos
+nombres sin equivalente CKAN evidente, pero también son solo Power BI —
+sin exportación posible sin las credenciales/API del propio Power BI
+(mismo patrón ya descartado para Centrosur). Las páginas `mediacion.xhtml`
+e `instituciones.xhtml` (sin nombre CKAN equivalente) no tienen iframe
+pero tampoco contenido tabular estático — cascarón JS vacío en la
+respuesta cruda. `desarrollohumano.gob.ec` (el dominio nuevo de
+MIES-fusionado ya anotado en la Séptima pasada) sigue sin responder
+—mismo timeout de hosting compartido confirmado de nuevo, no es un
+problema transitorio—, así que su portal "InfoDH" sigue sin poder
+auditarse.
+
+**CORRECCIÓN el mismo 2026-08-30: la conclusión de arriba ("sin gap,
+mismo dato que CKAN") era incorrecta — Daniel preguntó explícitamente
+"do we have monthly level SUT contratos by industry" y la respuesta
+correcta es no, no con lo ya integrado.** El error: solo se miró la URL
+del iframe (`app.powerbi.com/view?r=...`) sin abrir el dashboard real. Al
+abrirlo en un browser (`indiContratos` → "Contratos MDT v1"), la página 2
+de 3 ("Evolución mensual y acumulada de contratos") tiene una serie
+**mensual real desde enero 2015 hasta el mes vigente**, confirmada
+extrayendo la tabla subyacente vía el menú contextual "Show as a table"
+del propio Power BI (clic derecho sobre la visualización → grilla real
+`Año, Mes | Cantidad de Contratos`, ej. 2015-ene: 92,306; 2015-feb:
+55,571; ...). La página 1 tiene filtros compuestos: rango de fechas
+(Desde/Hasta), grupo etario, Rama de actividad (CIIU), provincia y
+cantón, género, estado del contrato (Vigente/Finalizado) y discapacidad
+— es decir, la fuente real sí tiene profundidad mensual y por industria,
+simplemente no está expuesta así en CKAN.
+
+El recurso CKAN `mdt_contratosvigentessistemaunicotrabajo_2026Agosto`
+(mismo resource_id desde 2021, sobreescrito cada mes) es solo una
+**foto del stock de contratos "Vigentes" al momento de la consulta** —
+sin columna de fecha ni historia — desagregada por género/provincia/tipo
+de contrato/rama de actividad, pero de un solo corte temporal. El
+dashboard Power BI, en cambio, cubre **Vigente + Finalizado** desde 2015,
+es decir contratos históricos que el CSV de "vigentes" nunca mostró.
+
+**No resuelto:** extraer esto como serie estructurada (mes × industria)
+requeriría automatizar el propio embed de Power BI — aplicar el filtro
+"Rama de actividad" por cada categoría y leer la tabla subyacente vía
+"Show as a table" para cada una (o encontrar el endpoint `querydata`
+interno que arma esas tablas; no capturado en esta pasada, la
+inspección de red del browser solo registró la carga inicial del
+reporte, no las llamadas posteriores a interacciones). Mismo nivel de
+dificultad que el widget OneDrive de Superbancos — no es scraping HTML
+estático, es automatizar un cliente de BI. Pendiente como ítem propio en
+ROADMAP.md, no como "sin gap".
 
 ### Sector eléctrico — segunda pasada, mucho más profunda
 
@@ -2494,6 +2556,330 @@ simplemente no cubre casos que la fuente vieja sí cubre por una razón
 administrativa distinta (Manga Del Cura, El Piedrero), o la realidad
 política va más rápido que la codificación estadística formal
 (Las Golondrinas).
+
+---
+
+## Décima pasada — SUT Power BI descifrado, MIES/Ministerio de Desarrollo Humano
+
+### SUT — protocolo Power BI descifrado, gap real resuelto
+
+**2026-08-30/31.** Continuación directa de la corrección de arriba
+("do we have monthly level SUT contratos by industry" refutó el "sin
+gap" anterior). En vez de quedarse en "esto necesita automatizar un
+embed de BI, no es HTML estático" como límite, se llegó al protocolo
+real conduciendo el dashboard en un browser real y capturando su
+tráfico de red (`window.fetch`/`XMLHttpRequest` hookeados desde
+`javascript_tool`):
+
+1. **Descubrimiento del endpoint de esquema.** El HTML de
+   `app.powerbi.com/view?r=<token>` referencia
+   `getConceptualSchemaUrl` y variables de bootstrap; el endpoint real
+   resultó ser `GET /public/reports/{resource_key}/modelsAndExploration`
+   contra `wabi-south-central-us-c-primary-api.analysis.windows.net`,
+   con el header `X-PowerBI-ResourceKey: {resource_key}` (el `resource_key`
+   es el campo `k` del JSON que decodifica el parámetro `r=` del embed —
+   público, no requiere login). Esta llamada devuelve, sin tocar ningún
+   visual: `reportId`, `modelId`, el `datasetId` (`models[0].dbName`), y
+   el layout completo del reporte (`exploration.sections[].visualContainers[]`),
+   donde el `config` de cada visual trae su propio `prototypeQuery` — la
+   query DAX exacta que ese gráfico ejecuta. Catalogar los campos de las 8
+   dashboards de SUT se hizo leyendo estos `prototypeQuery`, sin abrir
+   ninguno en el navegador.
+2. **Descubrimiento del endpoint de consulta.** `POST
+   /public/reports/querydata?synchronous=true` (mismo host, mismo header)
+   acepta un `SemanticQueryDataShapeCommand` arbitrario — cualquier
+   combinación de columnas/medidas del modelo, no solo lo que un visual
+   ya muestra. Trampa real encontrada: una consulta SIN el header
+   `X-PowerBI-ResourceKey` puede devolver 200 si por casualidad coincide
+   byte-a-byte con una consulta que una sesión real ya ejecutó (una
+   caché de borde/CDN keyed por cuerpo de la solicitud) — esto engañó la
+   primera prueba dando una falsa sensación de "acceso abierto sin auth".
+   Con el header presente, cualquier consulta nueva funciona (401 sin
+   él). Confirmado con una consulta mes × industria × conteo que ningún
+   visual del dashboard muestra combinada así.
+3. **Formato de respuesta (DSR).** El campo `dsr` de la respuesta es la
+   codificación compacta "Data Shape Result" de Power BI: la primera
+   entrada de cada lista `DM0` trae `"S"` (el esquema de columnas, con
+   `"DN"` apuntando a `ValueDicts` para columnas categóricas); cada
+   entrada siguiente es una fila que solo declara los valores que
+   cambiaron desde la fila anterior — `"C"` trae esos valores en el
+   orden del esquema, `"R"` es una máscara de bits (bit i activo =
+   columna i repite el valor de la fila anterior, no aporta nada a
+   "C"), `"Ø"` es la máscara equivalente para valor nulo. Implementado
+   en `helpers/sut_powerbi_client._decode_dsr` y **validado contra
+   verdad de terreno**: se leyó manualmente "enero 2015 = 92,306
+   contratos" directamente de la tabla que el propio Power BI genera
+   vía su menú contextual "Show as a table", y el decoder reproduce
+   exactamente ese número (y todos los meses siguientes) antes de
+   confiar en él para nada más.
+
+**Resultado:** `helpers/sut_powerbi_client.py` +
+`list_sut_indicadores`/`get_sut_indicador_schema`/`query_sut_indicador`,
+un cliente genérico (no 8 clientes por-dashboard) que aplica a las 8
+dashboards por igual. Catálogo de campos por dashboard (descubierto en
+vivo, sin adivinar):
+
+- **contratos** (`Contratos MDT v1`) — contratos SUT: mensual desde
+  2015, por rama de actividad (CIIU), cantón/provincia, género,
+  discapacidad, tipo de contrato, estado (Vigente/Finalizado); además un
+  hallazgo dentro del mismo modelo no visible en la navegación pública
+  del embed (solo 3 páginas mostradas, el modelo tiene 6): **actas de
+  finiquito legalizadas** (`public acta_finiquito`) — fecha de
+  finiquito/legalización, cantón, rama de actividad, motivo de salida.
+- **encuesta_demanda_laboral** — encuesta a EMPLEADORES (no a
+  trabajadores): contrataciones, vacantes y brecha de habilidades
+  (externa e interna), requisitos/canales de reclutamiento, capacitación
+  por tamaño de empresa — por ciudad y categoría/industria. Único
+  dataset de este grupo con la perspectiva de demanda laboral, no oferta.
+- **sentencia_genero** (`SENTENCIA_V2`) — el más grande: PEA, tasas de
+  desempleo/empleo adecuado, ingreso laboral, brecha salarial y de
+  puestos directivos por género, denuncias, trabajo no remunerado,
+  cuidado (MIES), presupuesto e inversión en política de género, más un
+  "Manual de Ambientes Laborales" institucional (salas de lactancia,
+  centros infantiles, teletrabajo) por período.
+- **capacitacion_certificacion** — capacitaciones y certificaciones del
+  MDT vía SETEC (Servicio Ecuatoriano de Capacitación Profesional):
+  conteos CI/OCC/OEC por provincia, mensual/anual, con metas KPI 2025.
+- **plan_nacional_desarrollo** — indicadores laborales del Plan Nacional
+  de Desarrollo por provincia y año desde 2018: brecha de empleo
+  adecuado y salarial por género, desempleo juvenil, tasa de desempleo,
+  tasa de empleo adecuado.
+- **estrategias_empleabilidad** — Emprende EC / Fortalece Empleo (7
+  campos catalogados).
+- **denuncias_publico**, **encuentra_empleo** — **resueltos 2026-08-31**
+  (pedido explícito de Daniel, "do SUT now"). Confirmado por qué
+  `modelsAndExploration` no devolvía campos: sus visualContainers son de
+  verdad minimalistas (`{id,x,y,z,width,height,objectName}`, sin
+  `config` en absoluto — no un bug del parser, el reporte no expone el
+  layout así). Recuperados conduciendo cada dashboard en un browser real
+  con `window.fetch`/`XMLHttpRequest` hookeados y forzando una query
+  nueva (cambiando un filtro de año/provincia), igual que reveló mes ×
+  industria en `contratos`. **denuncias_publico** (tabla `REGISTROS`):
+  fecha de ingreso al MDT (jerarquía Año/Mes), motivo de la denuncia,
+  regional asignada, estado, año de ingreso, fecha de carga, medida
+  "Cantidad denuncias". **encuentra_empleo** (tabla `CONSOLIDADO`,
+  Dirección de Servicio Público de Empleo): fecha de corte (jerarquía
+  Año/Mes/**Día** — la única granularidad diaria vista en SUT), columna
+  categórica "Encuentra Empleo" con valores REGISTRADOS/COLOCADOS/
+  CAPACITADOS, provincia, año, fecha de carga, y un tipo de campo nuevo
+  no visto en los otros 6 dashboards: "Número de Personas" es una
+  columna agregada con `SUM()` en tiempo de consulta
+  (`{"Aggregation":{...,"Function":0}}`), no una medida DAX prearmada —
+  confirmado también `Function:4` = Min en la misma sesión (usado para
+  "última fecha de carga"). Verificado en vivo con datos reales:
+  REGISTRADOS enero-2023 = 26,033 personas. Ambos ahora en
+  `_MANUAL_CAMPOS` (`helpers/sut_powerbi_client.py`), fusionados con el
+  descubrimiento automático — **los 8 dashboards de SUT quedan
+  completamente cubiertos.**
+
+### BCE — familia de indicadores diarios/mensuales fuera de BCEData e IEM
+
+**2026-08-31, pedido explícito de Daniel ("Riesgo Pais needs to be covered
+specifically... investigate").** `search_indicadores_bce`/BCEData solo
+tenía Riesgo País (EMBI) como agregado **mensual** (id_grupo 8, fin de
+período) — para un indicador que el propio BCE, según cobertura de
+prensa contemporánea (Infobae, El Universo, Bloomberg Línea, agosto
+2026), publica **todos los días hábiles**. Ni el buscador interno de
+`bce.fin.ec` ni el catálogo BCEData tienen una página o serie dedicada a
+"riesgo país" — la búsqueda en el sitio solo encontró una licitación
+para contratar Bloomberg/Moody's/PRS Group como proveedores de datos de
+riesgo crediticio internacional, lo que sugiere (incorrectamente, ver
+abajo) que el dato diario no se republica.
+
+**Hallazgo real:** un agregador financiero de terceros
+(tagline-soluciones.com) citaba como fuente
+`https://contenido.bce.fin.ec/estadisticas-de-publicaciones-generales/`
+— una página que el buscador del sitio principal (`bce.fin.ec`) nunca
+superficia porque vive en el subdominio de contenido
+(`contenido.bce.fin.ec`), el mismo que ya se usa para BCEData/IEM. Esa
+página incrusta varios widgets Highcharts, uno por indicador
+(`data-dd-title="Riesgo País"` etc.), cada uno cargando su HTML propio
+desde `wp-content/uploads/ESTADISTICAS-ECONOMICAS/indicadores/{Nombre}.html`.
+Cada página de widget declara una variable JS `archivo` (o
+`ARCHIVO_JSON`) con el nombre de un archivo JSON plano — sin
+autenticación, sin API key, confirmado descargándolo con `curl` puro.
+Varios widgets comparten el mismo archivo (ej. Riesgo País y Precio del
+Oro viven ambos en `datos_formulario.json`).
+
+**Confirmado en vivo, con `Periodicidad` explícita en cada fila del
+JSON** (no una suposición sobre la frecuencia real):
+
+| Archivo | Indicador | Periodicidad | Rango | Filas |
+|---|---|---|---|---|
+| `datos_formulario.json` | Riesgo País (pb) | D | 2004-07-29 → hoy | 7369 |
+| `datos_formulario.json` | Precio del Oro (USD/oz) | D | 1999-01-01 → hoy | 7213 |
+| `datos_diarios.json` | Petróleo WTI (USD/barril) | D | 2015-01-02 → hoy | 3868 |
+| `datos_diarios.json` | Índice Dow Jones | D | 2018-01-17 → hoy | 3087 |
+| `datos_diarios.json` | Tasa LIBOR | D | 2013-09-26 → 2024-09-30 (discontinuada) | 3289 |
+| `datos_diarios.json` | Tasa SOFR | D | 2022-01-01 → hoy | 1700 |
+| `datos_bonos_soberanos.json` | Bonos Ecuador 2030/2035/2040 (% valor nominal) | D | 2020-09-02 → hoy | ~6300 |
+| `datos_pagos.json` | SPI, SCI, SPL, CCC, Monto Recaudado | M | 2010-01-01 → hoy | 882 (agregado) |
+| `datos_hid.json` | **Producción Petrolera Nacional (barriles)** | D | 2018-01-01 → hoy | 3154 |
+| `datos_hid.json` | Precio Petróleo Crudo Ecuatoriano | M | 2000-01-01 → hoy | 318 |
+| `datos_ipc.json`, `datos_tes.json`, `datos_icc.json`, `datos_cna.json` | Inflación, desempleo, confianza consumidor, PIB | M/T/A | varía | varía |
+
+La página `estadisticas-del-sector-medios-y-sistemas-de-pagos/` resuelve
+por sí sola el ítem del roadmap "medios y sistemas de pago" que llevaba
+mucho tiempo marcado como "si el acceso automatizable se confirma" — sí
+se confirma, mismo patrón. La página `estadisticas-del-sector-real/`
+aportó el segundo hallazgo genuinamente diario más valioso
+(Producción Petrolera Nacional, clave para la posición fiscal del país)
+además de duplicados mensuales/anuales de series que probablemente ya
+están en BCEData. La página `estadisticas-del-sector-externo-d/`
+(nótese la "-d" en la URL, no la ruta "limpia" que se esperaría — un
+detalle que hay que preservar al construir el cliente) repite Riesgo
+País, Precio del Oro y WTI y añade balanza comercial/exportaciones/
+importaciones/remesas/tipo de cambio efectivo real, probablemente
+duplicados de BCEData también.
+
+**No exhaustivo:** se probaron 4 páginas del patrón
+`estadisticas-de-*`/`estadisticas-del-*` de las cuales 3 tenían
+widgets; no se recorrió el mega-menú completo de "Estadísticas" del
+sitio (bloqueado por un menú que solo se expande con JS, no con fetch
+crudo) — es razonable esperar más páginas con el mismo patrón sin
+descubrir todavía. Pendiente de construir: un cliente
+(`helpers/bce_indicadores_diarios_client.py` o similar) que parsee estos
+JSON directamente — sin necesidad de ningún truco de scraping, el mismo
+nivel de esfuerzo que cualquier cliente basado en archivo estático de
+este proyecto (SIPA, Superbancos estático).
+
+### Ministerio del Trabajo — más allá de SUT y CKAN
+
+**2026-08-31.** `trabajo.gob.ec` (dominio raíz, no `sut.` ni
+`desarrollohumano.`) reconfirma el patrón ya documentado: páginas
+dinámicas mueren en timeout (`/direccion-de-investigacion-y-estudios-laborales/`
+probado explícitamente, timeout total), pero archivos estáticos bajo
+`/wp-content/uploads/` cargan sin problema. Una búsqueda web (no
+navegación directa, imposible por el timeout) encontró dos ediciones
+reales del **"Boletín Estadístico Anual: El Mercado Laboral en el
+Ecuador"** — No. 3 (2022) y una edición 2020 — ambas confirmadas vivas
+con `curl -I` (PDF real, ~4 MB cada una, `Content-Type: application/pdf`).
+El boletín 2022 declara explícitamente que sus cifras derivan de la
+ENEMDU de INEC (referencia diciembre 2022) — es un producto derivado/
+análisis, no una encuesta propia del ministerio, coherente con el
+patrón ya documentado en la Octava pasada. Los nombres de archivo no
+siguen un patrón adivinable (`Boletin-Anual-2022-1_compressed.pdf` vs.
+`BoletinAnual2020ok.pdf`), así que no hay forma de listar ediciones de
+otros años sin acceder al índice real — bloqueado por el mismo timeout
+de siempre. Candidato para una pasada futura con Wayback Machine sobre
+la página índice.
+
+### SUT (`sut.trabajo.gob.ec`) — nav completo re-verificado, sin dashboards adicionales
+
+**2026-08-31, tercera pasada sobre el mismo portal.** Navegado el resto
+del árbol de navegación del portal (no solo la sección "Indicadores" ya
+cubierta) con un browser real. El menú "Datos Abiertos" del propio
+portal — la etiqueta más directa posible de "esto es un dataset" — solo
+lista dos ítems: "Contratos registrados en el Sistema Único de Trabajo"
+y "Sentencia Nro. 3-19-JP/20 y acumulados", ambos ya cubiertos por
+`sut_powerbi_client` (indicadores `contratos` y `sentencia_genero`). No
+hay un tercer dataset escondido bajo esa etiqueta. El resto del menú
+("Mediación laboral" → nueva solicitud / seguimiento de una solicitud;
+"Sustitutos"; "Capacitaciones" → catálogo de cursos de autoinscripción
+para Seguridad y Salud, Encuentra Empleo y Capacitaciones Internas MDT)
+son herramientas transaccionales de caso-por-caso o portales de
+autoservicio, no fuentes de datos agregados — mismo patrón ya
+descartado para trámites individuales en otras instituciones (Fiscalía,
+inspecciones laborales). **Conclusión: no queda ningún dashboard o
+sección de datos sin explorar en `sut.trabajo.gob.ec`** más allá de los
+8 ya catalogados en `helpers/sut_powerbi_client.py`.
+
+### MIES/Ministerio de Desarrollo Humano, portal `infoMIES`
+
+**Investigado 2026-08-30, pedido explícito de Daniel** después de haber
+perdido confianza en la pasada anterior de SUT ("I'm starting to doubt
+you a little"). Verificado en vivo con fetches reales, no por inferencia
+de nombres de dataset. **Conclusión: sí hay un gap real, y es grande —
+distinto del caso SUT.**
+
+**Dominios comprobados de nuevo, en vivo:**
+- `mies.gob.ec` — NXDOMAIN, reconfirmado.
+- `inclusion.gob.ec` — conecta en el puerto 443, negocia TLS, pero la
+  conexión se resetea después de enviar el `GET` (`schannel: server
+  closed abruptly` / `Connection was reset`) — peor que "certificado
+  expirado" como decía la nota anterior, pero el efecto práctico es el
+  mismo: inutilizable.
+- `desarrollohumano.gob.ec` y `www.desarrollohumano.gob.ec` — timeout de
+  60s+ reconfirmado en la raíz, mismo patrón de hosting compartido ya
+  documentado para `trabajo.gob.ec`.
+
+**El hallazgo real estaba en un subdominio que ninguna pasada anterior
+probó: `info.desarrollohumano.gob.ec`** ("infoMIES — información
+estadística y geográfica", sitio Joomla, HTTP 200 en <2s en cada
+página probada). Se llegó a él leyendo el campo "Fuente original" de un
+dataset CKAN real (`get_dataset_info` sobre
+`mdt-datos-abiertos-segundo-trimestre-2026-usuarios-de-unidad-de-atencion`),
+que apunta a `https://info.desarrollohumano.gob.ec/index.php/informacion`
+— el mismo patrón que ya había funcionado para encontrar `sut.trabajo.gob.ec`
+en la fuente declarada de un dataset. Confirma otra vez la lección de la
+Séptima pasada: el campo "fuente original" de un dataset CKAN es más
+confiable que adivinar subdominios.
+
+**Organización CKAN existente (`ministerio-de-inclusion-economica-y-social`,
+mostrada como "Ministerio de Desarrollo Humano", 27 datasets, activa,
+última actualización 2026-07-17):** dos series **trimestrales** —
+"Bonos y Pensiones" y "Usuarios de Unidad de Atención" — desde el
+Cuarto Trimestre 2023 hasta el Segundo Trimestre 2026. Ya alcanzable
+hoy con `search_organizations`/`get_organization_info`/
+`list_dataset_resources`/`preview_resource_data`, sin cliente nuevo.
+
+**Lo que el portal `info.desarrollohumano.gob.ec` tiene y CKAN NO
+tiene — confirmado descargando cabeceras reales, no solo listando
+enlaces:**
+
+1. **Bases de datos MENSUALES, no trimestrales**, para las mismas dos
+   series de arriba, bajo un sistema de descargas Joomla
+   (`?download=ID:slug`), un año por página:
+   - Aseguramiento No Contributivo (inclusión económica):
+     `/index.php/usuarios-de-inclusion-economica/usuarios-externos-ie/{año}-bdd-anc`,
+     años 2019-2026 confirmados, con enero-julio 2026 ya publicados.
+   - Usuarios de Unidad de Atención del SIIMIES (inclusión social):
+     `/index.php/usuarios-y-unidades-de-inclusion-social/usuarios-externos-is/{año}-externos-is`,
+     años 2020-2026 confirmados, mismo patrón mensual.
+   - Verificado con `curl -I` real sobre un enlace de julio 2026:
+     `2026_BASES_ASEGURAMIENTO_NO_CONTRIBUTIVO_JULIO_EXTERNO.rar`,
+     **109.8 MB**, `Content-Type: application/x-rar-compressed`. El
+     formato `.rar` ya está descartado explícitamente en este proyecto
+     (riesgo de subprocess/CVE, ver sección "Formatos y tipos de
+     recursos") — pero eso solo bloquea la *lectura* del contenido, no
+     el catalogar metadata + URL directa, igual que SIPA/Superbancos con
+     archivos grandes.
+2. **Boletines Zonales**, un archivo real y aparentemente discontinuado:
+   9 zonas (`zona-1-bz` … `zona-9-bz`), cada una con años 2017-2021 (no
+   más recientes, a diferencia de las BDD de arriba) y ~11-12 boletines
+   mensuales por año-zona vía el mismo sistema `?download=ID:slug`
+   (confirmado en `zona-1-bz/2021-bz1`: 11 meses, enero-noviembre).
+   Con 9 zonas × 5 años × ~11 meses, un archivo potencial de várias
+   centenas de reportes — sin confirmar el formato exacto de archivo
+   (no se descargó ninguno, solo se contaron los enlaces).
+3. **Dos dashboards Power BI embebidos, sin exportación directa** (mismo
+   patrón ya documentado para SUT y Superbancos): uno en
+   `/index.php/sinepidpam` (tenant Power BI `dbc77c07-...`, distinto del
+   tenant de SUT) y otro enlazado desde `/index.php/informacion` bajo
+   "reportes-dinamicos" (mismo tenant). No abiertos con browser en esta
+   pasada — solo confirmada la presencia del iframe, no su contenido.
+4. **Sin explorar todavía en esta pasada:** `geoportal.desarrollohumano.gob.ec`
+   (geoportal propio, enlazado desde el nav — visualizador de mapas, sin
+   confirmar si expone WFS/descarga de vectores como el geoportal de
+   SIPA), `/index.php/biblioteca`, `/index.php/documentos-metodologicos`,
+   `/index.php/estudios` (contenido no inspeccionado más allá de
+   confirmar que las páginas cargan).
+
+**Diferencia clave con el caso SUT:** en SUT, el "gap" resultó ser una
+serie histórica real *pero solo visualizable* (Power BI, sin descarga
+directa) — automatizarlo requiere reproducir el propio embed. Acá, la
+serie mensual real *sí tiene un enlace de descarga directo* (Joomla
+`?download=`, sin JS, sin AJAX) — mucho más parecido en dificultad a
+SIPA/Superbancos que al caso SUT. Construir un cliente para esto es
+factible con el mismo patrón ya usado en el proyecto (scraping de
+páginas índice + metadata/URL, sin descargar los `.rar`).
+
+Lección repetida una tercera vez en este proyecto (Registro Civil,
+Superbancos, ahora MIES): un dominio institucional "caído" no significa
+que el ministerio no tiene datos vivos — casi siempre hay un subdominio
+o portal separado que sigue funcionando, y el campo "fuente original" de
+un dataset CKAN real es la forma más confiable de encontrarlo, más que
+adivinar patrones de URL.
 
 ---
 

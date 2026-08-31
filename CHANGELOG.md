@@ -4,6 +4,83 @@
 
 ### Added
 
+- **`list_bce_indicadores_diarios`/`get_bce_indicador_diario`** —
+  BCE's family of daily/monthly "indicador" widgets living outside both
+  BCEData and IEM (`helpers/bce_indicadores_diarios_client.py`). Built to
+  cover Riesgo País (EMBI) specifically — BCEData only had it as a
+  monthly end-of-period aggregate, for something BCE republishes daily.
+  9 plain JSON files behind Highcharts widgets on `contenido.bce.fin.ec`,
+  no auth: 29 series total, several genuinely daily back decades (Riesgo
+  País since 2004, Precio del Oro since 1999, Petróleo WTI, Dow Jones,
+  SOFR/LIBOR, Ecuador sovereign bonds 2030/2034/2035/2039/2040,
+  Producción Petrolera Nacional since 2018), plus monthly/annual series
+  (sistemas de pago interbancarios, inflación, desempleo, PIB) that
+  likely duplicate BCEData but come from one clean file. The catalog is
+  discovered live from each file's own rows rather than hardcoded — a
+  "código" only means one thing within its own file, confirmed by two
+  sovereign-bond series (2034, 2039) turning up that weren't in the
+  original investigation. `get_indicador_diario` never returns a full
+  series (Riesgo País alone is 7,369+ rows) — only a bounded window
+  (most recent N or an explicit date range, capped at 366) plus the
+  series' true full range as metadata.
+- **`list_sut_indicadores`/`get_sut_indicador_schema`/`query_sut_indicador`** —
+  Ministerio del Trabajo/SUT's public Power BI "Indicadores" dashboards
+  (`helpers/sut_powerbi_client.py`). These are live semantic models, not
+  static files: `public/reports/{resource_key}/modelsAndExploration`
+  (public, no session — the resource_key comes straight from the
+  dashboard's own embed URL) returns each report's full field catalog by
+  reading every visual's own query definition, and
+  `public/reports/querydata` runs an arbitrary query against the model —
+  any combination of fields, not just what one chart already shows. Proved
+  this by pulling a genuine monthly contracts-by-industry panel back to
+  2015 (`contratos` dashboard) that has no equivalent anywhere in CKAN
+  (whose one resource for this topic is a single current-snapshot count,
+  no time dimension). The response format (Power BI's "DSR" delta
+  encoding — a repeat/null bitmask per row referencing a per-column value
+  dictionary) was reverse-engineered and validated against a number read
+  directly off the live dashboard (enero 2015 = 92,306) before being
+  trusted. Same mechanism generalizes to all 8 known dashboards without
+  per-dashboard code — 6 of 8 exposed a full field catalog automatically;
+  the last 2 (`denuncias_publico`, `encuentra_empleo`) use an older report
+  layout with no visual config exposed via `modelsAndExploration` at all,
+  so their fields were recovered by driving each dashboard in a browser
+  and capturing the queries it actually sent, then merged in as a small
+  manual override (`_MANUAL_CAMPOS`). That pass also surfaced a field kind
+  not seen elsewhere in SUT: a plain column aggregated with `SUM()` at
+  query time (`encuentra_empleo`'s "Número de Personas") rather than a
+  pre-built DAX measure, now supported as `kind="aggregated_sum"`. All 8
+  dashboards are fully covered.
+- **`list_superbancos_secciones`/`get_superbancos_seccion_archivos`** —
+  Superintendencia de Bancos' statistics portal (`helpers/superbancos_client.py`),
+  which has no CKAN organization. Four sections: Boletines Financieros
+  Mensuales, Servicios Financieros (tarjetas/oficinas/cajeros/corresponsales),
+  Información Histórica (comportamiento financiero anual banca pública/CFN/
+  BanEcuador/Banco de Desarrollo + Reporte de Estabilidad Financiera), and
+  Calendario Estadístico — 148 archivos found live across the four. A generic
+  TablePress-table parser handles two header styles (`<thead><th colspan>`
+  and a plain `<td colspan>` row with no `<thead>` at all) and separates a
+  row's "Año NNNN" label from its linked months when the table splits them
+  into different cells. Every parsed link is checked against the
+  `superbancos.gob.ec` domain before being surfaced — caught and dropped a
+  real mistyped link on the live Servicios Financieros page
+  (`httpas://w-group.tech/...` instead of the real host). Added
+  `superbancos.gob.ec` to `helpers/tls.py`'s OS-trust-store host list (same
+  missing-intermediate-CA failure mode already handled for
+  `censoecuador.gob.ec` — full verification, just a different CA bundle).
+  **`boletines_financieros`'s OneDrive widget reverse-engineered.** Each
+  section page also embeds a client-side "WP Cloud Plugin — Share-one-Drive"
+  widget that lazy-loads recent years from a OneDrive folder. Its AJAX
+  protocol was captured live (POST `wp-admin/admin-ajax.php`,
+  `action=shareonedrive-get-filelist`, with `listtoken`/`account_id`/
+  `drive_id`/`_ajax_nonce` all present in the page's own static HTML — no
+  session or cookies needed) and its download URLs turned out to be a
+  stable same-site proxy, not short-lived Graph tokens as first assumed.
+  `boletines_financieros` now returns 224 archivos, 1997-2026, merging the
+  static "OTROS AÑOS" table with every OneDrive year folder found live.
+  `servicios_financieros` was NOT extended the same way — that page embeds
+  three separate OneDrive widgets with distinct tokens, and mapping each to
+  its section needs a closer look before wiring it up; it still returns
+  only its static archive tables (through ~2021), documented as a known gap.
 - **`list_zip_contents`** — lists a .zip archive's members (name, size,
   compression) from a direct URL via HTTP Range requests, without
   downloading the archive. Reads only the End Of Central Directory record

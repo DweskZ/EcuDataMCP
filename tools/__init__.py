@@ -7,6 +7,7 @@ from tools.download_resource import register_download_resource_tool
 from tools.get_anda_survey_info import register_get_anda_survey_info_tool
 from tools.get_auditor_info import register_get_auditor_info_tool
 from tools.get_bce_iem_table import register_get_bce_iem_table_tool
+from tools.get_bce_indicador_diario import register_get_bce_indicador_diario_tool
 from tools.get_category_info import register_get_category_info_tool
 from tools.get_compania_info import register_get_compania_info_tool
 from tools.get_contraloria_informe import register_get_contraloria_informe_tool
@@ -23,7 +24,14 @@ from tools.get_organization_info import register_get_organization_info_tool
 from tools.get_regulacion_info import register_get_regulacion_info_tool
 from tools.get_resource_info import register_get_resource_info_tool
 from tools.get_sipa_modulo_archivos import register_get_sipa_modulo_archivos_tool
+from tools.get_superbancos_seccion_archivos import (
+    register_get_superbancos_seccion_archivos_tool,
+)
+from tools.get_sut_indicador_schema import register_get_sut_indicador_schema_tool
 from tools.get_tramite_info import register_get_tramite_info_tool
+from tools.list_bce_indicadores_diarios import (
+    register_list_bce_indicadores_diarios_tool,
+)
 from tools.list_capabilities import register_list_capabilities_tool
 from tools.list_categories import register_list_categories_tool
 from tools.list_contraloria_informes import register_list_contraloria_informes_tool
@@ -32,10 +40,13 @@ from tools.list_instituciones import register_list_instituciones_tool
 from tools.list_recent_datasets import register_list_recent_datasets_tool
 from tools.list_sat_tsunami import register_list_sat_tsunami_tool
 from tools.list_sipa_modulos import register_list_sipa_modulos_tool
+from tools.list_superbancos_secciones import register_list_superbancos_secciones_tool
+from tools.list_sut_indicadores import register_list_sut_indicadores_tool
 from tools.list_zip_contents import register_list_zip_contents_tool
 from tools.lookup_ubicacion import register_lookup_ubicacion_tool
 from tools.preview_resource_data import register_preview_resource_data_tool
 from tools.query_resource_data import register_query_resource_data_tool
+from tools.query_sut_indicador import register_query_sut_indicador_tool
 from tools.read_pdf import register_read_pdf_tool
 from tools.search_anda import register_search_anda_tool
 from tools.search_auditores import register_search_auditores_tool
@@ -111,6 +122,13 @@ def register_tools(mcp: FastMCP) -> None:
     register_list_sipa_modulos_tool(mcp)
     register_get_sipa_modulo_archivos_tool(mcp)
 
+    register_list_superbancos_secciones_tool(mcp)
+    register_get_superbancos_seccion_archivos_tool(mcp)
+
+    register_list_sut_indicadores_tool(mcp)
+    register_get_sut_indicador_schema_tool(mcp)
+    register_query_sut_indicador_tool(mcp)
+
     register_list_contraloria_informes_tool(mcp)
     register_get_contraloria_informe_tool(mcp)
 
@@ -123,6 +141,8 @@ def register_tools(mcp: FastMCP) -> None:
     register_search_bce_iem_tool(mcp)
     register_get_bce_iem_table_tool(mcp)
     register_search_bce_remesas_tool(mcp)
+    register_list_bce_indicadores_diarios_tool(mcp)
+    register_get_bce_indicador_diario_tool(mcp)
 
     register_search_companias_tool(mcp)
     register_get_compania_info_tool(mcp)
