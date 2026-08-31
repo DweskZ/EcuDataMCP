@@ -321,6 +321,9 @@ Casi todos los tools aceptan `format="json"` además de texto.
 | `query_resource_data` | Consulta tabular vía CKAN DataStore (filtros, texto, paginación) sin descargar el archivo. |
 | `detect_series_pattern` | Para datasets que publican un archivo por período (semanal/mensual): compara los dos más recientes y determina si cada archivo nuevo reemplaza a los anteriores (`acumulado`) o los complementa (`incremental`), en vez de tener que adivinar antes de sumar/comparar valores entre archivos. |
 | `search_sri_datasets` | Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN (sri.gob.ec/datasets): catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables. |
+| `search_sri_estadisticas_recaudacion` | Buscar reportes públicos de recaudación del SRI por impuesto, provincia, cantón y actividad económica. |
+| `get_sri_ruc_info` | Consultar la ficha pública de un RUC exacto: estado, tipo, actividad, fechas y establecimientos registrados. No incluye declaraciones ni montos tributarios individuales. |
+| `search_sri_ruc` | Buscar contribuyentes en el RUC del SRI por razón social o nombre comercial (texto parcial), sin necesitar el RUC exacto. |
 
 Todos los tools CKAN de esta sección y de "Exploración" más abajo (`search_organizations`,
 `get_organization_info`, `list_categories`, `get_category_info`) aceptan `source="nacional"`

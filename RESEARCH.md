@@ -2923,6 +2923,107 @@ o portal separado que sigue funcionando, y el campo "fuente original" de
 un dataset CKAN real es la forma más confiable de encontrarlo, más que
 adivinar patrones de URL.
 
+### CENACE — `info-operativa`, confirmado snapshot-only, cliente construido
+
+Continuación directa de la Octava pasada, que había dejado la URL
+confirmada pero sin decidir si había una serie histórica detrás. Esta vez
+se manejó el browser en vivo por las 5 pestañas (Producción/Demanda
+Tiempo Real, Información Operativa Diaria, Acumulada Mensual, Acumulada
+Anual) mirando `read_network_requests` en cada clic: cero llamadas
+AJAX/JSON en todo el recorrido, solo la carga inicial del HTML y una
+imagen de logo. Los 5 tableros están todos ya presentes en el DOM desde
+la primera carga (confirmado viendo el heading "INFORMACIÓN OPERATIVA
+DIARIA" en el árbol de accesibilidad antes de haber clicado esa pestaña)
+— JS solo alterna visibilidad, no hace fetch.
+
+Contenido real de cada tablero, confirmado con texto visible:
+- **Producción Tiempo Real**: instante actual (ej. domingo 30-ago,
+  Producción Total 97 995 MWh acumulados del día corriendo).
+- **Demanda Tiempo Real**: instante actual, con mapa de Ecuador por
+  empresa distribuidora (CNEL Guayaquil, E.E. Quito, etc.).
+- **Información Operativa Diaria**: el día completo *anterior* (jueves
+  27-ago cuando se probó un domingo 30), no el día en curso.
+- **Acumulada Mensual**: mes a la fecha ("Agosto de 2026, hasta el día
+  27").
+- **Acumulada Anual**: año a la fecha ("2026, hasta el día 27 de
+  agosto"), incluye "Demanda máxima histórica: miércoles 15 de julio de
+  2026" como único dato que asoma algo más allá del año en curso, pero
+  sigue sin ser una serie consultable.
+
+Conclusión: **no hay serie histórica ni selector de fecha en ninguna
+pestaña** — cada una es una vista "a este instante" distinta (ahora/
+ayer/mes a la fecha/año a la fecha), no una base de datos con historia
+consultable. Confirma la sospecha de la Octava pasada, ahora con
+evidencia directa en vez de inferencia por ausencia de enlaces de
+descarga.
+
+Construido `helpers/cenace_client.py` (`get_cenace_tablero`) igual: el
+snapshot en sí es información real y sin duplicado en el resto del MCP
+(mezcla de generación eléctrica y demanda nacional en vivo). El HTML
+descargado con un GET plano (~260 KB) contiene:
+- Los 6 números de resumen por tablero en `<div class="resumen-box
+  CLASE"><div>ETIQUETA</div><div>VALOR</div></div>` — separador de miles
+  con U+00A0 (NBSP), no espacio normal (`"97\xa0995"`), hay que limpiar
+  ambos o el `int()` revienta.
+- El desglose por distribuidora (19 entidades CNEL/empresa eléctrica) en
+  `demanda_tiempo_real` vive en dos sitios redundantes: un mapa SVG con
+  `<title>NOMBRE&#10;NNN MW</title>` por región, y un gráfico de barras
+  Plotly con los mismos datos en un array `"text"` de strings tipo
+  "1011 MW (25.0%)". Se usó el SVG por ser trivial de regexear; el Plotly
+  necesitaría decodificar un array `bdata` float64 en base64 para lo
+  mismo, sin ganancia real.
+- El desglose por planta/tipo de combustible (Coca Codo, Paute, Mazar,
+  Gas Natural, etc.) y la curva de generación de 24h SÍ existen en la
+  página, pero solo dentro de `Plotly.newPlot(...)` — cada gráfico trae
+  su propio blob de +15 KB con el tema/colorscale completo de Plotly
+  antes de llegar al array de datos real. Deliberadamente no se scrapeó
+  esto: los 6 números de resumen ya cubren el valor real del tablero: si
+  hace falta el desglose por planta en el futuro, hay que aislar el
+  primer `[{...}]` después de cada `Plotly.newPlot("ID",` y antes de
+  `,{"template"`.
+
+`www.cenace.gob.ec` falló con `CERTIFICATE_VERIFY_FAILED` contra el
+bundle certifi de httpx — mismo patrón exacto ya visto en
+`censoecuador.gob.ec` y `superbancos.gob.ec` (falta una CA intermedia en
+certifi, no un certificado roto/expirado). Añadido a
+`_OS_TRUST_HOST_SUFFIXES` en `helpers/tls.py`, mismo fix, verificación
+completa intacta.
+
+### SRI — búsqueda de RUC por razón social, API moderna sin CAPTCHA
+
+Pedido explícito de Daniel: agregar búsqueda por nombre de empresa/razón
+social al lookup de RUC exacto ya construido (`get_sri_ruc_info`). El
+formulario de búsqueda por nombre "clásico"
+(`/facturacion-internet/consultas/publico/ruc_consulta.jsp`, el mismo
+dominio legacy que sirve el lookup por RUC exacto) sí existe, pero trae un
+widget `visualcaptcha` (`codigoCaptcha`/`j_captcha_response`) — completar
+CAPTCHAs está fuera de los límites de este proyecto, así que esa ruta
+quedó descartada sin construir nada sobre ella.
+
+Manejando el browser sobre la app Angular actual de srienlinea.sri.gob.ec
+(`/sri-en-linea/SriRucWeb/ConsultaRuc/Consultas/consultaRuc`, a la que la
+página legacy redirige por JS) se encontró la ruta real: una API REST en
+JSON completamente distinta, sin CAPTCHA, confirmada con `curl` plano:
+
+1. `sri-catastro-sujeto-servicio-internet/rest/ConsolidadoContribuyente/cantidadObtenidaPorRazonSocial?razonSocial=X`
+2. `.../numerosRucPorRazonSocialToken?razonSocial=X`
+3. `.../obtenerPorNumerosRuc?ruc=A&ruc=B&...` (lote completo en una sola llamada)
+
+Confirmado en vivo que el lookup por RUC exacto de la app moderna usa la
+misma familia de API (`obtenerPorNumerosRuc` con un solo `ruc=`) — es
+decir, la API moderna cubre ambos casos (RUC exacto y búsqueda por
+nombre) con datos más ricos que el scrape HTML legacy (régimen,
+representantes legales, agente de retención, contribuyente
+especial/fantasma/con transacciones inexistentes). No se migró
+`get_sri_ruc_info` a esta API porque ya estaba construido y probado sobre
+el scrape legacy — `search_sri_ruc` (nuevo) usa la API moderna solo para
+el caso de búsqueda por nombre, que es lo que realmente pedía el gap.
+
+El servidor limita ambos pasos 1 y 2 a 100 coincidencias (confirmado en
+vivo con "BANCO" y con "SA", dos términos deliberadamente amplios: ambos
+devolvieron exactamente 100) — así que un conteo de 100 se reporta como
+"al menos 100", nunca como un total exacto.
+
 ---
 
 ## Notas históricas

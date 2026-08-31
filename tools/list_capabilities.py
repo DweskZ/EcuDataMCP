@@ -23,6 +23,7 @@ _CAPABILITIES = {
         "Supercías directorio de compañías",
         "Supercías registro de auditores externos autorizados",
         "Supercías ranking financiero (últimos años, requiere build local)",
+        "SRI consulta pública del Registro Único de Contribuyentes (RUC)",
         (
             "SIPA (Ministerio de Agricultura, Ganadería y Pesca): series "
             "agropecuarias reales — precios, comercio exterior, crédito, "
@@ -79,6 +80,12 @@ _CAPABILITIES = {
             "search_auditores",
             "get_auditor_info",
         ],
+        "sri": [
+            "search_sri_datasets",
+            "search_sri_estadisticas_recaudacion",
+            "get_sri_ruc_info",
+            "search_sri_ruc",
+        ],
         "financieros": ["search_ranking", "get_financials"],
         "agropecuario": ["list_sipa_modulos", "get_sipa_modulo_archivos"],
         "auditoria": ["list_contraloria_informes", "get_contraloria_informe"],
@@ -123,6 +130,11 @@ _CAPABILITIES = {
         (
             "search_companias/get_compania_info: primer uso tras expirar el "
             "caché (6h) puede tardar ~30-40s (descarga y parsea ~35 MB, 226k filas)"
+        ),
+        (
+            "get_sri_ruc_info consulta únicamente la ficha registral pública "
+            "del SRI y sus establecimientos; no expone declaraciones ni "
+            "montos tributarios individuales"
         ),
         (
             "search_ranking/get_financials: requieren que el operador del "

@@ -9,6 +9,7 @@ from tools.get_auditor_info import register_get_auditor_info_tool
 from tools.get_bce_iem_table import register_get_bce_iem_table_tool
 from tools.get_bce_indicador_diario import register_get_bce_indicador_diario_tool
 from tools.get_category_info import register_get_category_info_tool
+from tools.get_cenace_tablero import register_get_cenace_tablero_tool
 from tools.get_compania_info import register_get_compania_info_tool
 from tools.get_contraloria_informe import register_get_contraloria_informe_tool
 from tools.get_contrato_info import register_get_contrato_info_tool
@@ -24,6 +25,7 @@ from tools.get_organization_info import register_get_organization_info_tool
 from tools.get_regulacion_info import register_get_regulacion_info_tool
 from tools.get_resource_info import register_get_resource_info_tool
 from tools.get_sipa_modulo_archivos import register_get_sipa_modulo_archivos_tool
+from tools.get_sri_ruc_info import register_get_sri_ruc_info_tool
 from tools.get_superbancos_seccion_archivos import (
     register_get_superbancos_seccion_archivos_tool,
 )
@@ -70,6 +72,7 @@ from tools.search_sri_datasets import register_search_sri_datasets_tool
 from tools.search_sri_estadisticas_recaudacion import (
     register_search_sri_estadisticas_recaudacion_tool,
 )
+from tools.search_sri_ruc import register_search_sri_ruc_tool
 from tools.search_tramites import register_search_tramites_tool
 
 
@@ -97,6 +100,8 @@ def register_tools(mcp: FastMCP) -> None:
     register_get_category_info_tool(mcp)
     register_search_sri_datasets_tool(mcp)
     register_search_sri_estadisticas_recaudacion_tool(mcp)
+    register_get_sri_ruc_info_tool(mcp)
+    register_search_sri_ruc_tool(mcp)
     register_read_pdf_tool(mcp)
     register_list_zip_contents_tool(mcp)
 
@@ -143,6 +148,7 @@ def register_tools(mcp: FastMCP) -> None:
     register_search_bce_remesas_tool(mcp)
     register_list_bce_indicadores_diarios_tool(mcp)
     register_get_bce_indicador_diario_tool(mcp)
+    register_get_cenace_tablero_tool(mcp)
 
     register_search_companias_tool(mcp)
     register_get_compania_info_tool(mcp)

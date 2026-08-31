@@ -70,8 +70,9 @@ def should_retry_insecure(exc: BaseException, url: str) -> bool:
 # _INSECURE_TLS_HOST_SUFFIXES, this keeps full certificate verification on --
 # not a security downgrade, so it isn't gated behind CKAN_INSECURE_TLS and
 # is kept in its own list rather than merged with either existing one.
-# superbancos.gob.ec has the same failure mode, confirmed the same way.
-_OS_TRUST_HOST_SUFFIXES = ("censoecuador.gob.ec", "superbancos.gob.ec")
+# superbancos.gob.ec and cenace.gob.ec have the same failure mode, confirmed
+# the same way.
+_OS_TRUST_HOST_SUFFIXES = ("censoecuador.gob.ec", "superbancos.gob.ec", "cenace.gob.ec")
 
 
 def host_needs_os_trust_store(url: str) -> bool:

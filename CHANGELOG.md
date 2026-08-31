@@ -144,6 +144,50 @@
   docstring flags explicitly that "histórica" (pre-change) and "BDD"
   (post-change) files are methodologically distinct series, per the page's
   own comparability note, rather than one continuous one.
+- **`get_cenace_tablero`** — CENACE's live grid-operations snapshot
+  (`helpers/cenace_client.py`), Ecuador's national electricity operator:
+  generation mix and demand, no CKAN organization equivalent exists.
+  Confirmed live in-browser (network tab empty across all 5 tab switches)
+  that the whole page is server-rendered in one load with no AJAX behind
+  it — 5 fixed tableros (produccion_tiempo_real, demanda_tiempo_real,
+  operativa_diaria, acumulada_mensual, acumulada_anual), each an as-of-now
+  snapshot (this instant/yesterday/month-to-date/year-to-date) with no
+  date picker and no historical series behind any of them. Parses the 6
+  headline resumen numbers per tablero plus, for demanda_tiempo_real, a
+  19-distributor MW breakdown read from the SVG map's `<title>` tags
+  (simpler than decoding the equivalent Plotly bar chart's base64-packed
+  float64 array). Per-plant/fuel-type detail and the 24h generation curve
+  are deliberately not scraped — both live only inside `Plotly.newPlot`
+  blobs wrapped in a large shared theme template, and the resumen numbers
+  already cover the dashboard's real value. `www.cenace.gob.ec` needed the
+  same OS-trust-store TLS fallback as `censoecuador.gob.ec`/
+  `superbancos.gob.ec` (missing intermediate CA in certifi, not a broken
+  cert). Short (180s) cache TTL since the tiempo-real tablero changes
+  continuously.
+
+- **`get_sri_ruc_info`/`search_sri_ruc`** — SRI's public Registro Único de
+  Contribuyentes lookup (`helpers/sri_ruc_client.py`). `get_sri_ruc_info`
+  covers the exact-RUC case (registry record + registered establishments,
+  scraped from the legacy `/facturacion-internet/consultas/publico/`
+  pages — no auth, no CAPTCHA). `search_sri_ruc` adds the "I know the
+  company name, not its RUC" case, using a separate and more modern
+  unauthenticated JSON REST API
+  (`sri-catastro-sujeto-servicio-internet/rest/ConsolidadoContribuyente`)
+  found by driving srienlinea.sri.gob.ec's current Angular RUC app in a
+  browser and watching its network calls — the *legacy* name-search form
+  (`ruc_consulta.jsp`) is CAPTCHA-gated (a visualcaptcha widget) and was
+  deliberately left alone; the modern flow has no CAPTCHA at all,
+  confirmed with a bare `curl`. Three chained calls
+  (`cantidadObtenidaPorRazonSocial` → `numerosRucPorRazonSocialToken` →
+  `obtenerPorNumerosRuc`, the last batching a whole page of RUCs into one
+  request) also return richer fields than the HTML scrape — régimen,
+  representantes legales, agente de retención, contribuyente
+  especial/fantasma/con transacciones inexistentes. The SRI caps matches
+  at 100 server-side (confirmed live with both "BANCO" and "SA"); a
+  `total_reportado` of 100 is flagged as "at least 100, not necessarily
+  exactly 100" rather than presented as an exact count. Both tools state
+  explicitly that this is a registry lookup, not a way to retrieve an
+  individual's tax returns, sales, withholdings, or payments.
 
 ## 0.8.3 — 2026-08-30
 
