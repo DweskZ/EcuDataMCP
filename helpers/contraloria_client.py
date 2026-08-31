@@ -1,21 +1,28 @@
-"""Client for Contraloría General del Estado's "Datos Abiertos" page
-(contraloria.gob.ec/Portal/24287) — quarterly CSV exports of approved
-audit reports (informes de auditoría aprobados) for every public
-institution in the country, plus a glossary.
+"""Client for two Contraloría General del Estado pages that share the same
+`WFDescarga.aspx?id={id}&tipo={tipo}&op=d` download pattern:
 
-The page lists each document as a row with a "Descargar" button whose
-onclick builds a download URL: `WFDescarga.aspx?id={id}&tipo={tipo}&op=d`.
-No JS execution is needed — the id/tipo pair is present as plain text in
-the page's HTML (inside the button's onclick attribute), so it's scraped
-the same way as helpers/inec_client.py's file links. Confirmed live: each
+- "Datos Abiertos" (contraloria.gob.ec/Portal/24287, `tipo=pesdoc`) —
+  quarterly CSV exports of approved audit reports (informes de auditoría
+  aprobados) for every public institution in the country, plus a glossary.
+- "Plan Anual de Control" (contraloria.gob.ec/Portal/Sistema/PlanAnualControl,
+  `tipo=doc`) — one PDF per year (the "Acuerdo de aprobación") setting out
+  that year's planned control actions.
+
+Both pages list each document as a row with a "Descargar" button whose
+onclick builds the download URL. No JS execution is needed — the id/tipo
+pair is present as plain text in the page's HTML (inside the button's
+onclick attribute), so it's scraped the same way as
+helpers/inec_client.py's file links. Confirmed live: each "Datos Abiertos"
 CSV is real (~130-155 KB, well under the 5 MB cap), columns `N°; Unidad de
 Control; Entidad; Diligencia; Periodo Desde; Periodo Hasta; Tipo de
 informe; N° Informe; Fecha Aprobación` — one row per audit report approved
-for any institution in that quarter.
+for any institution in that quarter. "Plan Anual de Control" documents are
+PDFs, not CSVs — get_informe() returns metadata only for those and points
+callers at read_pdf.
 
-The list of quarters grows over time (a new one is added roughly every
-three months), so — unlike helpers/sipa_client.py's four fixed modules —
-this page is scraped live rather than hardcoded.
+Both lists grow over time (a new quarter/year roughly every three
+months/year), so — unlike helpers/sipa_client.py's four fixed modules —
+both pages are scraped live rather than hardcoded.
 
 Reuses helpers/csv_reader.preview_csv for the actual download+parse
 (encoding fallback for the site's non-UTF-8 CSVs, delimiter sniffing)
@@ -37,7 +44,14 @@ from helpers.logging import MAIN_LOGGER_NAME
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 _SEED_URL = "https://www.contraloria.gob.ec/Portal/24287"
+_PLAN_ANUAL_SEED_URL = "https://www.contraloria.gob.ec/Portal/Sistema/PlanAnualControl"
+_SEED_URLS = (_SEED_URL, _PLAN_ANUAL_SEED_URL)
 _BASE = "https://www.contraloria.gob.ec"
+
+# The one tipo that is a CSV export ("Datos Abiertos" quarterly reports).
+# Every other tipo (currently only "doc", Plan Anual de Control) is a PDF —
+# get_informe() returns metadata only for those instead of trying preview_csv.
+_CSV_TIPO = "pesdoc"
 
 # The page is only refreshed when a new quarter is published (roughly every
 # 3 months), same rationale as helpers/inec_client.py's topic-menu cache.
@@ -66,23 +80,24 @@ async def _fetch_informes() -> list[dict[str, str]]:
         if cached is not None:
             return cached
 
-        logger.info("Descargando la página de Datos Abiertos de la Contraloría")
-        content, truncated = await download_bytes(_SEED_URL)
-        if truncated:
-            raise ValueError(f"La página de {_SEED_URL} superó el límite de descarga.")
-        html = content.decode("utf-8", errors="replace")
-
         informes = []
-        for m in _ROW_RE.finditer(html):
-            id_, tipo = m.group("id"), m.group("tipo")
-            informes.append(
-                {
-                    "id": id_,
-                    "tipo": tipo,
-                    "label": _clean(m.group("label")),
-                    "url": f"{_BASE}/WFDescarga.aspx?id={id_}&tipo={tipo}&op=d",
-                }
-            )
+        for seed_url in _SEED_URLS:
+            logger.info("Descargando página de la Contraloría: %s", seed_url)
+            content, truncated = await download_bytes(seed_url)
+            if truncated:
+                raise ValueError(f"La página de {seed_url} superó el límite de descarga.")
+            html = content.decode("utf-8", errors="replace")
+
+            for m in _ROW_RE.finditer(html):
+                id_, tipo = m.group("id"), m.group("tipo")
+                informes.append(
+                    {
+                        "id": id_,
+                        "tipo": tipo,
+                        "label": _clean(m.group("label")),
+                        "url": f"{_BASE}/WFDescarga.aspx?id={id_}&tipo={tipo}&op=d",
+                    }
+                )
         if informes:
             # Same "don't cache an apparently-broken/empty scrape" rationale
             # as helpers/sipa_client.py — an empty result here likely means
@@ -111,6 +126,18 @@ async def get_informe(informe_id: str, max_rows: int = 50) -> dict[str, Any]:
     if match is None:
         valid = ", ".join(i["id"] for i in informes) or "(ninguno disponible)"
         raise ValueError(f"informe_id '{informe_id}' no encontrado. Válidos: {valid}")
+
+    if match["tipo"] != _CSV_TIPO:
+        # Plan Anual de Control (and any other non-pesdoc tipo) is a PDF, not
+        # a CSV export -- nothing here to parse as a table. Metadata + URL
+        # only, same pattern as SIPA/Supercías financials; read_pdf handles
+        # the actual content.
+        return {
+            "label": match["label"],
+            "url": match["url"],
+            "tipo": match["tipo"],
+            "is_pdf": True,
+        }
 
     result = await preview_csv(match["url"], max_rows=max_rows)
     result["label"] = match["label"]

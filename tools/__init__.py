@@ -32,6 +32,7 @@ from tools.list_instituciones import register_list_instituciones_tool
 from tools.list_recent_datasets import register_list_recent_datasets_tool
 from tools.list_sat_tsunami import register_list_sat_tsunami_tool
 from tools.list_sipa_modulos import register_list_sipa_modulos_tool
+from tools.list_zip_contents import register_list_zip_contents_tool
 from tools.lookup_ubicacion import register_lookup_ubicacion_tool
 from tools.preview_resource_data import register_preview_resource_data_tool
 from tools.query_resource_data import register_query_resource_data_tool
@@ -39,6 +40,7 @@ from tools.read_pdf import register_read_pdf_tool
 from tools.search_anda import register_search_anda_tool
 from tools.search_auditores import register_search_auditores_tool
 from tools.search_bce_iem import register_search_bce_iem_tool
+from tools.search_bce_remesas import register_search_bce_remesas_tool
 from tools.search_biinec_extras import register_search_biinec_extras_tool
 from tools.search_censo_recursos import register_search_censo_recursos_tool
 from tools.search_companias import register_search_companias_tool
@@ -54,6 +56,9 @@ from tools.search_ranking import register_search_ranking_tool
 from tools.search_regulaciones import register_search_regulaciones_tool
 from tools.search_sismos import register_search_sismos_tool
 from tools.search_sri_datasets import register_search_sri_datasets_tool
+from tools.search_sri_estadisticas_recaudacion import (
+    register_search_sri_estadisticas_recaudacion_tool,
+)
 from tools.search_tramites import register_search_tramites_tool
 
 
@@ -80,7 +85,9 @@ def register_tools(mcp: FastMCP) -> None:
     register_list_categories_tool(mcp)
     register_get_category_info_tool(mcp)
     register_search_sri_datasets_tool(mcp)
+    register_search_sri_estadisticas_recaudacion_tool(mcp)
     register_read_pdf_tool(mcp)
+    register_list_zip_contents_tool(mcp)
 
     register_search_tramites_tool(mcp)
     register_get_tramite_info_tool(mcp)
@@ -115,6 +122,7 @@ def register_tools(mcp: FastMCP) -> None:
     register_audit_bce_catalog_tool(mcp)
     register_search_bce_iem_tool(mcp)
     register_get_bce_iem_table_tool(mcp)
+    register_search_bce_remesas_tool(mcp)
 
     register_search_companias_tool(mcp)
     register_get_compania_info_tool(mcp)

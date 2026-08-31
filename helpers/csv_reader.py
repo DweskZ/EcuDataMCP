@@ -3,6 +3,7 @@ import io
 import json
 import logging
 import re
+import struct
 import tarfile
 import zipfile
 import zlib
@@ -744,6 +745,222 @@ async def preview_zip(
     result["format"] = "zip"
     result["member_name"] = member_name
     return result
+
+
+# A .zip's central directory lives at the end of the file and lists every
+# member's name/size without decompressing anything, so it can be listed via
+# HTTP Range requests for archives far larger than MAX_DOWNLOAD_BYTES (e.g.
+# INEC/censo multi-hundred-MB microdata ZIPs). Previewing a specific member's
+# *rows* still needs a full download (preview_zip, above) -- listing names is
+# cheap this way, reading content generally isn't.
+_EOCD_SIGNATURE = b"PK\x05\x06"
+_CD_HEADER_SIGNATURE = b"PK\x01\x02"
+_EOCD_TAIL_BYTES = 65557 + 22  # max comment (65535) + EOCD record, plus slack
+_MAX_CENTRAL_DIR_BYTES = 20 * 1024 * 1024  # same bound as _gunzip_capped's cap
+
+_CONTENT_RANGE_RE = re.compile(r"bytes\s+(\d+)-(\d+)/(\d+)")
+
+
+async def _fetch_range(
+    url: str,
+    range_header: str,
+    cap: int,
+    session: httpx.AsyncClient | None = None,
+) -> tuple[bytes, httpx.Headers, int]:
+    """GET a byte range, capped at `cap` bytes, returning (body, headers, status_code).
+
+    Mirrors download_bytes' TLS-retry ladder (SSRF-guarded via safe_stream,
+    then OS-trust-store retry, then insecure retry) since range requests hit
+    the same portal hosts with the same TLS quirks. Reads are capped the same
+    way _download() caps a full download, rather than trusting the server to
+    honor the Range header size -- a server that ignores Range and 200s the
+    whole file must not be allowed to stream an unbounded response here.
+    """
+
+    async def _do(sess: httpx.AsyncClient) -> tuple[bytes, httpx.Headers, int]:
+        async with safe_stream(
+            sess, url, timeout=_TIMEOUT, headers={"Range": range_header}
+        ) as resp:
+            if resp.status_code not in (200, 206):
+                resp.raise_for_status()
+            chunks: list[bytes] = []
+            total = 0
+            async for chunk in resp.aiter_bytes(chunk_size=64 * 1024):
+                chunks.append(chunk)
+                total += len(chunk)
+                if total > cap:
+                    break
+            return b"".join(chunks)[:cap], resp.headers, resp.status_code
+
+    own = session is None
+    if own:
+        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
+    assert session is not None
+    try:
+        try:
+            return await _do(session)
+        except httpx.ConnectError as exc:
+            if should_retry_with_os_trust(exc, url):
+                logger.warning(
+                    "TLS verification failed for %s against the bundled CA "
+                    "store; retrying against the OS trust store (still "
+                    "fully verified)",
+                    url,
+                )
+                async with httpx.AsyncClient(
+                    headers={"User-Agent": USER_AGENT}, verify=os_trust_context()
+                ) as os_trust_session:
+                    return await _do(os_trust_session)
+            if not should_retry_insecure(exc, url):
+                raise
+            logger.warning(
+                "TLS verification failed for %s (portal cert expired); "
+                "retrying without verification",
+                url,
+            )
+            async with httpx.AsyncClient(
+                headers={"User-Agent": USER_AGENT}, verify=False
+            ) as insecure_session:
+                return await _do(insecure_session)
+    finally:
+        if own:
+            await session.aclose()
+
+
+def _parse_content_range(headers: httpx.Headers) -> tuple[int, int]:
+    """Return (range_start, total_size) from a 206 response's Content-Range header."""
+    header = headers.get("content-range")
+    if not header:
+        raise ValueError(
+            "El servidor no devolvió un rango parcial (falta el header "
+            "Content-Range) -- no soporta HTTP Range requests, así que este "
+            ".zip no se puede listar sin descargarlo completo."
+        )
+    m = _CONTENT_RANGE_RE.search(header)
+    if not m:
+        raise ValueError(f"Header Content-Range con formato inesperado: {header!r}")
+    start, _end, total = (int(g) for g in m.groups())
+    return start, total
+
+
+def _parse_eocd(tail: bytes) -> tuple[int, int, int]:
+    """Return (cd_offset, cd_size, total_entries) from the End Of Central
+    Directory record found by scanning `tail` (the last bytes of a .zip)."""
+    idx = tail.rfind(_EOCD_SIGNATURE)
+    if idx == -1 or idx + 22 > len(tail):
+        raise ValueError(
+            "No se encontró el registro 'End Of Central Directory' -- puede "
+            "que no sea un .zip válido."
+        )
+    _sig, _disk, _disk_start, _entries_disk, total_entries, cd_size, cd_offset, _comment_len = (
+        struct.unpack_from("<4sHHHHIIH", tail, idx)
+    )
+    if total_entries == 0xFFFF or cd_offset == 0xFFFFFFFF or cd_size == 0xFFFFFFFF:
+        raise ValueError(
+            "Este .zip usa ZIP64 (más de 65535 archivos o directorio central "
+            "de más de 4 GB); el listado por HTTP Range todavía no lo "
+            "soporta. Usa download_resource o el enlace directo."
+        )
+    return cd_offset, cd_size, total_entries
+
+
+def _parse_central_directory(data: bytes, expected_entries: int) -> list[dict[str, Any]]:
+    members: list[dict[str, Any]] = []
+    pos = 0
+    while pos < len(data) and len(members) < expected_entries:
+        if data[pos : pos + 4] != _CD_HEADER_SIGNATURE:
+            break
+        (
+            _sig,
+            _made_by,
+            _needed,
+            flags,
+            compression,
+            _mtime,
+            _mdate,
+            _crc32,
+            compressed_size,
+            uncompressed_size,
+            name_len,
+            extra_len,
+            comment_len,
+            _disk_start,
+            _internal_attrs,
+            _external_attrs,
+            _local_offset,
+        ) = struct.unpack_from("<4sHHHHHHIIIHHHHHII", data, pos)
+        pos += 46
+        name = data[pos : pos + name_len].decode(
+            "utf-8" if flags & 0x0800 else "cp437", errors="replace"
+        )
+        pos += name_len + extra_len + comment_len
+        members.append(
+            {
+                "name": name,
+                "is_dir": name.endswith("/"),
+                "compressed_size": compressed_size,
+                "uncompressed_size": uncompressed_size,
+                "compression": {0: "stored", 8: "deflate"}.get(compression, str(compression)),
+            }
+        )
+    return members
+
+
+async def list_zip_contents(
+    url: str, session: httpx.AsyncClient | None = None
+) -> dict[str, Any]:
+    """
+    List a .zip archive's members (name, size, compression) via HTTP Range
+    requests, without downloading the archive itself.
+
+    Works for archives far past MAX_DOWNLOAD_BYTES since only the End Of
+    Central Directory record and the central directory itself are fetched --
+    both tiny relative to the archive, proportional to entry count rather
+    than entry content. Requires the server to honor Range requests (returns
+    HTTP 206); raises ValueError otherwise. Does not support ZIP64 archives.
+    """
+    tail, tail_headers, tail_status = await _fetch_range(
+        url, f"bytes=-{_EOCD_TAIL_BYTES}", cap=_EOCD_TAIL_BYTES, session=session
+    )
+    if tail_status != 206:
+        raise ValueError(
+            "El servidor respondió con HTTP 200 en vez de 206 (Partial "
+            "Content) -- no soporta HTTP Range requests, así que este .zip "
+            "no se puede listar sin descargarlo completo."
+        )
+    tail_start, total_size = _parse_content_range(tail_headers)
+
+    cd_offset, cd_size, total_entries = _parse_eocd(tail)
+
+    if cd_offset >= tail_start:
+        cd_data = tail[cd_offset - tail_start : cd_offset - tail_start + cd_size]
+    else:
+        if cd_size > _MAX_CENTRAL_DIR_BYTES:
+            raise ValueError(
+                f"El directorio central de este .zip pesa {cd_size} bytes, "
+                f"por encima del límite de {_MAX_CENTRAL_DIR_BYTES} bytes "
+                "que este listado soporta."
+            )
+        cd_data, _cd_headers, cd_status = await _fetch_range(
+            url,
+            f"bytes={cd_offset}-{cd_offset + cd_size - 1}",
+            cap=_MAX_CENTRAL_DIR_BYTES,
+            session=session,
+        )
+        if cd_status != 206:
+            raise ValueError(
+                "El servidor respondió con HTTP 200 en vez de 206 (Partial "
+                "Content) al pedir el directorio central -- no se puede "
+                "listar este .zip sin descargarlo completo."
+            )
+
+    members = _parse_central_directory(cd_data, total_entries)
+    return {
+        "url": url,
+        "total_size_bytes": total_size,
+        "total_entries": total_entries,
+        "members": members,
+    }
 
 
 def format_table(headers: list[str], rows: list[list[str]], max_col_width: int = 40) -> str:

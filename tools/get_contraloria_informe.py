@@ -13,11 +13,14 @@ def register_get_contraloria_informe_tool(mcp: FastMCP) -> None:
         informe_id: str, rows: int = 50, format: str = "text"
     ) -> str:
         """
-        Download and preview one Contraloría "Datos Abiertos" document.
+        Download and preview one Contraloría document (Datos Abiertos or
+        Plan Anual de Control).
 
-        Get informe_id from list_contraloria_informes. Quarterly documents
-        return one row per audit report approved that quarter, across every
-        public institution in the country.
+        Get informe_id from list_contraloria_informes. Quarterly "Datos
+        Abiertos" documents return one row per audit report approved that
+        quarter, across every public institution in the country. "Plan
+        Anual de Control" documents are PDFs (one per year); this returns
+        their metadata and points you at read_pdf instead of a table.
 
         Args:
             informe_id: An id from list_contraloria_informes
@@ -39,6 +42,18 @@ def register_get_contraloria_informe_tool(mcp: FastMCP) -> None:
                 {"error": str(e), "informe_id": informe_id},
                 format,
                 text_builder=lambda d: f"Error al descargar el documento: {d['error']}",
+            )
+
+        if result.get("is_pdf"):
+            return render_output(
+                result,
+                format,
+                text_builder=lambda d: (
+                    f"Documento: {d['label']}\n"
+                    f"URL: {d['url']}\n"
+                    "Este documento es un PDF, no una tabla -- usa "
+                    f"read_pdf('{d['url']}') para leer su contenido."
+                ),
             )
 
         headers = result["headers"]

@@ -1,5 +1,50 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- **`list_zip_contents`** — lists a .zip archive's members (name, size,
+  compression) from a direct URL via HTTP Range requests, without
+  downloading the archive. Reads only the End Of Central Directory record
+  and the central directory itself (`helpers/csv_reader.list_zip_contents`,
+  `_fetch_range`), both tiny relative to the archive regardless of its
+  total size — works for INEC/censo-style multi-hundred-MB ZIPs that
+  MAX_DOWNLOAD_BYTES would otherwise truncate outright. Requires the host to
+  honor Range requests (HTTP 206); fails with an explicit message otherwise.
+  Does not support ZIP64. Reuses `download_bytes`'s TLS-retry ladder
+  (OS-trust-store, then insecure) since this hits the same portal hosts.
+  Listing names this way is cheap; previewing a member's *rows* still needs
+  a full download (`preview_zip`) — noted explicitly in both docstrings so
+  it isn't mistaken for a general large-file preview solution.
+- **Contraloría — "Plan Anual de Control"** added to the existing
+  `list_contraloria_informes`/`get_contraloria_informe` tools
+  (`helpers/contraloria_client.py`), reusing the same
+  `WFDescarga.aspx?id={id}&tipo={tipo}&op=d` pattern already implemented
+  for "Datos Abiertos" (`tipo=pesdoc`) with a second seed page
+  (`Portal/Sistema/PlanAnualControl`, `tipo=doc`). Unlike the quarterly CSV
+  exports, these are one PDF per year (the approved annual control plan) —
+  `get_contraloria_informe` now detects the non-CSV `tipo` and returns
+  metadata plus a `read_pdf` pointer instead of attempting `preview_csv`.
+- **`search_sri_estadisticas_recaudacion`** — SRI's "Estadísticas de
+  Recaudación" page (`helpers/sri_client.py`), a real gap beyond the
+  existing `/datasets` scraper: monthly XLSX reports pre-aggregated by
+  impuesto/provincia/cantón and by actividad económica (a different
+  aggregation level than `/datasets`' raw yearly exports, not a duplicate),
+  plus a historical-indicators ZIP, an annual PDF boletín técnico, and
+  infografías. The page's links live in a Liferay "Biblioteca Alfresco"
+  document library with generic anchor text ("Ver estadísticas de
+  recaudación"), so labels are derived from the URL's filename instead —
+  which already carries the real report name and month/year.
+- **`search_bce_remesas`** — BCE's dedicated Remesas de Trabajadores
+  (worker remittances) page (`helpers/bce_remesas_client.py`), separate
+  from BCEData/IEM: the aggregate flow series, the full historical series,
+  a methodology user note, and — since a July 2025 change to microdata-based
+  collection — monthly aggregate and entity-level databases (BDD). The tool
+  docstring flags explicitly that "histórica" (pre-change) and "BDD"
+  (post-change) files are methodologically distinct series, per the page's
+  own comparability note, rather than one continuous one.
+
 ## 0.8.3 — 2026-08-30
 
 ### Added

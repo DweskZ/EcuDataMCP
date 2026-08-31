@@ -10,17 +10,19 @@ def register_list_contraloria_informes_tool(mcp: FastMCP) -> None:
     @log_tool
     async def list_contraloria_informes(format: str = "text") -> str:
         """
-        List Contraloría General del Estado's "Datos Abiertos" documents.
+        List Contraloría General del Estado's "Datos Abiertos" and
+        "Plan Anual de Control" documents.
 
-        Quarterly CSV exports of audit reports approved for ANY public
-        institution in the country (Unidad de Control, Entidad, Diligencia,
-        periodo, tipo de informe, N° de informe, fecha de aprobación) —
-        much broader than any single-institution audit archive already
-        covered elsewhere in this MCP. New quarters are added roughly every
-        three months.
+        "Datos Abiertos" are quarterly CSV exports of audit reports approved
+        for ANY public institution in the country (Unidad de Control,
+        Entidad, Diligencia, periodo, tipo de informe, N° de informe, fecha
+        de aprobación) — much broader than any single-institution audit
+        archive already covered elsewhere in this MCP. New quarters are
+        added roughly every three months. "Plan Anual de Control" documents
+        are one PDF per year (the approved annual control plan).
 
         Follow up with get_contraloria_informe(informe_id) for one
-        document's parsed rows.
+        document's parsed rows (CSV) or metadata + read_pdf pointer (PDF).
 
         Args:
             format: text | json

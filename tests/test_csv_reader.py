@@ -2,6 +2,7 @@ import gzip
 import io
 import socket
 import ssl
+import struct
 import tarfile
 import zipfile
 import zlib
@@ -14,7 +15,9 @@ from helpers.csv_reader import (
     MAX_DOWNLOAD_BYTES,
     _gunzip_capped,
     _parse_csv_bytes,
+    _parse_eocd,
     download_bytes,
+    list_zip_contents,
     normalize_eu_decimal_columns,
     preview_ods,
     preview_targz,
@@ -499,6 +502,99 @@ def _make_ods(rows: list[list[str]], pad_columns: int = 0, pad_rows: int = 0) ->
     buf = io.BytesIO()
     doc.write(buf)
     return buf.getvalue()
+
+
+def test_parse_eocd_rejects_zip64_sentinels():
+    tail = struct.pack(
+        "<4sHHHHIIH", b"PK\x05\x06", 0, 0, 0xFFFF, 0xFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0
+    )
+    with pytest.raises(ValueError, match="ZIP64"):
+        _parse_eocd(tail)
+
+
+async def test_list_zip_contents_lists_members_via_single_range(httpx_mock, monkeypatch):
+    # A small archive: the central directory sits well inside the default
+    # tail window, so this should resolve with a single Range request.
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+
+    zip_bytes = _make_zip({"data.csv": b"a,b\n1,2\n", "readme.txt": b"hello world"})
+    total = len(zip_bytes)
+    url = "https://example.com/small.zip"
+
+    httpx_mock.add_response(
+        url=url,
+        status_code=206,
+        content=zip_bytes,
+        headers={"Content-Range": f"bytes 0-{total - 1}/{total}"},
+    )
+
+    result = await list_zip_contents(url)
+
+    assert result["total_size_bytes"] == total
+    assert result["total_entries"] == 2
+    members = {m["name"]: m for m in result["members"]}
+    assert members["data.csv"]["uncompressed_size"] == len(b"a,b\n1,2\n")
+    assert members["data.csv"]["is_dir"] is False
+    assert members["readme.txt"]["uncompressed_size"] == len(b"hello world")
+
+
+async def test_list_zip_contents_fetches_central_directory_separately_when_outside_tail(
+    httpx_mock, monkeypatch
+):
+    # Force a tiny tail window so the central directory (which precedes the
+    # EOCD record) falls outside the first Range fetch, exercising the
+    # second Range request for the central directory itself.
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+    monkeypatch.setattr(csv_reader_module, "_EOCD_TAIL_BYTES", 30)
+
+    zip_bytes = _make_zip({"data.csv": b"a,b\n1,2\n", "readme.txt": b"hello world"})
+    total = len(zip_bytes)
+    tail = zip_bytes[-30:]
+    cd_offset, cd_size, _entries = _parse_eocd(tail)
+    url = "https://example.com/tiny-tail.zip"
+
+    httpx_mock.add_response(
+        url=url,
+        method="GET",
+        match_headers={"Range": "bytes=-30"},
+        status_code=206,
+        content=tail,
+        headers={"Content-Range": f"bytes {total - 30}-{total - 1}/{total}"},
+    )
+    httpx_mock.add_response(
+        url=url,
+        method="GET",
+        match_headers={"Range": f"bytes={cd_offset}-{cd_offset + cd_size - 1}"},
+        status_code=206,
+        content=zip_bytes[cd_offset : cd_offset + cd_size],
+        headers={
+            "Content-Range": f"bytes {cd_offset}-{cd_offset + cd_size - 1}/{total}"
+        },
+    )
+
+    result = await list_zip_contents(url)
+
+    assert result["total_entries"] == 2
+    assert {m["name"] for m in result["members"]} == {"data.csv", "readme.txt"}
+
+
+async def test_list_zip_contents_requires_range_support(httpx_mock, monkeypatch):
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+
+    url = "https://example.com/no-range.zip"
+    httpx_mock.add_response(url=url, status_code=200, content=b"whatever bytes")
+
+    with pytest.raises(ValueError, match="no soporta HTTP Range"):
+        await list_zip_contents(url)
 
 
 async def test_preview_ods_reads_header_and_rows(httpx_mock, monkeypatch):
