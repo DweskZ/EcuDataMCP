@@ -1,0 +1,40 @@
+name: Smoke test
+
+# Unlike ci.yml (mocked HTTP, runs on every push/PR), this hits the real
+# government sites this project scrapes. It's slow and depends on external
+# uptime, so it runs on its own schedule instead of blocking every push --
+# a failure here means a live source broke (HTML/API changed, moved,
+# went down), not that a code change is bad. GitHub emails the repo's
+# watchers by default when a scheduled workflow run fails, so this needs
+# no extra alerting setup.
+
+on:
+  schedule:
+    - cron: "17 9 * * *" # once a day; avoids the top-of-hour cron stampede
+  workflow_dispatch: {}
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: uv sync --group dev --locked
+      - name: Start server
+        run: |
+          uv run main.py > server.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:8000/health && exit 0
+            sleep 1
+          done
+          echo "server did not become healthy in time"
+          cat server.log
+          exit 1
+      - name: Smoke test
+        run: uv run python scripts/smoke_e2e.py
+      - name: Server log (on failure)
+        if: failure()
+        run: cat server.log

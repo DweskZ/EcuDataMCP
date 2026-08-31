@@ -32,6 +32,7 @@ from tools.get_superbancos_seccion_archivos import (
 )
 from tools.get_sut_indicador_schema import register_get_sut_indicador_schema_tool
 from tools.get_tramite_info import register_get_tramite_info_tool
+from tools.investigate_dataset import register_investigate_dataset_tool
 from tools.list_bce_indicadores_diarios import (
     register_list_bce_indicadores_diarios_tool,
 )
@@ -108,6 +109,7 @@ def register_tools(mcp: FastMCP) -> None:
     register_search_sri_ruc_tool(mcp)
     register_read_pdf_tool(mcp)
     register_list_zip_contents_tool(mcp)
+    register_investigate_dataset_tool(mcp)
 
     register_search_tramites_tool(mcp)
     register_get_tramite_info_tool(mcp)

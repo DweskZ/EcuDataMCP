@@ -4,6 +4,31 @@
 
 ### Added
 
+- **`investigate_dataset`** — one-shot research shortcut chaining
+  `search_datasets` → `list_dataset_resources` → `preview_resource_data`
+  into a single call: search a query, take the top-ranked dataset, and
+  preview the first resource in a format this server can actually parse
+  (skipping `.rar`/unrecognized ones instead of blindly previewing
+  whatever is listed first). Flags when the dataset looks like it
+  publishes a periodic series (reusing `list_dataset_resources`'s
+  `detect_periodic_series`) and points at `detect_series_pattern` instead
+  of re-implementing that heuristic.
+- **Smoke test coverage widened from 13 to ~39 of 68 tools**
+  (`scripts/smoke_e2e.py`), plus 3 new end-to-end chains (list → get) for
+  the trickiest integrations — SUT Power BI, Superbancos OneDrive, and
+  IG-EPN informes — that discover a real live ID first instead of
+  hardcoding one that could go stale. Fixed a real pre-existing bug found
+  in the process: any non-ASCII character (routine in this project's
+  output — accents, →, ⚠) in a failure message crashed the whole script
+  on Windows (`cp1252` console encoding), silently hiding every check
+  after the one that happened to fail first.
+- **`.github/workflows/smoke.yml`** — runs the smoke test daily against a
+  freshly started server (separate from `ci.yml`, which only runs mocked
+  unit tests on every push). A failure here means a live government site
+  changed/broke, not that a code change is bad; GitHub emails the repo's
+  watchers by default on a failed scheduled run, so no extra alerting
+  setup was needed.
+
 - **`search_informes_igepn`/`get_informe_igepn`** — the IG-EPN PDF report
   archive (`https://www.igepn.edu.ec/servicios/busqueda-informes`, backed
   by a separate JSF/PrimeFaces app at `informes.igepn.edu.ec`), distinct

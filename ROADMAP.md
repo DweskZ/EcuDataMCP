@@ -28,9 +28,17 @@ Leyenda: `[ ]` sin empezar · `[~]` parcial · `[x]` hecho
       consulta y nivel de frescura, y mantener respuestas pequeñas para uso
       móvil. Los archivos grandes deben quedarse en el servidor; el agente debe
       recibir resultados paginados o enlaces, no cientos de megabytes.
-- [ ] **Operación 24/7** — añadir una tarea programada separada del proceso MCP,
-      reintentos, alertas cuando una fuente cambie de esquema o deje de
-      responder, y una prueba de humo periódica desde fuera del servidor.
+- [~] **Operación 24/7** — construido 2026-08-31: `.github/workflows/smoke.yml`
+      ejecuta diariamente `scripts/smoke_e2e.py` (ahora con ~39 de 68 tools
+      cubiertos, antes 13, más 3 cadenas dinámicas list→get que descubren un
+      ID real en vivo para SUT/Superbancos/IG-EPN en vez de fijar uno que
+      pueda quedar obsoleto) contra un servidor recién levantado, separado de
+      `ci.yml` (que solo corre tests unitarios con HTTP mockeado en cada
+      push). GitHub avisa por correo a quienes ven el repo cuando una
+      ejecución programada falla — sin infraestructura de alertas nueva.
+      Cubre la "prueba de humo periódica desde fuera del servidor" del ítem
+      original. Pendiente: reintentos y alertas específicas de "una fuente
+      cambió de esquema" (hoy solo distingue passed/failed, no el motivo).
 
 ## Nuevas conexiones de datos
 
@@ -264,7 +272,7 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
 
 - [ ] `outputSchema` en los tools MCP.
 - [ ] Manejo geoespacial (WKT/GeoJSON más allá del stripping actual).
-- [ ] Tool de investigación "one-shot" (una sola llamada que combine búsqueda + preview + detección de serie).
+- [x] Tool de investigación "one-shot" — `investigate_dataset`, construido 2026-08-31. Encadena `search_datasets` → `list_dataset_resources` → `preview_resource_data` en una sola llamada (toma el dataset mejor rankeado y previsualiza su primer recurso en un formato legible, saltando `.rar`/desconocidos en vez de previsualizar ciegamente lo primero de la lista) y avisa cuando el dataset parece publicar una serie periódica, señalando `detect_series_pattern` en vez de reimplementar esa heurística.
 - [x] Protección HTTP base — `/mcp` admite Bearer token opcional, el bind local
       es loopback por defecto y existe un límite global de concurrencia; `/health`
       queda libre para health checks.

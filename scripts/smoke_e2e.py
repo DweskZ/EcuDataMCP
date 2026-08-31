@@ -4,8 +4,16 @@ from __future__ import annotations
 
 import asyncio
 import json
+import sys
 
 import httpx
+
+# Tool output routinely contains non-ASCII text (accents, →, ⚠...) from
+# real government sources; on Windows the console defaults to cp1252,
+# which raises on those and would abort the whole run mid-loop, hiding
+# every check after the one that happened to fail. utf-8 with `replace`
+# keeps a crash from ever being about console encoding.
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 MCP_URL = "http://127.0.0.1:8000/mcp"
 HEALTH_URL = "http://127.0.0.1:8000/health"
@@ -152,6 +160,42 @@ async def main() -> int:
                 {"query": "salud", "limit": 2, "format": "json"},
                 ["datasets", "tramites"],
             ),
+            # -- everything below has no fixed ID to assert against (a query
+            # legitimately returning zero results is not a failure -- only
+            # errors/tracebacks are), so `must` stays empty unless the tool
+            # returns a fixed, non-query-dependent shape.
+            ("search_organizations", {"query": "sri", "page_size": 3}, []),
+            ("search_sri_datasets", {"query": "recaudacion", "limit": 3}, []),
+            (
+                "search_sri_estadisticas_recaudacion",
+                {"query": "recaudacion", "limit": 3},
+                [],
+            ),
+            ("search_sri_ruc", {"razon_social": "BANCO", "max_resultados": 3}, []),
+            ("search_indicadores_bce", {"query": "inflacion", "limit": 5}, []),
+            ("search_bce_iem", {"query": "inflacion", "limit": 5}, []),
+            ("search_bce_remesas", {"query": ""}, []),
+            ("audit_bce_catalog", {}, ["grupos", "series"]),
+            ("list_bce_indicadores_diarios", {}, ["Riesgo", "serie"]),
+            (
+                "get_cenace_tablero",
+                {"tablero": "produccion_tiempo_real"},
+                ["PRODUCCIÓN", "HIDRÁULICA"],
+            ),
+            ("search_sismos", {"limit": 3}, []),
+            ("search_informes_igepn", {"anio": 2022, "grupo": "sismico", "limit": 3}, []),
+            ("search_companias", {"query": "BANCO", "limit": 3}, []),
+            ("search_auditores", {"query": "AUDIT", "limit": 3}, []),
+            ("search_ranking", {"limit": 3}, []),
+            ("list_sipa_modulos", {}, ["SIPA", "económico"]),
+            ("list_superbancos_secciones", {}, ["seccion"]),
+            ("list_sut_indicadores", {}, ["indicador"]),
+            ("list_contraloria_informes", {}, ["Contraloría"]),
+            ("search_anda", {"query": "empleo", "limit": 3}, []),
+            ("search_biinec_extras", {"query": "ambiental"}, []),
+            ("search_censo_recursos", {"query": "poblacion", "limit": 3}, []),
+            ("search_inec_estadisticas", {"query": "empleo", "limit": 3}, []),
+            ("search_inec_publicaciones", {"query": "empleo", "limit": 3}, []),
         ]
 
         print("== tools ==")
@@ -166,9 +210,82 @@ async def main() -> int:
                 failed += 1
                 print(f"  FAIL {name}: {exc}")
 
+        # -- dynamic list -> get chains -----------------------------------
+        # A handful of the trickiest integrations (undocumented internal
+        # APIs/widgets, session-bound flows) are worth exercising end to
+        # end -- list the catalog, then actually fetch one real item found
+        # in it -- rather than just confirming the list call responds.
+        # IDs are discovered live, not hardcoded, so this doesn't rot when
+        # the underlying site's IDs change.
+        print("== chains ==")
+        chains = 0
+        for label, coro in [
+            ("sut: list -> schema", chain_sut(client)),
+            ("superbancos: list -> archivos", chain_superbancos(client)),
+            ("igepn: search -> informe", chain_igepn(client)),
+        ]:
+            chains += 1
+            try:
+                await coro
+                print(f"  OK   {label}")
+            except Exception as exc:
+                failed += 1
+                print(f"  FAIL {label}: {exc}")
+
         print("== done ==")
-        print(f"failed={failed}/{len(checks)}")
+        total = len(checks) + chains
+        print(f"failed={failed}/{total}")
         return 1 if failed else 0
+
+
+async def chain_sut(client: httpx.AsyncClient) -> None:
+    listing = json.loads(await call_tool(client, "list_sut_indicadores", {"format": "json"}))
+    indicador = listing[0]["indicador"]
+    schema = await call_tool(
+        client, "get_sut_indicador_schema", {"indicador": indicador, "format": "json"}
+    )
+    if "Traceback" in schema[:200] or schema.strip().startswith(("Error:", "ERROR:")):
+        raise AssertionError(schema[:200])
+
+
+async def chain_superbancos(client: httpx.AsyncClient) -> None:
+    listing = json.loads(
+        await call_tool(client, "list_superbancos_secciones", {"format": "json"})
+    )
+    seccion = listing[0]["seccion"]
+    archivos = await call_tool(
+        client, "get_superbancos_seccion_archivos", {"seccion": seccion, "format": "json"}
+    )
+    if "Traceback" in archivos[:200] or archivos.strip().startswith(("Error:", "ERROR:")):
+        raise AssertionError(archivos[:200])
+
+
+async def chain_igepn(client: httpx.AsyncClient) -> None:
+    resultado = json.loads(
+        await call_tool(
+            client,
+            "search_informes_igepn",
+            {"anio": 2022, "grupo": "volcanico", "limit": 1, "format": "json"},
+        )
+    )
+    informes = resultado.get("informes") or []
+    if not informes:
+        raise AssertionError("search_informes_igepn returned no reports for 2022/volcanico")
+    informe = informes[0]
+    texto = await call_tool(
+        client,
+        "get_informe_igepn",
+        {
+            "nombre": informe["nombre"],
+            "volcan": informe.get("volcan") or "",
+            "grupo": "volcanico",
+            "anio": 2022,
+            "pages": "1",
+            "format": "json",
+        },
+    )
+    if "Traceback" in texto[:200] or texto.strip().startswith(("Error:", "ERROR:")):
+        raise AssertionError(texto[:200])
 
 
 if __name__ == "__main__":
