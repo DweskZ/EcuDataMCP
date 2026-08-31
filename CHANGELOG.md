@@ -4,6 +4,25 @@
 
 ### Added
 
+- **BCEData value audit and IEM period normalization** — `audit_bce_catalog`
+  can optionally probe one current `/grid` period for every advertised
+  frequency/unit pair and persist that bounded report separately. IEM table
+  readers now filter annual, numeric month/year, and Spanish month labels,
+  including tables without an explicit unit block.
+- **BCEData audit snapshots** — `audit_bce_catalog` can now persist every
+  audit attempt, preserve the last complete catalog when a request fails, and
+  compare groups, metadata, and series changes with the previous valid
+  snapshot. `scripts/audit_bce_catalog.py` provides the same flow for a
+  scheduler or operator.
+- **More complete IEM discovery** — bulletin discovery reconciles the long
+  historical index with the latest-publications page, reports detected archive
+  gaps, catalogs complete PDF/ZIP downloads, and returns an SHA-256 hash when
+  an individual XLSX table is read.
+- **SRI Saiku read-only tools** — discover public cubes, inspect cube metadata,
+  and run bounded one-dimension/one-measure aggregates without arbitrary MDX,
+  drill-through, exports, or writes. Live SRI connectivity remains an
+  environment-dependent verification step.
+
 - **`investigate_dataset`** — one-shot research shortcut chaining
   `search_datasets` → `list_dataset_resources` → `preview_resource_data`
   into a single call: search a query, take the top-ranked dataset, and

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import io
 
 import openpyxl
@@ -65,6 +66,18 @@ def _long_xlsx() -> bytes:
     return out.getvalue()
 
 
+def _monthly_xlsx() -> bytes:
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.append(["Indicador mensual", None, None])
+    sheet.append(["Mes", "Ene 2025", "Febrero 2025"])
+    sheet.append(["Variable", "valor", "valor"])
+    sheet.append(["PIB", 101, 102])
+    out = io.BytesIO()
+    workbook.save(out)
+    return out.getvalue()
+
+
 def _wide_xlsx_with_gap() -> bytes:
     workbook = openpyxl.Workbook()
     sheet = workbook.active
@@ -92,6 +105,61 @@ def test_parse_tables_keeps_real_link_not_guessed_bulletin_directory():
     assert [table["table_id"] for table in tables] == ["iem-431-e", "iem-432-e"]
     assert tables[0]["url"].endswith("IEMensual/m2091/IEM-431-e.xlsx")
     assert tables[0]["boletin_numero"] == 2092
+
+
+def test_merge_bulletins_prefers_latest_publication_for_duplicate_number():
+    index = [{"numero": 2092, "url": "index-version"}]
+    latest = [{"numero": 2092, "url": "latest-version"}, {"numero": 2093, "url": "new"}]
+
+    merged = bce_iem_client._merge_bulletins(latest, index)
+
+    assert [item["numero"] for item in merged] == [2093, 2092]
+    assert merged[1]["url"] == "latest-version"
+
+
+def test_parse_complete_files_catalogs_pdf_and_zip():
+    bulletin = _PARSED_BULLETINS[0]
+
+    files = bce_iem_client._parse_complete_files(
+        '<a href="IEM2092.pdf">PDF completo</a>'
+        '<a href="IEM2092.zip">ZIP completo</a>'
+        '<a href="IEM-431-e.xlsx">Tabla</a>',
+        bulletin,
+    )
+
+    assert [(item["tipo"], item["nombre"]) for item in files] == [
+        ("pdf", "IEM2092.pdf"),
+        ("zip", "IEM2092.zip"),
+    ]
+
+
+@pytest.mark.asyncio
+async def test_fetch_bulletins_reconciles_latest_publications(httpx_mock):
+    httpx_mock.add_response(url=bce_iem_client.IEM_INDEX_URL, html=_INDEX_HTML)
+    httpx_mock.add_response(
+        url=bce_iem_client.IEM_LATEST_PUBLICATIONS_URL,
+        html='<a href="m2093072026.html">No. 2093 Julio 2026</a>',
+    )
+
+    bulletins = await bce_iem_client._fetch_bulletins()
+
+    assert bulletins[0]["numero"] == 2093
+    assert len(bulletins) == 3
+
+
+@pytest.mark.asyncio
+async def test_search_tables_can_persist_the_complete_catalog(httpx_mock, tmp_path, monkeypatch):
+    monkeypatch.setenv("IEM_CATALOG_DIR", str(tmp_path))
+    httpx_mock.add_response(url=bce_iem_client.IEM_INDEX_URL, html=_INDEX_HTML)
+    httpx_mock.add_response(
+        url=bce_iem_client.IEM_LATEST_PUBLICATIONS_URL, html=""
+    )
+    httpx_mock.add_response(url=_NEW_BULLETIN_URL, html=_BULLETIN_HTML)
+
+    result = await bce_iem_client.search_tables(guardar_catalogo=True)
+
+    assert result["catalogo_guardado"]["archivo"].endswith(".json")
+    assert (tmp_path / "latest.json").exists()
 
 
 def test_merge_historical_tables_keeps_all_versions():
@@ -183,9 +251,33 @@ def test_extract_long_table_filters_rows_by_year():
     }
 
 
+def test_extract_monthly_wide_series_accepts_spanish_month_labels():
+    workbook = openpyxl.load_workbook(
+        io.BytesIO(_monthly_xlsx()), read_only=True, data_only=True
+    )
+    result = bce_iem_client._extract_wide_series(
+        workbook.active, "2025-02", "2025-02", 20
+    )
+    workbook.close()
+
+    assert result is not None
+    assert result["periodos"] == ["Febrero 2025"]
+    assert result["bloques"][0]["series"] == [
+        {"nombre": "PIB", "valores": {"Febrero 2025": 102}}
+    ]
+
+
+def test_period_key_accepts_numeric_month_year_and_spanish_month():
+    assert bce_iem_client._period_key("03/2025") == (2025, 3)
+    assert bce_iem_client._period_key("Marzo 2025") == (2025, 3)
+
+
 @pytest.mark.asyncio
 async def test_search_tables_indexes_latest_bulletin_and_filters(httpx_mock):
     httpx_mock.add_response(url=bce_iem_client.IEM_INDEX_URL, html=_INDEX_HTML)
+    httpx_mock.add_response(
+        url=bce_iem_client.IEM_LATEST_PUBLICATIONS_URL, html=""
+    )
     httpx_mock.add_response(url=_NEW_BULLETIN_URL, html=_BULLETIN_HTML)
 
     result = await bce_iem_client.search_tables("exportaciones")
@@ -198,6 +290,9 @@ async def test_search_tables_indexes_latest_bulletin_and_filters(httpx_mock):
 @pytest.mark.asyncio
 async def test_search_tables_historical_merges_versions(httpx_mock):
     httpx_mock.add_response(url=bce_iem_client.IEM_INDEX_URL, html=_INDEX_HTML)
+    httpx_mock.add_response(
+        url=bce_iem_client.IEM_LATEST_PUBLICATIONS_URL, html=""
+    )
     httpx_mock.add_response(url=_NEW_BULLETIN_URL, html=_BULLETIN_HTML)
     httpx_mock.add_response(url=_OLD_BULLETIN_URL, html=_BULLETIN_HTML)
 
@@ -211,9 +306,13 @@ async def test_search_tables_historical_merges_versions(httpx_mock):
 
 @pytest.mark.asyncio
 async def test_get_table_returns_layout_preview(httpx_mock):
+    xlsx = _xlsx()
     httpx_mock.add_response(url=bce_iem_client.IEM_INDEX_URL, html=_INDEX_HTML)
+    httpx_mock.add_response(
+        url=bce_iem_client.IEM_LATEST_PUBLICATIONS_URL, html=""
+    )
     httpx_mock.add_response(url=_NEW_BULLETIN_URL, html=_BULLETIN_HTML)
-    httpx_mock.add_response(url=_PIB_TABLE_URL, content=_xlsx())
+    httpx_mock.add_response(url=_PIB_TABLE_URL, content=xlsx)
 
     result = await bce_iem_client.get_table("iem-431-e", desde="2025", max_rows=3)
 
@@ -224,3 +323,4 @@ async def test_get_table_returns_layout_preview(httpx_mock):
     assert result["bloques"][0]["series"] == [
         {"nombre": "PIB", "valores": {"2025": 130.2}}
     ]
+    assert result["tabla"]["sha256"] == hashlib.sha256(xlsx).hexdigest()

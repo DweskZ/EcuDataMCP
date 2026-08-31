@@ -52,6 +52,7 @@ from typing import Any
 
 import httpx
 
+from helpers import bce_catalog_store
 from helpers.cache import TtlCache
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.text_utils import strip_accents as _strip
@@ -61,6 +62,8 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 _BASE_URL = "https://contenido.bce.fin.ec/wp-json/bcedata/v1"
 _TIMEOUT = 30.0
+_GRID_AUDIT_CONCURRENCY = 12
+_MAX_GRID_AUDIT_COMBINATIONS = 500
 
 # The catalog tree is small (~98 nodes) and rarely changes; a day balances
 # staleness against not re-fetching it on every search.
@@ -274,13 +277,124 @@ async def _fetch_catalog_with_series() -> list[dict[str, Any]]:
     return snapshot["grupos"]
 
 
-async def audit_catalog(incluir_grupos: bool = False) -> dict[str, Any]:
+def _grid_probe_period(group: dict[str, Any], frecuencia: str) -> str:
+    ranges = group.get("rango_por_frecuencia") or {}
+    selected = ranges.get(frecuencia) or group.get("rango") or {}
+    return str(selected.get("maxYm") or "").strip()
+
+
+async def _audit_grid_values(groups: list[dict[str, Any]]) -> dict[str, Any]:
+    """Probe one latest period for each discovered frequency/unit combination.
+
+    This deliberately checks response shape and non-empty series counts, not
+    the full historical value space.  It keeps the audit bounded while still
+    exercising every advertised frequency/unit pair.
+    """
+    combinations: list[dict[str, Any]] = []
+    omitted: list[dict[str, Any]] = []
+    for group in groups:
+        if not group.get("bundle_ok"):
+            continue
+        for frecuencia in group.get("frecuencias") or []:
+            period = _grid_probe_period(group, frecuencia)
+            units = (group.get("unidades") or {}).get(frecuencia) or []
+            for unidad in units:
+                item = {
+                    "id_grupo": group["id_grupo"],
+                    "grupo": group.get("descripcion", ""),
+                    "frecuencia": frecuencia,
+                    "unidad": unidad,
+                    "periodo": period,
+                }
+                if not period:
+                    omitted.append({**item, "motivo": "sin_rango_maximo"})
+                else:
+                    combinations.append(item)
+
+    bounded = combinations[:_MAX_GRID_AUDIT_COMBINATIONS]
+    if len(combinations) > len(bounded):
+        omitted.extend(
+            {
+                **item,
+                "motivo": "limite_de_combinaciones",
+            }
+            for item in combinations[len(bounded) :]
+        )
+
+    semaphore = asyncio.Semaphore(_GRID_AUDIT_CONCURRENCY)
+
+    async def probe(item: dict[str, Any], session: httpx.AsyncClient) -> dict[str, Any]:
+        async with semaphore:
+            try:
+                grid = await _get_json(
+                    "grid",
+                    params={
+                        "id_grupo": item["id_grupo"],
+                        "frecuencia": item["frecuencia"],
+                        "unidad": item["unidad"],
+                        "desde": item["periodo"],
+                        "hasta": item["periodo"],
+                    },
+                    session=session,
+                )
+                if not isinstance(grid, dict):
+                    raise TypeError("/grid no devolvió un objeto JSON")
+                rows = grid.get("rows") or []
+                if not isinstance(rows, list):
+                    raise TypeError("/grid no devolvió una lista de filas")
+                series = [row for row in rows if isinstance(row, dict) and row.get("tipo") == "Series"]
+                nonempty = sum(
+                    1
+                    for row in series
+                    if isinstance(row.get("values"), dict)
+                    and any(value not in (None, "") for value in row["values"].values())
+                )
+                return {
+                    **item,
+                    "ok": True,
+                    "periodos_recibidos": len(grid.get("columns") or []),
+                    "series": len(series),
+                    "series_con_datos": nonempty,
+                }
+            except Exception as exc:
+                return {**item, "ok": False, "error": str(exc)}
+
+    async with httpx.AsyncClient(
+        headers={"User-Agent": USER_AGENT}, timeout=_TIMEOUT
+    ) as session:
+        results = await asyncio.gather(
+            *(probe(item, session) for item in bounded), return_exceptions=False
+        )
+    failed = [item for item in results if not item["ok"]]
+    return {
+        "consultado_en": datetime.now(UTC).isoformat(),
+        "total_combinaciones": len(combinations),
+        "combinaciones_consultadas": len(bounded),
+        "combinaciones_exitosas": len(bounded) - len(failed),
+        "combinaciones_con_error": len(failed),
+        "omitidas": omitted,
+        "resultados": results,
+    }
+
+
+async def audit_catalog(
+    incluir_grupos: bool = False,
+    guardar_snapshot: bool = False,
+    comparar_anterior: bool = False,
+    auditar_grid: bool = False,
+) -> dict[str, Any]:
     """Return a compact, reproducible coverage report for the BCEData API.
 
-    The audit fetches the tree and every leaf group's bundle. It does not
-    download every grid value, because grids can contain many years of data;
-    ``get_indicador`` remains the complete value retrieval path for any group,
-    frequency, unit and requested period.
+    The default audit fetches the tree and every leaf group's bundle. When
+    ``auditar_grid`` is true, it additionally probes one latest period for
+    every advertised frequency/unit combination, without downloading full
+    historical grids.
+
+    ``guardar_snapshot`` writes an audit attempt to the configured snapshot
+    directory.  A complete attempt also becomes ``latest-valid.json``; a
+    partial attempt is retained for diagnosis without replacing it.  Set
+    ``comparar_anterior`` to include the differences from the last complete
+    snapshot.
     """
     snapshot = await _fetch_catalog_snapshot()
     groups = snapshot["grupos"]
@@ -301,9 +415,31 @@ async def audit_catalog(incluir_grupos: bool = False) -> dict[str, Any]:
         "secciones": sections,
         "errores": snapshot["errores"],
     }
+    if auditar_grid:
+        grid_audit = await _audit_grid_values(successful)
+        result["auditoria_grid"] = grid_audit
     if incluir_grupos:
         result["grupos"] = groups
+    if guardar_snapshot or comparar_anterior:
+        previous = bce_catalog_store.read_latest_valid()
+        if comparar_anterior:
+            result["comparacion"] = bce_catalog_store.compare_snapshots(
+                previous, snapshot
+            )
+        if guardar_snapshot:
+            result["snapshot"] = bce_catalog_store.persist_snapshot(snapshot)
+            if auditar_grid:
+                result["auditoria_grid"]["archivo_guardado"] = (
+                    bce_catalog_store.persist_grid_audit(result["auditoria_grid"])
+                )
     return result
+
+
+def clear_caches() -> None:
+    """Clear in-memory BCEData state; useful for refresh jobs and tests."""
+    _tree_cache.clear()
+    _bundle_cache.clear()
+    _catalog_cache.clear()
 
 
 _SEARCH_RESULT_FIELDS = ("id_grupo", "descripcion", "seccion", "subseccion")

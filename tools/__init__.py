@@ -1,6 +1,7 @@
 from mcp.server.fastmcp import FastMCP
 
 from tools.audit_bce_catalog import register_audit_bce_catalog_tool
+from tools.describe_sri_saiku_cube import register_describe_sri_saiku_cube_tool
 from tools.detect_series_pattern import register_detect_series_pattern_tool
 from tools.download_anda_microdata import register_download_anda_microdata_tool
 from tools.download_resource import register_download_resource_tool
@@ -44,12 +45,14 @@ from tools.list_instituciones import register_list_instituciones_tool
 from tools.list_recent_datasets import register_list_recent_datasets_tool
 from tools.list_sat_tsunami import register_list_sat_tsunami_tool
 from tools.list_sipa_modulos import register_list_sipa_modulos_tool
+from tools.list_sri_saiku_cubes import register_list_sri_saiku_cubes_tool
 from tools.list_superbancos_secciones import register_list_superbancos_secciones_tool
 from tools.list_sut_indicadores import register_list_sut_indicadores_tool
 from tools.list_zip_contents import register_list_zip_contents_tool
 from tools.lookup_ubicacion import register_lookup_ubicacion_tool
 from tools.preview_resource_data import register_preview_resource_data_tool
 from tools.query_resource_data import register_query_resource_data_tool
+from tools.query_sri_saiku_aggregate import register_query_sri_saiku_aggregate_tool
 from tools.query_sut_indicador import register_query_sut_indicador_tool
 from tools.read_pdf import register_read_pdf_tool
 from tools.search_anda import register_search_anda_tool
@@ -107,6 +110,9 @@ def register_tools(mcp: FastMCP) -> None:
     register_search_sri_estadisticas_recaudacion_tool(mcp)
     register_get_sri_ruc_info_tool(mcp)
     register_search_sri_ruc_tool(mcp)
+    register_list_sri_saiku_cubes_tool(mcp)
+    register_describe_sri_saiku_cube_tool(mcp)
+    register_query_sri_saiku_aggregate_tool(mcp)
     register_read_pdf_tool(mcp)
     register_list_zip_contents_tool(mcp)
     register_investigate_dataset_tool(mcp)

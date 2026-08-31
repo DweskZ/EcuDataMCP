@@ -19,6 +19,7 @@ def register_search_bce_iem_tool(mcp: FastMCP) -> None:
         historico: bool = False,
         desde_anio: int = 0,
         hasta_anio: int = 0,
+        guardar_catalogo: bool = False,
         format: str = "text",
     ) -> str:
         """Search individual Excel tables in the BCE's latest IEM bulletin.
@@ -31,6 +32,9 @@ def register_search_bce_iem_tool(mcp: FastMCP) -> None:
         historico=true (or provide desde_anio/hasta_anio) to search across
         all matching monthly bulletin pages; this is slower on the first call
         because the archive pages must be read.
+        Set guardar_catalogo=true to persist the complete catalog assembled by
+        this search under IEM_CATALOG_DIR (or data/iem_catalog_snapshots by
+        default). Pagination still keeps the MCP response bounded.
         """
         limit = min(max(limit, 1), 100)
         offset = max(offset, 0)
@@ -42,6 +46,7 @@ def register_search_bce_iem_tool(mcp: FastMCP) -> None:
                 historico,
                 desde_anio,
                 hasta_anio,
+                guardar_catalogo,
             )
         except Exception as exc:
             logger.exception("search_bce_iem failed (query=%r)", query)
@@ -59,6 +64,22 @@ def register_search_bce_iem_tool(mcp: FastMCP) -> None:
                 f"{data['total']} tabla(s) encontrada(s); mostrando {len(tables)}.",
                 "",
             ]
+            if data.get("boletines_descubiertos"):
+                parts.insert(
+                    1,
+                    (
+                        f"Archivo descubierto: {data['boletines_descubiertos']} boletines; "
+                        f"del No. {data.get('primer_boletin')} al No. "
+                        f"{data.get('ultimo_boletin')}."
+                    ),
+                )
+                if data.get("numeros_faltantes"):
+                    parts.insert(
+                        2,
+                        "Números faltantes detectados: "
+                        + ", ".join(map(str, data["numeros_faltantes"][:30]))
+                        + ("…" if len(data["numeros_faltantes"]) > 30 else "."),
+                    )
             if data.get("historico"):
                 parts.insert(
                     1,
@@ -87,6 +108,11 @@ def register_search_bce_iem_tool(mcp: FastMCP) -> None:
                 parts.append("Sin resultados.")
             else:
                 parts.append("Usa get_bce_iem_table(table_id=...) para leer una tabla.")
+            if data.get("catalogo_guardado"):
+                parts.append(
+                    "Catálogo completo guardado: "
+                    + data["catalogo_guardado"]["archivo"]
+                )
             return "\n".join(part for part in parts if part is not None)
 
         return render_output(result, format, text_builder=to_text)

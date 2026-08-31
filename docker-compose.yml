@@ -9,6 +9,8 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - MCP_AUTH_TOKEN=${MCP_AUTH_TOKEN:-}
       - MCP_MAX_CONCURRENT_REQUESTS=${MCP_MAX_CONCURRENT_REQUESTS:-8}
+      - BCE_CATALOG_SNAPSHOT_DIR=${BCE_CATALOG_SNAPSHOT_DIR:-/app/data/bce_catalog_snapshots}
+      - IEM_CATALOG_DIR=${IEM_CATALOG_DIR:-/app/data/iem_catalog_snapshots}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:${MCP_PORT:-8000}/health')"]

@@ -251,6 +251,8 @@ uv run main.py
 | `LOG_LEVEL` | Nivel de log (DEBUG, INFO, WARNING, ERROR) | `INFO` |
 | `MCP_AUTH_TOKEN` | Token Bearer opcional requerido por `/mcp` | vacío |
 | `MCP_MAX_CONCURRENT_REQUESTS` | Máximo de solicitudes MCP simultáneas | `8` |
+| `BCE_CATALOG_SNAPSHOT_DIR` | Directorio persistente para auditorías BCEData; vacío usa `data/bce_catalog_snapshots` | vacío |
+| `IEM_CATALOG_DIR` | Directorio persistente para catálogos IEM; vacío usa `data/iem_catalog_snapshots` | vacío |
 | `CKAN_INSECURE_TLS` | Reintento TLS inseguro solo para el portal de datos (`1`/`0`); poner en `1` solo si el certificado del portal vuelve a fallar | `0` |
 
 Stdio local:
@@ -324,6 +326,9 @@ Casi todos los tools aceptan `format="json"` además de texto.
 | `search_sri_estadisticas_recaudacion` | Buscar reportes públicos de recaudación del SRI por impuesto, provincia, cantón y actividad económica. |
 | `get_sri_ruc_info` | Consultar la ficha pública de un RUC exacto: estado, tipo, actividad, fechas y establecimientos registrados. No incluye declaraciones ni montos tributarios individuales. |
 | `search_sri_ruc` | Buscar contribuyentes en el RUC del SRI por razón social o nombre comercial (texto parcial), sin necesitar el RUC exacto. |
+| `list_sri_saiku_cubes` | Listar los cubos OLAP visibles en la instancia pública de Saiku del SRI. Solo metadatos de descubrimiento; no consulta filas. |
+| `describe_sri_saiku_cube` | Ver dimensiones, jerarquías, niveles y medidas de un cubo Saiku público. |
+| `query_sri_saiku_aggregate` | Ejecutar una consulta agregada limitada: una dimensión en filas y una medida. No acepta MDX arbitrario ni drill-through. |
 
 Todos los tools CKAN de esta sección y de "Exploración" más abajo (`search_organizations`,
 `get_organization_info`, `list_categories`, `get_category_info`) aceptan `source="nacional"`
@@ -364,9 +369,9 @@ municipal independiente, 92 datasets) — mismo tool, otro catálogo CKAN.
 |------|-------------|
 | `search_indicadores_bce` | Buscar en el catálogo estadístico del Banco Central del Ecuador (monetario/financiero, finanzas públicas, sector externo, sector real). |
 | `get_indicador_bce` | Serie de tiempo de un indicador por `id_grupo`: período, frecuencia y unidad configurables (defaults según el grupo). |
-| `audit_bce_catalog` | Auditar el catálogo BCEData completo: grupos, series, secciones, frecuencias, unidades, rangos de fechas y errores de carga. `incluir_grupos=true` devuelve el inventario detallado. |
-| `search_bce_iem` | Buscar tablas XLSX individuales del último boletín Información Estadística Mensual (IEM) del BCE: detalle de deuda, comercio, PIB, petróleo, finanzas públicas y más. `historico=true` o `desde_anio`/`hasta_anio` busca versiones en el archivo mensual. |
-| `get_bce_iem_table` | Leer una tabla XLSX IEM con filtro `desde`/`hasta`; `boletin_numero` permite elegir una versión histórica concreta. Conserva el diseño original cuando no es seguro normalizarlo. |
+| `audit_bce_catalog` | Auditar el catálogo BCEData completo: grupos, series, secciones, frecuencias, unidades, rangos de fechas y errores de carga. `incluir_grupos=true` devuelve el inventario detallado; `auditar_grid=true` prueba un período reciente por cada combinación frecuencia/unidad (con límite acotado); `guardar_snapshot=true` persiste el catálogo y, si corresponde, el reporte de valores; `comparar_anterior=true` detecta cambios frente al último snapshot completo. |
+| `search_bce_iem` | Buscar tablas XLSX individuales del último boletín Información Estadística Mensual (IEM) del BCE: detalle de deuda, comercio, PIB, petróleo, finanzas públicas y más. Reconcilia el índice histórico con “Últimas publicaciones”, reporta el rango del archivo y cataloga los enlaces PDF/ZIP completos. `historico=true` o `desde_anio`/`hasta_anio` busca versiones en el archivo mensual; `guardar_catalogo=true` persiste el catálogo completo construido por la búsqueda. |
+| `get_bce_iem_table` | Leer una tabla XLSX IEM con filtro `desde`/`hasta` (año, `YYYY-MM` o mes/año en español); `boletin_numero` permite elegir una versión histórica concreta. Conserva el diseño original cuando no es seguro normalizarlo y devuelve el SHA-256 del archivo leído. |
 
 ### Compañías (Supercías)
 

@@ -66,29 +66,43 @@ que la fuente expone, no que solo conozca los indicadores más conocidos. La
 integración debe poder demostrar qué grupos, series, frecuencias, unidades,
 fechas, boletines y archivos encontró, y cuáles no pudo leer.
 
-- [ ] **BCEData completo — catálogo y series**: cubrir todos los nodos hoja de
+- [~] **BCEData completo — catálogo y series**: cubrir todos los nodos hoja de
       `/tree`, el metadata de cada `/bundle/{id_grupo}` y todos los valores
       disponibles en `/grid`; conservar etiquetas, rutas, secciones,
       frecuencias, unidades, rango de fechas y revisiones. La búsqueda debe
       encontrar tanto grupos como series internas y la consulta debe permitir
-      seleccionar explícitamente cualquier frecuencia, unidad y período.
-- [~] **BCEData completo — verificación de cobertura**: `audit_bce_catalog`
-      ya consulta el árbol y los metadatos de todos los grupos, y registra
-      cuántos grupos y series fueron descubiertos, qué solicitudes fallaron y
-      cuándo se consultó la API. Pendiente: persistir snapshots y comparar
-      automáticamente grupos nuevos, retirados o modificados. No depender de
-      una lista fija de IDs.
-- [ ] **IEM completo — archivo y archivos fuente**: descubrir todos los
+      seleccionar explícitamente cualquier frecuencia, unidad y período. El
+      descubrimiento de grupos/series y la consulta de cualquier combinación ya
+      están implementados; `auditar_grid=true` prueba un período reciente por
+      cada combinación frecuencia/unidad, con reporte persistente separado y
+      límite de 500 combinaciones. Sigue pendiente comprobar cambios de
+      revisión cuando el endpoint los exponga explícitamente.
+- [x] **BCEData completo — verificación de cobertura**: `audit_bce_catalog`
+      consulta el árbol y los metadatos de todos los grupos, registra cuántos
+      grupos y series fueron descubiertos, qué solicitudes fallaron y cuándo
+      se consultó la API. `guardar_snapshot=true` conserva cada intento,
+      promueve solo auditorías completas a `latest-valid.json`, y
+      `comparar_anterior=true` detecta grupos nuevos, retirados y modificados,
+      incluidas series nuevas/retiradas. `scripts/audit_bce_catalog.py` deja
+      el mismo flujo listo para cron/scheduler. No depende de una lista fija
+      de IDs.
+- [~] **IEM completo — archivo y archivos fuente**: descubrir todos los
       boletines desde enero de 1996 hasta el más reciente, reconciliando el
       índice histórico con “Últimas publicaciones”; catalogar cada XLSX,
       además del PDF y ZIP completos, con boletín, fecha, sección, título, URL
-      y hash/fecha de consulta.
-- [ ] **IEM completo — lectura de tablas**: hacer buscables los valores de
+      y fecha de consulta; el hash se calcula al leer cada XLSX. `search_bce_iem`
+      puede persistir el catálogo construido y `scripts/audit_bce_iem.py`
+      deja preparado el barrido completo desde 1996. Pendiente calcular hashes
+      de todos los archivos sin convertir el barrido en una descarga masiva.
+- [~] **IEM completo — lectura de tablas**: hacer buscables los valores de
       todas las tablas individuales, no solo sus títulos. Añadir lectores para
       las familias de formatos que difieren del diseño común; conservar también
       una copia/vista fiel del archivo original cuando no sea seguro
-      normalizarlo. Una vista de las primeras filas cuenta como diagnóstico,
-      no como cobertura completa.
+      normalizarlo. Las formas ancha y larga comunes, y la vista segura, ya
+      están cubiertas; quedan normalizadores dedicados para las familias
+      restantes. Ahora también normaliza meses numéricos y nombres de meses en
+      español, además de tablas sin bloque de unidad explícito. Una vista de
+      las primeras filas cuenta como diagnóstico, no como cobertura completa.
 - [ ] **BCEData ↔ IEM — mapa de equivalencias**: identificar qué tabla IEM
       duplica una serie BCEData, cuál la amplía y cuál existe solo en una de las
       dos fuentes. Mantener la definición original, unidad, frecuencia, fecha
@@ -161,9 +175,9 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
 - [x] Ecuador en Cifras / INEC — `search_inec_estadisticas`/`get_inec_estadistica_files` (~75 temas: boletines + series históricas agregadas) + `search_biinec_extras` (lista curada de los 2-3 registros de BIINEC que sí son exclusivos — desechos peligrosos en salud, módulos ambientales ENEMDU/ECV; no un cliente genérico, ver análisis de costo/beneficio en RESEARCH.md). → RESEARCH.md § Ecuador en Cifras
 - [~] IESS — boletines/auditorías/actuariales scrapeables y confirmados, sin construir tool nuevo. → RESEARCH.md § IESS
 - [~] SENESCYT/Educación Superior — cubierto vía CKAN; registro de títulos bloqueado por captcha (no automatizable). → RESEARCH.md § SENESCYT
-- [~] BCE — Información Estadística Mensual (IEM/IEEM), boletín mensual mucho más rico que BCEData. `search_bce_iem` indexa en vivo las tablas XLSX individuales del boletín vigente y, con `historico=true` o un rango de años, agrupa versiones de la misma tabla en el archivo mensual. `get_bce_iem_table` devuelve series con filtro anual cuando detecta el formato tabular ancho, y reconoce también tablas largas; si no, preserva una vista segura sin inventar columnas. **Auditoría 2026-08-29**: la lógica cubre correctamente las páginas y tablas que encuentra, pero el índice maestro visible del BCE llega al IEM 2092 (junio 2026), mientras que el IEM 2093 (julio 2026) ya existe en una página de índice enlazada desde “Últimas publicaciones”; hay que hacer el descubrimiento resistente a índices atrasados. Pendiente: normalizadores dedicados, comparación explícita con BCEData y catálogo histórico completo. **Profundizado 2026-08-29**: cada boletín (archivo completo desde ene-1996) tiene ~60+ XLSX individuales por tabla, no solo el ZIP. → RESEARCH.md § Séptima pasada
-- [ ] BCE — **BCEData: auditoría viva de cobertura y metadatos**: comparar periódicamente `/tree`, cada `/bundle/{id_grupo}` y las series devueltas por `/grid` con el catálogo visible del BCE; detectar grupos nuevos, grupos retirados, cambios de nombre, rangos de fechas, frecuencias y unidades. Mantener la búsqueda por etiquetas de series y documentar que esta API pública no está formalmente documentada por el BCE.
-- [ ] BCE — **IEM: descubrimiento y catálogo histórico resistente**: no depender únicamente de `IndiceIEM.html`; reconciliarlo con “Últimas publicaciones”, detectar boletines nuevos no listados, comprobar que cada boletín tenga sus XLSX individuales, registrar boletines faltantes y añadir normalizadores para las familias de tablas de mayor valor. No presentar el IEM más reciente encontrado como “actual” sin informar su fecha de corte.
+- [~] BCE — Información Estadística Mensual (IEM/IEEM), boletín mensual mucho más rico que BCEData. `search_bce_iem` indexa en vivo las tablas XLSX individuales del boletín vigente y, con `historico=true` o un rango de años, agrupa versiones de la misma tabla en el archivo mensual. Ahora reconcilia el índice histórico con “Últimas publicaciones”, reporta el rango/números faltantes detectados y cataloga también los enlaces PDF/ZIP completos de cada boletín. `get_bce_iem_table` devuelve series con filtro anual cuando detecta el formato tabular ancho, reconoce tablas largas, conserva una vista segura sin inventar columnas y devuelve el SHA-256 del XLSX leído. Pendiente: normalizadores dedicados, comparación explícita con BCEData y catalogación persistente de todo el archivo histórico. **Profundizado 2026-08-29**: cada boletín (archivo completo desde ene-1996) tiene ~60+ XLSX individuales por tabla, no solo el ZIP. → RESEARCH.md § Séptima pasada
+- [~] BCE — **BCEData: auditoría viva de cobertura y metadatos**: `audit_bce_catalog` y `scripts/audit_bce_catalog.py` ya comparan periódicamente `/tree` y cada `/bundle/{id_grupo}`, detectan grupos/series modificados, conservan el último snapshot completo y pueden probar valores `/grid` seleccionados por frecuencia/unidad. Pendiente: conectar el script a un scheduler con almacenamiento persistente del despliegue y comprobar cambios de revisión si la respuesta los expone. Mantener la búsqueda por etiquetas de series y documentar que esta API pública no está formalmente documentada por el BCE.
+- [~] BCE — **IEM: descubrimiento y catálogo histórico resistente**: ya no depende únicamente de `IndiceIEM.html`: reconcilia “Últimas publicaciones”, detecta boletines nuevos no listados, registra números faltantes, comprueba tablas XLSX individuales y expone la fecha de catalogación. `guardar_catalogo=true` y `scripts/audit_bce_iem.py` persisten el catálogo completo construido. La lectura normaliza tablas anchas/largas, meses numéricos y nombres de meses en español, incluso sin unidad explícita; siguen pendientes más familias específicas y hashes masivos de archivos. No presenta el IEM más reciente encontrado como “actual” sin informar su boletín.
 - [ ] BCE — **búsqueda ampliada y mapa completo de fuentes**: revisar más allá de BCEData e IEM el sitio institucional, publicaciones temáticas, catálogos, archivos históricos y descargas por sector. Inventariar cada fuente, su cobertura, frecuencia, formato, API/archivo y traslape con lo ya integrado; priorizar únicamente tablas que añadan detalle ecuatoriano verificable, no duplicados de una misma serie. El resultado debe ser un mapa de cobertura y una lista corta de integraciones justificadas.
 - [x] BCE — **Remesas de trabajadores** (`search_bce_remesas`, `helpers/bce_remesas_client.py`): resultados agregados, serie histórica y bases mensuales, incluida la desagregación por entidad disponible desde julio de 2025. Metadata y URL directa solamente (mismo patrón que SIPA); el tool deja explícito que "histórica" (pre-cambio) y "BDD" (post-cambio) son series metodológicamente distintas, según la nota de comparabilidad de la propia página. → https://contenido.bce.fin.ec/series-de-datos-remesas-de-trabajadores/
 - [x] BCE — **familia de "indicadores en línea" construida 2026-08-31: `list_bce_indicadores_diarios`/`get_bce_indicador_diario` (`helpers/bce_indicadores_diarios_client.py`).** Descubierta y confirmada en vivo 2026-08-30/31, pedido explícito de Daniel ("investiga más y más", luego "Do all remaining BCE"). Varias páginas de `contenido.bce.fin.ec` (`estadisticas-de-publicaciones-generales`, `estadisticas-del-sector-medios-y-sistemas-de-pagos`, `estadisticas-del-sector-real`, `estadisticas-del-sector-externo-d`) incrustan un widget Highcharts por indicador (`wp-content/uploads/ESTADISTICAS-ECONOMICAS/indicadores/{Nombre}.html`), cada uno apuntando a un archivo JSON plano compartido entre varios widgets — sin auth, sin API key, confirmado con `curl` puro. Resuelve de una vez el ítem de abajo ("medios y sistemas de pago") — SPI/SCI/SPL/CCC/Monto Recaudado sí son automatizables, mensuales desde 2010 (`datos_pagos.json`). Catálogo confirmado por archivo:
@@ -221,7 +235,7 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
 - [ ] Datos legislativos/normativos (jurisprudencia, proyectos de ley) — investigado a fondo; **Daniel señaló que puede no ser relevante** para el alcance del proyecto. → RESEARCH.md § Datos legislativos
 - [ ] Fuentes internacionales con foco Ecuador — investigar **CEPAL/CEPALSTAT**, el **FMI/IMF** (pedido explícito de Daniel 2026-08-30: variables macro trimestrales — candidatos concretos son IFS/International Financial Statistics para series trimestrales de balanza de pagos/reservas/tipo de cambio, el WEO database para proyecciones, y los Article IV Staff Reports para el análisis narrativo con series propias), agencias de la **ONU** y, cuando tengan datos específicamente útiles para Ecuador, Banco Mundial, OIT, FAO, OMS/OPS, UNESCO, OIM y organismos regionales. Para cada fuente: confirmar acceso real (API/bulk/archivo — el FMI tiene una API REST pública para IFS/WEO sin key, por confirmar cobertura y campos exactos para Ecuador), indicador y desagregación disponibles para Ecuador, historia, frecuencia, licencia, fecha de actualización y duplicación frente a INEC/BCE/ministerios. Integrar solo lo que aporte una serie, corte o frecuencia (ej. trimestral cuando BCE solo publica mensual/anual) que la fuente ecuatoriana no publique; conservar siempre fuente y definición original — el valor de estas fuentes suele ser la comparabilidad internacional y la metodología armonizada, no un dato más nuevo que el de BCE/INEC. CEPAL y FMI son los primeros candidatos. → RESEARCH.md § Fuentes externas
 - Confirmados sin acción posible (bloqueos reales, no falta de esfuerzo): CNE y micrositio de Interior (WAF Incapsula), Aduana/SENAE comercio exterior (no publicado, solo por oficio — FEDEXPOR cubre el hueco), Fiscalía (sin dataset agregado propio), Supercías Valores/Seguros (login-gated, casi todo, un solo PDF estático encontrado), SERCOP catálogo/órdenes de compra (CAPTCHA), IG-EPN `descarga-de-datos` (cuenta obligatoria), Superbancos Catastro de Compañías (login obligatorio). → RESEARCH.md § Sitios de ministerios individuales / § Séptima pasada
-- **No es una fuente de datos, no construir nada aquí.** `srienlinea.sri.gob.ec/saiku-ui/` existe (una instancia real de Saiku, herramienta de analítica OLAP) — investigado 2026-08-31, pedido de Daniel. Sin detalles aquí; ver notas de la sesión.
+- [~] **SRI Saiku — `list_sri_saiku_cubes`, `describe_sri_saiku_cube`, `query_sri_saiku_aggregate`**: construidos como superficie anónima, de solo lectura y limitada a una dimensión/medida y 100 filas. La sesión, descubrimiento y metadatos se validan antes de consultar; no se permite MDX arbitrario, drill-through, exportación ni escritura. Pendiente: verificación contra el endpoint vivo desde un entorno con conectividad; la sesión actual no pudo alcanzar el host SRI.
 - ANDA — reconfirmado 2026-08-29: cobertura completa (437 encuestas, coincide con lo ya documentado), sin gap real, solo una limitación menor de UX (no se puede filtrar por tema del lado del servidor). **Corregido 2026-08-29 (segunda revisión, pedido de Daniel): "sin gap real" era incorrecto para ENEMDU específicamente** — ver el ítem nuevo de abajo (ENEMDU/mercado laboral post-2023 sin cubrir en ningún tool actual). → RESEARCH.md § Séptima pasada / § Novena pasada
 - [x] **`search_inec_publicaciones`/`get_inec_publicacion_archivos` — nuevos tools sobre la API REST pública de WordPress (`/wp-json/wp/v2/posts`), en vez de depender solo del scraping de páginas de tema.** Construido 2026-08-30. Corrección importante que motivó esto (Daniel aportó URLs reales que refutaron el diagnóstico anterior de este mismo roadmap): `search_inec_estadisticas`/`get_inec_estadistica_files` derivaban su lista de "temas" del menú (mega-menu) de una sola página semilla — pero **el menú no es el mismo en cada página del sitio**. La página `estadisticas-laborales-enemdu/` tiene su propio submenú con `enemdu-anual/`, `enemdu-trimestral/`, `enemdu-telefonica/`, `matrices-de-transicion-laboral/`, ninguno alcanzable desde la página semilla original — y `enemdu-anual/` tenía el ENEMDU anual 2025 completo (BDD SPSS/CSV, boletín técnico, tabulados) todo el tiempo. Dos arreglos, no uno solo:
   1. `search_topics`/`get_topic_files` (la capa vieja) ahora fusiona **dos** páginas semilla y captura también los ítems de submenú desplegable (`<li class="menu-item...">`, markup distinto del `mega-menu-link` de nivel superior) — de 74 a 89 temas descubiertos, incluyendo las 4 páginas de ENEMDU que faltaban. Reduce el problema, no lo elimina del todo (sigue dependiendo de qué semillas se usen).

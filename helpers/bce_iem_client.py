@@ -11,10 +11,15 @@ the previous month's directory.
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import io
+import json
 import logging
+import os
 import re
+from datetime import UTC, datetime
 from html import unescape
+from pathlib import Path
 from typing import Any
 from urllib.parse import urljoin
 
@@ -31,7 +36,10 @@ IEM_INDEX_URL = (
     "https://contenido.bce.fin.ec/documentos/informacioneconomica/"
     "PublicacionesGenerales/IndiceIEM.html"
 )
+IEM_LATEST_PUBLICATIONS_URL = "https://contenido.bce.fin.ec/ultimas-publicaciones/"
 _SOURCE_NAME = "Banco Central del Ecuador — Información Estadística Mensual"
+_ROOT = Path(__file__).resolve().parents[1]
+_DEFAULT_CATALOG_DIR = _ROOT / "data" / "iem_catalog_snapshots"
 
 _catalog_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
 _bulletins_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
@@ -60,7 +68,7 @@ _LINK_RE = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 _BULLETIN_RE = re.compile(
-    r"m(?P<number>\d{4})(?P<month>\d{2})(?P<year>\d{4})\.html$",
+    r"m(?P<number>\d{4})(?P<month>\d{2})(?P<year>\d{4})\.html(?:$|[?#])",
     re.IGNORECASE,
 )
 _TABLE_RE = re.compile(
@@ -92,6 +100,55 @@ def _parse_bulletins(html: str) -> list[dict[str, Any]]:
             }
         )
     return sorted(bulletins, key=lambda item: item["numero"], reverse=True)
+
+
+def _merge_bulletins(*bulletin_lists: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Merge bulletin discoveries, preferring the first occurrence per number."""
+    merged: dict[int, dict[str, Any]] = {}
+    for bulletins in bulletin_lists:
+        for bulletin in bulletins:
+            merged.setdefault(bulletin["numero"], bulletin)
+    return sorted(merged.values(), key=lambda item: item["numero"], reverse=True)
+
+
+def _bulletin_diagnostics(bulletins: list[dict[str, Any]]) -> dict[str, Any]:
+    """Summarize the discovered archive without pretending numbers are dates."""
+    numbers = sorted({int(item["numero"]) for item in bulletins})
+    gaps = [number for number in range(numbers[0], numbers[-1] + 1) if number not in numbers]
+    return {
+        "boletines_descubiertos": len(numbers),
+        "primer_boletin": numbers[0] if numbers else None,
+        "ultimo_boletin": numbers[-1] if numbers else None,
+        "numeros_faltantes": gaps,
+    }
+
+
+def _parse_complete_files(html: str, bulletin: dict[str, Any]) -> list[dict[str, Any]]:
+    """Catalog complete PDF/ZIP downloads linked by one bulletin page."""
+    files: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for match in _LINK_RE.finditer(html):
+        raw_url = unescape(match.group("url"))
+        filename = raw_url.split("?", 1)[0].rsplit("/", 1)[-1]
+        suffix = filename.lower()
+        if not suffix.endswith((".pdf", ".zip")):
+            continue
+        url = urljoin(bulletin["url"], raw_url)
+        if url in seen:
+            continue
+        seen.add(url)
+        files.append(
+            {
+                "nombre": filename,
+                "tipo": "pdf" if suffix.endswith(".pdf") else "zip",
+                "titulo": _clean(match.group("label")) or filename,
+                "url": url,
+                "boletin_numero": bulletin["numero"],
+                "boletin_mes": bulletin["mes"],
+                "boletin_anio": bulletin["anio"],
+            }
+        )
+    return files
 
 
 def _section_before(html: str, position: int) -> str:
@@ -128,6 +185,7 @@ def _parse_tables(html: str, bulletin: dict[str, Any]) -> list[dict[str, Any]]:
                 "boletin_mes": bulletin["mes"],
                 "boletin_anio": bulletin["anio"],
                 "boletin_url": bulletin["url"],
+                "catalogado_en": datetime.now(UTC).isoformat(),
             }
         )
     return tables
@@ -141,7 +199,7 @@ async def _fetch_catalog() -> dict[str, Any]:
     bulletins = await _fetch_bulletins()
     bulletin = bulletins[0]
     tables = await _fetch_tables_for_bulletin(bulletin)
-    return _catalog_result(bulletin, tables)
+    return _catalog_result(bulletin, tables, **_bulletin_diagnostics(bulletins))
 
 
 async def _fetch_bulletins() -> list[dict[str, Any]]:
@@ -157,7 +215,25 @@ async def _fetch_bulletins() -> list[dict[str, Any]]:
         raw_index, truncated = await download_bytes(IEM_INDEX_URL)
         if truncated:
             raise ValueError("El índice IEM del BCE superó el límite de descarga")
-        bulletins = _parse_bulletins(raw_index.decode("utf-8", errors="replace"))
+        index_bulletins = _parse_bulletins(
+            raw_index.decode("utf-8", errors="replace")
+        )
+        latest_bulletins: list[dict[str, Any]] = []
+        try:
+            raw_latest, latest_truncated = await download_bytes(
+                IEM_LATEST_PUBLICATIONS_URL
+            )
+            if not latest_truncated:
+                latest_bulletins = _parse_bulletins(
+                    raw_latest.decode("utf-8", errors="replace")
+                )
+        except Exception as exc:
+            # Keep the historical index as a safe fallback if the publications
+            # page is temporarily unavailable or changes its markup.
+            logger.warning(
+                "No se pudo reconciliar Últimas publicaciones del BCE: %s", exc
+            )
+        bulletins = _merge_bulletins(latest_bulletins, index_bulletins)
         if not bulletins:
             raise ValueError("No se encontraron boletines IEM en el índice del BCE")
         _bulletins_cache.set("bulletins", bulletins)
@@ -178,7 +254,9 @@ async def _fetch_tables_for_bulletin(bulletin: dict[str, Any]) -> list[dict[str,
         raw_bulletin, truncated = await download_bytes(bulletin["url"])
         if truncated:
             raise ValueError("La página del boletín IEM superó el límite de descarga")
-        tables = _parse_tables(raw_bulletin.decode("utf-8", errors="replace"), bulletin)
+        html = raw_bulletin.decode("utf-8", errors="replace")
+        bulletin["archivos_completos"] = _parse_complete_files(html, bulletin)
+        tables = _parse_tables(html, bulletin)
         if not tables:
             raise ValueError(
                 f"El boletín IEM {bulletin['numero']} no expuso tablas XLSX individuales"
@@ -194,6 +272,7 @@ def _build_catalog(
         "source": _SOURCE_NAME,
         "url_fuente": IEM_INDEX_URL,
         "boletin": bulletin,
+        "catalogado_en": datetime.now(UTC).isoformat(),
         **extra,
         "total_tablas": len(tables),
         "tablas": tables,
@@ -201,12 +280,42 @@ def _build_catalog(
 
 
 def _catalog_result(
-    bulletin: dict[str, Any], tables: list[dict[str, Any]]
+    bulletin: dict[str, Any], tables: list[dict[str, Any]], **extra: Any
 ) -> dict[str, Any]:
-    result = _build_catalog(bulletin, tables)
+    result = _build_catalog(bulletin, tables, **extra)
     _catalog_cache.set("catalog", result)
     logger.info("IEM BCE indexado: boletín %d, %d tablas", bulletin["numero"], len(tables))
     return result
+
+
+def _iem_catalog_dir() -> Path:
+    configured = os.getenv("IEM_CATALOG_DIR", "").strip()
+    return Path(configured) if configured else _DEFAULT_CATALOG_DIR
+
+
+def persist_catalog(catalog: dict[str, Any]) -> dict[str, Any]:
+    """Persist a complete IEM catalog atomically for later inspection."""
+    directory = _iem_catalog_dir()
+    directory.mkdir(parents=True, exist_ok=True)
+    now = datetime.now(UTC)
+    stamp = re.sub(r"[^0-9A-Za-z_.-]+", "-", now.isoformat()).strip("-")
+    payload = {
+        **catalog,
+        "persistido_en": now.isoformat(),
+        "catalogo_id": stamp,
+    }
+    raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2).encode(
+        "utf-8"
+    )
+    path = directory / f"catalog-{stamp}.json"
+    temporary = directory / f".{path.name}.tmp"
+    temporary.write_bytes(raw)
+    temporary.replace(path)
+    latest = directory / "latest.json"
+    temporary_latest = directory / ".latest.json.tmp"
+    temporary_latest.write_bytes(raw)
+    temporary_latest.replace(latest)
+    return {"directorio": str(directory), "archivo": str(path)}
 
 
 def _within_years(
@@ -296,6 +405,7 @@ async def search_tables(
     historico: bool = False,
     desde_anio: int = 0,
     hasta_anio: int = 0,
+    guardar_catalogo: bool = False,
 ) -> dict[str, Any]:
     """Search current tables, or versions across the IEM bulletin archive."""
     if desde_anio and hasta_anio and desde_anio > hasta_anio:
@@ -311,9 +421,14 @@ async def search_tables(
             tables,
             boletines_consultados=loaded_bulletins,
             boletines_sin_tablas=len(selected_bulletins) - loaded_bulletins,
+            **_bulletin_diagnostics(bulletins),
         )
     else:
         catalog = await _fetch_catalog()
+    if guardar_catalogo:
+        catalogo = persist_catalog(catalog)
+    else:
+        catalogo = None
     q = _strip(query)
     tables = catalog["tablas"]
     matched = [
@@ -321,13 +436,16 @@ async def search_tables(
         for table in tables
         if not q or q in _strip(f"{table['titulo']} {table['seccion']} {table['table_id']}")
     ]
-    return {
+    result = {
         **{key: value for key, value in catalog.items() if key != "tablas"},
         "total": len(matched),
         "offset": offset,
         "historico": historico or bool(desde_anio or hasta_anio),
         "tablas": matched[offset : offset + limit],
     }
+    if catalogo is not None:
+        result["catalogo_guardado"] = catalogo
+    return result
 
 
 def _cell(value: Any) -> str:
@@ -347,22 +465,81 @@ def _year(value: Any) -> int | None:
     return int(match.group(1)) if match else None
 
 
+_MONTHS = {
+    "ene": 1, "enero": 1, "feb": 2, "febrero": 2,
+    "mar": 3, "marzo": 3, "abr": 4, "abril": 4,
+    "may": 5, "mayo": 5, "jun": 6, "junio": 6,
+    "jul": 7, "julio": 7, "ago": 8, "agosto": 8,
+    "sep": 9, "sept": 9, "septiembre": 9, "oct": 10,
+    "octubre": 10, "nov": 11, "noviembre": 11, "dic": 12,
+    "diciembre": 12,
+}
+
+
+def _period_key(value: Any) -> tuple[int, int] | None:
+    """Normalize annual, monthly and Spanish month-year labels for filtering."""
+    if isinstance(value, datetime):
+        return value.year, value.month
+    text = _strip(str(value or "")).strip().replace(".", "")
+    year_match = re.search(r"(?<!\d)(\d{4})(?!\d)", text)
+    if year_match is None:
+        return None
+    year = int(year_match.group(1))
+    year_month = re.fullmatch(r"\d{4}[-/](0?[1-9]|1[0-2])", text)
+    if year_month:
+        return year, int(year_month.group(1))
+    month_year = re.fullmatch(r"(0?[1-9]|1[0-2])[-/]\d{4}", text)
+    if month_year:
+        return year, int(month_year.group(1))
+    prefix = text[: year_match.start()].strip(" -/_")
+    suffix = text[year_match.end() :].strip(" -/_")
+    month_name = prefix or suffix
+    if month_name in _MONTHS:
+        return year, _MONTHS[month_name]
+    numeric_month = re.search(r"(?<!\d)(0?[1-9]|1[0-2])(?=[/-])", text)
+    return (year, int(numeric_month.group(1))) if numeric_month else (year, 0)
+
+
+def _period_bounds(
+    desde: str, hasta: str
+) -> tuple[tuple[int, int] | None, tuple[int, int] | None]:
+    start = _period_key(desde) if desde else None
+    end = _period_key(hasta) if hasta else None
+    if desde and start is None:
+        raise ValueError("desde debe ser un período YYYY, YYYY-MM o mes-año")
+    if hasta and end is None:
+        raise ValueError("hasta debe ser un período YYYY, YYYY-MM o mes-año")
+    if start and end:
+        start_cmp = (start[0], start[1] or 1)
+        end_cmp = (end[0], end[1] or 12)
+        if start_cmp > end_cmp:
+            raise ValueError("desde no puede ser mayor que hasta")
+    return start, end
+
+
+def _period_in_bounds(
+    period: tuple[int, int],
+    start: tuple[int, int] | None,
+    end: tuple[int, int] | None,
+) -> bool:
+    year, month = period
+    if month == 0:
+        return (start is None or year >= start[0]) and (end is None or year <= end[0])
+    return (
+        (start is None or (year, month) >= (start[0], start[1] or 1))
+        and (end is None or (year, month) <= (end[0], end[1] or 12))
+    )
+
+
 def _selected_columns(
     header: tuple[Any, ...], desde: str, hasta: str
 ) -> list[tuple[int, str]]:
-    start = _year(desde)
-    end = _year(hasta)
-    if desde and start is None:
-        raise ValueError("desde debe ser un año YYYY")
-    if hasta and end is None:
-        raise ValueError("hasta debe ser un año YYYY")
-    if start is not None and end is not None and start > end:
-        raise ValueError("desde no puede ser mayor que hasta")
+    start, end = _period_bounds(desde, hasta)
 
     selected = []
     for index, value in enumerate(header[1:], start=1):
-        year = _year(value)
-        if year is None or (start is not None and year < start) or (end is not None and year > end):
+        period = _period_key(value)
+        if period is None or not _period_in_bounds(period, start, end):
             continue
         selected.append((index, str(value)))
     return selected
@@ -382,7 +559,10 @@ def _extract_wide_series(
             index
             for index, row in enumerate(all_rows)
             if row
-            and "period" in _strip(str(row[0] or ""))
+            and any(
+                token in _strip(str(row[0] or ""))
+                for token in ("period", "ano", "fecha", "mes")
+            )
             and len(_selected_columns(row, "", "")) >= 2
         ),
         None,
@@ -413,8 +593,15 @@ def _extract_wide_series(
             blocks.append(current)
             continue
         if current is None:
-            # The first row after the period header often says only "Variable".
-            continue
+            # Some monthly tables omit the unit block and start with a
+            # Variable/Indicador row. Create an explicit unitless block so
+            # the following series are still normalized.
+            if _strip(label) in {"variable", "indicador", "serie"}:
+                current = {"unidad": "", "series": [], "truncada": False}
+                blocks.append(current)
+                continue
+            current = {"unidad": "", "series": [], "truncada": False}
+            blocks.append(current)
         if len(current["series"]) >= max_rows:
             current["truncada"] = True
             continue
@@ -457,7 +644,9 @@ def _extract_long_table(
             (
                 position
                 for position, name in enumerate(names)
-                if any(token in name for token in ("period", "ano", "fecha"))
+                if any(
+                    token in name for token in ("period", "ano", "fecha", "mes")
+                )
             ),
             None,
         )
@@ -470,14 +659,7 @@ def _extract_long_table(
     if header_index is None or header is None or period_index is None:
         return None
 
-    start = _year(desde)
-    end = _year(hasta)
-    if desde and start is None:
-        raise ValueError("desde debe ser un año YYYY")
-    if hasta and end is None:
-        raise ValueError("hasta debe ser un año YYYY")
-    if start is not None and end is not None and start > end:
-        raise ValueError("desde no puede ser mayor que hasta")
+    start, end = _period_bounds(desde, hasta)
 
     headers = _trim_trailing_blanks([_cell(value) for value in header])
     rows: list[list[str]] = []
@@ -486,10 +668,10 @@ def _extract_long_table(
         row = [_cell(value) for value in raw_row[: len(headers)]]
         if not any(row):
             continue
-        period = _year(raw_row[period_index] if period_index < len(raw_row) else None)
-        if period is None:
-            continue
-        if (start is not None and period < start) or (end is not None and period > end):
+        period = _period_key(
+            raw_row[period_index] if period_index < len(raw_row) else None
+        )
+        if period is None or not _period_in_bounds(period, start, end):
             continue
         total_rows += 1
         if len(rows) < max_rows:
@@ -538,6 +720,14 @@ def _inspect_xlsx(raw: bytes, max_rows: int) -> dict[str, Any]:
         workbook.close()
 
 
+def clear_caches() -> None:
+    """Clear IEM discovery caches; useful for refresh jobs and tests."""
+    _catalog_cache.clear()
+    _bulletins_cache.clear()
+    _bulletin_tables_cache.clear()
+    _bulletin_fetch_locks.clear()
+
+
 async def get_table(
     table_id: str,
     desde: str = "",
@@ -577,7 +767,7 @@ async def get_table(
 
     result = {
         "source": _SOURCE_NAME,
-        "tabla": table,
+        "tabla": {**table, "sha256": hashlib.sha256(raw).hexdigest()},
         "archivo_truncado": False,
     }
     if structured is not None:

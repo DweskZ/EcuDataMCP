@@ -48,6 +48,7 @@ def register_get_bce_iem_table_tool(mcp: FastMCP) -> None:
                 table["titulo"],
                 f"table_id: {table['table_id']}",
                 f"Fuente: {table['url']}",
+                f"SHA-256: {table['sha256']}",
                 "",
             ]
             if data["formato"] == "series_ancho":

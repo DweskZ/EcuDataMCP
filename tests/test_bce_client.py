@@ -276,6 +276,81 @@ async def test_audit_catalog_reports_all_groups_and_series(httpx_mock):
     }
 
 
+async def test_audit_catalog_probes_every_frequency_unit_pair(
+    httpx_mock, tmp_path, monkeypatch
+):
+    monkeypatch.setenv("BCE_CATALOG_SNAPSHOT_DIR", str(tmp_path))
+    httpx_mock.add_response(
+        url="https://contenido.bce.fin.ec/wp-json/bcedata/v1/tree", json=_TREE
+    )
+    _mock_all_bundles(httpx_mock)
+    grid_url = "https://contenido.bce.fin.ec/wp-json/bcedata/v1/grid"
+    combinations = [
+        (10, "Mensual", "Millones de USD", "2026-06"),
+        (10, "Mensual", "Numero", "2026-06"),
+        (10, "Anual", "Millones de USD", "2025"),
+        (11, "Mensual", "Numero", "2026-06"),
+        (20, "Mensual", "Porcentaje", "2026-06"),
+    ]
+    for id_grupo, frecuencia, unidad, periodo in combinations:
+        httpx_mock.add_response(
+            url=grid_url,
+            match_params={
+                "id_grupo": str(id_grupo),
+                "frecuencia": frecuencia,
+                "unidad": unidad,
+                "desde": periodo,
+                "hasta": periodo,
+            },
+            json={
+                "columns": [periodo],
+                "rows": [
+                    {
+                        "tipo": "Series",
+                        "label": "Serie de prueba",
+                        "values": {periodo: 1},
+                    }
+                ],
+            },
+        )
+
+    result = await bce_client.audit_catalog(
+        auditar_grid=True, guardar_snapshot=True
+    )
+
+    audit = result["auditoria_grid"]
+    assert audit["total_combinaciones"] == 5
+    assert audit["combinaciones_consultadas"] == 5
+    assert audit["combinaciones_exitosas"] == 5
+    assert audit["combinaciones_con_error"] == 0
+    assert (tmp_path / "latest-grid-audit.json").exists()
+
+
+async def test_audit_catalog_persists_and_compares_previous_snapshot(
+    httpx_mock, tmp_path, monkeypatch
+):
+    monkeypatch.setenv("BCE_CATALOG_SNAPSHOT_DIR", str(tmp_path))
+    httpx_mock.add_response(
+        url="https://contenido.bce.fin.ec/wp-json/bcedata/v1/tree", json=_TREE
+    )
+    _mock_all_bundles(httpx_mock)
+
+    first = await bce_client.audit_catalog(guardar_snapshot=True)
+    bce_client.clear_caches()
+    httpx_mock.add_response(
+        url="https://contenido.bce.fin.ec/wp-json/bcedata/v1/tree", json=_TREE
+    )
+    _mock_all_bundles(httpx_mock)
+    second = await bce_client.audit_catalog(
+        guardar_snapshot=True, comparar_anterior=True
+    )
+
+    assert first["snapshot"]["completo"] is True
+    assert second["comparacion"]["disponible"] is True
+    assert second["comparacion"]["total_cambios"] == 0
+    assert (tmp_path / "latest-valid.json").exists()
+
+
 async def test_audit_catalog_records_bundle_failures(httpx_mock):
     httpx_mock.add_response(
         url="https://contenido.bce.fin.ec/wp-json/bcedata/v1/tree", json=_TREE

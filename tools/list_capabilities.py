@@ -24,6 +24,7 @@ _CAPABILITIES = {
         "Supercías registro de auditores externos autorizados",
         "Supercías ranking financiero (últimos años, requiere build local)",
         "SRI consulta pública del Registro Único de Contribuyentes (RUC)",
+        "SRI Saiku OLAP público: descubrimiento de cubos y consultas agregadas limitadas",
         (
             "SIPA (Ministerio de Agricultura, Ganadería y Pesca): series "
             "agropecuarias reales — precios, comercio exterior, crédito, "
@@ -85,6 +86,9 @@ _CAPABILITIES = {
             "search_sri_estadisticas_recaudacion",
             "get_sri_ruc_info",
             "search_sri_ruc",
+            "list_sri_saiku_cubes",
+            "describe_sri_saiku_cube",
+            "query_sri_saiku_aggregate",
         ],
         "financieros": ["search_ranking", "get_financials"],
         "agropecuario": ["list_sipa_modulos", "get_sipa_modulo_archivos"],
@@ -117,9 +121,12 @@ _CAPABILITIES = {
         ),
         (
             "audit_bce_catalog consulta el árbol y los metadatos de todos los "
-            "grupos BCEData; no descarga todos los valores de todas las series. "
-            "Usa get_indicador_bce para pedir los valores de un grupo, frecuencia "
-            "y unidad concretos."
+            "grupos BCEData; no descarga todos los valores históricos. Con "
+            "auditar_grid=true prueba un período reciente por cada combinación "
+            "frecuencia/unidad, hasta 500 combinaciones, y puede guardar el "
+            "reporte separado. Usa get_indicador_bce para series completas. "
+            "Con guardar_snapshot/comparar_anterior conserva el catálogo y "
+            "detecta cambios."
         ),
         (
             "search_biinec_extras no busca en vivo dentro de BIINEC "
@@ -135,6 +142,12 @@ _CAPABILITIES = {
             "get_sri_ruc_info consulta únicamente la ficha registral pública "
             "del SRI y sus establecimientos; no expone declaraciones ni "
             "montos tributarios individuales"
+        ),
+        (
+            "Saiku SRI usa sesión anónima, descubrimiento público y una sola "
+            "dimensión/medida por consulta; query_sri_saiku_aggregate limita "
+            "el resultado a 100 filas, no acepta MDX arbitrario y no hace "
+            "drill-through"
         ),
         (
             "search_ranking/get_financials: requieren que el operador del "
