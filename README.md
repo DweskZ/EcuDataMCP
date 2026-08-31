@@ -16,12 +16,12 @@ En lugar de navegar manualmente por portales gubernamentales, simplemente pregun
 
 ## Beneficios
 
-- **Acceso instantáneo a datos públicos**: Pregunta en lenguaje natural y obtén datos de 98 instituciones del Estado ecuatoriano sin navegar portales, descargar archivos ni lidiar con formatos.
-- **Unifica múltiples fuentes en un solo punto**: Datos abiertos (CKAN), trámites gubernamentales (gob.ec) y categorías temáticas, todo accesible desde una sola conversación con tu IA.
-- **Preview de datos sin descargas**: `preview_resource_data` parsea CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX) y `.tar.gz`/`.zip` (si envuelven un CSV/TSV/TXT) en memoria; `query_resource_data` consulta el DataStore CKAN sin bajar el archivo completo.
-- **Cero fricción**: No necesitas API key, no necesitas cuenta, no necesitas permisos especiales. 100% datos públicos bajo licencia abierta.
+- **Acceso instantáneo a datos públicos**: Pregunta en lenguaje natural y explora datos de instituciones del Estado ecuatoriano sin navegar portales, descargar archivos ni lidiar con formatos.
+- **Unifica múltiples fuentes en un solo punto**: Datos abiertos, trámites, regulaciones, contratación pública, riesgos, datos estadísticos y otras fuentes oficiales, todo accesible desde una sola conversación con tu IA.
+- **Preview de datos sin descargas**: `preview_resource_data` parsea CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX) y algunos archivos comprimidos en memoria; `query_resource_data` consulta el DataStore CKAN sin bajar el archivo completo.
+- **Cero fricción**: No necesitas API key ni permisos especiales para las fuentes públicas compatibles.
 - **Compatible con cualquier cliente MCP**: Claude, ChatGPT, Gemini, Cursor, VS Code, Windsurf, Le Chat, HuggingChat y más.
-- **Listo para producción**: Docker, health checks, logging estructurado, y un servidor HTTP Streamable que sigue la especificación MCP al pie de la letra.
+- **Listo para producción**: Docker, health checks, logging estructurado, y un servidor HTTP Streamable compatible con MCP.
 
 ---
 
@@ -32,13 +32,13 @@ En lugar de navegar manualmente por portales gubernamentales, simplemente pregun
 - Buscar datos públicos por tema (salud, educación, seguridad, economía) y entender qué publica cada institución.
 
 ### Para periodistas e investigadores
-- Explorar los 1,581 datasets del catálogo nacional y hacer preview de los datos directamente desde Claude o ChatGPT.
-- Cruzar información de múltiples instituciones (SRI, INEC, Ministerios) en una sola conversación.
+- Explorar datasets del catálogo nacional y hacer preview de los datos directamente desde Claude o ChatGPT.
+- Cruzar información de múltiples instituciones (SRI, INEC, BCE y ministerios) en una sola conversación.
 - Acceder rápidamente a datos de anticorrupción, presupuestos y ejecución del gasto público.
 
 ### Para desarrolladores
 - Integrar datos abiertos de Ecuador en aplicaciones mediante el protocolo MCP estándar.
-- Prototipar dashboards y análisis exploratorios sin escribir código de scraping ni parseo de CSV.
+- Prototipar dashboards y análisis exploratorios sin escribir código de scraping ni parseo de archivos.
 - Usar como backend de datos para agentes de IA que necesiten contexto sobre Ecuador.
 
 ### Para el sector público
@@ -50,45 +50,25 @@ En lugar de navegar manualmente por portales gubernamentales, simplemente pregun
 
 ## Fuentes de datos
 
-Este MCP unifica **fuentes gubernamentales** en un solo servidor:
+Este MCP unifica fuentes gubernamentales en un solo servidor:
 
-| Fuente | Datos | Cobertura |
-|--------|-------|-----------|
-| **Datos Abiertos** (CKAN) | Catálogo nacional + DataStore + preview CSV/JSON/XLSX | www.datosabiertos.gob.ec |
-| **Cuenca en Datos** (CKAN) | Portal municipal independiente (92 datasets); mismos tools con `source="cuenca"` | cuencaendatos.cuenca.gob.ec |
-| **SRI Datasets** | ~130 archivos (CSV/XLSX/ZIP) fuera del portal CKAN: RUC por provincia, recaudación, ventas/compras, vehículos, CEL | www.sri.gob.ec/datasets |
-| **Trámites e instituciones** (Gob.ec) | Procedimientos, requisitos, costos | gob.ec/api/v1 |
-| **Regulaciones** (Gob.ec) | Normas, acuerdos, Registro Oficial | gob.ec/api/v1/regulaciones |
-| **Contratos públicos** (SERCOP/OCDS) | Licitaciones, compradores, proveedores | datosabiertos.compraspublicas.gob.ec |
-| **Gestión de Riesgos** (SGR) | Eventos COE + estaciones SAT tsunami | sgrportal.gestionderiesgos.gob.ec |
-| **Sismos** (IG-EPN) | Catálogo sísmico del Instituto Geofísico | www.igepn.edu.ec |
-| **Geografía** (DPA) | 24 provincias + 224 cantones (códigos INEC) | referencia offline |
-| **ANDA** (NADA/IHSN) | Catálogo de encuestas y censos del INEC | anda.inec.gob.ec |
-| **Ecuador en Cifras** (INEC) | ~75 temas estadísticos: boletines, metodología y series históricas (IPC, ENEMDU, ENSANUT, pobreza, comercio exterior, censos...) | www.ecuadorencifras.gob.ec |
-| **BCE** (BCEData) | Catálogo BCEData: monetario/financiero, finanzas públicas, sector externo y sector real (PIB, empleo, confianza del consumidor); no representa todo el portal estadístico del BCE | contenido.bce.fin.ec |
-| **Supercías** | Directorio de compañías (226k+): representante legal, capital, CIIU | mercadodevalores.supercias.gob.ec |
-| **Supercías Ranking** | Financieros por balance (ingresos, activos, ROE, ~38 ratios), últimos años; requiere build local | appscvsmovil.supercias.gob.ec |
+| Fuente | Datos |
+|--------|-------|
+| **Datos Abiertos y Cuenca en Datos** (CKAN) | Catálogos, DataStore y archivos públicos |
+| **SRI** | Datasets estadísticos, recaudación, RUC y Saiku público |
+| **Gob.ec** | Trámites, instituciones y regulaciones |
+| **SERCOP/OCDS** | Contratación pública |
+| **SGR e IG-EPN** | Eventos de riesgo, tsunami y sismos |
+| **INEC** | ANDA, Ecuador en Cifras, censos y recursos estadísticos |
+| **BCE** | BCEData, IEM y otros indicadores económicos públicos |
+| **Superintendencia de Compañías** | Directorio, auditores y datos financieros |
+| **Geografía INEC/DPA** | Provincias, cantones y parroquias |
 
-**Sin API key. Sin restricciones de acceso. 100% datos públicos.**
+**Sin API key para las fuentes públicas compatibles.**
 
 ---
 
 ## Conecta tu chatbot al servidor MCP
-
-### Opción rápida: pídeselo a tu IA
-
-Si usas un asistente con acceso a la terminal (Claude Code, Cursor, Windsurf, etc.), puedes pegarle este prompt y dejar que él mismo clone el repo, instale las dependencias y edite la configuración de tu cliente MCP:
-
-```
-Clona https://github.com/DweskZ/EcuDataMCP, instala sus dependencias con uv sync,
-y regístralo como servidor MCP en mi cliente (Claude Desktop / Claude Code / Cursor)
-usando modo stdio con `uv run --directory <ruta-del-clon> python main.py --transport stdio`.
-Verifica que el servidor responda antes de darlo por terminado.
-```
-
-Revisa siempre lo que tu asistente cambie (archivos de configuración, comandos ejecutados) antes de confirmar.
-
-### Manual
 
 ### Claude Desktop
 
@@ -215,14 +195,6 @@ MCP_PORT=8007 LOG_LEVEL=DEBUG docker compose up -d
 docker compose down
 ```
 
-Los datos financieros de Supercías (`search_ranking`/`get_financials`) no
-se descargan solos ni bajo Docker — corré el build script dentro del
-contenedor, contra el volumen persistente `supercias_data:/app/data`:
-
-```bash
-docker compose exec mcp uv run python scripts/build_supercias_financials_db.py
-```
-
 ### Instalación manual
 
 Requiere Python 3.11+ y [uv](https://docs.astral.sh/uv/).
@@ -249,189 +221,15 @@ uv run main.py
 | `MCP_PORT` | Puerto del servidor | `8000` |
 | `MCP_TRANSPORT` | Transporte: `http` o `stdio` | `http` |
 | `LOG_LEVEL` | Nivel de log (DEBUG, INFO, WARNING, ERROR) | `INFO` |
-| `MCP_AUTH_TOKEN` | Token Bearer opcional requerido por `/mcp` | vacío |
-| `MCP_MAX_CONCURRENT_REQUESTS` | Máximo de solicitudes MCP simultáneas | `8` |
-| `BCE_CATALOG_SNAPSHOT_DIR` | Directorio persistente para auditorías BCEData; vacío usa `data/bce_catalog_snapshots` | vacío |
-| `IEM_CATALOG_DIR` | Directorio persistente para catálogos IEM; vacío usa `data/iem_catalog_snapshots` | vacío |
-| `CKAN_INSECURE_TLS` | Reintento TLS inseguro solo para el portal de datos (`1`/`0`); poner en `1` solo si el certificado del portal vuelve a fallar | `0` |
+| `MCP_AUTH_TOKEN` | Token Bearer opcional para `/mcp` | vacío |
 
-Stdio local:
+Para ejecutar el transporte stdio localmente:
 
 ```bash
 uv run python main.py --transport stdio
 ```
 
-**Seguridad del endpoint HTTP:** las instalaciones manuales escuchan solo en
-`127.0.0.1` por defecto. Si lo expones en otra interfaz, define
-`MCP_AUTH_TOKEN` y conserva el límite de concurrencia. Docker usa
-`0.0.0.0` dentro del contenedor para permitir el mapeo de puertos; el token se
-puede pasar con `MCP_AUTH_TOKEN=... docker compose up -d`.
-
-Si pytest falla con `PermissionError` al crear `pytest-of-...` en Windows, es
-un problema de permisos del directorio temporal del usuario, no de los tests.
-Cierra procesos que estén usando esa carpeta o ejecuta pytest con una carpeta
-temporal nueva y escribible, por ejemplo:
-
-```powershell
-$env:TEMP = "$PWD\\.pytest-temp"
-$env:TMP = $env:TEMP
-New-Item -ItemType Directory -Force $env:TEMP
-.\\.venv\\Scripts\\python.exe -m pytest -q
-```
-
-**Opcional — datos financieros de Supercías** (`search_ranking`/`get_financials`):
-a diferencia del resto de fuentes, esto no se descarga solo. Corre una vez
-antes de usarlos (tarda varios minutos, descarga ~356 MB):
-
-```bash
-uv run python scripts/build_supercias_financials_db.py
-```
-
-Guarda `data/supercias_financials.sqlite3` (gitignored). Repetir cuando
-pase de una semana — los tools avisan si la base está vieja o no existe.
-
-Si el script falla al descargar `bi_ranking.csv`, ver la nota sobre
-geografía de la conexión en la sección
-["Problema conocido"](#problema-conocido-el-portal-de-datos-abiertos-a-veces-bloquea-conexiones)
-más abajo.
-
----
-
-## Herramientas disponibles
-
-Casi todos los tools aceptan `format="json"` además de texto.
-
-### Entrada unificada
-
-| Tool | Descripción |
-|------|-------------|
-| `list_capabilities` | Resume fuentes, tools, prompts y límites del servidor. |
-| `search_ecuador` | Busca a la vez en datasets, orgs, trámites, regulaciones, contratos y riesgos. |
-| `lookup_ubicacion` | Provincias, cantones y parroquias (código INEC, región, población). |
-
-### Datos Abiertos
-
-| Tool | Descripción |
-|------|-------------|
-| `search_datasets` | Buscar datasets por palabras clave. Soporta filtro por categoría. Expande siglas comunes (ENEMDU, RUC, IESS, etc.) a su nombre completo antes de buscar. |
-| `list_recent_datasets` | Datasets más recientemente actualizados en el portal. |
-| `get_dataset_info` | Metadata detallada de un dataset: título, descripción, organización, tags, licencia, fechas. |
-| `list_dataset_resources` | Listar todos los archivos (recursos) de un dataset con formato, tamaño, URL y fechas de creación/modificación. |
-| `get_resource_info` | Información detallada de un archivo específico. |
-| `preview_resource_data` | Preview de CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX) o `.tar.gz`/`.zip` (si envuelven un CSV/TSV/TXT) como tabla (máx. 5 MB). |
-| `download_resource` | Baja el archivo crudo de un recurso en base64 (máx. 5 MB) — para formatos que no se pueden previsualizar como tabla (`.rar`, `.ods`, etc.). Usa `format="json"` para recibir `content_base64`. |
-| `query_resource_data` | Consulta tabular vía CKAN DataStore (filtros, texto, paginación) sin descargar el archivo. |
-| `detect_series_pattern` | Para datasets que publican un archivo por período (semanal/mensual): compara los dos más recientes y determina si cada archivo nuevo reemplaza a los anteriores (`acumulado`) o los complementa (`incremental`), en vez de tener que adivinar antes de sumar/comparar valores entre archivos. |
-| `search_sri_datasets` | Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN (sri.gob.ec/datasets): catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables. |
-| `search_sri_estadisticas_recaudacion` | Buscar reportes públicos de recaudación del SRI por impuesto, provincia, cantón y actividad económica. |
-| `get_sri_ruc_info` | Consultar la ficha pública de un RUC exacto: estado, tipo, actividad, fechas y establecimientos registrados. No incluye declaraciones ni montos tributarios individuales. |
-| `search_sri_ruc` | Buscar contribuyentes en el RUC del SRI por razón social o nombre comercial (texto parcial), sin necesitar el RUC exacto. |
-| `list_sri_saiku_cubes` | Listar los cubos OLAP visibles en la instancia pública de Saiku del SRI. Solo metadatos de descubrimiento; no consulta filas. |
-| `describe_sri_saiku_cube` | Ver dimensiones, jerarquías, niveles y medidas de un cubo Saiku público. |
-| `query_sri_saiku_aggregate` | Ejecutar una consulta agregada limitada: una dimensión en filas y una medida. No acepta MDX arbitrario ni drill-through. |
-
-Todos los tools CKAN de esta sección y de "Exploración" más abajo (`search_organizations`,
-`get_organization_info`, `list_categories`, `get_category_info`) aceptan `source="nacional"`
-(default, www.datosabiertos.gob.ec) o `source="cuenca"` (cuencaendatos.cuenca.gob.ec, portal
-municipal independiente, 92 datasets) — mismo tool, otro catálogo CKAN.
-
-### Trámites Gubernamentales
-
-| Tool | Descripción |
-|------|-------------|
-| `search_tramites` | Buscar trámites del gobierno ecuatoriano (cédula, pasaporte, RUC, licencia, etc.) |
-| `get_tramite_info` | Detalle completo: requisitos, procedimiento, costo, tiempo estimado. |
-| `list_instituciones` | Listar instituciones públicas del Ecuador. |
-| `get_institucion_info` | Detalle de una institución (sector, web, descripción). |
-
-### ANDA (INEC)
-
-| Tool | Descripción |
-|------|-------------|
-| `search_anda` | Buscar encuestas y censos en el catálogo ANDA del INEC (NADA/IHSN). Indica si cada encuesta tiene microdatos descargables. |
-| `get_anda_survey_info` | Metadata completa de una encuesta ANDA: resumen, variables, confidencialidad y contacto. |
-| `download_anda_microdata` | Links directos de descarga de los archivos de microdatos de una encuesta ANDA. |
-
-### Ecuador en Cifras (INEC)
-
-| Tool | Descripción |
-|------|-------------|
-| `search_inec_estadisticas` | Buscar temas estadísticos en ecuadorencifras.gob.ec (IPC, ENEMDU, ENSANUT, pobreza...). |
-| `get_inec_estadistica_files` | Links directos (boletín, metodología, series históricas) de un tema. |
-| `search_inec_publicaciones` | Búsqueda de texto completo sobre todas las publicaciones de INEC vía su API REST de WordPress — siempre vigente, ideal para "cuál es el último boletín de X". |
-| `get_inec_publicacion_archivos` | Links directos de una publicación específica encontrada con `search_inec_publicaciones`. |
-| `search_biinec_extras` | Lista curada (no scraping en vivo) de los pocos registros exclusivos del Banco de Datos Abiertos (BIINEC) — último recurso si ANDA y Ecuador en Cifras no tienen el dato. |
-| `search_censo_recursos` | Microdatos completos del Censo 2022 (censoecuador.gob.ec): sector/cantón/manzana en CSV/SPSS/REDATAM, más 2010 y 2001 recodificados a la geografía 2022. |
-
-### Macroeconomía (BCE)
-
-| Tool | Descripción |
-|------|-------------|
-| `search_indicadores_bce` | Buscar en el catálogo estadístico del Banco Central del Ecuador (monetario/financiero, finanzas públicas, sector externo, sector real). |
-| `get_indicador_bce` | Serie de tiempo de un indicador por `id_grupo`: período, frecuencia y unidad configurables (defaults según el grupo). |
-| `audit_bce_catalog` | Auditar el catálogo BCEData completo: grupos, series, secciones, frecuencias, unidades, rangos de fechas y errores de carga. `incluir_grupos=true` devuelve el inventario detallado; `auditar_grid=true` prueba un período reciente por cada combinación frecuencia/unidad (con límite acotado); `guardar_snapshot=true` persiste el catálogo y, si corresponde, el reporte de valores; `comparar_anterior=true` detecta cambios frente al último snapshot completo. |
-| `search_bce_iem` | Buscar tablas XLSX individuales del último boletín Información Estadística Mensual (IEM) del BCE: detalle de deuda, comercio, PIB, petróleo, finanzas públicas y más. Reconcilia el índice histórico con “Últimas publicaciones”, reporta el rango del archivo y cataloga los enlaces PDF/ZIP completos. `historico=true` o `desde_anio`/`hasta_anio` busca versiones en el archivo mensual; `guardar_catalogo=true` persiste el catálogo completo construido por la búsqueda. |
-| `get_bce_iem_table` | Leer una tabla XLSX IEM con filtro `desde`/`hasta` (año, `YYYY-MM` o mes/año en español); `boletin_numero` permite elegir una versión histórica concreta. Conserva el diseño original cuando no es seguro normalizarlo y devuelve el SHA-256 del archivo leído. |
-
-### Compañías (Supercías)
-
-| Tool | Descripción |
-|------|-------------|
-| `search_companias` | Buscar en el directorio de compañías de la Superintendencia de Compañías (226k+, por nombre/RUC, provincia, situación legal). |
-| `get_compania_info` | Ficha completa de una compañía por RUC: representante legal, capital suscrito, CIIU, dirección. |
-| `search_ranking` | Rankear/filtrar compañías por indicadores financieros (año, CIIU, cualquier columna) — requiere `scripts/build_supercias_financials_db.py` corrido de antemano. |
-| `get_financials` | Historial financiero de una compañía por expediente o RUC: ingresos, activos, patrimonio, ~38 ratios (liquidez, endeudamiento, rentabilidad), últimos años cacheados. |
-| `search_auditores` | Buscar en el registro de auditores externos autorizados (1,447 firmas/personas, por nombre o identificación, provincia). |
-| `get_auditor_info` | Ficha completa de un auditor externo por identificación: resolución de autorización, nacionalidad, dirección, contacto. |
-
-### Regulaciones y contratos
-
-| Tool | Descripción |
-|------|-------------|
-| `search_regulaciones` | Buscar/listar regulaciones en gob.ec (con ref. Registro Oficial). |
-| `get_regulacion_info` | Detalle de una regulación + enlace al PDF. |
-| `search_contratos` | Buscar procedimientos de contratación pública (SERCOP/OCDS). |
-| `get_contrato_info` | Expediente OCDS: comprador, licitación, adjudicaciones, contratos. |
-
-### Riesgos y sismos
-
-| Tool | Descripción |
-|------|-------------|
-| `search_eventos_riesgo` | Eventos de emergencia/riesgo del COE (deslizamientos, inundaciones, etc.). |
-| `list_sat_tsunami` | Estaciones SAT de alerta temprana por tsunami. |
-| `search_sismos` | Sismos recientes del catálogo del Instituto Geofísico (IG-EPN): magnitud, profundidad, ubicación y estado de revisión. |
-
-### Exploración
-
-| Tool | Descripción |
-|------|-------------|
-| `search_organizations` | Buscar entre 98+ instituciones que publican datos (INEC, SRI, BCE, MSP, etc.) |
-| `get_organization_info` | Info de una organización con listado de sus datasets. |
-| `list_categories` | Categorías temáticas con conteo de datasets. |
-| `get_category_info` | Detalle de una categoría y datasets de ejemplo. |
-
-### Flujo de trabajo típico
-
-```
-1. search_ecuador("recaudación tributaria")       → Orientación rápida
-2. list_dataset_resources("dataset-id")           → Ve los archivos disponibles
-3. query_resource_data("resource-id", query=...)  → Consulta tabular (DataStore)
-   # o preview_resource_data("resource-id")       → Preview del archivo
-```
-
-### Prompts MCP
-
-Plantillas listas para el cliente (Claude/Cursor): `explorar_datos`, `explorar_tema`, `consultar_tramite`, `investigar_contrato`, `buscar_regulacion`, `buscar_inec`, `monitorear_riesgos`.
-
-### Resources MCP
-
-| URI | Contenido |
-|-----|-----------|
-| `ecuador://fuentes` | Fuentes integradas y tools asociadas |
-| `ecuador://provincias` | 24 provincias (JSON) |
-| `ecuador://cantones` | 224 cantones (JSON) |
-| `ecuador://parroquias` | ~1040 parroquias (JSON) |
-| `ecuador://instituciones-clave` | IDs frecuentes de gob.ec (SRI, IESS, etc.) |
+La referencia detallada de cada herramienta está en [docs/TOOLS.md](docs/TOOLS.md).
 
 ---
 
@@ -442,36 +240,9 @@ Plantillas listas para el cliente (Claude/Cursor): `explorar_datos`, `explorar_t
 | `POST /mcp` | Mensajes JSON-RPC (cliente → servidor) |
 | `GET /health` | Health check: `{"status":"ok","uptime_since":"...","version":"..."}` |
 
-Cuando `MCP_AUTH_TOKEN` está definido, `POST /mcp` y las demás operaciones MCP
-requieren el encabezado `Authorization: Bearer <token>`. `/health` permanece
-sin autenticación para que Docker pueda comprobar el servicio.
-
----
-
-## Problema conocido: el portal de Datos Abiertos a veces bloquea conexiones
-
-El portal `www.datosabiertos.gob.ec` a veces rechaza las conexiones que vienen de fuera de Latinoamérica (error 403). Esto afecta a las herramientas que dependen de ese portal: `search_datasets`, `search_organizations`, `get_organization_info`, `get_dataset_info`, `list_dataset_resources`, `get_resource_info`, `preview_resource_data`, `query_resource_data`, `list_recent_datasets`, `list_categories` y `get_category_info`.
-
-En nuestras pruebas:
-- Conectando desde Canadá: bloqueado.
-- Conectando desde Estados Unidos: bloqueado.
-- Conectando desde Colombia: funcionó sin problemas.
-
-Las herramientas de trámites e instituciones (`search_tramites`, `list_instituciones`, `get_institucion_info`, etc.) usan otro portal (`gob.ec`) y no tienen este problema.
-
-**Si ves errores 403 en las herramientas de Datos Abiertos:** intenta correr el servidor desde una conexión (por ejemplo, una VPN) con salida en algún país de Latinoamérica.
-
-**Nota — Supercías (`search_ranking`/`get_financials`):** aparte del problema
-de cifrado TLS que ya maneja `legacy_cipher_context()`
-(`appscvsmovil.supercias.gob.ec` exige un mínimo de cifrado que OpenSSL 3
-rechaza por defecto), este host parece comportarse igual que
-`datosabiertos.gob.ec` en cuanto a geografía de la conexión. Si
-`scripts/build_supercias_financials_db.py` falla incluso con el fix de
-cifrado aplicado, probá correrlo también desde una conexión con salida en
-Latinoamérica antes de asumir que es otro problema — no confirmado de forma
-exhaustiva (el fix de cifrado sí resolvió la conexión en las pruebas de esta
-sesión, corriendo desde una IP de la región), pero vale la pena descartarlo
-primero si falla desde otra región.
+Cuando `MCP_AUTH_TOKEN` está definido, `POST /mcp` requiere el encabezado
+`Authorization: Bearer <token>`. `/health` permanece sin autenticación para
+que Docker pueda comprobar el servicio.
 
 ---
 
@@ -481,13 +252,13 @@ primero si falla desde otra región.
 
 > "¿Qué datos tiene el SRI sobre recaudación?"
 
-El MCP buscará en los 114 datasets del SRI y te mostrará los resultados con títulos, descripciones y enlaces.
+El MCP buscará los datos públicos del SRI y te mostrará los resultados con títulos, descripciones y enlaces.
 
 ### Ver datos de salud
 
 > "Muéstrame un preview de los datos de hospitales"
 
-El MCP descargará el CSV y te mostrará las primeras filas como una tabla formateada.
+El MCP descargará el archivo compatible y te mostrará las primeras filas como una tabla formateada.
 
 ### Consultar trámites
 
@@ -499,7 +270,7 @@ El MCP buscará en el portal gob.ec y te dará los requisitos, procedimiento y c
 
 > "¿Qué categorías de datos hay disponibles?"
 
-El MCP listará las 18 categorías temáticas con el conteo de datasets en cada una.
+El MCP listará las categorías temáticas disponibles.
 
 ---
 
@@ -534,10 +305,5 @@ MIT License - ver [LICENSE](LICENSE) para más detalles.
 
 ## Contribuir
 
-Contribuciones son bienvenidas. Por favor:
-
-1. Fork el repositorio
-2. Crea tu feature branch (`git checkout -b feature/nueva-herramienta`)
-3. Haz commit de tus cambios (`git commit -m 'feat: agregar nueva herramienta'`)
-4. Push a la branch (`git push origin feature/nueva-herramienta`)
-5. Abre un Pull Request
+Las contribuciones son bienvenidas. Consulta [CONTRIBUTING.md](CONTRIBUTING.md)
+para el proceso de colaboración.
