@@ -2,11 +2,11 @@
 {% block content %}
 <section class="landing hero">
 <div class="container-page">
-<p class="kicker">A context layer for Ecuador's open data</p>
+<p class="kicker">Open public-data infrastructure for Ecuador</p>
 <h1>Explore <span class="accent">open data.</span></h1>
-<p class="hero-sub">Connect your AI assistant to Ecuador's datasets, government procedures, regulations, public contracts, risk events, earthquakes, Central Bank indicators, and companies. Find the right sources, query the data, and always cite the official source.</p>
+<p class="hero-sub">Connect your AI assistant to verifiable public data from Ecuador: datasets, procedures, contracts, earthquakes, BCE indicators, IEM tables, RUC lookup and companies. Find the right source, query with clear limits, and always cite the official origin.</p>
 <div class="hero-ctas">
-<a class="btn-cta primary" href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">Get started on GitHub</a>
+<a class="btn-cta primary" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">Get started on GitHub</a>
 <a class="btn-cta secondary" href="#how-it-works">See how it works &darr;</a>
 </div>
 <div class="hero-stats">
@@ -106,13 +106,13 @@
 <div class="container-page">
 <p class="kicker">Connect your assistant</p>
 <h2 class="section-title">Copy your client's configuration.</h2>
-<p class="section-lede">Run the server locally (Docker or <code>uv run</code>, see the <a href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">README</a>) and point your MCP client at <code>http://localhost:8000/mcp</code>.</p>
+<p class="section-lede">Run the server locally (Docker or <code>uv run</code>, see the <a href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">README</a>) and point your MCP client at <code>http://localhost:8000/mcp</code>.</p>
 <div class="quick-connect">
 <p class="kicker">Quick option</p>
 <p class="client-intro">If your assistant has terminal access, hand it the repo link and let it install everything for you:</p>
 <div class="code-block">
 <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-<pre><code>Clone https://github.com/dsanchezp18/EcuDataMCP, install its dependencies with uv sync,
+<pre><code>Clone https://github.com/DweskZ/EcuDataMCP, install its dependencies with uv sync,
 and register it as an MCP server in my client using stdio mode with
 `uv run --directory &lt;clone-path&gt; python main.py --transport stdio`.
 Verify the server responds before calling it done.</code></pre>
@@ -195,7 +195,7 @@ Verify the server responds before calling it done.</code></pre>
 <section class="closing-cta">
 <div class="container-page">
 <p>Ecuador's open data, with your favorite AI assistant.</p>
-<a class="btn-cta primary" href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">View on GitHub</a>
+<a class="btn-cta primary" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">View on GitHub</a>
 </div>
 </section>
 {% endblock %}

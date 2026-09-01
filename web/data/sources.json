@@ -21,7 +21,7 @@
     "id": "sri-datasets",
     "name": "SRI Datasets",
     "tag": null,
-    "description": "~130 archivos (CSV/XLSX/ZIP) fuera del portal CKAN: RUC por provincia, recaudación, ventas/compras, vehículos, CEL",
+    "description": "Archivos públicos, consulta de RUC y exploración acotada de cubos Saiku: recaudación, ventas/compras, vehículos y más",
     "coverage": "www.sri.gob.ec/datasets",
     "url": "https://www.sri.gob.ec/datasets",
     "status": "live"
@@ -93,7 +93,7 @@
     "id": "bce",
     "name": "BCE",
     "tag": "BCEData",
-    "description": "Catálogo estadístico completo: monetario/financiero, finanzas públicas, sector externo, sector real (PIB, empleo, confianza del consumidor)",
+    "description": "BCEData, tablas IEM y series diarias: catálogo macroeconómico, comercio, finanzas públicas, PIB, empleo y riesgo país",
     "coverage": "contenido.bce.fin.ec",
     "url": "https://contenido.bce.fin.ec",
     "status": "live"
@@ -115,5 +115,32 @@
     "coverage": "appscvsmovil.supercias.gob.ec",
     "url": "https://appscvsmovil.supercias.gob.ec",
     "status": "build-local"
+  },
+  {
+    "id": "inec-publicaciones",
+    "name": "INEC Publicaciones",
+    "tag": "INEC",
+    "description": "Publicaciones, boletines y archivos enlazados desde el índice público del INEC",
+    "coverage": "ecuadorencifras.gob.ec",
+    "url": "https://www.ecuadorencifras.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "cenace",
+    "name": "CENACE",
+    "tag": "Energía",
+    "description": "Snapshot operativo de demanda, generación y despacho eléctrico",
+    "coverage": "cenace.gob.ec",
+    "url": "https://www.cenace.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "sut",
+    "name": "SUT",
+    "tag": "Trabajo",
+    "description": "Indicadores públicos del Ministerio del Trabajo mediante sus tableros estadísticos",
+    "coverage": "sut.trabajo.gob.ec",
+    "url": "https://sut.trabajo.gob.ec",
+    "status": "live"
   }
 ]

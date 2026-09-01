@@ -2,11 +2,11 @@
 {% block content %}
 <section class="landing hero">
 <div class="container-page">
-<p class="kicker">Una capa de contexto para datos abiertos de Ecuador</p>
+<p class="kicker">Infraestructura abierta de datos públicos para Ecuador</p>
 <h1>Explora <span class="accent">datos abiertos.</span></h1>
-<p class="hero-sub">Conecta tu asistente de IA a datasets, trámites, regulaciones, contratos públicos, riesgos, sismos, indicadores del Banco Central y compañías de Ecuador. Encuentra las fuentes correctas, consulta los datos y cita siempre la fuente oficial.</p>
+<p class="hero-sub">Conecta tu asistente de IA a datos públicos verificables de Ecuador: datasets, trámites, contratos, sismos, indicadores del BCE, tablas IEM, RUC y compañías. Encuentra la fuente correcta, consulta con límites claros y cita siempre el origen oficial.</p>
 <div class="hero-ctas">
-<a class="btn-cta primary" href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">Empezar en GitHub</a>
+<a class="btn-cta primary" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">Empezar en GitHub</a>
 <a class="btn-cta secondary" href="#como-funciona">Ver cómo funciona &darr;</a>
 </div>
 <div class="hero-stats">
@@ -106,13 +106,13 @@
 <div class="container-page">
 <p class="kicker">Conecta tu asistente</p>
 <h2 class="section-title">Copia la configuración de tu cliente.</h2>
-<p class="section-lede">Corre el servidor localmente (Docker o <code>uv run</code>, ver el <a href="https://github.com/dsanchezp18/EcuDataMCP#ejecutar-localmente" target="_blank" rel="noopener">README</a>) y apunta tu cliente MCP a <code>http://localhost:8000/mcp</code>.</p>
+<p class="section-lede">Corre el servidor localmente (Docker o <code>uv run</code>, ver el <a href="https://github.com/DweskZ/EcuDataMCP#ejecutar-localmente" target="_blank" rel="noopener">README</a>) y apunta tu cliente MCP a <code>http://localhost:8000/mcp</code>.</p>
 <div class="quick-connect">
 <p class="kicker">Opción rápida</p>
 <p class="client-intro">Si tu asistente tiene acceso a una terminal, pégale el link del repositorio y déjalo instalar todo por ti:</p>
 <div class="code-block">
 <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-<pre><code>Clona https://github.com/dsanchezp18/EcuDataMCP, instala sus dependencias con uv sync,
+<pre><code>Clona https://github.com/DweskZ/EcuDataMCP, instala sus dependencias con uv sync,
 y regístralo como servidor MCP en mi cliente usando modo stdio con
 `uv run --directory &lt;ruta-del-clon&gt; python main.py --transport stdio`.
 Verifica que el servidor responda antes de darlo por terminado.</code></pre>
@@ -195,7 +195,7 @@ Verifica que el servidor responda antes de darlo por terminado.</code></pre>
 <section class="closing-cta">
 <div class="container-page">
 <p>Datos abiertos de Ecuador, con tu asistente de IA favorito.</p>
-<a class="btn-cta primary" href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">Ver en GitHub</a>
+<a class="btn-cta primary" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">Ver en GitHub</a>
 </div>
 </section>
 {% endblock %}

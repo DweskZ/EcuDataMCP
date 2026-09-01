@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.8.5",
+    "date": "2026-08-31",
+    "summary": "BCEData/IEM audits, a cautious equivalence map, historical IEM reading, and bounded public tools for SRI Saiku. The server keeps results verifiable without claiming equivalence or access that a source does not expose."
+  },
+  {
+    "version": "0.8.4",
+    "date": "2026-08-31",
+    "summary": "BCEData revision observability, broader IEM table normalization, remote deployment with authentication and per-client limits, and technical documentation separated from the README."
+  },
+  {
     "version": "0.7.0",
     "date": "2026-08-26",
     "summary": "Preview support for legacy .xls, .tar.gz, and .zip (wrapping a CSV/TSV/TXT). Acronym expansion and Content-Type sniffing in search/preview. Several reliability fixes found verifying against the live portal."

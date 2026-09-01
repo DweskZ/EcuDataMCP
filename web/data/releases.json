@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.8.5",
+    "date": "2026-08-31",
+    "summary": "Auditorías BCEData/IEM, mapa de equivalencias cauteloso, lectura histórica IEM y herramientas públicas acotadas para SRI Saiku. El servidor mantiene resultados verificables, sin afirmar equivalencias ni acceso que la fuente no exponga."
+  },
+  {
+    "version": "0.8.4",
+    "date": "2026-08-31",
+    "summary": "Observabilidad de revisiones en BCEData, normalización adicional de tablas IEM, despliegue remoto con autenticación y límites por cliente, y documentación técnica separada del README."
+  },
+  {
     "version": "0.7.0",
     "date": "2026-08-26",
     "summary": "Preview de .xls legacy, .tar.gz y .zip (que envuelven un CSV/TSV/TXT). Expansión de siglas y sniffing de Content-Type en búsqueda/previsualización. Varios fixes de confiabilidad encontrados verificando contra el portal real."

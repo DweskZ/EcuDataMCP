@@ -188,6 +188,55 @@ def load_json(lang: str, name: str):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def complete_tool_catalog(
+    curated: list[dict], signatures: dict[str, dict], lang: str
+) -> list[dict]:
+    """Keep the human-written Atlas current when new tools are added.
+
+    The curated entries retain their translated descriptions. New tools appear
+    under one explicit supplementary category using their source docstrings,
+    rather than being silently omitted until a full editorial pass is made.
+    """
+    listed = {tool["name"] for category in curated for tool in category["tools"]}
+    missing = sorted(set(signatures) - listed)
+    if not missing:
+        return curated
+
+    fallback_description = (
+        "Parámetro documentado en el código fuente."
+        if lang == "es"
+        else "Parameter documented in the source code."
+    )
+    generated = []
+    for name in missing:
+        signature = signatures[name]
+        generated.append(
+            {
+                "name": name,
+                "description": signature["summary"].split(". ", 1)[0],
+                "long_description": signature["summary"],
+                "params": [
+                    {
+                        **parameter,
+                        "description": signature["args_doc"].get(
+                            parameter["name"], fallback_description
+                        ),
+                    }
+                    for parameter in signature["params"]
+                ],
+            }
+        )
+    category = {
+        "category": (
+            "Herramientas incorporadas recientemente"
+            if lang == "es"
+            else "Recently added tools"
+        ),
+        "tools": generated,
+    }
+    return [*curated, category]
+
+
 def build_env() -> jinja2.Environment:
     env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(str(TEMPLATES)),
@@ -209,7 +258,11 @@ def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
 
     sources = load_json(lang, "sources.json")
     clients = load_json(lang, "clients.json")
-    tools = load_json(lang, "tools.json")
+    tools = complete_tool_catalog(
+        load_json(lang, "tools.json"),
+        load_json("es", "tool_signatures.json"),
+        lang,
+    )
     questions = load_json(lang, "questions.json")
     releases = load_json(lang, "releases.json")
 
@@ -267,7 +320,7 @@ def copy_assets():
     shutil.copytree(ASSETS, dest)
 
 
-SITE_URL = "https://dsanchezp18.github.io/EcuDataMCP"
+SITE_URL = "https://dweskz.github.io/EcuDataMCP"
 
 
 def write_seo_files():
