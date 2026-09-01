@@ -1198,13 +1198,13 @@
     "tools": [
       {
         "name": "audit_bce_catalog",
-        "description": "Audit the live BCEData catalogue and report its coverage",
+        "description": "Audita en vivo el catálogo BCEData y reporta su cobertura",
         "params": [
           {
             "name": "incluir_grupos",
             "type": "bool",
             "default": "False",
-            "description": "Include every discovered group's metadata in the response. Defaults to false to keep mobile responses small."
+            "description": "Incluye la metadata completa de cada grupo descubierto en la respuesta. Por defecto es false para mantener las respuestas livianas en móvil."
           },
           {
             "name": "guardar_snapshot",
@@ -1231,11 +1231,11 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Audit the live BCEData catalogue and report its coverage. Fetches the catalogue tree and every indicator group's metadata. The report counts groups, series, sections and failed metadata requests. Set incluir_grupos=true to include the complete per-group inventory. Use get_indicador_bce for the actual values of a selected group. Set guardar_snapshot=true to persist the audit under BCE_CATALOG_SNAPSHOT_DIR (or data/bce_catalog_snapshots by default). Set comparar_anterior=true to compare the current catalog with the last complete saved audit. Set auditar_grid=true to probe one latest period for every discovered frequency/unit combination. The value audit is bounded and persisted separately when guardar_snapshot=true."
+        "long_description": "Audita en vivo el catálogo BCEData y reporta su cobertura. Descarga el árbol del catálogo y la metadata de cada grupo de indicadores. El reporte cuenta grupos, series, secciones y solicitudes de metadata que fallaron. Usa incluir_grupos=true para incluir el inventario completo por grupo. Usa get_indicador_bce para los valores reales de un grupo seleccionado. Usa guardar_snapshot=true para persistir la auditoría en BCE_CATALOG_SNAPSHOT_DIR (o data/bce_catalog_snapshots por defecto). Usa comparar_anterior=true para comparar el catálogo actual con la última auditoría completa guardada. Usa auditar_grid=true para probar el período más reciente de cada combinación de frecuencia/unidad descubierta. La auditoría de valores está acotada y se persiste por separado cuando guardar_snapshot=true."
       },
       {
         "name": "compare_bce_sources",
-        "description": "Build a cautious BCEData ↔ IEM candidate-equivalence map",
+        "description": "Construye un mapa cauteloso de equivalencias candidatas entre BCEData e IEM",
         "params": [
           {
             "name": "query",
@@ -1262,11 +1262,11 @@
             "description": "Parámetro documentado en el código fuente."
           }
         ],
-        "long_description": "Build a cautious BCEData ↔ IEM candidate-equivalence map. Matching uses normalized group/series/table labels. It reports candidate overlaps and source-only entries, but does not claim that two labels have identical definitions. Confirm unit, frequency, coverage, values and revisions before combining them."
+        "long_description": "Construye un mapa cauteloso de equivalencias candidatas entre BCEData e IEM. El emparejamiento usa etiquetas normalizadas de grupo/serie/tabla. Reporta coincidencias candidatas y entradas que solo aparecen en una fuente, pero no afirma que dos etiquetas tengan definiciones idénticas. Confirma unidad, frecuencia, cobertura, valores y revisiones antes de combinarlas."
       },
       {
         "name": "get_bce_iem_table",
-        "description": "Inspect one official XLSX table from the latest BCE IEM bulletin",
+        "description": "Inspecciona una tabla XLSX oficial del boletín IEM más reciente del BCE",
         "params": [
           {
             "name": "table_id",
@@ -1305,41 +1305,41 @@
             "description": "Parámetro documentado en el código fuente."
           }
         ],
-        "long_description": "Inspect one official XLSX table from the latest BCE IEM bulletin. Get table_id from search_bce_iem. Tables with the common BCE layout (periods across columns and variables down rows) return structured, date-filterable series. Other layouts return a faithful preview rather than silently guessing columns. Always includes the BCE file and bulletin URLs for verification. Pass boletin_numero to retrieve a historical version returned by search_bce_iem(historico=true)."
+        "long_description": "Inspecciona una tabla XLSX oficial del boletín IEM más reciente del BCE. Obtén table_id desde search_bce_iem. Las tablas con el diseño común del BCE (períodos en columnas y variables en filas) devuelven series estructuradas y filtrables por fecha. Otros diseños devuelven una vista previa fiel en vez de adivinar columnas silenciosamente. Siempre incluye las URLs del archivo y del boletín del BCE para verificación. Pasa boletin_numero para obtener una versión histórica de las que devuelve search_bce_iem(historico=true)."
       },
       {
         "name": "get_bce_indicador_diario",
-        "description": "Fetch one BCE daily/monthly indicator's time series (e.g",
+        "description": "Obtiene la serie temporal de un indicador diario/mensual del BCE (ej. Riesgo País)",
         "params": [
           {
             "name": "archivo",
             "type": "str",
             "default": null,
-            "description": "A file name from list_bce_indicadores_diarios."
+            "description": "Un nombre de archivo devuelto por list_bce_indicadores_diarios."
           },
           {
             "name": "codigo",
             "type": "str",
             "default": null,
-            "description": "A \"Código Variable Dinámica\" from that same archivo."
+            "description": "Un \"Código Variable Dinámica\" de ese mismo archivo."
           },
           {
             "name": "ultimos_n",
             "type": "int",
             "default": "30",
-            "description": "Most recent N observations when no date range is given."
+            "description": "Las N observaciones más recientes cuando no se indica un rango de fechas."
           },
           {
             "name": "desde",
             "type": "str",
             "default": "''",
-            "description": "Optional start date YYYY-MM-DD."
+            "description": "Fecha de inicio opcional, YYYY-MM-DD."
           },
           {
             "name": "hasta",
             "type": "str",
             "default": "''",
-            "description": "Optional end date YYYY-MM-DD."
+            "description": "Fecha de fin opcional, YYYY-MM-DD."
           },
           {
             "name": "format",
@@ -1348,11 +1348,11 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Fetch one BCE daily/monthly indicator's time series (e.g. Riesgo País), bounded to a window — never the full series (some run 7,000+ observations). Get archivo/codigo from list_bce_indicadores_diarios first — a codigo only means one thing within its own archivo. Without desde/hasta, returns the most recent ultimos_n observations (capped at 366). With desde/hasta (YYYY-MM-DD, inclusive), returns that date range instead, also capped at 366 rows (most recent within the range if it's larger). The response always includes rango_completo (the series' true full date range and row count) so the window returned is never mistaken for the whole series. Each point in \"datos\" has \"valor\" (one number) for almost every indicator, except Inflación (datos_ipc.json), which has no single value — its points carry \"valores\": {\"Mensual\":..., \"Anual\":..., \"Acumulada\":...} instead."
+        "long_description": "Obtiene la serie temporal de un indicador diario/mensual del BCE (ej. Riesgo País), acotada a una ventana — nunca la serie completa (algunas superan las 7,000 observaciones). Obtén archivo/codigo primero desde list_bce_indicadores_diarios — un codigo solo tiene sentido dentro de su propio archivo. Sin desde/hasta, devuelve las ultimos_n observaciones más recientes (tope 366). Con desde/hasta (YYYY-MM-DD, inclusive), devuelve ese rango en su lugar, también con tope de 366 filas (las más recientes dentro del rango si este es mayor). La respuesta siempre incluye rango_completo (el rango de fechas real y el número de filas de la serie completa) para que la ventana devuelta nunca se confunda con la serie entera. Cada punto en \"datos\" trae \"valor\" (un solo número) para casi todos los indicadores, excepto Inflación (datos_ipc.json), que no tiene un valor único — sus puntos traen \"valores\": {\"Mensual\":..., \"Anual\":..., \"Acumulada\":...} en su lugar."
       },
       {
         "name": "list_bce_indicadores_diarios",
-        "description": "List BCE's family of daily/monthly \"indicador\" widgets published outside both BCEData and IEM (contenido.bce.fin.ec's Highcharts widget pages) — includes Riesgo País (EMBI) as a genuine daily series back to 2004, which BCEData only exposes as a monthly end-of-period aggregate",
+        "description": "Lista la familia de widgets \"indicador\" diarios/mensuales del BCE, publicados fuera de BCEData e IEM (páginas de widgets Highcharts de contenido.bce.fin.ec) — incluye Riesgo País (EMBI) como serie genuinamente diaria desde 2004, que BCEData solo expone como agregado mensual de fin de período",
         "params": [
           {
             "name": "format",
@@ -1361,11 +1361,11 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List BCE's family of daily/monthly \"indicador\" widgets published outside both BCEData and IEM (contenido.bce.fin.ec's Highcharts widget pages) — includes Riesgo País (EMBI) as a genuine daily series back to 2004, which BCEData only exposes as a monthly end-of-period aggregate. Also covers: Precio del Oro, Petróleo WTI, Índice Dow Jones, Tasa SOFR/LIBOR, Ecuador sovereign bond prices (all daily); Sistema de Pagos/Cobros Interbancarios, Sistema de Pagos en Línea, Cámara de Compensación de Cheques (monthly); Producción Petrolera Nacional (daily); inflación, desempleo, confianza del consumidor, PIB (monthly/quarterly/annual, likely duplicates BCEData). The catalog is discovered live from each file's own data, not hardcoded — a \"codigo\" only means one thing within its own \"archivo\", not across files. Follow up with get_bce_indicador_diario(archivo, codigo) for one series."
+        "long_description": "Lista la familia de widgets \"indicador\" diarios/mensuales del BCE, publicados fuera de BCEData e IEM (páginas de widgets Highcharts de contenido.bce.fin.ec) — incluye Riesgo País (EMBI) como serie genuinamente diaria desde 2004, que BCEData solo expone como agregado mensual de fin de período. También cubre: Precio del Oro, Petróleo WTI, Índice Dow Jones, Tasa SOFR/LIBOR, precios de bonos soberanos de Ecuador (todos diarios); Sistema de Pagos/Cobros Interbancarios, Sistema de Pagos en Línea, Cámara de Compensación de Cheques (mensual); Producción Petrolera Nacional (diaria); inflación, desempleo, confianza del consumidor, PIB (mensual/trimestral/anual, probablemente duplican BCEData). El catálogo se descubre en vivo desde los datos de cada archivo, no está hardcodeado — un \"codigo\" solo tiene sentido dentro de su propio \"archivo\", no entre archivos distintos. Continúa con get_bce_indicador_diario(archivo, codigo) para una serie."
       },
       {
         "name": "search_bce_iem",
-        "description": "Search individual Excel tables in the BCE's latest IEM bulletin",
+        "description": "Busca tablas individuales de Excel en el último boletín IEM del BCE",
         "params": [
           {
             "name": "query",
@@ -1428,11 +1428,11 @@
             "description": "Parámetro documentado en el código fuente."
           }
         ],
-        "long_description": "Search individual Excel tables in the BCE's latest IEM bulletin. Use this for detailed BCE tables not conveniently available through search_indicadores_bce/BCEData: trade by country, debt, public finance by government level, oil, GDP breakdowns, and more. It lists tables from the current monthly bulletin; use get_bce_iem_table with a returned table_id to inspect one official XLSX file. Set historico=true (or provide desde_anio/hasta_anio) to search across all matching monthly bulletin pages; this is slower on the first call because the archive pages must be read. Set guardar_catalogo=true to persist the complete catalog assembled by this search under IEM_CATALOG_DIR (or data/iem_catalog_snapshots by default). Pagination still keeps the MCP response bounded. Set hash_archivos=true for an operator-style SHA-256 audit of the discovered XLSX files. This downloads complete files, so it is deliberately opt-in and bounded by max_hash_archivos."
+        "long_description": "Busca tablas individuales de Excel en el último boletín IEM del BCE. Úsalo para tablas detalladas del BCE que no están disponibles fácilmente vía search_indicadores_bce/BCEData: comercio por país, deuda, finanzas públicas por nivel de gobierno, petróleo, desagregaciones del PIB, y más. Lista las tablas del boletín mensual vigente; usa get_bce_iem_table con un table_id devuelto para inspeccionar un archivo XLSX oficial. Usa historico=true (o indica desde_anio/hasta_anio) para buscar en todas las páginas de boletines mensuales que coincidan; esto es más lento en la primera llamada porque hay que leer las páginas del archivo histórico. Usa guardar_catalogo=true para persistir el catálogo completo armado por esta búsqueda en IEM_CATALOG_DIR (o data/iem_catalog_snapshots por defecto). La paginación sigue acotando la respuesta del MCP. Usa hash_archivos=true para una auditoría SHA-256 tipo operador de los archivos XLSX descubiertos. Esto descarga los archivos completos, así que es deliberadamente opt-in y está acotado por max_hash_archivos."
       },
       {
         "name": "search_bce_remesas",
-        "description": "List BCE's Remesas de Trabajadores (worker remittances) direct file links",
+        "description": "Lista los enlaces directos a archivos de Remesas de Trabajadores del BCE",
         "params": [
           {
             "name": "query",
@@ -1447,7 +1447,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List BCE's Remesas de Trabajadores (worker remittances) direct file links. A dedicated series separate from BCEData/IEM (search_indicadores_bce, search_bce_iem): the aggregate flow series, the full historical series, a methodology user note, and — since a July 2025 change to microdata-based collection — monthly aggregate and entity-level databases (BDD). Treat \"histórica\" (pre-change) and \"BDD\" (post-change) files as methodologically distinct series, not one continuous one — see the user note (Nota_al_usuario) for the comparability details. Returns direct URLs, not file contents — download them yourself or via download_resource."
+        "long_description": "Lista los enlaces directos a archivos de Remesas de Trabajadores del BCE. Una serie separada de BCEData/IEM (search_indicadores_bce, search_bce_iem): la serie agregada de flujos, la serie histórica completa, una nota metodológica para el usuario, y — desde un cambio a recolección basada en microdatos en julio de 2025 — bases de datos (BDD) agregadas mensuales y por entidad. Trata los archivos \"histórica\" (previo al cambio) y \"BDD\" (posterior al cambio) como series metodológicamente distintas, no como una sola continua — revisa la nota al usuario (Nota_al_usuario) para el detalle de comparabilidad. Devuelve URLs directas, no el contenido de los archivos — descárgalos tú mismo o vía download_resource."
       }
     ]
   },
@@ -1456,7 +1456,7 @@
     "tools": [
       {
         "name": "get_inec_estadistica_files",
-        "description": "List the direct file links published on one INEC statistical topic page",
+        "description": "Lista los enlaces directos a archivos publicados en una página de tema estadístico del INEC",
         "params": [
           {
             "name": "url",
@@ -1471,11 +1471,11 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List the direct file links published on one INEC statistical topic page. Get the url from search_inec_estadisticas. Returns technical bulletins, methodology, and historical series as direct PDF/XLSX/CSV/ZIP links — not the file contents. Use read_pdf on a .pdf link, or download it yourself for tabular formats."
+        "long_description": "Lista los enlaces directos a archivos publicados en una página de tema estadístico del INEC. Obtén la url desde search_inec_estadisticas. Devuelve boletines técnicos, metodología y series históricas como enlaces directos PDF/XLSX/CSV/ZIP — no el contenido de los archivos. Usa read_pdf en un enlace .pdf, o descárgalo tú mismo para los formatos tabulares."
       },
       {
         "name": "get_inec_publicacion_archivos",
-        "description": "List the direct file links (PDF/XLSX/CSV/ZIP) embedded in one INEC publication found via search_inec_publicaciones.",
+        "description": "Lista los enlaces directos a archivos (PDF/XLSX/CSV/ZIP) incrustados en una publicación del INEC encontrada vía search_inec_publicaciones.",
         "params": [
           {
             "name": "post",
@@ -1490,11 +1490,11 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List the direct file links (PDF/XLSX/CSV/ZIP) embedded in one INEC publication found via search_inec_publicaciones."
+        "long_description": "Lista los enlaces directos a archivos (PDF/XLSX/CSV/ZIP) incrustados en una publicación del INEC encontrada vía search_inec_publicaciones."
       },
       {
         "name": "search_biinec_extras",
-        "description": "Check INEC's BIINEC (\"Banco de Datos Abiertos\") for data not found in search_anda or search_inec_estadisticas",
+        "description": "Revisa el BIINEC (\"Banco de Datos Abiertos\") del INEC en busca de datos que no aparecen en search_anda ni en search_inec_estadisticas",
         "params": [
           {
             "name": "query",
@@ -1509,29 +1509,29 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Check INEC's BIINEC (\"Banco de Datos Abiertos\") for data not found in search_anda or search_inec_estadisticas. Last resort for INEC queries: BIINEC (aplicaciones3.ecuadorencifras.gob.ec) mostly duplicates ANDA and Ecuador en Cifras, so this does NOT scrape or search BIINEC live — it's a small, manually-verified list of the handful of registries confirmed to exist only there (environmental/administrative modules, e.g. hazardous waste in health facilities, ENEMDU/ECV environmental modules). If your query matches nothing here, that does NOT mean BIINEC has nothing — it means it wasn't worth automating; search the site's own search box directly instead."
+        "long_description": "Revisa el BIINEC (\"Banco de Datos Abiertos\") del INEC en busca de datos que no aparecen en search_anda ni en search_inec_estadisticas. Último recurso para consultas de INEC: BIINEC (aplicaciones3.ecuadorencifras.gob.ec) en su mayoría duplica ANDA y Ecuador en Cifras, así que este tool NO scrapea ni busca en BIINEC en vivo — es una lista pequeña y verificada a mano de los pocos registros confirmados que existen solo ahí (módulos ambientales/administrativos, ej. desechos peligrosos en establecimientos de salud, módulos ambientales de ENEMDU/ECV). Si tu búsqueda no coincide con nada aquí, eso NO significa que BIINEC no tenga nada — significa que no valía la pena automatizarlo; busca directamente en el buscador propio del sitio."
       },
       {
         "name": "search_censo_recursos",
-        "description": "Search INEC's dedicated Census 2022 microsite (censoecuador.gob.ec) for direct microdata/methodology file links",
+        "description": "Busca en el micrositio dedicado del Censo 2022 del INEC (censoecuador.gob.ec) enlaces directos a archivos de microdatos/metodología",
         "params": [
           {
             "name": "query",
             "type": "str",
             "default": "''",
-            "description": "Free text matched (accent-insensitive) against the file label, e.g. \"manlo\" (city-block level), \"sector\", \"2010\", \"spss\", \"diccionario\", \"metodologia\". Empty returns every file found."
+            "description": "Texto libre (sin distinguir tildes) contra la etiqueta del archivo, ej. \"manlo\" (nivel manzana), \"sector\", \"2010\", \"spss\", \"diccionario\", \"metodologia\". Vacío devuelve todos los archivos encontrados."
           },
           {
             "name": "limit",
             "type": "int",
             "default": "30",
-            "description": "Max results (default 30, max 100)."
+            "description": "Máximo de resultados (default 30, máx. 100)."
           },
           {
             "name": "offset",
             "type": "int",
             "default": "0",
-            "description": "Pagination offset over the matched set."
+            "description": "Desplazamiento de paginación sobre el conjunto encontrado."
           },
           {
             "name": "format",
@@ -1540,29 +1540,29 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Search INEC's dedicated Census 2022 microsite (censoecuador.gob.ec) for direct microdata/methodology file links. Far more complete than the general \"Censo de Población y Vivienda\" result from search_inec_estadisticas: full microdata at sector, cantón, and city-block (\"manzana\"/MANLOC) level in CSV, SPSS (SAV), and REDATAM formats, plus the 2010 and 2001 censuses recoded onto 2022 geography for comparability, variable dictionaries, and methodology/quality documents. Returns metadata and direct URLs only, never file contents -- these are large microdata archives (multi-hundred-MB in some cases), not previewable through this tool."
+        "long_description": "Busca en el micrositio dedicado del Censo 2022 del INEC (censoecuador.gob.ec) enlaces directos a archivos de microdatos/metodología. Mucho más completo que el resultado general \"Censo de Población y Vivienda\" de search_inec_estadisticas: microdatos completos a nivel de sector, cantón y manzana (MANLOC) en CSV, SPSS (SAV) y REDATAM, además de los censos 2010 y 2001 recodificados sobre la geografía 2022 para comparabilidad, diccionarios de variables y documentos de metodología/calidad. Devuelve solo metadata y URLs directas, nunca el contenido de los archivos -- son archivos de microdatos grandes (varios cientos de MB en algunos casos), no previsualizables con este tool."
       },
       {
         "name": "search_inec_estadisticas",
-        "description": "Search INEC's statistical topic pages (ecuadorencifras.gob.ec)",
+        "description": "Busca en las páginas de temas estadísticos del INEC (ecuadorencifras.gob.ec)",
         "params": [
           {
             "name": "query",
             "type": "str",
             "default": "''",
-            "description": "Free text matched against the topic name (accent-insensitive), e.g. \"precios\", \"empleo\", \"pobreza\". Empty returns all topics."
+            "description": "Texto libre (sin distinguir tildes) contra el nombre del tema, ej. \"precios\", \"empleo\", \"pobreza\". Vacío devuelve todos los temas."
           },
           {
             "name": "limit",
             "type": "int",
             "default": "30",
-            "description": "Max results (default 30, max 100)"
+            "description": "Máximo de resultados (default 30, máx. 100)"
           },
           {
             "name": "offset",
             "type": "int",
             "default": "0",
-            "description": "Pagination offset over the matched set"
+            "description": "Desplazamiento de paginación sobre el conjunto encontrado"
           },
           {
             "name": "format",
@@ -1571,29 +1571,29 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Search INEC's statistical topic pages (ecuadorencifras.gob.ec). Covers ~75 topics INEC publishes (IPC, ENEMDU, ENSANUT, pobreza, comercio exterior, cuentas nacionales, construcción, censos...), separate from both search_datasets (CKAN) and search_anda (INEC's microdata archive). This is where the actual published aggregate series live — technical bulletins, methodology, and full historical series in Excel/CSV — for operations that ANDA only catalogs as metadata with no downloadable microdata (e.g. price indices). Follow up with get_inec_estadistica_files(url) for one topic's file links."
+        "long_description": "Busca en las páginas de temas estadísticos del INEC (ecuadorencifras.gob.ec). Cubre ~75 temas que publica el INEC (IPC, ENEMDU, ENSANUT, pobreza, comercio exterior, cuentas nacionales, construcción, censos...), separado tanto de search_datasets (CKAN) como de search_anda (el archivo de microdatos del INEC). Aquí es donde viven las series agregadas realmente publicadas — boletines técnicos, metodología y series históricas completas en Excel/CSV — para operaciones que ANDA solo cataloga como metadata sin microdatos descargables (ej. índices de precios). Continúa con get_inec_estadistica_files(url) para los enlaces de un tema."
       },
       {
         "name": "search_inec_publicaciones",
-        "description": "Search every post INEC has published on Ecuador en Cifras, via its public WordPress REST API -- always current, newest first",
+        "description": "Busca en todas las publicaciones del INEC en Ecuador en Cifras, vía su API REST pública de WordPress -- siempre actualizada, más recientes primero",
         "params": [
           {
             "name": "query",
             "type": "str",
             "default": "''",
-            "description": "Free text matched against title/content (e.g. \"ENEMDU anual 2025\", \"inflación julio\", \"censo\"). Empty returns the most recent posts regardless of topic."
+            "description": "Texto libre contra título/contenido (ej. \"ENEMDU anual 2025\", \"inflación julio\", \"censo\"). Vacío devuelve las publicaciones más recientes sin importar el tema."
           },
           {
             "name": "limit",
             "type": "int",
             "default": "20",
-            "description": "Max results (default 20, max 100)."
+            "description": "Máximo de resultados (default 20, máx. 100)."
           },
           {
             "name": "offset",
             "type": "int",
             "default": "0",
-            "description": "Pagination offset over the matched set."
+            "description": "Desplazamiento de paginación sobre el conjunto encontrado."
           },
           {
             "name": "format",
@@ -1602,7 +1602,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Search every post INEC has published on Ecuador en Cifras, via its public WordPress REST API -- always current, newest first. Complements search_inec_estadisticas: that tool's topic pages are curated landing pages that can go stale for months or years even while INEC keeps publishing the same operation (confirmed live: ENEMDU's old \"Empleo\" topic page stopped at April 2023 while INEC kept releasing it monthly under dated posts this tool finds). Use this tool for \"what's the latest bulletin/release for X\" questions. Use search_inec_estadisticas/get_inec_estadistica_files instead when you want one operation's fixed overview page rather than a specific dated release. Follow up with get_inec_publicacion_archivos(id) for one publication's file links."
+        "long_description": "Busca en todas las publicaciones del INEC en Ecuador en Cifras, vía su API REST pública de WordPress -- siempre actualizada, más recientes primero. Complementa a search_inec_estadisticas: las páginas de tema de ese tool son landing pages curadas que pueden quedar desactualizadas por meses o años aunque el INEC siga publicando la misma operación (confirmado en vivo: la vieja página de tema \"Empleo\" de ENEMDU se detuvo en abril de 2023 mientras el INEC seguía publicándola mensualmente en posts con fecha que este tool sí encuentra). Usa este tool para preguntas de \"cuál es el último boletín/publicación de X\". Usa search_inec_estadisticas/get_inec_estadistica_files en cambio cuando quieras la página general fija de una operación en vez de una publicación con fecha específica. Continúa con get_inec_publicacion_archivos(id) para los enlaces de una publicación."
       }
     ]
   },
@@ -1717,25 +1717,25 @@
       },
       {
         "name": "search_sri_estadisticas_recaudacion",
-        "description": "Search the SRI's \"Estadísticas de Recaudación\" page for direct file links",
+        "description": "Busca en la página \"Estadísticas de Recaudación\" del SRI enlaces directos a archivos",
         "params": [
           {
             "name": "query",
             "type": "str",
             "default": "''",
-            "description": "Free text matched against the file's label or URL (accent-insensitive), e.g. \"recaudación\", \"provincia\", \"actividad economica\". Empty returns all files."
+            "description": "Texto libre (sin distinguir tildes) contra la etiqueta o URL del archivo, ej. \"recaudación\", \"provincia\", \"actividad economica\". Vacío devuelve todos los archivos."
           },
           {
             "name": "limit",
             "type": "int",
             "default": "30",
-            "description": "Max results (default 30, max 100)"
+            "description": "Máximo de resultados (default 30, máx. 100)"
           },
           {
             "name": "offset",
             "type": "int",
             "default": "0",
-            "description": "Pagination offset over the matched set"
+            "description": "Desplazamiento de paginación sobre el conjunto encontrado"
           },
           {
             "name": "format",
@@ -1744,7 +1744,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Search the SRI's \"Estadísticas de Recaudación\" page for direct file links. Separate from search_sri_datasets (raw yearly declaration exports): this covers monthly XLSX reports pre-aggregated by impuesto, provincia/cantón, and actividad económica (updated monthly), plus a ZIP of historical indicators, an annual PDF boletín técnico, and infografías. Returns direct URLs, not the file contents — download them yourself, via download_resource, or read_pdf for the PDFs."
+        "long_description": "Busca en la página \"Estadísticas de Recaudación\" del SRI enlaces directos a archivos. Separado de search_sri_datasets (exportaciones anuales crudas de declaraciones): esto cubre reportes XLSX mensuales pre-agregados por impuesto, provincia/cantón y actividad económica (actualizados mensualmente), además de un ZIP de indicadores históricos, un boletín técnico PDF anual, e infografías. Devuelve URLs directas, no el contenido de los archivos — descárgalos tú mismo, vía download_resource, o con read_pdf para los PDF."
       },
       {
         "name": "search_sri_ruc",
@@ -1778,7 +1778,7 @@
     "tools": [
       {
         "name": "get_contraloria_informe",
-        "description": "Download and preview one Contraloría document (Datos Abiertos or Plan Anual de Control)",
+        "description": "Descarga y previsualiza un documento de la Contraloría (Datos Abiertos o Plan Anual de Control)",
         "params": [
           {
             "name": "informe_id",
@@ -1799,11 +1799,11 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Download and preview one Contraloría document (Datos Abiertos or Plan Anual de Control). Get informe_id from list_contraloria_informes. Quarterly \"Datos Abiertos\" documents return one row per audit report approved that quarter, across every public institution in the country. \"Plan Anual de Control\" documents are PDFs (one per year); this returns their metadata and points you at read_pdf instead of a table."
+        "long_description": "Descarga y previsualiza un documento de la Contraloría (Datos Abiertos o Plan Anual de Control). Obtén informe_id desde list_contraloria_informes. Los documentos trimestrales \"Datos Abiertos\" devuelven una fila por cada informe de auditoría aprobado ese trimestre, para cualquier institución pública del país. Los documentos \"Plan Anual de Control\" son PDFs (uno por año); esto devuelve su metadata y te dirige a read_pdf en vez de una tabla."
       },
       {
         "name": "get_sipa_modulo_archivos",
-        "description": "List the direct download links published on one SIPA statistics module",
+        "description": "Lista los enlaces de descarga directa publicados en un módulo de estadísticas de SIPA",
         "params": [
           {
             "name": "modulo",
@@ -1818,11 +1818,11 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List the direct download links published on one SIPA statistics module. Get the modulo key from list_sipa_modulos. Returns each file's title, description, direct XLSX/XLS URL, and format — not the file contents. Files can be large (one confirmed at 41 MB); download the URL directly instead of routing it through preview_resource_data or download_resource, which cap at 5 MB."
+        "long_description": "Lista los enlaces de descarga directa publicados en un módulo de estadísticas de SIPA. Obtén la clave modulo desde list_sipa_modulos. Devuelve el título, descripción, URL directa XLSX/XLS y formato de cada archivo — no el contenido del archivo. Los archivos pueden ser grandes (uno confirmado de 41 MB); descarga la URL directamente en vez de pasarla por preview_resource_data o download_resource, que tienen un tope de 5 MB."
       },
       {
         "name": "get_superbancos_seccion_archivos",
-        "description": "List the direct download links published on one Superbancos statistics section page",
+        "description": "Lista los enlaces de descarga directa publicados en una sección de estadísticas de Superbancos",
         "params": [
           {
             "name": "seccion",
@@ -1837,11 +1837,11 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List the direct download links published on one Superbancos statistics section page. Get the seccion key from list_superbancos_secciones. Returns each file's grupo (table section, e.g. \"TARJETAS DE CRÉDITO\"), periodo (year label, when the table separates it from the file title), titulo, direct URL, and format — not the file contents. Files can be several MB; download the URL directly instead of routing it through preview_resource_data or download_resource, which cap at 5 MB. Coverage stops where the page's static archive tables stop — most recent years live in a client-side OneDrive widget this tool does not read. Do not present the newest \"periodo\"/\"titulo\" found here as the most recent data available from Superbancos."
+        "long_description": "Lista los enlaces de descarga directa publicados en una sección de estadísticas de Superbancos. Obtén la clave seccion desde list_superbancos_secciones. Devuelve el grupo (sección de la tabla, ej. \"TARJETAS DE CRÉDITO\"), periodo (etiqueta de año, cuando la tabla lo separa del título del archivo), titulo, URL directa y formato de cada archivo — no el contenido. Los archivos pueden pesar varios MB; descarga la URL directamente en vez de pasarla por preview_resource_data o download_resource, que tienen un tope de 5 MB. La cobertura se detiene donde terminan las tablas estáticas de archivo de la página — los años más recientes viven en un widget de OneDrive del lado del cliente que este tool no lee. No presentes el \"periodo\"/\"titulo\" más reciente encontrado aquí como el dato más actual disponible en Superbancos."
       },
       {
         "name": "list_contraloria_informes",
-        "description": "List Contraloría General del Estado's \"Datos Abiertos\" and \"Plan Anual de Control\" documents",
+        "description": "Lista los documentos \"Datos Abiertos\" y \"Plan Anual de Control\" de la Contraloría General del Estado",
         "params": [
           {
             "name": "format",
@@ -1850,11 +1850,11 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List Contraloría General del Estado's \"Datos Abiertos\" and \"Plan Anual de Control\" documents. \"Datos Abiertos\" are quarterly CSV exports of audit reports approved for ANY public institution in the country (Unidad de Control, Entidad, Diligencia, periodo, tipo de informe, N° de informe, fecha de aprobación) — much broader than any single-institution audit archive already covered elsewhere in this MCP. New quarters are added roughly every three months. \"Plan Anual de Control\" documents are one PDF per year (the approved annual control plan). Follow up with get_contraloria_informe(informe_id) for one document's parsed rows (CSV) or metadata + read_pdf pointer (PDF)."
+        "long_description": "Lista los documentos \"Datos Abiertos\" y \"Plan Anual de Control\" de la Contraloría General del Estado. \"Datos Abiertos\" son exportaciones CSV trimestrales de informes de auditoría aprobados para CUALQUIER institución pública del país (Unidad de Control, Entidad, Diligencia, periodo, tipo de informe, N° de informe, fecha de aprobación) — mucho más amplio que cualquier archivo de auditoría de una sola institución ya cubierto en otra parte de este MCP. Se agregan trimestres nuevos aproximadamente cada tres meses. Los documentos \"Plan Anual de Control\" son un PDF por año (el plan anual de control aprobado). Continúa con get_contraloria_informe(informe_id) para las filas parseadas de un documento (CSV) o su metadata + puntero a read_pdf (PDF)."
       },
       {
         "name": "list_sipa_modulos",
-        "description": "List SIPA's statistics-download modules (sipa.agricultura.gob.ec)",
+        "description": "Lista los módulos de descarga de estadísticas de SIPA (sipa.agricultura.gob.ec)",
         "params": [
           {
             "name": "format",
@@ -1863,11 +1863,11 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List SIPA's statistics-download modules (sipa.agricultura.gob.ec). SIPA (Sistema de Información Pública Agropecuaria) is the Ministry of Agriculture, Livestock and Fisheries' statistics portal — distinct from MPCEIP (industry/trade). It publishes real Excel files with agropecuario price, trade, credit, production, and census series back to the early 2000s, organized into four modules: económico, productivo, social, and censos y registros administrativos. Follow up with get_sipa_modulo_archivos(modulo) for one module's file listing."
+        "long_description": "Lista los módulos de descarga de estadísticas de SIPA (sipa.agricultura.gob.ec). SIPA (Sistema de Información Pública Agropecuaria) es el portal de estadísticas del Ministerio de Agricultura, Ganadería y Pesca — distinto de MPCEIP (industria/comercio). Publica archivos Excel reales con series de precios, comercio, crédito, producción y censos agropecuarios desde inicios de los 2000, organizados en cuatro módulos: económico, productivo, social, y censos y registros administrativos. Continúa con get_sipa_modulo_archivos(modulo) para el listado de archivos de un módulo."
       },
       {
         "name": "list_superbancos_secciones",
-        "description": "List the Superintendencia de Bancos statistics sections (superbancos.gob.ec/estadisticas/portalestudios/)",
+        "description": "Lista las secciones de estadísticas de la Superintendencia de Bancos (superbancos.gob.ec/estadisticas/portalestudios/)",
         "params": [
           {
             "name": "format",
@@ -1876,7 +1876,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List the Superintendencia de Bancos statistics sections (superbancos.gob.ec/estadisticas/portalestudios/). Superbancos has no CKAN organization and no \"datos abiertos\" section, so this is the only path to its published statistics: monthly financial bulletins, cards/ATMs/correspondents service statistics, comparative annual bank behavior, and the publication calendar. IMPORTANT: each section page also embeds a client-side OneDrive widget that lazy-loads the *most recent* years' files outside the page HTML — not covered here. This tool only returns what is in the page's static archive tables, which for most sections stops around 2020-2021 (boletines financieros: 1997-2008 only). Follow up with get_superbancos_seccion_archivos(seccion) for one section's actual file listing and coverage."
+        "long_description": "Lista las secciones de estadísticas de la Superintendencia de Bancos (superbancos.gob.ec/estadisticas/portalestudios/). Superbancos no tiene organización CKAN ni sección de \"datos abiertos\", así que este es el único camino a sus estadísticas publicadas: boletines financieros mensuales, estadísticas de servicios de tarjetas/cajeros/corresponsales, comportamiento financiero anual comparativo, y el calendario de publicaciones. IMPORTANTE: cada página de sección también incrusta un widget de OneDrive del lado del cliente que carga de forma diferida los archivos de los años *más recientes* fuera del HTML de la página — no cubierto aquí. Este tool solo devuelve lo que está en las tablas estáticas de archivo de la página, que para la mayoría de secciones se detienen alrededor de 2020-2021 (boletines financieros: solo 1997-2008). Continúa con get_superbancos_seccion_archivos(seccion) para el listado real de archivos y cobertura de una sección."
       }
     ]
   },
@@ -1885,13 +1885,13 @@
     "tools": [
       {
         "name": "get_cenace_tablero",
-        "description": "Fetch one tablero (tab) of CENACE's live grid-operations snapshot (Ecuador's national electricity operator) — generation mix and demand, always as-of-now",
+        "description": "Obtiene un tablero del snapshot en vivo de la operación de la red eléctrica de CENACE (el operador nacional de Ecuador) — mezcla de generación y demanda, siempre al instante",
         "params": [
           {
             "name": "tablero",
             "type": "str",
             "default": null,
-            "description": "One of the 5 names above."
+            "description": "Uno de los 5 nombres indicados arriba."
           },
           {
             "name": "format",
@@ -1900,41 +1900,41 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Fetch one tablero (tab) of CENACE's live grid-operations snapshot (Ecuador's national electricity operator) — generation mix and demand, always as-of-now. Tableros: - produccion_tiempo_real: current instant. - demanda_tiempo_real: current instant, plus a per-distributor (empresa eléctrica/CNEL) MW breakdown. - operativa_diaria: yesterday's full day total. - acumulada_mensual: month-to-date total (MWh). - acumulada_anual: year-to-date total (GWh). Each returns \"resumen\" (produccion total/exportación/importación/ hidráulica/térmica/renovable no convencional, or the demand equivalent). There is no historical query here — CENACE's page has no date picker, only these 5 as-of-now views."
+        "long_description": "Obtiene un tablero del snapshot en vivo de la operación de la red eléctrica de CENACE (el operador nacional de Ecuador) — mezcla de generación y demanda, siempre al instante. Tableros: - produccion_tiempo_real: instante actual. - demanda_tiempo_real: instante actual, más el desglose en MW por distribuidora (empresa eléctrica/CNEL). - operativa_diaria: total del día completo de ayer. - acumulada_mensual: total del mes a la fecha (MWh). - acumulada_anual: total del año a la fecha (GWh). Cada uno devuelve un \"resumen\" (producción total/exportación/importación/hidráulica/térmica/renovable no convencional, o el equivalente de demanda). No hay consulta histórica aquí — la página de CENACE no tiene selector de fecha, solo estas 5 vistas al instante."
       },
       {
         "name": "get_informe_igepn",
-        "description": "Download and extract text from one IG-EPN report found via search_informes_igepn",
+        "description": "Descarga y extrae el texto de un informe del IG-EPN encontrado vía search_informes_igepn",
         "params": [
           {
             "name": "nombre",
             "type": "str",
             "default": null,
-            "description": "Exact report name from search_informes_igepn (e.g. \"Informe Diario 2022-071\")"
+            "description": "Nombre exacto del informe según search_informes_igepn (ej. \"Informe Diario 2022-071\")"
           },
           {
             "name": "volcan",
             "type": "str",
             "default": "''",
-            "description": "Volcano name, only needed to disambiguate a duplicate nombre"
+            "description": "Nombre del volcán, solo necesario para desambiguar un nombre duplicado"
           },
           {
             "name": "grupo",
             "type": "str",
             "default": "''",
-            "description": "\"sismico\" | \"volcanico\" | \"\" (both) -- same value used to find it"
+            "description": "\"sismico\" | \"volcanico\" | \"\" (ambos) -- el mismo valor usado para encontrarlo"
           },
           {
             "name": "anio",
             "type": "int",
             "default": "0",
-            "description": "Report year (0 = current year) -- same value used to find it"
+            "description": "Año del informe (0 = año actual) -- el mismo valor usado para encontrarlo"
           },
           {
             "name": "pages",
             "type": "str",
             "default": "''",
-            "description": "Page range, 1-indexed (e.g. \"3\", \"1-5\"). Empty = whole document, capped at 20 pages/call"
+            "description": "Rango de páginas, indexado desde 1 (ej. \"3\", \"1-5\"). Vacío = documento completo, con tope de 20 páginas por llamada"
           },
           {
             "name": "format",
@@ -1943,17 +1943,17 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Download and extract text from one IG-EPN report found via search_informes_igepn. IG-EPN has no stable per-report URL (each download is a session-bound form submit), so this re-locates the report by exact name/year/group and streams its PDF directly -- pass `volcan` to disambiguate when two reports share the same name on the same day (happens for volcanic daily reports)."
+        "long_description": "Descarga y extrae el texto de un informe del IG-EPN encontrado vía search_informes_igepn. El IG-EPN no tiene una URL estable por informe (cada descarga es un envío de formulario atado a una sesión), así que este tool vuelve a ubicar el informe por nombre/año/grupo exactos y transmite su PDF directamente -- pasa `volcan` para desambiguar cuando dos informes comparten el mismo nombre el mismo día (pasa con los informes diarios volcánicos)."
       },
       {
         "name": "get_sut_indicador_schema",
-        "description": "List the queryable columns/measures/date-levels for one SUT Power BI dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing",
+        "description": "Lista las columnas/medidas/niveles de fecha consultables de un tablero Power BI del SUT, descubiertos desde la definición propia del reporte (la consulta subyacente de cada visual), no por adivinanza",
         "params": [
           {
             "name": "indicador",
             "type": "str",
             "default": null,
-            "description": "A key from list_sut_indicadores."
+            "description": "Una clave de list_sut_indicadores."
           },
           {
             "name": "format",
@@ -1962,11 +1962,11 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List the queryable columns/measures/date-levels for one SUT Power BI dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing. A field like \"public contratos.nombre_padre_activ_econ_empresa\" is a plain column usable in query_sut_indicador's campos or filtros; one ending in \"[medida]\" is an aggregate measure (only valid in campos, never filtros); one ending in \"[Año]\"/\"[Mes]\" is a date-hierarchy level. denuncias_publico and encuentra_empleo use an older report layout where visuals don't expose their query this way at all — their fields come from a small manually-captured set instead (recovered by driving the live dashboard and reading the queries it actually sent), not from this automatic discovery, but they show up here the same as any other field."
+        "long_description": "Lista las columnas/medidas/niveles de fecha consultables de un tablero Power BI del SUT, descubiertos desde la definición propia del reporte (la consulta subyacente de cada visual), no por adivinanza. Un campo como \"public contratos.nombre_padre_activ_econ_empresa\" es una columna plana usable en campos o filtros de query_sut_indicador; uno que termina en \"[medida]\" es una medida agregada (válida solo en campos, nunca en filtros); uno que termina en \"[Año]\"/\"[Mes]\" es un nivel de jerarquía de fecha. denuncias_publico y encuentra_empleo usan un formato de reporte más antiguo donde los visuales no exponen su consulta de esta manera — sus campos vienen de un conjunto pequeño capturado a mano (recuperado navegando el tablero en vivo y leyendo las consultas que realmente envía), no de este descubrimiento automático, pero aparecen aquí igual que cualquier otro campo."
       },
       {
         "name": "list_sut_indicadores",
-        "description": "List the Ministerio del Trabajo/SUT's public Power BI \"Indicadores\" dashboards (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml)",
+        "description": "Lista los tableros públicos de Power BI \"Indicadores\" del Ministerio del Trabajo/SUT (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml)",
         "params": [
           {
             "name": "format",
@@ -1975,35 +1975,35 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List the Ministerio del Trabajo/SUT's public Power BI \"Indicadores\" dashboards (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml). These are live queryable semantic models, not static files — they cover monthly contract registrations by industry/province/gender since 2015 (contratos), employer-reported labor demand and skills gaps, training/certification stats, provincial employment-gap indicators, and a gender/workplace-policy compliance dashboard (PEA, wage gaps, lactation rooms, childcare, teleworking). None of this overlaps with what's already covered by CKAN's ministerio-del-trabajo datasets, which are current-snapshot-only. Follow up with get_sut_indicador_schema(indicador) to see one dashboard's queryable fields, then query_sut_indicador to pull actual data — any combination of fields, not just what one chart already shows."
+        "long_description": "Lista los tableros públicos de Power BI \"Indicadores\" del Ministerio del Trabajo/SUT (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml). Son modelos semánticos consultables en vivo, no archivos estáticos — cubren registro mensual de contratos por industria/provincia/género desde 2015 (contratos), demanda laboral y brechas de habilidades reportadas por empleadores, estadísticas de capacitación/certificación, indicadores provinciales de brecha de empleo, y un tablero de cumplimiento de políticas de género/lugar de trabajo (PEA, brechas salariales, salas de lactancia, cuidado infantil, teletrabajo). Nada de esto se solapa con lo que ya cubren los datasets CKAN de ministerio-del-trabajo, que son solo una foto del stock actual. Continúa con get_sut_indicador_schema(indicador) para ver los campos consultables de un tablero, y luego query_sut_indicador para extraer datos reales — cualquier combinación de campos, no solo lo que ya muestra un gráfico."
       },
       {
         "name": "query_sut_indicador",
-        "description": "Run a live query against one SUT Power BI dashboard's underlying data model — any combination of its fields, e.g",
+        "description": "Ejecuta una consulta en vivo contra el modelo de datos subyacente de un tablero Power BI del SUT — cualquier combinación de sus campos, ej. mes y provincia juntos",
         "params": [
           {
             "name": "indicador",
             "type": "str",
             "default": null,
-            "description": "A key from list_sut_indicadores."
+            "description": "Una clave de list_sut_indicadores."
           },
           {
             "name": "campos",
             "type": "list[str]",
             "default": null,
-            "description": "Field labels exactly as returned by get_sut_indicador_schema."
+            "description": "Etiquetas de campo exactamente como las devuelve get_sut_indicador_schema."
           },
           {
             "name": "filtros",
             "type": "dict[str, str] | None",
             "default": "None",
-            "description": "Optional {campo: valor} equality filters, plain columns only."
+            "description": "Filtros opcionales de igualdad {campo: valor}, solo columnas planas."
           },
           {
             "name": "limite",
             "type": "int",
             "default": "500",
-            "description": "Row cap applied server-side by the query itself."
+            "description": "Tope de filas aplicado del lado del servidor por la propia consulta."
           },
           {
             "name": "format",
@@ -2012,35 +2012,35 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Run a live query against one SUT Power BI dashboard's underlying data model — any combination of its fields, e.g. month AND industry together for \"contratos\" (a real monthly time series since 2015 by CIIU industry, province, gender, contract status — none of this is in the ministerio-del-trabajo CKAN datasets, which are a single current-snapshot stock count with no time dimension). Get valid campos from get_sut_indicador_schema(indicador) first — an unrecognized field name raises an error naming the tool to call instead of guessing. filtros only accepts plain-column fields (not \"[medida]\"/hierarchy-level fields) and matches exact text equality, e.g. {\"public contratos.Estado contrato\": \"Vigente\"}. Rows can run into the thousands for a wide breakdown (e.g. every month x every industry) — narrow with filtros or fewer campos rather than raising limite past what's actually needed; format \"json\" is exact but still subject to the same limite cap."
+        "long_description": "Ejecuta una consulta en vivo contra el modelo de datos subyacente de un tablero Power BI del SUT — cualquier combinación de sus campos, ej. mes E industria juntos para \"contratos\" (una serie temporal mensual real desde 2015 por industria CIIU, provincia, género, estado del contrato — nada de esto está en los datasets CKAN de ministerio-del-trabajo, que son un solo conteo de stock actual sin dimensión de tiempo). Obtén los campos válidos desde get_sut_indicador_schema(indicador) primero — un nombre de campo no reconocido levanta un error que indica qué tool llamar en vez de adivinar. filtros solo acepta campos de columna plana (no campos \"[medida]\"/de jerarquía) y compara igualdad de texto exacta, ej. {\"public contratos.Estado contrato\": \"Vigente\"}. Las filas pueden llegar a los miles para un desglose amplio (ej. cada mes x cada industria) — acota con filtros o menos campos en vez de subir limite más de lo necesario; el formato \"json\" es exacto pero sigue sujeto al mismo tope de limite."
       },
       {
         "name": "search_informes_igepn",
-        "description": "Search the IG-EPN PDF report archive (Instituto Geofísico): daily/weekly/monthly/special seismic bulletins, volcanic \"IG Al Instante\" alerts, field/annual reports, etc",
+        "description": "Busca en el archivo de informes PDF del IG-EPN (Instituto Geofísico): boletines sísmicos diarios/semanales/mensuales/especiales, alertas volcánicas \"IG Al Instante\", informes de campo/anuales, etc.",
         "params": [
           {
             "name": "query",
             "type": "str",
             "default": "''",
-            "description": "Free text over report name/volcano (e.g. \"cotopaxi\", \"trimestral\")"
+            "description": "Texto libre sobre nombre del informe/volcán (ej. \"cotopaxi\", \"trimestral\")"
           },
           {
             "name": "grupo",
             "type": "str",
             "default": "''",
-            "description": "\"sismico\" | \"volcanico\" | \"\" (both)"
+            "description": "\"sismico\" | \"volcanico\" | \"\" (ambos)"
           },
           {
             "name": "anio",
             "type": "int",
             "default": "0",
-            "description": "Report year (0 = current year)"
+            "description": "Año del informe (0 = año actual)"
           },
           {
             "name": "limit",
             "type": "int",
             "default": "15",
-            "description": "Max reports to return (default 15, max 30)"
+            "description": "Máximo de informes a devolver (default 15, máx. 30)"
           },
           {
             "name": "format",
@@ -2049,7 +2049,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Search the IG-EPN PDF report archive (Instituto Geofísico): daily/weekly/monthly/special seismic bulletins, volcanic \"IG Al Instante\" alerts, field/annual reports, etc. Different from search_sismos, which reads the raw earthquake catalog feed -- this searches the narrative/PDF report archive instead. Use get_informe_igepn afterwards to download and read one report's text."
+        "long_description": "Busca en el archivo de informes PDF del IG-EPN (Instituto Geofísico): boletines sísmicos diarios/semanales/mensuales/especiales, alertas volcánicas \"IG Al Instante\", informes de campo/anuales, etc. A diferencia de search_sismos, que lee el feed crudo del catálogo sísmico, este busca en el archivo narrativo de informes PDF. Usa get_informe_igepn después para descargar y leer el texto de un informe."
       }
     ]
   },
@@ -2058,25 +2058,25 @@
     "tools": [
       {
         "name": "investigate_dataset",
-        "description": "One-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of \"find me data about X and show me what's in it\"",
+        "description": "Atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de \"encuéntrame datos sobre X y muéstrame qué hay dentro\"",
         "params": [
           {
             "name": "query",
             "type": "str",
             "default": null,
-            "description": "Search keywords (e.g. \"empleo\", \"SRI recaudación\")"
+            "description": "Palabras clave de búsqueda (ej. \"empleo\", \"SRI recaudación\")"
           },
           {
             "name": "source",
             "type": "str",
             "default": "'nacional'",
-            "description": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)"
+            "description": "\"nacional\" (default) o \"cuenca\" (portal municipal de Cuenca)"
           },
           {
             "name": "preview_rows",
             "type": "int",
             "default": "10",
-            "description": "Data rows to preview from the chosen resource (default: 10, max: 50)"
+            "description": "Filas de datos a previsualizar del recurso elegido (default: 10, máx.: 50)"
           },
           {
             "name": "format",
@@ -2085,29 +2085,29 @@
             "description": "text | json"
           }
         ],
-        "long_description": "One-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of \"find me data about X and show me what's in it\". Picks the top-ranked search result and, among its resources, the first one in a format this server can actually parse into a table (CSV/JSON/XLS/XLSX/ODS/ZIP/TARGZ), skipping unreadable ones (.rar, unrecognized formats) rather than previewing whichever resource happens to be listed first. Not a replacement for the individual tools: if the top search result isn't the right dataset, or you need a specific resource within it, use search_datasets/list_dataset_resources/ preview_resource_data directly instead of re-running this."
+        "long_description": "Atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de \"encuéntrame datos sobre X y muéstrame qué hay dentro\". Elige el resultado de búsqueda mejor rankeado y, entre sus recursos, el primero en un formato que este servidor puede parsear a una tabla (CSV/JSON/XLS/XLSX/ODS/ZIP/TARGZ), saltando los ilegibles (.rar, formatos no reconocidos) en vez de previsualizar el que aparezca primero en la lista. No reemplaza a los tools individuales: si el resultado top no es el dataset correcto, o necesitas un recurso específico dentro de él, usa search_datasets/list_dataset_resources/preview_resource_data directamente en vez de repetir esta llamada."
       },
       {
         "name": "list_zip_contents",
-        "description": "List a .zip archive's member files (name, size) from a direct URL, without downloading the archive",
+        "description": "Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo",
         "params": [
           {
             "name": "url",
             "type": "str",
             "default": null,
-            "description": "Direct URL to a .zip file (from another tool's result, e.g. get_inec_publicacion_archivos, search_censo_recursos)."
+            "description": "URL directa a un archivo .zip (del resultado de otro tool, ej. get_inec_publicacion_archivos, search_censo_recursos)."
           },
           {
             "name": "limit",
             "type": "int",
             "default": "200",
-            "description": "Max members returned (default 200, max 1000)."
+            "description": "Máximo de miembros devueltos (default 200, máx. 1000)."
           },
           {
             "name": "offset",
             "type": "int",
             "default": "0",
-            "description": "Pagination offset over the member list."
+            "description": "Desplazamiento de paginación sobre la lista de miembros."
           },
           {
             "name": "format",
@@ -2116,23 +2116,23 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List a .zip archive's member files (name, size) from a direct URL, without downloading the archive. Reads only the End Of Central Directory record and the central directory via HTTP Range requests, so it works for archives far larger than the 5 MB preview_zip/download_resource cap -- e.g. INEC or censo microdata ZIPs of multiple hundred MB. Requires the server to honor Range requests; fails with a clear error otherwise. Does not support ZIP64 archives. Listing names is cheap this way, but previewing a specific member's rows is not (still needs decompressing from that member's offset onward) -- this tool only lists metadata."
+        "long_description": "Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo. Lee solo el registro End Of Central Directory y el directorio central vía peticiones HTTP Range, así que funciona para archivos mucho más grandes que el tope de 5 MB de preview_zip/download_resource -- ej. ZIPs de microdatos de INEC o del censo de varios cientos de MB. Requiere que el servidor respete peticiones Range; falla con un error claro si no. No soporta archivos ZIP64. Listar los nombres es barato de esta forma, pero previsualizar las filas de un miembro específico no lo es (igual hay que descomprimir desde el offset de ese miembro en adelante) -- este tool solo lista metadata."
       },
       {
         "name": "read_pdf",
-        "description": "Extract text from a PDF document at a direct URL",
+        "description": "Extrae texto de un documento PDF en una URL directa",
         "params": [
           {
             "name": "url",
             "type": "str",
             "default": null,
-            "description": "Direct URL to the PDF file"
+            "description": "URL directa al archivo PDF"
           },
           {
             "name": "pages",
             "type": "str",
             "default": "''",
-            "description": "Page range, 1-indexed (e.g. \"3\", \"1-5\", \"1,4,9\"). Empty means the whole document, still capped at 20 pages per call."
+            "description": "Rango de páginas, indexado desde 1 (ej. \"3\", \"1-5\", \"1,4,9\"). Vacío significa el documento completo, con tope de 20 páginas por llamada."
           },
           {
             "name": "format",
@@ -2141,7 +2141,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Extract text from a PDF document at a direct URL. Useful for PDFs linked from other tools' results, e.g. get_regulacion_info's Registro Oficial file, or a dataset resource that turned out to be a PDF bulletin instead of a tabular file. No OCR: a scanned PDF with no embedded text layer will come back empty. Max download size: 5 MB (larger files return an explicit error instead of a partial read -- PDFs can't be parsed from a truncated download); max 20 pages extracted per call (call again with a different `pages` range for the rest)."
+        "long_description": "Extrae texto de un documento PDF en una URL directa. Útil para PDFs enlazados desde el resultado de otros tools, ej. el archivo del Registro Oficial de get_regulacion_info, o un recurso de dataset que resultó ser un boletín PDF en vez de un archivo tabular. Sin OCR: un PDF escaneado sin capa de texto embebida vendrá vacío. Tamaño máximo de descarga: 5 MB (los archivos más grandes devuelven un error explícito en vez de una lectura parcial -- los PDF no se pueden parsear desde una descarga truncada); máximo 20 páginas extraídas por llamada (vuelve a llamar con un rango de `pages` distinto para el resto)."
       }
     ]
   }
