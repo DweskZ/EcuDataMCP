@@ -241,3 +241,22 @@ async def get_tramite_regulaciones(
     if isinstance(result, dict):
         return [result]
     return []
+
+
+async def get_tramite_estadisticas(
+    tramite_id: str, session: httpx.AsyncClient | None = None
+) -> list[dict[str, Any]]:
+    """Monthly atenciones/quejas transparency series for a given trámite.
+
+    Returns every month reported since the endpoint's own history starts
+    (2021), newest first, exactly as gob.ec exposes it -- this is a small
+    per-trámite series (tens of rows), not something that needs pagination.
+    """
+    result = await _fetch_json(
+        _gobec_url(f"tramites-transparencia/{tramite_id}"), session=session
+    )
+    if isinstance(result, list):
+        return result
+    if isinstance(result, dict):
+        return [result]
+    return []
