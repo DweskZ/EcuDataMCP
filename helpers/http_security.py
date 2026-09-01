@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import hmac
 import json
+import math
 import time
 from collections.abc import Awaitable, Callable
 
@@ -99,7 +100,7 @@ def with_http_security(
                 if len(hits) >= rate_limit_requests:
                     rate_hits[client_key] = hits
                     retry_after = max(
-                        1, int(rate_limit_window_seconds - (now - hits[0]))
+                        1, math.ceil(rate_limit_window_seconds - (now - hits[0]))
                     )
                     await _json_response(
                         send,
