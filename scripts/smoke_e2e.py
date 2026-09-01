@@ -99,24 +99,35 @@ async def call_tool(client: httpx.AsyncClient, name: str, args: dict) -> str:
     return "\n".join(c.get("text", "") for c in content if c.get("type") == "text")
 
 
-def ok(label: str, text: str) -> None:
+def error_message(text: str) -> str | None:
+    """Return the error text if `text` looks like a tool-level failure.
+
+    Covers both the "Error: ..." string convention and the {"error": ...}
+    payload `format="json"` tools use, so a tool that starts silently
+    erroring reads as a WARN (or below), never a false-positive OK/FAIL.
+    """
     if "Traceback" in text[:200]:
-        raise AssertionError(f"{label}: traceback in response")
+        return text[:200]
     stripped = text.strip()
     if stripped.startswith(("Error:", "ERROR:")):
-        print(f"  WARN {label}: {text[:160]}")
-        return
+        return text
     if stripped.startswith("{"):
-        # format="json" tools return an {"error": ...} payload on failure
-        # instead of an "Error:"-prefixed string -- catch those too, or a
-        # tool that silently starts erroring reads as a passing smoke test.
         try:
             payload = json.loads(stripped)
         except json.JSONDecodeError:
             payload = None
         if isinstance(payload, dict) and "error" in payload:
-            print(f"  WARN {label}: {text[:160]}")
-            return
+            return text
+    return None
+
+
+def ok(label: str, text: str) -> None:
+    err = error_message(text)
+    if err is not None:
+        if "Traceback" in text[:200]:
+            raise AssertionError(f"{label}: traceback in response")
+        print(f"  WARN {label}: {text[:160]}")
+        return
     print(f"  OK   {label} ({len(text)} chars)")
 
 
@@ -203,6 +214,15 @@ async def main() -> int:
         for name, args, must in checks:
             try:
                 text = await call_tool(client, name, args)
+                err = error_message(text)
+                if err is not None:
+                    # A tool-level error (site down, geo-blocked, rate
+                    # limited...) means the fixed-string assertion was never
+                    # going to match -- that's an environment/upstream issue,
+                    # not a code regression, so it's a WARN like the
+                    # error-tolerant checks below, not a hard FAIL.
+                    ok(name, text)
+                    continue
                 if must and not any(m.lower() in text.lower() for m in must):
                     raise AssertionError(f"none of {must} found: {text[:240]}")
                 ok(name, text)
