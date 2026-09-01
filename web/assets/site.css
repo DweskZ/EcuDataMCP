@@ -102,3 +102,18 @@
   font-size: 0.88rem;
   padding: 0.5rem 0.6rem;
 }
+
+.notice-box {
+  max-width: 760px;
+  margin: 1.25rem 0 2.25rem;
+  padding: 0.85rem 1rem;
+  border-left: 3px solid #f2b134;
+  background: rgba(242, 177, 52, 0.08);
+  color: #c7c9cc;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.notice-box strong {
+  color: #f2b134;
+}
