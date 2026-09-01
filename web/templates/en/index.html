@@ -92,14 +92,10 @@
 <p class="kicker">The backstage</p>
 <h2 class="section-title">Open-source MCP server.</h2>
 <p class="section-lede">EcuDataMCP runs as a <a href="https://github.com/jlowin/fastmcp" target="_blank" rel="noopener">FastMCP</a> server in Python, exposed over Streamable HTTP or stdio. There is no database of its own: every tool calls the matching official portal live (CKAN, gob.ec, SERCOP, BCE, Supercías, IG-EPN, SGR) and returns the formatted response.</p>
-<div class="tools-grid">
-{% for cat in tools %}
-<div class="data-card">
-<h3>{{ cat.category }}<span class="tag">{{ cat.tools | length }}</span></h3>
-<div>{% for tool in cat.tools %}<a class="tool-chip" href="atlas.html#tool-{{ tool.name }}">{{ tool.name }}</a>{% endfor %}</div>
+<div class="tools-summary">
+{% for cat in tools %}<span class="tool-chip">{{ cat.category }}</span>{% endfor %}
 </div>
-{% endfor %}
-</div>
+<a class="btn-cta secondary" href="atlas.html">See the {{ tool_count }} tools in the Reference &rarr;</a>
 </div>
 </section>
 
