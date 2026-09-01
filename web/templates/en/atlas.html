@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="landing hero">
+<div class="container-page">
+<p class="kicker">Reference</p>
+<h1>All <span class="accent">{{ tool_count }} tools</span>, one by one.</h1>
+<p class="hero-sub">The full reference, not the homepage's summary view. Every tool has its own anchor: link to it directly from GitHub, other docs, or your own agent's reasoning.</p>
+<div class="atlas-filter-wrap">
+<input type="text" id="atlas-filter" class="atlas-filter" placeholder="Filter by name or keyword…" autocomplete="off">
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+{% for cat in tools %}
+<div class="atlas-category">
+<h3 class="atlas-category-title">{{ cat.category }}<span class="tag">{{ cat.tools | length }}</span></h3>
+{% for tool in cat.tools %}
+<details class="atlas-tool" id="tool-{{ tool.name }}" data-search="{{ tool | atlas_search_key }}">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">{{ tool.name }}</code>
+<span class="atlas-tool-desc">{{ tool.description }}</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">{{ tool.long_description }}</p>
+{% if tool.params %}
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+{% for p in tool.params %}
+<tr><td><code>{{ p.name }}</code></td><td><code>{{ p.type }}</code></td><td><code>{{ p.default | clean_default(t) }}</code></td><td>{{ p.description }}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+</div>
+</details>
+{% endfor %}
+</div>
+{% endfor %}
+<p id="atlas-empty" class="atlas-empty" style="display:none;">No tool matches that search.</p>
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>Missing a tool you need? Propose it.</p>
+<a class="btn-cta primary" href="colaborar.html">Contribute</a>
+</div>
+</section>
+{% endblock %}
+{% block extra_script %}
+<script>
+(function () {
+  var input = document.getElementById("atlas-filter");
+  var tools = Array.from(document.querySelectorAll(".atlas-tool"));
+  var categories = Array.from(document.querySelectorAll(".atlas-category"));
+  var empty = document.getElementById("atlas-empty");
+
+  input.addEventListener("input", function (e) {
+    var q = e.target.value.trim().toLowerCase();
+
+    tools.forEach(function (el) {
+      el.style.display = el.dataset.search.includes(q) ? "" : "none";
+    });
+
+    var anyVisible = false;
+    categories.forEach(function (cat) {
+      var visible = Array.from(cat.querySelectorAll(".atlas-tool")).some(function (t) {
+        return t.style.display !== "none";
+      });
+      cat.style.display = visible ? "" : "none";
+      anyVisible = anyVisible || visible;
+    });
+
+    empty.style.display = anyVisible ? "none" : "";
+  });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,1190 @@
+{
+  "detect_series_pattern": {
+    "file": "detect_series_pattern.py",
+    "params": [
+      {
+        "name": "dataset_id",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "resource_id_new",
+        "type": "str | None",
+        "default": "None"
+      },
+      {
+        "name": "resource_id_old",
+        "type": "str | None",
+        "default": "None"
+      },
+      {
+        "name": "source",
+        "type": "str",
+        "default": "'nacional'"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Tell whether a dataset's periodic files (one per week/month/etc) replace each other (cumulative -- only the newest file matters) or complement each other (incremental -- every file must be combined) before you aggregate or sum values across them. Downloads the two most recent files from the dataset's periodic-name group (see list_dataset_resources's possible_periodic_series), finds a date/period-like column in each (matched by header name: fecha, mes, ano, periodo, semana, ...), and compares which period values appear in both. High overlap means the newer file already contains the older file's periods (cumulative); near-zero overlap means each file covers its own distinct period (incremental). This is a heuristic over a sample of up to 500 rows per file -- confirm with preview_resource_data if the result is close to the threshold or comes back indeterminado.",
+    "args_doc": {
+      "dataset_id": "The dataset ID or slug",
+      "resource_id_new": "Optional -- newer resource ID to compare (auto-detected from the dataset's periodic-name group if omitted)",
+      "resource_id_old": "Optional -- older resource ID to compare (auto-detected if omitted). Both resource_id_new/resource_id_old must be given together, or neither.",
+      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "format": "text | json"
+    }
+  },
+  "download_anda_microdata": {
+    "file": "download_anda_microdata.py",
+    "params": [
+      {
+        "name": "idno",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Get direct download links for an ANDA survey's microdata files. Automates ANDA's one-click usage-terms step (research/statistical use only, no re-identifying respondents, cite the source — see get_anda_survey_info for the full text) to reveal the file list. Check get_anda_survey_info first: aggregate-only surveys (microdatos_disponibles false) have no files here. Returns direct URLs, not the file contents — the files are typically multi-MB ZIPs (SPSS .sav inside), too large to embed in a tool result. Download them with the returned URL.",
+    "args_doc": {
+      "idno": "Survey identifier from search_anda (the \"idno\" field)",
+      "format": "text | json"
+    }
+  },
+  "download_resource": {
+    "file": "download_resource.py",
+    "params": [
+      {
+        "name": "resource_id",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "source",
+        "type": "str",
+        "default": "'nacional'"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Download a resource's raw bytes from Ecuador's open data portal, base64-encoded. Use this for formats preview_resource_data can't parse into a table (.rar, or anything unrecognized) — it fetches the file as-is instead of trying to read it. Max size: 5 MB (same cap as preview_resource_data). Larger files come back with an error and the direct URL instead, since they'd be too big to embed in a response. Call with format=\"json\" to get the actual file content — the default format=\"text\" only confirms the download and tells you to retry with json; it never includes content_base64.",
+    "args_doc": {
+      "resource_id": "The resource UUID (get it from list_dataset_resources)",
+      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "format": "text | json (json includes content_base64; use this to actually retrieve the file)"
+    }
+  },
+  "get_anda_survey_info": {
+    "file": "get_anda_survey_info.py",
+    "params": [
+      {
+        "name": "idno",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Get full metadata for one ANDA (INEC) survey/census by its idno. Get the idno from search_anda results — it's the string identifier (e.g. \"IDD-ECU-INEC-CGTPE-DECON-ENESEM-2023-v1.3\"), not the numeric id. Returns scope/abstract, variable count, whether microdata is actually downloadable, confidentiality terms, and a contact email for requesting restricted data when it isn't.",
+    "args_doc": {
+      "idno": "Survey identifier from search_anda (the \"idno\" field)",
+      "format": "text | json"
+    }
+  },
+  "get_auditor_info": {
+    "file": "get_auditor_info.py",
+    "params": [
+      {
+        "name": "identificacion",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Get full registry details for an authorized external auditor by identificación (Superintendencia de Compañías). Returns authorization resolution number/date, nationality, address and contact details. Use search_auditores first if you don't have the exact identificación (RUC/cédula).",
+    "args_doc": {
+      "identificacion": "The auditor's RUC or cédula",
+      "format": "text | json"
+    }
+  },
+  "get_category_info": {
+    "file": "get_category_info.py",
+    "params": [
+      {
+        "name": "category",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "include_datasets",
+        "type": "bool",
+        "default": "True"
+      },
+      {
+        "name": "source",
+        "type": "str",
+        "default": "'nacional'"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Get details for a thematic category (CKAN group) on Ecuador's open data portal. Use list_categories first to discover valid category IDs (the 'name' field, e.g. 'salud', 'educacion', 'economia-y-finanzas').",
+    "args_doc": {
+      "category": "Category slug/name from list_categories",
+      "include_datasets": "Include sample datasets in the category (default True)",
+      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "format": "text | json"
+    }
+  },
+  "get_compania_info": {
+    "file": "get_compania_info.py",
+    "params": [
+      {
+        "name": "ruc",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Get full registry details for a company by RUC (Superintendencia de Compañías). Returns legal status, incorporation date, legal representative, registered capital, economic activity (CIIU), address and last balance-sheet year. Use search_companias first if you don't have the exact RUC.",
+    "args_doc": {
+      "ruc": "The company's 13-digit RUC",
+      "format": "text | json"
+    }
+  },
+  "get_contrato_info": {
+    "file": "get_contrato_info.py",
+    "params": [
+      {
+        "name": "ocid",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Get the full OCDS record for a public procurement procedure (SERCOP). Returns buyer, tender, awards, contracts and useful links when available. Get the ocid from search_contratos.",
+    "args_doc": {
+      "ocid": "Open Contracting ID, e.g. \"ocds-5wno2w-001-LICO-GPLR-2020-2805\"",
+      "format": "text | json"
+    }
+  },
+  "get_dataset_info": {
+    "file": "get_dataset_info.py",
+    "params": [
+      {
+        "name": "dataset_id",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "source",
+        "type": "str",
+        "default": "'nacional'"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Get detailed metadata about a specific dataset from Ecuador's open data portal. Returns title, description, organization, tags, resource count, creation/update dates, license, update frequency, the publisher's source URL (where the entity keeps the authoritative data, if any), and any custom metadata fields the publisher added.",
+    "args_doc": {
+      "dataset_id": "The dataset ID or slug (e.g. \"registro-estadistico-de-recursos-y-actividades-de-salud-2019\")",
+      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "format": "text | json"
+    }
+  },
+  "get_financials": {
+    "file": "get_financials.py",
+    "params": [
+      {
+        "name": "expediente_or_ruc",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "anio",
+        "type": "int | None",
+        "default": "None"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Get a company's financial history from Supercías balance-sheet filings. Returns revenue, assets, equity, profit, employee count, and financial ratios (liquidity, leverage, profitability) per fiscal year. Covers only the last few fiscal years (whatever scripts/build_supercias_financials_db.py last cached), not the full history back to 2008. Complements get_compania_info, which has legal/registry data but no financials.",
+    "args_doc": {
+      "expediente_or_ruc": "The company's Supercías \"expediente\" number (from search_companias/get_compania_info) or its 13-digit RUC.",
+      "anio": "Optional single fiscal year filter.",
+      "format": "text | json"
+    }
+  },
+  "get_indicador_bce": {
+    "file": "get_indicador_bce.py",
+    "params": [
+      {
+        "name": "id_grupo",
+        "type": "int",
+        "default": null
+      },
+      {
+        "name": "desde",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "hasta",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "frecuencia",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "unidad",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Time series data for one Banco Central del Ecuador (BCE) indicator group. Use search_indicadores_bce first to find the id_grupo. Frequency and unit vary by group (e.g. \"Mensual\"/\"Millones de USD\" for money supply, \"Trimestral\"/\"Porcentaje\" for GDP growth) — omit them to get the group's default, or check the error message for the valid options if you guess wrong.",
+    "args_doc": {
+      "id_grupo": "The group id from search_indicadores_bce.",
+      "desde": "Start period as YYYY-MM. Defaults to the earliest available period for the chosen frequency.",
+      "hasta": "End period as YYYY-MM. Defaults to the latest available period for the chosen frequency.",
+      "frecuencia": "Semanal | Mensual | Trimestral | Anual. Defaults to the group's first available frequency.",
+      "unidad": "Varies by group (e.g. \"Millones de USD\", \"Indice\", \"Porcentaje\"). Defaults to the first one available for the chosen frequency.",
+      "format": "text | json"
+    }
+  },
+  "get_institucion_info": {
+    "file": "get_institucion_info.py",
+    "params": [
+      {
+        "name": "institucion_id",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Get detailed information about a public institution registered on gob.ec. Returns name, acronym, sector, description, website and portal URL. Get the institucion_id from list_instituciones. Common IDs: SRI=8, IESS=5, Registro Civil=23, ANT=62, Cancillería=16.",
+    "args_doc": {
+      "institucion_id": "Institution ID (e.g. \"8\")",
+      "format": "text | json"
+    }
+  },
+  "get_organization_info": {
+    "file": "get_organization_info.py",
+    "params": [
+      {
+        "name": "organization_id",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "source",
+        "type": "str",
+        "default": "'nacional'"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Get detailed information about a public institution and its published datasets. Returns the institution name, description, dataset count, and a list of its datasets.",
+    "args_doc": {
+      "organization_id": "The organization slug (e.g. \"sri-servicio-de-rentas-internas\")",
+      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "format": "text | json"
+    }
+  },
+  "get_regulacion_info": {
+    "file": "get_regulacion_info.py",
+    "params": [
+      {
+        "name": "regulacion_id",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Get detailed information about a regulation published on gob.ec. Returns type, Registro Oficial reference, description and PDF/archivo URL when available. Get the regulacion_id from search_regulaciones.",
+    "args_doc": {
+      "regulacion_id": "Regulation ID (e.g. \"5051\")",
+      "format": "text | json"
+    }
+  },
+  "get_resource_info": {
+    "file": "get_resource_info.py",
+    "params": [
+      {
+        "name": "resource_id",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "source",
+        "type": "str",
+        "default": "'nacional'"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Get detailed information about a specific resource (file) from Ecuador's open data portal. Returns format, size, MIME type, download URL, and dataset association. For CSV files, you can then use preview_resource_data to see the actual data.",
+    "args_doc": {
+      "resource_id": "The resource UUID",
+      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "format": "text | json"
+    }
+  },
+  "get_tramite_info": {
+    "file": "get_tramite_info.py",
+    "params": [
+      {
+        "name": "tramite_id",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Get detailed information about a specific government procedure (trámite). Returns the procedure name, description, requirements, beneficiaries, cost, and the institution responsible. Get the tramite_id from search_tramites.",
+    "args_doc": {
+      "tramite_id": "The procedure ID (e.g. \"18009\")",
+      "format": "text | json"
+    }
+  },
+  "list_capabilities": {
+    "file": "list_capabilities.py",
+    "params": [
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Describe what this Ecuador MCP can do: sources, key tools, prompts and limits. Call this first when you are unsure which tool to use.",
+    "args_doc": {
+      "format": "text | json"
+    }
+  },
+  "list_categories": {
+    "file": "list_categories.py",
+    "params": [
+      {
+        "name": "source",
+        "type": "str",
+        "default": "'nacional'"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List all thematic categories of Ecuador's open data portal. Categories include: Salud, Educación, Economía y Finanzas, Seguridad y Defensa, Anticorrupción, Ambiente y Agua, Transporte, Turismo, and more. Each category shows the number of datasets it contains. Use the category 'name' field as the 'category' parameter in search_datasets to filter results by topic.",
+    "args_doc": {
+      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "format": "text | json"
+    }
+  },
+  "list_dataset_resources": {
+    "file": "list_dataset_resources.py",
+    "params": [
+      {
+        "name": "dataset_id",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "source",
+        "type": "str",
+        "default": "'nacional'"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List all resources (files) in a dataset with their metadata. Returns resource ID, title, format, size, download URL, and creation/ last-modified dates for each file. The dates let you tell whether a dataset's files are periodic snapshots (compare last_modified across resources to find the most recent one) before reading any of them. Also flags groups of resources whose names look like a periodic series (e.g. weekly files) — that's only a hint that they might need combining or picking the latest one; it does not tell you which, since that depends on the dataset (some periodic files replace previous ones, others complement them). Next step: use preview_resource_data on a CSV resource to see its contents, or use get_resource_info for detailed metadata.",
+    "args_doc": {
+      "dataset_id": "The dataset ID or slug",
+      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "format": "text | json"
+    }
+  },
+  "list_instituciones": {
+    "file": "list_instituciones.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "page",
+        "type": "int",
+        "default": "1"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List or search public institutions registered on Ecuador's gob.ec portal. If a query is provided, searches across all institutions by name or acronym. Without a query, returns a paginated list. Common institutions: SRI (ID: 8), Registro Civil (ID: 23), ANT (ID: 62), Cancillería (ID: 16), IESS (ID: 5), Ministerio de Salud, INEC, BCE.",
+    "args_doc": {
+      "query": "Optional search term (e.g. \"SRI\", \"salud\", \"rentas\")",
+      "page": "Page number (1-based, default: 1, only used without query)",
+      "format": "text | json"
+    }
+  },
+  "list_recent_datasets": {
+    "file": "list_recent_datasets.py",
+    "params": [
+      {
+        "name": "page",
+        "type": "int",
+        "default": "1"
+      },
+      {
+        "name": "page_size",
+        "type": "int",
+        "default": "15"
+      },
+      {
+        "name": "source",
+        "type": "str",
+        "default": "'nacional'"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List the most recently updated datasets on Ecuador's open data portal. Useful to discover new or freshly refreshed government data without a specific keyword. Sorted by metadata_modified descending.",
+    "args_doc": {
+      "page": "Page number (1-based, default 1)",
+      "page_size": "Results per page (default 15, max 50)",
+      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "format": "text | json"
+    }
+  },
+  "list_sat_tsunami": {
+    "file": "list_sat_tsunami.py",
+    "params": [
+      {
+        "name": "limit",
+        "type": "int",
+        "default": "30"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List tsunami early-warning SAT stations published by SGR (Gestión de Riesgos). Returns station codes and coordinates from the public SAT MapServer.",
+    "args_doc": {
+      "limit": "Max stations to include in the response (default 30)",
+      "format": "text | json"
+    }
+  },
+  "lookup_ubicacion": {
+    "file": "lookup_ubicacion.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "region",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "provincia",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "canton",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "nivel",
+        "type": "str",
+        "default": "'auto'"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Look up Ecuador DPA geography: provinces, cantons and parroquias (INEC codes). - nivel='provincia' | 'canton' | 'parroquia' | 'auto' - For parroquias, filter with canton= and/or provincia= (recommended)",
+    "args_doc": {
+      "query": "Name or code (e.g. \"Pichincha\", \"Cuenca\", \"Tumbaco\", \"170150\")",
+      "region": "Optional natural region for provinces/cantons",
+      "provincia": "Optional province filter",
+      "canton": "Optional canton filter (useful for parroquias)",
+      "nivel": "auto | provincia | canton | parroquia",
+      "format": "text | json"
+    }
+  },
+  "preview_resource_data": {
+    "file": "preview_resource_data.py",
+    "params": [
+      {
+        "name": "resource_id",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "rows",
+        "type": "int",
+        "default": "20"
+      },
+      {
+        "name": "source",
+        "type": "str",
+        "default": "'nacional'"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Download and preview a resource from Ecuador's open data portal. Supports CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX), and .tar.gz/.zip archives that wrap a CSV/TSV/TXT file. Returns the first N rows as a formatted table so the model can inspect data without a local download. Geometry/WKT columns are dropped from the table (they can be tens of KB per cell); CSV columns in European decimal notation (7.760,2) are normalized to standard notation (7760.2). Max download size: 5 MB. For large tabular DataStore resources prefer query_resource_data.",
+    "args_doc": {
+      "resource_id": "The resource UUID (get it from list_dataset_resources)",
+      "rows": "Number of data rows to preview (default: 20, max: 100)",
+      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "format": "text | json"
+    }
+  },
+  "query_resource_data": {
+    "file": "query_resource_data.py",
+    "params": [
+      {
+        "name": "resource_id",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "filters_json",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "rows",
+        "type": "int",
+        "default": "20"
+      },
+      {
+        "name": "offset",
+        "type": "int",
+        "default": "0"
+      },
+      {
+        "name": "sort",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "source",
+        "type": "str",
+        "default": "'nacional'"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Query a tabular resource via CKAN DataStore without downloading the full file. Prefer this over preview_resource_data when the resource is in the DataStore (most CSV resources on the portal). Supports full-text query, JSON filters, sorting and pagination.",
+    "args_doc": {
+      "resource_id": "Resource UUID (from list_dataset_resources)",
+      "query": "Optional full-text search across datastore fields",
+      "filters_json": "Optional JSON object of exact field filters, e.g. '{\"provincia\":\"Pichincha\"}'",
+      "rows": "Number of records to return (default 20, max 100)",
+      "offset": "Pagination offset (default 0)",
+      "sort": "Optional sort expression, e.g. \"anio desc\"",
+      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "format": "text | json"
+    }
+  },
+  "search_anda": {
+    "file": "search_anda.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": "10"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Search INEC's ANDA catalog (anda.inec.gob.ec) of surveys and censuses. ANDA runs on NADA (World Bank/IHSN), separate from datosabiertos.gob.ec. It catalogs 437+ INEC surveys/censuses with metadata (title, year, authoring entity). Not every entry has downloadable microdata — many are aggregate-only publications (e.g. price indices); each result says so. Follow up with get_anda_survey_info(idno) for full metadata on one survey.",
+    "args_doc": {
+      "query": "Search keywords (e.g. \"empleo\", \"REEM\", \"censo agropecuario\")",
+      "limit": "Max results (default: 10, max: 50)",
+      "format": "text | json"
+    }
+  },
+  "search_auditores": {
+    "file": "search_auditores.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "provincia",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": "20"
+      },
+      {
+        "name": "offset",
+        "type": "int",
+        "default": "0"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Search Ecuador's registry of authorized external auditors (Superintendencia de Compañías). Covers the 1,447 firms/individuals licensed to act as external auditors, with their authorization resolution number/date and contact details. Source is a daily-refreshed government export, cached up to 6h server-side.",
+    "args_doc": {
+      "query": "Free text matched against auditor name or identificación (RUC/cédula), accent-insensitive",
+      "provincia": "Optional province filter, e.g. \"PICHINCHA\" (substring match)",
+      "limit": "Max results (default 20, max 100)",
+      "offset": "Pagination offset over the matched set",
+      "format": "text | json"
+    }
+  },
+  "search_companias": {
+    "file": "search_companias.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "provincia",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "situacion_legal",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": "20"
+      },
+      {
+        "name": "offset",
+        "type": "int",
+        "default": "0"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Search Ecuador's company registry (Superintendencia de Compañías). Covers 226k+ companies with legal status, incorporation date, legal representative, registered capital, economic activity (CIIU) and address. Source is a daily-refreshed government export, cached up to 6h server-side — the first call after the cache expires can take ~30-40s to download and parse (~35 MB, 226k rows).",
+    "args_doc": {
+      "query": "Free text matched against company name or RUC (accent-insensitive)",
+      "provincia": "Optional province filter, e.g. \"PICHINCHA\" (substring match)",
+      "situacion_legal": "Optional legal status filter, e.g. \"ACTIVA\", \"DISOLUCIÓN\"",
+      "limit": "Max results (default 20, max 100)",
+      "offset": "Pagination offset over the matched set",
+      "format": "text | json"
+    }
+  },
+  "search_contratos": {
+    "file": "search_contratos.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "year",
+        "type": "int",
+        "default": "0"
+      },
+      {
+        "name": "page",
+        "type": "int",
+        "default": "1"
+      },
+      {
+        "name": "buyer",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "supplier",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Search Ecuador public procurement procedures (SERCOP / OCDS open data). Useful for journalists, researchers and citizens looking for contracts, tenders, buyers or suppliers. Requires a keyword of at least 3 characters. Year defaults to the current calendar year and falls back to prior years when year=0. Results are cached ~30 minutes; on 429 the client cools down.",
+    "args_doc": {
+      "query": "Keyword (min 3 chars), e.g. \"medicinas\", \"vialidad\", \"software\"",
+      "year": "Contract year (2015–current). 0 = current year + fallback",
+      "page": "Results page (1-based)",
+      "buyer": "Optional buyer/institution keyword (min 3 chars)",
+      "supplier": "Optional supplier keyword (min 3 chars)",
+      "format": "text | json"
+    }
+  },
+  "search_datasets": {
+    "file": "search_datasets.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "page",
+        "type": "int",
+        "default": "1"
+      },
+      {
+        "name": "page_size",
+        "type": "int",
+        "default": "20"
+      },
+      {
+        "name": "category",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "source",
+        "type": "str",
+        "default": "'nacional'"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Search for datasets on Ecuador's open data portal (www.datosabiertos.gob.ec). This is the starting point for exploring government data from 98+ public institutions. Use short, specific queries in Spanish for best results. Typical workflow: search_datasets → list_dataset_resources → preview_resource_data",
+    "args_doc": {
+      "query": "Search keywords (e.g. \"empleo\", \"salud\", \"presupuesto\", \"SRI recaudación\")",
+      "page": "Page number (1-based, default: 1)",
+      "page_size": "Results per page (default: 20, max: 100)",
+      "category": "Optional category filter (e.g. \"sal\" for Salud, \"edu\" for Educación). Use list_categories to see all available categories.",
+      "source": "\"nacional\" (www.datosabiertos.gob.ec, default) or \"cuenca\" (cuencaendatos.cuenca.gob.ec, the Cuenca municipal open-data portal — a separate, smaller CKAN catalog)",
+      "format": "text | json"
+    }
+  },
+  "search_ecuador": {
+    "file": "search_ecuador.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": "5"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Unified search across Ecuador open data, trámites, regulations, contracts and risk events. Use this as the first step for broad questions. Then drill down with get_dataset_info, query_resource_data, get_tramite_info, get_regulacion_info, get_contrato_info or search_eventos_riesgo.",
+    "args_doc": {
+      "query": "Search terms in Spanish (e.g. \"salud\", \"RUC\", \"medicinas\")",
+      "limit": "Max results per section (default 5, max 10)",
+      "format": "text | json"
+    }
+  },
+  "search_eventos_riesgo": {
+    "file": "search_eventos_riesgo.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "provincia",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "canton",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "evento",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "estado",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": "15"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Search emergency/risk events from Ecuador's SGR COE (Gestión de Riesgos). Returns recent recorded events such as landslides, floods, structural damage, with province/canton, status (Seguimiento/Cierre), impacts and description. Data comes from the public ArcGIS COE2 service (cached ~5 minutes).",
+    "args_doc": {
+      "query": "Free text (sector, cause, description keywords)",
+      "provincia": "Province filter (e.g. \"Pichincha\")",
+      "canton": "Canton filter (e.g. \"Quito\")",
+      "evento": "Event type filter (e.g. \"Deslizamiento\", \"Inundación\", \"Aluvión\")",
+      "estado": "Status filter (e.g. \"Seguimiento\", \"Cierre\")",
+      "limit": "Max events to return (default 15, max 100)",
+      "format": "text | json"
+    }
+  },
+  "search_indicadores_bce": {
+    "file": "search_indicadores_bce.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": "20"
+      },
+      {
+        "name": "offset",
+        "type": "int",
+        "default": "0"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Search the Banco Central del Ecuador (BCE) statistical catalog. Covers monetary/financial statistics, public finances, external sector (foreign trade), and real sector (GDP, employment/ unemployment, consumer confidence, oil production, cement production, and more) — each result is an indicator group (id_grupo) whose time series data you fetch with get_indicador_bce. Some groups hold a single series, others dozens under a broader title (e.g. \"desempleo\" is a series inside the \"mercado laboral\" group, not a group of its own — matched here too, not just group titles). Does NOT cover Ecuador's own inflation (CPI) or poverty statistics — those are INEC's domain, try search_anda instead. First call after the cache expires (24h) takes ~10-15s: matching against series names, not just group titles, means fetching every group's metadata (~78 groups) once to build the search index. Cached after that.",
+    "args_doc": {
+      "query": "Free text matched against the group's description, its section/subsection, and its individual series labels (accent-insensitive)",
+      "limit": "Max results (default 20, max 100)",
+      "offset": "Pagination offset over the matched set",
+      "format": "text | json"
+    }
+  },
+  "search_organizations": {
+    "file": "search_organizations.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "page",
+        "type": "int",
+        "default": "1"
+      },
+      {
+        "name": "page_size",
+        "type": "int",
+        "default": "20"
+      },
+      {
+        "name": "source",
+        "type": "str",
+        "default": "'nacional'"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Search for public institutions that publish data on Ecuador's open data portal. There are 98+ organizations including INEC, SRI, Ministerio de Salud, BCE, etc.",
+    "args_doc": {
+      "query": "Optional search term (e.g. \"salud\", \"SRI\", \"INEC\")",
+      "page": "Page number (1-based, default: 1)",
+      "page_size": "Results per page (default: 20, max: 100)",
+      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "format": "text | json"
+    }
+  },
+  "search_ranking": {
+    "file": "search_ranking.py",
+    "params": [
+      {
+        "name": "anio",
+        "type": "int | None",
+        "default": "None"
+      },
+      {
+        "name": "ciiu_n1",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "order_by",
+        "type": "str",
+        "default": "'posicion_general'"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": "20"
+      },
+      {
+        "name": "offset",
+        "type": "int",
+        "default": "0"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Rank/filter Supercías companies by financial indicators for a fiscal year. Filter by year and/or CIIU level-1 economic activity (single letter, e.g. \"C\" for manufacturing), sorted by any indicator column (defaults to the dataset's own precomputed posicion_general). Each result includes the company's nombre/ruc alongside its financials. Covers only the last few cached fiscal years, not the full history. Use get_financials for one company's full detail, or get_compania_info for legal/registry data (address, legal representative, etc.).",
+    "args_doc": {
+      "anio": "Optional fiscal year filter.",
+      "ciiu_n1": "Optional CIIU level-1 filter, e.g. \"C\", \"G\", \"I\".",
+      "order_by": "Column to sort ascending by (e.g. \"posicion_general\", \"activos\", \"roe\"). Falls back to posicion_general if unknown.",
+      "limit": "Max results (default 20, max 100).",
+      "offset": "Pagination offset.",
+      "format": "text | json"
+    }
+  },
+  "search_regulaciones": {
+    "file": "search_regulaciones.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "page",
+        "type": "int",
+        "default": "1"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Search or list regulations published on Ecuador's gob.ec portal. Includes agreements, regulations and related norms with Registro Oficial references when available. With a query, scans several pages client-side (the API has no native search). Without a query, returns a paginated list.",
+    "args_doc": {
+      "query": "Keywords (e.g. \"datos personales\", \"tránsito\", \"LOTAIP\")",
+      "page": "Page number when query is empty (1-based)",
+      "format": "text | json"
+    }
+  },
+  "search_sismos": {
+    "file": "search_sismos.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "magnitud_minima",
+        "type": "float",
+        "default": "0.0"
+      },
+      {
+        "name": "dias",
+        "type": "int",
+        "default": "0"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": "15"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Search recent earthquakes in Ecuador from the Instituto Geofísico (IG-EPN). Returns the IG-EPN seismic catalog feed: magnitude, depth, coordinates, local/UTC time, review status and nearest-place description, with a link to each event page. Data is cached ~2 minutes.",
+    "args_doc": {
+      "query": "Free text over location/id (e.g. \"Quito\", \"Esmeraldas\")",
+      "magnitud_minima": "Minimum magnitude (e.g. 4.0)",
+      "dias": "Only events from the last N days (0 = all available)",
+      "limit": "Max events to return (default 15, max 100)",
+      "format": "text | json"
+    }
+  },
+  "search_sri_datasets": {
+    "file": "search_sri_datasets.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": "30"
+      },
+      {
+        "name": "offset",
+        "type": "int",
+        "default": "0"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Search the SRI's open datasets page (sri.gob.ec/datasets) for direct file links. Covers ~130 CSV/XLSX/ZIP files not reachable through search_datasets (they live on the SRI's own site, not the CKAN DataStore): RUC catastro by province, recaudación by year, ventas/compras, vehículos nuevos, comprobantes electrónicos (CEL), inscripciones/cierres, plus variable dictionaries (*_DD.xlsx). Returns direct URLs, not the file contents — download them yourself or via download_resource.",
+    "args_doc": {
+      "query": "Free text matched against the file's label or URL (accent-insensitive), e.g. \"recaudación\", \"vehiculos\", \"Pichincha\". Empty returns all files.",
+      "limit": "Max results (default 30, max 100)",
+      "offset": "Pagination offset over the matched set",
+      "format": "text | json"
+    }
+  },
+  "search_tramites": {
+    "file": "search_tramites.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "institution_id",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "page",
+        "type": "int",
+        "default": "1"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Search for government procedures (trámites) on Ecuador's official portal gob.ec. Best approach: provide an institution_id to get that institution's trámites. Add a query to filter results by keyword (filters by name and description). When query is provided with institution_id, ALL pages of that institution's trámites are fetched and filtered, so you always get the most relevant results. Common institution IDs: - \"8\" = SRI (Servicio de Rentas Internas) — impuestos, RUC, facturación - \"23\" = Registro Civil — cédula, partidas de nacimiento - \"62\" = ANT — licencias de conducir, matriculación vehicular - \"16\" = Ministerio de Relaciones Exteriores — pasaportes, apostilla - \"5\" = IESS — seguro social, pensiones, fondos de reserva Use list_instituciones to find more institution IDs.",
+    "args_doc": {
+      "query": "Keywords to filter results (e.g. \"RUC\", \"inscripción RUC persona natural\"). Each word must appear in the trámite name or description.",
+      "institution_id": "Institution ID (strongly recommended for relevant results)",
+      "page": "Page number (1-based, default: 1). Ignored when query is provided (all pages are searched automatically).",
+      "format": "text | json"
+    }
+  }
+}

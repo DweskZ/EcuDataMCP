@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="landing hero">
+<div class="container-page">
+<p class="kicker">About</p>
+<h1>A bridge between <span class="accent">public data</span> and your AI assistant.</h1>
+<p class="hero-sub">EcuDataMCP exists because finding a public data point in Ecuador almost always means guessing which portal it's on, under what name, and in what format. The server gives your assistant the tools to do that search for you, and always lets you verify against the official source.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">History</p>
+<h2 class="section-title">Where it comes from.</h2>
+<p class="section-lede">EcuDataMCP started as <a href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">DweskZ/EcuDataMCP</a>. Since then, DweskZ and Daniel Sánchez Pazmiño have maintained it together: new sources (SRI Datasets, BCE, Supercías auditors), more robust error and download handling, and this site, so connecting the server doesn't depend on reading a README end to end.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Independence</p>
+<h2 class="section-title">Not a service of the Ecuadorian state.</h2>
+<p class="section-lede">EcuDataMCP is an independent, open-source project. It queries the same public sources that Ecuadorian government institutions already publish (CKAN, gob.ec, SERCOP, BCE, Supercías, IG-EPN, SGR), but it is not affiliated with, funded by, or endorsed by any of them. Every answer links to the official source precisely so that distinction stays clear: what you see is what the portal publishes, not a copy.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">License & maintenance</p>
+<h2 class="section-title">MIT, and open for you to use.</h2>
+<p class="section-lede">The full codebase (MCP server and this site) is <a href="https://github.com/dsanchezp18/EcuDataMCP/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>. It's maintained by <a href="https://github.com/DweskZ" target="_blank" rel="noopener">DweskZ</a> and <a href="https://github.com/dsanchezp18" target="_blank" rel="noopener">Daniel Sánchez Pazmiño</a>. Want to add a source, a tool, or fix something? Start at <a href="colaborar.html">Contribute</a>.</p>
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>Ecuador's open data, with your favorite AI assistant.</p>
+<a class="btn-cta primary" href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">View on GitHub</a>
+</div>
+</section>
+{% endblock %}

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page_title }} – EcuDataMCP</title>
+<meta name="description" content="{{ page_description }}">
+<link rel="icon" href="{{ assets }}favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="{{ page_title }} – EcuDataMCP">
+<meta property="og:description" content="{{ page_description }}">
+<meta property="og:image" content="{{ og_image }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ og_image }}">
+<link rel="stylesheet" href="{{ assets }}bootstrap-icons.css">
+<link rel="stylesheet" href="{{ assets }}styles.css">
+<link rel="stylesheet" href="{{ assets }}site.css">
+<style>html { scroll-behavior: smooth; }</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+  <div class="navbar-container container-fluid">
+    <div class="navbar-brand-container mx-auto">
+      <a class="navbar-brand" href="{{ root }}index.html">
+        <span class="navbar-title">EcuDataMCP</span>
+      </a>
+    </div>
+    <button class="site-search-toggle" type="button" title="{{ t.search }}" aria-label="{{ t.search }}">
+      <i class="bi bi-search"></i>
+    </button>
+    <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="{{ t.toggle_nav }}" data-nav-toggle="navbarCollapse">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav navbar-nav-scroll me-auto">
+        {% for label, href in nav.left %}
+        <li class="nav-item">
+          <a class="nav-link{% if href == current_page + '.html' %} active{% endif %}" href="{{ root }}{{ href }}"{% if href == current_page + '.html' %} aria-current="page"{% endif %}>
+            <span class="menu-text">{{ label }}</span>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+      <ul class="navbar-nav navbar-nav-scroll ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ nav.lang_switch[1] }}">
+            <span class="menu-text">{{ nav.lang_switch[0] }}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank">
+            <span class="menu-text">GitHub</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="site-search-panel" id="siteSearchPanel" hidden>
+  <div class="site-search-panel-inner">
+    <input type="text" id="siteSearchInput" class="site-search-input" placeholder="{{ t.search_placeholder }}" autocomplete="off">
+    <div id="siteSearchResults" class="site-search-results"></div>
+  </div>
+</div>
+
+<main>
+{% block content %}{% endblock %}
+</main>
+
+<footer class="page-footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left"><p>{{ nav.footer_left }}</p></div>
+    <div class="nav-footer-center">&nbsp;</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+        <li class="nav-item"><a class="nav-link" href="https://github.com/dsanchezp18/EcuDataMCP">GitHub</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ root }}releases.html">Releases</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script src="{{ assets }}fuse.min.js"></script>
+<script>
+window.SITE_SEARCH_INDEX_URL = "{{ root }}search.json";
+window.SITE_ROOT = "{{ root }}";
+window.COPY_LABEL_COPIED = "{{ t.copied }}";
+window.SITE_SEARCH_EMPTY_LABEL = "{{ t.search_no_results }}";
+</script>
+<script src="{{ assets }}site.js"></script>
+{% block extra_script %}{% endblock %}
+</body>
+</html>

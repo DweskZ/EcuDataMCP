@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="landing hero">
+<div class="container-page">
+<p class="kicker">El problema, primero</p>
+<h1>Preguntas reales, <span class="accent">datos citados.</span></h1>
+<p class="hero-sub">Pregúntale a un asistente de IA sobre datos de Ecuador y es común que invente cifras con total confianza: no hay suficiente Ecuador en los datos con los que se entrenó, y no tiene forma de verificar nada en tiempo real. Dale las herramientas de EcuDataMCP y deja de adivinar: busca en el portal oficial, cita la fuente, y el número que devuelve es real. Estos diez ejemplos muestran esa diferencia.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+
+<div class="example-featured">
+<p class="example-flow"><span class="tool-chip">search_sismos</span></p>
+<p class="example-question">&ldquo;¿Qué sismos ha registrado el Instituto Geofísico en Ecuador recientemente?&rdquo;</p>
+<p class="example-result">Devuelve el catálogo más reciente del IG-EPN: magnitud, profundidad, ubicación y estado de revisión (automático o revisado) de cada evento, con enlace directo al boletín oficial.</p>
+<div class="example-featured-ctas">
+<a class="btn-cta primary" href="https://danielstats.io/apps/sismos-ecuador/" target="_blank" rel="noopener">Ver Sismicidad Ecuador en vivo &#8599;</a>
+<a class="example-source" href="https://www.igepn.edu.ec" target="_blank" rel="noopener">www.igepn.edu.ec &#8599;</a>
+</div>
+</div>
+
+<p class="examples-more-label">Y el resto del universo</p>
+
+<div class="examples-grid">
+
+<div class="example-mini">
+<p class="example-question">&ldquo;¿Cuántos contribuyentes activos tiene el RUC del SRI ahora mismo?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">search_sri_datasets</span></p>
+<p class="example-result">El catastro más reciente registra <strong>2,904,355</strong> contribuyentes activos, sumando la columna <code>TOTAL</code>, no contando filas.</p>
+<a class="example-source" href="https://www.sri.gob.ec/datasets" target="_blank" rel="noopener">sri.gob.ec/datasets &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;¿Cuántas personas cobraron el seguro de desempleo del IESS el mes pasado?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">query_resource_data</span></p>
+<p class="example-result">Junio 2026: <strong>2,561 beneficiarios</strong>, <strong>USD 836,716.99</strong> en total, excluyendo la fila <code>TOTAL:</code> embebida en el archivo.</p>
+<a class="example-source" href="https://www.datosabiertos.gob.ec" target="_blank" rel="noopener">datosabiertos.gob.ec (IESS) &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;¿Cuál fue el precio semanal del cacao Grado 1 en junio de 2026?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">preview_resource_data</span></p>
+<p class="example-result">USD <strong>174.77 / 168.15 / 166.28 / 188.07</strong> por quintal en las cuatro semanas, leyendo solo el archivo más reciente del MPCEIP, sin acumular versiones previas.</p>
+<a class="example-source" href="https://www.datosabiertos.gob.ec" target="_blank" rel="noopener">datosabiertos.gob.ec (MPCEIP) &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;¿Cuáles son los requisitos para sacar el pasaporte?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">get_tramite_info</span></p>
+<p class="example-result">Requisitos, procedimiento, costo y tiempo estimado, directo del portal gob.ec, sin navegarlo a mano.</p>
+<a class="example-source" href="https://www.gob.ec" target="_blank" rel="noopener">gob.ec &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;¿Quién ganó tal licitación pública y por cuánto?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">get_contrato_info</span></p>
+<p class="example-result">El expediente OCDS completo: comprador, proceso de licitación, adjudicación y contrato final.</p>
+<a class="example-source" href="https://datosabiertos.compraspublicas.gob.ec" target="_blank" rel="noopener">compraspublicas.gob.ec &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;¿Cómo ha evolucionado la confianza del consumidor este año?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">get_indicador_bce</span></p>
+<p class="example-result">La serie de tiempo del indicador, con la frecuencia y unidad que corresponda (mensual para confianza del consumidor).</p>
+<a class="example-source" href="https://contenido.bce.fin.ec" target="_blank" rel="noopener">contenido.bce.fin.ec &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;¿Qué compañías tienen mejor ROE en un sector específico?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">search_ranking</span></p>
+<p class="example-result">Ranking sobre ~38 ratios financieros (liquidez, endeudamiento, rentabilidad), filtrable por CIIU y año.</p>
+<a class="example-source" href="https://mercadodevalores.supercias.gob.ec" target="_blank" rel="noopener">supercias.gob.ec &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;¿Qué encuestas del INEC tienen microdatos descargables sobre empleo?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">search_anda</span></p>
+<p class="example-result">El catálogo NADA/IHSN indica exactamente cuáles encuestas traen microdatos descargables, con el link directo.</p>
+<a class="example-source" href="https://anda.inec.gob.ec" target="_blank" rel="noopener">anda.inec.gob.ec &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;¿Qué normas regulan tal actividad, con referencia al Registro Oficial?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">get_regulacion_info</span></p>
+<p class="example-result">El detalle de la regulación con enlace directo al PDF del Registro Oficial.</p>
+<a class="example-source" href="https://www.gob.ec" target="_blank" rel="noopener">gob.ec &#8599;</a>
+</div>
+
+</div>
+
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>¿Tienes una pregunta que estas fuentes podrían responder?</p>
+<a class="btn-cta primary" href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">Pruébalo en GitHub</a>
+</div>
+</section>
+{% endblock %}

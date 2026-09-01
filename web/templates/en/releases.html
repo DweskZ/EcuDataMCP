@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="landing hero">
+<div class="container-page">
+<p class="kicker">Releases</p>
+<h1>Eleven versions, <span class="accent">a real pace.</span></h1>
+<p class="hero-sub">Eight of the eleven releases shipped on the same day (August 4, 2026), building the server's foundation. Since then, each new version corresponds to an added source or a concrete improvement, not a fixed schedule. The full technical detail for every change lives in the <a href="https://github.com/dsanchezp18/EcuDataMCP/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG</a>.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+{% for r in releases %}
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v{{ r.version }}</span><span class="release-date">{{ r.date }}</span></div>
+<p class="release-summary">{{ r.summary }}</p>
+</div>
+{% endfor %}
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>Every release is documented, with a date and what it brought.</p>
+<a class="btn-cta primary" href="https://github.com/dsanchezp18/EcuDataMCP/blob/main/CHANGELOG.md" target="_blank" rel="noopener">View the full CHANGELOG</a>
+</div>
+</section>
+{% endblock %}

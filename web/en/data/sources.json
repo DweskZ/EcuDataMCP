@@ -1,0 +1,119 @@
+[
+  {
+    "id": "datos-abiertos",
+    "name": "Open Data",
+    "tag": "CKAN",
+    "description": "National catalog + DataStore + CSV/JSON/XLSX preview",
+    "coverage": "www.datosabiertos.gob.ec",
+    "url": "https://www.datosabiertos.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "cuenca",
+    "name": "Cuenca en Datos",
+    "tag": "CKAN",
+    "description": "Independent municipal CKAN portal (92 datasets); same tools with source=\"cuenca\"",
+    "coverage": "cuencaendatos.cuenca.gob.ec",
+    "url": "https://cuencaendatos.cuenca.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "sri-datasets",
+    "name": "SRI Datasets",
+    "tag": null,
+    "description": "~130 files (CSV/XLSX/ZIP) outside the CKAN portal: RUC registry by province, tax collection, sales/purchases, vehicles, CEL",
+    "coverage": "www.sri.gob.ec/datasets",
+    "url": "https://www.sri.gob.ec/datasets",
+    "status": "live"
+  },
+  {
+    "id": "tramites",
+    "name": "Procedures & institutions",
+    "tag": "Gob.ec",
+    "description": "Procedures, requirements, costs",
+    "coverage": "gob.ec/api/v1",
+    "url": "https://www.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "regulaciones",
+    "name": "Regulations",
+    "tag": "Gob.ec",
+    "description": "Rules, agreements, Official Register",
+    "coverage": "gob.ec/api/v1/regulaciones",
+    "url": "https://www.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "contratos",
+    "name": "Public contracts",
+    "tag": "SERCOP/OCDS",
+    "description": "Tenders, buyers, suppliers",
+    "coverage": "datosabiertos.compraspublicas.gob.ec",
+    "url": "https://datosabiertos.compraspublicas.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "riesgos",
+    "name": "Risk management",
+    "tag": "SGR",
+    "description": "COE emergency events + tsunami early-warning stations",
+    "coverage": "sgrportal.gestionderiesgos.gob.ec",
+    "url": "https://sgrportal.gestionderiesgos.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "sismos",
+    "name": "Earthquakes",
+    "tag": "IG-EPN",
+    "description": "Seismic catalog from the Geophysical Institute",
+    "coverage": "www.igepn.edu.ec",
+    "url": "https://www.igepn.edu.ec",
+    "status": "live"
+  },
+  {
+    "id": "geografia",
+    "name": "Geography",
+    "tag": "DPA",
+    "description": "24 provinces + 224 cantons (INEC codes)",
+    "coverage": "offline reference",
+    "url": null,
+    "status": "offline"
+  },
+  {
+    "id": "anda",
+    "name": "ANDA",
+    "tag": "NADA/IHSN",
+    "description": "INEC's catalog of surveys and censuses",
+    "coverage": "anda.inec.gob.ec",
+    "url": "https://anda.inec.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "bce",
+    "name": "BCE",
+    "tag": "BCEData",
+    "description": "Full statistical catalog: monetary/financial, public finance, external sector, real sector (GDP, employment, consumer confidence)",
+    "coverage": "contenido.bce.fin.ec",
+    "url": "https://contenido.bce.fin.ec",
+    "status": "live"
+  },
+  {
+    "id": "supercias",
+    "name": "Supercías",
+    "tag": null,
+    "description": "Company directory (226k+): legal representative, capital, CIIU code",
+    "coverage": "mercadodevalores.supercias.gob.ec",
+    "url": "https://mercadodevalores.supercias.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "supercias-ranking",
+    "name": "Supercías Ranking",
+    "tag": null,
+    "description": "Financial statement data (revenue, assets, ROE, ~38 ratios), recent years; requires a local build",
+    "coverage": "appscvsmovil.supercias.gob.ec",
+    "url": "https://appscvsmovil.supercias.gob.ec",
+    "status": "build-local"
+  }
+]

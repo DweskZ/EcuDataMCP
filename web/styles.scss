@@ -1,0 +1,734 @@
+/*-- scss:defaults --*/
+
+$theme: "darkly" !default;
+
+$body-bg: #0b0c0e;
+$body-color: #e6e6e6;
+$primary: #f2b134;
+$secondary: #7c8591;
+
+$link-color: $primary;
+$link-hover-color: lighten($primary, 10%);
+
+$font-family-sans-serif: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+$font-family-monospace: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+$font-family-display: "Bricolage Grotesque", "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+$navbar-bg: #0b0c0e;
+$footer-bg: #0b0c0e;
+$border-color: #24262b;
+
+/*-- scss:rules --*/
+
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+.hero h1,
+.section-title,
+.closing-cta h2 {
+  font-family: $font-family-display;
+  font-weight: 700;
+}
+
+.navbar {
+  border-bottom: 1px solid $border-color;
+}
+
+// Every page supplies its own hero heading — suppress Quarto's default
+// title block so the page title isn't rendered twice.
+#title-block-header {
+  display: none;
+}
+
+// ---- layout helpers ----------------------------------------------------
+
+.container-page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.landing {
+  padding: 5rem 0;
+  border-bottom: 1px solid $border-color;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+}
+
+.kicker {
+  font-family: $font-family-monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $primary;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-weight: 800;
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+.section-lede {
+  color: $secondary;
+  font-size: 1.05rem;
+  max-width: 640px;
+  margin-bottom: 2.5rem;
+}
+
+// ---- hero ---------------------------------------------------------------
+
+.hero {
+  padding: 6rem 0 5rem;
+  text-align: left;
+}
+
+.hero h1 {
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin-bottom: 1.25rem;
+}
+
+.hero h1 .accent {
+  color: $primary;
+}
+
+.hero-sub {
+  font-size: 1.15rem;
+  color: $secondary;
+  max-width: 640px;
+  margin-bottom: 2.25rem;
+}
+
+.hero-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-bottom: 3rem;
+}
+
+.btn-cta {
+  font-family: $font-family-monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.7rem 1.4rem;
+  border-radius: 6px;
+  text-decoration: none;
+  display: inline-block;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.btn-cta:hover {
+  transform: translateY(-1px);
+}
+
+.btn-cta.primary {
+  background: $primary;
+  color: #16130a;
+}
+
+.btn-cta.secondary {
+  background: transparent;
+  color: $body-color;
+  border: 1px solid $border-color;
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid $border-color;
+}
+
+.hero-stat .num {
+  font-family: $font-family-monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $primary;
+  display: block;
+}
+
+.hero-stat .label {
+  font-size: 0.82rem;
+  color: $secondary;
+}
+
+@media (max-width: 700px) {
+  .hero-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.hero-breakdown {
+  font-family: $font-family-monospace;
+  font-size: 0.8rem;
+  color: $secondary;
+  margin-top: 0.9rem;
+}
+
+// ---- how it works ---------------------------------------------------------
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.step-card .step-num {
+  font-family: $font-family-monospace;
+  color: $primary;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.step-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.step-card p {
+  color: $secondary;
+  font-size: 0.92rem;
+}
+
+@media (max-width: 900px) {
+  .steps-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 550px) {
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ---- generic card grid (sources / tools) --------------------------------
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.1rem;
+}
+
+@media (max-width: 900px) {
+  .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .card-grid { grid-template-columns: 1fr; }
+}
+
+.data-card {
+  background: #131417;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: 1.25rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.data-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.data-card p {
+  color: $secondary;
+  font-size: 0.88rem;
+  margin-bottom: 0.75rem;
+}
+
+.data-card .source-coverage {
+  font-family: $font-family-monospace;
+  font-size: 0.8rem;
+}
+
+.data-card .source-coverage a {
+  color: $primary;
+  text-decoration: none;
+}
+
+.data-card .source-coverage a:hover {
+  text-decoration: underline;
+}
+
+.tag {
+  display: inline-block;
+  font-family: $font-family-monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  color: $secondary;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  padding: 0.05rem 0.4rem;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+}
+
+.tool-chip {
+  display: inline-block;
+  font-family: $font-family-monospace;
+  font-size: 0.76rem;
+  background: #0b0c0e;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  margin: 0.18rem 0.28rem 0.18rem 0;
+  color: #d6d9de;
+  text-decoration: none;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+
+a.tool-chip:hover {
+  border-color: $primary;
+  color: $primary;
+}
+
+// ---- questions grid -------------------------------------------------------
+
+.questions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 700px) {
+  .questions-grid { grid-template-columns: 1fr; }
+}
+
+.question-card {
+  background: #131417;
+  border: 1px solid $border-color;
+  border-left: 3px solid $primary;
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  font-size: 0.98rem;
+  color: #e6e6e6;
+}
+
+// ---- tool atlas ----------------------------------------------------------------
+
+.atlas-filter-wrap {
+  margin-top: 0.5rem;
+}
+
+.atlas-filter {
+  width: 100%;
+  max-width: 420px;
+  font-family: $font-family-monospace;
+  font-size: 0.9rem;
+  background: #131417;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  padding: 0.6rem 0.9rem;
+  color: $body-color;
+}
+
+.atlas-filter:focus {
+  outline: none;
+  border-color: $primary;
+}
+
+.atlas-filter::placeholder {
+  color: $secondary;
+}
+
+.atlas-category {
+  margin-bottom: 2.25rem;
+}
+
+.atlas-category-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid $border-color;
+}
+
+.atlas-tool {
+  padding: 0.65rem 0;
+  border-bottom: 1px solid $border-color;
+}
+
+.atlas-tool:last-child {
+  border-bottom: none;
+}
+
+.atlas-tool-summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.atlas-tool-summary::-webkit-details-marker {
+  display: none;
+}
+
+.atlas-tool-summary::before {
+  content: "+";
+  color: $primary;
+  font-family: $font-family-monospace;
+  flex: 0 0 auto;
+}
+
+.atlas-tool[open] .atlas-tool-summary::before {
+  content: "\2212";
+}
+
+.atlas-tool-name {
+  font-family: $font-family-monospace;
+  font-size: 0.88rem;
+  color: $primary;
+}
+
+.atlas-tool-desc {
+  color: #d6d9de;
+  font-size: 0.88rem;
+}
+
+.atlas-tool-body {
+  margin: 0.75rem 0 0.25rem 1.1rem;
+}
+
+.atlas-tool-long {
+  color: $secondary;
+  font-size: 0.88rem;
+  margin-bottom: 0.9rem;
+  max-width: 640px;
+}
+
+.atlas-params {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  margin-bottom: 0.5rem;
+}
+
+.atlas-params th {
+  text-align: left;
+  font-family: $font-family-monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $secondary;
+  font-weight: 500;
+  padding: 0.3rem 0.75rem 0.3rem 0;
+  border-bottom: 1px solid $border-color;
+}
+
+.atlas-params td {
+  padding: 0.45rem 0.75rem 0.45rem 0;
+  border-bottom: 1px solid $border-color;
+  vertical-align: top;
+  color: #d6d9de;
+}
+
+.atlas-params tr:last-child td {
+  border-bottom: none;
+}
+
+.atlas-params code {
+  color: $primary;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.atlas-empty {
+  color: $secondary;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+// ---- releases ----------------------------------------------------------------
+
+.release-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 1.25rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid $border-color;
+}
+
+.release-row:last-child {
+  border-bottom: none;
+}
+
+.release-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  min-width: 190px;
+}
+
+.release-version {
+  font-family: $font-family-monospace;
+  font-weight: 700;
+  color: $primary;
+  font-size: 0.92rem;
+}
+
+.release-date {
+  font-family: $font-family-monospace;
+  font-size: 0.78rem;
+  color: $secondary;
+}
+
+.release-summary {
+  color: #d6d9de;
+  font-size: 0.92rem;
+  flex: 1 1 400px;
+}
+
+// ---- examples ----------------------------------------------------------------
+
+.example-card {
+  background: #131417;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.example-question {
+  font-family: $font-family-display;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: $body-color;
+  margin-bottom: 0.85rem;
+}
+
+.example-flow {
+  margin-bottom: 0.85rem;
+}
+
+.example-result {
+  color: #d6d9de;
+  font-size: 0.95rem;
+  margin-bottom: 0.85rem;
+}
+
+.example-result code {
+  font-size: 0.85em;
+}
+
+.example-source {
+  font-family: $font-family-monospace;
+  font-size: 0.82rem;
+  color: $primary;
+  text-decoration: none;
+}
+
+.example-source:hover {
+  text-decoration: underline;
+}
+
+.example-further {
+  color: $secondary;
+  font-size: 0.85rem;
+  font-style: italic;
+  margin: 0.6rem 0 0;
+}
+
+.example-further a {
+  color: $secondary;
+}
+
+// ---- under the hood --------------------------------------------------------
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 700px) {
+  .tools-grid { grid-template-columns: 1fr; }
+}
+
+// ---- connect / tabs ---------------------------------------------------------
+
+.quick-connect {
+  background: #131417;
+  border: 1px solid $border-color;
+  border-left: 3px solid $primary;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.quick-connect .kicker {
+  margin-bottom: 0.6rem;
+}
+
+.quick-connect .client-intro:last-child {
+  margin-bottom: 0;
+}
+
+.nav-tabs {
+  border-bottom: 1px solid $border-color;
+  flex-wrap: wrap;
+}
+
+.nav-tabs .nav-link {
+  font-family: $font-family-monospace;
+  font-size: 0.85rem;
+  color: $secondary;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+}
+
+.nav-tabs .nav-link.active {
+  color: $primary;
+  background: transparent;
+  border-bottom: 2px solid $primary;
+}
+
+.tab-content {
+  padding-top: 1.5rem;
+}
+
+.client-intro {
+  color: $secondary;
+  font-size: 0.92rem;
+  margin-bottom: 1rem;
+}
+
+.client-steps {
+  color: #d6d9de;
+  font-size: 0.92rem;
+  margin-bottom: 1rem;
+}
+
+.code-block {
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.code-block pre {
+  background: #0b0c0e;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: 1rem 1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  font-family: $font-family-monospace;
+  font-size: 0.72rem;
+  background: #1c1e22;
+  color: $secondary;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  padding: 0.25rem 0.55rem;
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  color: $primary;
+  border-color: $primary;
+}
+
+// ---- friction-free bullets -------------------------------------------------
+
+.friction-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 700px) {
+  .friction-list { grid-template-columns: 1fr; }
+}
+
+.friction-list li {
+  background: #131417;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  font-size: 0.92rem;
+}
+
+.friction-list strong {
+  color: $primary;
+  display: block;
+  font-family: $font-family-monospace;
+  font-size: 0.82rem;
+  margin-bottom: 0.3rem;
+}
+
+// ---- FAQ --------------------------------------------------------------------
+
+.faq-item {
+  border-bottom: 1px solid $border-color;
+  padding: 1.1rem 0;
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  list-style: none;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary::before {
+  content: "+";
+  color: $primary;
+  font-family: $font-family-monospace;
+  margin-right: 0.6rem;
+}
+
+.faq-item[open] summary::before {
+  content: "\2212";
+}
+
+.faq-item p {
+  color: $secondary;
+  margin-top: 0.75rem;
+  font-size: 0.94rem;
+}
+
+// ---- closing CTA --------------------------------------------------------------
+
+.closing-cta {
+  text-align: center;
+  padding: 5rem 0;
+}
+
+.closing-cta h2 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+}
+
+.closing-cta p {
+  color: $body-color;
+  font-family: $font-family-display;
+  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+  font-weight: 700;
+  max-width: 620px;
+  margin: 0 auto 2rem;
+}

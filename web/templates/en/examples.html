@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="landing hero">
+<div class="container-page">
+<p class="kicker">The problem, first</p>
+<h1>Real questions, <span class="accent">cited data.</span></h1>
+<p class="hero-sub">Ask a general AI assistant about Ecuador and it's common for it to invent figures with total confidence: there isn't enough Ecuador in the data it was trained on, and it has no way to verify anything in real time. Give it EcuDataMCP's tools and it stops guessing: it searches the official portal, cites the source, and the number it returns is real. These ten examples show that difference.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+
+<div class="example-featured">
+<p class="example-flow"><span class="tool-chip">search_sismos</span></p>
+<p class="example-question">&ldquo;What earthquakes has the Geophysical Institute recorded in Ecuador recently?&rdquo;</p>
+<p class="example-result">Returns the IG-EPN's latest catalog: magnitude, depth, location, and review status (automatic or reviewed) for each event, with a direct link to the official bulletin.</p>
+<div class="example-featured-ctas">
+<a class="btn-cta primary" href="https://danielstats.io/apps/sismos-ecuador/" target="_blank" rel="noopener">See Sismicidad Ecuador live &#8599;</a>
+<a class="example-source" href="https://www.igepn.edu.ec" target="_blank" rel="noopener">www.igepn.edu.ec &#8599;</a>
+</div>
+</div>
+
+<p class="examples-more-label">And the rest of the universe</p>
+
+<div class="examples-grid">
+
+<div class="example-mini">
+<p class="example-question">&ldquo;How many active taxpayers does the SRI's RUC registry have right now?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">search_sri_datasets</span></p>
+<p class="example-result">The most recent registry records <strong>2,904,355</strong> active taxpayers, summing the <code>TOTAL</code> column, not counting rows.</p>
+<a class="example-source" href="https://www.sri.gob.ec/datasets" target="_blank" rel="noopener">sri.gob.ec/datasets &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;How many people collected IESS unemployment insurance last month?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">query_resource_data</span></p>
+<p class="example-result">June 2026: <strong>2,561 beneficiaries</strong>, <strong>USD 836,716.99</strong> in total, excluding the <code>TOTAL:</code> row embedded in the file.</p>
+<a class="example-source" href="https://www.datosabiertos.gob.ec" target="_blank" rel="noopener">datosabiertos.gob.ec (IESS) &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;What was the weekly Grade 1 cacao price in June 2026?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">preview_resource_data</span></p>
+<p class="example-result">USD <strong>174.77 / 168.15 / 166.28 / 188.07</strong> per quintal across the four weeks, reading only the most recent MPCEIP file, without stacking prior versions.</p>
+<a class="example-source" href="https://www.datosabiertos.gob.ec" target="_blank" rel="noopener">datosabiertos.gob.ec (MPCEIP) &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;What are the requirements for getting a passport?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">get_tramite_info</span></p>
+<p class="example-result">Requirements, procedure, cost, and estimated time, straight from the gob.ec portal, without browsing it by hand.</p>
+<a class="example-source" href="https://www.gob.ec" target="_blank" rel="noopener">gob.ec &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;Who won a given public tender, and for how much?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">get_contrato_info</span></p>
+<p class="example-result">The full OCDS record: buyer, tender process, award, and final contract.</p>
+<a class="example-source" href="https://datosabiertos.compraspublicas.gob.ec" target="_blank" rel="noopener">compraspublicas.gob.ec &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;How has consumer confidence evolved this year?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">get_indicador_bce</span></p>
+<p class="example-result">The indicator's time series, at whatever frequency and unit apply (monthly, for consumer confidence).</p>
+<a class="example-source" href="https://contenido.bce.fin.ec" target="_blank" rel="noopener">contenido.bce.fin.ec &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;Which companies have the best ROE in a given sector?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">search_ranking</span></p>
+<p class="example-result">A ranking across ~38 financial ratios (liquidity, leverage, profitability), filterable by CIIU code and year.</p>
+<a class="example-source" href="https://mercadodevalores.supercias.gob.ec" target="_blank" rel="noopener">supercias.gob.ec &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;Which INEC surveys have downloadable microdata on employment?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">search_anda</span></p>
+<p class="example-result">The NADA/IHSN catalog shows exactly which surveys carry downloadable microdata, with the direct link.</p>
+<a class="example-source" href="https://anda.inec.gob.ec" target="_blank" rel="noopener">anda.inec.gob.ec &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;What rules regulate a given activity, with an Official Register reference?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">get_regulacion_info</span></p>
+<p class="example-result">The regulation's detail, with a direct link to the Official Register PDF.</p>
+<a class="example-source" href="https://www.gob.ec" target="_blank" rel="noopener">gob.ec &#8599;</a>
+</div>
+
+</div>
+
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>Got a question these sources could answer?</p>
+<a class="btn-cta primary" href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">Try it on GitHub</a>
+</div>
+</section>
+{% endblock %}

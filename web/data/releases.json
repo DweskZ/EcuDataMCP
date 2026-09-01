@@ -1,0 +1,62 @@
+[
+  {
+    "version": "0.7.0",
+    "date": "2026-08-26",
+    "summary": "Preview de .xls legacy, .tar.gz y .zip (que envuelven un CSV/TSV/TXT). Expansión de siglas y sniffing de Content-Type en búsqueda/previsualización. Varios fixes de confiabilidad encontrados verificando contra el portal real."
+  },
+  {
+    "version": "0.6.0",
+    "date": "2026-08-18",
+    "summary": "Banco Central del Ecuador, SRI Datasets, y Supercías completo (directorio, ranking financiero, auditores externos). Guardia SSRF, uv.lock, CI en Python 3.11 a 3.13."
+  },
+  {
+    "version": "0.5.1",
+    "date": "2026-08-13",
+    "summary": "Fechas de creación/modificación por recurso, detección de series periódicas, limpieza de columnas de geometría en los previews."
+  },
+  {
+    "version": "0.5.0",
+    "date": "2026-08-10",
+    "summary": "Integración del Instituto Geofísico (IG-EPN): search_sismos sobre el catálogo sísmico público."
+  },
+  {
+    "version": "0.4.4",
+    "date": "2026-08-04",
+    "summary": "format=json en el resto de tools."
+  },
+  {
+    "version": "0.4.3",
+    "date": "2026-08-04",
+    "summary": "Parroquias del DPA (offline, ~1040) y lookup_ubicacion a nivel parroquia."
+  },
+  {
+    "version": "0.4.2",
+    "date": "2026-08-04",
+    "summary": "Rate limiting y caché ampliada para SERCOP."
+  },
+  {
+    "version": "0.4.1",
+    "date": "2026-08-04",
+    "summary": "list_recent_datasets y el primer smoke test end-to-end."
+  },
+  {
+    "version": "0.4.0",
+    "date": "2026-08-04",
+    "summary": "Cantones del DPA, integración con la Secretaría de Gestión de Riesgos (SGR), 23 tools."
+  },
+  {
+    "version": "0.3.2",
+    "date": "2026-08-04",
+    "summary": "list_capabilities, lookup_ubicacion, y los primeros resources ecuador://."
+  },
+  {
+    "version": "0.3.1",
+    "date": "2026-08-04",
+    "summary": "Prompts MCP y el vínculo entre trámites y regulaciones."
+  },
+  {
+    "version": "0.3.0",
+    "date": "2026-08-04",
+    "summary": "Primer release: búsqueda unificada, DataStore de CKAN, regulaciones y contratos SERCOP."
+  }
+]

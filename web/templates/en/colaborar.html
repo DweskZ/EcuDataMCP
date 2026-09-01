@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="landing hero">
+<div class="container-page">
+<p class="kicker">Contribute</p>
+<h1>Add your <span class="accent">source</span>, your <span class="accent">tool</span>, your idea.</h1>
+<p class="hero-sub">EcuDataMCP is MIT-licensed and accepts pull requests. You don't need to be an expert in MCP or the whole project stack: most contributions touch a single piece.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Before you start</p>
+<h2 class="section-title">Check what's already in motion.</h2>
+<p class="section-lede">The <a href="https://github.com/dsanchezp18/EcuDataMCP/blob/main/ROADMAP.md" target="_blank" rel="noopener">ROADMAP.md</a> tracks loose ends, candidate sources, and known issues: it's the best place to check whether your idea is already noted before opening a new issue.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Contribution flow</p>
+<h2 class="section-title">Fork, branch, PR.</h2>
+<div class="steps-grid">
+<div class="step-card">
+<div class="step-num">01</div>
+<h3>Fork</h3>
+<p>Fork <a href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">dsanchezp18/EcuDataMCP</a> to your account.</p>
+</div>
+<div class="step-card">
+<div class="step-num">02</div>
+<h3>Branch</h3>
+<p><code>git checkout -b feature/new-tool</code></p>
+</div>
+<div class="step-card">
+<div class="step-num">03</div>
+<h3>Commit</h3>
+<p><code>git commit -m 'feat: add new tool'</code></p>
+</div>
+<div class="step-card">
+<div class="step-num">04</div>
+<h3>Pull Request</h3>
+<p>Push to your fork and open a PR describing the change.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">MCP server</p>
+<h2 class="section-title">Python, uv, pytest.</h2>
+<p class="section-lede">The server lives in <code>tools/</code>, <code>helpers/</code>, <code>resources/</code>, and <code>prompts/</code>. It requires Python 3.11+ and <a href="https://docs.astral.sh/uv/" target="_blank" rel="noopener">uv</a>.</p>
+<div class="code-block">
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><code>uv sync
+uv run pytest
+uv run ruff check .</code></pre>
+</div>
+<p class="client-intro">A new tool is usually three files: the function in <code>tools/</code>, its registration in <code>tools/__init__.py</code>, and a test in <code>tests/</code>.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">This site</p>
+<h2 class="section-title">All Python, no R or Quarto.</h2>
+<p class="section-lede">The site lives in <code>web/</code> and uses Jinja2 (Python) to generate HTML from <code>web/data/*.json</code>. The source, tool, and MCP client cards are generated from those files: editing them is just JSON. No R or Quarto needed at all &mdash; the site builds with <code>uv run python build.py</code> like any other Python script in the repo. The full detail is in <code>web/README.md</code>, inside the repository.</p>
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>Every missing source, every tool short on coverage, is a possible contribution.</p>
+<a class="btn-cta primary" href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">View on GitHub</a>
+</div>
+</section>
+{% endblock %}

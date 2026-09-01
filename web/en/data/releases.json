@@ -1,0 +1,62 @@
+[
+  {
+    "version": "0.7.0",
+    "date": "2026-08-26",
+    "summary": "Preview support for legacy .xls, .tar.gz, and .zip (wrapping a CSV/TSV/TXT). Acronym expansion and Content-Type sniffing in search/preview. Several reliability fixes found verifying against the live portal."
+  },
+  {
+    "version": "0.6.0",
+    "date": "2026-08-18",
+    "summary": "Central Bank of Ecuador, SRI Datasets, and full Supercías coverage (directory, financial ranking, external auditors). SSRF guard, uv.lock, CI on Python 3.11 through 3.13."
+  },
+  {
+    "version": "0.5.1",
+    "date": "2026-08-13",
+    "summary": "Per-resource creation/modification dates, periodic-series detection, geometry-column cleanup in previews."
+  },
+  {
+    "version": "0.5.0",
+    "date": "2026-08-10",
+    "summary": "Geophysical Institute (IG-EPN) integration: search_sismos over the public seismic catalog."
+  },
+  {
+    "version": "0.4.4",
+    "date": "2026-08-04",
+    "summary": "format=json across the remaining tools."
+  },
+  {
+    "version": "0.4.3",
+    "date": "2026-08-04",
+    "summary": "DPA parishes (offline, ~1040) and lookup_ubicacion at the parish level."
+  },
+  {
+    "version": "0.4.2",
+    "date": "2026-08-04",
+    "summary": "Rate limiting and an expanded cache for SERCOP."
+  },
+  {
+    "version": "0.4.1",
+    "date": "2026-08-04",
+    "summary": "list_recent_datasets and the first end-to-end smoke test."
+  },
+  {
+    "version": "0.4.0",
+    "date": "2026-08-04",
+    "summary": "DPA cantons, integration with the risk management agency (SGR), 23 tools."
+  },
+  {
+    "version": "0.3.2",
+    "date": "2026-08-04",
+    "summary": "list_capabilities, lookup_ubicacion, and the first ecuador:// resources."
+  },
+  {
+    "version": "0.3.1",
+    "date": "2026-08-04",
+    "summary": "MCP prompts and the procedure-to-regulation link."
+  },
+  {
+    "version": "0.3.0",
+    "date": "2026-08-04",
+    "summary": "First release: unified search, CKAN DataStore, regulations, and SERCOP contracts."
+  }
+]

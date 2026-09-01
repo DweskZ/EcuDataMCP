@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="landing hero">
+<div class="container-page">
+<p class="kicker">Una capa de contexto para datos abiertos de Ecuador</p>
+<h1>Explora <span class="accent">datos abiertos.</span></h1>
+<p class="hero-sub">Conecta tu asistente de IA a datasets, trámites, regulaciones, contratos públicos, riesgos, sismos, indicadores del Banco Central y compañías de Ecuador. Encuentra las fuentes correctas, consulta los datos y cita siempre la fuente oficial.</p>
+<div class="hero-ctas">
+<a class="btn-cta primary" href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">Empezar en GitHub</a>
+<a class="btn-cta secondary" href="#como-funciona">Ver cómo funciona &darr;</a>
+</div>
+<div class="hero-stats">
+<div class="hero-stat"><span class="num">1,581</span><span class="label">datasets</span></div>
+<div class="hero-stat"><span class="num">{{ tool_count }}</span><span class="label">tools MCP</span></div>
+<div class="hero-stat"><span class="num">{{ source_count }}</span><span class="label">fuentes oficiales</span></div>
+<div class="hero-stat"><span class="num">0</span><span class="label">API keys</span></div>
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">El problema</p>
+<h2 class="section-title">Menos tiempo en portales. Más respuestas de tus datos.</h2>
+<p class="section-lede">Ecuador publica una enorme cantidad de datos públicos, pero encontrarlos significa navegar portales distintos, revisar catálogos separados y adivinar cuál archivo está vigente. EcuDataMCP le da a tu asistente de IA las herramientas para hacer ese trabajo por ti, y sigue citando la fuente oficial en cada respuesta.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="como-funciona">
+<p class="kicker">Cómo funciona</p>
+<h2 class="section-title">Un camino trazable.</h2>
+<p class="section-lede">Cuatro pasos, del lenguaje natural a la fuente oficial.</p>
+<div class="steps-grid">
+<div class="step-card">
+<div class="step-num">01</div>
+<h3>Buscar</h3>
+<p><code>search_ecuador</code> busca a la vez en datasets, trámites, regulaciones, contratos y riesgos por palabra clave.</p>
+</div>
+<div class="step-card">
+<div class="step-num">02</div>
+<h3>Inspeccionar</h3>
+<p><code>get_dataset_info</code> y <code>list_dataset_resources</code> revisan campos, formatos y fechas antes de traer datos.</p>
+</div>
+<div class="step-card">
+<div class="step-num">03</div>
+<h3>Consultar</h3>
+<p><code>query_resource_data</code> filtra en el DataStore de CKAN sin descargar el archivo completo, o <code>preview_resource_data</code> para CSV, JSON y XLSX.</p>
+</div>
+<div class="step-card">
+<div class="step-num">04</div>
+<h3>Citar</h3>
+<p>Cada resultado enlaza a la fuente oficial (el dataset, el trámite, el expediente SERCOP) para que puedas verificarlo.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">¿Qué puedes preguntar?</p>
+<h2 class="section-title">Nunca antes había sido tan fácil navegar los datos sobre Ecuador.</h2>
+<p class="section-lede">{{ source_count }} fuentes oficiales, en una sola conversación.</p>
+<div class="questions-grid">
+{% for q in questions %}
+<div class="question-card">&ldquo;{{ q }}&rdquo;</div>
+{% endfor %}
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="fuentes">
+<p class="kicker">Fuentes</p>
+<h2 class="section-title">Datos oficiales, siempre citados.</h2>
+<p class="section-lede">EcuDataMCP no copia ni almacena estos catálogos, cada consulta va en vivo contra el portal de origen.</p>
+<div class="card-grid">
+{% for s in sources %}
+<div class="data-card">
+<h3>{{ s.name }}{% if s.tag %}<span class="tag">{{ s.tag }}</span>{% endif %}{% if s.status in status_badges %}<span class="tag">{{ status_badges[s.status] }}</span>{% endif %}</h3>
+<p>{{ s.description }}</p>
+<div class="source-coverage">{% if s.url %}<a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.coverage }}</a>{% else %}{{ s.coverage }}{% endif %}</div>
+</div>
+{% endfor %}
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="tools">
+<p class="kicker">El backstage</p>
+<h2 class="section-title">Servidor MCP de código abierto.</h2>
+<p class="section-lede">EcuDataMCP corre como un servidor <a href="https://github.com/jlowin/fastmcp" target="_blank" rel="noopener">FastMCP</a> en Python, expuesto sobre HTTP Streamable o stdio. No hay base de datos propia: cada tool llama en vivo al portal oficial correspondiente (CKAN, gob.ec, SERCOP, BCE, Supercías, IG-EPN, SGR) y devuelve la respuesta formateada.</p>
+<div class="tools-grid">
+{% for cat in tools %}
+<div class="data-card">
+<h3>{{ cat.category }}<span class="tag">{{ cat.tools | length }}</span></h3>
+<div>{% for tool in cat.tools %}<a class="tool-chip" href="atlas.html#tool-{{ tool.name }}">{{ tool.name }}</a>{% endfor %}</div>
+</div>
+{% endfor %}
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Conecta tu asistente</p>
+<h2 class="section-title">Copia la configuración de tu cliente.</h2>
+<p class="section-lede">Corre el servidor localmente (Docker o <code>uv run</code>, ver el <a href="https://github.com/dsanchezp18/EcuDataMCP#ejecutar-localmente" target="_blank" rel="noopener">README</a>) y apunta tu cliente MCP a <code>http://localhost:8000/mcp</code>.</p>
+<div class="quick-connect">
+<p class="kicker">Opción rápida</p>
+<p class="client-intro">Si tu asistente tiene acceso a una terminal, pégale el link del repositorio y déjalo instalar todo por ti:</p>
+<div class="code-block">
+<button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+<pre><code>Clona https://github.com/dsanchezp18/EcuDataMCP, instala sus dependencias con uv sync,
+y regístralo como servidor MCP en mi cliente usando modo stdio con
+`uv run --directory &lt;ruta-del-clon&gt; python main.py --transport stdio`.
+Verifica que el servidor responda antes de darlo por terminado.</code></pre>
+</div>
+<p class="client-intro">Revisa siempre lo que tu asistente cambie (archivos de configuración, comandos ejecutados) antes de confirmar. Esta opción solo funciona con asistentes que pueden ejecutar comandos por su cuenta: hoy eso es <strong>Claude Code</strong>, <strong>Cursor</strong> y <strong>Windsurf</strong> en modo agente. Con ChatGPT, Claude.ai de solo-chat u otros clientes sin terminal, usa la configuración manual de abajo.</p>
+</div>
+<ul class="nav nav-tabs" id="client-tabs" role="tablist">
+{% for cl in clients %}
+<li class="nav-item" role="presentation"><button class="nav-link{% if loop.first %} active{% endif %}" id="{{ cl.id }}-tab" data-tab-target="{{ cl.id }}-pane" type="button" role="tab">{{ cl.name }}</button></li>
+{% endfor %}
+</ul>
+<div class="tab-content" id="client-tabs-content">
+{% for cl in clients %}
+<div class="tab-pane fade{% if loop.first %} show active{% endif %}" id="{{ cl.id }}-pane" role="tabpanel">
+{% if cl.intro %}<p class="client-intro">{{ cl.intro | mdlite }}</p>{% endif %}
+{% if cl.steps %}<ol class="client-steps">{% for step in cl.steps %}<li>{{ step | mdlite }}</li>{% endfor %}</ol>{% endif %}
+{% if cl.code %}<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>{{ cl.code | codeescape }}</code></pre></div>{% endif %}
+</div>
+{% endfor %}
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Sin fricción</p>
+<h2 class="section-title">Listo para usar, sin trámite propio.</h2>
+<ul class="friction-list">
+<li><strong>Sin API key</strong>Todas las fuentes son datos públicos, sin autenticación.</li>
+<li><strong>Sin cuenta</strong>No hay registro ni cuenta de usuario que crear.</li>
+<li><strong>100% datos públicos</strong>Bajo licencia abierta, tal como los publica el Estado ecuatoriano.</li>
+<li><strong>Sin telemetría</strong>El servidor corre en tu máquina y no registra ni envía ninguna de tus consultas.</li>
+</ul>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">FAQ</p>
+<h2 class="section-title">¿Tienes más preguntas?</h2>
+<details class="faq-item">
+<summary>¿Qué es EcuDataMCP?</summary>
+<p>Un servidor MCP (Model Context Protocol) de código abierto que ayuda a tu asistente de IA a descubrir y consultar datos abiertos del gobierno de Ecuador: datasets, trámites, regulaciones, contratos públicos, riesgos, sismos, indicadores del Banco Central y compañías.</p>
+</details>
+<details class="faq-item">
+<summary>¿Qué es MCP?</summary>
+<p>Model Context Protocol es un estándar abierto para conectar asistentes de IA con herramientas y fuentes de datos externas, manteniendo el control sobre qué puede hacer el modelo y qué datos puede leer.</p>
+</details>
+<details class="faq-item">
+<summary>¿Qué asistentes puedo usar?</summary>
+<p>Cualquier cliente compatible con MCP: Claude Desktop, Claude Code, ChatGPT (planes pagos), Cursor, VS Code, Gemini CLI, Le Chat, Windsurf, HuggingChat, y más.</p>
+</details>
+<details class="faq-item">
+<summary>¿Necesito una API key?</summary>
+<p>No. Todas las fuentes que usa el servidor son datos públicos sin autenticación.</p>
+</details>
+<details class="faq-item">
+<summary>¿Es esto un servicio oficial del gobierno ecuatoriano?</summary>
+<p>No. EcuDataMCP es un proyecto independiente de código abierto que consulta las mismas fuentes públicas que ya publica el Estado ecuatoriano. No está afiliado a ninguna institución.</p>
+</details>
+<details class="faq-item">
+<summary>¿El servidor guarda mis preguntas?</summary>
+<p>No hay telemetría. El servidor corre localmente en tu máquina y cada consulta va directo del cliente MCP al portal oficial correspondiente.</p>
+</details>
+<details class="faq-item">
+<summary>¿Qué formatos soporta?</summary>
+<p>Preview en memoria de CSV, TSV, JSON, GeoJSON y XLSX; consulta tabular filtrada vía el DataStore de CKAN cuando el recurso lo soporta.</p>
+</details>
+<details class="faq-item">
+<summary>¿Por qué a veces falla la conexión al portal de Datos Abiertos?</summary>
+<p><code>www.datosabiertos.gob.ec</code> a veces rechaza conexiones que vienen de fuera de Latinoamérica (error 403). Si ves esto, corre el servidor desde una conexión con salida en Ecuador o la región (por ejemplo, una VPN). Los tools de trámites e instituciones usan otro portal y no tienen este problema.</p>
+</details>
+<details class="faq-item">
+<summary>¿Puedo contribuir?</summary>
+<p>Sí, el proyecto es MIT y acepta pull requests. Ve la guía en <a href="colaborar.html">Cómo colaborar</a>.</p>
+</details>
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>Datos abiertos de Ecuador, con tu asistente de IA favorito.</p>
+<a class="btn-cta primary" href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">Ver en GitHub</a>
+</div>
+</section>
+{% endblock %}

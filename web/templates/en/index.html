@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="landing hero">
+<div class="container-page">
+<p class="kicker">A context layer for Ecuador's open data</p>
+<h1>Explore <span class="accent">open data.</span></h1>
+<p class="hero-sub">Connect your AI assistant to Ecuador's datasets, government procedures, regulations, public contracts, risk events, earthquakes, Central Bank indicators, and companies. Find the right sources, query the data, and always cite the official source.</p>
+<div class="hero-ctas">
+<a class="btn-cta primary" href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">Get started on GitHub</a>
+<a class="btn-cta secondary" href="#how-it-works">See how it works &darr;</a>
+</div>
+<div class="hero-stats">
+<div class="hero-stat"><span class="num">1,581</span><span class="label">datasets</span></div>
+<div class="hero-stat"><span class="num">{{ tool_count }}</span><span class="label">MCP tools</span></div>
+<div class="hero-stat"><span class="num">{{ source_count }}</span><span class="label">official sources</span></div>
+<div class="hero-stat"><span class="num">0</span><span class="label">API keys</span></div>
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">The problem</p>
+<h2 class="section-title">Less time in portals. More answers from your data.</h2>
+<p class="section-lede">Ecuador publishes a huge amount of public data, but finding it means navigating different portals, checking separate catalogs, and guessing which file is current. EcuDataMCP gives your AI assistant the tools to do that work for you, and still cites the official source in every answer.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="how-it-works">
+<p class="kicker">How it works</p>
+<h2 class="section-title">A traceable path.</h2>
+<p class="section-lede">Four steps, from natural language to the official source.</p>
+<div class="steps-grid">
+<div class="step-card">
+<div class="step-num">01</div>
+<h3>Search</h3>
+<p><code>search_ecuador</code> searches datasets, procedures, regulations, contracts, and risk events by keyword, all at once.</p>
+</div>
+<div class="step-card">
+<div class="step-num">02</div>
+<h3>Inspect</h3>
+<p><code>get_dataset_info</code> and <code>list_dataset_resources</code> check fields, formats, and dates before pulling any data.</p>
+</div>
+<div class="step-card">
+<div class="step-num">03</div>
+<h3>Query</h3>
+<p><code>query_resource_data</code> filters the CKAN DataStore without downloading the whole file, or <code>preview_resource_data</code> for CSV, JSON, and XLSX.</p>
+</div>
+<div class="step-card">
+<div class="step-num">04</div>
+<h3>Cite</h3>
+<p>Every result links back to the official source (the dataset, the procedure, the SERCOP record) so you can verify it.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">What can you ask?</p>
+<h2 class="section-title">It has never been this easy to navigate Ecuador's data.</h2>
+<p class="section-lede">{{ source_count }} official sources, in a single conversation.</p>
+<div class="questions-grid">
+{% for q in questions %}
+<div class="question-card">&ldquo;{{ q }}&rdquo;</div>
+{% endfor %}
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="sources">
+<p class="kicker">Sources</p>
+<h2 class="section-title">Official data, always cited.</h2>
+<p class="section-lede">EcuDataMCP does not copy or store these catalogs, every query goes live against the source portal.</p>
+<div class="card-grid">
+{% for s in sources %}
+<div class="data-card">
+<h3>{{ s.name }}{% if s.tag %}<span class="tag">{{ s.tag }}</span>{% endif %}{% if s.status in status_badges %}<span class="tag">{{ status_badges[s.status] }}</span>{% endif %}</h3>
+<p>{{ s.description }}</p>
+<div class="source-coverage">{% if s.url %}<a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.coverage }}</a>{% else %}{{ s.coverage }}{% endif %}</div>
+</div>
+{% endfor %}
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="tools">
+<p class="kicker">The backstage</p>
+<h2 class="section-title">Open-source MCP server.</h2>
+<p class="section-lede">EcuDataMCP runs as a <a href="https://github.com/jlowin/fastmcp" target="_blank" rel="noopener">FastMCP</a> server in Python, exposed over Streamable HTTP or stdio. There is no database of its own: every tool calls the matching official portal live (CKAN, gob.ec, SERCOP, BCE, Supercías, IG-EPN, SGR) and returns the formatted response.</p>
+<div class="tools-grid">
+{% for cat in tools %}
+<div class="data-card">
+<h3>{{ cat.category }}<span class="tag">{{ cat.tools | length }}</span></h3>
+<div>{% for tool in cat.tools %}<a class="tool-chip" href="atlas.html#tool-{{ tool.name }}">{{ tool.name }}</a>{% endfor %}</div>
+</div>
+{% endfor %}
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Connect your assistant</p>
+<h2 class="section-title">Copy your client's configuration.</h2>
+<p class="section-lede">Run the server locally (Docker or <code>uv run</code>, see the <a href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">README</a>) and point your MCP client at <code>http://localhost:8000/mcp</code>.</p>
+<div class="quick-connect">
+<p class="kicker">Quick option</p>
+<p class="client-intro">If your assistant has terminal access, hand it the repo link and let it install everything for you:</p>
+<div class="code-block">
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><code>Clone https://github.com/dsanchezp18/EcuDataMCP, install its dependencies with uv sync,
+and register it as an MCP server in my client using stdio mode with
+`uv run --directory &lt;clone-path&gt; python main.py --transport stdio`.
+Verify the server responds before calling it done.</code></pre>
+</div>
+<p class="client-intro">Always review what your assistant changes (config files, commands run) before confirming. This option only works with assistants that can run commands on their own: today that's <strong>Claude Code</strong>, <strong>Cursor</strong>, and <strong>Windsurf</strong> in agent mode. With ChatGPT, chat-only Claude.ai, or other terminal-less clients, use the manual configuration below.</p>
+</div>
+<ul class="nav nav-tabs" id="client-tabs" role="tablist">
+{% for cl in clients %}
+<li class="nav-item" role="presentation"><button class="nav-link{% if loop.first %} active{% endif %}" id="{{ cl.id }}-tab" data-tab-target="{{ cl.id }}-pane" type="button" role="tab">{{ cl.name }}</button></li>
+{% endfor %}
+</ul>
+<div class="tab-content" id="client-tabs-content">
+{% for cl in clients %}
+<div class="tab-pane fade{% if loop.first %} show active{% endif %}" id="{{ cl.id }}-pane" role="tabpanel">
+{% if cl.intro %}<p class="client-intro">{{ cl.intro | mdlite }}</p>{% endif %}
+{% if cl.steps %}<ol class="client-steps">{% for step in cl.steps %}<li>{{ step | mdlite }}</li>{% endfor %}</ol>{% endif %}
+{% if cl.code %}<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{{ cl.code | codeescape }}</code></pre></div>{% endif %}
+</div>
+{% endfor %}
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">No friction</p>
+<h2 class="section-title">Ready to use, no setup of your own.</h2>
+<ul class="friction-list">
+<li><strong>No API key</strong>All sources are public data, no authentication.</li>
+<li><strong>No account</strong>There is no sign-up or user account to create.</li>
+<li><strong>100% public data</strong>Under an open license, exactly as the Ecuadorian state publishes it.</li>
+<li><strong>No telemetry</strong>The server runs on your machine and never logs or sends any of your queries.</li>
+</ul>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">FAQ</p>
+<h2 class="section-title">Got more questions?</h2>
+<details class="faq-item">
+<summary>What is EcuDataMCP?</summary>
+<p>An open-source MCP (Model Context Protocol) server that helps your AI assistant discover and query Ecuador's open government data: datasets, procedures, regulations, public contracts, risk events, earthquakes, Central Bank indicators, and companies.</p>
+</details>
+<details class="faq-item">
+<summary>What is MCP?</summary>
+<p>Model Context Protocol is an open standard for connecting AI assistants to external tools and data sources, while keeping control over what the model can do and what data it can read.</p>
+</details>
+<details class="faq-item">
+<summary>What assistants can I use?</summary>
+<p>Any MCP-compatible client: Claude Desktop, Claude Code, ChatGPT (paid plans), Cursor, VS Code, Gemini CLI, Le Chat, Windsurf, HuggingChat, and more.</p>
+</details>
+<details class="faq-item">
+<summary>Do I need an API key?</summary>
+<p>No. Every source the server uses is public data with no authentication.</p>
+</details>
+<details class="faq-item">
+<summary>Is this an official service of the Ecuadorian government?</summary>
+<p>No. EcuDataMCP is an independent, open-source project that queries the same public sources the Ecuadorian state already publishes. It is not affiliated with any institution.</p>
+</details>
+<details class="faq-item">
+<summary>Does the server store my questions?</summary>
+<p>There is no telemetry. The server runs locally on your machine, and every query goes straight from the MCP client to the matching official portal.</p>
+</details>
+<details class="faq-item">
+<summary>What formats does it support?</summary>
+<p>In-memory preview of CSV, TSV, JSON, GeoJSON, and XLSX; filtered tabular queries via the CKAN DataStore when the resource supports it.</p>
+</details>
+<details class="faq-item">
+<summary>Why does the connection to the Open Data portal sometimes fail?</summary>
+<p><code>www.datosabiertos.gob.ec</code> sometimes rejects connections coming from outside Latin America (403 error). If you see this, run the server from a connection with an exit point in Ecuador or the region (a VPN, for example). The procedures and institutions tools use a different portal and don't have this issue.</p>
+</details>
+<details class="faq-item">
+<summary>Can I contribute?</summary>
+<p>Yes, the project is MIT-licensed and accepts pull requests. See the guide at <a href="colaborar.html">Contribute</a>.</p>
+</details>
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>Ecuador's open data, with your favorite AI assistant.</p>
+<a class="btn-cta primary" href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">View on GitHub</a>
+</div>
+</section>
+{% endblock %}

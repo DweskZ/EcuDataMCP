@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="landing hero">
+<div class="container-page">
+<p class="kicker">Cómo colaborar</p>
+<h1>Suma tu <span class="accent">fuente</span>, tu <span class="accent">tool</span>, tu idea.</h1>
+<p class="hero-sub">EcuDataMCP es MIT y acepta pull requests. No hace falta ser experto en MCP ni en el stack completo del proyecto: la mayoría de contribuciones tocan una sola pieza.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Antes de empezar</p>
+<h2 class="section-title">Revisa qué ya está en marcha.</h2>
+<p class="section-lede">El <a href="https://github.com/dsanchezp18/EcuDataMCP/blob/main/ROADMAP.md" target="_blank" rel="noopener">ROADMAP.md</a> lleva la lista de cabos sueltos, fuentes candidatas y problemas conocidos: es el mejor lugar para ver si tu idea ya está anotada antes de abrir un issue nuevo.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Flujo de contribución</p>
+<h2 class="section-title">Fork, branch, PR.</h2>
+<div class="steps-grid">
+<div class="step-card">
+<div class="step-num">01</div>
+<h3>Fork</h3>
+<p>Haz fork de <a href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">dsanchezp18/EcuDataMCP</a> a tu cuenta.</p>
+</div>
+<div class="step-card">
+<div class="step-num">02</div>
+<h3>Branch</h3>
+<p><code>git checkout -b feature/nueva-herramienta</code></p>
+</div>
+<div class="step-card">
+<div class="step-num">03</div>
+<h3>Commit</h3>
+<p><code>git commit -m 'feat: agregar nueva herramienta'</code></p>
+</div>
+<div class="step-card">
+<div class="step-num">04</div>
+<h3>Pull Request</h3>
+<p>Push a tu fork y abre un PR describiendo el cambio.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Servidor MCP</p>
+<h2 class="section-title">Python, uv, pytest.</h2>
+<p class="section-lede">El servidor vive en <code>tools/</code>, <code>helpers/</code>, <code>resources/</code> y <code>prompts/</code>. Requiere Python 3.11+ y <a href="https://docs.astral.sh/uv/" target="_blank" rel="noopener">uv</a>.</p>
+<div class="code-block">
+<button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+<pre><code>uv sync
+uv run pytest
+uv run ruff check .</code></pre>
+</div>
+<p class="client-intro">Un tool nuevo normalmente son tres archivos: la función en <code>tools/</code>, su registro en <code>tools/__init__.py</code>, y un test en <code>tests/</code>.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Este sitio</p>
+<h2 class="section-title">Todo Python, sin R ni Quarto.</h2>
+<p class="section-lede">El sitio vive en <code>web/</code> y usa Jinja2 (Python) para generar HTML desde <code>web/data/*.json</code>. Las tarjetas de fuentes, tools y clientes MCP se generan desde esos archivos: editarlos es solo JSON. No hace falta R ni Quarto para nada &mdash; el sitio se genera con <code>uv run python build.py</code> como cualquier script Python del repo. El detalle completo está en <code>web/README.md</code>, dentro del repositorio.</p>
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>Cada fuente que falta, cada tool que le falta cobertura, es una contribución posible.</p>
+<a class="btn-cta primary" href="https://github.com/dsanchezp18/EcuDataMCP" target="_blank" rel="noopener">Ver en GitHub</a>
+</div>
+</section>
+{% endblock %}

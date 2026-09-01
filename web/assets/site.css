@@ -1,0 +1,104 @@
+/* Custom UI not present in the old Quarto/darkly build: the search toggle
+   button and results panel. Everything else (navbar collapse, Bootstrap
+   tabs) reuses classes already baked into styles.css. */
+
+.site-search-toggle {
+  background: transparent;
+  border: none;
+  color: #7c8591;
+  font-size: 1.05rem;
+  padding: 0.4rem 0.6rem;
+  margin-left: auto;
+  cursor: pointer;
+  order: 2;
+}
+
+.site-search-toggle:hover {
+  color: #f2b134;
+}
+
+@media (min-width: 992px) {
+  .site-search-toggle {
+    margin-left: 0.75rem;
+    margin-right: 0.25rem;
+  }
+}
+
+.site-search-panel {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 12, 14, 0.72);
+  z-index: 1050;
+  display: flex;
+  justify-content: center;
+  padding-top: 12vh;
+}
+
+.site-search-panel[hidden] {
+  display: none;
+}
+
+.site-search-panel-inner {
+  width: 100%;
+  max-width: 640px;
+  height: fit-content;
+  margin: 0 1.25rem;
+  background: #131417;
+  border: 1px solid #24262b;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.site-search-input {
+  width: 100%;
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.95rem;
+  background: #0b0c0e;
+  border: 1px solid #24262b;
+  border-radius: 6px;
+  padding: 0.65rem 0.9rem;
+  color: #e6e6e6;
+}
+
+.site-search-input:focus {
+  outline: none;
+  border-color: #f2b134;
+}
+
+.site-search-results {
+  margin-top: 0.75rem;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.site-search-result {
+  display: block;
+  padding: 0.7rem 0.6rem;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #e6e6e6;
+}
+
+.site-search-result:hover,
+.site-search-result.is-active {
+  background: #1c1e22;
+}
+
+.site-search-result-title {
+  font-weight: 700;
+  color: #f2b134;
+  font-size: 0.92rem;
+}
+
+.site-search-result-excerpt {
+  color: #7c8591;
+  font-size: 0.85rem;
+  margin-top: 0.15rem;
+}
+
+.site-search-empty {
+  color: #7c8591;
+  font-size: 0.88rem;
+  padding: 0.5rem 0.6rem;
+}

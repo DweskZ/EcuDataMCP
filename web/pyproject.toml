@@ -1,0 +1,9 @@
+[project]
+name = "ecudatamcp-web"
+version = "0.1.0"
+description = "Static site generator for the EcuDataMCP landing page."
+requires-python = ">=3.11"
+dependencies = ["jinja2>=3.1"]
+
+[tool.uv]
+package = false
