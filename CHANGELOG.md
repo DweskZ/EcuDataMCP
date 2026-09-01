@@ -28,14 +28,6 @@
   guidance are now available through environment variables and
   `docs/DEPLOYMENT.md`.
 
-### Changed
-
-- Project positioning now consistently describes EcuDataMCP as open
-  public-data infrastructure for Ecuador, and the README keeps the detailed
-  tool reference in `docs/TOOLS.md`.
-
-### Added
-
 - **BCEData value audit and IEM period normalization** — `audit_bce_catalog`
   can optionally probe one current `/grid` period for every advertised
   frequency/unit pair and persist that bounded report separately. IEM table
@@ -289,6 +281,12 @@
   exactly 100" rather than presented as an exact count. Both tools state
   explicitly that this is a registry lookup, not a way to retrieve an
   individual's tax returns, sales, withholdings, or payments.
+
+### Changed
+
+- Project positioning now consistently describes EcuDataMCP as open
+  public-data infrastructure for Ecuador, and the README keeps the detailed
+  tool reference in `docs/TOOLS.md`.
 
 ### Fixed
 

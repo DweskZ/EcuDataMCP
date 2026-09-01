@@ -2,29 +2,39 @@ from mcp.server.fastmcp import FastMCP
 
 from helpers.format_out import render_output
 from helpers.logging import log_tool
+from helpers.version import get_version
 
 _CAPABILITIES = {
     "name": "Ecuador MCP",
-    "version": "0.8.2",
+    "version": get_version(),
     "fuentes": [
         "CKAN datos abiertos (nacional, www.datosabiertos.gob.ec)",
         (
             "Cuenca en Datos (portal municipal CKAN independiente, "
             "source='cuenca' en los mismos tools CKAN)"
         ),
-        "gob.ec trámites/instituciones/regulaciones",
+        "gob.ec trámites/instituciones/regulaciones + estadísticas de transparencia por trámite",
         "SERCOP OCDS contratos",
         "SGR COE eventos de riesgo + SAT tsunami",
-        "IG-EPN Instituto Geofísico (sismos)",
+        "IG-EPN Instituto Geofísico: catálogo sísmico + archivo de informes sísmicos/volcánicos en PDF",
         "DPA provincias/cantones/parroquias (offline INEC)",
         "ANDA (NADA/IHSN) catálogo de encuestas y censos del INEC",
-        "Ecuador en Cifras (INEC): boletines/metodología/series históricas por tema",
-        "BCE (BCEData) catálogo estadístico: monetario, fiscal, externo, real",
+        (
+            "Ecuador en Cifras (INEC): boletines/metodología/series históricas "
+            "por tema, API REST de publicaciones, microsito del Censo 2022 y "
+            "BIINEC (registros complementarios)"
+        ),
+        (
+            "BCE: BCEData (catálogo monetario/fiscal/externo/real), boletín "
+            "mensual IEM, familia de indicadores diarios en línea (riesgo "
+            "país, petróleo, oro, bonos soberanos) y remesas de trabajadores"
+        ),
         "Supercías directorio de compañías",
         "Supercías registro de auditores externos autorizados",
         "Supercías ranking financiero (últimos años, requiere build local)",
         "SRI consulta pública del Registro Único de Contribuyentes (RUC)",
         "SRI Saiku OLAP público: descubrimiento de cubos y consultas agregadas limitadas",
+        "SRI estadísticas de recaudación: reportes mensuales pre-agregados por impuesto/provincia/actividad",
         (
             "SIPA (Ministerio de Agricultura, Ganadería y Pesca): series "
             "agropecuarias reales — precios, comercio exterior, crédito, "
@@ -33,6 +43,16 @@ _CAPABILITIES = {
         (
             "Contraloría General del Estado: CSV trimestrales de informes de "
             "auditoría aprobados a cualquier institución pública del país"
+        ),
+        (
+            "Superintendencia de Bancos: boletines financieros mensuales, "
+            "servicios financieros e información histórica"
+        ),
+        "CENACE: snapshot en vivo de generación y demanda de la red eléctrica nacional",
+        (
+            "Ministerio del Trabajo (SUT): tableros Power BI en vivo — "
+            "contratos mensuales por industria/provincia/género desde 2015, "
+            "brechas de empleo, cumplimiento de políticas de género"
         ),
     ],
     "entrada": [
@@ -52,12 +72,19 @@ _CAPABILITIES = {
         "tramites": [
             "search_tramites",
             "get_tramite_info",
+            "get_tramite_estadisticas",
             "list_instituciones",
             "get_institucion_info",
         ],
         "normas": ["search_regulaciones", "get_regulacion_info"],
         "compras": ["search_contratos", "get_contrato_info"],
-        "riesgos": ["search_eventos_riesgo", "list_sat_tsunami", "search_sismos"],
+        "riesgos": [
+            "search_eventos_riesgo",
+            "list_sat_tsunami",
+            "search_sismos",
+            "search_informes_igepn",
+            "get_informe_igepn",
+        ],
         "geo": ["lookup_ubicacion"],
         "encuestas": ["search_anda", "get_anda_survey_info", "download_anda_microdata"],
         "inec_estadisticas": [
@@ -72,8 +99,12 @@ _CAPABILITIES = {
             "search_indicadores_bce",
             "get_indicador_bce",
             "audit_bce_catalog",
+            "compare_bce_sources",
             "search_bce_iem",
             "get_bce_iem_table",
+            "list_bce_indicadores_diarios",
+            "get_bce_indicador_diario",
+            "search_bce_remesas",
         ],
         "companias": [
             "search_companias",
@@ -93,6 +124,17 @@ _CAPABILITIES = {
         "financieros": ["search_ranking", "get_financials"],
         "agropecuario": ["list_sipa_modulos", "get_sipa_modulo_archivos"],
         "auditoria": ["list_contraloria_informes", "get_contraloria_informe"],
+        "superbancos": [
+            "list_superbancos_secciones",
+            "get_superbancos_seccion_archivos",
+        ],
+        "energia": ["get_cenace_tablero"],
+        "trabajo": [
+            "list_sut_indicadores",
+            "get_sut_indicador_schema",
+            "query_sut_indicador",
+        ],
+        "utilidades": ["investigate_dataset", "list_zip_contents"],
     },
     "resources": [
         "ecuador://fuentes",
