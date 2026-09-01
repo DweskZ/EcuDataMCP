@@ -137,7 +137,7 @@ PAGE_DESCRIPTIONS = {
     },
 }
 
-OG_IMAGE = "https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png"
+OG_IMAGE = "https://dweskz.github.io/EcuDataMCP/assets/og-image.png"
 
 _BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
 _CODE_RE = re.compile(r"`(.+?)`")
@@ -170,9 +170,11 @@ def clean_default(value, t: dict) -> str:
 
 
 def flatten_sources(raw: list[dict]) -> list[dict]:
-    """Sources may be flat (old format, still used by en/) or grouped by
-    theme -> institution (new format, es/). Normalize to a flat list for
-    anything that only needs a total count or a single flat card grid."""
+    """Sources may be flat (old format) or grouped by theme -> institution
+    (current format, used by both es/ and en/ as of the Fuentes/Sources
+    page). Normalize to a flat list for anything that only needs a total
+    count or a single flat card grid. The flat format is kept supported
+    as a fallback, not because any current data file still uses it."""
     if raw and "institutions" in raw[0]:
         return [
             source
@@ -218,6 +220,11 @@ def complete_tool_catalog(
     The curated entries retain their translated descriptions. New tools appear
     under one explicit supplementary category using their source docstrings,
     rather than being silently omitted until a full editorial pass is made.
+    `signatures` is always the English extraction (there is only one
+    tool_signatures.json -- docstrings are written in English) regardless of
+    `lang`, so on the Spanish site this fallback text is English by
+    construction; the category label says so explicitly instead of silently
+    mixing languages.
     """
     listed = {tool["name"] for category in curated for tool in category["tools"]}
     missing = sorted(set(signatures) - listed)
@@ -250,7 +257,8 @@ def complete_tool_catalog(
         )
     category = {
         "category": (
-            "Herramientas incorporadas recientemente"
+            "Herramientas incorporadas recientemente (descripción original "
+            "en inglés, pendiente de traducir)"
             if lang == "es"
             else "Recently added tools"
         ),
@@ -285,7 +293,12 @@ def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
 
     sources_raw = load_json(lang, "sources.json")
     sources = flatten_sources(sources_raw)
-    source_themes = sources_raw if sources_raw and "institutions" in sources_raw[0] else None
+    # [] rather than None if sources.json ever reverts to the flat format --
+    # fuentes.html/en/fuentes.html iterate this unconditionally, and Jinja
+    # raises TypeError on `for x in None` instead of just rendering nothing.
+    source_themes = (
+        sources_raw if sources_raw and "institutions" in sources_raw[0] else []
+    )
     clients = load_json(lang, "clients.json")
     tools = complete_tool_catalog(
         load_json(lang, "tools.json"),

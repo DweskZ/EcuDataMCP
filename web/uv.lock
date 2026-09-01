@@ -8,10 +8,14 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "jinja2" },
+    { name = "markupsafe" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "jinja2", specifier = ">=3.1" }]
+requires-dist = [
+    { name = "jinja2", specifier = ">=3.1" },
+    { name = "markupsafe", specifier = ">=2.1" },
+]
 
 [[package]]
 name = "jinja2"
