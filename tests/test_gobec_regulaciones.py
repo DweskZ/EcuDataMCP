@@ -47,3 +47,35 @@ async def test_find_regulaciones(httpx_mock):
     matches = await gobec_client.find_regulaciones("datos personales", max_pages=2)
     assert len(matches) == 1
     assert matches[0]["regulacion_id"] == "1"
+
+
+@pytest.mark.asyncio
+async def test_get_tramite_estadisticas(httpx_mock):
+    httpx_mock.add_response(
+        url="https://www.gob.ec/api/v1/tramites-transparencia/11752",
+        json=[
+            {
+                "tramite_transparencia_id": "420887",
+                "tramite_id": "11752",
+                "ano": "2026",
+                "mes": "07",
+                "atenciones": "253729",
+                "quejas": "6",
+                "modificado": '<time datetime="2026-08-11T11:22:05-05:00">2026-08-11T11:22:05-0500</time>\n',
+            }
+        ],
+    )
+    rows = await gobec_client.get_tramite_estadisticas("11752")
+    assert len(rows) == 1
+    assert rows[0]["ano"] == "2026"
+    assert rows[0]["atenciones"] == "253729"
+
+
+@pytest.mark.asyncio
+async def test_get_tramite_estadisticas_missing_returns_empty_list(httpx_mock):
+    httpx_mock.add_response(
+        url="https://www.gob.ec/api/v1/tramites-transparencia/999999",
+        json=[],
+    )
+    rows = await gobec_client.get_tramite_estadisticas("999999")
+    assert rows == []

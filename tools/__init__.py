@@ -33,6 +33,7 @@ from tools.get_superbancos_seccion_archivos import (
     register_get_superbancos_seccion_archivos_tool,
 )
 from tools.get_sut_indicador_schema import register_get_sut_indicador_schema_tool
+from tools.get_tramite_estadisticas import register_get_tramite_estadisticas_tool
 from tools.get_tramite_info import register_get_tramite_info_tool
 from tools.investigate_dataset import register_investigate_dataset_tool
 from tools.list_bce_indicadores_diarios import (
@@ -120,6 +121,7 @@ def register_tools(mcp: FastMCP) -> None:
 
     register_search_tramites_tool(mcp)
     register_get_tramite_info_tool(mcp)
+    register_get_tramite_estadisticas_tool(mcp)
     register_list_instituciones_tool(mcp)
     register_get_institucion_info_tool(mcp)
 

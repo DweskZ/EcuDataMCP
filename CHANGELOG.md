@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Added
+
+- **`get_tramite_estadisticas`** — monthly atenciones/quejas transparency
+  series for one trámite (`gob.ec/api/v1/tramites-transparencia/{id}`),
+  since mid-2021. No bulk endpoint; fetches one trámite's series at a time.
+
 ## 0.8.5 — 2026-08-31
 
 ### Added

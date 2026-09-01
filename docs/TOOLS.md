@@ -41,6 +41,7 @@ para consultar el catálogo nacional o el portal municipal Cuenca en Datos.
 |------|-------------|
 | `search_tramites` | Buscar trámites del gobierno ecuatoriano. |
 | `get_tramite_info` | Detalle completo: requisitos, procedimiento, costo y tiempo estimado. |
+| `get_tramite_estadisticas` | Serie mensual de atenciones/quejas de transparencia de un trámite, desde 2021. |
 | `list_instituciones` | Listar instituciones públicas del Ecuador. |
 | `get_institucion_info` | Detalle de una institución: sector, web y descripción. |
 

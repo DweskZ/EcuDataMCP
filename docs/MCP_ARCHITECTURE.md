@@ -6,7 +6,7 @@ no implica que todos los cambios deban hacerse de una sola vez.
 
 ## Conclusión corta
 
-El servidor tiene 73 tools registradas. Ese número no es, por sí solo, un
+El servidor tiene 74 tools registradas. Ese número no es, por sí solo, un
 problema de MCP: `tools/list` admite paginación y la especificación no fija un
 máximo pequeño. El problema actual es la forma de describir y devolver esas
 tools.
@@ -18,10 +18,10 @@ con 2 o 3 tools de mantenimiento en un perfil separado.
 
 ## Evidencia del repositorio
 
-- Hay 73 módulos en `tools/` y 73 decoradores `@mcp.tool()` registrados.
-- Las 73 tools aceptan `format: str`, normalmente con los valores `text` o
+- Hay 74 módulos en `tools/` y 74 decoradores `@mcp.tool()` registrados.
+- Las 74 tools aceptan `format: str`, normalmente con los valores `text` o
   `json`.
-- Las 73 declaran retorno `str`. Con el SDK MCP 1.29.0 usado por el entorno,
+- Las 74 declaran retorno `str`. Con el SDK MCP 1.29.0 usado por el entorno,
   `tools/list` las presenta con un output schema equivalente a un resultado
   textual (`result: string`), aunque muchas internamente construyen objetos
   JSON dentro de una cadena.
