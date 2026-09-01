@@ -29,7 +29,7 @@ from tools import register_tools
 setup_logging()
 
 SERVER_START_TIME = datetime.now(UTC)
-VERSION = "0.8.4"
+VERSION = "0.8.5"
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.8.5 — 2026-08-31
+
+### Fixed
+
+- **Locked CI installation** — synchronized the editable package version in
+  `uv.lock` with the release version so `uv sync --locked` can install the
+  project in GitHub Actions.
+
 ## 0.8.4 — 2026-08-31
 
 ### Added
