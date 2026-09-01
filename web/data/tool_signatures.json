@@ -762,6 +762,26 @@
       "format": "text | json"
     }
   },
+  "get_tramite_estadisticas": {
+    "file": "get_tramite_estadisticas.py",
+    "params": [
+      {
+        "name": "tramite_id",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Monthly usage/complaint stats (atenciones/quejas) for one trámite. A separate transparency series from get_tramite_info: how many people were actually attended each month, and how many complaints were filed, since gob.ec started publishing this (mid-2021). Get tramite_id from search_tramites. There is no bulk endpoint -- this fetches one trámite's series at a time (currently a few dozen months, oldest and newest bounds returned as-is, no pagination needed).",
+    "args_doc": {
+      "tramite_id": "The procedure ID (e.g. \"11752\")",
+      "format": "text | json"
+    }
+  },
   "get_tramite_info": {
     "file": "get_tramite_info.py",
     "params": [

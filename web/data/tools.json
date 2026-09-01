@@ -472,6 +472,25 @@
         "long_description": "Información detallada de un trámite gubernamental específico. Devuelve nombre, descripción, requisitos, beneficiarios, costo, y la institución responsable. Obtén el tramite_id de search_tramites."
       },
       {
+        "name": "get_tramite_estadisticas",
+        "description": "Serie mensual de atenciones/quejas de transparencia de un trámite, desde 2021.",
+        "params": [
+          {
+            "name": "tramite_id",
+            "type": "str",
+            "default": null,
+            "description": "El ID del trámite (ej. \"11752\")"
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "Formato de salida: `text` (default) o `json`."
+          }
+        ],
+        "long_description": "Serie mensual de uso y quejas (atenciones/quejas) de un trámite específico. Distinta de get_tramite_info: aquí está cuántas personas fueron atendidas cada mes y cuántas quejas se presentaron, desde que gob.ec empezó a publicar esto (mediados de 2021). Obtén el tramite_id de search_tramites. No existe un endpoint masivo -- esto trae la serie de un solo trámite a la vez (hoy son unas pocas decenas de meses, sin necesidad de paginación)."
+      },
+      {
         "name": "list_instituciones",
         "description": "Listar instituciones públicas del Ecuador.",
         "params": [

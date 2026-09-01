@@ -472,6 +472,25 @@
         "long_description": "Get detailed information about a specific government procedure (trámite). Returns the procedure name, description, requirements, beneficiaries, cost, and the institution responsible. Get the tramite_id from search_tramites."
       },
       {
+        "name": "get_tramite_estadisticas",
+        "description": "Monthly usage/complaint transparency series for one trámite, since 2021.",
+        "params": [
+          {
+            "name": "tramite_id",
+            "type": "str",
+            "default": null,
+            "description": "The procedure ID (e.g. \"11752\")"
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "Output format: `text` (default) or `json`."
+          }
+        ],
+        "long_description": "Monthly usage and complaint series (atenciones/quejas) for one specific trámite. Different from get_tramite_info: this is how many people were actually attended each month, and how many complaints were filed, since gob.ec started publishing this (mid-2021). Get tramite_id from search_tramites. There is no bulk endpoint -- this fetches one trámite's series at a time (currently a few dozen months, no pagination needed)."
+      },
+      {
         "name": "list_instituciones",
         "description": "List Ecuador's public institutions.",
         "params": [
