@@ -47,9 +47,20 @@ def _fuentes_payload() -> dict:
             },
             {
                 "id": "sri",
-                "nombre": "SRI Datasets (fuera del portal CKAN)",
+                "nombre": (
+                    "SRI: datasets fuera de CKAN, RUC, estadísticas de "
+                    "recaudación y cubos Saiku"
+                ),
                 "base": "https://www.sri.gob.ec/datasets",
-                "tools": ["search_sri_datasets"],
+                "tools": [
+                    "search_sri_datasets",
+                    "get_sri_ruc_info",
+                    "search_sri_ruc",
+                    "search_sri_estadisticas_recaudacion",
+                    "list_sri_saiku_cubes",
+                    "describe_sri_saiku_cube",
+                    "query_sri_saiku_aggregate",
+                ],
             },
             {
                 "id": "gobec",
@@ -58,6 +69,7 @@ def _fuentes_payload() -> dict:
                 "tools": [
                     "search_tramites",
                     "get_tramite_info",
+                    "get_tramite_estadisticas",
                     "search_regulaciones",
                     "get_regulacion_info",
                     "list_instituciones",
@@ -78,9 +90,13 @@ def _fuentes_payload() -> dict:
             },
             {
                 "id": "igepn",
-                "nombre": "Instituto Geofísico EPN (catálogo sísmico)",
+                "nombre": "Instituto Geofísico EPN (catálogo sísmico + informes sísmicos/volcánicos)",
                 "base": "https://www.igepn.edu.ec/portal/eventos/www/",
-                "tools": ["search_sismos"],
+                "tools": [
+                    "search_sismos",
+                    "search_informes_igepn",
+                    "get_informe_igepn",
+                ],
             },
             {
                 "id": "geo",
@@ -122,14 +138,22 @@ def _fuentes_payload() -> dict:
             },
             {
                 "id": "bce",
-                "nombre": "Banco Central del Ecuador (BCEData + Información Estadística Mensual)",
+                "nombre": (
+                    "Banco Central del Ecuador (BCEData, Información "
+                    "Estadística Mensual, indicadores diarios en línea y "
+                    "remesas de trabajadores)"
+                ),
                 "base": "https://contenido.bce.fin.ec/",
                 "tools": [
                     "search_indicadores_bce",
                     "get_indicador_bce",
+                    "audit_bce_catalog",
+                    "compare_bce_sources",
                     "search_bce_iem",
                     "get_bce_iem_table",
-                    "audit_bce_catalog",
+                    "list_bce_indicadores_diarios",
+                    "get_bce_indicador_diario",
+                    "search_bce_remesas",
                 ],
             },
             {
@@ -166,6 +190,37 @@ def _fuentes_payload() -> dict:
                 "nombre": "Superintendencia de Compañías (ranking financiero, últimos años)",
                 "base": "https://appscvsmovil.supercias.gob.ec/ranking/",
                 "tools": ["search_ranking", "get_financials"],
+            },
+            {
+                "id": "superbancos",
+                "nombre": (
+                    "Superintendencia de Bancos (boletines financieros, "
+                    "servicios financieros, información histórica)"
+                ),
+                "base": "https://www.superbancos.gob.ec/estadisticas/portalestudios",
+                "tools": [
+                    "list_superbancos_secciones",
+                    "get_superbancos_seccion_archivos",
+                ],
+            },
+            {
+                "id": "cenace",
+                "nombre": "CENACE (snapshot en vivo de generación y demanda eléctrica)",
+                "base": "https://www.cenace.gob.ec/",
+                "tools": ["get_cenace_tablero"],
+            },
+            {
+                "id": "sut",
+                "nombre": (
+                    "Ministerio del Trabajo / SUT (tableros Power BI en vivo: "
+                    "contratos, brechas de empleo, políticas de género)"
+                ),
+                "base": "https://sut.trabajo.gob.ec/",
+                "tools": [
+                    "list_sut_indicadores",
+                    "get_sut_indicador_schema",
+                    "query_sut_indicador",
+                ],
             },
         ]
     }
