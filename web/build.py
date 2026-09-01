@@ -30,7 +30,7 @@ PAGES = ["index", "atlas", "examples", "releases", "about", "colaborar"]
 # PAGES for that language only; excluded from the other language's sitemap
 # and given a language-toggle fallback (see lang_switch_href below) instead
 # of a link to a page that doesn't exist yet.
-EXTRA_PAGES = {"es": ["fuentes"], "en": []}
+EXTRA_PAGES = {"es": ["fuentes"], "en": ["fuentes"]}
 
 STATUS_BADGES = {
     "es": {"build-local": "build local", "offline": "offline"},
@@ -81,7 +81,7 @@ NAV = {
         "left": [
             ("EcuDataMCP", "index.html"),
             ("How it works", "index.html#how-it-works"),
-            ("Sources", "index.html#sources"),
+            ("Sources", "fuentes.html"),
             ("Reference", "atlas.html"),
             ("Examples", "examples.html"),
             ("Releases", "releases.html"),
@@ -112,6 +112,7 @@ PAGE_TITLES = {
         "releases": "Releases",
         "about": "About",
         "colaborar": "Contribute",
+        "fuentes": "Sources",
     },
 }
 
@@ -132,6 +133,7 @@ PAGE_DESCRIPTIONS = {
         "releases": "EcuDataMCP's version history and the real pace of its releases.",
         "about": "What EcuDataMCP is, where it comes from, and who maintains it.",
         "colaborar": "How to propose a source, a tool, or a change to the EcuDataMCP site.",
+        "fuentes": "EcuDataMCP's {n_sources} official sources, grouped by theme and institution.",
     },
 }
 
@@ -298,6 +300,7 @@ def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
 
     search_entries = []
 
+    other_lang = "en" if lang == "es" else "es"
     other_root = "en/" if lang == "es" else "../"
 
     for page in PAGES + EXTRA_PAGES[lang]:
@@ -306,10 +309,11 @@ def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
         description = PAGE_DESCRIPTIONS[lang][page].format(
             n=tool_count, n_sources=source_count
         )
-        # A page only rendered for this language (EXTRA_PAGES) has no
-        # counterpart to switch to yet -- fall back to the other language's
-        # homepage instead of linking a 404.
-        other_page = page if page in PAGES else "index"
+        # A page only rendered for this language and not (yet) the other one
+        # has no counterpart to switch to -- fall back to the other
+        # language's homepage instead of linking a 404.
+        has_counterpart = page in PAGES or page in EXTRA_PAGES[other_lang]
+        other_page = page if has_counterpart else "index"
         html = template.render(
             lang=lang,
             root=root,
