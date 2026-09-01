@@ -2,12 +2,7 @@
   {
     "version": "0.8.5",
     "date": "2026-08-31",
-    "summary": "Synchronized the editable package version in uv.lock with the release version so `uv sync --locked` can install the project in GitHub Actions."
-  },
-  {
-    "version": "0.8.4",
-    "date": "2026-08-31",
-    "summary": "Ten new sources — SRI Saiku, RUC lookup, BCE daily indicators, SUT, Superbancos, IG-EPN, CENACE, SRI tax-collection stats, BCE remittances, and more — plus BCEData/IEM audit snapshots, investigate_dataset, and remote deployment with authentication and per-client limits."
+    "summary": "Ten new sources — SRI Saiku, RUC lookup, BCE daily indicators, SUT, Superbancos, IG-EPN, CENACE, SRI tax-collection stats, BCE remittances, and more — plus BCEData/IEM audit snapshots, investigate_dataset, and remote deployment with authentication and per-client limits. Includes a follow-up fix: synchronized the editable package version in uv.lock with the release version so `uv sync --locked` can install the project in GitHub Actions."
   },
   {
     "version": "0.8.3",
