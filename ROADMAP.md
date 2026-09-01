@@ -293,6 +293,12 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
 
 ## Arquitectura, más adelante
 
+- [ ] **Simplificar y armonizar la arquitectura MCP** — reducir duplicaciones
+      en la superficie pública, separar las herramientas de mantenimiento,
+      conservar nombres existentes por compatibilidad y migrar gradualmente a
+      esquemas, resultados y errores estructurados. El diagnóstico, el diseño
+      propuesto y los criterios para decidir qué fusionar están en
+      [docs/MCP_ARCHITECTURE.md](docs/MCP_ARCHITECTURE.md).
 - [ ] `outputSchema` en los tools MCP.
 - [ ] Manejo geoespacial (WKT/GeoJSON más allá del stripping actual).
 - [x] Tool de investigación "one-shot" — `investigate_dataset`, construido 2026-08-31. Encadena `search_datasets` → `list_dataset_resources` → `preview_resource_data` en una sola llamada (toma el dataset mejor rankeado y previsualiza su primer recurso en un formato legible, saltando `.rar`/desconocidos en vez de previsualizar ciegamente lo primero de la lista) y avisa cuando el dataset parece publicar una serie periódica, señalando `detect_series_pattern` en vez de reimplementar esa heurística.
