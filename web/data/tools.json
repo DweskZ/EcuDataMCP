@@ -1198,7 +1198,7 @@
     "tools": [
       {
         "name": "audit_bce_catalog",
-        "description": "Audita en vivo el catálogo BCEData y reporta su cobertura",
+        "description": "Audita en vivo el catálogo BCEData y reporta su cobertura.",
         "params": [
           {
             "name": "incluir_grupos",
@@ -1235,7 +1235,7 @@
       },
       {
         "name": "compare_bce_sources",
-        "description": "Construye un mapa cauteloso de equivalencias candidatas entre BCEData e IEM",
+        "description": "Construye un mapa cauteloso de equivalencias candidatas entre BCEData e IEM.",
         "params": [
           {
             "name": "query",
@@ -1266,7 +1266,7 @@
       },
       {
         "name": "get_bce_iem_table",
-        "description": "Inspecciona una tabla XLSX oficial del boletín IEM más reciente del BCE",
+        "description": "Inspecciona una tabla XLSX oficial del boletín IEM más reciente del BCE.",
         "params": [
           {
             "name": "table_id",
@@ -1309,7 +1309,7 @@
       },
       {
         "name": "get_bce_indicador_diario",
-        "description": "Obtiene la serie temporal de un indicador diario/mensual del BCE (ej. Riesgo País)",
+        "description": "Obtiene la serie temporal de un indicador diario/mensual del BCE (ej. Riesgo País).",
         "params": [
           {
             "name": "archivo",
@@ -1352,7 +1352,7 @@
       },
       {
         "name": "list_bce_indicadores_diarios",
-        "description": "Lista la familia de widgets \"indicador\" diarios/mensuales del BCE, publicados fuera de BCEData e IEM (páginas de widgets Highcharts de contenido.bce.fin.ec) — incluye Riesgo País (EMBI) como serie genuinamente diaria desde 2004, que BCEData solo expone como agregado mensual de fin de período",
+        "description": "Lista la familia de widgets \"indicador\" diarios/mensuales del BCE, publicados fuera de BCEData e IEM (páginas de widgets Highcharts de contenido.bce.fin.ec) — incluye Riesgo País (EMBI) como serie genuinamente diaria desde 2004, que BCEData solo expone como agregado mensual de fin de período.",
         "params": [
           {
             "name": "format",
@@ -1365,7 +1365,7 @@
       },
       {
         "name": "search_bce_iem",
-        "description": "Busca tablas individuales de Excel en el último boletín IEM del BCE",
+        "description": "Busca tablas individuales de Excel en el último boletín IEM del BCE.",
         "params": [
           {
             "name": "query",
@@ -1432,7 +1432,7 @@
       },
       {
         "name": "search_bce_remesas",
-        "description": "Lista los enlaces directos a archivos de Remesas de Trabajadores del BCE",
+        "description": "Lista los enlaces directos a archivos de Remesas de Trabajadores del BCE.",
         "params": [
           {
             "name": "query",
@@ -1456,7 +1456,7 @@
     "tools": [
       {
         "name": "get_inec_estadistica_files",
-        "description": "Lista los enlaces directos a archivos publicados en una página de tema estadístico del INEC",
+        "description": "Lista los enlaces directos a archivos publicados en una página de tema estadístico del INEC.",
         "params": [
           {
             "name": "url",
@@ -1494,7 +1494,7 @@
       },
       {
         "name": "search_biinec_extras",
-        "description": "Revisa el BIINEC (\"Banco de Datos Abiertos\") del INEC en busca de datos que no aparecen en search_anda ni en search_inec_estadisticas",
+        "description": "Revisa el BIINEC (\"Banco de Datos Abiertos\") del INEC en busca de datos que no aparecen en search_anda ni en search_inec_estadisticas.",
         "params": [
           {
             "name": "query",
@@ -1513,7 +1513,7 @@
       },
       {
         "name": "search_censo_recursos",
-        "description": "Busca en el micrositio dedicado del Censo 2022 del INEC (censoecuador.gob.ec) enlaces directos a archivos de microdatos/metodología",
+        "description": "Busca en el micrositio dedicado del Censo 2022 del INEC (censoecuador.gob.ec) enlaces directos a archivos de microdatos/metodología.",
         "params": [
           {
             "name": "query",
@@ -1544,7 +1544,7 @@
       },
       {
         "name": "search_inec_estadisticas",
-        "description": "Busca en las páginas de temas estadísticos del INEC (ecuadorencifras.gob.ec)",
+        "description": "Busca en las páginas de temas estadísticos del INEC (ecuadorencifras.gob.ec).",
         "params": [
           {
             "name": "query",
@@ -1575,7 +1575,7 @@
       },
       {
         "name": "search_inec_publicaciones",
-        "description": "Busca en todas las publicaciones del INEC en Ecuador en Cifras, vía su API REST pública de WordPress -- siempre actualizada, más recientes primero",
+        "description": "Busca en todas las publicaciones del INEC en Ecuador en Cifras, vía su API REST pública de WordPress -- siempre actualizada, más recientes primero.",
         "params": [
           {
             "name": "query",
@@ -1611,7 +1611,7 @@
     "tools": [
       {
         "name": "describe_sri_saiku_cube",
-        "description": "Describir un cubo Saiku público del SRI: dimensiones, jerarquías, niveles, medidas y metadatos OLAP",
+        "description": "Describir un cubo Saiku público del SRI: dimensiones, jerarquías, niveles, medidas y metadatos OLAP.",
         "params": [
           {
             "name": "cube_id",
@@ -1630,7 +1630,7 @@
       },
       {
         "name": "get_sri_ruc_info",
-        "description": "Consultar la información pública de un contribuyente por RUC en el SRI",
+        "description": "Consultar la información pública de un contribuyente por RUC en el SRI.",
         "params": [
           {
             "name": "ruc",
@@ -1655,7 +1655,7 @@
       },
       {
         "name": "list_sri_saiku_cubes",
-        "description": "Listar los cubos OLAP visibles en la instancia pública de Saiku del SRI",
+        "description": "Listar los cubos OLAP visibles en la instancia pública de Saiku del SRI.",
         "params": [
           {
             "name": "format",
@@ -1668,7 +1668,7 @@
       },
       {
         "name": "query_sri_saiku_aggregate",
-        "description": "Ejecutar una consulta agregada y limitada en un cubo público de Saiku",
+        "description": "Ejecutar una consulta agregada y limitada en un cubo público de Saiku.",
         "params": [
           {
             "name": "cube_id",
@@ -1717,7 +1717,7 @@
       },
       {
         "name": "search_sri_estadisticas_recaudacion",
-        "description": "Busca en la página \"Estadísticas de Recaudación\" del SRI enlaces directos a archivos",
+        "description": "Busca en la página \"Estadísticas de Recaudación\" del SRI enlaces directos a archivos.",
         "params": [
           {
             "name": "query",
@@ -1748,7 +1748,7 @@
       },
       {
         "name": "search_sri_ruc",
-        "description": "Buscar contribuyentes en el RUC del SRI por razón social o nombre comercial (texto parcial), sin necesitar el RUC exacto de antemano",
+        "description": "Buscar contribuyentes en el RUC del SRI por razón social o nombre comercial (texto parcial), sin necesitar el RUC exacto de antemano.",
         "params": [
           {
             "name": "razon_social",
@@ -1778,7 +1778,7 @@
     "tools": [
       {
         "name": "get_contraloria_informe",
-        "description": "Descarga y previsualiza un documento de la Contraloría (Datos Abiertos o Plan Anual de Control)",
+        "description": "Descarga y previsualiza un documento de la Contraloría (Datos Abiertos o Plan Anual de Control).",
         "params": [
           {
             "name": "informe_id",
@@ -1803,7 +1803,7 @@
       },
       {
         "name": "get_sipa_modulo_archivos",
-        "description": "Lista los enlaces de descarga directa publicados en un módulo de estadísticas de SIPA",
+        "description": "Lista los enlaces de descarga directa publicados en un módulo de estadísticas de SIPA.",
         "params": [
           {
             "name": "modulo",
@@ -1822,7 +1822,7 @@
       },
       {
         "name": "get_superbancos_seccion_archivos",
-        "description": "Lista los enlaces de descarga directa publicados en una sección de estadísticas de Superbancos",
+        "description": "Lista los enlaces de descarga directa publicados en una sección de estadísticas de Superbancos.",
         "params": [
           {
             "name": "seccion",
@@ -1841,7 +1841,7 @@
       },
       {
         "name": "list_contraloria_informes",
-        "description": "Lista los documentos \"Datos Abiertos\" y \"Plan Anual de Control\" de la Contraloría General del Estado",
+        "description": "Lista los documentos \"Datos Abiertos\" y \"Plan Anual de Control\" de la Contraloría General del Estado.",
         "params": [
           {
             "name": "format",
@@ -1854,7 +1854,7 @@
       },
       {
         "name": "list_sipa_modulos",
-        "description": "Lista los módulos de descarga de estadísticas de SIPA (sipa.agricultura.gob.ec)",
+        "description": "Lista los módulos de descarga de estadísticas de SIPA (sipa.agricultura.gob.ec).",
         "params": [
           {
             "name": "format",
@@ -1867,7 +1867,7 @@
       },
       {
         "name": "list_superbancos_secciones",
-        "description": "Lista las secciones de estadísticas de la Superintendencia de Bancos (superbancos.gob.ec/estadisticas/portalestudios/)",
+        "description": "Lista las secciones de estadísticas de la Superintendencia de Bancos (superbancos.gob.ec/estadisticas/portalestudios/).",
         "params": [
           {
             "name": "format",
@@ -1885,7 +1885,7 @@
     "tools": [
       {
         "name": "get_cenace_tablero",
-        "description": "Obtiene un tablero del snapshot en vivo de la operación de la red eléctrica de CENACE (el operador nacional de Ecuador) — mezcla de generación y demanda, siempre al instante",
+        "description": "Obtiene un tablero del snapshot en vivo de la operación de la red eléctrica de CENACE (el operador nacional de Ecuador) — mezcla de generación y demanda, siempre al instante.",
         "params": [
           {
             "name": "tablero",
@@ -1904,7 +1904,7 @@
       },
       {
         "name": "get_informe_igepn",
-        "description": "Descarga y extrae el texto de un informe del IG-EPN encontrado vía search_informes_igepn",
+        "description": "Descarga y extrae el texto de un informe del IG-EPN encontrado vía search_informes_igepn.",
         "params": [
           {
             "name": "nombre",
@@ -1947,7 +1947,7 @@
       },
       {
         "name": "get_sut_indicador_schema",
-        "description": "Lista las columnas/medidas/niveles de fecha consultables de un tablero Power BI del SUT, descubiertos desde la definición propia del reporte (la consulta subyacente de cada visual), no por adivinanza",
+        "description": "Lista las columnas/medidas/niveles de fecha consultables de un tablero Power BI del SUT, descubiertos desde la definición propia del reporte (la consulta subyacente de cada visual), no por adivinanza.",
         "params": [
           {
             "name": "indicador",
@@ -1966,7 +1966,7 @@
       },
       {
         "name": "list_sut_indicadores",
-        "description": "Lista los tableros públicos de Power BI \"Indicadores\" del Ministerio del Trabajo/SUT (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml)",
+        "description": "Lista los tableros públicos de Power BI \"Indicadores\" del Ministerio del Trabajo/SUT (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml).",
         "params": [
           {
             "name": "format",
@@ -1979,7 +1979,7 @@
       },
       {
         "name": "query_sut_indicador",
-        "description": "Ejecuta una consulta en vivo contra el modelo de datos subyacente de un tablero Power BI del SUT — cualquier combinación de sus campos, ej. mes y provincia juntos",
+        "description": "Ejecuta una consulta en vivo contra el modelo de datos subyacente de un tablero Power BI del SUT — cualquier combinación de sus campos, ej. mes y provincia juntos.",
         "params": [
           {
             "name": "indicador",
@@ -2089,7 +2089,7 @@
       },
       {
         "name": "list_zip_contents",
-        "description": "Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo",
+        "description": "Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo.",
         "params": [
           {
             "name": "url",
@@ -2120,7 +2120,7 @@
       },
       {
         "name": "read_pdf",
-        "description": "Extrae texto de un documento PDF en una URL directa",
+        "description": "Extrae texto de un documento PDF en una URL directa.",
         "params": [
           {
             "name": "url",
