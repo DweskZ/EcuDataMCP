@@ -50,7 +50,7 @@ function copyCode(btn) {
   });
 })();
 
-// ---- site search (replaces quarto-search/autocomplete.umd.js) -----------
+// ---- site search ----------------------------------------------------------
 
 (function () {
   var toggle = document.querySelector(".site-search-toggle");

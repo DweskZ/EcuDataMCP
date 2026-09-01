@@ -7,7 +7,7 @@ para que un solo PR pueda actualizar el README del servidor y el sitio a la vez.
 
 - `build.py` — el generador. Lee `data/*.json` y `en/data/*.json`, renderiza `templates/{es,en}/*.html`
   con Jinja2, y escribe todo a `_site/` (`_site/en/` para inglés). Sin dependencias fuera de Python +
-  Jinja2 — no hace falta R, Quarto ni Node para nada.
+  Jinja2 — no hace falta R ni Node para nada.
 - `templates/base.html` — el navbar y footer compartidos (una sola plantilla, parametrizada por idioma).
 - `templates/{es,en}/*.html` — una plantilla por página por idioma (`index`, `atlas`, `examples`,
   `releases`, `about`, `colaborar`). Igual que antes, mantener los dos idiomas sincronizados es manual:
@@ -22,7 +22,7 @@ para que un solo PR pueda actualizar el README del servidor y el sitio a la vez.
 - `styles.scss` — se mantiene como referencia legible (variables de tema, comentarios), pero **ya no se
   compila automáticamente**. El CSS real que sirve el sitio es `assets/styles.css`, ya compilado
   (Bootstrap `darkly` + este SCSS, fusionados una sola vez). Para cambiar el tema: edita `styles.css`
-  directamente (es CSS plano, no minificado más allá de lo que ya traía), o instala Quarto + Dart Sass
+  directamente (es CSS plano, no minificado más allá de lo que ya traía), o instala Dart Sass
   una vez para recompilar `styles.scss` y pega el resultado en `styles.css`.
 - `assets/` — CSS compilado, `site.js` (toggle de navbar móvil, tabs de clientes MCP, panel de búsqueda,
   botón de copiar), `fuse.min.js` (vendored, motor de la búsqueda), favicon, imagen OG. El ícono de
@@ -37,8 +37,8 @@ uv run python build.py
 ```
 
 Esto regenera `_site/` completo (español + inglés) a partir de `data/*.json` y las plantillas. No hace
-falta ningún paso adicional ni ninguna dependencia fuera de Python — a diferencia del setup anterior con
-Quarto, editar un `data/*.json` y correr `build.py` ya refleja el cambio en el HTML.
+falta ningún paso adicional ni ninguna dependencia fuera de Python — a diferencia del setup anterior,
+editar un `data/*.json` y correr `build.py` ya refleja el cambio en el HTML.
 
 ## Cómo se publica
 

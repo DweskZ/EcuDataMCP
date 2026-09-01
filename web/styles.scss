@@ -33,12 +33,6 @@ $border-color: #24262b;
   border-bottom: 1px solid $border-color;
 }
 
-// Every page supplies its own hero heading — suppress Quarto's default
-// title block so the page title isn't rendered twice.
-#title-block-header {
-  display: none;
-}
-
 // ---- layout helpers ----------------------------------------------------
 
 .container-page {

@@ -1,6 +1,7 @@
-/* Custom UI not present in the old Quarto/darkly build: the search toggle
-   button and results panel. Everything else (navbar collapse, Bootstrap
-   tabs) reuses classes already baked into styles.css. */
+/* Custom UI not present in the base Bootstrap darkly build: the search
+   toggle button, results panel, and language toggle. Everything else
+   (navbar collapse, Bootstrap tabs) reuses classes already baked into
+   styles.css. */
 
 .site-search-toggle {
   background: transparent;

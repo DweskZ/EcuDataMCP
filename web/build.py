@@ -1,6 +1,6 @@
 """Static site generator for EcuDataMCP's landing page.
 
-Replaces the old Quarto + R pipeline: renders web/templates/{lang}/*.html
+Replaces the old static-site pipeline: renders web/templates/{lang}/*.html
 via Jinja2 against web/data/*.json, copies web/assets/ verbatim, and writes
 everything to web/_site/ (web/_site/en/ for the English tree) -- same
 output layout the old pipeline used, so the gh-pages publish flow doesn't
@@ -331,7 +331,7 @@ SITE_URL = "https://dweskz.github.io/EcuDataMCP"
 
 def write_seo_files():
     """robots.txt + sitemap.xml against the real deployed domain -- the old
-    Quarto build pointed both at a stale, seemingly-unused netlify.app URL."""
+    site build pointed both at a stale, seemingly-unused netlify.app URL."""
     (SITE / "robots.txt").write_text(
         f"Sitemap: {SITE_URL}/sitemap.xml\n", encoding="utf-8"
     )
