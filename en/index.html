@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EcuDataMCP – EcuDataMCP</title>
+<meta name="description" content="Open-source MCP server for exploring Ecuador's open government data from your AI assistant.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="EcuDataMCP – EcuDataMCP">
+<meta property="og:description" content="Open-source MCP server for exploring Ecuador's open government data from your AI assistant.">
+<meta property="og:image" content="https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png">
+<link rel="stylesheet" href="../assets/bootstrap-icons.css">
+<link rel="stylesheet" href="../assets/styles.css">
+<link rel="stylesheet" href="../assets/site.css">
+<style>html { scroll-behavior: smooth; }</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+  <div class="navbar-container container-fluid">
+    <div class="navbar-brand-container mx-auto">
+      <a class="navbar-brand" href="../index.html">
+        <span class="navbar-title">EcuDataMCP</span>
+      </a>
+    </div>
+    <button class="site-search-toggle" type="button" title="Search" aria-label="Search">
+      <i class="bi bi-search"></i>
+    </button>
+    <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" data-nav-toggle="navbarCollapse">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav navbar-nav-scroll me-auto">
+        
+        <li class="nav-item">
+          <a class="nav-link active" href="../index.html" aria-current="page">
+            <span class="menu-text">EcuDataMCP</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="../index.html#how-it-works">
+            <span class="menu-text">How it works</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="../index.html#sources">
+            <span class="menu-text">Sources</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="../atlas.html">
+            <span class="menu-text">Reference</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="../examples.html">
+            <span class="menu-text">Examples</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="../releases.html">
+            <span class="menu-text">Releases</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="../about.html">
+            <span class="menu-text">About</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="../colaborar.html">
+            <span class="menu-text">Contribute</span>
+          </a>
+        </li>
+        
+      </ul>
+      <ul class="navbar-nav navbar-nav-scroll ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="../index.html">
+            <span class="menu-text">Español</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP" target="_blank">
+            <span class="menu-text">GitHub</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="site-search-panel" id="siteSearchPanel" hidden>
+  <div class="site-search-panel-inner">
+    <input type="text" id="siteSearchInput" class="site-search-input" placeholder="Search the site…" autocomplete="off">
+    <div id="siteSearchResults" class="site-search-results"></div>
+  </div>
+</div>
+
+<main>
+
+<section class="landing hero">
+<div class="container-page">
+<p class="kicker">Open public-data infrastructure for Ecuador</p>
+<h1>Explore <span class="accent">open data.</span></h1>
+<p class="hero-sub">Connect your AI assistant to verifiable public data from Ecuador: datasets, procedures, contracts, earthquakes, BCE indicators, IEM tables, RUC lookup and companies. Find the right source, query with clear limits, and always cite the official origin.</p>
+<div class="notice-box" role="note"><strong>Notice:</strong> Some tool definitions, parameters and descriptions were generated or assisted by AI. They may be incomplete or outdated; a tool may return partial results, reject valid parameters, or behave unexpectedly when the official source changes. Always check the response against the linked source and manually review results before using them for important decisions.</div>
+<div class="hero-ctas">
+<a class="btn-cta primary" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">Get started on GitHub</a>
+<a class="btn-cta secondary" href="#how-it-works">See how it works &darr;</a>
+</div>
+<div class="hero-stats">
+<div class="hero-stat"><span class="num">1,581</span><span class="label">datasets</span></div>
+<div class="hero-stat"><span class="num">73</span><span class="label">MCP tools</span></div>
+<div class="hero-stat"><span class="num">16</span><span class="label">official sources</span></div>
+<div class="hero-stat"><span class="num">0</span><span class="label">API keys</span></div>
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">The problem</p>
+<h2 class="section-title">Less time in portals. More answers from your data.</h2>
+<p class="section-lede">Ecuador publishes a huge amount of public data, but finding it means navigating different portals, checking separate catalogs, and guessing which file is current. EcuDataMCP gives your AI assistant the tools to do that work for you, and still cites the official source in every answer.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="how-it-works">
+<p class="kicker">How it works</p>
+<h2 class="section-title">A traceable path.</h2>
+<p class="section-lede">Four steps, from natural language to the official source.</p>
+<div class="steps-grid">
+<div class="step-card">
+<div class="step-num">01</div>
+<h3>Search</h3>
+<p><code>search_ecuador</code> searches datasets, procedures, regulations, contracts, and risk events by keyword, all at once.</p>
+</div>
+<div class="step-card">
+<div class="step-num">02</div>
+<h3>Inspect</h3>
+<p><code>get_dataset_info</code> and <code>list_dataset_resources</code> check fields, formats, and dates before pulling any data.</p>
+</div>
+<div class="step-card">
+<div class="step-num">03</div>
+<h3>Query</h3>
+<p><code>query_resource_data</code> filters the CKAN DataStore without downloading the whole file, or <code>preview_resource_data</code> for CSV, JSON, and XLSX.</p>
+</div>
+<div class="step-card">
+<div class="step-num">04</div>
+<h3>Cite</h3>
+<p>Every result links back to the official source (the dataset, the procedure, the SERCOP record) so you can verify it.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">What can you ask?</p>
+<h2 class="section-title">It has never been this easy to navigate Ecuador's data.</h2>
+<p class="section-lede">16 official sources, in a single conversation.</p>
+<div class="questions-grid">
+
+<div class="question-card">&ldquo;What data does the SRI have on tax collection?&rdquo;</div>
+
+<div class="question-card">&ldquo;Show me INEC's health datasets&rdquo;</div>
+
+<div class="question-card">&ldquo;What are the requirements for getting a passport?&rdquo;</div>
+
+<div class="question-card">&ldquo;Which retail-sector companies had the highest ROE this year?&rdquo;</div>
+
+<div class="question-card">&ldquo;Look up this public tender in SERCOP&rdquo;</div>
+
+<div class="question-card">&ldquo;How has consumer confidence changed according to the BCE over the last two years?&rdquo;</div>
+
+<div class="question-card">&ldquo;Find a BCE IEM table on exports and show me its latest values.&rdquo;</div>
+
+<div class="question-card">&ldquo;Which public SRI cubes are available for aggregate queries?&rdquo;</div>
+
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="sources">
+<p class="kicker">Sources</p>
+<h2 class="section-title">Official data, always cited.</h2>
+<p class="section-lede">EcuDataMCP does not copy or store these catalogs, every query goes live against the source portal.</p>
+<div class="card-grid">
+
+<div class="data-card">
+<h3>Open Data<span class="tag">CKAN</span></h3>
+<p>National catalog + DataStore + CSV/JSON/XLSX preview</p>
+<div class="source-coverage"><a href="https://www.datosabiertos.gob.ec" target="_blank" rel="noopener">www.datosabiertos.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>Cuenca en Datos<span class="tag">CKAN</span></h3>
+<p>Independent municipal CKAN portal (92 datasets); same tools with source="cuenca"</p>
+<div class="source-coverage"><a href="https://cuencaendatos.cuenca.gob.ec" target="_blank" rel="noopener">cuencaendatos.cuenca.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>SRI Datasets</h3>
+<p>Public files, RUC lookup and bounded Saiku cube exploration: tax collection, sales/purchases, vehicles, and more</p>
+<div class="source-coverage"><a href="https://www.sri.gob.ec/datasets" target="_blank" rel="noopener">www.sri.gob.ec/datasets</a></div>
+</div>
+
+<div class="data-card">
+<h3>Procedures & institutions<span class="tag">Gob.ec</span></h3>
+<p>Procedures, requirements, costs</p>
+<div class="source-coverage"><a href="https://www.gob.ec" target="_blank" rel="noopener">gob.ec/api/v1</a></div>
+</div>
+
+<div class="data-card">
+<h3>Regulations<span class="tag">Gob.ec</span></h3>
+<p>Rules, agreements, Official Register</p>
+<div class="source-coverage"><a href="https://www.gob.ec" target="_blank" rel="noopener">gob.ec/api/v1/regulaciones</a></div>
+</div>
+
+<div class="data-card">
+<h3>Public contracts<span class="tag">SERCOP/OCDS</span></h3>
+<p>Tenders, buyers, suppliers</p>
+<div class="source-coverage"><a href="https://datosabiertos.compraspublicas.gob.ec" target="_blank" rel="noopener">datosabiertos.compraspublicas.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>Risk management<span class="tag">SGR</span></h3>
+<p>COE emergency events + tsunami early-warning stations</p>
+<div class="source-coverage"><a href="https://sgrportal.gestionderiesgos.gob.ec" target="_blank" rel="noopener">sgrportal.gestionderiesgos.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>Earthquakes<span class="tag">IG-EPN</span></h3>
+<p>Seismic catalog from the Geophysical Institute</p>
+<div class="source-coverage"><a href="https://www.igepn.edu.ec" target="_blank" rel="noopener">www.igepn.edu.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>Geography<span class="tag">DPA</span><span class="tag">offline</span></h3>
+<p>24 provinces + 224 cantons (INEC codes)</p>
+<div class="source-coverage">offline reference</div>
+</div>
+
+<div class="data-card">
+<h3>ANDA<span class="tag">NADA/IHSN</span></h3>
+<p>INEC's catalog of surveys and censuses</p>
+<div class="source-coverage"><a href="https://anda.inec.gob.ec" target="_blank" rel="noopener">anda.inec.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>BCE<span class="tag">BCEData</span></h3>
+<p>BCEData, IEM tables and daily series: macroeconomic catalog, trade, public finance, GDP, employment and country risk</p>
+<div class="source-coverage"><a href="https://contenido.bce.fin.ec" target="_blank" rel="noopener">contenido.bce.fin.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>Supercías</h3>
+<p>Company directory (226k+): legal representative, capital, CIIU code</p>
+<div class="source-coverage"><a href="https://mercadodevalores.supercias.gob.ec" target="_blank" rel="noopener">mercadodevalores.supercias.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>Supercías Ranking<span class="tag">local build</span></h3>
+<p>Financial statement data (revenue, assets, ROE, ~38 ratios), recent years; requires a local build</p>
+<div class="source-coverage"><a href="https://appscvsmovil.supercias.gob.ec" target="_blank" rel="noopener">appscvsmovil.supercias.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>INEC Publications<span class="tag">INEC</span></h3>
+<p>Publications, bulletins and linked files from INEC's public index</p>
+<div class="source-coverage"><a href="https://www.ecuadorencifras.gob.ec" target="_blank" rel="noopener">ecuadorencifras.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>CENACE<span class="tag">Energy</span></h3>
+<p>Operational snapshot of electricity demand, generation and dispatch</p>
+<div class="source-coverage"><a href="https://www.cenace.gob.ec" target="_blank" rel="noopener">cenace.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>SUT<span class="tag">Labour</span></h3>
+<p>Public Ministry of Labour indicators through its statistical dashboards</p>
+<div class="source-coverage"><a href="https://sut.trabajo.gob.ec" target="_blank" rel="noopener">sut.trabajo.gob.ec</a></div>
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="tools">
+<p class="kicker">The backstage</p>
+<h2 class="section-title">Open-source MCP server.</h2>
+<p class="section-lede">EcuDataMCP runs as a <a href="https://github.com/jlowin/fastmcp" target="_blank" rel="noopener">FastMCP</a> server in Python, exposed over Streamable HTTP or stdio. There is no database of its own: every tool calls the matching official portal live (CKAN, gob.ec, SERCOP, BCE, Supercías, IG-EPN, SGR) and returns the formatted response.</p>
+<div class="tools-grid">
+
+<div class="data-card">
+<h3>Unified entry points<span class="tag">3</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-list_capabilities">list_capabilities</a><a class="tool-chip" href="atlas.html#tool-search_ecuador">search_ecuador</a><a class="tool-chip" href="atlas.html#tool-lookup_ubicacion">lookup_ubicacion</a></div>
+</div>
+
+<div class="data-card">
+<h3>Open Data<span class="tag">10</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-search_datasets">search_datasets</a><a class="tool-chip" href="atlas.html#tool-list_recent_datasets">list_recent_datasets</a><a class="tool-chip" href="atlas.html#tool-get_dataset_info">get_dataset_info</a><a class="tool-chip" href="atlas.html#tool-list_dataset_resources">list_dataset_resources</a><a class="tool-chip" href="atlas.html#tool-get_resource_info">get_resource_info</a><a class="tool-chip" href="atlas.html#tool-preview_resource_data">preview_resource_data</a><a class="tool-chip" href="atlas.html#tool-download_resource">download_resource</a><a class="tool-chip" href="atlas.html#tool-query_resource_data">query_resource_data</a><a class="tool-chip" href="atlas.html#tool-detect_series_pattern">detect_series_pattern</a><a class="tool-chip" href="atlas.html#tool-search_sri_datasets">search_sri_datasets</a></div>
+</div>
+
+<div class="data-card">
+<h3>Government procedures<span class="tag">4</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-search_tramites">search_tramites</a><a class="tool-chip" href="atlas.html#tool-get_tramite_info">get_tramite_info</a><a class="tool-chip" href="atlas.html#tool-list_instituciones">list_instituciones</a><a class="tool-chip" href="atlas.html#tool-get_institucion_info">get_institucion_info</a></div>
+</div>
+
+<div class="data-card">
+<h3>ANDA (INEC)<span class="tag">3</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-search_anda">search_anda</a><a class="tool-chip" href="atlas.html#tool-get_anda_survey_info">get_anda_survey_info</a><a class="tool-chip" href="atlas.html#tool-download_anda_microdata">download_anda_microdata</a></div>
+</div>
+
+<div class="data-card">
+<h3>Macroeconomics (BCE)<span class="tag">2</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-search_indicadores_bce">search_indicadores_bce</a><a class="tool-chip" href="atlas.html#tool-get_indicador_bce">get_indicador_bce</a></div>
+</div>
+
+<div class="data-card">
+<h3>Companies (Supercías)<span class="tag">6</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-search_companias">search_companias</a><a class="tool-chip" href="atlas.html#tool-get_compania_info">get_compania_info</a><a class="tool-chip" href="atlas.html#tool-search_ranking">search_ranking</a><a class="tool-chip" href="atlas.html#tool-get_financials">get_financials</a><a class="tool-chip" href="atlas.html#tool-search_auditores">search_auditores</a><a class="tool-chip" href="atlas.html#tool-get_auditor_info">get_auditor_info</a></div>
+</div>
+
+<div class="data-card">
+<h3>Regulations & contracts<span class="tag">4</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-search_regulaciones">search_regulaciones</a><a class="tool-chip" href="atlas.html#tool-get_regulacion_info">get_regulacion_info</a><a class="tool-chip" href="atlas.html#tool-search_contratos">search_contratos</a><a class="tool-chip" href="atlas.html#tool-get_contrato_info">get_contrato_info</a></div>
+</div>
+
+<div class="data-card">
+<h3>Risk & earthquakes<span class="tag">3</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-search_eventos_riesgo">search_eventos_riesgo</a><a class="tool-chip" href="atlas.html#tool-list_sat_tsunami">list_sat_tsunami</a><a class="tool-chip" href="atlas.html#tool-search_sismos">search_sismos</a></div>
+</div>
+
+<div class="data-card">
+<h3>Exploration<span class="tag">4</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-search_organizations">search_organizations</a><a class="tool-chip" href="atlas.html#tool-get_organization_info">get_organization_info</a><a class="tool-chip" href="atlas.html#tool-list_categories">list_categories</a><a class="tool-chip" href="atlas.html#tool-get_category_info">get_category_info</a></div>
+</div>
+
+<div class="data-card">
+<h3>Recently added tools<span class="tag">34</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-audit_bce_catalog">audit_bce_catalog</a><a class="tool-chip" href="atlas.html#tool-compare_bce_sources">compare_bce_sources</a><a class="tool-chip" href="atlas.html#tool-describe_sri_saiku_cube">describe_sri_saiku_cube</a><a class="tool-chip" href="atlas.html#tool-get_bce_iem_table">get_bce_iem_table</a><a class="tool-chip" href="atlas.html#tool-get_bce_indicador_diario">get_bce_indicador_diario</a><a class="tool-chip" href="atlas.html#tool-get_cenace_tablero">get_cenace_tablero</a><a class="tool-chip" href="atlas.html#tool-get_contraloria_informe">get_contraloria_informe</a><a class="tool-chip" href="atlas.html#tool-get_inec_estadistica_files">get_inec_estadistica_files</a><a class="tool-chip" href="atlas.html#tool-get_inec_publicacion_archivos">get_inec_publicacion_archivos</a><a class="tool-chip" href="atlas.html#tool-get_informe_igepn">get_informe_igepn</a><a class="tool-chip" href="atlas.html#tool-get_sipa_modulo_archivos">get_sipa_modulo_archivos</a><a class="tool-chip" href="atlas.html#tool-get_sri_ruc_info">get_sri_ruc_info</a><a class="tool-chip" href="atlas.html#tool-get_superbancos_seccion_archivos">get_superbancos_seccion_archivos</a><a class="tool-chip" href="atlas.html#tool-get_sut_indicador_schema">get_sut_indicador_schema</a><a class="tool-chip" href="atlas.html#tool-investigate_dataset">investigate_dataset</a><a class="tool-chip" href="atlas.html#tool-list_bce_indicadores_diarios">list_bce_indicadores_diarios</a><a class="tool-chip" href="atlas.html#tool-list_contraloria_informes">list_contraloria_informes</a><a class="tool-chip" href="atlas.html#tool-list_sipa_modulos">list_sipa_modulos</a><a class="tool-chip" href="atlas.html#tool-list_sri_saiku_cubes">list_sri_saiku_cubes</a><a class="tool-chip" href="atlas.html#tool-list_superbancos_secciones">list_superbancos_secciones</a><a class="tool-chip" href="atlas.html#tool-list_sut_indicadores">list_sut_indicadores</a><a class="tool-chip" href="atlas.html#tool-list_zip_contents">list_zip_contents</a><a class="tool-chip" href="atlas.html#tool-query_sri_saiku_aggregate">query_sri_saiku_aggregate</a><a class="tool-chip" href="atlas.html#tool-query_sut_indicador">query_sut_indicador</a><a class="tool-chip" href="atlas.html#tool-read_pdf">read_pdf</a><a class="tool-chip" href="atlas.html#tool-search_bce_iem">search_bce_iem</a><a class="tool-chip" href="atlas.html#tool-search_bce_remesas">search_bce_remesas</a><a class="tool-chip" href="atlas.html#tool-search_biinec_extras">search_biinec_extras</a><a class="tool-chip" href="atlas.html#tool-search_censo_recursos">search_censo_recursos</a><a class="tool-chip" href="atlas.html#tool-search_inec_estadisticas">search_inec_estadisticas</a><a class="tool-chip" href="atlas.html#tool-search_inec_publicaciones">search_inec_publicaciones</a><a class="tool-chip" href="atlas.html#tool-search_informes_igepn">search_informes_igepn</a><a class="tool-chip" href="atlas.html#tool-search_sri_estadisticas_recaudacion">search_sri_estadisticas_recaudacion</a><a class="tool-chip" href="atlas.html#tool-search_sri_ruc">search_sri_ruc</a></div>
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Connect your assistant</p>
+<h2 class="section-title">Copy your client's configuration.</h2>
+<p class="section-lede">Run the server locally (Docker or <code>uv run</code>, see the <a href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">README</a>) and point your MCP client at <code>http://localhost:8000/mcp</code>.</p>
+<div class="quick-connect">
+<p class="kicker">Quick option</p>
+<p class="client-intro">If your assistant has terminal access, hand it the repo link and let it install everything for you:</p>
+<div class="code-block">
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><code>Clone https://github.com/DweskZ/EcuDataMCP, install its dependencies with uv sync,
+and register it as an MCP server in my client using stdio mode with
+`uv run --directory &lt;clone-path&gt; python main.py --transport stdio`.
+Verify the server responds before calling it done.</code></pre>
+</div>
+<p class="client-intro">Always review what your assistant changes (config files, commands run) before confirming. This option only works with assistants that can run commands on their own: today that's <strong>Claude Code</strong>, <strong>Cursor</strong>, and <strong>Windsurf</strong> in agent mode. With ChatGPT, chat-only Claude.ai, or other terminal-less clients, use the manual configuration below.</p>
+</div>
+<ul class="nav nav-tabs" id="client-tabs" role="tablist">
+
+<li class="nav-item" role="presentation"><button class="nav-link active" id="claude-desktop-tab" data-tab-target="claude-desktop-pane" type="button" role="tab">Claude Desktop</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="cursor-tab" data-tab-target="cursor-pane" type="button" role="tab">Cursor</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="vscode-tab" data-tab-target="vscode-pane" type="button" role="tab">VS Code</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="chatgpt-tab" data-tab-target="chatgpt-pane" type="button" role="tab">ChatGPT</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="claude-code-tab" data-tab-target="claude-code-pane" type="button" role="tab">Claude Code</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="gemini-cli-tab" data-tab-target="gemini-cli-pane" type="button" role="tab">Gemini CLI</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="le-chat-tab" data-tab-target="le-chat-pane" type="button" role="tab">Le Chat (Mistral)</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="windsurf-tab" data-tab-target="windsurf-pane" type="button" role="tab">Windsurf</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="huggingchat-tab" data-tab-target="huggingchat-pane" type="button" role="tab">HuggingChat</button></li>
+
+</ul>
+<div class="tab-content" id="client-tabs-content">
+
+<div class="tab-pane fade show active" id="claude-desktop-pane" role="tabpanel">
+<p class="client-intro">Add this to your Claude Desktop config file (<code>~/Library/Application Support/Claude/claude_desktop_config.json</code> on macOS, <code>%APPDATA%\Claude\claude_desktop_config.json</code> on Windows):</p>
+
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
+  "mcpServers": {
+    "ecuador-datos": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "http://localhost:8000/mcp"
+      ]
+    }
+  }
+}</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="cursor-pane" role="tabpanel">
+
+<ol class="client-steps"><li>Open Cursor Settings</li><li>Search for "MCP"</li><li>Add a new MCP server:</li></ol>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
+  "mcpServers": {
+    "ecuador-datos": {
+      "url": "http://localhost:8000/mcp",
+      "transport": "http"
+    }
+  }
+}</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="vscode-pane" role="tabpanel">
+<p class="client-intro">Add to your <code>mcp.json</code> file (run <strong>MCP: Open User Configuration</strong> from the command palette):</p>
+
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
+  "servers": {
+    "ecuador-datos": {
+      "url": "http://localhost:8000/mcp",
+      "type": "http"
+    }
+  }
+}</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="chatgpt-pane" role="tabpanel">
+<p class="client-intro">*Available on paid plans (Plus, Pro, Team, Enterprise).*</p>
+<ol class="client-steps"><li>Go to <code>Settings</code> > <code>Apps and connectors</code></li><li>Open <code>Advanced settings</code> and enable <strong>Developer mode</strong></li><li>In <code>Settings</code> > <code>Connectors</code> > <code>Browse connectors</code>, click <strong>Add a new connector</strong></li><li>Set the URL: <code>http://localhost:8000/mcp</code></li></ol>
+
+</div>
+
+<div class="tab-pane fade" id="claude-code-pane" role="tabpanel">
+
+
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>claude mcp add --transport http ecuador-datos http://localhost:8000/mcp</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="gemini-cli-pane" role="tabpanel">
+<p class="client-intro">Add to <code>~/.gemini/settings.json</code>:</p>
+
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
+  "mcpServers": {
+    "ecuador-datos": {
+      "httpUrl": "http://localhost:8000/mcp"
+    }
+  }
+}</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="le-chat-pane" role="tabpanel">
+
+<ol class="client-steps"><li>Go to <code>Intelligence</code> > <code>Connectors</code></li><li><code>Add connector</code> > <code>Custom MCP Connector</code></li><li>Name: "Ecuador Datos" / URL: <code>http://localhost:8000/mcp</code></li></ol>
+
+</div>
+
+<div class="tab-pane fade" id="windsurf-pane" role="tabpanel">
+<p class="client-intro">Add to <code>~/.codeium/windsurf/mcp_config.json</code>:</p>
+
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
+  "mcpServers": {
+    "ecuador-datos": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "http://localhost:8000/mcp"]
+    }
+  }
+}</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="huggingchat-pane" role="tabpanel">
+
+<ol class="client-steps"><li>In the chat, click the <code>+</code> icon > <code>MCP Servers</code> > <code>Manage MCP Servers</code></li><li><code>Add Server</code> with name "Ecuador Datos" and URL <code>http://localhost:8000/mcp</code></li></ol>
+
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">No friction</p>
+<h2 class="section-title">Ready to use, no setup of your own.</h2>
+<ul class="friction-list">
+<li><strong>No API key</strong>All sources are public data, no authentication.</li>
+<li><strong>No account</strong>There is no sign-up or user account to create.</li>
+<li><strong>100% public data</strong>Under an open license, exactly as the Ecuadorian state publishes it.</li>
+<li><strong>No telemetry</strong>The server runs on your machine and never logs or sends any of your queries.</li>
+</ul>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">FAQ</p>
+<h2 class="section-title">Got more questions?</h2>
+<details class="faq-item">
+<summary>What is EcuDataMCP?</summary>
+<p>An open-source MCP (Model Context Protocol) server that helps your AI assistant discover and query Ecuador's open government data: datasets, procedures, regulations, public contracts, risk events, earthquakes, Central Bank indicators, and companies.</p>
+</details>
+<details class="faq-item">
+<summary>What is MCP?</summary>
+<p>Model Context Protocol is an open standard for connecting AI assistants to external tools and data sources, while keeping control over what the model can do and what data it can read.</p>
+</details>
+<details class="faq-item">
+<summary>What assistants can I use?</summary>
+<p>Any MCP-compatible client: Claude Desktop, Claude Code, ChatGPT (paid plans), Cursor, VS Code, Gemini CLI, Le Chat, Windsurf, HuggingChat, and more.</p>
+</details>
+<details class="faq-item">
+<summary>Do I need an API key?</summary>
+<p>No. Every source the server uses is public data with no authentication.</p>
+</details>
+<details class="faq-item">
+<summary>Is this an official service of the Ecuadorian government?</summary>
+<p>No. EcuDataMCP is an independent, open-source project that queries the same public sources the Ecuadorian state already publishes. It is not affiliated with any institution.</p>
+</details>
+<details class="faq-item">
+<summary>Does the server store my questions?</summary>
+<p>There is no telemetry. The server runs locally on your machine, and every query goes straight from the MCP client to the matching official portal.</p>
+</details>
+<details class="faq-item">
+<summary>What formats does it support?</summary>
+<p>In-memory preview of CSV, TSV, JSON, GeoJSON, and XLSX; filtered tabular queries via the CKAN DataStore when the resource supports it.</p>
+</details>
+<details class="faq-item">
+<summary>Why does the connection to the Open Data portal sometimes fail?</summary>
+<p><code>www.datosabiertos.gob.ec</code> sometimes rejects connections coming from outside Latin America (403 error). If you see this, run the server from a connection with an exit point in Ecuador or the region (a VPN, for example). The procedures and institutions tools use a different portal and don't have this issue.</p>
+</details>
+<details class="faq-item">
+<summary>Can I contribute?</summary>
+<p>Yes, the project is MIT-licensed and accepts pull requests. See the guide at <a href="colaborar.html">Contribute</a>.</p>
+</details>
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>Ecuador's open data, with your favorite AI assistant.</p>
+<a class="btn-cta primary" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">View on GitHub</a>
+</div>
+</section>
+
+</main>
+
+<footer class="page-footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left"><p>MIT License · Independent project, not affiliated with any Ecuadorian government institution.</p></div>
+    <div class="nav-footer-center">&nbsp;</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+        <li class="nav-item"><a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP">GitHub</a></li>
+        <li class="nav-item"><a class="nav-link" href="../releases.html">Releases</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/fuse.min.js"></script>
+<script>
+window.SITE_SEARCH_INDEX_URL = "../search.json";
+window.SITE_ROOT = "../";
+window.COPY_LABEL_COPIED = "Copied!";
+window.SITE_SEARCH_EMPTY_LABEL = "No results.";
+</script>
+<script src="../assets/site.js"></script>
+
+</body>
+</html>

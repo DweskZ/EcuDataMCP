@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Releases – EcuDataMCP</title>
+<meta name="description" content="Historial de versiones de EcuDataMCP y el ritmo real de los releases.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="Releases – EcuDataMCP">
+<meta property="og:description" content="Historial de versiones de EcuDataMCP y el ritmo real de los releases.">
+<meta property="og:image" content="https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png">
+<link rel="stylesheet" href="assets/bootstrap-icons.css">
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/site.css">
+<style>html { scroll-behavior: smooth; }</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+  <div class="navbar-container container-fluid">
+    <div class="navbar-brand-container mx-auto">
+      <a class="navbar-brand" href="index.html">
+        <span class="navbar-title">EcuDataMCP</span>
+      </a>
+    </div>
+    <button class="site-search-toggle" type="button" title="Buscar" aria-label="Buscar">
+      <i class="bi bi-search"></i>
+    </button>
+    <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Navegación de palanca" data-nav-toggle="navbarCollapse">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav navbar-nav-scroll me-auto">
+        
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">
+            <span class="menu-text">EcuDataMCP</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="index.html#como-funciona">
+            <span class="menu-text">Cómo funciona</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="index.html#fuentes">
+            <span class="menu-text">Fuentes</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="atlas.html">
+            <span class="menu-text">Referencia</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="examples.html">
+            <span class="menu-text">Ejemplos</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link active" href="releases.html" aria-current="page">
+            <span class="menu-text">Releases</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">
+            <span class="menu-text">Acerca de</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="colaborar.html">
+            <span class="menu-text">Cómo colaborar</span>
+          </a>
+        </li>
+        
+      </ul>
+      <ul class="navbar-nav navbar-nav-scroll ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="en/index.html">
+            <span class="menu-text">English</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP" target="_blank">
+            <span class="menu-text">GitHub</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="site-search-panel" id="siteSearchPanel" hidden>
+  <div class="site-search-panel-inner">
+    <input type="text" id="siteSearchInput" class="site-search-input" placeholder="Buscar en el sitio…" autocomplete="off">
+    <div id="siteSearchResults" class="site-search-results"></div>
+  </div>
+</div>
+
+<main>
+
+<section class="landing hero">
+<div class="container-page">
+<p class="kicker">Releases</p>
+<h1>Once versiones, <span class="accent">un ritmo real.</span></h1>
+<p class="hero-sub">Ocho de los once releases salieron el mismo día (4 de agosto de 2026), armando la base del servidor. Desde ahí, cada versión nueva corresponde a una fuente agregada o una mejora concreta, no a un calendario fijo. El detalle técnico completo de cada cambio vive en el <a href="https://github.com/DweskZ/EcuDataMCP/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG</a>.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.8.5</span><span class="release-date">2026-08-31</span></div>
+<p class="release-summary">Auditorías BCEData/IEM, mapa de equivalencias cauteloso, lectura histórica IEM y herramientas públicas acotadas para SRI Saiku. El servidor mantiene resultados verificables, sin afirmar equivalencias ni acceso que la fuente no exponga.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.8.4</span><span class="release-date">2026-08-31</span></div>
+<p class="release-summary">Observabilidad de revisiones en BCEData, normalización adicional de tablas IEM, despliegue remoto con autenticación y límites por cliente, y documentación técnica separada del README.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.7.0</span><span class="release-date">2026-08-26</span></div>
+<p class="release-summary">Preview de .xls legacy, .tar.gz y .zip (que envuelven un CSV/TSV/TXT). Expansión de siglas y sniffing de Content-Type en búsqueda/previsualización. Varios fixes de confiabilidad encontrados verificando contra el portal real.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.6.0</span><span class="release-date">2026-08-18</span></div>
+<p class="release-summary">Banco Central del Ecuador, SRI Datasets, y Supercías completo (directorio, ranking financiero, auditores externos). Guardia SSRF, uv.lock, CI en Python 3.11 a 3.13.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.5.1</span><span class="release-date">2026-08-13</span></div>
+<p class="release-summary">Fechas de creación/modificación por recurso, detección de series periódicas, limpieza de columnas de geometría en los previews.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.5.0</span><span class="release-date">2026-08-10</span></div>
+<p class="release-summary">Integración del Instituto Geofísico (IG-EPN): search_sismos sobre el catálogo sísmico público.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.4.4</span><span class="release-date">2026-08-04</span></div>
+<p class="release-summary">format=json en el resto de tools.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.4.3</span><span class="release-date">2026-08-04</span></div>
+<p class="release-summary">Parroquias del DPA (offline, ~1040) y lookup_ubicacion a nivel parroquia.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.4.2</span><span class="release-date">2026-08-04</span></div>
+<p class="release-summary">Rate limiting y caché ampliada para SERCOP.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.4.1</span><span class="release-date">2026-08-04</span></div>
+<p class="release-summary">list_recent_datasets y el primer smoke test end-to-end.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.4.0</span><span class="release-date">2026-08-04</span></div>
+<p class="release-summary">Cantones del DPA, integración con la Secretaría de Gestión de Riesgos (SGR), 23 tools.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.3.2</span><span class="release-date">2026-08-04</span></div>
+<p class="release-summary">list_capabilities, lookup_ubicacion, y los primeros resources ecuador://.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.3.1</span><span class="release-date">2026-08-04</span></div>
+<p class="release-summary">Prompts MCP y el vínculo entre trámites y regulaciones.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.3.0</span><span class="release-date">2026-08-04</span></div>
+<p class="release-summary">Primer release: búsqueda unificada, DataStore de CKAN, regulaciones y contratos SERCOP.</p>
+</div>
+
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>Cada release queda documentado, con fecha y con lo que trajo.</p>
+<a class="btn-cta primary" href="https://github.com/DweskZ/EcuDataMCP/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Ver el CHANGELOG completo</a>
+</div>
+</section>
+
+</main>
+
+<footer class="page-footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left"><p>MIT License · Proyecto independiente, no afiliado a ninguna institución del Estado ecuatoriano.</p></div>
+    <div class="nav-footer-center">&nbsp;</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+        <li class="nav-item"><a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP">GitHub</a></li>
+        <li class="nav-item"><a class="nav-link" href="releases.html">Releases</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/fuse.min.js"></script>
+<script>
+window.SITE_SEARCH_INDEX_URL = "search.json";
+window.SITE_ROOT = "";
+window.COPY_LABEL_COPIED = "¡Copiado!";
+window.SITE_SEARCH_EMPTY_LABEL = "Sin resultados.";
+</script>
+<script src="assets/site.js"></script>
+
+</body>
+</html>

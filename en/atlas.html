@@ -1,0 +1,2072 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reference – EcuDataMCP</title>
+<meta name="description" content="EcuDataMCP's 73 tools, with a full description and a direct link to each one.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="Reference – EcuDataMCP">
+<meta property="og:description" content="EcuDataMCP's 73 tools, with a full description and a direct link to each one.">
+<meta property="og:image" content="https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png">
+<link rel="stylesheet" href="../assets/bootstrap-icons.css">
+<link rel="stylesheet" href="../assets/styles.css">
+<link rel="stylesheet" href="../assets/site.css">
+<style>html { scroll-behavior: smooth; }</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+  <div class="navbar-container container-fluid">
+    <div class="navbar-brand-container mx-auto">
+      <a class="navbar-brand" href="../index.html">
+        <span class="navbar-title">EcuDataMCP</span>
+      </a>
+    </div>
+    <button class="site-search-toggle" type="button" title="Search" aria-label="Search">
+      <i class="bi bi-search"></i>
+    </button>
+    <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" data-nav-toggle="navbarCollapse">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav navbar-nav-scroll me-auto">
+        
+        <li class="nav-item">
+          <a class="nav-link" href="../index.html">
+            <span class="menu-text">EcuDataMCP</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="../index.html#how-it-works">
+            <span class="menu-text">How it works</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="../index.html#sources">
+            <span class="menu-text">Sources</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link active" href="../atlas.html" aria-current="page">
+            <span class="menu-text">Reference</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="../examples.html">
+            <span class="menu-text">Examples</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="../releases.html">
+            <span class="menu-text">Releases</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="../about.html">
+            <span class="menu-text">About</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="../colaborar.html">
+            <span class="menu-text">Contribute</span>
+          </a>
+        </li>
+        
+      </ul>
+      <ul class="navbar-nav navbar-nav-scroll ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="../index.html">
+            <span class="menu-text">Español</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP" target="_blank">
+            <span class="menu-text">GitHub</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="site-search-panel" id="siteSearchPanel" hidden>
+  <div class="site-search-panel-inner">
+    <input type="text" id="siteSearchInput" class="site-search-input" placeholder="Search the site…" autocomplete="off">
+    <div id="siteSearchResults" class="site-search-results"></div>
+  </div>
+</div>
+
+<main>
+
+<section class="landing hero">
+<div class="container-page">
+<p class="kicker">Reference</p>
+<h1>All <span class="accent">73 tools</span>, one by one.</h1>
+<p class="hero-sub">The full reference, not the homepage's summary view. Every tool has its own anchor: link to it directly from GitHub, other docs, or your own agent's reasoning.</p>
+<div class="atlas-filter-wrap">
+<input type="text" id="atlas-filter" class="atlas-filter" placeholder="Filter by name or keyword…" autocomplete="off">
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+
+<div class="atlas-category">
+<h3 class="atlas-category-title">Unified entry points<span class="tag">3</span></h3>
+
+<details class="atlas-tool" id="tool-list_capabilities" data-search="list_capabilities summarizes sources, tools, prompts, and server limits. describe what this ecuador mcp can do: sources, key tools, prompts and limits. call this first when you are unsure which tool to use. format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_capabilities</code>
+<span class="atlas-tool-desc">Summarizes sources, tools, prompts, and server limits.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Describe what this Ecuador MCP can do: sources, key tools, prompts and limits. Call this first when you are unsure which tool to use.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_ecuador" data-search="search_ecuador searches datasets, orgs, procedures, regulations, contracts, and risk events all at once. unified search across ecuador open data, trámites, regulations, contracts and risk events. use this as the first step for broad questions. then drill down with get_dataset_info, query_resource_data, get_tramite_info, get_regulacion_info, get_contrato_info or search_eventos_riesgo. query search terms in spanish (e.g. &quot;salud&quot;, &quot;ruc&quot;, &quot;medicinas&quot;) limit max results per section (default 5, max 10) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_ecuador</code>
+<span class="atlas-tool-desc">Searches datasets, orgs, procedures, regulations, contracts, and risk events all at once.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Unified search across Ecuador open data, trámites, regulations, contracts and risk events. Use this as the first step for broad questions. Then drill down with get_dataset_info, query_resource_data, get_tramite_info, get_regulacion_info, get_contrato_info or search_eventos_riesgo.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>required</code></td><td>Search terms in Spanish (e.g. "salud", "RUC", "medicinas")</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>5</code></td><td>Max results per section (default 5, max 10)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-lookup_ubicacion" data-search="lookup_ubicacion provinces, cantons, and parishes (inec code, region, population). look up ecuador dpa geography: provinces, cantons and parroquias (inec codes). - nivel='provincia' | 'canton' | 'parroquia' | 'auto' - for parroquias, filter with canton= and/or provincia= (recommended) query name or code (e.g. &quot;pichincha&quot;, &quot;cuenca&quot;, &quot;tumbaco&quot;, &quot;170150&quot;) region optional natural region for provinces/cantons provincia optional province filter canton optional canton filter (useful for parroquias) nivel auto | provincia | canton | parroquia format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">lookup_ubicacion</code>
+<span class="atlas-tool-desc">Provinces, cantons, and parishes (INEC code, region, population).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Look up Ecuador DPA geography: provinces, cantons and parroquias (INEC codes). - nivel='provincia' | 'canton' | 'parroquia' | 'auto' - For parroquias, filter with canton= and/or provincia= (recommended)</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Name or code (e.g. "Pichincha", "Cuenca", "Tumbaco", "170150")</td></tr>
+
+<tr><td><code>region</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional natural region for provinces/cantons</td></tr>
+
+<tr><td><code>provincia</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional province filter</td></tr>
+
+<tr><td><code>canton</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional canton filter (useful for parroquias)</td></tr>
+
+<tr><td><code>nivel</code></td><td><code>str</code></td><td><code>auto</code></td><td>auto | provincia | canton | parroquia</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+</div>
+
+<div class="atlas-category">
+<h3 class="atlas-category-title">Open Data<span class="tag">10</span></h3>
+
+<details class="atlas-tool" id="tool-search_datasets" data-search="search_datasets search datasets by keyword. supports filtering by category. search for datasets on ecuador's open data portal (www.datosabiertos.gob.ec). this is the starting point for exploring government data from 98+ public institutions. use short, specific queries in spanish for best results. typical workflow: search_datasets → list_dataset_resources → preview_resource_data query search keywords (e.g. &quot;empleo&quot;, &quot;salud&quot;, &quot;presupuesto&quot;, &quot;sri recaudación&quot;) page page number (1-based, default: 1) page_size results per page (default: 20, max: 100) category optional category filter (e.g. &quot;sal&quot; for salud, &quot;edu&quot; for educación). use list_categories to see all available categories. source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) or &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_datasets</code>
+<span class="atlas-tool-desc">Search datasets by keyword. Supports filtering by category.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search for datasets on Ecuador's open data portal (www.datosabiertos.gob.ec). This is the starting point for exploring government data from 98+ public institutions. Use short, specific queries in Spanish for best results. Typical workflow: search_datasets → list_dataset_resources → preview_resource_data</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>required</code></td><td>Search keywords (e.g. "empleo", "salud", "presupuesto", "SRI recaudación")</td></tr>
+
+<tr><td><code>page</code></td><td><code>int</code></td><td><code>1</code></td><td>Page number (1-based, default: 1)</td></tr>
+
+<tr><td><code>page_size</code></td><td><code>int</code></td><td><code>20</code></td><td>Results per page (default: 20, max: 100)</td></tr>
+
+<tr><td><code>category</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional category filter (e.g. "sal" for Salud, "edu" for Educación). Use list_categories to see all available categories.</td></tr>
+
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) or "cuenca" (cuencaendatos.cuenca.gob.ec, independent municipal portal)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_recent_datasets" data-search="list_recent_datasets the most recently updated datasets on the portal. list the most recently updated datasets on ecuador's open data portal. useful to discover new or freshly refreshed government data without a specific keyword. sorted by metadata_modified descending. page page number (1-based, default 1) page_size results per page (default 15, max 50) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) or &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_recent_datasets</code>
+<span class="atlas-tool-desc">The most recently updated datasets on the portal.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List the most recently updated datasets on Ecuador's open data portal. Useful to discover new or freshly refreshed government data without a specific keyword. Sorted by metadata_modified descending.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>page</code></td><td><code>int</code></td><td><code>1</code></td><td>Page number (1-based, default 1)</td></tr>
+
+<tr><td><code>page_size</code></td><td><code>int</code></td><td><code>15</code></td><td>Results per page (default 15, max 50)</td></tr>
+
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) or "cuenca" (cuencaendatos.cuenca.gob.ec, independent municipal portal)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_dataset_info" data-search="get_dataset_info detailed dataset metadata: title, description, organization, tags, license, dates. get detailed metadata about a specific dataset from ecuador's open data portal. returns title, description, organization, tags, resource count, creation/update dates, license, update frequency, the publisher's source url (where the entity keeps the authoritative data, if any), and any custom metadata fields the publisher added. dataset_id the dataset id or slug (e.g. &quot;registro-estadistico-de-recursos-y-actividades-de-salud-2019&quot;) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) or &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_dataset_info</code>
+<span class="atlas-tool-desc">Detailed dataset metadata: title, description, organization, tags, license, dates.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Get detailed metadata about a specific dataset from Ecuador's open data portal. Returns title, description, organization, tags, resource count, creation/update dates, license, update frequency, the publisher's source URL (where the entity keeps the authoritative data, if any), and any custom metadata fields the publisher added.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>dataset_id</code></td><td><code>str</code></td><td><code>required</code></td><td>The dataset ID or slug (e.g. "registro-estadistico-de-recursos-y-actividades-de-salud-2019")</td></tr>
+
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) or "cuenca" (cuencaendatos.cuenca.gob.ec, independent municipal portal)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_dataset_resources" data-search="list_dataset_resources lists all files (resources) in a dataset with format, size, url, and creation/modification dates. list all resources (files) in a dataset with their metadata. returns resource id, title, format, size, download url, and creation/ last-modified dates for each file. the dates let you tell whether a dataset's files are periodic snapshots (compare last_modified across resources to find the most recent one) before reading any of them. also flags groups of resources whose names look like a periodic series (e.g. weekly files) — that's only a hint that they might need combining or picking the latest one; it does not tell you which, since that depends on the dataset (some periodic files replace previous ones, others complement them). next step: use preview_resource_data on a csv resource to see its contents, or use get_resource_info for detailed metadata. dataset_id the dataset id or slug source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) or &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_dataset_resources</code>
+<span class="atlas-tool-desc">Lists all files (resources) in a dataset with format, size, URL, and creation/modification dates.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List all resources (files) in a dataset with their metadata. Returns resource ID, title, format, size, download URL, and creation/ last-modified dates for each file. The dates let you tell whether a dataset's files are periodic snapshots (compare last_modified across resources to find the most recent one) before reading any of them. Also flags groups of resources whose names look like a periodic series (e.g. weekly files) — that's only a hint that they might need combining or picking the latest one; it does not tell you which, since that depends on the dataset (some periodic files replace previous ones, others complement them). Next step: use preview_resource_data on a CSV resource to see its contents, or use get_resource_info for detailed metadata.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>dataset_id</code></td><td><code>str</code></td><td><code>required</code></td><td>The dataset ID or slug</td></tr>
+
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) or "cuenca" (cuencaendatos.cuenca.gob.ec, independent municipal portal)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_resource_info" data-search="get_resource_info detailed information about a specific file. get detailed information about a specific resource (file) from ecuador's open data portal. returns format, size, mime type, download url, and dataset association. for csv files, you can then use preview_resource_data to see the actual data. resource_id the resource uuid source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) or &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_resource_info</code>
+<span class="atlas-tool-desc">Detailed information about a specific file.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Get detailed information about a specific resource (file) from Ecuador's open data portal. Returns format, size, MIME type, download URL, and dataset association. For CSV files, you can then use preview_resource_data to see the actual data.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>resource_id</code></td><td><code>str</code></td><td><code>required</code></td><td>The resource UUID</td></tr>
+
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) or "cuenca" (cuencaendatos.cuenca.gob.ec, independent municipal portal)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-preview_resource_data" data-search="preview_resource_data preview of csv/tsv, json/geojson, or excel (xls/xlsx) as a table (max 5 mb). download and preview a resource from ecuador's open data portal. supports csv/tsv, json/geojson and excel (xlsx). returns the first n rows as a formatted table so the model can inspect data without a local download. geometry/wkt columns are dropped from the table (they can be tens of kb per cell); csv columns in european decimal notation (7.760,2) are normalized to standard notation (7760.2). max download size: 5 mb. for large tabular datastore resources prefer query_resource_data. resource_id the resource uuid (get it from list_dataset_resources) rows number of data rows to preview (default: 20, max: 100) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) or &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">preview_resource_data</code>
+<span class="atlas-tool-desc">Preview of CSV/TSV, JSON/GeoJSON, or Excel (XLS/XLSX) as a table (max 5 MB).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Download and preview a resource from Ecuador's open data portal. Supports CSV/TSV, JSON/GeoJSON and Excel (XLSX). Returns the first N rows as a formatted table so the model can inspect data without a local download. Geometry/WKT columns are dropped from the table (they can be tens of KB per cell); CSV columns in European decimal notation (7.760,2) are normalized to standard notation (7760.2). Max download size: 5 MB. For large tabular DataStore resources prefer query_resource_data.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>resource_id</code></td><td><code>str</code></td><td><code>required</code></td><td>The resource UUID (get it from list_dataset_resources)</td></tr>
+
+<tr><td><code>rows</code></td><td><code>int</code></td><td><code>20</code></td><td>Number of data rows to preview (default: 20, max: 100)</td></tr>
+
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) or "cuenca" (cuencaendatos.cuenca.gob.ec, independent municipal portal)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-download_resource" data-search="download_resource downloads the raw file of a resource as base64 (max 5 mb), for formats that can't be previewed as a table (.rar, .tar.gz, etc.). download a resource's raw bytes from ecuador's open data portal, base64-encoded. use this for formats preview_resource_data can't parse into a table (.rar, .tar.gz, legacy .xls, or anything unrecognized) — it fetches the file as-is instead of trying to read it. max size: 5 mb (same cap as preview_resource_data). larger files come back with an error and the direct url instead, since they'd be too big to embed in a response. call with format=&quot;json&quot; to get the actual file content — the default format=&quot;text&quot; only confirms the download and tells you to retry with json; it never includes content_base64. resource_id the resource uuid (get it from list_dataset_resources) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) or &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">download_resource</code>
+<span class="atlas-tool-desc">Downloads the raw file of a resource as base64 (max 5 MB), for formats that can't be previewed as a table (.rar, .tar.gz, etc.).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Download a resource's raw bytes from Ecuador's open data portal, base64-encoded. Use this for formats preview_resource_data can't parse into a table (.rar, .tar.gz, legacy .xls, or anything unrecognized) — it fetches the file as-is instead of trying to read it. Max size: 5 MB (same cap as preview_resource_data). Larger files come back with an error and the direct URL instead, since they'd be too big to embed in a response. Call with format="json" to get the actual file content — the default format="text" only confirms the download and tells you to retry with json; it never includes content_base64.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>resource_id</code></td><td><code>str</code></td><td><code>required</code></td><td>The resource UUID (get it from list_dataset_resources)</td></tr>
+
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) or "cuenca" (cuencaendatos.cuenca.gob.ec, independent municipal portal)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-query_resource_data" data-search="query_resource_data tabular query via the ckan datastore (filters, text, pagination) without downloading the file. query a tabular resource via ckan datastore without downloading the full file. prefer this over preview_resource_data when the resource is in the datastore (most csv resources on the portal). supports full-text query, json filters, sorting and pagination. resource_id resource uuid (from list_dataset_resources) query optional full-text search across datastore fields filters_json optional json object of exact field filters, e.g. '{&quot;provincia&quot;:&quot;pichincha&quot;}' rows number of records to return (default 20, max 100) offset pagination offset (default 0) sort optional sort expression, e.g. &quot;anio desc&quot; source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) or &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">query_resource_data</code>
+<span class="atlas-tool-desc">Tabular query via the CKAN DataStore (filters, text, pagination) without downloading the file.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Query a tabular resource via CKAN DataStore without downloading the full file. Prefer this over preview_resource_data when the resource is in the DataStore (most CSV resources on the portal). Supports full-text query, JSON filters, sorting and pagination.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>resource_id</code></td><td><code>str</code></td><td><code>required</code></td><td>Resource UUID (from list_dataset_resources)</td></tr>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional full-text search across datastore fields</td></tr>
+
+<tr><td><code>filters_json</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional JSON object of exact field filters, e.g. '{"provincia":"Pichincha"}'</td></tr>
+
+<tr><td><code>rows</code></td><td><code>int</code></td><td><code>20</code></td><td>Number of records to return (default 20, max 100)</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Pagination offset (default 0)</td></tr>
+
+<tr><td><code>sort</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional sort expression, e.g. "anio desc"</td></tr>
+
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) or "cuenca" (cuencaendatos.cuenca.gob.ec, independent municipal portal)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-detect_series_pattern" data-search="detect_series_pattern for datasets that publish one file per period: tells whether each new file replaces the previous ones (cumulative) or complements them (incremental). when a dataset publishes one file per period (weekly/monthly), it's not always clear whether each new file replaces the previous ones (cumulative -- only the newest file matters) or complements them (incremental -- every file must be combined). downloads the two most recent resources from the periodic-name group list_dataset_resources already detects, finds a date/period-like column by header name (fecha, mes, año, periodo, semana, ...), and compares which period values appear in both files. high overlap → cumulative; near-zero overlap → incremental; if no period column is found or the overlap is ambiguous, returns indeterminado rather than guessing. a heuristic over a sample of up to 500 rows per file -- confirm with preview_resource_data if the result is close to the threshold. dataset_id the dataset id or slug resource_id_new optional -- newer resource id to compare (auto-detected from the dataset's periodic-name group if omitted) resource_id_old optional -- older resource id to compare (auto-detected if omitted). both resource_id_new/resource_id_old must be given together, or neither. source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) or &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">detect_series_pattern</code>
+<span class="atlas-tool-desc">For datasets that publish one file per period: tells whether each new file replaces the previous ones (cumulative) or complements them (incremental).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">When a dataset publishes one file per period (weekly/monthly), it's not always clear whether each new file replaces the previous ones (cumulative -- only the newest file matters) or complements them (incremental -- every file must be combined). Downloads the two most recent resources from the periodic-name group list_dataset_resources already detects, finds a date/period-like column by header name (fecha, mes, año, periodo, semana, ...), and compares which period values appear in both files. High overlap → cumulative; near-zero overlap → incremental; if no period column is found or the overlap is ambiguous, returns indeterminado rather than guessing. A heuristic over a sample of up to 500 rows per file -- confirm with preview_resource_data if the result is close to the threshold.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>dataset_id</code></td><td><code>str</code></td><td><code>required</code></td><td>The dataset ID or slug</td></tr>
+
+<tr><td><code>resource_id_new</code></td><td><code>str | None</code></td><td><code>none</code></td><td>Optional -- newer resource ID to compare (auto-detected from the dataset's periodic-name group if omitted)</td></tr>
+
+<tr><td><code>resource_id_old</code></td><td><code>str | None</code></td><td><code>none</code></td><td>Optional -- older resource ID to compare (auto-detected if omitted). Both resource_id_new/resource_id_old must be given together, or neither.</td></tr>
+
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) or "cuenca" (cuencaendatos.cuenca.gob.ec, independent municipal portal)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_sri_datasets" data-search="search_sri_datasets search across ~130 sri files published outside the ckan portal: ruc registry by province, tax collection, sales/purchases, vehicles, cel, data dictionaries. search the sri's open datasets page (sri.gob.ec/datasets) for direct file links. covers ~130 csv/xlsx/zip files not reachable through search_datasets (they live on the sri's own site, not the ckan datastore): ruc catastro by province, recaudación by year, ventas/compras, vehículos nuevos, comprobantes electrónicos (cel), inscripciones/cierres, plus variable dictionaries (*_dd.xlsx). returns direct urls, not the file contents — download them yourself or via download_resource. query free text matched against the file's label or url (accent-insensitive), e.g. &quot;recaudación&quot;, &quot;vehiculos&quot;, &quot;pichincha&quot;. empty returns all files. limit max results (default 30, max 100) offset pagination offset over the matched set format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_sri_datasets</code>
+<span class="atlas-tool-desc">Search across ~130 SRI files published outside the CKAN portal: RUC registry by province, tax collection, sales/purchases, vehicles, CEL, data dictionaries.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search the SRI's open datasets page (sri.gob.ec/datasets) for direct file links. Covers ~130 CSV/XLSX/ZIP files not reachable through search_datasets (they live on the SRI's own site, not the CKAN DataStore): RUC catastro by province, recaudación by year, ventas/compras, vehículos nuevos, comprobantes electrónicos (CEL), inscripciones/cierres, plus variable dictionaries (*_DD.xlsx). Returns direct URLs, not the file contents — download them yourself or via download_resource.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched against the file's label or URL (accent-insensitive), e.g. "recaudación", "vehiculos", "Pichincha". Empty returns all files.</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>30</code></td><td>Max results (default 30, max 100)</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Pagination offset over the matched set</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+</div>
+
+<div class="atlas-category">
+<h3 class="atlas-category-title">Government procedures<span class="tag">4</span></h3>
+
+<details class="atlas-tool" id="tool-search_tramites" data-search="search_tramites search ecuadorian government procedures (id card, passport, ruc, driver's license, etc.). search for government procedures (trámites) on ecuador's official portal gob.ec. best approach: provide an institution_id to get that institution's trámites. add a query to filter results by keyword (filters by name and description). when query is provided with institution_id, all pages of that institution's trámites are fetched and filtered, so you always get the most relevant results. common institution ids: - &quot;8&quot; = sri (servicio de rentas internas) — impuestos, ruc, facturación - &quot;23&quot; = registro civil — cédula, partidas de nacimiento - &quot;62&quot; = ant — licencias de conducir, matriculación vehicular - &quot;16&quot; = ministerio de relaciones exteriores — pasaportes, apostilla - &quot;5&quot; = iess — seguro social, pensiones, fondos de reserva use list_instituciones to find more institution ids. query keywords to filter results (e.g. &quot;ruc&quot;, &quot;inscripción ruc persona natural&quot;). each word must appear in the trámite name or description. institution_id institution id (strongly recommended for relevant results) page page number (1-based, default: 1). ignored when query is provided (all pages are searched automatically). format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_tramites</code>
+<span class="atlas-tool-desc">Search Ecuadorian government procedures (ID card, passport, RUC, driver's license, etc.).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search for government procedures (trámites) on Ecuador's official portal gob.ec. Best approach: provide an institution_id to get that institution's trámites. Add a query to filter results by keyword (filters by name and description). When query is provided with institution_id, ALL pages of that institution's trámites are fetched and filtered, so you always get the most relevant results. Common institution IDs: - "8" = SRI (Servicio de Rentas Internas) — impuestos, RUC, facturación - "23" = Registro Civil — cédula, partidas de nacimiento - "62" = ANT — licencias de conducir, matriculación vehicular - "16" = Ministerio de Relaciones Exteriores — pasaportes, apostilla - "5" = IESS — seguro social, pensiones, fondos de reserva Use list_instituciones to find more institution IDs.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Keywords to filter results (e.g. "RUC", "inscripción RUC persona natural"). Each word must appear in the trámite name or description.</td></tr>
+
+<tr><td><code>institution_id</code></td><td><code>str</code></td><td><code>empty</code></td><td>Institution ID (strongly recommended for relevant results)</td></tr>
+
+<tr><td><code>page</code></td><td><code>int</code></td><td><code>1</code></td><td>Page number (1-based, default: 1). Ignored when query is provided (all pages are searched automatically).</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_tramite_info" data-search="get_tramite_info full detail: requirements, procedure, cost, estimated time. get detailed information about a specific government procedure (trámite). returns the procedure name, description, requirements, beneficiaries, cost, and the institution responsible. get the tramite_id from search_tramites. tramite_id the procedure id (e.g. &quot;18009&quot;) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_tramite_info</code>
+<span class="atlas-tool-desc">Full detail: requirements, procedure, cost, estimated time.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Get detailed information about a specific government procedure (trámite). Returns the procedure name, description, requirements, beneficiaries, cost, and the institution responsible. Get the tramite_id from search_tramites.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>tramite_id</code></td><td><code>str</code></td><td><code>required</code></td><td>The procedure ID (e.g. "18009")</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_instituciones" data-search="list_instituciones list ecuador's public institutions. list or search public institutions registered on ecuador's gob.ec portal. if a query is provided, searches across all institutions by name or acronym. without a query, returns a paginated list. common institutions: sri (id: 8), registro civil (id: 23), ant (id: 62), cancillería (id: 16), iess (id: 5), ministerio de salud, inec, bce. query optional search term (e.g. &quot;sri&quot;, &quot;salud&quot;, &quot;rentas&quot;) page page number (1-based, default: 1, only used without query) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_instituciones</code>
+<span class="atlas-tool-desc">List Ecuador's public institutions.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List or search public institutions registered on Ecuador's gob.ec portal. If a query is provided, searches across all institutions by name or acronym. Without a query, returns a paginated list. Common institutions: SRI (ID: 8), Registro Civil (ID: 23), ANT (ID: 62), Cancillería (ID: 16), IESS (ID: 5), Ministerio de Salud, INEC, BCE.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional search term (e.g. "SRI", "salud", "rentas")</td></tr>
+
+<tr><td><code>page</code></td><td><code>int</code></td><td><code>1</code></td><td>Page number (1-based, default: 1, only used without query)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_institucion_info" data-search="get_institucion_info detail of an institution (sector, website, description). get detailed information about a public institution registered on gob.ec. returns name, acronym, sector, description, website and portal url. get the institucion_id from list_instituciones. common ids: sri=8, iess=5, registro civil=23, ant=62, cancillería=16. institucion_id institution id (e.g. &quot;8&quot;) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_institucion_info</code>
+<span class="atlas-tool-desc">Detail of an institution (sector, website, description).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Get detailed information about a public institution registered on gob.ec. Returns name, acronym, sector, description, website and portal URL. Get the institucion_id from list_instituciones. Common IDs: SRI=8, IESS=5, Registro Civil=23, ANT=62, Cancillería=16.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>institucion_id</code></td><td><code>str</code></td><td><code>required</code></td><td>Institution ID (e.g. "8")</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+</div>
+
+<div class="atlas-category">
+<h3 class="atlas-category-title">ANDA (INEC)<span class="tag">3</span></h3>
+
+<details class="atlas-tool" id="tool-search_anda" data-search="search_anda search inec's anda catalog of surveys and censuses (nada/ihsn). indicates whether each survey has downloadable microdata. search inec's anda catalog (anda.inec.gob.ec) of surveys and censuses. anda runs on nada (world bank/ihsn), separate from datosabiertos.gob.ec. it catalogs 437+ inec surveys/censuses with metadata (title, year, authoring entity). not every entry has downloadable microdata — many are aggregate-only publications (e.g. price indices); each result says so. follow up with get_anda_survey_info(idno) for full metadata on one survey. query search keywords (e.g. &quot;empleo&quot;, &quot;reem&quot;, &quot;censo agropecuario&quot;) limit max results (default: 10, max: 50) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_anda</code>
+<span class="atlas-tool-desc">Search INEC's ANDA catalog of surveys and censuses (NADA/IHSN). Indicates whether each survey has downloadable microdata.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search INEC's ANDA catalog (anda.inec.gob.ec) of surveys and censuses. ANDA runs on NADA (World Bank/IHSN), separate from datosabiertos.gob.ec. It catalogs 437+ INEC surveys/censuses with metadata (title, year, authoring entity). Not every entry has downloadable microdata — many are aggregate-only publications (e.g. price indices); each result says so. Follow up with get_anda_survey_info(idno) for full metadata on one survey.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Search keywords (e.g. "empleo", "REEM", "censo agropecuario")</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>10</code></td><td>Max results (default: 10, max: 50)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_anda_survey_info" data-search="get_anda_survey_info full metadata for an anda survey: summary, variables, confidentiality, and contact. get full metadata for one anda (inec) survey/census by its idno. get the idno from search_anda results — it's the string identifier (e.g. &quot;idd-ecu-inec-cgtpe-decon-enesem-2023-v1.3&quot;), not the numeric id. returns scope/abstract, variable count, whether microdata is actually downloadable, confidentiality terms, and a contact email for requesting restricted data when it isn't. idno survey identifier from search_anda (the &quot;idno&quot; field) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_anda_survey_info</code>
+<span class="atlas-tool-desc">Full metadata for an ANDA survey: summary, variables, confidentiality, and contact.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Get full metadata for one ANDA (INEC) survey/census by its idno. Get the idno from search_anda results — it's the string identifier (e.g. "IDD-ECU-INEC-CGTPE-DECON-ENESEM-2023-v1.3"), not the numeric id. Returns scope/abstract, variable count, whether microdata is actually downloadable, confidentiality terms, and a contact email for requesting restricted data when it isn't.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>idno</code></td><td><code>str</code></td><td><code>required</code></td><td>Survey identifier from search_anda (the "idno" field)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-download_anda_microdata" data-search="download_anda_microdata direct download links for an anda survey's microdata files. get direct download links for an anda survey's microdata files. automates anda's one-click usage-terms step (research/statistical use only, no re-identifying respondents, cite the source — see get_anda_survey_info for the full text) to reveal the file list. check get_anda_survey_info first: aggregate-only surveys (microdatos_disponibles false) have no files here. returns direct urls, not the file contents — the files are typically multi-mb zips (spss .sav inside), too large to embed in a tool result. download them with the returned url. idno survey identifier from search_anda (the &quot;idno&quot; field) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">download_anda_microdata</code>
+<span class="atlas-tool-desc">Direct download links for an ANDA survey's microdata files.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Get direct download links for an ANDA survey's microdata files. Automates ANDA's one-click usage-terms step (research/statistical use only, no re-identifying respondents, cite the source — see get_anda_survey_info for the full text) to reveal the file list. Check get_anda_survey_info first: aggregate-only surveys (microdatos_disponibles false) have no files here. Returns direct URLs, not the file contents — the files are typically multi-MB ZIPs (SPSS .sav inside), too large to embed in a tool result. Download them with the returned URL.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>idno</code></td><td><code>str</code></td><td><code>required</code></td><td>Survey identifier from search_anda (the "idno" field)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+</div>
+
+<div class="atlas-category">
+<h3 class="atlas-category-title">Macroeconomics (BCE)<span class="tag">2</span></h3>
+
+<details class="atlas-tool" id="tool-search_indicadores_bce" data-search="search_indicadores_bce search the central bank of ecuador's statistical catalog (monetary/financial, public finance, external sector, real sector). search the banco central del ecuador (bce) statistical catalog. covers monetary/financial statistics, public finances, external sector (foreign trade), and real sector (gdp, employment/ unemployment, consumer confidence, oil production, cement production, and more) — each result is an indicator group (id_grupo) whose time series data you fetch with get_indicador_bce. some groups hold a single series, others dozens under a broader title (e.g. &quot;desempleo&quot; is a series inside the &quot;mercado laboral&quot; group, not a group of its own — matched here too, not just group titles). does not cover ecuador's own inflation (cpi) or poverty statistics — those are inec's domain, try search_anda instead. first call after the cache expires (24h) takes ~10-15s: matching against series names, not just group titles, means fetching every group's metadata (~78 groups) once to build the search index. cached after that. query free text matched against the group's description, its section/subsection, and its individual series labels (accent-insensitive) limit max results (default 20, max 100) offset pagination offset over the matched set format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_indicadores_bce</code>
+<span class="atlas-tool-desc">Search the Central Bank of Ecuador's statistical catalog (monetary/financial, public finance, external sector, real sector).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search the Banco Central del Ecuador (BCE) statistical catalog. Covers monetary/financial statistics, public finances, external sector (foreign trade), and real sector (GDP, employment/ unemployment, consumer confidence, oil production, cement production, and more) — each result is an indicator group (id_grupo) whose time series data you fetch with get_indicador_bce. Some groups hold a single series, others dozens under a broader title (e.g. "desempleo" is a series inside the "mercado laboral" group, not a group of its own — matched here too, not just group titles). Does NOT cover Ecuador's own inflation (CPI) or poverty statistics — those are INEC's domain, try search_anda instead. First call after the cache expires (24h) takes ~10-15s: matching against series names, not just group titles, means fetching every group's metadata (~78 groups) once to build the search index. Cached after that.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched against the group's description, its section/subsection, and its individual series labels (accent-insensitive)</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>20</code></td><td>Max results (default 20, max 100)</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Pagination offset over the matched set</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_indicador_bce" data-search="get_indicador_bce time series for an indicator by id_grupo: configurable period, frequency, and unit (defaults set per group). time series data for one banco central del ecuador (bce) indicator group. use search_indicadores_bce first to find the id_grupo. frequency and unit vary by group (e.g. &quot;mensual&quot;/&quot;millones de usd&quot; for money supply, &quot;trimestral&quot;/&quot;porcentaje&quot; for gdp growth) — omit them to get the group's default, or check the error message for the valid options if you guess wrong. id_grupo the group id from search_indicadores_bce. desde start period as yyyy-mm. defaults to the earliest available period for the chosen frequency. hasta end period as yyyy-mm. defaults to the latest available period for the chosen frequency. frecuencia semanal | mensual | trimestral | anual. defaults to the group's first available frequency. unidad varies by group (e.g. &quot;millones de usd&quot;, &quot;indice&quot;, &quot;porcentaje&quot;). defaults to the first one available for the chosen frequency. format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_indicador_bce</code>
+<span class="atlas-tool-desc">Time series for an indicator by id_grupo: configurable period, frequency, and unit (defaults set per group).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Time series data for one Banco Central del Ecuador (BCE) indicator group. Use search_indicadores_bce first to find the id_grupo. Frequency and unit vary by group (e.g. "Mensual"/"Millones de USD" for money supply, "Trimestral"/"Porcentaje" for GDP growth) — omit them to get the group's default, or check the error message for the valid options if you guess wrong.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>id_grupo</code></td><td><code>int</code></td><td><code>required</code></td><td>The group id from search_indicadores_bce.</td></tr>
+
+<tr><td><code>desde</code></td><td><code>str</code></td><td><code>empty</code></td><td>Start period as YYYY-MM. Defaults to the earliest available period for the chosen frequency.</td></tr>
+
+<tr><td><code>hasta</code></td><td><code>str</code></td><td><code>empty</code></td><td>End period as YYYY-MM. Defaults to the latest available period for the chosen frequency.</td></tr>
+
+<tr><td><code>frecuencia</code></td><td><code>str</code></td><td><code>empty</code></td><td>Semanal | Mensual | Trimestral | Anual. Defaults to the group's first available frequency.</td></tr>
+
+<tr><td><code>unidad</code></td><td><code>str</code></td><td><code>empty</code></td><td>Varies by group (e.g. "Millones de USD", "Indice", "Porcentaje"). Defaults to the first one available for the chosen frequency.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+</div>
+
+<div class="atlas-category">
+<h3 class="atlas-category-title">Companies (Supercías)<span class="tag">6</span></h3>
+
+<details class="atlas-tool" id="tool-search_companias" data-search="search_companias search the superintendency of companies' directory (226k+, by name/ruc, province, legal status). search ecuador's company registry (superintendencia de compañías). covers 226k+ companies with legal status, incorporation date, legal representative, registered capital, economic activity (ciiu) and address. source is a daily-refreshed government export, cached up to 6h server-side — the first call after the cache expires can take ~30-40s to download and parse (~35 mb, 226k rows). query free text matched against company name or ruc (accent-insensitive) provincia optional province filter, e.g. &quot;pichincha&quot; (substring match) situacion_legal optional legal status filter, e.g. &quot;activa&quot;, &quot;disolución&quot; limit max results (default 20, max 100) offset pagination offset over the matched set format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_companias</code>
+<span class="atlas-tool-desc">Search the Superintendency of Companies' directory (226k+, by name/RUC, province, legal status).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search Ecuador's company registry (Superintendencia de Compañías). Covers 226k+ companies with legal status, incorporation date, legal representative, registered capital, economic activity (CIIU) and address. Source is a daily-refreshed government export, cached up to 6h server-side — the first call after the cache expires can take ~30-40s to download and parse (~35 MB, 226k rows).</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched against company name or RUC (accent-insensitive)</td></tr>
+
+<tr><td><code>provincia</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional province filter, e.g. "PICHINCHA" (substring match)</td></tr>
+
+<tr><td><code>situacion_legal</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional legal status filter, e.g. "ACTIVA", "DISOLUCIÓN"</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>20</code></td><td>Max results (default 20, max 100)</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Pagination offset over the matched set</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_compania_info" data-search="get_compania_info full company profile by ruc: legal representative, subscribed capital, ciiu code, address. get full registry details for a company by ruc (superintendencia de compañías). returns legal status, incorporation date, legal representative, registered capital, economic activity (ciiu), address and last balance-sheet year. use search_companias first if you don't have the exact ruc. ruc the company's 13-digit ruc format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_compania_info</code>
+<span class="atlas-tool-desc">Full company profile by RUC: legal representative, subscribed capital, CIIU code, address.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Get full registry details for a company by RUC (Superintendencia de Compañías). Returns legal status, incorporation date, legal representative, registered capital, economic activity (CIIU), address and last balance-sheet year. Use search_companias first if you don't have the exact RUC.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>ruc</code></td><td><code>str</code></td><td><code>required</code></td><td>The company's 13-digit RUC</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_ranking" data-search="search_ranking rank/filter companies by financial indicators (year, ciiu, any column); requires the local financial database build. rank/filter supercías companies by financial indicators for a fiscal year. filter by year and/or ciiu level-1 economic activity (single letter, e.g. &quot;c&quot; for manufacturing), sorted by any indicator column (defaults to the dataset's own precomputed posicion_general). each result includes the company's nombre/ruc alongside its financials. covers only the last few cached fiscal years, not the full history. use get_financials for one company's full detail, or get_compania_info for legal/registry data (address, legal representative, etc.). anio optional fiscal year filter. ciiu_n1 optional ciiu level-1 filter, e.g. &quot;c&quot;, &quot;g&quot;, &quot;i&quot;. order_by column to sort ascending by (e.g. &quot;posicion_general&quot;, &quot;activos&quot;, &quot;roe&quot;). falls back to posicion_general if unknown. limit max results (default 20, max 100). offset pagination offset. format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_ranking</code>
+<span class="atlas-tool-desc">Rank/filter companies by financial indicators (year, CIIU, any column); requires the local financial database build.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Rank/filter Supercías companies by financial indicators for a fiscal year. Filter by year and/or CIIU level-1 economic activity (single letter, e.g. "C" for manufacturing), sorted by any indicator column (defaults to the dataset's own precomputed posicion_general). Each result includes the company's nombre/ruc alongside its financials. Covers only the last few cached fiscal years, not the full history. Use get_financials for one company's full detail, or get_compania_info for legal/registry data (address, legal representative, etc.).</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>anio</code></td><td><code>int | None</code></td><td><code>none</code></td><td>Optional fiscal year filter.</td></tr>
+
+<tr><td><code>ciiu_n1</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional CIIU level-1 filter, e.g. "C", "G", "I".</td></tr>
+
+<tr><td><code>order_by</code></td><td><code>str</code></td><td><code>posicion_general</code></td><td>Column to sort ascending by (e.g. "posicion_general", "activos", "roe"). Falls back to posicion_general if unknown.</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>20</code></td><td>Max results (default 20, max 100).</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Pagination offset.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_financials" data-search="get_financials a company's financial history by filing number or ruc: revenue, assets, equity, ~38 ratios (liquidity, leverage, profitability). get a company's financial history from supercías balance-sheet filings. returns revenue, assets, equity, profit, employee count, and financial ratios (liquidity, leverage, profitability) per fiscal year. covers only the last few fiscal years (whatever scripts/build_supercias_financials_db.py last cached), not the full history back to 2008. complements get_compania_info, which has legal/registry data but no financials. expediente_or_ruc the company's supercías &quot;expediente&quot; number (from search_companias/get_compania_info) or its 13-digit ruc. anio optional single fiscal year filter. format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_financials</code>
+<span class="atlas-tool-desc">A company's financial history by filing number or RUC: revenue, assets, equity, ~38 ratios (liquidity, leverage, profitability).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Get a company's financial history from Supercías balance-sheet filings. Returns revenue, assets, equity, profit, employee count, and financial ratios (liquidity, leverage, profitability) per fiscal year. Covers only the last few fiscal years (whatever scripts/build_supercias_financials_db.py last cached), not the full history back to 2008. Complements get_compania_info, which has legal/registry data but no financials.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>expediente_or_ruc</code></td><td><code>str</code></td><td><code>required</code></td><td>The company's Supercías "expediente" number (from search_companias/get_compania_info) or its 13-digit RUC.</td></tr>
+
+<tr><td><code>anio</code></td><td><code>int | None</code></td><td><code>none</code></td><td>Optional single fiscal year filter.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_auditores" data-search="search_auditores search the registry of authorized external auditors (1,447 firms/individuals, by name or id, province). search ecuador's registry of authorized external auditors (superintendencia de compañías). covers the 1,447 firms/individuals licensed to act as external auditors, with their authorization resolution number/date and contact details. source is a daily-refreshed government export, cached up to 6h server-side. query free text matched against auditor name or identificación (ruc/cédula), accent-insensitive provincia optional province filter, e.g. &quot;pichincha&quot; (substring match) limit max results (default 20, max 100) offset pagination offset over the matched set format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_auditores</code>
+<span class="atlas-tool-desc">Search the registry of authorized external auditors (1,447 firms/individuals, by name or ID, province).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search Ecuador's registry of authorized external auditors (Superintendencia de Compañías). Covers the 1,447 firms/individuals licensed to act as external auditors, with their authorization resolution number/date and contact details. Source is a daily-refreshed government export, cached up to 6h server-side.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched against auditor name or identificación (RUC/cédula), accent-insensitive</td></tr>
+
+<tr><td><code>provincia</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional province filter, e.g. "PICHINCHA" (substring match)</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>20</code></td><td>Max results (default 20, max 100)</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Pagination offset over the matched set</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_auditor_info" data-search="get_auditor_info full profile of an external auditor by id: authorization resolution, nationality, address, contact. get full registry details for an authorized external auditor by identificación (superintendencia de compañías). returns authorization resolution number/date, nationality, address and contact details. use search_auditores first if you don't have the exact identificación (ruc/cédula). identificacion the auditor's ruc or cédula format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_auditor_info</code>
+<span class="atlas-tool-desc">Full profile of an external auditor by ID: authorization resolution, nationality, address, contact.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Get full registry details for an authorized external auditor by identificación (Superintendencia de Compañías). Returns authorization resolution number/date, nationality, address and contact details. Use search_auditores first if you don't have the exact identificación (RUC/cédula).</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>identificacion</code></td><td><code>str</code></td><td><code>required</code></td><td>The auditor's RUC or cédula</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+</div>
+
+<div class="atlas-category">
+<h3 class="atlas-category-title">Regulations & contracts<span class="tag">4</span></h3>
+
+<details class="atlas-tool" id="tool-search_regulaciones" data-search="search_regulaciones search/list regulations on gob.ec (with official register reference). search or list regulations published on ecuador's gob.ec portal. includes agreements, regulations and related norms with registro oficial references when available. with a query, scans several pages client-side (the api has no native search). without a query, returns a paginated list. query keywords (e.g. &quot;datos personales&quot;, &quot;tránsito&quot;, &quot;lotaip&quot;) page page number when query is empty (1-based) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_regulaciones</code>
+<span class="atlas-tool-desc">Search/list regulations on gob.ec (with Official Register reference).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search or list regulations published on Ecuador's gob.ec portal. Includes agreements, regulations and related norms with Registro Oficial references when available. With a query, scans several pages client-side (the API has no native search). Without a query, returns a paginated list.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Keywords (e.g. "datos personales", "tránsito", "LOTAIP")</td></tr>
+
+<tr><td><code>page</code></td><td><code>int</code></td><td><code>1</code></td><td>Page number when query is empty (1-based)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_regulacion_info" data-search="get_regulacion_info detail of a regulation, plus a link to the pdf. get detailed information about a regulation published on gob.ec. returns type, registro oficial reference, description and pdf/archivo url when available. get the regulacion_id from search_regulaciones. regulacion_id regulation id (e.g. &quot;5051&quot;) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_regulacion_info</code>
+<span class="atlas-tool-desc">Detail of a regulation, plus a link to the PDF.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Get detailed information about a regulation published on gob.ec. Returns type, Registro Oficial reference, description and PDF/archivo URL when available. Get the regulacion_id from search_regulaciones.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>regulacion_id</code></td><td><code>str</code></td><td><code>required</code></td><td>Regulation ID (e.g. "5051")</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_contratos" data-search="search_contratos search public procurement processes (sercop/ocds). search ecuador public procurement procedures (sercop / ocds open data). useful for journalists, researchers and citizens looking for contracts, tenders, buyers or suppliers. requires a keyword of at least 3 characters. year defaults to the current calendar year and falls back to prior years when year=0. results are cached ~30 minutes; on 429 the client cools down. query keyword (min 3 chars), e.g. &quot;medicinas&quot;, &quot;vialidad&quot;, &quot;software&quot; year contract year (2015–current). 0 = current year + fallback page results page (1-based) buyer optional buyer/institution keyword (min 3 chars) supplier optional supplier keyword (min 3 chars) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_contratos</code>
+<span class="atlas-tool-desc">Search public procurement processes (SERCOP/OCDS).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search Ecuador public procurement procedures (SERCOP / OCDS open data). Useful for journalists, researchers and citizens looking for contracts, tenders, buyers or suppliers. Requires a keyword of at least 3 characters. Year defaults to the current calendar year and falls back to prior years when year=0. Results are cached ~30 minutes; on 429 the client cools down.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>required</code></td><td>Keyword (min 3 chars), e.g. "medicinas", "vialidad", "software"</td></tr>
+
+<tr><td><code>year</code></td><td><code>int</code></td><td><code>0</code></td><td>Contract year (2015–current). 0 = current year + fallback</td></tr>
+
+<tr><td><code>page</code></td><td><code>int</code></td><td><code>1</code></td><td>Results page (1-based)</td></tr>
+
+<tr><td><code>buyer</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional buyer/institution keyword (min 3 chars)</td></tr>
+
+<tr><td><code>supplier</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional supplier keyword (min 3 chars)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_contrato_info" data-search="get_contrato_info full ocds record: buyer, tender, awards, contracts. get the full ocds record for a public procurement procedure (sercop). returns buyer, tender, awards, contracts and useful links when available. get the ocid from search_contratos. ocid open contracting id, e.g. &quot;ocds-5wno2w-001-lico-gplr-2020-2805&quot; format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_contrato_info</code>
+<span class="atlas-tool-desc">Full OCDS record: buyer, tender, awards, contracts.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Get the full OCDS record for a public procurement procedure (SERCOP). Returns buyer, tender, awards, contracts and useful links when available. Get the ocid from search_contratos.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>ocid</code></td><td><code>str</code></td><td><code>required</code></td><td>Open Contracting ID, e.g. "ocds-5wno2w-001-LICO-GPLR-2020-2805"</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+</div>
+
+<div class="atlas-category">
+<h3 class="atlas-category-title">Risk & earthquakes<span class="tag">3</span></h3>
+
+<details class="atlas-tool" id="tool-search_eventos_riesgo" data-search="search_eventos_riesgo coe emergency/risk events (landslides, floods, etc.). search emergency/risk events from ecuador's sgr coe (gestión de riesgos). returns recent recorded events such as landslides, floods, structural damage, with province/canton, status (seguimiento/cierre), impacts and description. data comes from the public arcgis coe2 service (cached ~5 minutes). query free text (sector, cause, description keywords) provincia province filter (e.g. &quot;pichincha&quot;) canton canton filter (e.g. &quot;quito&quot;) evento event type filter (e.g. &quot;deslizamiento&quot;, &quot;inundación&quot;, &quot;aluvión&quot;) estado status filter (e.g. &quot;seguimiento&quot;, &quot;cierre&quot;) limit max events to return (default 15, max 100) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_eventos_riesgo</code>
+<span class="atlas-tool-desc">COE emergency/risk events (landslides, floods, etc.).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search emergency/risk events from Ecuador's SGR COE (Gestión de Riesgos). Returns recent recorded events such as landslides, floods, structural damage, with province/canton, status (Seguimiento/Cierre), impacts and description. Data comes from the public ArcGIS COE2 service (cached ~5 minutes).</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text (sector, cause, description keywords)</td></tr>
+
+<tr><td><code>provincia</code></td><td><code>str</code></td><td><code>empty</code></td><td>Province filter (e.g. "Pichincha")</td></tr>
+
+<tr><td><code>canton</code></td><td><code>str</code></td><td><code>empty</code></td><td>Canton filter (e.g. "Quito")</td></tr>
+
+<tr><td><code>evento</code></td><td><code>str</code></td><td><code>empty</code></td><td>Event type filter (e.g. "Deslizamiento", "Inundación", "Aluvión")</td></tr>
+
+<tr><td><code>estado</code></td><td><code>str</code></td><td><code>empty</code></td><td>Status filter (e.g. "Seguimiento", "Cierre")</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>15</code></td><td>Max events to return (default 15, max 100)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_sat_tsunami" data-search="list_sat_tsunami tsunami early-warning stations. list tsunami early-warning sat stations published by sgr (gestión de riesgos). returns station codes and coordinates from the public sat mapserver. limit max stations to include in the response (default 30) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_sat_tsunami</code>
+<span class="atlas-tool-desc">Tsunami early-warning stations.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List tsunami early-warning SAT stations published by SGR (Gestión de Riesgos). Returns station codes and coordinates from the public SAT MapServer.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>30</code></td><td>Max stations to include in the response (default 30)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_sismos" data-search="search_sismos recent earthquakes from the geophysical institute's (ig-epn) catalog: magnitude, depth, location, and review status. search recent earthquakes in ecuador from the instituto geofísico (ig-epn). returns the ig-epn seismic catalog feed: magnitude, depth, coordinates, local/utc time, review status and nearest-place description, with a link to each event page. data is cached ~2 minutes. query free text over location/id (e.g. &quot;quito&quot;, &quot;esmeraldas&quot;) magnitud_minima minimum magnitude (e.g. 4.0) dias only events from the last n days (0 = all available) limit max events to return (default 15, max 100) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_sismos</code>
+<span class="atlas-tool-desc">Recent earthquakes from the Geophysical Institute's (IG-EPN) catalog: magnitude, depth, location, and review status.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search recent earthquakes in Ecuador from the Instituto Geofísico (IG-EPN). Returns the IG-EPN seismic catalog feed: magnitude, depth, coordinates, local/UTC time, review status and nearest-place description, with a link to each event page. Data is cached ~2 minutes.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text over location/id (e.g. "Quito", "Esmeraldas")</td></tr>
+
+<tr><td><code>magnitud_minima</code></td><td><code>float</code></td><td><code>0.0</code></td><td>Minimum magnitude (e.g. 4.0)</td></tr>
+
+<tr><td><code>dias</code></td><td><code>int</code></td><td><code>0</code></td><td>Only events from the last N days (0 = all available)</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>15</code></td><td>Max events to return (default 15, max 100)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+</div>
+
+<div class="atlas-category">
+<h3 class="atlas-category-title">Exploration<span class="tag">4</span></h3>
+
+<details class="atlas-tool" id="tool-search_organizations" data-search="search_organizations search across 98+ institutions that publish data (inec, sri, bce, msp, etc.). search for public institutions that publish data on ecuador's open data portal. there are 98+ organizations including inec, sri, ministerio de salud, bce, etc. query optional search term (e.g. &quot;salud&quot;, &quot;sri&quot;, &quot;inec&quot;) page page number (1-based, default: 1) page_size results per page (default: 20, max: 100) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) or &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_organizations</code>
+<span class="atlas-tool-desc">Search across 98+ institutions that publish data (INEC, SRI, BCE, MSP, etc.).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search for public institutions that publish data on Ecuador's open data portal. There are 98+ organizations including INEC, SRI, Ministerio de Salud, BCE, etc.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional search term (e.g. "salud", "SRI", "INEC")</td></tr>
+
+<tr><td><code>page</code></td><td><code>int</code></td><td><code>1</code></td><td>Page number (1-based, default: 1)</td></tr>
+
+<tr><td><code>page_size</code></td><td><code>int</code></td><td><code>20</code></td><td>Results per page (default: 20, max: 100)</td></tr>
+
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) or "cuenca" (cuencaendatos.cuenca.gob.ec, independent municipal portal)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_organization_info" data-search="get_organization_info info about an organization, with a list of its datasets. get detailed information about a public institution and its published datasets. returns the institution name, description, dataset count, and a list of its datasets. organization_id the organization slug (e.g. &quot;sri-servicio-de-rentas-internas&quot;) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) or &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_organization_info</code>
+<span class="atlas-tool-desc">Info about an organization, with a list of its datasets.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Get detailed information about a public institution and its published datasets. Returns the institution name, description, dataset count, and a list of its datasets.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>organization_id</code></td><td><code>str</code></td><td><code>required</code></td><td>The organization slug (e.g. "sri-servicio-de-rentas-internas")</td></tr>
+
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) or "cuenca" (cuencaendatos.cuenca.gob.ec, independent municipal portal)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_categories" data-search="list_categories topic categories with dataset counts. list all thematic categories of ecuador's open data portal. categories include: salud, educación, economía y finanzas, seguridad y defensa, anticorrupción, ambiente y agua, transporte, turismo, and more. each category shows the number of datasets it contains. use the category 'name' field as the 'category' parameter in search_datasets to filter results by topic. source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) or &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_categories</code>
+<span class="atlas-tool-desc">Topic categories with dataset counts.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List all thematic categories of Ecuador's open data portal. Categories include: Salud, Educación, Economía y Finanzas, Seguridad y Defensa, Anticorrupción, Ambiente y Agua, Transporte, Turismo, and more. Each category shows the number of datasets it contains. Use the category 'name' field as the 'category' parameter in search_datasets to filter results by topic.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) or "cuenca" (cuencaendatos.cuenca.gob.ec, independent municipal portal)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_category_info" data-search="get_category_info detail of a category and sample datasets. get details for a thematic category (ckan group) on ecuador's open data portal. use list_categories first to discover valid category ids (the 'name' field, e.g. 'salud', 'educacion', 'economia-y-finanzas'). category category slug/name from list_categories include_datasets include sample datasets in the category (default true) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) or &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_category_info</code>
+<span class="atlas-tool-desc">Detail of a category and sample datasets.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Get details for a thematic category (CKAN group) on Ecuador's open data portal. Use list_categories first to discover valid category IDs (the 'name' field, e.g. 'salud', 'educacion', 'economia-y-finanzas').</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>category</code></td><td><code>str</code></td><td><code>required</code></td><td>Category slug/name from list_categories</td></tr>
+
+<tr><td><code>include_datasets</code></td><td><code>bool</code></td><td><code>True</code></td><td>Include sample datasets in the category (default True)</td></tr>
+
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) or "cuenca" (cuencaendatos.cuenca.gob.ec, independent municipal portal)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+</div>
+
+<div class="atlas-category">
+<h3 class="atlas-category-title">Recently added tools<span class="tag">34</span></h3>
+
+<details class="atlas-tool" id="tool-audit_bce_catalog" data-search="audit_bce_catalog audit the live bcedata catalogue and report its coverage audit the live bcedata catalogue and report its coverage. fetches the catalogue tree and every indicator group's metadata. the report counts groups, series, sections and failed metadata requests. set incluir_grupos=true to include the complete per-group inventory. use get_indicador_bce for the actual values of a selected group. set guardar_snapshot=true to persist the audit under bce_catalog_snapshot_dir (or data/bce_catalog_snapshots by default). set comparar_anterior=true to compare the current catalog with the last complete saved audit. set auditar_grid=true to probe one latest period for every discovered frequency/unit combination. the value audit is bounded and persisted separately when guardar_snapshot=true. incluir_grupos include every discovered group's metadata in the response. defaults to false to keep mobile responses small. guardar_snapshot parameter documented in the source code. comparar_anterior parameter documented in the source code. auditar_grid parameter documented in the source code. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">audit_bce_catalog</code>
+<span class="atlas-tool-desc">Audit the live BCEData catalogue and report its coverage</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Audit the live BCEData catalogue and report its coverage. Fetches the catalogue tree and every indicator group's metadata. The report counts groups, series, sections and failed metadata requests. Set incluir_grupos=true to include the complete per-group inventory. Use get_indicador_bce for the actual values of a selected group. Set guardar_snapshot=true to persist the audit under BCE_CATALOG_SNAPSHOT_DIR (or data/bce_catalog_snapshots by default). Set comparar_anterior=true to compare the current catalog with the last complete saved audit. Set auditar_grid=true to probe one latest period for every discovered frequency/unit combination. The value audit is bounded and persisted separately when guardar_snapshot=true.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>incluir_grupos</code></td><td><code>bool</code></td><td><code>False</code></td><td>Include every discovered group's metadata in the response. Defaults to false to keep mobile responses small.</td></tr>
+
+<tr><td><code>guardar_snapshot</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>comparar_anterior</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>auditar_grid</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-compare_bce_sources" data-search="compare_bce_sources build a cautious bcedata ↔ iem candidate-equivalence map build a cautious bcedata ↔ iem candidate-equivalence map. matching uses normalized group/series/table labels. it reports candidate overlaps and source-only entries, but does not claim that two labels have identical definitions. confirm unit, frequency, coverage, values and revisions before combining them. query parameter documented in the source code. limit parameter documented in the source code. historico parameter documented in the source code. format parameter documented in the source code.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">compare_bce_sources</code>
+<span class="atlas-tool-desc">Build a cautious BCEData ↔ IEM candidate-equivalence map</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Build a cautious BCEData ↔ IEM candidate-equivalence map. Matching uses normalized group/series/table labels. It reports candidate overlaps and source-only entries, but does not claim that two labels have identical definitions. Confirm unit, frequency, coverage, values and revisions before combining them.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>100</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>historico</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Parameter documented in the source code.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-describe_sri_saiku_cube" data-search="describe_sri_saiku_cube describir un cubo saiku público del sri: dimensiones, jerarquías, niveles, medidas y metadatos olap describir un cubo saiku público del sri: dimensiones, jerarquías, niveles, medidas y metadatos olap. usa solo rutas de descubrimiento de lectura. no consulta filas ni devuelve la configuración oracle de las fuentes. cube_id identificador devuelto por list_sri_saiku_cubes format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">describe_sri_saiku_cube</code>
+<span class="atlas-tool-desc">Describir un cubo Saiku público del SRI: dimensiones, jerarquías, niveles, medidas y metadatos OLAP</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Describir un cubo Saiku público del SRI: dimensiones, jerarquías, niveles, medidas y metadatos OLAP. Usa solo rutas de descubrimiento de lectura. No consulta filas ni devuelve la configuración Oracle de las fuentes.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>cube_id</code></td><td><code>str</code></td><td><code>required</code></td><td>Identificador devuelto por list_sri_saiku_cubes</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_bce_iem_table" data-search="get_bce_iem_table inspect one official xlsx table from the latest bce iem bulletin inspect one official xlsx table from the latest bce iem bulletin. get table_id from search_bce_iem. tables with the common bce layout (periods across columns and variables down rows) return structured, date-filterable series. other layouts return a faithful preview rather than silently guessing columns. always includes the bce file and bulletin urls for verification. pass boletin_numero to retrieve a historical version returned by search_bce_iem(historico=true). table_id parameter documented in the source code. desde parameter documented in the source code. hasta parameter documented in the source code. boletin_numero parameter documented in the source code. rows parameter documented in the source code. format parameter documented in the source code.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_bce_iem_table</code>
+<span class="atlas-tool-desc">Inspect one official XLSX table from the latest BCE IEM bulletin</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Inspect one official XLSX table from the latest BCE IEM bulletin. Get table_id from search_bce_iem. Tables with the common BCE layout (periods across columns and variables down rows) return structured, date-filterable series. Other layouts return a faithful preview rather than silently guessing columns. Always includes the BCE file and bulletin URLs for verification. Pass boletin_numero to retrieve a historical version returned by search_bce_iem(historico=true).</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>table_id</code></td><td><code>str</code></td><td><code>required</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>desde</code></td><td><code>str</code></td><td><code>empty</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>hasta</code></td><td><code>str</code></td><td><code>empty</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>boletin_numero</code></td><td><code>int</code></td><td><code>0</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>rows</code></td><td><code>int</code></td><td><code>20</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Parameter documented in the source code.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_bce_indicador_diario" data-search="get_bce_indicador_diario fetch one bce daily/monthly indicator's time series (e.g fetch one bce daily/monthly indicator's time series (e.g. riesgo país), bounded to a window — never the full series (some run 7,000+ observations). get archivo/codigo from list_bce_indicadores_diarios first — a codigo only means one thing within its own archivo. without desde/hasta, returns the most recent ultimos_n observations (capped at 366). with desde/hasta (yyyy-mm-dd, inclusive), returns that date range instead, also capped at 366 rows (most recent within the range if it's larger). the response always includes rango_completo (the series' true full date range and row count) so the window returned is never mistaken for the whole series. each point in &quot;datos&quot; has &quot;valor&quot; (one number) for almost every indicator, except inflación (datos_ipc.json), which has no single value — its points carry &quot;valores&quot;: {&quot;mensual&quot;:..., &quot;anual&quot;:..., &quot;acumulada&quot;:...} instead. archivo a file name from list_bce_indicadores_diarios. codigo a &quot;código variable dinámica&quot; from that same archivo. ultimos_n most recent n observations when no date range is given. desde optional start date yyyy-mm-dd. hasta optional end date yyyy-mm-dd. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_bce_indicador_diario</code>
+<span class="atlas-tool-desc">Fetch one BCE daily/monthly indicator's time series (e.g</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Fetch one BCE daily/monthly indicator's time series (e.g. Riesgo País), bounded to a window — never the full series (some run 7,000+ observations). Get archivo/codigo from list_bce_indicadores_diarios first — a codigo only means one thing within its own archivo. Without desde/hasta, returns the most recent ultimos_n observations (capped at 366). With desde/hasta (YYYY-MM-DD, inclusive), returns that date range instead, also capped at 366 rows (most recent within the range if it's larger). The response always includes rango_completo (the series' true full date range and row count) so the window returned is never mistaken for the whole series. Each point in "datos" has "valor" (one number) for almost every indicator, except Inflación (datos_ipc.json), which has no single value — its points carry "valores": {"Mensual":..., "Anual":..., "Acumulada":...} instead.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>archivo</code></td><td><code>str</code></td><td><code>required</code></td><td>A file name from list_bce_indicadores_diarios.</td></tr>
+
+<tr><td><code>codigo</code></td><td><code>str</code></td><td><code>required</code></td><td>A "Código Variable Dinámica" from that same archivo.</td></tr>
+
+<tr><td><code>ultimos_n</code></td><td><code>int</code></td><td><code>30</code></td><td>Most recent N observations when no date range is given.</td></tr>
+
+<tr><td><code>desde</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional start date YYYY-MM-DD.</td></tr>
+
+<tr><td><code>hasta</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional end date YYYY-MM-DD.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_cenace_tablero" data-search="get_cenace_tablero fetch one tablero (tab) of cenace's live grid-operations snapshot (ecuador's national electricity operator) — generation mix and demand, always as-of-now fetch one tablero (tab) of cenace's live grid-operations snapshot (ecuador's national electricity operator) — generation mix and demand, always as-of-now. tableros: - produccion_tiempo_real: current instant. - demanda_tiempo_real: current instant, plus a per-distributor (empresa eléctrica/cnel) mw breakdown. - operativa_diaria: yesterday's full day total. - acumulada_mensual: month-to-date total (mwh). - acumulada_anual: year-to-date total (gwh). each returns &quot;resumen&quot; (produccion total/exportación/importación/ hidráulica/térmica/renovable no convencional, or the demand equivalent). there is no historical query here — cenace's page has no date picker, only these 5 as-of-now views. tablero one of the 5 names above. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_cenace_tablero</code>
+<span class="atlas-tool-desc">Fetch one tablero (tab) of CENACE's live grid-operations snapshot (Ecuador's national electricity operator) — generation mix and demand, always as-of-now</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Fetch one tablero (tab) of CENACE's live grid-operations snapshot (Ecuador's national electricity operator) — generation mix and demand, always as-of-now. Tableros: - produccion_tiempo_real: current instant. - demanda_tiempo_real: current instant, plus a per-distributor (empresa eléctrica/CNEL) MW breakdown. - operativa_diaria: yesterday's full day total. - acumulada_mensual: month-to-date total (MWh). - acumulada_anual: year-to-date total (GWh). Each returns "resumen" (produccion total/exportación/importación/ hidráulica/térmica/renovable no convencional, or the demand equivalent). There is no historical query here — CENACE's page has no date picker, only these 5 as-of-now views.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>tablero</code></td><td><code>str</code></td><td><code>required</code></td><td>One of the 5 names above.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_contraloria_informe" data-search="get_contraloria_informe download and preview one contraloría document (datos abiertos or plan anual de control) download and preview one contraloría document (datos abiertos or plan anual de control). get informe_id from list_contraloria_informes. quarterly &quot;datos abiertos&quot; documents return one row per audit report approved that quarter, across every public institution in the country. &quot;plan anual de control&quot; documents are pdfs (one per year); this returns their metadata and points you at read_pdf instead of a table. informe_id an id from list_contraloria_informes rows number of data rows to preview (default: 50, max: 200) format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_contraloria_informe</code>
+<span class="atlas-tool-desc">Download and preview one Contraloría document (Datos Abiertos or Plan Anual de Control)</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Download and preview one Contraloría document (Datos Abiertos or Plan Anual de Control). Get informe_id from list_contraloria_informes. Quarterly "Datos Abiertos" documents return one row per audit report approved that quarter, across every public institution in the country. "Plan Anual de Control" documents are PDFs (one per year); this returns their metadata and points you at read_pdf instead of a table.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>informe_id</code></td><td><code>str</code></td><td><code>required</code></td><td>An id from list_contraloria_informes</td></tr>
+
+<tr><td><code>rows</code></td><td><code>int</code></td><td><code>50</code></td><td>Number of data rows to preview (default: 50, max: 200)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_inec_estadistica_files" data-search="get_inec_estadistica_files list the direct file links published on one inec statistical topic page list the direct file links published on one inec statistical topic page. get the url from search_inec_estadisticas. returns technical bulletins, methodology, and historical series as direct pdf/xlsx/csv/zip links — not the file contents. use read_pdf on a .pdf link, or download it yourself for tabular formats. url a topic url from search_inec_estadisticas's &quot;url&quot; field (must be on ecuadorencifras.gob.ec) format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_inec_estadistica_files</code>
+<span class="atlas-tool-desc">List the direct file links published on one INEC statistical topic page</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List the direct file links published on one INEC statistical topic page. Get the url from search_inec_estadisticas. Returns technical bulletins, methodology, and historical series as direct PDF/XLSX/CSV/ZIP links — not the file contents. Use read_pdf on a .pdf link, or download it yourself for tabular formats.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>url</code></td><td><code>str</code></td><td><code>required</code></td><td>A topic URL from search_inec_estadisticas's "url" field (must be on ecuadorencifras.gob.ec)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_inec_publicacion_archivos" data-search="get_inec_publicacion_archivos list the direct file links (pdf/xlsx/csv/zip) embedded in one inec publication found via search_inec_publicaciones. list the direct file links (pdf/xlsx/csv/zip) embedded in one inec publication found via search_inec_publicaciones. post either the numeric &quot;id&quot; from search_inec_publicaciones, or the publication's full ecuadorencifras.gob.ec url. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_inec_publicacion_archivos</code>
+<span class="atlas-tool-desc">List the direct file links (PDF/XLSX/CSV/ZIP) embedded in one INEC publication found via search_inec_publicaciones.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List the direct file links (PDF/XLSX/CSV/ZIP) embedded in one INEC publication found via search_inec_publicaciones.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>post</code></td><td><code>str</code></td><td><code>required</code></td><td>Either the numeric "id" from search_inec_publicaciones, or the publication's full ecuadorencifras.gob.ec URL.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_informe_igepn" data-search="get_informe_igepn download and extract text from one ig-epn report found via search_informes_igepn download and extract text from one ig-epn report found via search_informes_igepn. ig-epn has no stable per-report url (each download is a session-bound form submit), so this re-locates the report by exact name/year/group and streams its pdf directly -- pass `volcan` to disambiguate when two reports share the same name on the same day (happens for volcanic daily reports). nombre exact report name from search_informes_igepn (e.g. &quot;informe diario 2022-071&quot;) volcan volcano name, only needed to disambiguate a duplicate nombre grupo &quot;sismico&quot; | &quot;volcanico&quot; | &quot;&quot; (both) -- same value used to find it anio report year (0 = current year) -- same value used to find it pages page range, 1-indexed (e.g. &quot;3&quot;, &quot;1-5&quot;). empty = whole document, capped at 20 pages/call format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_informe_igepn</code>
+<span class="atlas-tool-desc">Download and extract text from one IG-EPN report found via search_informes_igepn</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Download and extract text from one IG-EPN report found via search_informes_igepn. IG-EPN has no stable per-report URL (each download is a session-bound form submit), so this re-locates the report by exact name/year/group and streams its PDF directly -- pass `volcan` to disambiguate when two reports share the same name on the same day (happens for volcanic daily reports).</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>nombre</code></td><td><code>str</code></td><td><code>required</code></td><td>Exact report name from search_informes_igepn (e.g. "Informe Diario 2022-071")</td></tr>
+
+<tr><td><code>volcan</code></td><td><code>str</code></td><td><code>empty</code></td><td>Volcano name, only needed to disambiguate a duplicate nombre</td></tr>
+
+<tr><td><code>grupo</code></td><td><code>str</code></td><td><code>empty</code></td><td>"sismico" | "volcanico" | "" (both) -- same value used to find it</td></tr>
+
+<tr><td><code>anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Report year (0 = current year) -- same value used to find it</td></tr>
+
+<tr><td><code>pages</code></td><td><code>str</code></td><td><code>empty</code></td><td>Page range, 1-indexed (e.g. "3", "1-5"). Empty = whole document, capped at 20 pages/call</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_sipa_modulo_archivos" data-search="get_sipa_modulo_archivos list the direct download links published on one sipa statistics module list the direct download links published on one sipa statistics module. get the modulo key from list_sipa_modulos. returns each file's title, description, direct xlsx/xls url, and format — not the file contents. files can be large (one confirmed at 41 mb); download the url directly instead of routing it through preview_resource_data or download_resource, which cap at 5 mb. modulo a module key from list_sipa_modulos, e.g. &quot;economico&quot;, &quot;productivo&quot;, &quot;social&quot;, &quot;censos&quot;. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_sipa_modulo_archivos</code>
+<span class="atlas-tool-desc">List the direct download links published on one SIPA statistics module</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List the direct download links published on one SIPA statistics module. Get the modulo key from list_sipa_modulos. Returns each file's title, description, direct XLSX/XLS URL, and format — not the file contents. Files can be large (one confirmed at 41 MB); download the URL directly instead of routing it through preview_resource_data or download_resource, which cap at 5 MB.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>modulo</code></td><td><code>str</code></td><td><code>required</code></td><td>A module key from list_sipa_modulos, e.g. "economico", "productivo", "social", "censos".</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_sri_ruc_info" data-search="get_sri_ruc_info consultar la información pública de un contribuyente por ruc en el sri consultar la información pública de un contribuyente por ruc en el sri. devuelve razón social, estado, tipo, actividad económica, fechas de registro y establecimientos públicos registrados. no devuelve declaraciones ni montos tributarios individuales. ruc ruc ecuatoriano exacto de 13 dígitos include_establecimientos incluir establecimientos registrados format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_sri_ruc_info</code>
+<span class="atlas-tool-desc">Consultar la información pública de un contribuyente por RUC en el SRI</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Consultar la información pública de un contribuyente por RUC en el SRI. Devuelve razón social, estado, tipo, actividad económica, fechas de registro y establecimientos públicos registrados. No devuelve declaraciones ni montos tributarios individuales.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>ruc</code></td><td><code>str</code></td><td><code>required</code></td><td>RUC ecuatoriano exacto de 13 dígitos</td></tr>
+
+<tr><td><code>include_establecimientos</code></td><td><code>bool</code></td><td><code>True</code></td><td>incluir establecimientos registrados</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_superbancos_seccion_archivos" data-search="get_superbancos_seccion_archivos list the direct download links published on one superbancos statistics section page list the direct download links published on one superbancos statistics section page. get the seccion key from list_superbancos_secciones. returns each file's grupo (table section, e.g. &quot;tarjetas de crédito&quot;), periodo (year label, when the table separates it from the file title), titulo, direct url, and format — not the file contents. files can be several mb; download the url directly instead of routing it through preview_resource_data or download_resource, which cap at 5 mb. coverage stops where the page's static archive tables stop — most recent years live in a client-side onedrive widget this tool does not read. do not present the newest &quot;periodo&quot;/&quot;titulo&quot; found here as the most recent data available from superbancos. seccion a section key from list_superbancos_secciones, e.g. &quot;boletines_financieros&quot;, &quot;servicios_financieros&quot;, &quot;informacion_historica&quot;, &quot;calendario_estadistico&quot;. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_superbancos_seccion_archivos</code>
+<span class="atlas-tool-desc">List the direct download links published on one Superbancos statistics section page</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List the direct download links published on one Superbancos statistics section page. Get the seccion key from list_superbancos_secciones. Returns each file's grupo (table section, e.g. "TARJETAS DE CRÉDITO"), periodo (year label, when the table separates it from the file title), titulo, direct URL, and format — not the file contents. Files can be several MB; download the URL directly instead of routing it through preview_resource_data or download_resource, which cap at 5 MB. Coverage stops where the page's static archive tables stop — most recent years live in a client-side OneDrive widget this tool does not read. Do not present the newest "periodo"/"titulo" found here as the most recent data available from Superbancos.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>seccion</code></td><td><code>str</code></td><td><code>required</code></td><td>A section key from list_superbancos_secciones, e.g. "boletines_financieros", "servicios_financieros", "informacion_historica", "calendario_estadistico".</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_sut_indicador_schema" data-search="get_sut_indicador_schema list the queryable columns/measures/date-levels for one sut power bi dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing list the queryable columns/measures/date-levels for one sut power bi dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing. a field like &quot;public contratos.nombre_padre_activ_econ_empresa&quot; is a plain column usable in query_sut_indicador's campos or filtros; one ending in &quot;[medida]&quot; is an aggregate measure (only valid in campos, never filtros); one ending in &quot;[año]&quot;/&quot;[mes]&quot; is a date-hierarchy level. denuncias_publico and encuentra_empleo use an older report layout where visuals don't expose their query this way at all — their fields come from a small manually-captured set instead (recovered by driving the live dashboard and reading the queries it actually sent), not from this automatic discovery, but they show up here the same as any other field. indicador a key from list_sut_indicadores. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_sut_indicador_schema</code>
+<span class="atlas-tool-desc">List the queryable columns/measures/date-levels for one SUT Power BI dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List the queryable columns/measures/date-levels for one SUT Power BI dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing. A field like "public contratos.nombre_padre_activ_econ_empresa" is a plain column usable in query_sut_indicador's campos or filtros; one ending in "[medida]" is an aggregate measure (only valid in campos, never filtros); one ending in "[Año]"/"[Mes]" is a date-hierarchy level. denuncias_publico and encuentra_empleo use an older report layout where visuals don't expose their query this way at all — their fields come from a small manually-captured set instead (recovered by driving the live dashboard and reading the queries it actually sent), not from this automatic discovery, but they show up here the same as any other field.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>indicador</code></td><td><code>str</code></td><td><code>required</code></td><td>A key from list_sut_indicadores.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-investigate_dataset" data-search="investigate_dataset one-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of &quot;find me data about x and show me what's in it&quot; one-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of &quot;find me data about x and show me what's in it&quot;. picks the top-ranked search result and, among its resources, the first one in a format this server can actually parse into a table (csv/json/xls/xlsx/ods/zip/targz), skipping unreadable ones (.rar, unrecognized formats) rather than previewing whichever resource happens to be listed first. not a replacement for the individual tools: if the top search result isn't the right dataset, or you need a specific resource within it, use search_datasets/list_dataset_resources/ preview_resource_data directly instead of re-running this. query search keywords (e.g. &quot;empleo&quot;, &quot;sri recaudación&quot;) source &quot;nacional&quot; (default) or &quot;cuenca&quot; (cuenca municipal portal) preview_rows data rows to preview from the chosen resource (default: 10, max: 50) format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">investigate_dataset</code>
+<span class="atlas-tool-desc">One-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of "find me data about X and show me what's in it"</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">One-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of "find me data about X and show me what's in it". Picks the top-ranked search result and, among its resources, the first one in a format this server can actually parse into a table (CSV/JSON/XLS/XLSX/ODS/ZIP/TARGZ), skipping unreadable ones (.rar, unrecognized formats) rather than previewing whichever resource happens to be listed first. Not a replacement for the individual tools: if the top search result isn't the right dataset, or you need a specific resource within it, use search_datasets/list_dataset_resources/ preview_resource_data directly instead of re-running this.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>required</code></td><td>Search keywords (e.g. "empleo", "SRI recaudación")</td></tr>
+
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default) or "cuenca" (Cuenca municipal portal)</td></tr>
+
+<tr><td><code>preview_rows</code></td><td><code>int</code></td><td><code>10</code></td><td>Data rows to preview from the chosen resource (default: 10, max: 50)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_bce_indicadores_diarios" data-search="list_bce_indicadores_diarios list bce's family of daily/monthly &quot;indicador&quot; widgets published outside both bcedata and iem (contenido.bce.fin.ec's highcharts widget pages) — includes riesgo país (embi) as a genuine daily series back to 2004, which bcedata only exposes as a monthly end-of-period aggregate list bce's family of daily/monthly &quot;indicador&quot; widgets published outside both bcedata and iem (contenido.bce.fin.ec's highcharts widget pages) — includes riesgo país (embi) as a genuine daily series back to 2004, which bcedata only exposes as a monthly end-of-period aggregate. also covers: precio del oro, petróleo wti, índice dow jones, tasa sofr/libor, ecuador sovereign bond prices (all daily); sistema de pagos/cobros interbancarios, sistema de pagos en línea, cámara de compensación de cheques (monthly); producción petrolera nacional (daily); inflación, desempleo, confianza del consumidor, pib (monthly/quarterly/annual, likely duplicates bcedata). the catalog is discovered live from each file's own data, not hardcoded — a &quot;codigo&quot; only means one thing within its own &quot;archivo&quot;, not across files. follow up with get_bce_indicador_diario(archivo, codigo) for one series. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_bce_indicadores_diarios</code>
+<span class="atlas-tool-desc">List BCE's family of daily/monthly "indicador" widgets published outside both BCEData and IEM (contenido.bce.fin.ec's Highcharts widget pages) — includes Riesgo País (EMBI) as a genuine daily series back to 2004, which BCEData only exposes as a monthly end-of-period aggregate</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List BCE's family of daily/monthly "indicador" widgets published outside both BCEData and IEM (contenido.bce.fin.ec's Highcharts widget pages) — includes Riesgo País (EMBI) as a genuine daily series back to 2004, which BCEData only exposes as a monthly end-of-period aggregate. Also covers: Precio del Oro, Petróleo WTI, Índice Dow Jones, Tasa SOFR/LIBOR, Ecuador sovereign bond prices (all daily); Sistema de Pagos/Cobros Interbancarios, Sistema de Pagos en Línea, Cámara de Compensación de Cheques (monthly); Producción Petrolera Nacional (daily); inflación, desempleo, confianza del consumidor, PIB (monthly/quarterly/annual, likely duplicates BCEData). The catalog is discovered live from each file's own data, not hardcoded — a "codigo" only means one thing within its own "archivo", not across files. Follow up with get_bce_indicador_diario(archivo, codigo) for one series.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_contraloria_informes" data-search="list_contraloria_informes list contraloría general del estado's &quot;datos abiertos&quot; and &quot;plan anual de control&quot; documents list contraloría general del estado's &quot;datos abiertos&quot; and &quot;plan anual de control&quot; documents. &quot;datos abiertos&quot; are quarterly csv exports of audit reports approved for any public institution in the country (unidad de control, entidad, diligencia, periodo, tipo de informe, n° de informe, fecha de aprobación) — much broader than any single-institution audit archive already covered elsewhere in this mcp. new quarters are added roughly every three months. &quot;plan anual de control&quot; documents are one pdf per year (the approved annual control plan). follow up with get_contraloria_informe(informe_id) for one document's parsed rows (csv) or metadata + read_pdf pointer (pdf). format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_contraloria_informes</code>
+<span class="atlas-tool-desc">List Contraloría General del Estado's "Datos Abiertos" and "Plan Anual de Control" documents</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List Contraloría General del Estado's "Datos Abiertos" and "Plan Anual de Control" documents. "Datos Abiertos" are quarterly CSV exports of audit reports approved for ANY public institution in the country (Unidad de Control, Entidad, Diligencia, periodo, tipo de informe, N° de informe, fecha de aprobación) — much broader than any single-institution audit archive already covered elsewhere in this MCP. New quarters are added roughly every three months. "Plan Anual de Control" documents are one PDF per year (the approved annual control plan). Follow up with get_contraloria_informe(informe_id) for one document's parsed rows (CSV) or metadata + read_pdf pointer (PDF).</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_sipa_modulos" data-search="list_sipa_modulos list sipa's statistics-download modules (sipa.agricultura.gob.ec) list sipa's statistics-download modules (sipa.agricultura.gob.ec). sipa (sistema de información pública agropecuaria) is the ministry of agriculture, livestock and fisheries' statistics portal — distinct from mpceip (industry/trade). it publishes real excel files with agropecuario price, trade, credit, production, and census series back to the early 2000s, organized into four modules: económico, productivo, social, and censos y registros administrativos. follow up with get_sipa_modulo_archivos(modulo) for one module's file listing. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_sipa_modulos</code>
+<span class="atlas-tool-desc">List SIPA's statistics-download modules (sipa.agricultura.gob.ec)</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List SIPA's statistics-download modules (sipa.agricultura.gob.ec). SIPA (Sistema de Información Pública Agropecuaria) is the Ministry of Agriculture, Livestock and Fisheries' statistics portal — distinct from MPCEIP (industry/trade). It publishes real Excel files with agropecuario price, trade, credit, production, and census series back to the early 2000s, organized into four modules: económico, productivo, social, and censos y registros administrativos. Follow up with get_sipa_modulo_archivos(modulo) for one module's file listing.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_sri_saiku_cubes" data-search="list_sri_saiku_cubes listar los cubos olap visibles en la instancia pública de saiku del sri listar los cubos olap visibles en la instancia pública de saiku del sri. esta herramienta solo consulta la sesión anónima y la ruta pública de descubrimiento. no lee la configuración administrativa ni devuelve registros de contribuyentes. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_sri_saiku_cubes</code>
+<span class="atlas-tool-desc">Listar los cubos OLAP visibles en la instancia pública de Saiku del SRI</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Listar los cubos OLAP visibles en la instancia pública de Saiku del SRI. Esta herramienta solo consulta la sesión anónima y la ruta pública de descubrimiento. No lee la configuración administrativa ni devuelve registros de contribuyentes.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_superbancos_secciones" data-search="list_superbancos_secciones list the superintendencia de bancos statistics sections (superbancos.gob.ec/estadisticas/portalestudios/) list the superintendencia de bancos statistics sections (superbancos.gob.ec/estadisticas/portalestudios/). superbancos has no ckan organization and no &quot;datos abiertos&quot; section, so this is the only path to its published statistics: monthly financial bulletins, cards/atms/correspondents service statistics, comparative annual bank behavior, and the publication calendar. important: each section page also embeds a client-side onedrive widget that lazy-loads the *most recent* years' files outside the page html — not covered here. this tool only returns what is in the page's static archive tables, which for most sections stops around 2020-2021 (boletines financieros: 1997-2008 only). follow up with get_superbancos_seccion_archivos(seccion) for one section's actual file listing and coverage. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_superbancos_secciones</code>
+<span class="atlas-tool-desc">List the Superintendencia de Bancos statistics sections (superbancos.gob.ec/estadisticas/portalestudios/)</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List the Superintendencia de Bancos statistics sections (superbancos.gob.ec/estadisticas/portalestudios/). Superbancos has no CKAN organization and no "datos abiertos" section, so this is the only path to its published statistics: monthly financial bulletins, cards/ATMs/correspondents service statistics, comparative annual bank behavior, and the publication calendar. IMPORTANT: each section page also embeds a client-side OneDrive widget that lazy-loads the *most recent* years' files outside the page HTML — not covered here. This tool only returns what is in the page's static archive tables, which for most sections stops around 2020-2021 (boletines financieros: 1997-2008 only). Follow up with get_superbancos_seccion_archivos(seccion) for one section's actual file listing and coverage.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_sut_indicadores" data-search="list_sut_indicadores list the ministerio del trabajo/sut's public power bi &quot;indicadores&quot; dashboards (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml) list the ministerio del trabajo/sut's public power bi &quot;indicadores&quot; dashboards (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml). these are live queryable semantic models, not static files — they cover monthly contract registrations by industry/province/gender since 2015 (contratos), employer-reported labor demand and skills gaps, training/certification stats, provincial employment-gap indicators, and a gender/workplace-policy compliance dashboard (pea, wage gaps, lactation rooms, childcare, teleworking). none of this overlaps with what's already covered by ckan's ministerio-del-trabajo datasets, which are current-snapshot-only. follow up with get_sut_indicador_schema(indicador) to see one dashboard's queryable fields, then query_sut_indicador to pull actual data — any combination of fields, not just what one chart already shows. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_sut_indicadores</code>
+<span class="atlas-tool-desc">List the Ministerio del Trabajo/SUT's public Power BI "Indicadores" dashboards (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml)</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List the Ministerio del Trabajo/SUT's public Power BI "Indicadores" dashboards (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml). These are live queryable semantic models, not static files — they cover monthly contract registrations by industry/province/gender since 2015 (contratos), employer-reported labor demand and skills gaps, training/certification stats, provincial employment-gap indicators, and a gender/workplace-policy compliance dashboard (PEA, wage gaps, lactation rooms, childcare, teleworking). None of this overlaps with what's already covered by CKAN's ministerio-del-trabajo datasets, which are current-snapshot-only. Follow up with get_sut_indicador_schema(indicador) to see one dashboard's queryable fields, then query_sut_indicador to pull actual data — any combination of fields, not just what one chart already shows.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_zip_contents" data-search="list_zip_contents list a .zip archive's member files (name, size) from a direct url, without downloading the archive list a .zip archive's member files (name, size) from a direct url, without downloading the archive. reads only the end of central directory record and the central directory via http range requests, so it works for archives far larger than the 5 mb preview_zip/download_resource cap -- e.g. inec or censo microdata zips of multiple hundred mb. requires the server to honor range requests; fails with a clear error otherwise. does not support zip64 archives. listing names is cheap this way, but previewing a specific member's rows is not (still needs decompressing from that member's offset onward) -- this tool only lists metadata. url direct url to a .zip file (from another tool's result, e.g. get_inec_publicacion_archivos, search_censo_recursos). limit max members returned (default 200, max 1000). offset pagination offset over the member list. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_zip_contents</code>
+<span class="atlas-tool-desc">List a .zip archive's member files (name, size) from a direct URL, without downloading the archive</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List a .zip archive's member files (name, size) from a direct URL, without downloading the archive. Reads only the End Of Central Directory record and the central directory via HTTP Range requests, so it works for archives far larger than the 5 MB preview_zip/download_resource cap -- e.g. INEC or censo microdata ZIPs of multiple hundred MB. Requires the server to honor Range requests; fails with a clear error otherwise. Does not support ZIP64 archives. Listing names is cheap this way, but previewing a specific member's rows is not (still needs decompressing from that member's offset onward) -- this tool only lists metadata.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>url</code></td><td><code>str</code></td><td><code>required</code></td><td>Direct URL to a .zip file (from another tool's result, e.g. get_inec_publicacion_archivos, search_censo_recursos).</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>200</code></td><td>Max members returned (default 200, max 1000).</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Pagination offset over the member list.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-query_sri_saiku_aggregate" data-search="query_sri_saiku_aggregate ejecutar una consulta agregada y limitada en un cubo público de saiku ejecutar una consulta agregada y limitada en un cubo público de saiku. la consulta tiene una sola dimensión en filas y una medida. el cubo, dimensión, jerarquía, nivel y medida deben salir de list_sri_saiku_cubes/describe_sri_saiku_cube. el límite máximo es 100. no acepta mdx arbitrario, no hace drill-through y no busca rucs. cube_id identificador completo del cubo row_dimension nombre de la dimensión para las filas row_hierarchy nombre de la jerarquía row_level nivel que se mostrará en las filas measure medida agregada limit máximo de filas solicitado (1-100) format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">query_sri_saiku_aggregate</code>
+<span class="atlas-tool-desc">Ejecutar una consulta agregada y limitada en un cubo público de Saiku</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Ejecutar una consulta agregada y limitada en un cubo público de Saiku. La consulta tiene una sola dimensión en filas y una medida. El cubo, dimensión, jerarquía, nivel y medida deben salir de list_sri_saiku_cubes/describe_sri_saiku_cube. El límite máximo es 100. No acepta MDX arbitrario, no hace drill-through y no busca RUCs.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>cube_id</code></td><td><code>str</code></td><td><code>required</code></td><td>Identificador completo del cubo</td></tr>
+
+<tr><td><code>row_dimension</code></td><td><code>str</code></td><td><code>required</code></td><td>Nombre de la dimensión para las filas</td></tr>
+
+<tr><td><code>row_hierarchy</code></td><td><code>str</code></td><td><code>required</code></td><td>Nombre de la jerarquía</td></tr>
+
+<tr><td><code>row_level</code></td><td><code>str</code></td><td><code>required</code></td><td>Nivel que se mostrará en las filas</td></tr>
+
+<tr><td><code>measure</code></td><td><code>str</code></td><td><code>required</code></td><td>Medida agregada</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>25</code></td><td>Máximo de filas solicitado (1-100)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-query_sut_indicador" data-search="query_sut_indicador run a live query against one sut power bi dashboard's underlying data model — any combination of its fields, e.g run a live query against one sut power bi dashboard's underlying data model — any combination of its fields, e.g. month and industry together for &quot;contratos&quot; (a real monthly time series since 2015 by ciiu industry, province, gender, contract status — none of this is in the ministerio-del-trabajo ckan datasets, which are a single current-snapshot stock count with no time dimension). get valid campos from get_sut_indicador_schema(indicador) first — an unrecognized field name raises an error naming the tool to call instead of guessing. filtros only accepts plain-column fields (not &quot;[medida]&quot;/hierarchy-level fields) and matches exact text equality, e.g. {&quot;public contratos.estado contrato&quot;: &quot;vigente&quot;}. rows can run into the thousands for a wide breakdown (e.g. every month x every industry) — narrow with filtros or fewer campos rather than raising limite past what's actually needed; format &quot;json&quot; is exact but still subject to the same limite cap. indicador a key from list_sut_indicadores. campos field labels exactly as returned by get_sut_indicador_schema. filtros optional {campo: valor} equality filters, plain columns only. limite row cap applied server-side by the query itself. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">query_sut_indicador</code>
+<span class="atlas-tool-desc">Run a live query against one SUT Power BI dashboard's underlying data model — any combination of its fields, e.g</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Run a live query against one SUT Power BI dashboard's underlying data model — any combination of its fields, e.g. month AND industry together for "contratos" (a real monthly time series since 2015 by CIIU industry, province, gender, contract status — none of this is in the ministerio-del-trabajo CKAN datasets, which are a single current-snapshot stock count with no time dimension). Get valid campos from get_sut_indicador_schema(indicador) first — an unrecognized field name raises an error naming the tool to call instead of guessing. filtros only accepts plain-column fields (not "[medida]"/hierarchy-level fields) and matches exact text equality, e.g. {"public contratos.Estado contrato": "Vigente"}. Rows can run into the thousands for a wide breakdown (e.g. every month x every industry) — narrow with filtros or fewer campos rather than raising limite past what's actually needed; format "json" is exact but still subject to the same limite cap.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>indicador</code></td><td><code>str</code></td><td><code>required</code></td><td>A key from list_sut_indicadores.</td></tr>
+
+<tr><td><code>campos</code></td><td><code>list[str]</code></td><td><code>required</code></td><td>Field labels exactly as returned by get_sut_indicador_schema.</td></tr>
+
+<tr><td><code>filtros</code></td><td><code>dict[str, str] | None</code></td><td><code>none</code></td><td>Optional {campo: valor} equality filters, plain columns only.</td></tr>
+
+<tr><td><code>limite</code></td><td><code>int</code></td><td><code>500</code></td><td>Row cap applied server-side by the query itself.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-read_pdf" data-search="read_pdf extract text from a pdf document at a direct url extract text from a pdf document at a direct url. useful for pdfs linked from other tools' results, e.g. get_regulacion_info's registro oficial file, or a dataset resource that turned out to be a pdf bulletin instead of a tabular file. no ocr: a scanned pdf with no embedded text layer will come back empty. max download size: 5 mb (larger files return an explicit error instead of a partial read -- pdfs can't be parsed from a truncated download); max 20 pages extracted per call (call again with a different `pages` range for the rest). url direct url to the pdf file pages page range, 1-indexed (e.g. &quot;3&quot;, &quot;1-5&quot;, &quot;1,4,9&quot;). empty means the whole document, still capped at 20 pages per call. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">read_pdf</code>
+<span class="atlas-tool-desc">Extract text from a PDF document at a direct URL</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Extract text from a PDF document at a direct URL. Useful for PDFs linked from other tools' results, e.g. get_regulacion_info's Registro Oficial file, or a dataset resource that turned out to be a PDF bulletin instead of a tabular file. No OCR: a scanned PDF with no embedded text layer will come back empty. Max download size: 5 MB (larger files return an explicit error instead of a partial read -- PDFs can't be parsed from a truncated download); max 20 pages extracted per call (call again with a different `pages` range for the rest).</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>url</code></td><td><code>str</code></td><td><code>required</code></td><td>Direct URL to the PDF file</td></tr>
+
+<tr><td><code>pages</code></td><td><code>str</code></td><td><code>empty</code></td><td>Page range, 1-indexed (e.g. "3", "1-5", "1,4,9"). Empty means the whole document, still capped at 20 pages per call.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_bce_iem" data-search="search_bce_iem search individual excel tables in the bce's latest iem bulletin search individual excel tables in the bce's latest iem bulletin. use this for detailed bce tables not conveniently available through search_indicadores_bce/bcedata: trade by country, debt, public finance by government level, oil, gdp breakdowns, and more. it lists tables from the current monthly bulletin; use get_bce_iem_table with a returned table_id to inspect one official xlsx file. set historico=true (or provide desde_anio/hasta_anio) to search across all matching monthly bulletin pages; this is slower on the first call because the archive pages must be read. set guardar_catalogo=true to persist the complete catalog assembled by this search under iem_catalog_dir (or data/iem_catalog_snapshots by default). pagination still keeps the mcp response bounded. set hash_archivos=true for an operator-style sha-256 audit of the discovered xlsx files. this downloads complete files, so it is deliberately opt-in and bounded by max_hash_archivos. query parameter documented in the source code. limit parameter documented in the source code. offset parameter documented in the source code. historico parameter documented in the source code. desde_anio parameter documented in the source code. hasta_anio parameter documented in the source code. guardar_catalogo parameter documented in the source code. hash_archivos parameter documented in the source code. max_hash_archivos parameter documented in the source code. format parameter documented in the source code.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_bce_iem</code>
+<span class="atlas-tool-desc">Search individual Excel tables in the BCE's latest IEM bulletin</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search individual Excel tables in the BCE's latest IEM bulletin. Use this for detailed BCE tables not conveniently available through search_indicadores_bce/BCEData: trade by country, debt, public finance by government level, oil, GDP breakdowns, and more. It lists tables from the current monthly bulletin; use get_bce_iem_table with a returned table_id to inspect one official XLSX file. Set historico=true (or provide desde_anio/hasta_anio) to search across all matching monthly bulletin pages; this is slower on the first call because the archive pages must be read. Set guardar_catalogo=true to persist the complete catalog assembled by this search under IEM_CATALOG_DIR (or data/iem_catalog_snapshots by default). Pagination still keeps the MCP response bounded. Set hash_archivos=true for an operator-style SHA-256 audit of the discovered XLSX files. This downloads complete files, so it is deliberately opt-in and bounded by max_hash_archivos.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>20</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>historico</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>desde_anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>hasta_anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>guardar_catalogo</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>hash_archivos</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>max_hash_archivos</code></td><td><code>int</code></td><td><code>5000</code></td><td>Parameter documented in the source code.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Parameter documented in the source code.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_bce_remesas" data-search="search_bce_remesas list bce's remesas de trabajadores (worker remittances) direct file links list bce's remesas de trabajadores (worker remittances) direct file links. a dedicated series separate from bcedata/iem (search_indicadores_bce, search_bce_iem): the aggregate flow series, the full historical series, a methodology user note, and — since a july 2025 change to microdata-based collection — monthly aggregate and entity-level databases (bdd). treat &quot;histórica&quot; (pre-change) and &quot;bdd&quot; (post-change) files as methodologically distinct series, not one continuous one — see the user note (nota_al_usuario) for the comparability details. returns direct urls, not file contents — download them yourself or via download_resource. query free text matched against the file's label or url (accent-insensitive), e.g. &quot;historica&quot;, &quot;entidad&quot;, &quot;bdd&quot;. empty returns all files. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_bce_remesas</code>
+<span class="atlas-tool-desc">List BCE's Remesas de Trabajadores (worker remittances) direct file links</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List BCE's Remesas de Trabajadores (worker remittances) direct file links. A dedicated series separate from BCEData/IEM (search_indicadores_bce, search_bce_iem): the aggregate flow series, the full historical series, a methodology user note, and — since a July 2025 change to microdata-based collection — monthly aggregate and entity-level databases (BDD). Treat "histórica" (pre-change) and "BDD" (post-change) files as methodologically distinct series, not one continuous one — see the user note (Nota_al_usuario) for the comparability details. Returns direct URLs, not file contents — download them yourself or via download_resource.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched against the file's label or URL (accent-insensitive), e.g. "historica", "entidad", "bdd". Empty returns all files.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_biinec_extras" data-search="search_biinec_extras check inec's biinec (&quot;banco de datos abiertos&quot;) for data not found in search_anda or search_inec_estadisticas check inec's biinec (&quot;banco de datos abiertos&quot;) for data not found in search_anda or search_inec_estadisticas. last resort for inec queries: biinec (aplicaciones3.ecuadorencifras.gob.ec) mostly duplicates anda and ecuador en cifras, so this does not scrape or search biinec live — it's a small, manually-verified list of the handful of registries confirmed to exist only there (environmental/administrative modules, e.g. hazardous waste in health facilities, enemdu/ecv environmental modules). if your query matches nothing here, that does not mean biinec has nothing — it means it wasn't worth automating; search the site's own search box directly instead. query free text matched against the registry's name/description (accent-insensitive). empty returns the full curated list. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_biinec_extras</code>
+<span class="atlas-tool-desc">Check INEC's BIINEC ("Banco de Datos Abiertos") for data not found in search_anda or search_inec_estadisticas</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Check INEC's BIINEC ("Banco de Datos Abiertos") for data not found in search_anda or search_inec_estadisticas. Last resort for INEC queries: BIINEC (aplicaciones3.ecuadorencifras.gob.ec) mostly duplicates ANDA and Ecuador en Cifras, so this does NOT scrape or search BIINEC live — it's a small, manually-verified list of the handful of registries confirmed to exist only there (environmental/administrative modules, e.g. hazardous waste in health facilities, ENEMDU/ECV environmental modules). If your query matches nothing here, that does NOT mean BIINEC has nothing — it means it wasn't worth automating; search the site's own search box directly instead.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched against the registry's name/description (accent-insensitive). Empty returns the full curated list.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_censo_recursos" data-search="search_censo_recursos search inec's dedicated census 2022 microsite (censoecuador.gob.ec) for direct microdata/methodology file links search inec's dedicated census 2022 microsite (censoecuador.gob.ec) for direct microdata/methodology file links. far more complete than the general &quot;censo de población y vivienda&quot; result from search_inec_estadisticas: full microdata at sector, cantón, and city-block (&quot;manzana&quot;/manloc) level in csv, spss (sav), and redatam formats, plus the 2010 and 2001 censuses recoded onto 2022 geography for comparability, variable dictionaries, and methodology/quality documents. returns metadata and direct urls only, never file contents -- these are large microdata archives (multi-hundred-mb in some cases), not previewable through this tool. query free text matched (accent-insensitive) against the file label, e.g. &quot;manlo&quot; (city-block level), &quot;sector&quot;, &quot;2010&quot;, &quot;spss&quot;, &quot;diccionario&quot;, &quot;metodologia&quot;. empty returns every file found. limit max results (default 30, max 100). offset pagination offset over the matched set. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_censo_recursos</code>
+<span class="atlas-tool-desc">Search INEC's dedicated Census 2022 microsite (censoecuador.gob.ec) for direct microdata/methodology file links</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search INEC's dedicated Census 2022 microsite (censoecuador.gob.ec) for direct microdata/methodology file links. Far more complete than the general "Censo de Población y Vivienda" result from search_inec_estadisticas: full microdata at sector, cantón, and city-block ("manzana"/MANLOC) level in CSV, SPSS (SAV), and REDATAM formats, plus the 2010 and 2001 censuses recoded onto 2022 geography for comparability, variable dictionaries, and methodology/quality documents. Returns metadata and direct URLs only, never file contents -- these are large microdata archives (multi-hundred-MB in some cases), not previewable through this tool.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched (accent-insensitive) against the file label, e.g. "manlo" (city-block level), "sector", "2010", "spss", "diccionario", "metodologia". Empty returns every file found.</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>30</code></td><td>Max results (default 30, max 100).</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Pagination offset over the matched set.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_inec_estadisticas" data-search="search_inec_estadisticas search inec's statistical topic pages (ecuadorencifras.gob.ec) search inec's statistical topic pages (ecuadorencifras.gob.ec). covers ~75 topics inec publishes (ipc, enemdu, ensanut, pobreza, comercio exterior, cuentas nacionales, construcción, censos...), separate from both search_datasets (ckan) and search_anda (inec's microdata archive). this is where the actual published aggregate series live — technical bulletins, methodology, and full historical series in excel/csv — for operations that anda only catalogs as metadata with no downloadable microdata (e.g. price indices). follow up with get_inec_estadistica_files(url) for one topic's file links. query free text matched against the topic name (accent-insensitive), e.g. &quot;precios&quot;, &quot;empleo&quot;, &quot;pobreza&quot;. empty returns all topics. limit max results (default 30, max 100) offset pagination offset over the matched set format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_inec_estadisticas</code>
+<span class="atlas-tool-desc">Search INEC's statistical topic pages (ecuadorencifras.gob.ec)</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search INEC's statistical topic pages (ecuadorencifras.gob.ec). Covers ~75 topics INEC publishes (IPC, ENEMDU, ENSANUT, pobreza, comercio exterior, cuentas nacionales, construcción, censos...), separate from both search_datasets (CKAN) and search_anda (INEC's microdata archive). This is where the actual published aggregate series live — technical bulletins, methodology, and full historical series in Excel/CSV — for operations that ANDA only catalogs as metadata with no downloadable microdata (e.g. price indices). Follow up with get_inec_estadistica_files(url) for one topic's file links.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched against the topic name (accent-insensitive), e.g. "precios", "empleo", "pobreza". Empty returns all topics.</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>30</code></td><td>Max results (default 30, max 100)</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Pagination offset over the matched set</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_inec_publicaciones" data-search="search_inec_publicaciones search every post inec has published on ecuador en cifras, via its public wordpress rest api -- always current, newest first search every post inec has published on ecuador en cifras, via its public wordpress rest api -- always current, newest first. complements search_inec_estadisticas: that tool's topic pages are curated landing pages that can go stale for months or years even while inec keeps publishing the same operation (confirmed live: enemdu's old &quot;empleo&quot; topic page stopped at april 2023 while inec kept releasing it monthly under dated posts this tool finds). use this tool for &quot;what's the latest bulletin/release for x&quot; questions. use search_inec_estadisticas/get_inec_estadistica_files instead when you want one operation's fixed overview page rather than a specific dated release. follow up with get_inec_publicacion_archivos(id) for one publication's file links. query free text matched against title/content (e.g. &quot;enemdu anual 2025&quot;, &quot;inflación julio&quot;, &quot;censo&quot;). empty returns the most recent posts regardless of topic. limit max results (default 20, max 100). offset pagination offset over the matched set. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_inec_publicaciones</code>
+<span class="atlas-tool-desc">Search every post INEC has published on Ecuador en Cifras, via its public WordPress REST API -- always current, newest first</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search every post INEC has published on Ecuador en Cifras, via its public WordPress REST API -- always current, newest first. Complements search_inec_estadisticas: that tool's topic pages are curated landing pages that can go stale for months or years even while INEC keeps publishing the same operation (confirmed live: ENEMDU's old "Empleo" topic page stopped at April 2023 while INEC kept releasing it monthly under dated posts this tool finds). Use this tool for "what's the latest bulletin/release for X" questions. Use search_inec_estadisticas/get_inec_estadistica_files instead when you want one operation's fixed overview page rather than a specific dated release. Follow up with get_inec_publicacion_archivos(id) for one publication's file links.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched against title/content (e.g. "ENEMDU anual 2025", "inflación julio", "censo"). Empty returns the most recent posts regardless of topic.</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>20</code></td><td>Max results (default 20, max 100).</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Pagination offset over the matched set.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_informes_igepn" data-search="search_informes_igepn search the ig-epn pdf report archive (instituto geofísico): daily/weekly/monthly/special seismic bulletins, volcanic &quot;ig al instante&quot; alerts, field/annual reports, etc search the ig-epn pdf report archive (instituto geofísico): daily/weekly/monthly/special seismic bulletins, volcanic &quot;ig al instante&quot; alerts, field/annual reports, etc. different from search_sismos, which reads the raw earthquake catalog feed -- this searches the narrative/pdf report archive instead. use get_informe_igepn afterwards to download and read one report's text. query free text over report name/volcano (e.g. &quot;cotopaxi&quot;, &quot;trimestral&quot;) grupo &quot;sismico&quot; | &quot;volcanico&quot; | &quot;&quot; (both) anio report year (0 = current year) limit max reports to return (default 15, max 30) format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_informes_igepn</code>
+<span class="atlas-tool-desc">Search the IG-EPN PDF report archive (Instituto Geofísico): daily/weekly/monthly/special seismic bulletins, volcanic "IG Al Instante" alerts, field/annual reports, etc</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search the IG-EPN PDF report archive (Instituto Geofísico): daily/weekly/monthly/special seismic bulletins, volcanic "IG Al Instante" alerts, field/annual reports, etc. Different from search_sismos, which reads the raw earthquake catalog feed -- this searches the narrative/PDF report archive instead. Use get_informe_igepn afterwards to download and read one report's text.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text over report name/volcano (e.g. "cotopaxi", "trimestral")</td></tr>
+
+<tr><td><code>grupo</code></td><td><code>str</code></td><td><code>empty</code></td><td>"sismico" | "volcanico" | "" (both)</td></tr>
+
+<tr><td><code>anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Report year (0 = current year)</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>15</code></td><td>Max reports to return (default 15, max 30)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_sri_estadisticas_recaudacion" data-search="search_sri_estadisticas_recaudacion search the sri's &quot;estadísticas de recaudación&quot; page for direct file links search the sri's &quot;estadísticas de recaudación&quot; page for direct file links. separate from search_sri_datasets (raw yearly declaration exports): this covers monthly xlsx reports pre-aggregated by impuesto, provincia/cantón, and actividad económica (updated monthly), plus a zip of historical indicators, an annual pdf boletín técnico, and infografías. returns direct urls, not the file contents — download them yourself, via download_resource, or read_pdf for the pdfs. query free text matched against the file's label or url (accent-insensitive), e.g. &quot;recaudación&quot;, &quot;provincia&quot;, &quot;actividad economica&quot;. empty returns all files. limit max results (default 30, max 100) offset pagination offset over the matched set format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_sri_estadisticas_recaudacion</code>
+<span class="atlas-tool-desc">Search the SRI's "Estadísticas de Recaudación" page for direct file links</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Search the SRI's "Estadísticas de Recaudación" page for direct file links. Separate from search_sri_datasets (raw yearly declaration exports): this covers monthly XLSX reports pre-aggregated by impuesto, provincia/cantón, and actividad económica (updated monthly), plus a ZIP of historical indicators, an annual PDF boletín técnico, and infografías. Returns direct URLs, not the file contents — download them yourself, via download_resource, or read_pdf for the PDFs.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched against the file's label or URL (accent-insensitive), e.g. "recaudación", "provincia", "actividad economica". Empty returns all files.</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>30</code></td><td>Max results (default 30, max 100)</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Pagination offset over the matched set</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_sri_ruc" data-search="search_sri_ruc buscar contribuyentes en el ruc del sri por razón social o nombre comercial (texto parcial), sin necesitar el ruc exacto de antemano buscar contribuyentes en el ruc del sri por razón social o nombre comercial (texto parcial), sin necesitar el ruc exacto de antemano. complementa get_sri_ruc_info (que requiere el ruc exacto) para el caso &quot;conozco el nombre de la empresa, no su ruc&quot;. cada resultado incluye estado, tipo de contribuyente, régimen, actividad económica, representantes legales, y si es agente de retención/contribuyente especial/fantasma — no declaraciones ni montos tributarios individuales. el sri limita esta búsqueda a 100 coincidencias por consulta; si total_reportado sale en 100, puede haber más contribuyentes de los que realmente se están devolviendo — usa un texto más específico para acotar. razon_social texto a buscar (mínimo 4 caracteres), ej. &quot;bananera&quot; max_resultados cuántos resultados con detalle completo devolver (máx 100) format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_sri_ruc</code>
+<span class="atlas-tool-desc">Buscar contribuyentes en el RUC del SRI por razón social o nombre comercial (texto parcial), sin necesitar el RUC exacto de antemano</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Buscar contribuyentes en el RUC del SRI por razón social o nombre comercial (texto parcial), sin necesitar el RUC exacto de antemano. Complementa get_sri_ruc_info (que requiere el RUC exacto) para el caso "conozco el nombre de la empresa, no su RUC". Cada resultado incluye estado, tipo de contribuyente, régimen, actividad económica, representantes legales, y si es agente de retención/contribuyente especial/fantasma — no declaraciones ni montos tributarios individuales. El SRI limita esta búsqueda a 100 coincidencias por consulta; si total_reportado sale en 100, puede haber más contribuyentes de los que realmente se están devolviendo — usa un texto más específico para acotar.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>razon_social</code></td><td><code>str</code></td><td><code>required</code></td><td>Texto a buscar (mínimo 4 caracteres), ej. "BANANERA"</td></tr>
+
+<tr><td><code>max_resultados</code></td><td><code>int</code></td><td><code>25</code></td><td>Cuántos resultados con detalle completo devolver (máx 100)</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+</div>
+
+<p id="atlas-empty" class="atlas-empty" style="display:none;">No tool matches that search.</p>
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>Missing a tool you need? Propose it.</p>
+<a class="btn-cta primary" href="colaborar.html">Contribute</a>
+</div>
+</section>
+
+</main>
+
+<footer class="page-footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left"><p>MIT License · Independent project, not affiliated with any Ecuadorian government institution.</p></div>
+    <div class="nav-footer-center">&nbsp;</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+        <li class="nav-item"><a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP">GitHub</a></li>
+        <li class="nav-item"><a class="nav-link" href="../releases.html">Releases</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/fuse.min.js"></script>
+<script>
+window.SITE_SEARCH_INDEX_URL = "../search.json";
+window.SITE_ROOT = "../";
+window.COPY_LABEL_COPIED = "Copied!";
+window.SITE_SEARCH_EMPTY_LABEL = "No results.";
+</script>
+<script src="../assets/site.js"></script>
+
+<script>
+(function () {
+  var input = document.getElementById("atlas-filter");
+  var tools = Array.from(document.querySelectorAll(".atlas-tool"));
+  var categories = Array.from(document.querySelectorAll(".atlas-category"));
+  var empty = document.getElementById("atlas-empty");
+
+  input.addEventListener("input", function (e) {
+    var q = e.target.value.trim().toLowerCase();
+
+    tools.forEach(function (el) {
+      el.style.display = el.dataset.search.includes(q) ? "" : "none";
+    });
+
+    var anyVisible = false;
+    categories.forEach(function (cat) {
+      var visible = Array.from(cat.querySelectorAll(".atlas-tool")).some(function (t) {
+        return t.style.display !== "none";
+      });
+      cat.style.display = visible ? "" : "none";
+      anyVisible = anyVisible || visible;
+    });
+
+    empty.style.display = anyVisible ? "none" : "";
+  });
+})();
+</script>
+
+</body>
+</html>

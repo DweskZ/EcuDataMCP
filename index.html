@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EcuDataMCP – EcuDataMCP</title>
+<meta name="description" content="Servidor MCP de código abierto para explorar datos abiertos del gobierno de Ecuador desde tu asistente de IA.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="EcuDataMCP – EcuDataMCP">
+<meta property="og:description" content="Servidor MCP de código abierto para explorar datos abiertos del gobierno de Ecuador desde tu asistente de IA.">
+<meta property="og:image" content="https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png">
+<link rel="stylesheet" href="assets/bootstrap-icons.css">
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/site.css">
+<style>html { scroll-behavior: smooth; }</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+  <div class="navbar-container container-fluid">
+    <div class="navbar-brand-container mx-auto">
+      <a class="navbar-brand" href="index.html">
+        <span class="navbar-title">EcuDataMCP</span>
+      </a>
+    </div>
+    <button class="site-search-toggle" type="button" title="Buscar" aria-label="Buscar">
+      <i class="bi bi-search"></i>
+    </button>
+    <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Navegación de palanca" data-nav-toggle="navbarCollapse">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav navbar-nav-scroll me-auto">
+        
+        <li class="nav-item">
+          <a class="nav-link active" href="index.html" aria-current="page">
+            <span class="menu-text">EcuDataMCP</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="index.html#como-funciona">
+            <span class="menu-text">Cómo funciona</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="index.html#fuentes">
+            <span class="menu-text">Fuentes</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="atlas.html">
+            <span class="menu-text">Referencia</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="examples.html">
+            <span class="menu-text">Ejemplos</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="releases.html">
+            <span class="menu-text">Releases</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">
+            <span class="menu-text">Acerca de</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="colaborar.html">
+            <span class="menu-text">Cómo colaborar</span>
+          </a>
+        </li>
+        
+      </ul>
+      <ul class="navbar-nav navbar-nav-scroll ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="en/index.html">
+            <span class="menu-text">English</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP" target="_blank">
+            <span class="menu-text">GitHub</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="site-search-panel" id="siteSearchPanel" hidden>
+  <div class="site-search-panel-inner">
+    <input type="text" id="siteSearchInput" class="site-search-input" placeholder="Buscar en el sitio…" autocomplete="off">
+    <div id="siteSearchResults" class="site-search-results"></div>
+  </div>
+</div>
+
+<main>
+
+<section class="landing hero">
+<div class="container-page">
+<p class="kicker">Infraestructura abierta de datos públicos para Ecuador</p>
+<h1>Explora <span class="accent">datos abiertos.</span></h1>
+<p class="hero-sub">Conecta tu asistente de IA a datos públicos verificables de Ecuador: datasets, trámites, contratos, sismos, indicadores del BCE, tablas IEM, RUC y compañías. Encuentra la fuente correcta, consulta con límites claros y cita siempre el origen oficial.</p>
+<div class="notice-box" role="note"><strong>Aviso:</strong> Algunas definiciones, parámetros y descripciones de herramientas fueron generados o asistidos por IA. Pueden estar incompletos o desactualizados; una herramienta puede devolver resultados parciales, rechazar parámetros válidos o comportarse inesperadamente cuando cambia la fuente oficial. Verifica siempre la respuesta contra la fuente enlazada y revisa manualmente los resultados antes de usarlos para decisiones importantes.</div>
+<div class="hero-ctas">
+<a class="btn-cta primary" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">Empezar en GitHub</a>
+<a class="btn-cta secondary" href="#como-funciona">Ver cómo funciona &darr;</a>
+</div>
+<div class="hero-stats">
+<div class="hero-stat"><span class="num">1,581</span><span class="label">datasets</span></div>
+<div class="hero-stat"><span class="num">73</span><span class="label">tools MCP</span></div>
+<div class="hero-stat"><span class="num">16</span><span class="label">fuentes oficiales</span></div>
+<div class="hero-stat"><span class="num">0</span><span class="label">API keys</span></div>
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">El problema</p>
+<h2 class="section-title">Menos tiempo en portales. Más respuestas de tus datos.</h2>
+<p class="section-lede">Ecuador publica una enorme cantidad de datos públicos, pero encontrarlos significa navegar portales distintos, revisar catálogos separados y adivinar cuál archivo está vigente. EcuDataMCP le da a tu asistente de IA las herramientas para hacer ese trabajo por ti, y sigue citando la fuente oficial en cada respuesta.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="como-funciona">
+<p class="kicker">Cómo funciona</p>
+<h2 class="section-title">Un camino trazable.</h2>
+<p class="section-lede">Cuatro pasos, del lenguaje natural a la fuente oficial.</p>
+<div class="steps-grid">
+<div class="step-card">
+<div class="step-num">01</div>
+<h3>Buscar</h3>
+<p><code>search_ecuador</code> busca a la vez en datasets, trámites, regulaciones, contratos y riesgos por palabra clave.</p>
+</div>
+<div class="step-card">
+<div class="step-num">02</div>
+<h3>Inspeccionar</h3>
+<p><code>get_dataset_info</code> y <code>list_dataset_resources</code> revisan campos, formatos y fechas antes de traer datos.</p>
+</div>
+<div class="step-card">
+<div class="step-num">03</div>
+<h3>Consultar</h3>
+<p><code>query_resource_data</code> filtra en el DataStore de CKAN sin descargar el archivo completo, o <code>preview_resource_data</code> para CSV, JSON y XLSX.</p>
+</div>
+<div class="step-card">
+<div class="step-num">04</div>
+<h3>Citar</h3>
+<p>Cada resultado enlaza a la fuente oficial (el dataset, el trámite, el expediente SERCOP) para que puedas verificarlo.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">¿Qué puedes preguntar?</p>
+<h2 class="section-title">Nunca antes había sido tan fácil navegar los datos sobre Ecuador.</h2>
+<p class="section-lede">16 fuentes oficiales, en una sola conversación.</p>
+<div class="questions-grid">
+
+<div class="question-card">&ldquo;¿Qué datos tiene el SRI sobre recaudación tributaria?&rdquo;</div>
+
+<div class="question-card">&ldquo;Muéstrame los datasets de salud del INEC&rdquo;</div>
+
+<div class="question-card">&ldquo;¿Cuáles son los requisitos para sacar el pasaporte?&rdquo;</div>
+
+<div class="question-card">&ldquo;¿Qué compañías del CIIU de comercio al por menor tienen mayor ROE este año?&rdquo;</div>
+
+<div class="question-card">&ldquo;Investiga el expediente de esta licitación pública en SERCOP&rdquo;</div>
+
+<div class="question-card">&ldquo;¿Cómo ha cambiado la confianza del consumidor según el BCE en los últimos dos años?&rdquo;</div>
+
+<div class="question-card">&ldquo;Busca una tabla IEM del BCE sobre exportaciones y muéstrame sus valores recientes.&rdquo;</div>
+
+<div class="question-card">&ldquo;¿Qué cubos públicos del SRI están disponibles para consultas agregadas?&rdquo;</div>
+
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="fuentes">
+<p class="kicker">Fuentes</p>
+<h2 class="section-title">Datos oficiales, siempre citados.</h2>
+<p class="section-lede">EcuDataMCP no copia ni almacena estos catálogos, cada consulta va en vivo contra el portal de origen.</p>
+<div class="card-grid">
+
+<div class="data-card">
+<h3>Datos Abiertos<span class="tag">CKAN</span></h3>
+<p>Catálogo nacional + DataStore + preview CSV/JSON/XLSX</p>
+<div class="source-coverage"><a href="https://www.datosabiertos.gob.ec" target="_blank" rel="noopener">www.datosabiertos.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>Cuenca en Datos<span class="tag">CKAN</span></h3>
+<p>Portal municipal CKAN independiente del nacional (92 datasets); mismos tools con source="cuenca"</p>
+<div class="source-coverage"><a href="https://cuencaendatos.cuenca.gob.ec" target="_blank" rel="noopener">cuencaendatos.cuenca.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>SRI Datasets</h3>
+<p>Archivos públicos, consulta de RUC y exploración acotada de cubos Saiku: recaudación, ventas/compras, vehículos y más</p>
+<div class="source-coverage"><a href="https://www.sri.gob.ec/datasets" target="_blank" rel="noopener">www.sri.gob.ec/datasets</a></div>
+</div>
+
+<div class="data-card">
+<h3>Trámites e instituciones<span class="tag">Gob.ec</span></h3>
+<p>Procedimientos, requisitos, costos</p>
+<div class="source-coverage"><a href="https://www.gob.ec" target="_blank" rel="noopener">gob.ec/api/v1</a></div>
+</div>
+
+<div class="data-card">
+<h3>Regulaciones<span class="tag">Gob.ec</span></h3>
+<p>Normas, acuerdos, Registro Oficial</p>
+<div class="source-coverage"><a href="https://www.gob.ec" target="_blank" rel="noopener">gob.ec/api/v1/regulaciones</a></div>
+</div>
+
+<div class="data-card">
+<h3>Contratos públicos<span class="tag">SERCOP/OCDS</span></h3>
+<p>Licitaciones, compradores, proveedores</p>
+<div class="source-coverage"><a href="https://datosabiertos.compraspublicas.gob.ec" target="_blank" rel="noopener">datosabiertos.compraspublicas.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>Gestión de Riesgos<span class="tag">SGR</span></h3>
+<p>Eventos COE + estaciones SAT tsunami</p>
+<div class="source-coverage"><a href="https://sgrportal.gestionderiesgos.gob.ec" target="_blank" rel="noopener">sgrportal.gestionderiesgos.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>Sismos<span class="tag">IG-EPN</span></h3>
+<p>Catálogo sísmico del Instituto Geofísico</p>
+<div class="source-coverage"><a href="https://www.igepn.edu.ec" target="_blank" rel="noopener">www.igepn.edu.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>Geografía<span class="tag">DPA</span><span class="tag">offline</span></h3>
+<p>24 provincias + 224 cantones (códigos INEC)</p>
+<div class="source-coverage">referencia offline</div>
+</div>
+
+<div class="data-card">
+<h3>ANDA<span class="tag">NADA/IHSN</span></h3>
+<p>Catálogo de encuestas y censos del INEC</p>
+<div class="source-coverage"><a href="https://anda.inec.gob.ec" target="_blank" rel="noopener">anda.inec.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>BCE<span class="tag">BCEData</span></h3>
+<p>BCEData, tablas IEM y series diarias: catálogo macroeconómico, comercio, finanzas públicas, PIB, empleo y riesgo país</p>
+<div class="source-coverage"><a href="https://contenido.bce.fin.ec" target="_blank" rel="noopener">contenido.bce.fin.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>Supercías</h3>
+<p>Directorio de compañías (226k+): representante legal, capital, CIIU</p>
+<div class="source-coverage"><a href="https://mercadodevalores.supercias.gob.ec" target="_blank" rel="noopener">mercadodevalores.supercias.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>Supercías Ranking<span class="tag">build local</span></h3>
+<p>Financieros por balance (ingresos, activos, ROE, ~38 ratios), últimos años; requiere build local</p>
+<div class="source-coverage"><a href="https://appscvsmovil.supercias.gob.ec" target="_blank" rel="noopener">appscvsmovil.supercias.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>INEC Publicaciones<span class="tag">INEC</span></h3>
+<p>Publicaciones, boletines y archivos enlazados desde el índice público del INEC</p>
+<div class="source-coverage"><a href="https://www.ecuadorencifras.gob.ec" target="_blank" rel="noopener">ecuadorencifras.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>CENACE<span class="tag">Energía</span></h3>
+<p>Snapshot operativo de demanda, generación y despacho eléctrico</p>
+<div class="source-coverage"><a href="https://www.cenace.gob.ec" target="_blank" rel="noopener">cenace.gob.ec</a></div>
+</div>
+
+<div class="data-card">
+<h3>SUT<span class="tag">Trabajo</span></h3>
+<p>Indicadores públicos del Ministerio del Trabajo mediante sus tableros estadísticos</p>
+<div class="source-coverage"><a href="https://sut.trabajo.gob.ec" target="_blank" rel="noopener">sut.trabajo.gob.ec</a></div>
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="tools">
+<p class="kicker">El backstage</p>
+<h2 class="section-title">Servidor MCP de código abierto.</h2>
+<p class="section-lede">EcuDataMCP corre como un servidor <a href="https://github.com/jlowin/fastmcp" target="_blank" rel="noopener">FastMCP</a> en Python, expuesto sobre HTTP Streamable o stdio. No hay base de datos propia: cada tool llama en vivo al portal oficial correspondiente (CKAN, gob.ec, SERCOP, BCE, Supercías, IG-EPN, SGR) y devuelve la respuesta formateada.</p>
+<div class="tools-grid">
+
+<div class="data-card">
+<h3>Entrada unificada<span class="tag">3</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-list_capabilities">list_capabilities</a><a class="tool-chip" href="atlas.html#tool-search_ecuador">search_ecuador</a><a class="tool-chip" href="atlas.html#tool-lookup_ubicacion">lookup_ubicacion</a></div>
+</div>
+
+<div class="data-card">
+<h3>Datos Abiertos<span class="tag">10</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-search_datasets">search_datasets</a><a class="tool-chip" href="atlas.html#tool-list_recent_datasets">list_recent_datasets</a><a class="tool-chip" href="atlas.html#tool-get_dataset_info">get_dataset_info</a><a class="tool-chip" href="atlas.html#tool-list_dataset_resources">list_dataset_resources</a><a class="tool-chip" href="atlas.html#tool-get_resource_info">get_resource_info</a><a class="tool-chip" href="atlas.html#tool-preview_resource_data">preview_resource_data</a><a class="tool-chip" href="atlas.html#tool-download_resource">download_resource</a><a class="tool-chip" href="atlas.html#tool-query_resource_data">query_resource_data</a><a class="tool-chip" href="atlas.html#tool-detect_series_pattern">detect_series_pattern</a><a class="tool-chip" href="atlas.html#tool-search_sri_datasets">search_sri_datasets</a></div>
+</div>
+
+<div class="data-card">
+<h3>Trámites Gubernamentales<span class="tag">4</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-search_tramites">search_tramites</a><a class="tool-chip" href="atlas.html#tool-get_tramite_info">get_tramite_info</a><a class="tool-chip" href="atlas.html#tool-list_instituciones">list_instituciones</a><a class="tool-chip" href="atlas.html#tool-get_institucion_info">get_institucion_info</a></div>
+</div>
+
+<div class="data-card">
+<h3>ANDA (INEC)<span class="tag">3</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-search_anda">search_anda</a><a class="tool-chip" href="atlas.html#tool-get_anda_survey_info">get_anda_survey_info</a><a class="tool-chip" href="atlas.html#tool-download_anda_microdata">download_anda_microdata</a></div>
+</div>
+
+<div class="data-card">
+<h3>Macroeconomía (BCE)<span class="tag">2</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-search_indicadores_bce">search_indicadores_bce</a><a class="tool-chip" href="atlas.html#tool-get_indicador_bce">get_indicador_bce</a></div>
+</div>
+
+<div class="data-card">
+<h3>Compañías (Supercías)<span class="tag">6</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-search_companias">search_companias</a><a class="tool-chip" href="atlas.html#tool-get_compania_info">get_compania_info</a><a class="tool-chip" href="atlas.html#tool-search_ranking">search_ranking</a><a class="tool-chip" href="atlas.html#tool-get_financials">get_financials</a><a class="tool-chip" href="atlas.html#tool-search_auditores">search_auditores</a><a class="tool-chip" href="atlas.html#tool-get_auditor_info">get_auditor_info</a></div>
+</div>
+
+<div class="data-card">
+<h3>Regulaciones y contratos<span class="tag">4</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-search_regulaciones">search_regulaciones</a><a class="tool-chip" href="atlas.html#tool-get_regulacion_info">get_regulacion_info</a><a class="tool-chip" href="atlas.html#tool-search_contratos">search_contratos</a><a class="tool-chip" href="atlas.html#tool-get_contrato_info">get_contrato_info</a></div>
+</div>
+
+<div class="data-card">
+<h3>Riesgos y sismos<span class="tag">3</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-search_eventos_riesgo">search_eventos_riesgo</a><a class="tool-chip" href="atlas.html#tool-list_sat_tsunami">list_sat_tsunami</a><a class="tool-chip" href="atlas.html#tool-search_sismos">search_sismos</a></div>
+</div>
+
+<div class="data-card">
+<h3>Exploración<span class="tag">4</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-search_organizations">search_organizations</a><a class="tool-chip" href="atlas.html#tool-get_organization_info">get_organization_info</a><a class="tool-chip" href="atlas.html#tool-list_categories">list_categories</a><a class="tool-chip" href="atlas.html#tool-get_category_info">get_category_info</a></div>
+</div>
+
+<div class="data-card">
+<h3>Herramientas incorporadas recientemente<span class="tag">34</span></h3>
+<div><a class="tool-chip" href="atlas.html#tool-audit_bce_catalog">audit_bce_catalog</a><a class="tool-chip" href="atlas.html#tool-compare_bce_sources">compare_bce_sources</a><a class="tool-chip" href="atlas.html#tool-describe_sri_saiku_cube">describe_sri_saiku_cube</a><a class="tool-chip" href="atlas.html#tool-get_bce_iem_table">get_bce_iem_table</a><a class="tool-chip" href="atlas.html#tool-get_bce_indicador_diario">get_bce_indicador_diario</a><a class="tool-chip" href="atlas.html#tool-get_cenace_tablero">get_cenace_tablero</a><a class="tool-chip" href="atlas.html#tool-get_contraloria_informe">get_contraloria_informe</a><a class="tool-chip" href="atlas.html#tool-get_inec_estadistica_files">get_inec_estadistica_files</a><a class="tool-chip" href="atlas.html#tool-get_inec_publicacion_archivos">get_inec_publicacion_archivos</a><a class="tool-chip" href="atlas.html#tool-get_informe_igepn">get_informe_igepn</a><a class="tool-chip" href="atlas.html#tool-get_sipa_modulo_archivos">get_sipa_modulo_archivos</a><a class="tool-chip" href="atlas.html#tool-get_sri_ruc_info">get_sri_ruc_info</a><a class="tool-chip" href="atlas.html#tool-get_superbancos_seccion_archivos">get_superbancos_seccion_archivos</a><a class="tool-chip" href="atlas.html#tool-get_sut_indicador_schema">get_sut_indicador_schema</a><a class="tool-chip" href="atlas.html#tool-investigate_dataset">investigate_dataset</a><a class="tool-chip" href="atlas.html#tool-list_bce_indicadores_diarios">list_bce_indicadores_diarios</a><a class="tool-chip" href="atlas.html#tool-list_contraloria_informes">list_contraloria_informes</a><a class="tool-chip" href="atlas.html#tool-list_sipa_modulos">list_sipa_modulos</a><a class="tool-chip" href="atlas.html#tool-list_sri_saiku_cubes">list_sri_saiku_cubes</a><a class="tool-chip" href="atlas.html#tool-list_superbancos_secciones">list_superbancos_secciones</a><a class="tool-chip" href="atlas.html#tool-list_sut_indicadores">list_sut_indicadores</a><a class="tool-chip" href="atlas.html#tool-list_zip_contents">list_zip_contents</a><a class="tool-chip" href="atlas.html#tool-query_sri_saiku_aggregate">query_sri_saiku_aggregate</a><a class="tool-chip" href="atlas.html#tool-query_sut_indicador">query_sut_indicador</a><a class="tool-chip" href="atlas.html#tool-read_pdf">read_pdf</a><a class="tool-chip" href="atlas.html#tool-search_bce_iem">search_bce_iem</a><a class="tool-chip" href="atlas.html#tool-search_bce_remesas">search_bce_remesas</a><a class="tool-chip" href="atlas.html#tool-search_biinec_extras">search_biinec_extras</a><a class="tool-chip" href="atlas.html#tool-search_censo_recursos">search_censo_recursos</a><a class="tool-chip" href="atlas.html#tool-search_inec_estadisticas">search_inec_estadisticas</a><a class="tool-chip" href="atlas.html#tool-search_inec_publicaciones">search_inec_publicaciones</a><a class="tool-chip" href="atlas.html#tool-search_informes_igepn">search_informes_igepn</a><a class="tool-chip" href="atlas.html#tool-search_sri_estadisticas_recaudacion">search_sri_estadisticas_recaudacion</a><a class="tool-chip" href="atlas.html#tool-search_sri_ruc">search_sri_ruc</a></div>
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Conecta tu asistente</p>
+<h2 class="section-title">Copia la configuración de tu cliente.</h2>
+<p class="section-lede">Corre el servidor localmente (Docker o <code>uv run</code>, ver el <a href="https://github.com/DweskZ/EcuDataMCP#ejecutar-localmente" target="_blank" rel="noopener">README</a>) y apunta tu cliente MCP a <code>http://localhost:8000/mcp</code>.</p>
+<div class="quick-connect">
+<p class="kicker">Opción rápida</p>
+<p class="client-intro">Si tu asistente tiene acceso a una terminal, pégale el link del repositorio y déjalo instalar todo por ti:</p>
+<div class="code-block">
+<button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+<pre><code>Clona https://github.com/DweskZ/EcuDataMCP, instala sus dependencias con uv sync,
+y regístralo como servidor MCP en mi cliente usando modo stdio con
+`uv run --directory &lt;ruta-del-clon&gt; python main.py --transport stdio`.
+Verifica que el servidor responda antes de darlo por terminado.</code></pre>
+</div>
+<p class="client-intro">Revisa siempre lo que tu asistente cambie (archivos de configuración, comandos ejecutados) antes de confirmar. Esta opción solo funciona con asistentes que pueden ejecutar comandos por su cuenta: hoy eso es <strong>Claude Code</strong>, <strong>Cursor</strong> y <strong>Windsurf</strong> en modo agente. Con ChatGPT, Claude.ai de solo-chat u otros clientes sin terminal, usa la configuración manual de abajo.</p>
+</div>
+<ul class="nav nav-tabs" id="client-tabs" role="tablist">
+
+<li class="nav-item" role="presentation"><button class="nav-link active" id="claude-desktop-tab" data-tab-target="claude-desktop-pane" type="button" role="tab">Claude Desktop</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="cursor-tab" data-tab-target="cursor-pane" type="button" role="tab">Cursor</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="vscode-tab" data-tab-target="vscode-pane" type="button" role="tab">VS Code</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="chatgpt-tab" data-tab-target="chatgpt-pane" type="button" role="tab">ChatGPT</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="claude-code-tab" data-tab-target="claude-code-pane" type="button" role="tab">Claude Code</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="gemini-cli-tab" data-tab-target="gemini-cli-pane" type="button" role="tab">Gemini CLI</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="le-chat-tab" data-tab-target="le-chat-pane" type="button" role="tab">Le Chat (Mistral)</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="windsurf-tab" data-tab-target="windsurf-pane" type="button" role="tab">Windsurf</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="huggingchat-tab" data-tab-target="huggingchat-pane" type="button" role="tab">HuggingChat</button></li>
+
+</ul>
+<div class="tab-content" id="client-tabs-content">
+
+<div class="tab-pane fade show active" id="claude-desktop-pane" role="tabpanel">
+<p class="client-intro">Agrega esto a tu archivo de configuración (<code>~/Library/Application Support/Claude/claude_desktop_config.json</code> en macOS, <code>%APPDATA%\Claude\claude_desktop_config.json</code> en Windows):</p>
+
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>{
+  "mcpServers": {
+    "ecuador-datos": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "http://localhost:8000/mcp"
+      ]
+    }
+  }
+}</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="cursor-pane" role="tabpanel">
+
+<ol class="client-steps"><li>Abre Cursor Settings</li><li>Busca "MCP"</li><li>Agrega un nuevo servidor MCP:</li></ol>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>{
+  "mcpServers": {
+    "ecuador-datos": {
+      "url": "http://localhost:8000/mcp",
+      "transport": "http"
+    }
+  }
+}</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="vscode-pane" role="tabpanel">
+<p class="client-intro">Agrega a tu archivo <code>mcp.json</code> (ejecuta <strong>MCP: Open User Configuration</strong> desde la paleta de comandos):</p>
+
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>{
+  "servers": {
+    "ecuador-datos": {
+      "url": "http://localhost:8000/mcp",
+      "type": "http"
+    }
+  }
+}</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="chatgpt-pane" role="tabpanel">
+<p class="client-intro">*Disponible para planes pagos (Plus, Pro, Team, Enterprise).*</p>
+<ol class="client-steps"><li>Ve a <code>Settings</code> > <code>Apps and connectors</code></li><li>Abre <code>Advanced settings</code> y habilita <strong>Developer mode</strong></li><li>En <code>Settings</code> > <code>Connectors</code> > <code>Browse connectors</code>, haz clic en <strong>Add a new connector</strong></li><li>Configura la URL: <code>http://localhost:8000/mcp</code></li></ol>
+
+</div>
+
+<div class="tab-pane fade" id="claude-code-pane" role="tabpanel">
+
+
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>claude mcp add --transport http ecuador-datos http://localhost:8000/mcp</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="gemini-cli-pane" role="tabpanel">
+<p class="client-intro">Agrega a <code>~/.gemini/settings.json</code>:</p>
+
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>{
+  "mcpServers": {
+    "ecuador-datos": {
+      "httpUrl": "http://localhost:8000/mcp"
+    }
+  }
+}</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="le-chat-pane" role="tabpanel">
+
+<ol class="client-steps"><li>Ve a <code>Intelligence</code> > <code>Connectors</code></li><li><code>Add connector</code> > <code>Custom MCP Connector</code></li><li>Nombre: "Ecuador Datos" / URL: <code>http://localhost:8000/mcp</code></li></ol>
+
+</div>
+
+<div class="tab-pane fade" id="windsurf-pane" role="tabpanel">
+<p class="client-intro">Agrega a <code>~/.codeium/windsurf/mcp_config.json</code>:</p>
+
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>{
+  "mcpServers": {
+    "ecuador-datos": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "http://localhost:8000/mcp"]
+    }
+  }
+}</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="huggingchat-pane" role="tabpanel">
+
+<ol class="client-steps"><li>En el chat, haz clic en el ícono <code>+</code> > <code>MCP Servers</code> > <code>Manage MCP Servers</code></li><li><code>Add Server</code> con nombre "Ecuador Datos" y URL <code>http://localhost:8000/mcp</code></li></ol>
+
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Sin fricción</p>
+<h2 class="section-title">Listo para usar, sin trámite propio.</h2>
+<ul class="friction-list">
+<li><strong>Sin API key</strong>Todas las fuentes son datos públicos, sin autenticación.</li>
+<li><strong>Sin cuenta</strong>No hay registro ni cuenta de usuario que crear.</li>
+<li><strong>100% datos públicos</strong>Bajo licencia abierta, tal como los publica el Estado ecuatoriano.</li>
+<li><strong>Sin telemetría</strong>El servidor corre en tu máquina y no registra ni envía ninguna de tus consultas.</li>
+</ul>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">FAQ</p>
+<h2 class="section-title">¿Tienes más preguntas?</h2>
+<details class="faq-item">
+<summary>¿Qué es EcuDataMCP?</summary>
+<p>Un servidor MCP (Model Context Protocol) de código abierto que ayuda a tu asistente de IA a descubrir y consultar datos abiertos del gobierno de Ecuador: datasets, trámites, regulaciones, contratos públicos, riesgos, sismos, indicadores del Banco Central y compañías.</p>
+</details>
+<details class="faq-item">
+<summary>¿Qué es MCP?</summary>
+<p>Model Context Protocol es un estándar abierto para conectar asistentes de IA con herramientas y fuentes de datos externas, manteniendo el control sobre qué puede hacer el modelo y qué datos puede leer.</p>
+</details>
+<details class="faq-item">
+<summary>¿Qué asistentes puedo usar?</summary>
+<p>Cualquier cliente compatible con MCP: Claude Desktop, Claude Code, ChatGPT (planes pagos), Cursor, VS Code, Gemini CLI, Le Chat, Windsurf, HuggingChat, y más.</p>
+</details>
+<details class="faq-item">
+<summary>¿Necesito una API key?</summary>
+<p>No. Todas las fuentes que usa el servidor son datos públicos sin autenticación.</p>
+</details>
+<details class="faq-item">
+<summary>¿Es esto un servicio oficial del gobierno ecuatoriano?</summary>
+<p>No. EcuDataMCP es un proyecto independiente de código abierto que consulta las mismas fuentes públicas que ya publica el Estado ecuatoriano. No está afiliado a ninguna institución.</p>
+</details>
+<details class="faq-item">
+<summary>¿El servidor guarda mis preguntas?</summary>
+<p>No hay telemetría. El servidor corre localmente en tu máquina y cada consulta va directo del cliente MCP al portal oficial correspondiente.</p>
+</details>
+<details class="faq-item">
+<summary>¿Qué formatos soporta?</summary>
+<p>Preview en memoria de CSV, TSV, JSON, GeoJSON y XLSX; consulta tabular filtrada vía el DataStore de CKAN cuando el recurso lo soporta.</p>
+</details>
+<details class="faq-item">
+<summary>¿Por qué a veces falla la conexión al portal de Datos Abiertos?</summary>
+<p><code>www.datosabiertos.gob.ec</code> a veces rechaza conexiones que vienen de fuera de Latinoamérica (error 403). Si ves esto, corre el servidor desde una conexión con salida en Ecuador o la región (por ejemplo, una VPN). Los tools de trámites e instituciones usan otro portal y no tienen este problema.</p>
+</details>
+<details class="faq-item">
+<summary>¿Puedo contribuir?</summary>
+<p>Sí, el proyecto es MIT y acepta pull requests. Ve la guía en <a href="colaborar.html">Cómo colaborar</a>.</p>
+</details>
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>Datos abiertos de Ecuador, con tu asistente de IA favorito.</p>
+<a class="btn-cta primary" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">Ver en GitHub</a>
+</div>
+</section>
+
+</main>
+
+<footer class="page-footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left"><p>MIT License · Proyecto independiente, no afiliado a ninguna institución del Estado ecuatoriano.</p></div>
+    <div class="nav-footer-center">&nbsp;</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+        <li class="nav-item"><a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP">GitHub</a></li>
+        <li class="nav-item"><a class="nav-link" href="releases.html">Releases</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/fuse.min.js"></script>
+<script>
+window.SITE_SEARCH_INDEX_URL = "search.json";
+window.SITE_ROOT = "";
+window.COPY_LABEL_COPIED = "¡Copiado!";
+window.SITE_SEARCH_EMPTY_LABEL = "Sin resultados.";
+</script>
+<script src="assets/site.js"></script>
+
+</body>
+</html>

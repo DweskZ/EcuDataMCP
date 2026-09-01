@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cómo colaborar – EcuDataMCP</title>
+<meta name="description" content="Cómo proponer una fuente, un tool o un cambio al sitio de EcuDataMCP.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="Cómo colaborar – EcuDataMCP">
+<meta property="og:description" content="Cómo proponer una fuente, un tool o un cambio al sitio de EcuDataMCP.">
+<meta property="og:image" content="https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png">
+<link rel="stylesheet" href="assets/bootstrap-icons.css">
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/site.css">
+<style>html { scroll-behavior: smooth; }</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+  <div class="navbar-container container-fluid">
+    <div class="navbar-brand-container mx-auto">
+      <a class="navbar-brand" href="index.html">
+        <span class="navbar-title">EcuDataMCP</span>
+      </a>
+    </div>
+    <button class="site-search-toggle" type="button" title="Buscar" aria-label="Buscar">
+      <i class="bi bi-search"></i>
+    </button>
+    <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Navegación de palanca" data-nav-toggle="navbarCollapse">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav navbar-nav-scroll me-auto">
+        
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">
+            <span class="menu-text">EcuDataMCP</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="index.html#como-funciona">
+            <span class="menu-text">Cómo funciona</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="index.html#fuentes">
+            <span class="menu-text">Fuentes</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="atlas.html">
+            <span class="menu-text">Referencia</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="examples.html">
+            <span class="menu-text">Ejemplos</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="releases.html">
+            <span class="menu-text">Releases</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">
+            <span class="menu-text">Acerca de</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link active" href="colaborar.html" aria-current="page">
+            <span class="menu-text">Cómo colaborar</span>
+          </a>
+        </li>
+        
+      </ul>
+      <ul class="navbar-nav navbar-nav-scroll ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="en/index.html">
+            <span class="menu-text">English</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP" target="_blank">
+            <span class="menu-text">GitHub</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="site-search-panel" id="siteSearchPanel" hidden>
+  <div class="site-search-panel-inner">
+    <input type="text" id="siteSearchInput" class="site-search-input" placeholder="Buscar en el sitio…" autocomplete="off">
+    <div id="siteSearchResults" class="site-search-results"></div>
+  </div>
+</div>
+
+<main>
+
+<section class="landing hero">
+<div class="container-page">
+<p class="kicker">Cómo colaborar</p>
+<h1>Suma tu <span class="accent">fuente</span>, tu <span class="accent">tool</span>, tu idea.</h1>
+<p class="hero-sub">EcuDataMCP es MIT y acepta pull requests. No hace falta ser experto en MCP ni en el stack completo del proyecto: la mayoría de contribuciones tocan una sola pieza.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Antes de empezar</p>
+<h2 class="section-title">Revisa qué ya está en marcha.</h2>
+<p class="section-lede">El <a href="https://github.com/DweskZ/EcuDataMCP/blob/main/ROADMAP.md" target="_blank" rel="noopener">ROADMAP.md</a> lleva la lista de cabos sueltos, fuentes candidatas y problemas conocidos: es el mejor lugar para ver si tu idea ya está anotada antes de abrir un issue nuevo.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Flujo de contribución</p>
+<h2 class="section-title">Fork, branch, PR.</h2>
+<div class="steps-grid">
+<div class="step-card">
+<div class="step-num">01</div>
+<h3>Fork</h3>
+<p>Haz fork de <a href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">DweskZ/EcuDataMCP</a> a tu cuenta.</p>
+</div>
+<div class="step-card">
+<div class="step-num">02</div>
+<h3>Branch</h3>
+<p><code>git checkout -b feature/nueva-herramienta</code></p>
+</div>
+<div class="step-card">
+<div class="step-num">03</div>
+<h3>Commit</h3>
+<p><code>git commit -m 'feat: agregar nueva herramienta'</code></p>
+</div>
+<div class="step-card">
+<div class="step-num">04</div>
+<h3>Pull Request</h3>
+<p>Push a tu fork y abre un PR describiendo el cambio.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Servidor MCP</p>
+<h2 class="section-title">Python, uv, pytest.</h2>
+<p class="section-lede">El servidor vive en <code>tools/</code>, <code>helpers/</code>, <code>resources/</code> y <code>prompts/</code>. Requiere Python 3.11+ y <a href="https://docs.astral.sh/uv/" target="_blank" rel="noopener">uv</a>.</p>
+<div class="code-block">
+<button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+<pre><code>uv sync
+uv run pytest
+uv run ruff check .</code></pre>
+</div>
+<p class="client-intro">Un tool nuevo normalmente son tres archivos: la función en <code>tools/</code>, su registro en <code>tools/__init__.py</code>, y un test en <code>tests/</code>.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Este sitio</p>
+<h2 class="section-title">Todo Python, sin R ni Quarto.</h2>
+<p class="section-lede">El sitio vive en <code>web/</code> y usa Jinja2 (Python) para generar HTML desde <code>web/data/*.json</code>. Las tarjetas de fuentes, tools y clientes MCP se generan desde esos archivos: editarlos es solo JSON. No hace falta R ni Quarto para nada &mdash; el sitio se genera con <code>uv run python build.py</code> como cualquier script Python del repo. El detalle completo está en <code>web/README.md</code>, dentro del repositorio.</p>
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>Cada fuente que falta, cada tool que le falta cobertura, es una contribución posible.</p>
+<a class="btn-cta primary" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">Ver en GitHub</a>
+</div>
+</section>
+
+</main>
+
+<footer class="page-footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left"><p>MIT License · Proyecto independiente, no afiliado a ninguna institución del Estado ecuatoriano.</p></div>
+    <div class="nav-footer-center">&nbsp;</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+        <li class="nav-item"><a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP">GitHub</a></li>
+        <li class="nav-item"><a class="nav-link" href="releases.html">Releases</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/fuse.min.js"></script>
+<script>
+window.SITE_SEARCH_INDEX_URL = "search.json";
+window.SITE_ROOT = "";
+window.COPY_LABEL_COPIED = "¡Copiado!";
+window.SITE_SEARCH_EMPTY_LABEL = "Sin resultados.";
+</script>
+<script src="assets/site.js"></script>
+
+</body>
+</html>
