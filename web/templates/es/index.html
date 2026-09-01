@@ -74,16 +74,11 @@
 <div class="container-page" id="fuentes">
 <p class="kicker">Fuentes</p>
 <h2 class="section-title">Datos oficiales, siempre citados.</h2>
-<p class="section-lede">EcuDataMCP no copia ni almacena estos catálogos, cada consulta va en vivo contra el portal de origen.</p>
-<div class="card-grid">
-{% for s in sources %}
-<div class="data-card">
-<h3>{{ s.name }}{% if s.tag %}<span class="tag">{{ s.tag }}</span>{% endif %}{% if s.status in status_badges %}<span class="tag">{{ status_badges[s.status] }}</span>{% endif %}</h3>
-<p>{{ s.description }}</p>
-<div class="source-coverage">{% if s.url %}<a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.coverage }}</a>{% else %}{{ s.coverage }}{% endif %}</div>
+<p class="section-lede">EcuDataMCP no copia ni almacena estos catálogos: cada consulta va en vivo contra el portal de origen. {{ source_count }} fuentes agrupadas por tema — Banco Central, SRI, INEC, Supercías, Superbancos y más — cada una con su institución de origen.</p>
+<div class="tools-summary">
+{% for theme in source_themes %}<span class="tool-chip">{{ theme.theme }}</span>{% endfor %}
 </div>
-{% endfor %}
-</div>
+<a class="btn-cta secondary" href="fuentes.html">Ver las {{ source_count }} fuentes agrupadas &rarr;</a>
 </div>
 </section>
 

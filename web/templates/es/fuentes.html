@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="landing hero">
+<div class="container-page">
+<p class="kicker">Fuentes</p>
+<h1>Las <span class="accent">{{ source_count }} fuentes</span>, agrupadas por tema.</h1>
+<p class="hero-sub">EcuDataMCP no copia ni almacena estos catálogos: cada consulta va en vivo contra el portal de origen. Cuando una institución tiene más de una integración, aparece agrupada bajo su propio subtítulo.</p>
+<div class="source-theme-nav">
+{% for theme in source_themes %}<a class="tool-chip" href="#{{ theme.id }}">{{ theme.theme }}</a>{% endfor %}
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+{% for theme in source_themes %}
+<div class="source-theme" id="{{ theme.id }}">
+<h2 class="section-title">{{ theme.theme }}</h2>
+<p class="section-lede">{{ theme.lede }}</p>
+{% for institution in theme.institutions %}
+<div class="source-institution">
+<h3 class="institution-heading">{{ institution.name }}{% if institution.sources | length > 1 %}<span class="tag">{{ institution.sources | length }}</span>{% endif %}</h3>
+<div class="card-grid">
+{% for s in institution.sources %}
+<div class="data-card">
+<h3>{{ s.name }}{% if s.tag %}<span class="tag">{{ s.tag }}</span>{% endif %}{% if s.status in status_badges %}<span class="tag">{{ status_badges[s.status] }}</span>{% endif %}</h3>
+<p>{{ s.description }}</p>
+<div class="source-coverage">{% if s.url %}<a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.coverage }}</a>{% else %}{{ s.coverage }}{% endif %}</div>
+</div>
+{% endfor %}
+</div>
+</div>
+{% endfor %}
+</div>
+{% endfor %}
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>¿Falta una fuente que necesitas?</p>
+<a class="btn-cta primary" href="colaborar.html">Cómo colaborar</a>
+</div>
+</section>
+{% endblock %}

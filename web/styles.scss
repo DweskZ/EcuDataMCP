@@ -778,3 +778,34 @@ a.tool-chip:hover {
   max-width: 620px;
   margin: 0 auto 2rem;
 }
+
+// -----------------------------
+// Fuentes (sources) page
+// -----------------------------
+
+.source-theme-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.5rem;
+}
+
+.source-theme {
+  margin-bottom: 3rem;
+  &:last-child { margin-bottom: 0; }
+}
+
+.source-institution {
+  margin-bottom: 1.75rem;
+  &:last-child { margin-bottom: 0; }
+}
+
+.institution-heading {
+  font-family: $font-family-monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $text-muted;
+  font-weight: 600;
+  margin-bottom: 0.9rem;
+}

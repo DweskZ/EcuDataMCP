@@ -26,6 +26,12 @@ SITE = WEB / "_site"
 
 PAGES = ["index", "atlas", "examples", "releases", "about", "colaborar"]
 
+# Pages that only exist in one language so far. Rendered in addition to
+# PAGES for that language only; excluded from the other language's sitemap
+# and given a language-toggle fallback (see lang_switch_href below) instead
+# of a link to a page that doesn't exist yet.
+EXTRA_PAGES = {"es": ["fuentes"], "en": []}
+
 STATUS_BADGES = {
     "es": {"build-local": "build local", "offline": "offline"},
     "en": {"build-local": "local build", "offline": "offline"},
@@ -59,7 +65,7 @@ NAV = {
         "left": [
             ("EcuDataMCP", "index.html"),
             ("Cómo funciona", "index.html#como-funciona"),
-            ("Fuentes", "index.html#fuentes"),
+            ("Fuentes", "fuentes.html"),
             ("Referencia", "atlas.html"),
             ("Ejemplos", "examples.html"),
             ("Releases", "releases.html"),
@@ -97,6 +103,7 @@ PAGE_TITLES = {
         "releases": "Releases",
         "about": "Acerca de",
         "colaborar": "Cómo colaborar",
+        "fuentes": "Fuentes",
     },
     "en": {
         "index": "EcuDataMCP",
@@ -116,6 +123,7 @@ PAGE_DESCRIPTIONS = {
         "releases": "Historial de versiones de EcuDataMCP y el ritmo real de los releases.",
         "about": "Qué es EcuDataMCP, de dónde viene y quién lo mantiene.",
         "colaborar": "Cómo proponer una fuente, un tool o un cambio al sitio de EcuDataMCP.",
+        "fuentes": "Las {n_sources} fuentes oficiales de EcuDataMCP, agrupadas por tema e institución.",
     },
     "en": {
         "index": "Open-source MCP server for exploring Ecuador's open government data from your AI assistant.",
@@ -157,6 +165,20 @@ def clean_default(value, t: dict) -> str:
     if cleaned == "":
         return t["default_empty"]
     return cleaned
+
+
+def flatten_sources(raw: list[dict]) -> list[dict]:
+    """Sources may be flat (old format, still used by en/) or grouped by
+    theme -> institution (new format, es/). Normalize to a flat list for
+    anything that only needs a total count or a single flat card grid."""
+    if raw and "institutions" in raw[0]:
+        return [
+            source
+            for theme in raw
+            for institution in theme["institutions"]
+            for source in institution["sources"]
+        ]
+    return raw
 
 
 def atlas_search_key(tool: dict) -> str:
@@ -259,7 +281,9 @@ def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
     root = ""
     assets_prefix = "assets/" if lang == "es" else "../assets/"
 
-    sources = load_json(lang, "sources.json")
+    sources_raw = load_json(lang, "sources.json")
+    sources = flatten_sources(sources_raw)
+    source_themes = sources_raw if sources_raw and "institutions" in sources_raw[0] else None
     clients = load_json(lang, "clients.json")
     tools = complete_tool_catalog(
         load_json(lang, "tools.json"),
@@ -276,16 +300,22 @@ def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
 
     other_root = "en/" if lang == "es" else "../"
 
-    for page in PAGES:
+    for page in PAGES + EXTRA_PAGES[lang]:
         template = env.get_template(f"{lang}/{page}.html")
         title = PAGE_TITLES[lang][page]
-        description = PAGE_DESCRIPTIONS[lang][page].format(n=tool_count)
+        description = PAGE_DESCRIPTIONS[lang][page].format(
+            n=tool_count, n_sources=source_count
+        )
+        # A page only rendered for this language (EXTRA_PAGES) has no
+        # counterpart to switch to yet -- fall back to the other language's
+        # homepage instead of linking a 404.
+        other_page = page if page in PAGES else "index"
         html = template.render(
             lang=lang,
             root=root,
             assets=assets_prefix,
             nav=NAV[lang],
-            lang_switch_href=f"{other_root}{page}.html",
+            lang_switch_href=f"{other_root}{other_page}.html",
             t=TRANSLATIONS[lang],
             status_badges=STATUS_BADGES[lang],
             current_page=page,
@@ -293,6 +323,7 @@ def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
             page_description=description,
             og_image=OG_IMAGE,
             sources=sources,
+            source_themes=source_themes,
             clients=clients,
             tools=tools,
             questions=questions,
@@ -337,8 +368,9 @@ def write_seo_files():
     )
     now = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     urls = []
-    for page in PAGES:
+    for page in PAGES + EXTRA_PAGES["es"]:
         urls.append(f"{SITE_URL}/{page}.html")
+    for page in PAGES + EXTRA_PAGES["en"]:
         urls.append(f"{SITE_URL}/en/{page}.html")
     entries = "\n".join(
         f"  <url>\n    <loc>{u}</loc>\n    <lastmod>{now}</lastmod>\n  </url>"
