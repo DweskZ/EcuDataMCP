@@ -25,8 +25,8 @@ para que un solo PR pueda actualizar el README del servidor y el sitio a la vez.
   directamente (es CSS plano, no minificado más allá de lo que ya traía), o instala Quarto + Dart Sass
   una vez para recompilar `styles.scss` y pega el resultado en `styles.css`.
 - `assets/` — CSS compilado, `site.js` (toggle de navbar móvil, tabs de clientes MCP, panel de búsqueda,
-  botón de copiar), `fuse.min.js` (vendored, motor de la búsqueda), favicon, imagen OG, ícono de
-  bootstrap-icons.
+  botón de copiar), `fuse.min.js` (vendored, motor de la búsqueda), favicon, imagen OG. El ícono de
+  búsqueda del navbar es un SVG inline en `templates/base.html`, no una fuente de íconos.
 
 ## Cómo se genera
 

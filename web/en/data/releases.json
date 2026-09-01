@@ -2,12 +2,32 @@
   {
     "version": "0.8.5",
     "date": "2026-08-31",
-    "summary": "BCEData/IEM audits, a cautious equivalence map, historical IEM reading, and bounded public tools for SRI Saiku. The server keeps results verifiable without claiming equivalence or access that a source does not expose."
+    "summary": "Synchronized the editable package version in uv.lock with the release version so `uv sync --locked` can install the project in GitHub Actions."
   },
   {
     "version": "0.8.4",
     "date": "2026-08-31",
-    "summary": "BCEData revision observability, broader IEM table normalization, remote deployment with authentication and per-client limits, and technical documentation separated from the README."
+    "summary": "Ten new sources — SRI Saiku, RUC lookup, BCE daily indicators, SUT, Superbancos, IG-EPN, CENACE, SRI tax-collection stats, BCE remittances, and more — plus BCEData/IEM audit snapshots, investigate_dataset, and remote deployment with authentication and per-client limits."
+  },
+  {
+    "version": "0.8.3",
+    "date": "2026-08-30",
+    "summary": "Census 2022 microdata, INEC publications via its REST API, and fixes to DPA geography (La Concordia, Sevilla Don Bosco) that had drifted from the official classifier."
+  },
+  {
+    "version": "0.8.2",
+    "date": "2026-08-29",
+    "summary": "SIPA (agricultural statistics), Contraloría General del Estado, and BCE's IEM monthly bulletin tables. Fixed CSV delimiter sniffing and 26 bugs found in a full adversarial code review."
+  },
+  {
+    "version": "0.8.1",
+    "date": "2026-08-29",
+    "summary": "inec_client now goes through the shared SSRF guard. Consolidated 13 duplicated accent-stripping functions, switched the Docker image to a non-root user, and enabled Dependabot."
+  },
+  {
+    "version": "0.8.0",
+    "date": "2026-08-29",
+    "summary": "Ecuador en Cifras/INEC, Cuenca en Datos (municipal CKAN portal), PDF text extraction (read_pdf), .ods support, and detect_series_pattern to classify periodic series as cumulative or incremental."
   },
   {
     "version": "0.7.0",

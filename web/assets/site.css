@@ -17,6 +17,10 @@
   color: #f2b134;
 }
 
+.icon-search {
+  vertical-align: -0.125em;
+}
+
 @media (min-width: 992px) {
   .site-search-toggle {
     margin-left: 0.75rem;

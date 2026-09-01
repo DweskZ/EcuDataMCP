@@ -2,12 +2,32 @@
   {
     "version": "0.8.5",
     "date": "2026-08-31",
-    "summary": "Auditorías BCEData/IEM, mapa de equivalencias cauteloso, lectura histórica IEM y herramientas públicas acotadas para SRI Saiku. El servidor mantiene resultados verificables, sin afirmar equivalencias ni acceso que la fuente no exponga."
+    "summary": "Sincroniza la versión del paquete editable en uv.lock con la versión del release, para que `uv sync --locked` pueda instalar el proyecto en GitHub Actions."
   },
   {
     "version": "0.8.4",
     "date": "2026-08-31",
-    "summary": "Observabilidad de revisiones en BCEData, normalización adicional de tablas IEM, despliegue remoto con autenticación y límites por cliente, y documentación técnica separada del README."
+    "summary": "Diez fuentes nuevas — SRI Saiku, RUC del SRI, indicadores diarios del BCE, SUT, Superbancos, IG-EPN, CENACE, recaudación SRI, remesas BCE y más — más snapshots de auditoría BCEData/IEM, investigate_dataset, y despliegue remoto con autenticación y límites por cliente."
+  },
+  {
+    "version": "0.8.3",
+    "date": "2026-08-30",
+    "summary": "Microdatos del Censo 2022, publicaciones del INEC vía su API REST, y correcciones a la geografía DPA (La Concordia, Sevilla Don Bosco) que estaban desactualizadas frente al clasificador oficial."
+  },
+  {
+    "version": "0.8.2",
+    "date": "2026-08-29",
+    "summary": "SIPA (estadísticas agropecuarias), Contraloría General del Estado, y las tablas IEM del BCE. Corrección del sniffing de delimitador CSV y 26 bugs encontrados en una revisión adversarial completa del repo."
+  },
+  {
+    "version": "0.8.1",
+    "date": "2026-08-29",
+    "summary": "inec_client ahora pasa por el guardia SSRF compartido. Se consolidaron 13 funciones duplicadas de limpieza de tildes, el contenedor Docker corre como usuario no root, y se habilitó Dependabot."
+  },
+  {
+    "version": "0.8.0",
+    "date": "2026-08-29",
+    "summary": "Ecuador en Cifras/INEC, Cuenca en Datos (portal municipal CKAN), lectura de texto en PDF (read_pdf), soporte .ods, y detect_series_pattern para clasificar series periódicas como acumuladas o incrementales."
   },
   {
     "version": "0.7.0",

@@ -1611,13 +1611,13 @@
     "tools": [
       {
         "name": "describe_sri_saiku_cube",
-        "description": "Describir un cubo Saiku público del SRI: dimensiones, jerarquías, niveles, medidas y metadatos OLAP",
+        "description": "Describe one public SRI Saiku cube: dimensions, hierarchies, levels, measures, and OLAP metadata",
         "params": [
           {
             "name": "cube_id",
             "type": "str",
             "default": null,
-            "description": "Identificador devuelto por list_sri_saiku_cubes"
+            "description": "Identifier returned by list_sri_saiku_cubes"
           },
           {
             "name": "format",
@@ -1626,23 +1626,23 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Describir un cubo Saiku público del SRI: dimensiones, jerarquías, niveles, medidas y metadatos OLAP. Usa solo rutas de descubrimiento de lectura. No consulta filas ni devuelve la configuración Oracle de las fuentes."
+        "long_description": "Describe one public SRI Saiku cube: dimensions, hierarchies, levels, measures, and OLAP metadata. Uses only read-only discovery routes. Does not query rows or return the sources' Oracle configuration."
       },
       {
         "name": "get_sri_ruc_info",
-        "description": "Consultar la información pública de un contribuyente por RUC en el SRI",
+        "description": "Look up a taxpayer's public record by RUC in the SRI",
         "params": [
           {
             "name": "ruc",
             "type": "str",
             "default": null,
-            "description": "RUC ecuatoriano exacto de 13 dígitos"
+            "description": "Exact 13-digit Ecuadorian RUC"
           },
           {
             "name": "include_establecimientos",
             "type": "bool",
             "default": "True",
-            "description": "incluir establecimientos registrados"
+            "description": "include registered establishments"
           },
           {
             "name": "format",
@@ -1651,11 +1651,11 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Consultar la información pública de un contribuyente por RUC en el SRI. Devuelve razón social, estado, tipo, actividad económica, fechas de registro y establecimientos públicos registrados. No devuelve declaraciones ni montos tributarios individuales."
+        "long_description": "Look up a taxpayer's public record by RUC in the SRI. Returns legal name, status, type, economic activity, registration dates, and registered public establishments. Does not return individual tax declarations or amounts."
       },
       {
         "name": "list_sri_saiku_cubes",
-        "description": "Listar los cubos OLAP visibles en la instancia pública de Saiku del SRI",
+        "description": "List the OLAP cubes visible on the SRI's public Saiku instance",
         "params": [
           {
             "name": "format",
@@ -1664,47 +1664,47 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Listar los cubos OLAP visibles en la instancia pública de Saiku del SRI. Esta herramienta solo consulta la sesión anónima y la ruta pública de descubrimiento. No lee la configuración administrativa ni devuelve registros de contribuyentes."
+        "long_description": "List the OLAP cubes visible on the SRI's public Saiku instance. This tool only queries the anonymous session and the public discovery route. It does not read administrative configuration or return taxpayer records."
       },
       {
         "name": "query_sri_saiku_aggregate",
-        "description": "Ejecutar una consulta agregada y limitada en un cubo público de Saiku",
+        "description": "Run a bounded aggregate query against a public Saiku cube",
         "params": [
           {
             "name": "cube_id",
             "type": "str",
             "default": null,
-            "description": "Identificador completo del cubo"
+            "description": "Full cube identifier"
           },
           {
             "name": "row_dimension",
             "type": "str",
             "default": null,
-            "description": "Nombre de la dimensión para las filas"
+            "description": "Dimension name for the rows"
           },
           {
             "name": "row_hierarchy",
             "type": "str",
             "default": null,
-            "description": "Nombre de la jerarquía"
+            "description": "Hierarchy name"
           },
           {
             "name": "row_level",
             "type": "str",
             "default": null,
-            "description": "Nivel que se mostrará en las filas"
+            "description": "Level to display in the rows"
           },
           {
             "name": "measure",
             "type": "str",
             "default": null,
-            "description": "Medida agregada"
+            "description": "Aggregate measure"
           },
           {
             "name": "limit",
             "type": "int",
             "default": "25",
-            "description": "Máximo de filas solicitado (1-100)"
+            "description": "Maximum rows requested (1-100)"
           },
           {
             "name": "format",
@@ -1713,7 +1713,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Ejecutar una consulta agregada y limitada en un cubo público de Saiku. La consulta tiene una sola dimensión en filas y una medida. El cubo, dimensión, jerarquía, nivel y medida deben salir de list_sri_saiku_cubes/describe_sri_saiku_cube. El límite máximo es 100. No acepta MDX arbitrario, no hace drill-through y no busca RUCs."
+        "long_description": "Run a bounded aggregate query against a public Saiku cube. The query has a single row dimension and one measure. The cube, dimension, hierarchy, level, and measure must come from list_sri_saiku_cubes/describe_sri_saiku_cube. The maximum limit is 100. Does not accept arbitrary MDX, does not drill through, and does not search RUCs."
       },
       {
         "name": "search_sri_estadisticas_recaudacion",
@@ -1748,19 +1748,19 @@
       },
       {
         "name": "search_sri_ruc",
-        "description": "Buscar contribuyentes en el RUC del SRI por razón social o nombre comercial (texto parcial), sin necesitar el RUC exacto de antemano",
+        "description": "Search SRI's RUC registry by legal name or trade name (partial text), without needing the exact RUC upfront",
         "params": [
           {
             "name": "razon_social",
             "type": "str",
             "default": null,
-            "description": "Texto a buscar (mínimo 4 caracteres), ej. \"BANANERA\""
+            "description": "Text to search for (minimum 4 characters), e.g. \"BANANERA\""
           },
           {
             "name": "max_resultados",
             "type": "int",
             "default": "25",
-            "description": "Cuántos resultados con detalle completo devolver (máx 100)"
+            "description": "How many full-detail results to return (max 100)"
           },
           {
             "name": "format",
@@ -1769,7 +1769,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Buscar contribuyentes en el RUC del SRI por razón social o nombre comercial (texto parcial), sin necesitar el RUC exacto de antemano. Complementa get_sri_ruc_info (que requiere el RUC exacto) para el caso \"conozco el nombre de la empresa, no su RUC\". Cada resultado incluye estado, tipo de contribuyente, régimen, actividad económica, representantes legales, y si es agente de retención/contribuyente especial/fantasma — no declaraciones ni montos tributarios individuales. El SRI limita esta búsqueda a 100 coincidencias por consulta; si total_reportado sale en 100, puede haber más contribuyentes de los que realmente se están devolviendo — usa un texto más específico para acotar."
+        "long_description": "Search SRI's RUC registry by legal name or trade name (partial text), without needing the exact RUC upfront. Complements get_sri_ruc_info (which requires the exact RUC) for the \"I know the company name, not its RUC\" case. Each result includes status, taxpayer type, régimen, economic activity, legal representatives, and whether it's a withholding agent/special taxpayer/ghost taxpayer — no declarations or individual tax amounts. The SRI caps this search at 100 matches per query; if total_reportado comes back as 100, there may be more taxpayers than are actually being returned — use more specific text to narrow it down."
       }
     ]
   },
