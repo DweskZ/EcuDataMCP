@@ -1,10 +1,12 @@
-# Ecuador MCP Server
+# EcuDataMCP
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![MCP](https://img.shields.io/badge/MCP-compatible-green.svg)](https://modelcontextprotocol.io)
 
-**Servidor MCP (Model Context Protocol) que permite a chatbots de IA (Claude, ChatGPT, Gemini, Cursor, etc.) buscar, explorar y analizar datos abiertos del gobierno de Ecuador, directamente por conversación.**
+**Infraestructura abierta de datos públicos para Ecuador.** EcuDataMCP conecta asistentes de IA, investigadores, periodistas y software con datos oficiales ecuatorianos mediante una interfaz común.
+
+Utiliza el Model Context Protocol (MCP) para que clientes compatibles como Claude, ChatGPT, Gemini y Cursor puedan buscar, explorar y analizar esos datos mediante conversación o software.
 
 En lugar de navegar manualmente por portales gubernamentales, simplemente pregunta cosas como:
 - *"¿Qué datos tiene el SRI sobre recaudación tributaria?"*
@@ -222,6 +224,9 @@ uv run main.py
 | `MCP_TRANSPORT` | Transporte: `http` o `stdio` | `http` |
 | `LOG_LEVEL` | Nivel de log (DEBUG, INFO, WARNING, ERROR) | `INFO` |
 | `MCP_AUTH_TOKEN` | Token Bearer opcional para `/mcp` | vacío |
+| `MCP_REQUIRE_AUTH` | Rechaza el arranque remoto sin token | `0` |
+| `MCP_RATE_LIMIT_REQUESTS` / `MCP_RATE_LIMIT_WINDOW_SECONDS` | Cuota por cliente/IP | `120` / `60` |
+| `MCP_SSL_CERTFILE` / `MCP_SSL_KEYFILE` | Certificado y clave para TLS directo | vacío |
 
 Para ejecutar el transporte stdio localmente:
 
@@ -241,8 +246,10 @@ La referencia detallada de cada herramienta está en [docs/TOOLS.md](docs/TOOLS.
 | `GET /health` | Health check: `{"status":"ok","uptime_since":"...","version":"..."}` |
 
 Cuando `MCP_AUTH_TOKEN` está definido, `POST /mcp` requiere el encabezado
-`Authorization: Bearer <token>`. `/health` permanece sin autenticación para
-que Docker pueda comprobar el servicio.
+`Authorization: Bearer <token>`. Para un despliegue remoto usa también
+`MCP_REQUIRE_AUTH=1`, HTTPS y un proxy con su propia cuota por IP. `/health`
+permanece sin autenticación para que Docker pueda comprobar el servicio.
+Consulta [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) para el despliegue remoto.
 
 ---
 

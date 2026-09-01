@@ -376,6 +376,32 @@ async def test_audit_catalog_records_bundle_failures(httpx_mock):
     assert result["errores"][0]["id_grupo"] == 11
 
 
+async def test_audit_catalog_reports_unavailable_source_revision(httpx_mock):
+    httpx_mock.add_response(
+        url="https://contenido.bce.fin.ec/wp-json/bcedata/v1/tree", json=_TREE
+    )
+    _mock_all_bundles(httpx_mock)
+
+    result = await bce_client.audit_catalog()
+
+    assert result["revision_fuente"]["disponible"] is False
+    assert "no expone revision" in result["revision_fuente"]["motivo"]
+
+
+async def test_audit_catalog_uses_explicit_etag_when_published(httpx_mock):
+    httpx_mock.add_response(
+        url="https://contenido.bce.fin.ec/wp-json/bcedata/v1/tree",
+        json=_TREE,
+        headers={"ETag": '"catalog-v1"'},
+    )
+    _mock_all_bundles(httpx_mock)
+
+    result = await bce_client.audit_catalog()
+
+    assert result["revision_fuente"]["disponible"] is True
+    assert result["revision_fuente"]["valor"] == '"catalog-v1"'
+
+
 async def test_get_indicador_surfaces_api_error_message(httpx_mock):
     httpx_mock.add_response(
         url="https://contenido.bce.fin.ec/wp-json/bcedata/v1/bundle/999",

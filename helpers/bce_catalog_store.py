@@ -79,6 +79,17 @@ def compare_snapshots(
             "grupos_modificados": [],
         }
 
+    old_revision = previous.get("revision_fuente") or {}
+    new_revision = current.get("revision_fuente") or {}
+    revision_comparable = (
+        old_revision.get("disponible") is True
+        and new_revision.get("disponible") is True
+    )
+    revision_changed = (
+        revision_comparable
+        and old_revision.get("valor") != new_revision.get("valor")
+    )
+
     old = {
         str(item["id_grupo"]): item
         for item in previous.get("grupos", [])
@@ -117,6 +128,12 @@ def compare_snapshots(
         "snapshot_anterior": previous.get("consultado_en"),
         "huella_anterior": snapshot_fingerprint(previous),
         "huella_actual": snapshot_fingerprint(current),
+        "revision": {
+            "comparable": revision_comparable,
+            "cambio_detectado": revision_changed,
+            "anterior": old_revision,
+            "actual": new_revision,
+        },
         "grupos_nuevos": [new[group_id] for group_id in added],
         "grupos_retirados": [old[group_id] for group_id in removed],
         "grupos_modificados": changed,

@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 0.8.4 — 2026-08-31
+
+### Added
+
+- **BCEData revision observability** — catalog audits now report whether the
+  API exposes an explicit revision marker (`revision`, `version`, `updated`,
+  `modified`, `ETag`, or `Last-Modified`) and compare it when available;
+  current live responses expose no such marker, so content comparison remains
+  the available fallback.
+- **Broader IEM reading and archive checks** — matrix-shaped tables and
+  quarterly periods are normalized, and the audit script can opt in to bounded
+  full-XLSX SHA-256 hashing without changing the default download behavior.
+- **BCEData/IEM comparison** — `compare_bce_sources` produces cautious label-
+  based candidate matches and source-only entries, clearly separating
+  discovery from methodological equivalence.
+- **Remote deployment safeguards** — per-client/IP rate limits, required
+  Bearer authentication, direct Uvicorn TLS configuration, and deployment
+  guidance are now available through environment variables and
+  `docs/DEPLOYMENT.md`.
+
+### Changed
+
+- Project positioning now consistently describes EcuDataMCP as open
+  public-data infrastructure for Ecuador, and the README keeps the detailed
+  tool reference in `docs/TOOLS.md`.
+
 ### Added
 
 - **BCEData value audit and IEM period normalization** — `audit_bce_catalog`

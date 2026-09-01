@@ -47,6 +47,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 from datetime import UTC, datetime
 from typing import Any
 
@@ -75,6 +76,7 @@ _bundle_cache = TtlCache(ttl_seconds=86400.0, max_entries=256)
 # built from, cached separately since building it costs ~78 concurrent
 # bundle fetches, not worth repeating per search.
 _catalog_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
+_revision_observations: list[dict[str, Any]] = []
 
 _SOURCE_NAME = "Banco Central del Ecuador — BCEData"
 _TREE_URL = f"{_BASE_URL}/tree"
@@ -84,6 +86,8 @@ async def _get_json(
     path: str,
     params: dict[str, Any] | None = None,
     session: httpx.AsyncClient | None = None,
+    *,
+    include_headers: bool = False,
 ) -> Any:
     own = session is None
     if own:
@@ -102,7 +106,10 @@ async def _get_json(
                 "BCEData %s devolvió %d: %s", path, resp.status_code, detail
             )
             raise ValueError(detail or f"BCEData devolvió HTTP {resp.status_code}")
-        return resp.json()
+        payload = resp.json()
+        if include_headers:
+            return payload, {key.lower(): value for key, value in resp.headers.items()}
+        return payload
     finally:
         if own:
             await session.aclose()
@@ -112,9 +119,10 @@ async def _fetch_tree() -> list[dict[str, Any]]:
     cached = _tree_cache.get("tree")
     if cached is not None:
         return cached
-    tree = await _get_json("tree")
+    tree, headers = await _get_json("tree", include_headers=True)
     if not isinstance(tree, list):
         raise TypeError("BCEData /tree devolvió un formato inesperado")
+    _record_revision_observation("/tree", tree, headers)
     _tree_cache.set("tree", tree)
     return tree
 
@@ -160,11 +168,69 @@ async def _fetch_bundle(
     cached = _bundle_cache.get(id_grupo)
     if cached is not None:
         return cached
-    bundle = await _get_json(f"bundle/{id_grupo}", session=session)
+    bundle, headers = await _get_json(
+        f"bundle/{id_grupo}", session=session, include_headers=True
+    )
     if not isinstance(bundle, dict):
         raise TypeError("BCEData /bundle devolvió un formato inesperado")
+    _record_revision_observation(f"/bundle/{id_grupo}", bundle, headers)
     _bundle_cache.set(id_grupo, bundle)
     return bundle
+
+
+_REVISION_KEY_RE = re.compile(
+    r"(?:revision|version|updated|modified|last.?modified|fecha.?actual)",
+    re.IGNORECASE,
+)
+
+
+def _record_revision_observation(
+    endpoint: str, payload: Any, headers: dict[str, str]
+) -> None:
+    """Keep only explicit source revision markers, never invent one.
+
+    BCEData currently returns neither a revision field nor ETag/Last-Modified
+    headers.  Recording the absence makes that limitation visible in audits;
+    if the API adds one later, the same audit will automatically compare it.
+    """
+    candidates: list[dict[str, str]] = []
+    for key, value in headers.items():
+        if key in {"etag", "last-modified"} and value:
+            candidates.append({"campo": key, "valor": value})
+    if isinstance(payload, dict):
+        containers = [payload, payload.get("context")]
+        for container in containers:
+            if not isinstance(container, dict):
+                continue
+            for key, value in container.items():
+                if _REVISION_KEY_RE.search(str(key)) and value not in (None, ""):
+                    candidates.append({"campo": str(key), "valor": str(value)})
+    _revision_observations.append({"endpoint": endpoint, "candidatos": candidates})
+
+
+def _revision_summary() -> dict[str, Any]:
+    candidates = [
+        {"endpoint": item["endpoint"], **candidate}
+        for item in _revision_observations
+        for candidate in item["candidatos"]
+    ]
+    if not candidates:
+        return {
+            "disponible": False,
+            "valor": None,
+            "motivo": (
+                "La respuesta BCEData no expone revision/version ni "
+                "ETag/Last-Modified; se compara el contenido del catálogo."
+            ),
+            "observaciones": len(_revision_observations),
+        }
+    values = sorted({item["valor"] for item in candidates})
+    return {
+        "disponible": True,
+        "valor": values[0] if len(values) == 1 else values,
+        "motivo": "Marcador explícito publicado por BCEData.",
+        "candidatos": candidates,
+    }
 
 
 async def _fetch_catalog_snapshot() -> dict[str, Any]:
@@ -179,6 +245,8 @@ async def _fetch_catalog_snapshot() -> dict[str, Any]:
     cached = _catalog_cache.get("catalog")
     if cached is not None:
         return cached
+
+    _revision_observations.clear()
 
     tree = await _fetch_tree()
     groups = _index_tree(tree)
@@ -267,6 +335,7 @@ async def _fetch_catalog_snapshot() -> dict[str, Any]:
         "total_grupos": len(groups),
         "grupos": enriched,
         "errores": errors,
+        "revision_fuente": _revision_summary(),
     }
     _catalog_cache.set("catalog", snapshot)
     return snapshot
@@ -414,6 +483,7 @@ async def audit_catalog(
         "total_series": sum(group["total_series"] for group in successful),
         "secciones": sections,
         "errores": snapshot["errores"],
+        "revision_fuente": snapshot["revision_fuente"],
     }
     if auditar_grid:
         grid_audit = await _audit_grid_values(successful)
@@ -440,6 +510,7 @@ def clear_caches() -> None:
     _tree_cache.clear()
     _bundle_cache.clear()
     _catalog_cache.clear()
+    _revision_observations.clear()
 
 
 _SEARCH_RESULT_FIELDS = ("id_grupo", "descripcion", "seccion", "subseccion")

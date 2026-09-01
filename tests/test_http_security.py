@@ -59,3 +59,14 @@ async def test_mcp_rejects_work_when_concurrency_limit_is_reached():
 
     release.set()
     assert (await first)[0]["status"] == 204
+
+
+async def test_mcp_applies_per_client_rate_limit():
+    app = with_http_security(_ok_app, rate_limit_requests=1, rate_limit_window_seconds=60)
+
+    first = await _call(app)
+    second = await _call(app)
+
+    assert first[0]["status"] == 204
+    assert second[0]["status"] == 429
+    assert (b"retry-after", b"60") in second[0]["headers"]

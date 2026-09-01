@@ -80,3 +80,35 @@ def get_mcp_max_concurrent_requests() -> int:
         return min(256, max(1, int(raw)))
     except ValueError:
         return 8
+
+
+def get_mcp_rate_limit_requests() -> int:
+    raw = os.getenv("MCP_RATE_LIMIT_REQUESTS", "120")
+    try:
+        return min(10000, max(0, int(raw)))
+    except ValueError:
+        return 120
+
+
+def get_mcp_rate_limit_window_seconds() -> float:
+    raw = os.getenv("MCP_RATE_LIMIT_WINDOW_SECONDS", "60")
+    try:
+        return min(3600.0, max(1.0, float(raw)))
+    except ValueError:
+        return 60.0
+
+
+def get_mcp_require_auth() -> bool:
+    return os.getenv("MCP_REQUIRE_AUTH", "0").strip().lower() in {
+        "1", "true", "yes", "on"
+    }
+
+
+def get_mcp_ssl_certfile() -> str | None:
+    value = os.getenv("MCP_SSL_CERTFILE", "").strip()
+    return value or None
+
+
+def get_mcp_ssl_keyfile() -> str | None:
+    value = os.getenv("MCP_SSL_KEYFILE", "").strip()
+    return value or None

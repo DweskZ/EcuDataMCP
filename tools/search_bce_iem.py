@@ -20,6 +20,8 @@ def register_search_bce_iem_tool(mcp: FastMCP) -> None:
         desde_anio: int = 0,
         hasta_anio: int = 0,
         guardar_catalogo: bool = False,
+        hash_archivos: bool = False,
+        max_hash_archivos: int = 5000,
         format: str = "text",
     ) -> str:
         """Search individual Excel tables in the BCE's latest IEM bulletin.
@@ -35,6 +37,9 @@ def register_search_bce_iem_tool(mcp: FastMCP) -> None:
         Set guardar_catalogo=true to persist the complete catalog assembled by
         this search under IEM_CATALOG_DIR (or data/iem_catalog_snapshots by
         default). Pagination still keeps the MCP response bounded.
+        Set hash_archivos=true for an operator-style SHA-256 audit of the
+        discovered XLSX files. This downloads complete files, so it is
+        deliberately opt-in and bounded by max_hash_archivos.
         """
         limit = min(max(limit, 1), 100)
         offset = max(offset, 0)
@@ -47,6 +52,8 @@ def register_search_bce_iem_tool(mcp: FastMCP) -> None:
                 desde_anio,
                 hasta_anio,
                 guardar_catalogo,
+                hash_archivos,
+                max_hash_archivos,
             )
         except Exception as exc:
             logger.exception("search_bce_iem failed (query=%r)", query)
@@ -112,6 +119,13 @@ def register_search_bce_iem_tool(mcp: FastMCP) -> None:
                 parts.append(
                     "Catálogo completo guardado: "
                     + data["catalogo_guardado"]["archivo"]
+                )
+            if data.get("hash_archivos"):
+                audit = data["hash_archivos"]
+                parts.append(
+                    "Auditoría SHA-256: "
+                    f"{audit['archivos_exitosos']}/{audit['archivos_consultados']} "
+                    "archivos calculados."
                 )
             return "\n".join(part for part in parts if part is not None)
 

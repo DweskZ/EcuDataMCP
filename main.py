@@ -13,6 +13,11 @@ from helpers.env_config import (
     get_mcp_host,
     get_mcp_max_concurrent_requests,
     get_mcp_port,
+    get_mcp_rate_limit_requests,
+    get_mcp_rate_limit_window_seconds,
+    get_mcp_require_auth,
+    get_mcp_ssl_certfile,
+    get_mcp_ssl_keyfile,
     get_transport,
 )
 from helpers.http_security import with_http_security
@@ -24,7 +29,7 @@ from tools import register_tools
 setup_logging()
 
 SERVER_START_TIME = datetime.now(UTC)
-VERSION = "0.8.3"
+VERSION = "0.8.4"
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
@@ -74,6 +79,8 @@ asgi_app = with_health_endpoint(
         mcp.streamable_http_app(),
         auth_token=get_mcp_auth_token(),
         max_concurrent_requests=get_mcp_max_concurrent_requests(),
+        rate_limit_requests=get_mcp_rate_limit_requests(),
+        rate_limit_window_seconds=get_mcp_rate_limit_window_seconds(),
     )
 )
 
@@ -102,26 +109,42 @@ def main(argv: list[str] | None = None) -> None:
 
     host = args.host if args.host is not None else get_mcp_host()
     port = args.port if args.port is not None else get_mcp_port()
+    auth_token = get_mcp_auth_token()
+    certfile = get_mcp_ssl_certfile()
+    keyfile = get_mcp_ssl_keyfile()
+    loopback = host in {"127.0.0.1", "localhost", "::1"}
+    if get_mcp_require_auth() and not auth_token:
+        raise RuntimeError("MCP_REQUIRE_AUTH está activo pero MCP_AUTH_TOKEN está vacío")
+    if not loopback and not auth_token:
+        logger.warning(
+            "MCP HTTP endpoint is externally bound without MCP_AUTH_TOKEN; "
+            "set a token before exposing it beyond a trusted network"
+        )
+    if bool(certfile) != bool(keyfile):
+        raise RuntimeError(
+            "MCP_SSL_CERTFILE y MCP_SSL_KEYFILE deben configurarse juntos"
+        )
 
     logger.info(
         "Starting Ecuador MCP server v%s on %s:%d",
         VERSION, host, port,
     )
-    if get_mcp_auth_token():
+    if auth_token:
         logger.info("MCP HTTP authentication: Bearer token enabled")
-    elif host not in {"127.0.0.1", "localhost", "::1"}:
-        logger.warning(
-            "MCP HTTP endpoint is externally bound without MCP_AUTH_TOKEN; "
-            "set a token before exposing it beyond a trusted network"
-        )
     logger.info(
         "MCP HTTP concurrency limit: %d",
         get_mcp_max_concurrent_requests(),
     )
+    logger.info(
+        "MCP per-client rate limit: %d requests / %.0f seconds",
+        get_mcp_rate_limit_requests(),
+        get_mcp_rate_limit_window_seconds(),
+    )
     logger.info("CKAN API: www.datosabiertos.gob.ec")
     logger.info("GobEC API: gob.ec/api/v1")
-    logger.info("MCP endpoint: http://%s:%d/mcp", host, port)
-    logger.info("Health check: http://%s:%d/health", host, port)
+    scheme = "https" if certfile else "http"
+    logger.info("MCP endpoint: %s://%s:%d/mcp", scheme, host, port)
+    logger.info("Health check: %s://%s:%d/health", scheme, host, port)
 
     uvicorn.run(
         asgi_app,
@@ -129,6 +152,8 @@ def main(argv: list[str] | None = None) -> None:
         port=port,
         log_level="info",
         log_config=UVICORN_LOGGING_CONFIG,
+        ssl_certfile=certfile,
+        ssl_keyfile=keyfile,
     )
 
 

@@ -51,8 +51,13 @@ def register_get_bce_iem_table_tool(mcp: FastMCP) -> None:
                 f"SHA-256: {table['sha256']}",
                 "",
             ]
-            if data["formato"] == "series_ancho":
+            if data["formato"] in {"series_ancho", "series_matriz"}:
                 parts.append("Períodos: " + ", ".join(data["periodos"]))
+                if data["formato"] == "series_matriz":
+                    parts.append(
+                        "Columnas descriptivas: "
+                        + " | ".join(data["columnas_descriptivas"])
+                    )
                 parts.append("")
                 for block in data["bloques"]:
                     parts.append(block["unidad"])

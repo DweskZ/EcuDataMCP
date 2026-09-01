@@ -1,6 +1,7 @@
 from mcp.server.fastmcp import FastMCP
 
 from tools.audit_bce_catalog import register_audit_bce_catalog_tool
+from tools.compare_bce_sources import register_compare_bce_sources_tool
 from tools.describe_sri_saiku_cube import register_describe_sri_saiku_cube_tool
 from tools.detect_series_pattern import register_detect_series_pattern_tool
 from tools.download_anda_microdata import register_download_anda_microdata_tool
@@ -155,6 +156,7 @@ def register_tools(mcp: FastMCP) -> None:
     register_search_indicadores_bce_tool(mcp)
     register_get_indicador_bce_tool(mcp)
     register_audit_bce_catalog_tool(mcp)
+    register_compare_bce_sources_tool(mcp)
     register_search_bce_iem_tool(mcp)
     register_get_bce_iem_table_tool(mcp)
     register_search_bce_remesas_tool(mcp)

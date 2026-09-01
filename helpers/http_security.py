@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import hmac
 import json
+import time
 from collections.abc import Awaitable, Callable
 
 ASGIApp = Callable[[dict, Callable, Callable], Awaitable[None]]
@@ -17,6 +18,13 @@ def _header(scope: dict, name: bytes) -> str | None:
         if key.lower() == name:
             return value.decode("latin-1")
     return None
+
+
+def _client_key(scope: dict) -> str:
+    client = scope.get("client")
+    if isinstance(client, (tuple, list)) and client:
+        return str(client[0])
+    return "unknown"
 
 
 async def _json_response(
@@ -42,15 +50,24 @@ def with_http_security(
     *,
     auth_token: str | None = None,
     max_concurrent_requests: int = 8,
+    rate_limit_requests: int = 120,
+    rate_limit_window_seconds: float = 60.0,
 ) -> ASGIApp:
     """Protect MCP requests while leaving health checks and stdio untouched.
 
     Authentication is opt-in so existing local configurations keep working.
     When enabled, clients must send ``Authorization: Bearer <token>``. The
     concurrency limit rejects excess work instead of allowing an unbounded
-    queue of downloads and parsers to consume memory.
+    queue of downloads and parsers to consume memory. A separate per-client
+    sliding-window limit protects a remotely exposed instance from one client
+    consuming all available request capacity. Set the request limit to 0 to
+    disable it for a trusted local-only deployment.
     """
     slots = asyncio.Semaphore(max(1, max_concurrent_requests))
+    rate_limit_requests = max(0, rate_limit_requests)
+    rate_limit_window_seconds = max(1.0, rate_limit_window_seconds)
+    rate_hits: dict[str, list[float]] = {}
+    rate_lock = asyncio.Lock()
 
     async def app(scope: dict, receive: Callable, send: Callable) -> None:
         if scope.get("type") != "http" or scope.get("path") not in _MCP_PATHS:
@@ -69,6 +86,30 @@ def with_http_security(
                     [(b"www-authenticate", b"Bearer")],
                 )
                 return
+
+        if rate_limit_requests:
+            now = time.monotonic()
+            client_key = _client_key(scope)
+            async with rate_lock:
+                hits = [
+                    hit
+                    for hit in rate_hits.get(client_key, [])
+                    if now - hit < rate_limit_window_seconds
+                ]
+                if len(hits) >= rate_limit_requests:
+                    rate_hits[client_key] = hits
+                    retry_after = max(
+                        1, int(rate_limit_window_seconds - (now - hits[0]))
+                    )
+                    await _json_response(
+                        send,
+                        429,
+                        {"error": "Límite de solicitudes excedido."},
+                        [(b"retry-after", str(retry_after).encode("ascii"))],
+                    )
+                    return
+                hits.append(now)
+                rate_hits[client_key] = hits
 
         try:
             await asyncio.wait_for(slots.acquire(), timeout=_QUEUE_TIMEOUT_SECONDS)

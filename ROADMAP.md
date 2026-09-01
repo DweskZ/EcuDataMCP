@@ -14,10 +14,11 @@ Leyenda: `[ ]` sin empezar · `[~]` parcial · `[x]` hecho
       `linux/arm64`) y una configuración solo por variables de entorno. El
       agente del teléfono no debe instalar Python, descargar datos ni guardar
       una base de datos: debe consumir un único endpoint MCP remoto por HTTPS.
-- [ ] **Endpoint remoto para agentes** — publicar una instancia estable detrás
-      de HTTPS, autenticación (token inicialmente; OAuth si el cliente móvil lo
-      exige), límite por usuario/IP, health check y logs con `request_id`. El
-      endpoint público no debe depender de `localhost`, del disco del
+- [~] **Endpoint remoto para agentes** — el proceso ya admite autenticación Bearer,
+      HTTPS directo mediante certificados Uvicorn, límite global y límite por
+      cliente/IP, además de `/health`. Sigue pendiente publicar la instancia
+      estable detrás de un proxy HTTPS, con DNS, secretos y operación real.
+      El endpoint público no debe depender de `localhost`, del disco del
       desarrollador ni de una terminal abierta.
 - [ ] **Persistencia portable** — separar el proceso MCP del almacenamiento:
       volumen/objeto persistente para cachés y artefactos grandes, backups,
@@ -76,7 +77,11 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
       están implementados; `auditar_grid=true` prueba un período reciente por
       cada combinación frecuencia/unidad, con reporte persistente separado y
       límite de 500 combinaciones. Sigue pendiente comprobar cambios de
-      revisión cuando el endpoint los exponga explícitamente.
+      revisión cuando el endpoint los exponga explícitamente. La auditoría ya
+      registra si existe un marcador explícito (campo de revisión/version o
+      `ETag`/`Last-Modified`); comprobación en vivo 2026-08-31: BCEData responde
+      200, pero no publica ninguno, así que la comparación por contenido es la
+      única evidencia disponible hoy.
 - [x] **BCEData completo — verificación de cobertura**: `audit_bce_catalog`
       consulta el árbol y los metadatos de todos los grupos, registra cuántos
       grupos y series fueron descubiertos, qué solicitudes fallaron y cuándo
@@ -92,21 +97,25 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
       además del PDF y ZIP completos, con boletín, fecha, sección, título, URL
       y fecha de consulta; el hash se calcula al leer cada XLSX. `search_bce_iem`
       puede persistir el catálogo construido y `scripts/audit_bce_iem.py`
-      deja preparado el barrido completo desde 1996. Pendiente calcular hashes
-      de todos los archivos sin convertir el barrido en una descarga masiva.
+      deja preparado el barrido completo desde 1996. Ahora `hash_archivos=true`
+      calcula SHA-256 de los XLSX completos de forma opt-in, concurrente y
+      acotada; todavía no se ha ejecutado el barrido histórico completo porque
+      sería una descarga masiva.
 - [~] **IEM completo — lectura de tablas**: hacer buscables los valores de
       todas las tablas individuales, no solo sus títulos. Añadir lectores para
       las familias de formatos que difieren del diseño común; conservar también
       una copia/vista fiel del archivo original cuando no sea seguro
       normalizarlo. Las formas ancha y larga comunes, y la vista segura, ya
       están cubiertas; quedan normalizadores dedicados para las familias
-      restantes. Ahora también normaliza meses numéricos y nombres de meses en
-      español, además de tablas sin bloque de unidad explícito. Una vista de
-      las primeras filas cuenta como diagnóstico, no como cobertura completa.
-- [ ] **BCEData ↔ IEM — mapa de equivalencias**: identificar qué tabla IEM
-      duplica una serie BCEData, cuál la amplía y cuál existe solo en una de las
-      dos fuentes. Mantener la definición original, unidad, frecuencia, fecha
-      de corte y notas de revisión para evitar combinar series incompatibles.
+      restantes. Ahora también normaliza meses numéricos, nombres de meses en
+      español, trimestres, tablas sin bloque de unidad explícito y matrices con
+      varias columnas descriptivas. Una vista de las primeras filas cuenta como
+      diagnóstico, no como cobertura completa.
+- [~] **BCEData ↔ IEM — mapa de equivalencias**: `compare_bce_sources` genera
+      coincidencias candidatas por etiquetas normalizadas, además de entradas
+      que aparecen solo en una fuente. Sigue pendiente confirmar manualmente
+      definición, unidad, frecuencia, fecha de corte y revisión antes de
+      declarar una equivalencia metodológica.
 - [ ] **BCE — prueba de completitud y frescura**: ejecutar una comprobación
       programada que compare el catálogo descubierto con el anterior, confirme
       que el boletín más reciente está presente y deje visible el último período
@@ -290,9 +299,11 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
 - [x] Protección HTTP base — `/mcp` admite Bearer token opcional, el bind local
       es loopback por defecto y existe un límite global de concurrencia; `/health`
       queda libre para health checks.
-- [ ] Rate limiting por usuario/IP y proxy HTTPS — complementar el límite
-      global con cuotas por cliente, TLS terminado delante de Uvicorn y una
-      política explícita para el endpoint remoto que consumirán agentes móviles.
+- [~] Rate limiting por usuario/IP y proxy HTTPS — el servidor ya aplica cuotas
+      por cliente/IP además del límite global, exige token cuando
+      `MCP_REQUIRE_AUTH=1` y puede terminar TLS directamente con Uvicorn.
+      Sigue pendiente configurar el proxy HTTPS, DNS y la política operativa
+      del endpoint remoto real.
 - [ ] Type-checking en CI (mypy/pyright) — ruff cubre estilo/imports pero no
       errores de tipo; el repo ya está tipado casi en su totalidad. Riesgo:
       podría destapar errores preexistentes en los 40+ archivos que

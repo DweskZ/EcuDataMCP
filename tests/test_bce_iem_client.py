@@ -270,6 +270,22 @@ def test_extract_monthly_wide_series_accepts_spanish_month_labels():
 def test_period_key_accepts_numeric_month_year_and_spanish_month():
     assert bce_iem_client._period_key("03/2025") == (2025, 3)
     assert bce_iem_client._period_key("Marzo 2025") == (2025, 3)
+    assert bce_iem_client._period_key("II trimestre 2025") == (2025, 4)
+
+
+def test_extract_matrix_series_preserves_descriptor_columns():
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.append(["Código", "Descripción", 2024, 2025])
+    sheet.append(["A", "PIB", 100, 110])
+
+    result = bce_iem_client._extract_matrix_series(sheet, "2025", "2025", 20)
+
+    assert result["formato"] == "series_matriz"
+    assert result["columnas_descriptivas"] == ["Código", "Descripción"]
+    assert result["bloques"][0]["series"] == [
+        {"nombre": "A | PIB", "valores": {"2025": 110}}
+    ]
 
 
 @pytest.mark.asyncio

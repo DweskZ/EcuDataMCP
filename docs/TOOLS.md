@@ -70,7 +70,8 @@ para consultar el catálogo nacional o el portal municipal Cuenca en Datos.
 | `search_indicadores_bce` | Buscar en el catálogo estadístico BCEData. |
 | `get_indicador_bce` | Serie temporal por grupo, período, frecuencia y unidad. |
 | `audit_bce_catalog` | Auditar grupos, series, secciones, frecuencias, unidades, rangos y errores de carga; puede probar valores recientes de `/grid` y guardar snapshots. |
-| `search_bce_iem` | Buscar tablas XLSX individuales del archivo IEM, actual o histórico. |
+| `compare_bce_sources` | Generar un mapa candidato de traslapes entre etiquetas de BCEData e IEM, sin declarar equivalencias metodológicas automáticamente. |
+| `search_bce_iem` | Buscar tablas XLSX individuales del archivo IEM, actual o histórico; `hash_archivos=true` permite un manifiesto SHA-256 acotado. |
 | `get_bce_iem_table` | Leer una tabla XLSX IEM con filtro de período y elegir una versión histórica. |
 
 ## Compañías (Supercías)

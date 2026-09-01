@@ -23,12 +23,15 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urljoin
 
+import httpx
 from openpyxl import load_workbook
 
 from helpers.cache import TtlCache
 from helpers.csv_reader import download_bytes
 from helpers.logging import MAIN_LOGGER_NAME
+from helpers.safe_download import safe_stream
 from helpers.text_utils import strip_accents as _strip
+from helpers.user_agent import USER_AGENT
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
@@ -55,6 +58,8 @@ _HISTORY_CONCURRENCY = 12
 # hasta_anio): otherwise every bulletin the IEM index has ever listed would
 # be fetched in one call. ~5 years of monthly bulletins.
 _MAX_HISTORICAL_BULLETINS = 60
+_HASH_CONCURRENCY = 4
+_MAX_HASH_FILES = 5000
 
 
 def _bulletin_lock(key: int) -> asyncio.Lock:
@@ -406,15 +411,19 @@ async def search_tables(
     desde_anio: int = 0,
     hasta_anio: int = 0,
     guardar_catalogo: bool = False,
+    hash_archivos: bool = False,
+    max_hash_archivos: int = _MAX_HASH_FILES,
 ) -> dict[str, Any]:
     """Search current tables, or versions across the IEM bulletin archive."""
     if desde_anio and hasta_anio and desde_anio > hasta_anio:
         raise ValueError("desde_anio no puede ser mayor que hasta_anio")
+    hash_targets: list[dict[str, Any]] | None = None
     if historico or desde_anio or hasta_anio:
         bulletins = await _fetch_bulletins()
         all_tables, selected_bulletins, loaded_bulletins = await _fetch_historical_tables(
             bulletins, desde_anio, hasta_anio
         )
+        hash_targets = all_tables
         tables = _merge_historical_tables(all_tables)
         catalog = _build_catalog(
             selected_bulletins[0],
@@ -425,6 +434,10 @@ async def search_tables(
         )
     else:
         catalog = await _fetch_catalog()
+        hash_targets = catalog["tablas"]
+    hash_result = None
+    if hash_archivos:
+        hash_result = await hash_catalog_tables(hash_targets or [], max_hash_archivos)
     if guardar_catalogo:
         catalogo = persist_catalog(catalog)
     else:
@@ -445,6 +458,8 @@ async def search_tables(
     }
     if catalogo is not None:
         result["catalogo_guardado"] = catalogo
+    if hash_result is not None:
+        result["hash_archivos"] = hash_result
     return result
 
 
@@ -491,11 +506,31 @@ def _period_key(value: Any) -> tuple[int, int] | None:
     month_year = re.fullmatch(r"(0?[1-9]|1[0-2])[-/]\d{4}", text)
     if month_year:
         return year, int(month_year.group(1))
+    compact_quarter = re.fullmatch(r"\d{4}\s*(?:t|q)\s*([1-4])", text, re.IGNORECASE)
+    if compact_quarter:
+        return year, (int(compact_quarter.group(1)) - 1) * 3 + 1
     prefix = text[: year_match.start()].strip(" -/_")
     suffix = text[year_match.end() :].strip(" -/_")
     month_name = prefix or suffix
     if month_name in _MONTHS:
         return year, _MONTHS[month_name]
+    quarter = re.search(
+        r"(?<!\d)([1-4])\s*(?:er|ro|do|to)?\s*(?:trimestre|trim\.?|t)(?:\s|[-/])*"
+        r"(\d{4})(?!\d)",
+        text,
+        re.IGNORECASE,
+    )
+    if quarter:
+        return int(quarter.group(2)), (int(quarter.group(1)) - 1) * 3 + 1
+    roman_quarter = re.search(
+        r"\b((?:i{1,3}|iv))\s*(?:trimestre|trim\.?)"
+        r"(?:\s|[-/])*(\d{4})\b",
+        text,
+        re.IGNORECASE,
+    )
+    if roman_quarter:
+        quarter_number = {"i": 1, "ii": 2, "iii": 3, "iv": 4}[roman_quarter.group(1).lower()]
+        return int(roman_quarter.group(2)), (quarter_number - 1) * 3 + 1
     numeric_month = re.search(r"(?<!\d)(0?[1-9]|1[0-2])(?=[/-])", text)
     return (year, int(numeric_month.group(1))) if numeric_month else (year, 0)
 
@@ -687,6 +722,129 @@ def _extract_long_table(
     }
 
 
+def _extract_matrix_series(
+    worksheet: Any, desde: str, hasta: str, max_rows: int
+) -> dict[str, Any] | None:
+    """Normalize tables with several descriptor columns before the periods.
+
+    Some IEM families use a matrix such as ``Código | Descripción | 2025 | …``
+    or put quarterly/monthly labels in a header row that is not named
+    ``Período``.  The existing wide parser intentionally stays conservative;
+    this parser handles that family while preserving the source descriptors.
+    """
+    all_rows = list(worksheet.iter_rows(values_only=True))
+    header_index = None
+    period_columns: list[tuple[int, str]] = []
+    for index, row in enumerate(all_rows[:50]):
+        periods = [
+            (position, str(value))
+            for position, value in enumerate(row)
+            if _period_key(value) is not None
+        ]
+        if len(periods) >= 2:
+            header_index = index
+            period_columns = periods
+            break
+    if header_index is None:
+        return None
+
+    start, end = _period_bounds(desde, hasta)
+    selected = [
+        (position, label)
+        for position, label in period_columns
+        if _period_in_bounds(_period_key(label) or (0, 0), start, end)
+    ]
+    if not selected:
+        return None
+
+    first_period_column = min(position for position, _ in period_columns)
+    descriptor_columns = list(range(first_period_column))
+    if not descriptor_columns:
+        return None
+    blocks: list[dict[str, Any]] = []
+    current: dict[str, Any] | None = None
+    for row in all_rows[header_index + 1 :]:
+        descriptors = [
+            _cell(row[position]).strip()
+            for position in descriptor_columns
+            if position < len(row) and _cell(row[position]).strip()
+        ]
+        if not descriptors:
+            continue
+        label = " | ".join(descriptors)
+        values = {
+            period: row[position] if position < len(row) else None
+            for position, period in selected
+        }
+        if not any(value is not None for value in values.values()):
+            current = {"unidad": label, "series": [], "truncada": False}
+            blocks.append(current)
+            continue
+        if current is None:
+            current = {"unidad": "", "series": [], "truncada": False}
+            blocks.append(current)
+        if len(current["series"]) >= max_rows:
+            current["truncada"] = True
+            continue
+        current["series"].append({"nombre": label, "valores": values})
+
+    blocks = [block for block in blocks if block["series"]]
+    if not blocks:
+        return None
+    return {
+        "formato": "series_matriz",
+        "periodos": [period for _, period in selected],
+        "columnas_descriptivas": [
+            _cell(all_rows[header_index][position])
+            for position in descriptor_columns
+        ],
+        "bloques": blocks,
+    }
+
+
+async def _hash_url(url: str, session: httpx.AsyncClient) -> dict[str, Any]:
+    """Hash one complete XLSX without applying the preview-size limit."""
+    digest = hashlib.sha256()
+    total = 0
+    async with safe_stream(session, url, timeout=120.0) as response:
+        response.raise_for_status()
+        async for chunk in response.aiter_bytes(chunk_size=256 * 1024):
+            digest.update(chunk)
+            total += len(chunk)
+    return {"sha256": digest.hexdigest(), "bytes": total}
+
+
+async def hash_catalog_tables(
+    tables: list[dict[str, Any]], max_files: int = _MAX_HASH_FILES
+) -> dict[str, Any]:
+    """Hash a bounded set of IEM XLSX links for reproducible archive audits."""
+    max_files = min(max(max_files, 1), _MAX_HASH_FILES)
+    selected = tables[:max_files]
+    omitted = max(0, len(tables) - len(selected))
+    semaphore = asyncio.Semaphore(_HASH_CONCURRENCY)
+
+    async def hash_one(table: dict[str, Any], session: httpx.AsyncClient) -> dict[str, Any]:
+        async with semaphore:
+            try:
+                result = await _hash_url(table["url"], session)
+                return {**table, **result, "ok": True}
+            except Exception as exc:
+                return {**table, "ok": False, "error": str(exc)}
+
+    async with httpx.AsyncClient(
+        headers={"User-Agent": USER_AGENT}, timeout=120.0
+    ) as session:
+        results = await asyncio.gather(*(hash_one(table, session) for table in selected))
+    return {
+        "total_archivos": len(tables),
+        "archivos_consultados": len(selected),
+        "archivos_omitidos_por_limite": omitted,
+        "archivos_exitosos": sum(1 for result in results if result["ok"]),
+        "archivos_con_error": sum(1 for result in results if not result["ok"]),
+        "resultados": results,
+    }
+
+
 def _inspect_xlsx(raw: bytes, max_rows: int) -> dict[str, Any]:
     """Return a layout-preserving preview without guessing a universal header.
 
@@ -762,6 +920,8 @@ async def get_table(
         structured = _extract_wide_series(workbook.active, desde, hasta, max_rows)
         if structured is None:
             structured = _extract_long_table(workbook.active, desde, hasta, max_rows)
+        if structured is None:
+            structured = _extract_matrix_series(workbook.active, desde, hasta, max_rows)
     finally:
         workbook.close()
 
