@@ -22,6 +22,7 @@ from helpers.env_config import (
 )
 from helpers.http_security import with_http_security
 from helpers.logging import MAIN_LOGGER_NAME, UVICORN_LOGGING_CONFIG, setup_logging
+from helpers.version import get_version
 from prompts import register_prompts
 from resources import register_resources
 from tools import register_tools
@@ -29,7 +30,7 @@ from tools import register_tools
 setup_logging()
 
 SERVER_START_TIME = datetime.now(UTC)
-VERSION = "0.8.5"
+VERSION = get_version()
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
