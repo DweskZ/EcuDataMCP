@@ -4,14 +4,6 @@
 
 ## 0.8.5 — 2026-08-31
 
-### Fixed
-
-- **Locked CI installation** — synchronized the editable package version in
-  `uv.lock` with the release version so `uv sync --locked` can install the
-  project in GitHub Actions.
-
-## 0.8.4 — 2026-08-31
-
 ### Added
 
 - **BCEData revision observability** — catalog audits now report whether the
@@ -291,6 +283,12 @@
   exactly 100" rather than presented as an exact count. Both tools state
   explicitly that this is a registry lookup, not a way to retrieve an
   individual's tax returns, sales, withholdings, or payments.
+
+### Fixed
+
+- **Locked CI installation** — synchronized the editable package version in
+  `uv.lock` with the release version so `uv sync --locked` can install the
+  project in GitHub Actions.
 
 ## 0.8.3 — 2026-08-30
 
