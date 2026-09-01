@@ -117,6 +117,60 @@
     "status": "build-local"
   },
   {
+    "id": "inec-estadisticas",
+    "name": "INEC Statistics",
+    "tag": "INEC",
+    "description": "Statistical topics, aggregate series, bulletins and published files",
+    "coverage": "ecuadorencifras.gob.ec",
+    "url": "https://www.ecuadorencifras.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "inec-biinec",
+    "name": "BIINEC",
+    "tag": "INEC",
+    "description": "Complementary statistical registries and curated modules",
+    "coverage": "aplicaciones3.ecuadorencifras.gob.ec/BIINEC-war",
+    "url": "https://aplicaciones3.ecuadorencifras.gob.ec/BIINEC-war/",
+    "status": "live"
+  },
+  {
+    "id": "inec-censo",
+    "name": "Censo Ecuador 2022",
+    "tag": "INEC",
+    "description": "Census resources, microdata and methodology documents",
+    "coverage": "censoecuador.gob.ec",
+    "url": "https://www.censoecuador.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "sipa",
+    "name": "SIPA",
+    "tag": "Agriculture",
+    "description": "Agricultural statistics and download modules",
+    "coverage": "sipa.agricultura.gob.ec",
+    "url": "https://sipa.agricultura.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "contraloria",
+    "name": "Contraloría General del Estado",
+    "tag": "CGE",
+    "description": "Open audit data and the Annual Control Plan",
+    "coverage": "contraloria.gob.ec",
+    "url": "https://www.contraloria.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "superbancos",
+    "name": "Superbancos",
+    "tag": "Banking",
+    "description": "Bulletins, financial services, historical information and statistical calendar",
+    "coverage": "superbancos.gob.ec",
+    "url": "https://www.superbancos.gob.ec/estadisticas/portalestudios",
+    "status": "live"
+  },
+  {
     "id": "inec-publications",
     "name": "INEC Publications",
     "tag": "INEC",

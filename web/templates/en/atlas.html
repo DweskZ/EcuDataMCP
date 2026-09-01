@@ -4,9 +4,16 @@
 <div class="container-page">
 <p class="kicker">Reference</p>
 <h1>All <span class="accent">{{ tool_count }} tools</span>, one by one.</h1>
-<p class="hero-sub">The full reference, not the homepage's summary view. Every tool has its own anchor: link to it directly from GitHub, other docs, or your own agent's reasoning.</p>
+<p class="hero-sub">Find a tool by name, source, or task. Open only the group and detail you need.</p>
 <div class="atlas-filter-wrap">
 <input type="text" id="atlas-filter" class="atlas-filter" placeholder="Filter by name or keyword…" autocomplete="off">
+</div>
+<div class="atlas-toolbar" aria-live="polite">
+<p id="atlas-result-count">{{ tool_count }} tools · open a group to see its details.</p>
+<div class="atlas-actions">
+<button type="button" data-atlas-action="open">Expand groups</button>
+<button type="button" data-atlas-action="close">Collapse groups</button>
+</div>
 </div>
 </div>
 </section>
@@ -14,8 +21,12 @@
 <section class="landing">
 <div class="container-page">
 {% for cat in tools %}
-<div class="atlas-category">
-<h3 class="atlas-category-title">{{ cat.category }}<span class="tag">{{ cat.tools | length }}</span></h3>
+<details class="atlas-category">
+<summary class="atlas-category-summary">
+<span class="atlas-category-title">{{ cat.category }}<span class="tag">{{ cat.tools | length }}</span></span>
+<span class="atlas-category-action">Show</span>
+</summary>
+<div class="atlas-category-tools">
 {% for tool in cat.tools %}
 <details class="atlas-tool" id="tool-{{ tool.name }}" data-search="{{ tool | atlas_search_key }}">
 <summary class="atlas-tool-summary">
@@ -38,6 +49,7 @@
 </details>
 {% endfor %}
 </div>
+</details>
 {% endfor %}
 <p id="atlas-empty" class="atlas-empty" style="display:none;">No tool matches that search.</p>
 </div>
@@ -57,12 +69,24 @@
   var tools = Array.from(document.querySelectorAll(".atlas-tool"));
   var categories = Array.from(document.querySelectorAll(".atlas-category"));
   var empty = document.getElementById("atlas-empty");
+  var resultCount = document.getElementById("atlas-result-count");
 
-  input.addEventListener("input", function (e) {
-    var q = e.target.value.trim().toLowerCase();
+  function visibleTools() {
+    return tools.filter(function (tool) { return tool.style.display !== "none"; });
+  }
 
+  function updateResultCount(query) {
+    var count = visibleTools().length;
+    resultCount.textContent = query
+      ? count + " tool" + (count === 1 ? "" : "s") + " match" + (count === 1 ? "es" : "") + "."
+      : "{{ tool_count }} tools · open a group to see its details.";
+  }
+
+  function applyFilter(query) {
     tools.forEach(function (el) {
-      el.style.display = el.dataset.search.includes(q) ? "" : "none";
+      var match = el.dataset.search.includes(query);
+      el.style.display = match ? "" : "none";
+      if (!match) el.open = false;
     });
 
     var anyVisible = false;
@@ -71,11 +95,45 @@
         return t.style.display !== "none";
       });
       cat.style.display = visible ? "" : "none";
+      if (query && visible) cat.open = true;
       anyVisible = anyVisible || visible;
     });
 
     empty.style.display = anyVisible ? "none" : "";
+    updateResultCount(query);
+  }
+
+  input.addEventListener("input", function (e) {
+    var q = e.target.value.trim().toLowerCase();
+
+    applyFilter(q);
   });
+
+  document.querySelectorAll("[data-atlas-action]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var open = button.dataset.atlasAction === "open";
+      categories.forEach(function (cat) {
+        if (cat.style.display !== "none") {
+          cat.open = open;
+          if (!open) cat.querySelectorAll(".atlas-tool").forEach(function (tool) {
+            tool.open = false;
+          });
+        }
+      });
+    });
+  });
+
+  function openHashTarget() {
+    var target = document.getElementById(window.location.hash.slice(1));
+    if (!target) return;
+    var category = target.closest(".atlas-category");
+    if (category) category.open = true;
+    if (target.tagName === "DETAILS") target.open = true;
+    setTimeout(function () { target.scrollIntoView(); }, 0);
+  }
+
+  window.addEventListener("hashchange", openHashTarget);
+  openHashTarget();
 })();
 </script>
 {% endblock %}

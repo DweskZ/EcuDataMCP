@@ -117,6 +117,60 @@
     "status": "build-local"
   },
   {
+    "id": "inec-estadisticas",
+    "name": "INEC Estadísticas",
+    "tag": "INEC",
+    "description": "Temas estadísticos, series agregadas, boletines y archivos publicados",
+    "coverage": "ecuadorencifras.gob.ec",
+    "url": "https://www.ecuadorencifras.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "inec-biinec",
+    "name": "BIINEC",
+    "tag": "INEC",
+    "description": "Registros estadísticos complementarios y módulos curados",
+    "coverage": "aplicaciones3.ecuadorencifras.gob.ec/BIINEC-war",
+    "url": "https://aplicaciones3.ecuadorencifras.gob.ec/BIINEC-war/",
+    "status": "live"
+  },
+  {
+    "id": "inec-censo",
+    "name": "Censo Ecuador 2022",
+    "tag": "INEC",
+    "description": "Recursos, microdatos y documentos metodológicos del censo",
+    "coverage": "censoecuador.gob.ec",
+    "url": "https://www.censoecuador.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "sipa",
+    "name": "SIPA",
+    "tag": "Agricultura",
+    "description": "Módulos de descargas y estadísticas agropecuarias",
+    "coverage": "sipa.agricultura.gob.ec",
+    "url": "https://sipa.agricultura.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "contraloria",
+    "name": "Contraloría General del Estado",
+    "tag": "CGE",
+    "description": "Datos abiertos de auditorías y Plan Anual de Control",
+    "coverage": "contraloria.gob.ec",
+    "url": "https://www.contraloria.gob.ec",
+    "status": "live"
+  },
+  {
+    "id": "superbancos",
+    "name": "Superbancos",
+    "tag": "SB",
+    "description": "Boletines, servicios financieros, información histórica y calendario estadístico",
+    "coverage": "superbancos.gob.ec",
+    "url": "https://www.superbancos.gob.ec/estadisticas/portalestudios",
+    "status": "live"
+  },
+  {
     "id": "inec-publicaciones",
     "name": "INEC Publicaciones",
     "tag": "INEC",
