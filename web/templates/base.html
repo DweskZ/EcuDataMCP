@@ -41,10 +41,14 @@
         {% endfor %}
       </ul>
       <ul class="navbar-nav navbar-nav-scroll ms-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="{{ nav.lang_switch[1] }}">
-            <span class="menu-text">{{ nav.lang_switch[0] }}</span>
-          </a>
+        <li class="nav-item lang-toggle" role="group" aria-label="Language / Idioma">
+          {% if lang == "es" %}
+          <span class="lang-toggle-option active" aria-current="true">ES</span>
+          <a class="lang-toggle-option" href="{{ lang_switch_href }}">EN</a>
+          {% else %}
+          <a class="lang-toggle-option" href="{{ lang_switch_href }}">ES</a>
+          <span class="lang-toggle-option active" aria-current="true">EN</span>
+          {% endif %}
         </li>
         <li class="nav-item">
           <a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP" target="_blank">

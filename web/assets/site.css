@@ -121,3 +121,33 @@
 .notice-box strong {
   color: #f2b134;
 }
+
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #24262b;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0.4rem 0.5rem;
+}
+
+.lang-toggle-option {
+  display: inline-block;
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  padding: 0.32rem 0.6rem;
+  color: #7c8591;
+  text-decoration: none;
+}
+
+a.lang-toggle-option:hover {
+  color: #f2b134;
+}
+
+.lang-toggle-option.active {
+  background: #f2b134;
+  color: #0b0c0e;
+  font-weight: 700;
+}

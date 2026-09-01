@@ -561,6 +561,49 @@ a.tool-chip:hover {
   color: $secondary;
 }
 
+.examples-more-label {
+  font-family: $font-family-monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $secondary;
+  margin: 2rem 0 1.25rem;
+}
+
+.example-featured {
+  background: #131417;
+  border: 1px solid $border-color;
+  border-left: 3px solid $primary;
+  border-radius: 8px;
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.example-featured-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.examples-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem;
+}
+
+@media (max-width: 700px) {
+  .examples-grid { grid-template-columns: 1fr; }
+}
+
+.example-mini {
+  background: #131417;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+}
+
 // ---- under the hood --------------------------------------------------------
 
 .tools-summary {

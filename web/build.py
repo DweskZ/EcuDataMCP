@@ -66,7 +66,6 @@ NAV = {
             ("Acerca de", "about.html"),
             ("Cómo colaborar", "colaborar.html"),
         ],
-        "lang_switch": ("English", "en/index.html"),
         "footer_left": (
             "MIT License · Proyecto independiente, no afiliado a ninguna "
             "institución del Estado ecuatoriano."
@@ -83,7 +82,6 @@ NAV = {
             ("About", "about.html"),
             ("Contribute", "colaborar.html"),
         ],
-        "lang_switch": ("Español", "../index.html"),
         "footer_left": (
             "MIT License · Independent project, not affiliated with any "
             "Ecuadorian government institution."
@@ -253,8 +251,13 @@ def build_env() -> jinja2.Environment:
 def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
     out_dir = SITE if lang == "es" else SITE / "en"
     out_dir.mkdir(parents=True, exist_ok=True)
-    root = "" if lang == "es" else "../"
-    assets_prefix = f"{root}assets/"
+    # NAV/search hrefs (e.g. "atlas.html") are relative to the current
+    # language's own output directory, which is always where the current
+    # page itself lives -- so root must stay empty for BOTH languages, or
+    # every in-page/nav link on the English site escapes into es/. Only
+    # the assets/ directory actually lives a level up from en/.
+    root = ""
+    assets_prefix = "assets/" if lang == "es" else "../assets/"
 
     sources = load_json(lang, "sources.json")
     clients = load_json(lang, "clients.json")
@@ -271,6 +274,8 @@ def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
 
     search_entries = []
 
+    other_root = "en/" if lang == "es" else "../"
+
     for page in PAGES:
         template = env.get_template(f"{lang}/{page}.html")
         title = PAGE_TITLES[lang][page]
@@ -280,6 +285,7 @@ def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
             root=root,
             assets=assets_prefix,
             nav=NAV[lang],
+            lang_switch_href=f"{other_root}{page}.html",
             t=TRANSLATIONS[lang],
             status_badges=STATUS_BADGES[lang],
             current_page=page,
