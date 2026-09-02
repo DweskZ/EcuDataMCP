@@ -111,6 +111,29 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
       cuatro enlaces 404 y ocho páginas sin XLSX individuales. Por tanto, el
       índice histórico está cubierto, pero todavía no se puede declarar lectura
       ni hashing completos de 1996–2026.
+      **Frontera exacta encontrada 2026-09-02** (búsqueda binaria en vivo por
+      año: 2000, 2010, 2015 sin tablas; 2016 parcial; 2017+ completo): las
+      tablas XLSX individuales por tabla empiezan recién con el **boletín No.
+      1976 (octubre 2016)** — de los 12 boletines de 2016, solo oct/nov/dic
+      (1976/1977/1978) las exponen; ene-sep 2016 no. Todo lo anterior al No.
+      1976 (No. 1727-1975, enero 1996 - septiembre 2016 — **249 de los 367
+      boletines, el 68% del archivo**) solo existe como ZIP de la publicación
+      completa (`archivos_completos`, tipo `zip`), sin tablas individuales
+      descargables. **Buena noticia confirmada en vivo** (`list_zip_contents`
+      sobre `IEM1975.zip`, el boletín justo antes de la frontera): el ZIP ya
+      trae archivos por tabla con el mismo esquema `IEM-{numero}`, solo que en
+      `.xls` legado (no `.xlsx`) — `helpers/csv_reader.py` ya sabe leer `.xls`
+      legado. No es un formato desconocido; es el mismo table_id, empacado
+      distinto. Construir esta ruta es viable pero no trivial (extraer un
+      miembro específico del ZIP, no solo listarlo, y mapear table_id →
+      nombre de archivo dentro del ZIP, que no siempre coincide 1:1 con la
+      convención actual — visto `IEM-315a.xls`, `5_SectorPetrolero.xls`,
+      `7_GraficosIDEAC.xls` sin equivalente obvio hoy). Pendiente decisión de
+      Daniel sobre si construirlo ahora. Con esta frontera, "cobertura completa 1996-2026"
+      significa en la práctica dos problemas distintos: 1996-2016 (formato
+      conocido pero sin construir, ZIP + `.xls` legado) y 2016-2026 (formato
+      conocido, XLSX individuales, cobertura ya alta pero sin hashing masivo
+      confirmado).
 - [~] **IEM completo — lectura de tablas**: hacer buscables los valores de
       todas las tablas individuales, no solo sus títulos. Añadir lectores para
       las familias de formatos que difieren del diseño común; conservar también
@@ -154,11 +177,11 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
       petrolera, derivados↔IPC, salario↔IPP) son falsos positivos por
       similitud de etiqueta — sin relación real, no revisados en detalle
       más allá de notar que los títulos no corresponden.
-- [ ] **BCE — prueba de completitud y frescura**: ejecutar una comprobación
-      programada que compare el catálogo descubierto con el anterior, confirme
-      que el boletín más reciente está presente y deje visible el último período
-      disponible por fuente. Un fallo de la web no debe borrar la última versión
-      válida.
+- [x] ~~BCE — prueba de completitud y frescura~~ **Descartado 2026-09-02**:
+      requiere un scheduler con almacenamiento persistente de snapshots, que
+      Daniel decidió no construir. `audit_bce_catalog`/`audit_bce_iem` ya
+      hacen la comparación bajo demanda (no programada) cuando se invocan
+      con `guardar_snapshot=true`/`guardar_catalogo=true`.
 
 - [x] SRI — datasets page (`search_sri_datasets`).
 - [~] BCE — indicadores vía BCEData (`search_indicadores_bce`/`get_indicador_bce`).
@@ -223,7 +246,7 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
 - [~] IESS — boletines/auditorías/actuariales scrapeables y confirmados, sin construir tool nuevo. → RESEARCH.md § IESS
 - [~] SENESCYT/Educación Superior — cubierto vía CKAN; registro de títulos bloqueado por captcha (no automatizable). → RESEARCH.md § SENESCYT
 - [~] BCE — Información Estadística Mensual (IEM/IEEM), boletín mensual mucho más rico que BCEData. `search_bce_iem` indexa en vivo las tablas XLSX individuales del boletín vigente y, con `historico=true` o un rango de años, agrupa versiones de la misma tabla en el archivo mensual. Ahora reconcilia el índice histórico con “Últimas publicaciones”, reporta el rango/números faltantes detectados y cataloga también los enlaces PDF/ZIP completos de cada boletín. `get_bce_iem_table` devuelve series con filtro anual cuando detecta el formato tabular ancho, reconoce tablas largas, conserva una vista segura sin inventar columnas y devuelve el SHA-256 del XLSX leído. Pendiente: normalizadores dedicados, comparación explícita con BCEData y catalogación persistente de todo el archivo histórico. **Profundizado 2026-08-29**: cada boletín (archivo completo desde ene-1996) tiene ~60+ XLSX individuales por tabla, no solo el ZIP. → RESEARCH.md § Séptima pasada
-- [~] BCE — **BCEData: auditoría viva de cobertura y metadatos**: `audit_bce_catalog` y `scripts/audit_bce_catalog.py` ya comparan periódicamente `/tree` y cada `/bundle/{id_grupo}`, detectan grupos/series modificados, conservan el último snapshot completo y pueden probar valores `/grid` seleccionados por frecuencia/unidad. Pendiente: conectar el script a un scheduler con almacenamiento persistente del despliegue y comprobar cambios de revisión si la respuesta los expone. Mantener la búsqueda por etiquetas de series y documentar que esta API pública no está formalmente documentada por el BCE.
+- [x] BCE — **BCEData: auditoría viva de cobertura y metadatos**: `audit_bce_catalog` y `scripts/audit_bce_catalog.py` comparan `/tree` y cada `/bundle/{id_grupo}` bajo demanda, detectan grupos/series modificados, conservan el último snapshot completo y pueden probar valores `/grid` seleccionados por frecuencia/unidad. **Descartado 2026-09-02**: conectarlo a un scheduler con almacenamiento persistente — Daniel decidió no construir esa infraestructura; el flujo bajo demanda ya cubre lo que se necesita hoy. Comprobar cambios de revisión sigue sin aplicar porque la API no expone ningún marcador de revisión. Mantener la búsqueda por etiquetas de series y documentar que esta API pública no está formalmente documentada por el BCE.
 - [~] BCE — **IEM: descubrimiento y catálogo histórico resistente**: ya no depende únicamente de `IndiceIEM.html`: reconcilia “Últimas publicaciones”, detecta boletines nuevos no listados, registra números faltantes, comprueba tablas XLSX individuales y expone la fecha de catalogación. `guardar_catalogo=true` y `scripts/audit_bce_iem.py` persisten el catálogo completo construido. La lectura normaliza tablas anchas/largas, meses numéricos y nombres de meses en español, incluso sin unidad explícita; siguen pendientes más familias específicas y hashes masivos de archivos. No presenta el IEM más reciente encontrado como “actual” sin informar su boletín.
 - [ ] BCE — **búsqueda ampliada y mapa completo de fuentes**: revisar más allá de BCEData e IEM el sitio institucional, publicaciones temáticas, catálogos, archivos históricos y descargas por sector. Inventariar cada fuente, su cobertura, frecuencia, formato, API/archivo y traslape con lo ya integrado; priorizar únicamente tablas que añadan detalle ecuatoriano verificable, no duplicados de una misma serie. El resultado debe ser un mapa de cobertura y una lista corta de integraciones justificadas.
 - [x] BCE — **Remesas de trabajadores** (`search_bce_remesas`, `helpers/bce_remesas_client.py`): resultados agregados, serie histórica y bases mensuales, incluida la desagregación por entidad disponible desde julio de 2025. Metadata y URL directa solamente (mismo patrón que SIPA); el tool deja explícito que "histórica" (pre-cambio) y "BDD" (post-cambio) son series metodológicamente distintas, según la nota de comparabilidad de la propia página. → https://contenido.bce.fin.ec/series-de-datos-remesas-de-trabajadores/
