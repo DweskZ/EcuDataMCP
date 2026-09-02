@@ -68,6 +68,11 @@ _HISTORY_CONCURRENCY = 12
 _MAX_HISTORICAL_BULLETINS = 60
 _HASH_CONCURRENCY = 4
 _MAX_HASH_FILES = 5000
+# One frameset-era "section" can be a prose methodology note instead of a
+# data table (confirmed live, bulletin No. 1820: a single <TD colspan=30>
+# wrapping several paragraphs) -- cap any one cell's text so it can't blow
+# up an otherwise agent-sized response.
+_MAX_FRAMESET_CELL_CHARS = 500
 
 
 def _bulletin_lock(key: int) -> asyncio.Lock:
@@ -373,6 +378,13 @@ class _TableGridParser(HTMLParser):
         if self._cell is None or self._row is None:
             return
         text = _WS_RE.sub(" ", "".join(self._cell)).strip()
+        if len(text) > _MAX_FRAMESET_CELL_CHARS:
+            # Some "sections" in this era are prose notes, not data -- one
+            # <TD colspan=30> wrapping a multi-paragraph methodology note
+            # (confirmed live, bulletin No. 1820) is a real page, not a
+            # parser bug. Cap it so one such cell can't blow up an
+            # otherwise agent-sized response.
+            text = text[:_MAX_FRAMESET_CELL_CHARS] + "…"
         rowspan, colspan = self._cell_span
         self._row.append((text, max(rowspan, 1), max(colspan, 1)))
         self._cell = None

@@ -578,6 +578,21 @@ FUENTE: BCE.
 """
 
 
+def test_table_grid_parser_caps_prose_cell_length():
+    # Some "sections" are methodology notes, not data -- one <TD colspan=N>
+    # wrapping several paragraphs (confirmed live, bulletin No. 1820), not
+    # a parser bug. Must not blow up an otherwise agent-sized response.
+    long_html = f"<TABLE><TR><TD colspan=30>{'x' * 2000}</TABLE>"
+    parser = bce_iem_client._TableGridParser()
+    parser.feed(long_html)
+
+    grid = bce_iem_client._expand_table_grid(parser.tables[0])
+    assert len(grid) == 1
+    for cell in grid[0]:
+        assert len(cell) == bce_iem_client._MAX_FRAMESET_CELL_CHARS + 1  # +1 for "…"
+        assert cell.endswith("…")
+
+
 def test_table_grid_parser_resolves_rowspan_and_colspan():
     parser = bce_iem_client._TableGridParser()
     parser.feed(_FRAMESET_SECTION_HTML)
