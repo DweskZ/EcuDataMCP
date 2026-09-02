@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import sys
 
 import httpx
+
+from helpers.smoke_status import assess_response
 
 # Tool output routinely contains non-ASCII text (accents, →, ⚠...) from
 # real government sources; on Windows the console defaults to cp1252,
@@ -99,36 +102,41 @@ async def call_tool(client: httpx.AsyncClient, name: str, args: dict) -> str:
     return "\n".join(c.get("text", "") for c in content if c.get("type") == "text")
 
 
-def error_message(text: str) -> str | None:
-    """Return the error text if `text` looks like a tool-level failure.
+async def check_tool(
+    client: httpx.AsyncClient, name: str, args: dict, required: list[str]
+) -> tuple[str, str | None]:
+    """Run a check twice when a known live source is temporarily degraded."""
+    assessment = None
+    for attempt in range(2):
+        text = await call_tool(client, name, args)
+        assessment = assess_response(text, required)
+        if assessment.status != "degraded" or attempt:
+            break
+        await asyncio.sleep(1)
+    assert assessment is not None
+    if assessment.status == "ok":
+        print(f"  OK       {name}")
+    elif assessment.status == "degraded":
+        print(f"  DEGRADED {name} [{assessment.source}]: {assessment.detail[:160]}")
+    else:
+        raise AssertionError(assessment.detail)
+    return assessment.status, assessment.source
 
-    Covers both the "Error: ..." string convention and the {"error": ...}
-    payload `format="json"` tools use, so a tool that starts silently
-    erroring reads as a WARN (or below), never a false-positive OK/FAIL.
-    """
-    if "Traceback" in text[:200]:
-        return text[:200]
-    stripped = text.strip()
-    if stripped.startswith(("Error:", "ERROR:")):
-        return text
-    if stripped.startswith("{"):
-        try:
-            payload = json.loads(stripped)
-        except json.JSONDecodeError:
-            payload = None
-        if isinstance(payload, dict) and "error" in payload:
-            return text
-    return None
 
-
-def ok(label: str, text: str) -> None:
-    err = error_message(text)
-    if err is not None:
-        if "Traceback" in text[:200]:
-            raise AssertionError(f"{label}: traceback in response")
-        print(f"  WARN {label}: {text[:160]}")
+def write_summary(total: int, failed: int, degraded: set[str]) -> None:
+    """Write a compact GitHub Actions summary while keeping local runs plain."""
+    path = os.getenv("GITHUB_STEP_SUMMARY")
+    if not path:
         return
-    print(f"  OK   {label} ({len(text)} chars)")
+    lines = [
+        "## EcuDataMCP smoke",
+        "",
+        f"- Checks: {total}",
+        f"- Hard failures: {failed}",
+        f"- Degraded external sources: {', '.join(sorted(degraded)) or 'none'}",
+    ]
+    with open(path, "a", encoding="utf-8") as summary:
+        summary.write("\n".join(lines) + "\n")
 
 
 async def main() -> int:
@@ -211,21 +219,12 @@ async def main() -> int:
 
         print("== tools ==")
         failed = 0
+        degraded: set[str] = set()
         for name, args, must in checks:
             try:
-                text = await call_tool(client, name, args)
-                err = error_message(text)
-                if err is not None:
-                    # A tool-level error (site down, geo-blocked, rate
-                    # limited...) means the fixed-string assertion was never
-                    # going to match -- that's an environment/upstream issue,
-                    # not a code regression, so it's a WARN like the
-                    # error-tolerant checks below, not a hard FAIL.
-                    ok(name, text)
-                    continue
-                if must and not any(m.lower() in text.lower() for m in must):
-                    raise AssertionError(f"none of {must} found: {text[:240]}")
-                ok(name, text)
+                status, source = await check_tool(client, name, args, must)
+                if status == "degraded" and source:
+                    degraded.add(source)
             except Exception as exc:
                 failed += 1
                 print(f"  FAIL {name}: {exc}")
@@ -254,7 +253,8 @@ async def main() -> int:
 
         print("== done ==")
         total = len(checks) + chains
-        print(f"failed={failed}/{total}")
+        print(f"failed={failed}/{total}; degraded={len(degraded)}")
+        write_summary(total, failed, degraded)
         return 1 if failed else 0
 
 

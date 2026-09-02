@@ -40,6 +40,7 @@ IEM_INDEX_URL = (
     "PublicacionesGenerales/IndiceIEM.html"
 )
 IEM_LATEST_PUBLICATIONS_URL = "https://contenido.bce.fin.ec/ultimas-publicaciones/"
+IEM_ARCHIVE_URL = "https://contenido.bce.fin.ec/iem-publicaciones/"
 _SOURCE_NAME = "Banco Central del Ecuador — Información Estadística Mensual"
 _ROOT = Path(__file__).resolve().parents[1]
 _DEFAULT_CATALOG_DIR = _ROOT / "data" / "iem_catalog_snapshots"
@@ -73,7 +74,7 @@ _LINK_RE = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 _BULLETIN_RE = re.compile(
-    r"m(?P<number>\d{4})(?P<month>\d{2})(?P<year>\d{4})\.html(?:$|[?#])",
+    r"m(?P<number>\d{4})(?P<month>\d{2})(?P<year>\d{4})\.html?(?:$|[?#])",
     re.IGNORECASE,
 )
 _TABLE_RE = re.compile(
@@ -224,6 +225,7 @@ async def _fetch_bulletins() -> list[dict[str, Any]]:
             raw_index.decode("utf-8", errors="replace")
         )
         latest_bulletins: list[dict[str, Any]] = []
+        archive_bulletins: list[dict[str, Any]] = []
         try:
             raw_latest, latest_truncated = await download_bytes(
                 IEM_LATEST_PUBLICATIONS_URL
@@ -238,7 +240,19 @@ async def _fetch_bulletins() -> list[dict[str, Any]]:
             logger.warning(
                 "No se pudo reconciliar Últimas publicaciones del BCE: %s", exc
             )
-        bulletins = _merge_bulletins(latest_bulletins, index_bulletins)
+        try:
+            raw_archive, archive_truncated = await download_bytes(IEM_ARCHIVE_URL)
+            if not archive_truncated:
+                archive_bulletins = _parse_bulletins(
+                    raw_archive.decode("utf-8", errors="replace")
+                )
+        except Exception as exc:
+            # The older archive is supplementary: preserve the current index
+            # when it is temporarily unavailable or its WordPress markup moves.
+            logger.warning("No se pudo cargar el archivo histórico IEM del BCE: %s", exc)
+        bulletins = _merge_bulletins(
+            latest_bulletins, index_bulletins, archive_bulletins
+        )
         if not bulletins:
             raise ValueError("No se encontraron boletines IEM en el índice del BCE")
         _bulletins_cache.set("bulletins", bulletins)

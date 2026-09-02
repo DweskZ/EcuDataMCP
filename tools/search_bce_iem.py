@@ -5,6 +5,7 @@ from mcp.server.fastmcp import FastMCP
 from helpers import bce_iem_client
 from helpers.format_out import render_output
 from helpers.logging import MAIN_LOGGER_NAME, log_tool
+from helpers.response_contract import with_response_metadata
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
@@ -129,4 +130,16 @@ def register_search_bce_iem_tool(mcp: FastMCP) -> None:
                 )
             return "\n".join(part for part in parts if part is not None)
 
+        bulletin = result["boletin"]
+        result = with_response_metadata(
+            result,
+            source=result["source"],
+            source_url=result["url_fuente"],
+            freshness="boletin_mensual",
+            schema_name="bce_iem_catalogo_v1",
+            schema_fields=["boletin", "total", "tablas", "historico"],
+            consulted_at=result["catalogado_en"],
+            published_at=f"{bulletin.get('anio')}-{bulletin.get('mes'):02d}"
+            if bulletin.get("anio") and bulletin.get("mes") else None,
+        )
         return render_output(result, format, text_builder=to_text)

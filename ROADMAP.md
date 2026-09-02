@@ -24,11 +24,14 @@ Leyenda: `[ ]` sin empezar · `[~]` parcial · `[x]` hecho
       volumen/objeto persistente para cachés y artefactos grandes, backups,
       restauración y una ruta de actualización reproducible. El servidor debe
       poder recrearse desde la imagen sin perder el estado actualizado.
-- [ ] **Contrato de respuesta para agentes** — completar `outputSchema`,
-      incluir siempre fuente, URL, fecha de publicación/corte, fecha de
-      consulta y nivel de frescura, y mantener respuestas pequeñas para uso
-      móvil. Los archivos grandes deben quedarse en el servidor; el agente debe
-      recibir resultados paginados o enlaces, no cientos de megabytes.
+- [~] **Contrato de respuesta para agentes** — BCEData/IEM ya incluyen el
+      bloque estable `metadatos` con fuente, URL, fecha de publicación/corte,
+      fecha de consulta, frescura y esquema semántico, sin romper los campos
+      históricos. Falta extender el contrato a las demás fuentes y migrar los
+      resultados MCP nativos desde texto dual (`format=text|json`) a schemas
+      estructurados completos. Los archivos grandes deben quedarse en el
+      servidor; el agente debe recibir resultados paginados o enlaces, no
+      cientos de megabytes.
 - [~] **Operación 24/7** — construido 2026-08-31: `.github/workflows/smoke.yml`
       ejecuta diariamente `scripts/smoke_e2e.py` (ahora con ~39 de 68 tools
       cubiertos, antes 13, más 3 cadenas dinámicas list→get que descubren un
@@ -38,8 +41,10 @@ Leyenda: `[ ]` sin empezar · `[~]` parcial · `[x]` hecho
       push). GitHub avisa por correo a quienes ven el repo cuando una
       ejecución programada falla — sin infraestructura de alertas nueva.
       Cubre la "prueba de humo periódica desde fuera del servidor" del ítem
-      original. Pendiente: reintentos y alertas específicas de "una fuente
-      cambió de esquema" (hoy solo distingue passed/failed, no el motivo).
+      original. Desde 2026-08-31 reintenta fuentes externas conocidas y
+      distingue `degraded` (CKAN con bloqueo regional o TLS de CENACE) de un
+      fallo duro del servidor; el resumen de Actions muestra las fuentes
+      afectadas. Pendiente: alertas específicas de cambio de esquema.
 
 ## Nuevas conexiones de datos
 
@@ -81,7 +86,11 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
       registra si existe un marcador explícito (campo de revisión/version o
       `ETag`/`Last-Modified`); comprobación en vivo 2026-08-31: BCEData responde
       200, pero no publica ninguno, así que la comparación por contenido es la
-      única evidencia disponible hoy.
+      única evidencia disponible hoy. Auditoría viva 2026-09-01: 78/78 grupos
+      y 2.360 series sí cargaron; 108/154 combinaciones frecuencia/unidad
+      devolvieron valores y 46 recibieron una página HTML de rechazo por la
+      propia política de seguridad del BCE con HTTP 200. No tratarlas como
+      datos ausentes ni como error JSON del servidor.
 - [x] **BCEData completo — verificación de cobertura**: `audit_bce_catalog`
       consulta el árbol y los metadatos de todos los grupos, registra cuántos
       grupos y series fueron descubiertos, qué solicitudes fallaron y cuándo
@@ -91,16 +100,17 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
       incluidas series nuevas/retiradas. `scripts/audit_bce_catalog.py` deja
       el mismo flujo listo para cron/scheduler. No depende de una lista fija
       de IDs.
-- [~] **IEM completo — archivo y archivos fuente**: descubrir todos los
-      boletines desde enero de 1996 hasta el más reciente, reconciliando el
-      índice histórico con “Últimas publicaciones”; catalogar cada XLSX,
-      además del PDF y ZIP completos, con boletín, fecha, sección, título, URL
-      y fecha de consulta; el hash se calcula al leer cada XLSX. `search_bce_iem`
-      puede persistir el catálogo construido y `scripts/audit_bce_iem.py`
-      deja preparado el barrido completo desde 1996. Ahora `hash_archivos=true`
-      calcula SHA-256 de los XLSX completos de forma opt-in, concurrente y
-      acotada; todavía no se ha ejecutado el barrido histórico completo porque
-      sería una descarga masiva.
+- [~] **IEM completo — archivo y archivos fuente**: `search_bce_iem` ahora
+      reconcilia el índice, “Últimas publicaciones” y el archivo oficial
+      `iem-publicaciones/`. Este último enumera 367 boletines consecutivos,
+      No. 1727–2093 (1996–2026), y el auditor conserva esa evidencia aunque
+      una página no tenga tablas legibles. Los XLSX se catalogan con boletín,
+      fecha, sección, título, URL y fecha de consulta; el hash es opt-in,
+      concurrente y acotado. Verificación viva 2026-09-01: los siete boletines
+      disponibles de 2026 expusieron 84 tablas XLSX; la muestra de 1996 reveló
+      cuatro enlaces 404 y ocho páginas sin XLSX individuales. Por tanto, el
+      índice histórico está cubierto, pero todavía no se puede declarar lectura
+      ni hashing completos de 1996–2026.
 - [~] **IEM completo — lectura de tablas**: hacer buscables los valores de
       todas las tablas individuales, no solo sus títulos. Añadir lectores para
       las familias de formatos que difieren del diseño común; conservar también
@@ -112,10 +122,16 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
       varias columnas descriptivas. Una vista de las primeras filas cuenta como
       diagnóstico, no como cobertura completa.
 - [~] **BCEData ↔ IEM — mapa de equivalencias**: `compare_bce_sources` genera
-      coincidencias candidatas por etiquetas normalizadas, además de entradas
-      que aparecen solo en una fuente. Sigue pendiente confirmar manualmente
-      definición, unidad, frecuencia, fecha de corte y revisión antes de
-      declarar una equivalencia metodológica.
+      coincidencias candidatas por etiquetas normalizadas, alternativas,
+      confianza y campos pendientes de revisión; `guardar_revision=true` y
+      `scripts/audit_bce_equivalence.py` persisten una cola revisable. Sigue
+      pendiente confirmar manualmente definición, unidad, frecuencia, fecha de
+      corte, revisión y valores antes de declarar una equivalencia metodológica.
+      Barrido vivo 2026-09-01 sobre el boletín disponible: 77 candidatos, una
+      tabla IEM sin traslape y 2.352 etiquetas solo BCEData; 72 son posibles
+      componentes de tabla, cuatro posibles tabla/grupo y solo una posible
+      equivalencia directa. Ninguna se trata como duplicado confirmado hasta
+      revisar valores y metodología.
 - [ ] **BCE — prueba de completitud y frescura**: ejecutar una comprobación
       programada que compare el catálogo descubierto con el anterior, confirme
       que el boletín más reciente está presente y deje visible el último período

@@ -14,6 +14,14 @@ En lugar de navegar manualmente por portales gubernamentales, simplemente pregun
 - *"¿Cuáles son los requisitos para sacar el pasaporte?"*
 - *"Dame un preview de los datos de transporte aéreo"*
 
+> **Aviso:** Las definiciones, parámetros y descripciones de algunas
+> herramientas fueron generadas o asistidas por IA y pueden estar incompletas,
+> desactualizadas o no cubrir todos los casos del endpoint subyacente. Una
+> herramienta puede devolver resultados parciales, rechazar parámetros válidos
+> o comportarse de forma inesperada cuando cambia la fuente oficial. Verifica
+> siempre la respuesta contra la fuente enlazada y revisa manualmente los
+> resultados antes de usarlos para decisiones importantes.
+
 ---
 
 ## Beneficios
@@ -235,6 +243,8 @@ uv run python main.py --transport stdio
 ```
 
 La referencia detallada de cada herramienta está en [docs/TOOLS.md](docs/TOOLS.md).
+El contrato JSON para agentes de BCEData/IEM está en
+[docs/RESPONSE_CONTRACT.md](docs/RESPONSE_CONTRACT.md).
 
 ---
 

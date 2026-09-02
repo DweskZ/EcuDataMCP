@@ -2,9 +2,10 @@ import logging
 
 from mcp.server.fastmcp import FastMCP
 
-from helpers import bce_client, bce_equivalence, bce_iem_client
+from helpers import bce_client, bce_equivalence, bce_equivalence_store, bce_iem_client
 from helpers.format_out import render_output
 from helpers.logging import MAIN_LOGGER_NAME, log_tool
+from helpers.response_contract import with_response_metadata
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
@@ -16,6 +17,7 @@ def register_compare_bce_sources_tool(mcp: FastMCP) -> None:
         query: str = "",
         limit: int = 100,
         historico: bool = False,
+        guardar_revision: bool = False,
         format: str = "text",
     ) -> str:
         """Build a cautious BCEData ↔ IEM candidate-equivalence map.
@@ -38,6 +40,21 @@ def register_compare_bce_sources_tool(mcp: FastMCP) -> None:
             )
             result["bce_consultado_en"] = bce_snapshot.get("consultado_en")
             result["iem_consultado_en"] = iem_catalog.get("catalogado_en")
+            if guardar_revision:
+                result["revision_guardada"] = bce_equivalence_store.persist_review_map(result)
+            result = with_response_metadata(
+                result,
+                source="Banco Central del Ecuador — BCEData e IEM",
+                source_url="https://contenido.bce.fin.ec/bcedata/",
+                freshness="comparacion_de_catalogos_en_vivo",
+                schema_name="bce_equivalencias_candidatas_v1",
+                schema_fields=[
+                    "equivalencias_candidatas", "iem_solo_por_etiquetas",
+                    "bcedata_solo_por_etiquetas", "nota",
+                ],
+                consulted_at=bce_snapshot.get("consultado_en"),
+                published_at=iem_catalog.get("catalogado_en"),
+            )
             return render_output(
                 result,
                 format,
