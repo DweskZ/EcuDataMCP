@@ -111,29 +111,48 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
       cuatro enlaces 404 y ocho páginas sin XLSX individuales. Por tanto, el
       índice histórico está cubierto, pero todavía no se puede declarar lectura
       ni hashing completos de 1996–2026.
-      **Frontera exacta encontrada 2026-09-02** (búsqueda binaria en vivo por
-      año: 2000, 2010, 2015 sin tablas; 2016 parcial; 2017+ completo): las
-      tablas XLSX individuales por tabla empiezan recién con el **boletín No.
-      1976 (octubre 2016)** — de los 12 boletines de 2016, solo oct/nov/dic
-      (1976/1977/1978) las exponen; ene-sep 2016 no. Todo lo anterior al No.
-      1976 (No. 1727-1975, enero 1996 - septiembre 2016 — **249 de los 367
-      boletines, el 68% del archivo**) solo existe como ZIP de la publicación
-      completa (`archivos_completos`, tipo `zip`), sin tablas individuales
-      descargables. **Buena noticia confirmada en vivo** (`list_zip_contents`
-      sobre `IEM1975.zip`, el boletín justo antes de la frontera): el ZIP ya
-      trae archivos por tabla con el mismo esquema `IEM-{numero}`, solo que en
-      `.xls` legado (no `.xlsx`) — `helpers/csv_reader.py` ya sabe leer `.xls`
-      legado. No es un formato desconocido; es el mismo table_id, empacado
-      distinto. Construir esta ruta es viable pero no trivial (extraer un
-      miembro específico del ZIP, no solo listarlo, y mapear table_id →
-      nombre de archivo dentro del ZIP, que no siempre coincide 1:1 con la
-      convención actual — visto `IEM-315a.xls`, `5_SectorPetrolero.xls`,
-      `7_GraficosIDEAC.xls` sin equivalente obvio hoy). Pendiente decisión de
-      Daniel sobre si construirlo ahora. Con esta frontera, "cobertura completa 1996-2026"
-      significa en la práctica dos problemas distintos: 1996-2016 (formato
-      conocido pero sin construir, ZIP + `.xls` legado) y 2016-2026 (formato
-      conocido, XLSX individuales, cobertura ya alta pero sin hashing masivo
-      confirmado).
+      **Fronteras exactas encontradas 2026-09-02** (búsqueda binaria en vivo
+      por boletín): resultan ser **tres eras**, no dos.
+      - **No. 1976–2093 (octubre 2016→hoy, ~118 boletines, ~32%):** XLSX
+        individuales por tabla. Ya cubierto.
+      - **No. 1854–1975 (agosto 2006 – septiembre 2016, ~122 boletines,
+        ~33%): construido 2026-09-02.** La página no linkea XLSX
+        individuales, pero sí un ZIP de la publicación completa
+        (`archivos_completos`, tipo `zip`) que ya trae un archivo por tabla
+        con el mismo esquema `IEM-{numero}`, solo que en `.xls` legado (no
+        `.xlsx`) — confirmado en vivo con `list_zip_contents` sobre
+        `IEM1975.zip` antes de construir nada. `_fetch_legacy_zip_tables`
+        lista los miembros del ZIP como tablas (`table_id` con prefijo
+        `iem-legado-` porque la numeración 1:1 contra la era moderna no
+        está confirmada — vistos `IEM-315a.xls`, `5_SectorPetrolero.xls`,
+        `7_GraficosIDEAC.xls` sin equivalente obvio hoy); `get_table` lee
+        el miembro con `xlrd` (`.xls` legado) a través de un adaptador
+        (`_XlsSheetAdapter`) que reutiliza sin cambios los mismos
+        `_extract_wide_series`/`_extract_long_table`/`_extract_matrix_series`
+        ya probados contra XLSX moderno. Encontrado y corregido en el
+        proceso: xlrd no distingue int de float (todo número es float), así
+        que un encabezado de año como `2025.0` rompía la regex de 4 dígitos
+        de `_period_key` (`"2025.0"` → `.replace(".", "")` → `"20250"`) —
+        el adaptador ahora normaliza floats enteros a `int`, igual que
+        openpyxl. Verificado en vivo extremo a extremo contra boletines
+        reales (No. 1975, No. 1900, No. 1950), no solo con mocks. 8 tests
+        nuevos.
+      - **No. 1727–1853 (enero 1996 – julio 2006, ~126 boletines, ~34%): sin
+        construir.** Confirmado en vivo (No. 1800) que estas páginas usan
+        HTML pre-moderno de framesets — `<A HREF = ... TARGET="_top">` en
+        mayúsculas y sin comillas — que ni siquiera enlaza un ZIP o XLSX
+        directo: enlaza páginas `.htm` por sección (`m1800_77.htm` etc.),
+        una capa adicional de scraping antes de llegar al dato real. El
+        regex `href="..."` de `_parse_complete_files`/`_parse_tables` no
+        matchea nada de esta era — por diseño, no por bug; es un formato
+        genuinamente distinto que necesitaría su propio parser. Frontera
+        exacta: No. 1853 (jul 2006) ya tiene HTML moderno pero sin ZIP
+        todavía; No. 1854 (ago 2006) es el primer boletín con ZIP.
+      Con estas tres fronteras, "cobertura completa 1996-2026" ahora es un
+      problema de un solo tramo real, no dos: 1996-2006 (formato distinto,
+      sin empezar, ~126 boletines). El resto (2006-2026, ~240 boletines, el
+      65% del archivo) ya es legible hoy, aunque sin hashing masivo
+      confirmado para la porción ZIP.
 - [~] **IEM completo — lectura de tablas**: hacer buscables los valores de
       todas las tablas individuales, no solo sus títulos. Añadir lectores para
       las familias de formatos que difieren del diseño común; conservar también

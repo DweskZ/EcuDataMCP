@@ -17,6 +17,7 @@ import json
 import logging
 import os
 import re
+import zipfile
 from datetime import UTC, datetime
 from html import unescape
 from pathlib import Path
@@ -48,6 +49,11 @@ _DEFAULT_CATALOG_DIR = _ROOT / "data" / "iem_catalog_snapshots"
 _catalog_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
 _bulletins_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
 _bulletin_tables_cache = TtlCache(ttl_seconds=86400.0, max_entries=512)
+# Legacy bulletin ZIPs (pre-Oct-2016) are fetched whole -- both to list their
+# members (building the table catalog) and later to read one member's bytes.
+# Caching avoids a second ~1-2 MB download for the very common "list, then
+# read one of the tables just listed" sequence.
+_zip_bytes_cache = TtlCache(ttl_seconds=86400.0, max_entries=16)
 _fetch_lock = asyncio.Lock()
 # Keyed per bulletin number so concurrent historical fetches (bounded by
 # _HISTORY_CONCURRENCY below) actually run in parallel instead of serializing
@@ -82,6 +88,23 @@ _TABLE_RE = re.compile(
 )
 _TAG_RE = re.compile(r"<[^>]+>")
 _WS_RE = re.compile(r"\s+")
+
+# Bulletins before No. 1976 (October 2016) never link individual XLSX on the
+# bulletin page at all -- confirmed live 2026-09-02 there are actually two
+# older eras, not one:
+#   - No. 1854-1975 (Aug 2006 - Sep 2016, ~122 bulletins): modern-ish
+#     href="..." markup, bulk-ZIP-only. The ZIP already has one legacy .xls
+#     per table, same IEM-{n} numbering as today, just packaged differently
+#     -- not an unknown format. Handled by _fetch_legacy_zip_tables below.
+#   - No. 1727-1853 (Jan 1996 - Jul 2006, ~126 bulletins): pre-modern-HTML
+#     frameset pages (uppercase, unquoted <A HREF = ... TARGET="_top">,
+#     confirmed live on No. 1800) that link to per-SECTION .htm pages
+#     instead of a table or a ZIP directly -- a further scrape needed to
+#     even find the underlying files, not just a different container
+#     format. NOT handled -- _parse_complete_files/_parse_tables' href="
+#     regex doesn't match this markup at all, so these bulletins still
+#     raise "no expuso tablas XLSX individuales".
+_LEGACY_XLS_MEMBER_RE = re.compile(r"\.xls$", re.IGNORECASE)
 
 
 def _clean(text: str) -> str:
@@ -259,6 +282,67 @@ async def _fetch_bulletins() -> list[dict[str, Any]]:
         return bulletins
 
 
+def _legacy_table_id(filename: str) -> str:
+    """table_id for one member of a pre-Oct-2016 bulk ZIP.
+
+    Deliberately a different shape from _TABLE_RE's "iem-NNN-e": whether a
+    legacy "IEM-315.xls" is the same table as the modern "iem-315-e" is not
+    confirmed (BCE's own section numbering could have shifted across a
+    decade), and some legacy members don't even follow the IEM-NNN pattern
+    at all (e.g. "5_SectorPetrolero.xls", "7_GraficosIDEAC.xls"). Prefixing
+    every legacy id avoids silently implying an equivalence this client
+    hasn't verified.
+    """
+    stem = re.sub(r"\.xls$", "", filename, flags=re.IGNORECASE)
+    normalized = re.sub(r"[^a-z0-9]+", "-", stem.lower()).strip("-")
+    return f"iem-legado-{normalized}"
+
+
+async def _download_zip_cached(url: str) -> bytes:
+    cached = _zip_bytes_cache.get(url)
+    if cached is not None:
+        return cached
+    raw, truncated = await download_bytes(url)
+    if truncated:
+        raise ValueError("El ZIP del boletín IEM superó el límite de descarga")
+    _zip_bytes_cache.set(url, raw)
+    return raw
+
+
+async def _fetch_legacy_zip_tables(
+    bulletin: dict[str, Any], zip_info: dict[str, Any]
+) -> list[dict[str, Any]]:
+    """Build a table catalog for a bulletin whose page has no individual
+    XLSX links, from the bulk ZIP's own member list instead."""
+    raw = await _download_zip_cached(zip_info["url"])
+    try:
+        archive = zipfile.ZipFile(io.BytesIO(raw))
+    except zipfile.BadZipFile as exc:
+        raise ValueError(
+            f"El ZIP del boletín IEM {bulletin['numero']} no es un archivo válido"
+        ) from exc
+    tables: list[dict[str, Any]] = []
+    for name in archive.namelist():
+        if not _LEGACY_XLS_MEMBER_RE.search(name):
+            continue
+        tables.append(
+            {
+                "table_id": _legacy_table_id(name),
+                "titulo": name,
+                "seccion": "",
+                "url": zip_info["url"],
+                "zip_member": name,
+                "formato_origen": "xls_legado_zip",
+                "boletin_numero": bulletin["numero"],
+                "boletin_mes": bulletin["mes"],
+                "boletin_anio": bulletin["anio"],
+                "boletin_url": bulletin["url"],
+                "catalogado_en": datetime.now(UTC).isoformat(),
+            }
+        )
+    return tables
+
+
 async def _fetch_tables_for_bulletin(bulletin: dict[str, Any]) -> list[dict[str, Any]]:
     key = bulletin["numero"]
     cached = _bulletin_tables_cache.get(key)
@@ -276,6 +360,12 @@ async def _fetch_tables_for_bulletin(bulletin: dict[str, Any]) -> list[dict[str,
         html = raw_bulletin.decode("utf-8", errors="replace")
         bulletin["archivos_completos"] = _parse_complete_files(html, bulletin)
         tables = _parse_tables(html, bulletin)
+        if not tables:
+            zip_info = next(
+                (f for f in bulletin["archivos_completos"] if f["tipo"] == "zip"), None
+            )
+            if zip_info is not None:
+                tables = await _fetch_legacy_zip_tables(bulletin, zip_info)
         if not tables:
             raise ValueError(
                 f"El boletín IEM {bulletin['numero']} no expuso tablas XLSX individuales"
@@ -859,6 +949,24 @@ async def hash_catalog_tables(
     }
 
 
+def _inspect_worksheet_rows(rows_iterable: Any, max_rows: int) -> dict[str, Any]:
+    """Shared row-collection logic behind _inspect_xlsx/_inspect_legacy_xls."""
+    rows: list[list[str]] = []
+    nonempty_total = 0
+    for row in rows_iterable:
+        rendered = _trim_trailing_blanks([_cell(value) for value in row])
+        if not any(rendered):
+            continue
+        nonempty_total += 1
+        if len(rows) < max_rows:
+            rows.append(rendered[:30])
+    return {
+        "vista": rows,
+        "filas_mostradas": len(rows),
+        "truncada": nonempty_total > len(rows),
+    }
+
+
 def _inspect_xlsx(raw: bytes, max_rows: int) -> dict[str, Any]:
     """Return a layout-preserving preview without guessing a universal header.
 
@@ -868,28 +976,78 @@ def _inspect_xlsx(raw: bytes, max_rows: int) -> dict[str, Any]:
     """
     workbook = load_workbook(io.BytesIO(raw), read_only=True, data_only=True)
     try:
-        sheets = []
-        for worksheet in workbook.worksheets:
-            rows: list[list[str]] = []
-            nonempty_total = 0
-            for row in worksheet.iter_rows(values_only=True):
-                rendered = _trim_trailing_blanks([_cell(value) for value in row])
-                if not any(rendered):
-                    continue
-                nonempty_total += 1
-                if len(rows) < max_rows:
-                    rows.append(rendered[:30])
-            sheets.append(
-                {
-                    "nombre": worksheet.title,
-                    "vista": rows,
-                    "filas_mostradas": len(rows),
-                    "truncada": nonempty_total > len(rows),
-                }
-            )
+        sheets = [
+            {
+                "nombre": worksheet.title,
+                **_inspect_worksheet_rows(worksheet.iter_rows(values_only=True), max_rows),
+            }
+            for worksheet in workbook.worksheets
+        ]
         return {"hojas": sheets}
     finally:
         workbook.close()
+
+
+class _XlsSheetAdapter:
+    """Minimal openpyxl-worksheet-shaped wrapper around an xlrd Sheet.
+
+    _extract_wide_series/_extract_long_table/_extract_matrix_series only
+    ever call worksheet.iter_rows(values_only=True), so this one method is
+    the entire surface needed to reuse them unchanged for legacy .xls
+    tables pulled out of pre-Oct-2016 bulletin ZIPs -- normalizing xlrd's
+    "" empty-cell value to None (openpyxl's convention, which the
+    extraction functions' `is not None` checks depend on) and its raw date
+    floats to datetime (which _period_key already handles).
+    """
+
+    def __init__(self, sheet: Any, book: Any) -> None:
+        self._sheet = sheet
+        self._book = book
+
+    def iter_rows(self, values_only: bool = True):
+        import xlrd
+
+        for row_index in range(self._sheet.nrows):
+            row: list[Any] = []
+            for col_index in range(self._sheet.ncols):
+                cell = self._sheet.cell(row_index, col_index)
+                if cell.ctype in (xlrd.XL_CELL_EMPTY, xlrd.XL_CELL_BLANK) or cell.value == "":
+                    row.append(None)
+                elif cell.ctype == xlrd.XL_CELL_DATE:
+                    row.append(xlrd.xldate.xldate_as_datetime(cell.value, self._book.datemode))
+                elif (
+                    cell.ctype == xlrd.XL_CELL_NUMBER
+                    and isinstance(cell.value, float)
+                    and cell.value.is_integer()
+                ):
+                    # xlrd has no separate int type -- every number comes back
+                    # as float. A year header like 2025.0 stringifies to
+                    # "2025.0", and _period_key's str(...).replace(".", "")
+                    # turns that into "20250", breaking its 4-digit year
+                    # regex. openpyxl gives plain ints for whole numbers;
+                    # matching that here is what makes the shared
+                    # _extract_* functions and _period_key work unchanged.
+                    row.append(int(cell.value))
+                else:
+                    row.append(cell.value)
+            yield tuple(row)
+
+
+def _inspect_legacy_xls(raw: bytes, max_rows: int) -> dict[str, Any]:
+    """Layout-preserving preview for a legacy .xls table -- see _inspect_xlsx."""
+    import xlrd
+
+    book = xlrd.open_workbook(file_contents=raw)
+    sheets = [
+        {
+            "nombre": sheet.name,
+            **_inspect_worksheet_rows(
+                _XlsSheetAdapter(sheet, book).iter_rows(), max_rows
+            ),
+        }
+        for sheet in book.sheets()
+    ]
+    return {"hojas": sheets}
 
 
 def clear_caches() -> None:
@@ -898,6 +1056,7 @@ def clear_caches() -> None:
     _bulletins_cache.clear()
     _bulletin_tables_cache.clear()
     _bulletin_fetch_locks.clear()
+    _zip_bytes_cache.clear()
 
 
 async def get_table(
@@ -924,20 +1083,43 @@ async def get_table(
     if table is None:
         raise ValueError(f"Tabla IEM '{table_id}' no encontrada en el boletín vigente")
 
-    raw, truncated = await download_bytes(table["url"])
-    if truncated:
-        raise ValueError("La tabla IEM supera el límite seguro de descarga")
-    if not raw.startswith(b"PK"):
-        raise ValueError("La URL de la tabla IEM no devolvió un archivo XLSX válido")
-    workbook = load_workbook(io.BytesIO(raw), read_only=True, data_only=True)
-    try:
-        structured = _extract_wide_series(workbook.active, desde, hasta, max_rows)
+    if table.get("zip_member"):
+        # Pre-Oct-2016 bulletin: no individual XLSX URL, read one member
+        # out of the bulk ZIP instead (see _fetch_legacy_zip_tables).
+        import xlrd
+
+        zip_raw = await _download_zip_cached(table["url"])
+        try:
+            raw = zipfile.ZipFile(io.BytesIO(zip_raw)).read(table["zip_member"])
+        except KeyError as exc:
+            raise ValueError(
+                f"El miembro '{table['zip_member']}' ya no está en el ZIP del boletín IEM"
+            ) from exc
+        try:
+            legacy_book = xlrd.open_workbook(file_contents=raw)
+        except xlrd.XLRDError as exc:
+            raise ValueError("El archivo .xls legado del boletín IEM no se pudo leer") from exc
+        worksheet = _XlsSheetAdapter(legacy_book.sheet_by_index(0), legacy_book)
+        structured = _extract_wide_series(worksheet, desde, hasta, max_rows)
         if structured is None:
-            structured = _extract_long_table(workbook.active, desde, hasta, max_rows)
+            structured = _extract_long_table(worksheet, desde, hasta, max_rows)
         if structured is None:
-            structured = _extract_matrix_series(workbook.active, desde, hasta, max_rows)
-    finally:
-        workbook.close()
+            structured = _extract_matrix_series(worksheet, desde, hasta, max_rows)
+    else:
+        raw, truncated = await download_bytes(table["url"])
+        if truncated:
+            raise ValueError("La tabla IEM supera el límite seguro de descarga")
+        if not raw.startswith(b"PK"):
+            raise ValueError("La URL de la tabla IEM no devolvió un archivo XLSX válido")
+        workbook = load_workbook(io.BytesIO(raw), read_only=True, data_only=True)
+        try:
+            structured = _extract_wide_series(workbook.active, desde, hasta, max_rows)
+            if structured is None:
+                structured = _extract_long_table(workbook.active, desde, hasta, max_rows)
+            if structured is None:
+                structured = _extract_matrix_series(workbook.active, desde, hasta, max_rows)
+        finally:
+            workbook.close()
 
     result = {
         "source": _SOURCE_NAME,
@@ -946,4 +1128,5 @@ async def get_table(
     }
     if structured is not None:
         return {**result, **structured}
-    return {**result, "formato": "vista", **_inspect_xlsx(raw, max_rows=max_rows)}
+    inspector = _inspect_legacy_xls if table.get("zip_member") else _inspect_xlsx
+    return {**result, "formato": "vista", **inspector(raw, max_rows=max_rows)}
