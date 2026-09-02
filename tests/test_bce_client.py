@@ -83,6 +83,20 @@ def _mock_all_bundles(httpx_mock):
     )
 
 
+async def test_get_json_explains_security_html_returned_with_http_200(httpx_mock):
+    httpx_mock.add_response(
+        url="https://contenido.bce.fin.ec/wp-json/bcedata/v1/grid",
+        text=(
+            "Por políticas de seguridad del BCE el requerimiento de "
+            "despliegue del url fue rechazado."
+        ),
+        headers={"content-type": "text/html"},
+    )
+
+    with pytest.raises(ValueError, match="política de seguridad"):
+        await bce_client._get_json("grid")
+
+
 @pytest.fixture(autouse=True)
 def _reset_cache():
     bce_client._tree_cache = TtlCache(ttl_seconds=60)

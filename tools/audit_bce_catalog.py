@@ -5,6 +5,7 @@ from mcp.server.fastmcp import FastMCP
 from helpers import bce_client
 from helpers.format_out import render_output
 from helpers.logging import MAIN_LOGGER_NAME, log_tool
+from helpers.response_contract import with_response_metadata
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
@@ -136,4 +137,16 @@ def register_audit_bce_catalog_tool(mcp: FastMCP) -> None:
             )
             return "\n".join(parts)
 
+        result = with_response_metadata(
+            result,
+            source=result["source"],
+            source_url=result["url_fuente"],
+            freshness="auditoria_en_vivo",
+            schema_name="bcedata_auditoria_catalogo_v1",
+            schema_fields=[
+                "total_grupos", "total_series", "errores", "revision_fuente",
+                "auditoria_grid", "comparacion",
+            ],
+            consulted_at=result["consultado_en"],
+        )
         return render_output(result, format, text_builder=to_text)

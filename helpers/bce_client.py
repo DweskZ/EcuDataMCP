@@ -106,7 +106,19 @@ async def _get_json(
                 "BCEData %s devolvió %d: %s", path, resp.status_code, detail
             )
             raise ValueError(detail or f"BCEData devolvió HTTP {resp.status_code}")
-        payload = resp.json()
+        try:
+            payload = resp.json()
+        except ValueError as exc:
+            preview = resp.text[:500]
+            if "políticas de seguridad" in preview or "requerimiento de despliegue" in preview:
+                raise ValueError(
+                    "BCEData rechazó esta consulta por su política de seguridad "
+                    "aunque respondió HTTP 200; la combinación publicada no "
+                    "pudo verificarse."
+                ) from exc
+            raise ValueError(
+                f"BCEData devolvió contenido no JSON para /{path.lstrip('/')}"
+            ) from exc
         if include_headers:
             return payload, {key.lower(): value for key, value in resp.headers.items()}
         return payload

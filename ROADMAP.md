@@ -24,11 +24,14 @@ Leyenda: `[ ]` sin empezar · `[~]` parcial · `[x]` hecho
       volumen/objeto persistente para cachés y artefactos grandes, backups,
       restauración y una ruta de actualización reproducible. El servidor debe
       poder recrearse desde la imagen sin perder el estado actualizado.
-- [ ] **Contrato de respuesta para agentes** — completar `outputSchema`,
-      incluir siempre fuente, URL, fecha de publicación/corte, fecha de
-      consulta y nivel de frescura, y mantener respuestas pequeñas para uso
-      móvil. Los archivos grandes deben quedarse en el servidor; el agente debe
-      recibir resultados paginados o enlaces, no cientos de megabytes.
+- [~] **Contrato de respuesta para agentes** — BCEData/IEM ya incluyen el
+      bloque estable `metadatos` con fuente, URL, fecha de publicación/corte,
+      fecha de consulta, frescura y esquema semántico, sin romper los campos
+      históricos. Falta extender el contrato a las demás fuentes y migrar los
+      resultados MCP nativos desde texto dual (`format=text|json`) a schemas
+      estructurados completos. Los archivos grandes deben quedarse en el
+      servidor; el agente debe recibir resultados paginados o enlaces, no
+      cientos de megabytes.
 - [~] **Operación 24/7** — construido 2026-08-31: `.github/workflows/smoke.yml`
       ejecuta diariamente `scripts/smoke_e2e.py` (ahora con ~39 de 68 tools
       cubiertos, antes 13, más 3 cadenas dinámicas list→get que descubren un
@@ -38,8 +41,10 @@ Leyenda: `[ ]` sin empezar · `[~]` parcial · `[x]` hecho
       push). GitHub avisa por correo a quienes ven el repo cuando una
       ejecución programada falla — sin infraestructura de alertas nueva.
       Cubre la "prueba de humo periódica desde fuera del servidor" del ítem
-      original. Pendiente: reintentos y alertas específicas de "una fuente
-      cambió de esquema" (hoy solo distingue passed/failed, no el motivo).
+      original. Desde 2026-08-31 reintenta fuentes externas conocidas y
+      distingue `degraded` (CKAN con bloqueo regional o TLS de CENACE) de un
+      fallo duro del servidor; el resumen de Actions muestra las fuentes
+      afectadas. Pendiente: alertas específicas de cambio de esquema.
 
 ## Nuevas conexiones de datos
 
@@ -81,7 +86,11 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
       registra si existe un marcador explícito (campo de revisión/version o
       `ETag`/`Last-Modified`); comprobación en vivo 2026-08-31: BCEData responde
       200, pero no publica ninguno, así que la comparación por contenido es la
-      única evidencia disponible hoy.
+      única evidencia disponible hoy. Auditoría viva 2026-09-01: 78/78 grupos
+      y 2.360 series sí cargaron; 108/154 combinaciones frecuencia/unidad
+      devolvieron valores y 46 recibieron una página HTML de rechazo por la
+      propia política de seguridad del BCE con HTTP 200. No tratarlas como
+      datos ausentes ni como error JSON del servidor.
 - [x] **BCEData completo — verificación de cobertura**: `audit_bce_catalog`
       consulta el árbol y los metadatos de todos los grupos, registra cuántos
       grupos y series fueron descubiertos, qué solicitudes fallaron y cuándo
@@ -91,16 +100,17 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
       incluidas series nuevas/retiradas. `scripts/audit_bce_catalog.py` deja
       el mismo flujo listo para cron/scheduler. No depende de una lista fija
       de IDs.
-- [~] **IEM completo — archivo y archivos fuente**: descubrir todos los
-      boletines desde enero de 1996 hasta el más reciente, reconciliando el
-      índice histórico con “Últimas publicaciones”; catalogar cada XLSX,
-      además del PDF y ZIP completos, con boletín, fecha, sección, título, URL
-      y fecha de consulta; el hash se calcula al leer cada XLSX. `search_bce_iem`
-      puede persistir el catálogo construido y `scripts/audit_bce_iem.py`
-      deja preparado el barrido completo desde 1996. Ahora `hash_archivos=true`
-      calcula SHA-256 de los XLSX completos de forma opt-in, concurrente y
-      acotada; todavía no se ha ejecutado el barrido histórico completo porque
-      sería una descarga masiva.
+- [~] **IEM completo — archivo y archivos fuente**: `search_bce_iem` ahora
+      reconcilia el índice, “Últimas publicaciones” y el archivo oficial
+      `iem-publicaciones/`. Este último enumera 367 boletines consecutivos,
+      No. 1727–2093 (1996–2026), y el auditor conserva esa evidencia aunque
+      una página no tenga tablas legibles. Los XLSX se catalogan con boletín,
+      fecha, sección, título, URL y fecha de consulta; el hash es opt-in,
+      concurrente y acotado. Verificación viva 2026-09-01: los siete boletines
+      disponibles de 2026 expusieron 84 tablas XLSX; la muestra de 1996 reveló
+      cuatro enlaces 404 y ocho páginas sin XLSX individuales. Por tanto, el
+      índice histórico está cubierto, pero todavía no se puede declarar lectura
+      ni hashing completos de 1996–2026.
 - [~] **IEM completo — lectura de tablas**: hacer buscables los valores de
       todas las tablas individuales, no solo sus títulos. Añadir lectores para
       las familias de formatos que difieren del diseño común; conservar también
@@ -112,10 +122,38 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
       varias columnas descriptivas. Una vista de las primeras filas cuenta como
       diagnóstico, no como cobertura completa.
 - [~] **BCEData ↔ IEM — mapa de equivalencias**: `compare_bce_sources` genera
-      coincidencias candidatas por etiquetas normalizadas, además de entradas
-      que aparecen solo en una fuente. Sigue pendiente confirmar manualmente
-      definición, unidad, frecuencia, fecha de corte y revisión antes de
-      declarar una equivalencia metodológica.
+      coincidencias candidatas por etiquetas normalizadas, alternativas,
+      confianza y campos pendientes de revisión; `guardar_revision=true` y
+      `scripts/audit_bce_equivalence.py` persisten una cola revisable. Sigue
+      pendiente confirmar manualmente definición, unidad, frecuencia, fecha de
+      corte, revisión y valores antes de declarar una equivalencia metodológica.
+      Barrido vivo 2026-09-01 sobre el boletín disponible: 77 candidatos, una
+      tabla IEM sin traslape y 2.352 etiquetas solo BCEData; 72 son posibles
+      componentes de tabla, cuatro posibles tabla/grupo y solo una posible
+      equivalencia directa. Ninguna se trata como duplicado confirmado hasta
+      revisar valores y metodología.
+      **Revisión manual 2026-09-02, dos candidatos confirmados con datos
+      en vivo:**
+      1. **Confirmada — equivalencia directa.** `id_grupo=101` (BCEData,
+         "4.1.4 Ingresos y egresos por comercialización interna de
+         derivados importados") ↔ `iem-414-e` (misma sección/título). Las
+         8 series de BCEData (4 productos × precio importación/venta
+         nacional) igualan los valores de `iem-414-e` mes a mes hasta ~13
+         cifras significativas (ene-2025 verificado en las 4 líneas de
+         producto). Es la misma tabla, republicada por dos rutas.
+      2. **Confirmada parcial — tabla↔grupo.** `id_grupo=65` ↔ `iem-423-e`
+         ("Salario Básico Unificado y Componentes Salariales"): la serie
+         "SALARIO REAL PROMEDIO" de BCEData iguala exactamente la segunda
+         fila de `iem-423-e` (ene-2025: 122.414726663655 en ambas). Pero
+         `id_grupo=65` solo expone esa fila — el SBU nominal (fila 1 de la
+         tabla IEM, 548.2638888888889 constante) no aparece bajo ninguna
+         unidad de ese id_grupo. Confirma que la clasificación
+         "posible_correspondencia_tabla_grupo" del tool es correcta aquí:
+         cobertura parcial, no equivalencia completa.
+      Los otros tres candidatos "tabla↔grupo" (riesgo país↔producción
+      petrolera, derivados↔IPC, salario↔IPP) son falsos positivos por
+      similitud de etiqueta — sin relación real, no revisados en detalle
+      más allá de notar que los títulos no corresponden.
 - [ ] **BCE — prueba de completitud y frescura**: ejecutar una comprobación
       programada que compare el catálogo descubierto con el anterior, confirme
       que el boletín más reciente está presente y deje visible el último período
@@ -196,7 +234,13 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
   - `datos_pagos.json` (285 KB): SPI, SCI, SPL, CCC, Monto Recaudado Servicios Básicos — mensuales desde 2010 (más dos series SPI/PIB y SCI/PIB anuales).
   - `datos_hid.json` (1.4 MB): **Producción Petrolera Nacional** (D, 2018-01-01→hoy, 3154 filas — genuinamente diaria, valiosa por la dependencia fiscal del petróleo) y Precio Petróleo Crudo Ecuatoriano (M).
   - `datos_ipc.json`, `datos_tes.json`, `datos_icc.json`, `datos_cna.json`: inflación, desempleo, confianza del consumidor y PIB — mensual/trimestral/anual, probablemente duplican BCEData pero en un formato más limpio de consultar.
-  Ninguno de estos archivos aparece en el buscador del propio sitio bce.fin.ec ni en BCEData — se llegó a ellos seleccionando "riesgo país" en un agregador financiero de terceros que citaba `contenido.bce.fin.ec/estadisticas-de-publicaciones-generales/` como fuente, y desde ahí leyendo el HTML del widget para encontrar su archivo de datos. **Construido:** el catálogo se descubre en vivo desde los datos mismos (no hardcoded — un "código" solo significa algo dentro de su propio archivo), confirmado con las 29 series reales encontradas en los 9 archivos (incluye 2 bonos soberanos, 2034/2039, que no se habían visto en la investigación original). `get_bce_indicador_diario` nunca devuelve la serie completa (Riesgo País tiene 7369+ filas) — solo una ventana acotada (últimos N o rango de fechas explícito, tope 366) más el rango completo como metadata. Sigue pendiente: revisar si hay más páginas con el mismo patrón de widgets más allá de las 4 ya probadas (no se recorrió el mega-menú completo de "Estadísticas").
+  Ninguno de estos archivos aparece en el buscador del propio sitio bce.fin.ec ni en BCEData — se llegó a ellos seleccionando "riesgo país" en un agregador financiero de terceros que citaba `contenido.bce.fin.ec/estadisticas-de-publicaciones-generales/` como fuente, y desde ahí leyendo el HTML del widget para encontrar su archivo de datos. **Construido:** el catálogo se descubre en vivo desde los datos mismos (no hardcoded — un "código" solo significa algo dentro de su propio archivo), confirmado con las 29 series reales encontradas en los 9 archivos (incluye 2 bonos soberanos, 2034/2039, que no se habían visto en la investigación original). `get_bce_indicador_diario` nunca devuelve la serie completa (Riesgo País tiene 7369+ filas) — solo una ventana acotada (últimos N o rango de fechas explícito, tope 366) más el rango completo como metadata.
+  **Barrido completo del mega-menú, 2026-09-02.** Solo 4 de las 7 secciones de nivel superior de "Estadísticas" se habían revisado. Las 2 no revisadas (`estadisticas-del-sector-monetario-d-2`, `estadisticas-del-sector-fiscal`) sí tenían el widget, y `estadisticas-del-sector-externo-d` — ya "revisada" — tenía 7 widgets más que el barrido original no encontró por seguir solo los que compartían archivo con indicadores ya conocidos. 4 archivos nuevos:
+  - `datos.json` (`view_ind_monetario`): Reservas Internacionales, Liquidez Total M2, Crédito al Sector Privado (empresas y hogares), Captaciones OSD (Total), Tasa Activa/Pasiva Referencial — mensual, 2000/2003/2015→hoy.
+  - `datos_fiscales.json` (`view_ind_fiscales`): Total Ingresos SPNF, Total Erogaciones SPNF, Resultado Global SPNF (% del PIB), Saldo Deuda Pública Interna — mensual, 2000→hoy.
+  - `datos_bpa.json` (`view_ind_externo_bpa`): Cuenta Corriente, Remesas de Trabajadores Recibidas (trimestral, 2016→hoy), Índice Tipo de Cambio Efectivo Real (mensual, 1995→hoy).
+  - `datos_cxt.json` (`view_ind_externo_cxt`): Saldo Balanza Comercial, Balanza Comercial no Petrolera, Exportaciones de Bienes, Importaciones de Bienes — mensual, 1990→hoy. Usa "Código Variable Dinámica" como los 9 archivos originales, no "id_serie".
+  Los 3 archivos nuevos "id_serie" (`datos.json`/`datos_fiscales.json`/`datos_bpa.json`) no tienen "Código Variable Dinámica" — el código de serie es un int en `id_serie`, y añaden un campo "Grupo" que los 9 archivos originales no tienen. `_codigo()` unifica ambos esquemas detrás de una sola interfaz string. Catálogo total: 49 series (antes 29). Verificado completo contra la página de inicio de `contenido.bce.fin.ec`, que agrega los widgets de todas las secciones en un solo lugar (40 `data-dd-title` distintos) — los 40 resuelven ahora a un archivo conocido.
 - [ ] BCE — **Cuentas Nacionales completas**: investigar los paquetes anual, trimestral y regional, retropolación, Tabla Oferta-Utilización, Cuadro Económico Integrado y Matriz de Empleo e Ingresos. IEM/BCEData pueden contener partes, pero la integración debe conservar la metodología de base móvil, revisiones, frecuencia y carácter provisional/definitivo. → https://contenido.bce.fin.ec/estadisticas-de-cuentas-nacionales/
 - [ ] BCE — **EMOE y coyuntura**: investigar el Estudio Mensual de Opinión Empresarial, metodologías, expectativas económicas, confianza del consumidor, ciclo económico, inflación, mercado laboral, pobreza/desigualdad y crédito. Reutilizar BCEData/IEM cuando ya sean la misma serie; añadir solo archivos, cortes o metadatos que falten. → https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Indicador_coy.html
 - [ ] BCE — **paquetes sectoriales**: auditar por separado petróleo, minería, cemento, agricultura y compra/venta de divisas. Para cada uno, decidir si basta BCEData/IEM o si hace falta un cliente de publicaciones/archivos; conservar frecuencia, fecha de corte y revisión. → https://contenido.bce.fin.ec/ultimas-publicaciones/

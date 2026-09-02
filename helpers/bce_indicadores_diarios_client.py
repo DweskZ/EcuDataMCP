@@ -40,9 +40,30 @@ and Producción Petrolera Nacional. The rest (sistemas de pago, inflación,
 desempleo, PIB, confianza del consumidor) are monthly/quarterly/annual
 and likely duplicate BCEData, but come from a single clean file here.
 
-Not exhaustive: only 4 pages were checked for this widget pattern (3 had
-it); the full "Estadísticas" mega-menu wasn't crawled, so more files may
-exist undiscovered.
+2026-09-02: swept the rest of the "Estadísticas" mega-menu (only 4 of 7
+top-level sections had been checked before). Two sections not checked at
+all (estadisticas-del-sector-monetario-d-2, estadisticas-del-sector-
+fiscal) turned out to have the widget too, plus estadisticas-del-sector-
+externo-d -- already "checked" -- had 7 more widgets on it that the
+original pass missed by only following ones that shared a file with
+already-known indicators. 4 new files:
+  - datos.json ("view_ind_monetario"): Reservas Internacionales, Liquidez
+    Total M2, Crédito al Sector Privado (empresas y hogares), Captaciones
+    OSD (Total), Tasa Activa/Pasiva Referencial -- monthly,
+    2000/2003/2015-present.
+  - datos_fiscales.json ("view_ind_fiscales"): Total Ingresos SPNF, Total
+    Erogaciones SPNF, Resultado Global SPNF (% del PIB), Saldo Deuda
+    Pública Interna -- monthly, 2000-present.
+  - datos_bpa.json ("view_ind_externo_bpa"): Cuenta Corriente, Remesas de
+    Trabajadores Recibidas (both quarterly, 2016-present), Índice Tipo de
+    Cambio Efectivo Real (monthly, 1995-present).
+  - datos_cxt.json ("view_ind_externo_cxt"): Saldo Balanza Comercial,
+    Balanza Comercial no Petrolera, Exportaciones de Bienes, Importaciones
+    de Bienes -- monthly, 1990-present. Uses "Código Variable Dinámica"
+    like the original 9 files, not "id_serie".
+Verified complete: contenido.bce.fin.ec's own homepage aggregates every
+section's widgets in one place (40 distinct `data-dd-title` values as of
+this sweep) -- every one of the 40 now resolves to a file in _ARCHIVOS.
 
 Series can run into the thousands of rows (Riesgo País: 7369+) --
 get_indicador_diario never returns the full series, only a bounded
@@ -68,6 +89,14 @@ _BASE = "https://contenido.bce.fin.ec/wp-content/uploads/ESTADISTICAS-ECONOMICAS
 
 # Every file found live sharing this widget infrastructure. Order matters
 # only for list_indicadores' output order (grouped by file).
+#
+# datos.json, datos_fiscales.json, and datos_bpa.json (found 2026-09-02,
+# see module docstring) are a newer generation of this same widget: same
+# per-indicator HTML page pointing at a plain JSON file, but the JSON rows
+# use "id_serie" (an int) instead of "Código Variable Dinámica", and add a
+# "Grupo" field. datos_cxt.json (also found 2026-09-02) uses the original
+# "Código Variable Dinámica" shape. See _codigo() below for how both
+# shapes are read through one interface.
 _ARCHIVOS: list[str] = [
     "datos_formulario.json",
     "datos_diarios.json",
@@ -78,6 +107,10 @@ _ARCHIVOS: list[str] = [
     "datos_tes.json",
     "datos_icc.json",
     "datos_cna.json",
+    "datos.json",
+    "datos_fiscales.json",
+    "datos_bpa.json",
+    "datos_cxt.json",
 ]
 _ARCHIVOS_SET = set(_ARCHIVOS)
 
@@ -102,7 +135,20 @@ _METADATA_FIELDS = {
     "Segmento",
     "Estado",
     "Sector",
+    "Grupo",
+    "id_serie",
 }
+
+
+def _codigo(row: dict[str, Any]) -> str:
+    """Row-level series identifier. "Código Variable Dinámica" in the
+    original 9 files; "id_serie" (an int) in datos.json/datos_fiscales.json,
+    which have no "Código Variable Dinámica" field at all. Normalized to
+    str so callers never need to know which key a given file uses."""
+    codigo = row.get("Código Variable Dinámica")
+    if codigo is not None:
+        return codigo
+    return str(row.get("id_serie"))
 
 
 def _datapoint(row: dict[str, Any]) -> dict[str, Any]:
@@ -162,7 +208,7 @@ async def list_indicadores() -> list[dict[str, Any]]:
             continue
         by_codigo: dict[str, dict[str, Any]] = {}
         for r in rows_or_exc:
-            codigo = r.get("Código Variable Dinámica")
+            codigo = _codigo(r)
             fecha = r.get("Fecha")
             entry = by_codigo.get(codigo)
             if entry is None:
@@ -205,7 +251,7 @@ async def get_indicador_diario(
         hasta: Optional end date (YYYY-MM-DD, inclusive).
     """
     rows = await _get_archivo(archivo)
-    matching = [r for r in rows if r.get("Código Variable Dinámica") == codigo]
+    matching = [r for r in rows if _codigo(r) == codigo]
     if not matching:
         raise ValueError(
             f"Código '{codigo}' no encontrado en '{archivo}'. "

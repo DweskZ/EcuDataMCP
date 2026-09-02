@@ -33,6 +33,10 @@ def _candidate_tokens(*values: Any) -> set[str]:
     return tokens - _GENERIC
 
 
+def _normalized_label(value: Any) -> str:
+    return " ".join(sorted(_candidate_tokens(value)))
+
+
 def _score(left: set[str], right: set[str]) -> float:
     if not left or not right:
         return 0.0
@@ -78,6 +82,16 @@ def _bce_candidates(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
     return candidates
 
 
+def _public_candidate(candidate: dict[str, Any], score: float) -> dict[str, Any]:
+    return {
+        "id_grupo": candidate.get("id_grupo"),
+        "tipo": candidate.get("tipo"),
+        "etiqueta": candidate.get("etiqueta"),
+        "grupo": candidate.get("grupo"),
+        "puntuacion_etiquetas": round(score, 3),
+    }
+
+
 def build_equivalence_map(
     bce_snapshot: dict[str, Any], iem_catalog: dict[str, Any]
 ) -> dict[str, Any]:
@@ -104,10 +118,17 @@ def build_equivalence_map(
             continue
         key = (str(candidate.get("id_grupo")), candidate["etiqueta"])
         matched_bce.add(key)
-        if score >= 0.60:
-            relation = "posible_duplicado_o_ampliacion"
+        if _normalized_label(table.get("titulo")) == _normalized_label(
+            candidate.get("etiqueta")
+        ):
+            relation = "posible_equivalencia_directa"
+            confidence = "media"
+        elif candidate["tipo"] == "grupo":
+            relation = "posible_correspondencia_tabla_grupo"
+            confidence = "baja"
         else:
-            relation = "posible_traslape"
+            relation = "posible_componente_de_tabla"
+            confidence = "baja"
         matches.append(
             {
                 "iem": {
@@ -122,6 +143,17 @@ def build_equivalence_map(
                 },
                 "puntuacion_etiquetas": round(score, 3),
                 "relacion": relation,
+                "confianza": confidence,
+                "estado_revision": "pendiente",
+                "candidatos_alternativos": [
+                    _public_candidate(alternative, alternative_score)
+                    for alternative_score, alternative in ranked[1:4]
+                    if alternative_score >= 0.25
+                ],
+                "campos_por_confirmar": [
+                    "definicion", "unidad", "frecuencia", "cobertura",
+                    "fecha_corte", "revision", "valores",
+                ],
                 "advertencia": (
                     "Candidato generado por etiquetas; confirmar definición, "
                     "unidad, frecuencia, cobertura y revisión antes de combinar."

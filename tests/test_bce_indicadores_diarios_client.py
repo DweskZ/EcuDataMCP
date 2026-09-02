@@ -61,7 +61,7 @@ def test_list_archivos_returns_fixed_set():
     archivos = bce.list_archivos()
 
     assert "datos_formulario.json" in archivos
-    assert len(archivos) == 9
+    assert len(archivos) == 13
 
 
 @pytest.mark.asyncio
@@ -142,6 +142,81 @@ async def test_get_indicador_diario_handles_files_with_no_valor_field(httpx_mock
     assert bce._datapoint(_FORMULARIO_JSON["view_ind_formulario"][0]) == {
         "fecha": "2026-08-26",
         "valor": "419",
+    }
+
+
+@pytest.mark.asyncio
+async def test_get_indicador_diario_handles_id_serie_schema(httpx_mock):
+    # datos.json/datos_fiscales.json/datos_bpa.json (found 2026-09-02) have
+    # no "Código Variable Dinámica" at all -- an int "id_serie" instead,
+    # plus a "Grupo" field absent from the original 9 files. _codigo()
+    # falls back to str(id_serie); "Grupo" must not leak into valores as
+    # if it were a second value column.
+    monetario_url = f"{bce._BASE}/datos.json"
+    monetario_json = {
+        "view_ind_monetario": [
+            {
+                "Grupo": "reservas internacionales",
+                "id_serie": 805,
+                "Indicador": "Reservas Internacionales",
+                "Fecha": "2026-06-30",
+                "Carga": "2026-08-12",
+                "Valor": 852.62,
+                "Periodicidad": "M",
+                "Medida": "Millones de USD",
+            },
+            {
+                "Grupo": "reservas internacionales",
+                "id_serie": 805,
+                "Indicador": "Reservas Internacionales",
+                "Fecha": "2026-07-31",
+                "Carga": "2026-08-12",
+                "Valor": 909.76,
+                "Periodicidad": "M",
+                "Medida": "Millones de USD",
+            },
+        ]
+    }
+    httpx_mock.add_response(url=monetario_url, json=monetario_json)
+
+    result = await bce.get_indicador_diario("datos.json", "805")
+
+    assert result["indicador"] == "Reservas Internacionales"
+    assert result["rango_completo"] == {"desde": "2026-06-30", "hasta": "2026-07-31", "n_datos": 2}
+    assert result["datos"] == [
+        {"fecha": "2026-06-30", "valor": 852.62},
+        {"fecha": "2026-07-31", "valor": 909.76},
+    ]
+
+
+@pytest.mark.asyncio
+async def test_list_indicadores_dedupes_id_serie_rows_separately_per_indicator(httpx_mock):
+    # Regression check for the bug this schema would hit if _codigo() fell
+    # back to r.get("Código Variable Dinámica") only: every row's codigo
+    # would be None, collapsing every indicator in the file into one entry.
+    monetario_url = f"{bce._BASE}/datos.json"
+    httpx_mock.add_response(
+        url=monetario_url,
+        json={
+            "view_ind_monetario": [
+                {"Grupo": "g", "id_serie": 805, "Indicador": "Reservas Internacionales",
+                 "Fecha": "2026-07-31", "Carga": "x", "Valor": 1.0, "Periodicidad": "M", "Medida": "USD"},
+                {"Grupo": "g", "id_serie": 798, "Indicador": "Liquidez Total M2",
+                 "Fecha": "2026-07-31", "Carga": "x", "Valor": 2.0, "Periodicidad": "M", "Medida": "USD"},
+            ]
+        },
+    )
+    for archivo in bce.list_archivos():
+        if archivo == "datos.json":
+            continue
+        httpx_mock.add_response(url=f"{bce._BASE}/{archivo}", status_code=404)
+
+    catalog = await bce.list_indicadores()
+
+    entries = {(c["archivo"], c["codigo"]): c["indicador"] for c in catalog if c["archivo"] == "datos.json"}
+    assert entries == {
+        ("datos.json", "805"): "Reservas Internacionales",
+        ("datos.json", "798"): "Liquidez Total M2",
     }
 
 

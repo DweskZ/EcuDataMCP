@@ -14,6 +14,15 @@ _INDEX_HTML = """
 <a href="m2092062026.html">No. 2092 Junio 2026</a>
 """
 
+_ARCHIVE_HTML = """
+<a href="/documentos/PublicacionesNotas/Catalogo/IEMensual/Indices/m1727011996.htm">
+  <strong>No. 1727 Enero 1996</strong>
+</a>
+<a href="/documentos/PublicacionesNotas/Catalogo/IEMensual/Indices/m2093072026.html">
+  <strong>No. 2093 Julio 2026</strong>
+</a>
+"""
+
 _BULLETIN_HTML = """
 <h2>3. ESTADÍSTICAS DEL SECTOR EXTERNO</h2>
 <p>3.1.1 <a href="Catalogo/IEMensual/m2091/IEM-431-e.xlsx">Producto Interno Bruto (PIB): Enfoque del Gasto</a></p>
@@ -140,11 +149,24 @@ async def test_fetch_bulletins_reconciles_latest_publications(httpx_mock):
         url=bce_iem_client.IEM_LATEST_PUBLICATIONS_URL,
         html='<a href="m2093072026.html">No. 2093 Julio 2026</a>',
     )
+    httpx_mock.add_response(url=bce_iem_client.IEM_ARCHIVE_URL, html=_ARCHIVE_HTML)
 
     bulletins = await bce_iem_client._fetch_bulletins()
 
     assert bulletins[0]["numero"] == 2093
-    assert len(bulletins) == 3
+    assert len(bulletins) == 4
+
+
+@pytest.mark.asyncio
+async def test_fetch_bulletins_adds_official_historical_archive(httpx_mock):
+    httpx_mock.add_response(url=bce_iem_client.IEM_INDEX_URL, html=_INDEX_HTML)
+    httpx_mock.add_response(url=bce_iem_client.IEM_LATEST_PUBLICATIONS_URL, html="")
+    httpx_mock.add_response(url=bce_iem_client.IEM_ARCHIVE_URL, html=_ARCHIVE_HTML)
+
+    bulletins = await bce_iem_client._fetch_bulletins()
+
+    assert [item["numero"] for item in bulletins] == [2093, 2092, 2091, 1727]
+    assert bulletins[-1]["anio"] == 1996
 
 
 @pytest.mark.asyncio
@@ -154,6 +176,7 @@ async def test_search_tables_can_persist_the_complete_catalog(httpx_mock, tmp_pa
     httpx_mock.add_response(
         url=bce_iem_client.IEM_LATEST_PUBLICATIONS_URL, html=""
     )
+    httpx_mock.add_response(url=bce_iem_client.IEM_ARCHIVE_URL, html="")
     httpx_mock.add_response(url=_NEW_BULLETIN_URL, html=_BULLETIN_HTML)
 
     result = await bce_iem_client.search_tables(guardar_catalogo=True)
@@ -294,6 +317,7 @@ async def test_search_tables_indexes_latest_bulletin_and_filters(httpx_mock):
     httpx_mock.add_response(
         url=bce_iem_client.IEM_LATEST_PUBLICATIONS_URL, html=""
     )
+    httpx_mock.add_response(url=bce_iem_client.IEM_ARCHIVE_URL, html="")
     httpx_mock.add_response(url=_NEW_BULLETIN_URL, html=_BULLETIN_HTML)
 
     result = await bce_iem_client.search_tables("exportaciones")
@@ -309,6 +333,7 @@ async def test_search_tables_historical_merges_versions(httpx_mock):
     httpx_mock.add_response(
         url=bce_iem_client.IEM_LATEST_PUBLICATIONS_URL, html=""
     )
+    httpx_mock.add_response(url=bce_iem_client.IEM_ARCHIVE_URL, html="")
     httpx_mock.add_response(url=_NEW_BULLETIN_URL, html=_BULLETIN_HTML)
     httpx_mock.add_response(url=_OLD_BULLETIN_URL, html=_BULLETIN_HTML)
 
@@ -327,6 +352,7 @@ async def test_get_table_returns_layout_preview(httpx_mock):
     httpx_mock.add_response(
         url=bce_iem_client.IEM_LATEST_PUBLICATIONS_URL, html=""
     )
+    httpx_mock.add_response(url=bce_iem_client.IEM_ARCHIVE_URL, html="")
     httpx_mock.add_response(url=_NEW_BULLETIN_URL, html=_BULLETIN_HTML)
     httpx_mock.add_response(url=_PIB_TABLE_URL, content=xlsx)
 

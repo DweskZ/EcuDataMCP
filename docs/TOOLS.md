@@ -136,3 +136,13 @@ y `monitorear_riesgos`.
 | `ecuador://cantones` | 224 cantones. |
 | `ecuador://parroquias` | Parroquias con referencia geográfica. |
 | `ecuador://instituciones-clave` | IDs frecuentes de gob.ec. |
+## Auditorías BCEData e IEM
+
+- `audit_bce_catalog` comprueba el catálogo BCEData, puede persistir snapshots
+  y comparar el actual con el último completo.
+- `search_bce_iem` descubre tablas del boletín mensual o archivo histórico;
+  puede guardar el catálogo y calcular hashes XLSX de forma acotada.
+- `compare_bce_sources` genera candidatos BCEData ↔ IEM. Con
+  `guardar_revision=true` guarda una cola revisable bajo
+  `BCE_EQUIVALENCE_REVIEW_DIR`; nunca declara equivalencia metodológica solo
+  por el título.
