@@ -21,7 +21,14 @@ def register_list_bce_indicadores_diarios_tool(mcp: FastMCP) -> None:
         Pagos/Cobros Interbancarios, Sistema de Pagos en Línea, Cámara de
         Compensación de Cheques (monthly); Producción Petrolera Nacional
         (daily); inflación, desempleo, confianza del consumidor, PIB
-        (monthly/quarterly/annual, likely duplicates BCEData).
+        (monthly/quarterly/annual, likely duplicates BCEData); Reservas
+        Internacionales, Liquidez Total M2, Crédito al Sector Privado,
+        Tasas Activa/Pasiva Referencial, Captaciones OSD (monetary,
+        monthly); Ingresos/Erogaciones/Resultado Global SPNF, Deuda
+        Pública Interna (fiscal, monthly); Cuenta Corriente, Remesas de
+        Trabajadores, Tipo de Cambio Efectivo Real, Balanza Comercial
+        (total/no petrolera), Exportaciones/Importaciones de Bienes
+        (external sector, monthly/quarterly).
 
         The catalog is discovered live from each file's own data, not
         hardcoded — a "codigo" only means one thing within its own

@@ -132,6 +132,28 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
       componentes de tabla, cuatro posibles tabla/grupo y solo una posible
       equivalencia directa. Ninguna se trata como duplicado confirmado hasta
       revisar valores y metodología.
+      **Revisión manual 2026-09-02, dos candidatos confirmados con datos
+      en vivo:**
+      1. **Confirmada — equivalencia directa.** `id_grupo=101` (BCEData,
+         "4.1.4 Ingresos y egresos por comercialización interna de
+         derivados importados") ↔ `iem-414-e` (misma sección/título). Las
+         8 series de BCEData (4 productos × precio importación/venta
+         nacional) igualan los valores de `iem-414-e` mes a mes hasta ~13
+         cifras significativas (ene-2025 verificado en las 4 líneas de
+         producto). Es la misma tabla, republicada por dos rutas.
+      2. **Confirmada parcial — tabla↔grupo.** `id_grupo=65` ↔ `iem-423-e`
+         ("Salario Básico Unificado y Componentes Salariales"): la serie
+         "SALARIO REAL PROMEDIO" de BCEData iguala exactamente la segunda
+         fila de `iem-423-e` (ene-2025: 122.414726663655 en ambas). Pero
+         `id_grupo=65` solo expone esa fila — el SBU nominal (fila 1 de la
+         tabla IEM, 548.2638888888889 constante) no aparece bajo ninguna
+         unidad de ese id_grupo. Confirma que la clasificación
+         "posible_correspondencia_tabla_grupo" del tool es correcta aquí:
+         cobertura parcial, no equivalencia completa.
+      Los otros tres candidatos "tabla↔grupo" (riesgo país↔producción
+      petrolera, derivados↔IPC, salario↔IPP) son falsos positivos por
+      similitud de etiqueta — sin relación real, no revisados en detalle
+      más allá de notar que los títulos no corresponden.
 - [ ] **BCE — prueba de completitud y frescura**: ejecutar una comprobación
       programada que compare el catálogo descubierto con el anterior, confirme
       que el boletín más reciente está presente y deje visible el último período
@@ -212,7 +234,13 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
   - `datos_pagos.json` (285 KB): SPI, SCI, SPL, CCC, Monto Recaudado Servicios Básicos — mensuales desde 2010 (más dos series SPI/PIB y SCI/PIB anuales).
   - `datos_hid.json` (1.4 MB): **Producción Petrolera Nacional** (D, 2018-01-01→hoy, 3154 filas — genuinamente diaria, valiosa por la dependencia fiscal del petróleo) y Precio Petróleo Crudo Ecuatoriano (M).
   - `datos_ipc.json`, `datos_tes.json`, `datos_icc.json`, `datos_cna.json`: inflación, desempleo, confianza del consumidor y PIB — mensual/trimestral/anual, probablemente duplican BCEData pero en un formato más limpio de consultar.
-  Ninguno de estos archivos aparece en el buscador del propio sitio bce.fin.ec ni en BCEData — se llegó a ellos seleccionando "riesgo país" en un agregador financiero de terceros que citaba `contenido.bce.fin.ec/estadisticas-de-publicaciones-generales/` como fuente, y desde ahí leyendo el HTML del widget para encontrar su archivo de datos. **Construido:** el catálogo se descubre en vivo desde los datos mismos (no hardcoded — un "código" solo significa algo dentro de su propio archivo), confirmado con las 29 series reales encontradas en los 9 archivos (incluye 2 bonos soberanos, 2034/2039, que no se habían visto en la investigación original). `get_bce_indicador_diario` nunca devuelve la serie completa (Riesgo País tiene 7369+ filas) — solo una ventana acotada (últimos N o rango de fechas explícito, tope 366) más el rango completo como metadata. Sigue pendiente: revisar si hay más páginas con el mismo patrón de widgets más allá de las 4 ya probadas (no se recorrió el mega-menú completo de "Estadísticas").
+  Ninguno de estos archivos aparece en el buscador del propio sitio bce.fin.ec ni en BCEData — se llegó a ellos seleccionando "riesgo país" en un agregador financiero de terceros que citaba `contenido.bce.fin.ec/estadisticas-de-publicaciones-generales/` como fuente, y desde ahí leyendo el HTML del widget para encontrar su archivo de datos. **Construido:** el catálogo se descubre en vivo desde los datos mismos (no hardcoded — un "código" solo significa algo dentro de su propio archivo), confirmado con las 29 series reales encontradas en los 9 archivos (incluye 2 bonos soberanos, 2034/2039, que no se habían visto en la investigación original). `get_bce_indicador_diario` nunca devuelve la serie completa (Riesgo País tiene 7369+ filas) — solo una ventana acotada (últimos N o rango de fechas explícito, tope 366) más el rango completo como metadata.
+  **Barrido completo del mega-menú, 2026-09-02.** Solo 4 de las 7 secciones de nivel superior de "Estadísticas" se habían revisado. Las 2 no revisadas (`estadisticas-del-sector-monetario-d-2`, `estadisticas-del-sector-fiscal`) sí tenían el widget, y `estadisticas-del-sector-externo-d` — ya "revisada" — tenía 7 widgets más que el barrido original no encontró por seguir solo los que compartían archivo con indicadores ya conocidos. 4 archivos nuevos:
+  - `datos.json` (`view_ind_monetario`): Reservas Internacionales, Liquidez Total M2, Crédito al Sector Privado (empresas y hogares), Captaciones OSD (Total), Tasa Activa/Pasiva Referencial — mensual, 2000/2003/2015→hoy.
+  - `datos_fiscales.json` (`view_ind_fiscales`): Total Ingresos SPNF, Total Erogaciones SPNF, Resultado Global SPNF (% del PIB), Saldo Deuda Pública Interna — mensual, 2000→hoy.
+  - `datos_bpa.json` (`view_ind_externo_bpa`): Cuenta Corriente, Remesas de Trabajadores Recibidas (trimestral, 2016→hoy), Índice Tipo de Cambio Efectivo Real (mensual, 1995→hoy).
+  - `datos_cxt.json` (`view_ind_externo_cxt`): Saldo Balanza Comercial, Balanza Comercial no Petrolera, Exportaciones de Bienes, Importaciones de Bienes — mensual, 1990→hoy. Usa "Código Variable Dinámica" como los 9 archivos originales, no "id_serie".
+  Los 3 archivos nuevos "id_serie" (`datos.json`/`datos_fiscales.json`/`datos_bpa.json`) no tienen "Código Variable Dinámica" — el código de serie es un int en `id_serie`, y añaden un campo "Grupo" que los 9 archivos originales no tienen. `_codigo()` unifica ambos esquemas detrás de una sola interfaz string. Catálogo total: 49 series (antes 29). Verificado completo contra la página de inicio de `contenido.bce.fin.ec`, que agrega los widgets de todas las secciones en un solo lugar (40 `data-dd-title` distintos) — los 40 resuelven ahora a un archivo conocido.
 - [ ] BCE — **Cuentas Nacionales completas**: investigar los paquetes anual, trimestral y regional, retropolación, Tabla Oferta-Utilización, Cuadro Económico Integrado y Matriz de Empleo e Ingresos. IEM/BCEData pueden contener partes, pero la integración debe conservar la metodología de base móvil, revisiones, frecuencia y carácter provisional/definitivo. → https://contenido.bce.fin.ec/estadisticas-de-cuentas-nacionales/
 - [ ] BCE — **EMOE y coyuntura**: investigar el Estudio Mensual de Opinión Empresarial, metodologías, expectativas económicas, confianza del consumidor, ciclo económico, inflación, mercado laboral, pobreza/desigualdad y crédito. Reutilizar BCEData/IEM cuando ya sean la misma serie; añadir solo archivos, cortes o metadatos que falten. → https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Indicador_coy.html
 - [ ] BCE — **paquetes sectoriales**: auditar por separado petróleo, minería, cemento, agricultura y compra/venta de divisas. Para cada uno, decidir si basta BCEData/IEM o si hace falta un cliente de publicaciones/archivos; conservar frecuencia, fecha de corte y revisión. → https://contenido.bce.fin.ec/ultimas-publicaciones/
