@@ -323,7 +323,21 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
 - [ ] BCE — **EMOE y coyuntura**: investigar el Estudio Mensual de Opinión Empresarial, metodologías, expectativas económicas, confianza del consumidor, ciclo económico, inflación, mercado laboral, pobreza/desigualdad y crédito. Reutilizar BCEData/IEM cuando ya sean la misma serie; añadir solo archivos, cortes o metadatos que falten. → https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Indicador_coy.html
 - [ ] BCE — **paquetes sectoriales**: auditar por separado petróleo, minería, cemento, agricultura y compra/venta de divisas. Para cada uno, decidir si basta BCEData/IEM o si hace falta un cliente de publicaciones/archivos; conservar frecuencia, fecha de corte y revisión. → https://contenido.bce.fin.ec/ultimas-publicaciones/
 - [ ] BCE — **índices de precios de comercio exterior**: verificar si las series IPX/IPM/ITI que aparecen en BCEData tienen la misma cobertura que la página dedicada; integrar la metodología, series históricas y archivos de exportación/importación solo si aportan detalle adicional. → https://contenido.bce.fin.ec/estadisticas-de-indice-de-precios-de-comercio-exterior/
-- [ ] BCE — **catálogo de publicaciones, calendario y archivo histórico**: añadir búsqueda de “Últimas publicaciones”, Cifras Económicas del Ecuador, boletines monetarios/financieros, informes y metodologías, con fecha de publicación, período cubierto, formato y URL. Esto complementa las series de BCEData y las tablas IEM. → https://contenido.bce.fin.ec/ultimas-publicaciones/
+- [~] BCE — **catálogo de publicaciones, calendario y archivo histórico**: añadir búsqueda de “Últimas publicaciones”, Cifras Económicas del Ecuador, boletines monetarios/financieros, informes y metodologías, con fecha de publicación, período cubierto, formato y URL. Esto complementa las series de BCEData y las tablas IEM. → https://contenido.bce.fin.ec/ultimas-publicaciones/
+  **Construido 2026-09-01 para "Últimas Publicaciones"**: `search_bce_publicaciones`
+  (`helpers/bce_publicaciones_client.py`). Confirmado en vivo: la página renderiza
+  una sola tabla HTML estática vía un shortcode (`bce-ultimas-publicaciones`) — sin
+  AJAX, sin ruta `wp-json` propia, sin paginación. Extrae fecha (texto español
+  largo, parseado a ISO), título, URL directa y formato — el formato se deriva de
+  la extensión de la URL, no del ícono decorativo de la fila (confirmado en vivo:
+  dos filas con el mismo formato real HTML usan íconos `file-web` distintos según
+  criterio editorial, uno de ellos genérico "gráfico"). Verificado en vivo
+  extremo a extremo contra la página real: 30/30 filas parseadas correctamente,
+  cero fechas o formatos sin reconocer. Límite real, no solucionable desde esta
+  página: solo expone su ventana rodante (~30 publicaciones más recientes), sin
+  parámetro de fecha ni paginación — no es un archivo histórico completo.
+  **Sigue pendiente**: Cifras Económicas del Ecuador y cualquier calendario de
+  publicaciones futuras viven en páginas distintas, no investigadas todavía.
 - [x] SIPA (Ministerio de Agricultura) — `list_sipa_modulos`/`get_sipa_modulo_archivos`, 30 archivos Excel reales en 4 módulos (económico/productivo/social/censos), verificado en vivo. → RESEARCH.md § Sitios de ministerios individuales
 - [x] Contraloría General del Estado — `list_contraloria_informes`/`get_contraloria_informe`, CSV trimestrales reales de informes de auditoría aprobados a cualquier institución pública, verificado en vivo. De paso corrigió un bug real en el sniffing de delimitador CSV compartido (`helpers/csv_reader.py`). → RESEARCH.md § Sitios de ministerios individuales
 - [x] Contraloría — "Plan anual de control", mismo patrón `WFDescarga.aspx` ya implementado en `helpers/contraloria_client.py` (solo cambia `tipo`, más un segundo seed page `Portal/Sistema/PlanAnualControl`). `get_contraloria_informe` distingue el `tipo` no-CSV y devuelve metadata + puntero a `read_pdf` en vez de intentar `preview_csv`. → RESEARCH.md § Séptima pasada

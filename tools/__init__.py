@@ -60,6 +60,7 @@ from tools.read_pdf import register_read_pdf_tool
 from tools.search_anda import register_search_anda_tool
 from tools.search_auditores import register_search_auditores_tool
 from tools.search_bce_iem import register_search_bce_iem_tool
+from tools.search_bce_publicaciones import register_search_bce_publicaciones_tool
 from tools.search_bce_remesas import register_search_bce_remesas_tool
 from tools.search_biinec_extras import register_search_biinec_extras_tool
 from tools.search_censo_recursos import register_search_censo_recursos_tool
@@ -161,6 +162,7 @@ def register_tools(mcp: FastMCP) -> None:
     register_compare_bce_sources_tool(mcp)
     register_search_bce_iem_tool(mcp)
     register_get_bce_iem_table_tool(mcp)
+    register_search_bce_publicaciones_tool(mcp)
     register_search_bce_remesas_tool(mcp)
     register_list_bce_indicadores_diarios_tool(mcp)
     register_get_bce_indicador_diario_tool(mcp)

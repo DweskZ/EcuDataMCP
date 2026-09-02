@@ -193,6 +193,7 @@ async def main() -> int:
             ("search_sri_ruc", {"razon_social": "BANCO", "max_resultados": 3}, []),
             ("search_indicadores_bce", {"query": "inflacion", "limit": 5}, []),
             ("search_bce_iem", {"query": "inflacion", "limit": 5}, []),
+            ("search_bce_publicaciones", {"query": ""}, []),
             ("search_bce_remesas", {"query": ""}, []),
             ("audit_bce_catalog", {}, ["grupos", "series"]),
             ("list_bce_indicadores_diarios", {}, ["Riesgo", "serie"]),

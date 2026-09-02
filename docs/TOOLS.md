@@ -74,6 +74,7 @@ para consultar el catálogo nacional o el portal municipal Cuenca en Datos.
 | `compare_bce_sources` | Generar un mapa candidato de traslapes entre etiquetas de BCEData e IEM, sin declarar equivalencias metodológicas automáticamente. |
 | `search_bce_iem` | Buscar tablas XLSX individuales del archivo IEM, actual o histórico; `hash_archivos=true` permite un manifiesto SHA-256 acotado. |
 | `get_bce_iem_table` | Leer una tabla XLSX IEM con filtro de período y elegir una versión histórica. |
+| `search_bce_publicaciones` | Catálogo de "Últimas Publicaciones" del BCE (boletines, reportes): fecha, título, URL directa y formato. Solo la ventana de las ~30 publicaciones más recientes; sin paginación. |
 
 ## Compañías (Supercías)
 

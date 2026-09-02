@@ -102,6 +102,7 @@ _CAPABILITIES = {
             "compare_bce_sources",
             "search_bce_iem",
             "get_bce_iem_table",
+            "search_bce_publicaciones",
             "list_bce_indicadores_diarios",
             "get_bce_indicador_diario",
             "search_bce_remesas",

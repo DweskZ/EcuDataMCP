@@ -7,6 +7,18 @@
 - **`get_tramite_estadisticas`** — monthly atenciones/quejas transparency
   series for one trámite (`gob.ec/api/v1/tramites-transparencia/{id}`),
   since mid-2021. No bulk endpoint; fetches one trámite's series at a time.
+- **`search_bce_publicaciones`** — BCE's "Últimas Publicaciones" feed
+  (bulletins/reports with date, title, direct URL, format); complements
+  BCEData/IEM rather than duplicating them, since most listed publications
+  have no equivalent numeric series in either. Only the ~30-most-recent
+  rolling window the page itself exposes — no pagination on the source.
+
+### Fixed
+
+- **IEM legacy ZIP era** — some pre-2016 bulletin ZIP members keep a legacy
+  `.xls` filename while actually containing a modern XLSX payload, which made
+  `xlrd` fail outright; `get_bce_iem_table` now sniffs the bytes instead of
+  trusting the extension.
 
 ## 0.8.5 — 2026-08-31
 
