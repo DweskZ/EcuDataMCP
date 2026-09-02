@@ -138,16 +138,28 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
         reales (No. 1975, No. 1900, No. 1950), no solo con mocks. 8 tests
         nuevos.
       - **No. 1727–1853 (enero 1996 – julio 2006, ~126 boletines, ~34%): sin
-        construir.** Confirmado en vivo (No. 1800) que estas páginas usan
-        HTML pre-moderno de framesets — `<A HREF = ... TARGET="_top">` en
-        mayúsculas y sin comillas — que ni siquiera enlaza un ZIP o XLSX
-        directo: enlaza páginas `.htm` por sección (`m1800_77.htm` etc.),
-        una capa adicional de scraping antes de llegar al dato real. El
-        regex `href="..."` de `_parse_complete_files`/`_parse_tables` no
-        matchea nada de esta era — por diseño, no por bug; es un formato
-        genuinamente distinto que necesitaría su propio parser. Frontera
-        exacta: No. 1853 (jul 2006) ya tiene HTML moderno pero sin ZIP
-        todavía; No. 1854 (ago 2006) es el primer boletín con ZIP.
+        construir, investigado 2026-09-02.** Confirmado en vivo (No. 1800,
+        No. 1780) que estas páginas usan HTML pre-moderno de framesets —
+        `<A HREF = ... TARGET="_top">` en mayúsculas y sin comillas — que
+        enlazan páginas `.htm` por sección (`m{boletin}_{k}.htm`, ~60 por
+        boletín). **El dato en sí no está en ningún archivo descargable —
+        vive como una `<TABLE>` HTML cruda embebida directamente en cada
+        página de sección**, con encabezados multinivel de ROWSPAN/COLSPAN
+        genuinamente irregulares (grupos anidados tipo "BANCO CENTRAL" /
+        "SISTEMA FINANCIERO" con sub-encabezados y marcadores de nota al
+        pie tipo "(1)" mezclados en el texto del encabezado), filas
+        dispersas (un año solo, luego sus meses en filas siguientes), y
+        contenido en `cp1252`/entidades HTML mixtas. Construir esto
+        exigiría: (1) un resolutor de grilla ROWSPAN/COLSPAN real, no solo
+        extraer texto de celdas; (2) una clave de identidad de tabla
+        distinta, porque el índice `k` en `m{boletin}_{k}.htm` no está
+        confirmado estable entre boletines — probablemente hay que igualar
+        por texto de sección ("1.1 Principales Indicadores Monetarios")
+        en vez de número; (3) tolerar variación real de formato en 126
+        boletines a lo largo de una década. No es un formato desconocido
+        (es HTML), pero es bastante más trabajo y más frágil que el ZIP —
+        y son los datos más viejos del archivo. Pendiente decisión de
+        Daniel sobre si vale la pena construirlo.
       Con estas tres fronteras, "cobertura completa 1996-2026" ahora es un
       problema de un solo tramo real, no dos: 1996-2006 (formato distinto,
       sin empezar, ~126 boletines). El resto (2006-2026, ~240 boletines, el
