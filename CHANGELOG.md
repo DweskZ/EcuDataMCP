@@ -12,6 +12,12 @@
   BCEData/IEM rather than duplicating them, since most listed publications
   have no equivalent numeric series in either. Only the ~30-most-recent
   rolling window the page itself exposes — no pagination on the source.
+- **`search_bce_indices` / `get_bce_indice_archivo`** — BCE's site-wide
+  "índice" archive pages (~35 series: sector bulletins, trade/confidence
+  indices, FX buy/sell, balance of payments, weekly monetary bulletin,
+  etc.), each with a full year-by-year or week-by-week file archive (some
+  back to 2004). Resolves most of the "sector packages" and "EMOE/coyuntura"
+  roadmap items via one generic parser instead of five one-off clients.
 
 ### Fixed
 

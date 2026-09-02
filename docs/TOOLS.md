@@ -75,6 +75,8 @@ para consultar el catálogo nacional o el portal municipal Cuenca en Datos.
 | `search_bce_iem` | Buscar tablas XLSX individuales del archivo IEM, actual o histórico; `hash_archivos=true` permite un manifiesto SHA-256 acotado. |
 | `get_bce_iem_table` | Leer una tabla XLSX IEM con filtro de período y elegir una versión histórica. |
 | `search_bce_publicaciones` | Catálogo de "Últimas Publicaciones" del BCE (boletines, reportes): fecha, título, URL directa y formato. Solo la ventana de las ~30 publicaciones más recientes; sin paginación. |
+| `search_bce_indices` | Catálogo de páginas "índice" del BCE (petróleo, minería, cemento, precios de comercio exterior, EMOE, divisas, balanza de pagos, boletín monetario semanal, etc.), cada una con archivo histórico completo. |
+| `get_bce_indice_archivo` | Leer el archivo de una página "índice" (por año o completo). |
 
 ## Compañías (Supercías)
 

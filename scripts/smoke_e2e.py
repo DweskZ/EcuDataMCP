@@ -194,6 +194,7 @@ async def main() -> int:
             ("search_indicadores_bce", {"query": "inflacion", "limit": 5}, []),
             ("search_bce_iem", {"query": "inflacion", "limit": 5}, []),
             ("search_bce_publicaciones", {"query": ""}, []),
+            ("search_bce_indices", {"query": "petrolero"}, []),
             ("search_bce_remesas", {"query": ""}, []),
             ("audit_bce_catalog", {}, ["grupos", "series"]),
             ("list_bce_indicadores_diarios", {}, ["Riesgo", "serie"]),

@@ -320,9 +320,57 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
   - `datos_cxt.json` (`view_ind_externo_cxt`): Saldo Balanza Comercial, Balanza Comercial no Petrolera, Exportaciones de Bienes, Importaciones de Bienes — mensual, 1990→hoy. Usa "Código Variable Dinámica" como los 9 archivos originales, no "id_serie".
   Los 3 archivos nuevos "id_serie" (`datos.json`/`datos_fiscales.json`/`datos_bpa.json`) no tienen "Código Variable Dinámica" — el código de serie es un int en `id_serie`, y añaden un campo "Grupo" que los 9 archivos originales no tienen. `_codigo()` unifica ambos esquemas detrás de una sola interfaz string. Catálogo total: 49 series (antes 29). Verificado completo contra la página de inicio de `contenido.bce.fin.ec`, que agrega los widgets de todas las secciones en un solo lugar (40 `data-dd-title` distintos) — los 40 resuelven ahora a un archivo conocido.
 - [ ] BCE — **Cuentas Nacionales completas**: investigar los paquetes anual, trimestral y regional, retropolación, Tabla Oferta-Utilización, Cuadro Económico Integrado y Matriz de Empleo e Ingresos. IEM/BCEData pueden contener partes, pero la integración debe conservar la metodología de base móvil, revisiones, frecuencia y carácter provisional/definitivo. → https://contenido.bce.fin.ec/estadisticas-de-cuentas-nacionales/
-- [ ] BCE — **EMOE y coyuntura**: investigar el Estudio Mensual de Opinión Empresarial, metodologías, expectativas económicas, confianza del consumidor, ciclo económico, inflación, mercado laboral, pobreza/desigualdad y crédito. Reutilizar BCEData/IEM cuando ya sean la misma serie; añadir solo archivos, cortes o metadatos que falten. → https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Indicador_coy.html
-- [ ] BCE — **paquetes sectoriales**: auditar por separado petróleo, minería, cemento, agricultura y compra/venta de divisas. Para cada uno, decidir si basta BCEData/IEM o si hace falta un cliente de publicaciones/archivos; conservar frecuencia, fecha de corte y revisión. → https://contenido.bce.fin.ec/ultimas-publicaciones/
+- [x] BCE — **sistema genérico de páginas "índice" (gestor de índices editorial del propio BCE)**:
+  descubierto 2026-09-01 investigando el ítem de paquetes sectoriales de abajo — BCE
+  publica ~35 páginas cuyo slug termina en "-indice(s)" (encontradas vía su propio
+  `wp-sitemap-posts-page-1.xml`), cada una un archivo histórico completo (año por
+  año, algunas desde 2004-2010, o semana por semana) para una serie de publicación
+  con nombre propio: boletines sectoriales, índices de precios/confianza, compra y
+  venta de divisas, balanza de pagos, boletín monetario semanal, remesas, etc. Dos
+  formas de widget, ambas estáticas (sin AJAX, todo presente en el HTML inicial —
+  confirmado comparando bytes crudos vs DOM del navegador):
+  `.bce-gi` (pestañas por año → tarjetas con período + formato) y `.bce-gi-weekly`
+  (tarjetas de año → meses → enlaces con número de semana + fecha).
+  **Construido**: `search_bce_indices`/`get_bce_indice_archivo`
+  (`helpers/bce_indices_client.py`). El catálogo se construye descubriendo las
+  páginas candidatas en el sitemap y leyendo cada una una vez (cacheado 6h);
+  `search_bce_indices` devuelve solo resúmenes (para no inflar la respuesta),
+  `get_bce_indice_archivo` lee los archivos ya cacheados de una página, con
+  filtro por año y tope de resultados. Verificado en vivo extremo a extremo: 30
+  de 36 páginas candidatas exponen realmente el widget (las otras 6, p.ej.
+  `memoria-anual-indice`, solo cargan el CSS del plugin pero no tienen contenido
+  publicado con este sistema — se omiten del catálogo, no son un bug). Dos bugs
+  reales de parseo corregidos durante la verificación en vivo: (1) el lookahead
+  que separa un panel de año del siguiente confundía `bce-gi-panel` con
+  `bce-gi-panelhead` (prefijo compartido) y devolvía cuerpos vacíos; (2) en
+  `.bce-gi-weekly`, todo panel de año que no es el activo lleva un atributo
+  `hidden` en vez de cerrar el tag con `>` a secas — el regex original solo
+  aceptaba la forma activa y silenciosamente perdía 7 de los 8 años de boletín
+  monetario semanal hasta corregirlo.
+- [~] BCE — **paquetes sectoriales**: auditar por separado petróleo, minería, cemento, agricultura y compra/venta de divisas. Para cada uno, decidir si basta BCEData/IEM o si hace falta un cliente de publicaciones/archivos; conservar frecuencia, fecha de corte y revisión. → https://contenido.bce.fin.ec/ultimas-publicaciones/
+  **Resuelto 2026-09-01 vía el sistema de índices de arriba** para 4 de 5:
+  petróleo (`boletin-analitico-del-sector-petrolero-indice`, 67 archivos,
+  2006-2026), minería (`boletin-analitico-del-sector-minero-indice`, 26,
+  2016-2026), cemento (`estadisticas-de-cemento-indice`, 11, 2025-2026) y
+  compra/venta de divisas (3 páginas índice distintas, mensual y trimestral,
+  2010-2026). **Sigue pendiente**: agricultura — no se encontró ninguna página
+  BCE dedicada (ni en el sitemap de índices ni en el menú de "Estadísticas");
+  probablemente vive en otra institución (MAG/INEC), no en BCE.
 - [ ] BCE — **índices de precios de comercio exterior**: verificar si las series IPX/IPM/ITI que aparecen en BCEData tienen la misma cobertura que la página dedicada; integrar la metodología, series históricas y archivos de exportación/importación solo si aportan detalle adicional. → https://contenido.bce.fin.ec/estadisticas-de-indice-de-precios-de-comercio-exterior/
+  **Nota 2026-09-01**: no cubierto por el sistema de índices de arriba — las
+  páginas de esta sección (`indices-de-precios-de-importacion`,
+  `indices-de-precios-de-exportacion`, `serie-historica-indices-de-precios-comercio-exterior-y-terminos-de-intercambio`)
+  no terminan en "-indice(s)", quedan fuera del filtro del sitemap; siguen sin
+  investigar directamente.
+- [~] BCE — **EMOE y coyuntura**: investigar el Estudio Mensual de Opinión Empresarial, metodologías, expectativas económicas, confianza del consumidor, ciclo económico, inflación, mercado laboral, pobreza/desigualdad y crédito. Reutilizar BCEData/IEM cuando ya sean la misma serie; añadir solo archivos, cortes o metadatos que falten. → https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Indicador_coy.html
+  **Resuelto 2026-09-01 vía el sistema de índices de arriba**, parcialmente:
+  expectativas económicas (`indice-de-expectativas-de-la-economia-indice`, 43
+  archivos, 2023-2026), confianza del consumidor (`indice-de-confianza-al-consumidor-icc-indice`,
+  198, 2009-2026), inflación (`boletin-mensual-de-inflacion-indice`, 268,
+  2004-2026) y ciclo económico (`reporte-de-indicadores-del-ciclo-economico-...-indice`).
+  **Sigue pendiente**: mercado laboral y pobreza/desigualdad — ninguna página
+  índice encontrada para esos dos; no investigado más allá del sistema de
+  índices.
 - [~] BCE — **catálogo de publicaciones, calendario y archivo histórico**: añadir búsqueda de “Últimas publicaciones”, Cifras Económicas del Ecuador, boletines monetarios/financieros, informes y metodologías, con fecha de publicación, período cubierto, formato y URL. Esto complementa las series de BCEData y las tablas IEM. → https://contenido.bce.fin.ec/ultimas-publicaciones/
   **Construido 2026-09-01 para "Últimas Publicaciones"**: `search_bce_publicaciones`
   (`helpers/bce_publicaciones_client.py`). Confirmado en vivo: la página renderiza

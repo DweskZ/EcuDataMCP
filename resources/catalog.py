@@ -152,6 +152,8 @@ def _fuentes_payload() -> dict:
                     "search_bce_iem",
                     "get_bce_iem_table",
                     "search_bce_publicaciones",
+                    "search_bce_indices",
+                    "get_bce_indice_archivo",
                     "list_bce_indicadores_diarios",
                     "get_bce_indicador_diario",
                     "search_bce_remesas",
