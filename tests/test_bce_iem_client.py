@@ -530,6 +530,39 @@ async def test_get_table_reads_legacy_xls_from_zip_member(httpx_mock, monkeypatc
 
 
 @pytest.mark.asyncio
+async def test_get_table_reads_xlsx_mislabeled_as_legacy_xls_from_zip_member(
+    httpx_mock, monkeypatch
+):
+    # Confirmed live in bulletin No. 1975: some ZIP members keep a legacy
+    # ".xls" filename but the bytes are actually a modern XLSX (OOXML zip
+    # container) -- xlrd.open_workbook used to blow up on these outright.
+    bulletin = dict(_PARSED_BULLETINS[0])
+    bulletin["numero"] = 1975
+    bce_iem_client._bulletins_cache.set("bulletins", [bulletin])
+    httpx_mock.add_response(url=bulletin["url"], html=_LEGACY_BULLETIN_HTML)
+    zip_url = _LEGACY_ZIP_URL
+    member_bytes = _xlsx()
+    httpx_mock.add_response(
+        url=zip_url, content=_zip_bytes({"IEM-316b.xls": member_bytes})
+    )
+
+    def fail_open_workbook(file_contents: bytes):
+        raise AssertionError("xlrd should not be invoked for a PK-prefixed member")
+
+    monkeypatch.setattr(xlrd, "open_workbook", fail_open_workbook)
+
+    result = await bce_iem_client.get_table(
+        "iem-legado-iem-316b", desde="2025", boletin_numero=1975
+    )
+
+    assert result["tabla"]["sha256"] == hashlib.sha256(member_bytes).hexdigest()
+    assert result["formato"] == "series_ancho"
+    assert result["bloques"][0]["series"] == [
+        {"nombre": "PIB", "valores": {"2025": 130.2}}
+    ]
+
+
+@pytest.mark.asyncio
 async def test_download_zip_cached_only_fetches_once(httpx_mock):
     zip_url = _LEGACY_ZIP_URL
     httpx_mock.add_response(

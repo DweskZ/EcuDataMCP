@@ -1225,19 +1225,51 @@ class _XlsSheetAdapter:
             yield tuple(row)
 
 
-def _inspect_legacy_xls(raw: bytes, max_rows: int) -> dict[str, Any]:
-    """Layout-preserving preview for a legacy .xls table -- see _inspect_xlsx."""
+def _open_legacy_zip_member(raw: bytes) -> tuple[Any, bool]:
+    """Open a ZIP-member table named ``*.xls`` as its real format.
+
+    Confirmed live in bulletin No. 1975 (IEM-316b/312b/315a/322a.xls):
+    BCE sometimes ships a modern XLSX (an OOXML zip container) inside the
+    legacy bulk ZIP but keeps the old ``.xls`` filename, which made xlrd
+    fail outright. Sniff the actual bytes rather than trusting the
+    extension -- same principle as CLAUDE.md's CKAN-format guidance.
+    Returns (workbook, is_xlsx).
+    """
+    if raw.startswith(b"PK"):
+        return load_workbook(io.BytesIO(raw), read_only=True, data_only=True), True
     import xlrd
 
-    book = xlrd.open_workbook(file_contents=raw)
+    try:
+        return xlrd.open_workbook(file_contents=raw), False
+    except xlrd.XLRDError as exc:
+        raise ValueError("El archivo .xls legado del boletín IEM no se pudo leer") from exc
+
+
+def _inspect_legacy_xls(raw: bytes, max_rows: int) -> dict[str, Any]:
+    """Layout-preserving preview for a legacy .xls table -- see _inspect_xlsx."""
+    workbook, is_xlsx = _open_legacy_zip_member(raw)
+    if is_xlsx:
+        try:
+            sheets = [
+                {
+                    "nombre": worksheet.title,
+                    **_inspect_worksheet_rows(
+                        worksheet.iter_rows(values_only=True), max_rows
+                    ),
+                }
+                for worksheet in workbook.worksheets
+            ]
+        finally:
+            workbook.close()
+        return {"hojas": sheets}
     sheets = [
         {
             "nombre": sheet.name,
             **_inspect_worksheet_rows(
-                _XlsSheetAdapter(sheet, book).iter_rows(), max_rows
+                _XlsSheetAdapter(sheet, workbook).iter_rows(), max_rows
             ),
         }
-        for sheet in book.sheets()
+        for sheet in workbook.sheets()
     ]
     return {"hojas": sheets}
 
@@ -1303,8 +1335,6 @@ async def get_table(
     if table.get("zip_member"):
         # Pre-Oct-2016 bulletin: no individual XLSX URL, read one member
         # out of the bulk ZIP instead (see _fetch_legacy_zip_tables).
-        import xlrd
-
         zip_raw = await _download_zip_cached(table["url"])
         try:
             raw = zipfile.ZipFile(io.BytesIO(zip_raw)).read(table["zip_member"])
@@ -1312,16 +1342,21 @@ async def get_table(
             raise ValueError(
                 f"El miembro '{table['zip_member']}' ya no está en el ZIP del boletín IEM"
             ) from exc
+        legacy_book, is_xlsx = _open_legacy_zip_member(raw)
         try:
-            legacy_book = xlrd.open_workbook(file_contents=raw)
-        except xlrd.XLRDError as exc:
-            raise ValueError("El archivo .xls legado del boletín IEM no se pudo leer") from exc
-        worksheet = _XlsSheetAdapter(legacy_book.sheet_by_index(0), legacy_book)
-        structured = _extract_wide_series(worksheet, desde, hasta, max_rows)
-        if structured is None:
-            structured = _extract_long_table(worksheet, desde, hasta, max_rows)
-        if structured is None:
-            structured = _extract_matrix_series(worksheet, desde, hasta, max_rows)
+            worksheet = (
+                legacy_book.active
+                if is_xlsx
+                else _XlsSheetAdapter(legacy_book.sheet_by_index(0), legacy_book)
+            )
+            structured = _extract_wide_series(worksheet, desde, hasta, max_rows)
+            if structured is None:
+                structured = _extract_long_table(worksheet, desde, hasta, max_rows)
+            if structured is None:
+                structured = _extract_matrix_series(worksheet, desde, hasta, max_rows)
+        finally:
+            if is_xlsx:
+                legacy_book.close()
     elif table.get("formato_origen") == "html_frameset":
         # Pre-Aug-2006 bulletin: the table is a raw HTML <TABLE> on its own
         # section page, not a downloadable file (see

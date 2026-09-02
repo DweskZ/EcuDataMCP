@@ -170,16 +170,35 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
       para las porciones ZIP/frameset, y sin garantía de que cada una de
       las 126 secciones del tramo más viejo tenga exactamente esta forma
       (no se revisaron los 126 boletines uno por uno, solo una muestra).
-- [~] **IEM completo — lectura de tablas**: hacer buscables los valores de
+- [x] **IEM completo — lectura de tablas**: hacer buscables los valores de
       todas las tablas individuales, no solo sus títulos. Añadir lectores para
       las familias de formatos que difieren del diseño común; conservar también
       una copia/vista fiel del archivo original cuando no sea seguro
       normalizarlo. Las formas ancha y larga comunes, y la vista segura, ya
-      están cubiertas; quedan normalizadores dedicados para las familias
-      restantes. Ahora también normaliza meses numéricos, nombres de meses en
+      están cubiertas. Ahora también normaliza meses numéricos, nombres de meses en
       español, trimestres, tablas sin bloque de unidad explícito y matrices con
       varias columnas descriptivas. Una vista de las primeras filas cuenta como
       diagnóstico, no como cobertura completa.
+      **Barrido en vivo 2026-09-01** sobre las 78 tablas del boletín vigente:
+      77 (98.7 %) se extraen ya como `series_ancho`/`tabla_larga`/`series_matriz`;
+      la única `vista` (`iem-1111-e`, "Encaje Legal") es de periodicidad
+      semanal con columnas Año/Mes/Rango dispersas y una hoja de cálculo
+      interna del BCE — un caso genuinamente único, no una familia recurrente.
+      Repetido sobre 4 boletines de la era ZIP (No. 1854, 1900, 1950, 1975):
+      encontró un bug real, no una forma de tabla nueva — 4 miembros del ZIP
+      del boletín No. 1975 (`IEM-316b/312b/315a/322a.xls`) resultaban en
+      `ValueError` porque son en realidad XLSX modernos (contenedor ZIP OOXML)
+      con extensión `.xls` heredada; `xlrd.open_workbook` fallaba directo.
+      Corregido con sniffing de bytes (`raw.startswith(b"PK")`) en vez de
+      confiar en la extensión, igual que la regla ya documentada en
+      `CLAUDE.md` para el campo `format` de CKAN — ver `_open_legacy_zip_member`
+      en `helpers/bce_iem_client.py`. Tras la corrección, cero errores en los
+      4 boletines muestreados; los 4-7 `vista` restantes por boletín son
+      tablas legadas con jerarquías de encabezado genuinamente irregulares
+      (tasas por semana, PIB por industria con encabezados fusionados a varios
+      niveles), no una familia repetible. No se identificó ninguna familia de
+      formato adicional que justifique un normalizador dedicado; la
+      combinación actual de extractores + vista honesta ya cubre el archivo.
 - [~] **BCEData ↔ IEM — mapa de equivalencias**: `compare_bce_sources` genera
       coincidencias candidatas por etiquetas normalizadas, alternativas,
       confianza y campos pendientes de revisión; `guardar_revision=true` y
