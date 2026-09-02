@@ -541,3 +541,133 @@ async def test_download_zip_cached_only_fetches_once(httpx_mock):
 
     assert first == second
     assert len(httpx_mock.get_requests()) == 1
+
+
+# ---- pre-Aug-2006 frameset HTML fallback (bulletins before No. 1854) ------
+
+# Real shape confirmed live on bulletin No. 1800/1780: uppercase, unquoted
+# <A HREF = ...>, no closing </TR>/</TH>/</TD>, real ROWSPAN/COLSPAN.
+_FRAMESET_BULLETIN_HTML = """
+<HTML>
+<A HREF = /documentos/PublicacionesNotas/Catalogo/IEMensual/m1800/m1800_77.htm TARGET="_top"><IMG SRC = x.gif> <B>1.1 Principales Indicadores</B></A><BR>
+<A HREF = /documentos/PublicacionesNotas/Catalogo/IEMensual/m1800/m1800_78.htm TARGET="_top"><IMG SRC = x.gif> <B>1.2 Otra Seccion</B></A><BR>
+</HTML>
+"""
+
+_FRAMESET_SECTION_HTML = """
+<HTML>
+<HEAD><TITLE> Boletin</TITLE></HEAD>
+<BODY>
+<H3><CENTER>1.1 PRINCIPALES INDICADORES MONETARIOS</CENTER></H3>
+<P>
+<TABLE BORDER=2>
+<TR>
+<TH ROWSPAN=2 colspan=1><B>PERIODO</B></TH>
+<TH COLSPAN=2><B>BANCO CENTRAL</B></TH>
+</TR>
+<TR>
+<TH><B>Total</B></TH>
+<TH><B>Otro</B></TH>
+</TR>
+<TR><TD>1999<TD>872.7<TD>577.9
+</TABLE>
+<HR>
+FUENTE: BCE.
+</BODY>
+</HTML>
+"""
+
+
+def test_table_grid_parser_resolves_rowspan_and_colspan():
+    parser = bce_iem_client._TableGridParser()
+    parser.feed(_FRAMESET_SECTION_HTML)
+
+    assert len(parser.tables) == 1
+    grid = bce_iem_client._expand_table_grid(parser.tables[0])
+    assert grid == [
+        ["PERIODO", "BANCO CENTRAL", "BANCO CENTRAL"],
+        ["PERIODO", "Total", "Otro"],
+        ["1999", "872.7", "577.9"],
+    ]
+
+
+@pytest.mark.parametrize(
+    ("title", "expected"),
+    [
+        ("1.1 Principales Indicadores Monetarios", "iem-legado-frameset-1-1-principales-indicadores-monetarios"),
+        ("", "iem-legado-frameset-seccion-3"),
+    ],
+)
+def test_legacy_frameset_table_id_normalizes_title(title, expected):
+    assert bce_iem_client._legacy_frameset_table_id(title, fallback_index=3) == expected
+
+
+@pytest.mark.asyncio
+async def test_fetch_legacy_frameset_tables_discovers_sections(httpx_mock):
+    bulletin = dict(_PARSED_BULLETINS[0])
+    section1 = "https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Catalogo/IEMensual/m1800/m1800_77.htm"
+    section2 = "https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Catalogo/IEMensual/m1800/m1800_78.htm"
+    httpx_mock.add_response(url=section1, content=_FRAMESET_SECTION_HTML.encode("cp1252"))
+    httpx_mock.add_response(
+        url=section2, content="<H3>1.2 Otra Seccion</H3><TABLE><TR><TD>x</TABLE>".encode("cp1252")
+    )
+
+    tables = await bce_iem_client._fetch_legacy_frameset_tables(
+        bulletin, _FRAMESET_BULLETIN_HTML
+    )
+
+    assert [t["table_id"] for t in tables] == [
+        "iem-legado-frameset-1-1-principales-indicadores-monetarios",
+        "iem-legado-frameset-1-2-otra-seccion",
+    ]
+    assert tables[0]["formato_origen"] == "html_frameset"
+    assert tables[0]["url"] == section1
+
+
+@pytest.mark.asyncio
+async def test_fetch_tables_for_bulletin_falls_back_to_frameset_when_no_zip(httpx_mock):
+    bulletin = dict(_PARSED_BULLETINS[0])
+    httpx_mock.add_response(url=bulletin["url"], html=_FRAMESET_BULLETIN_HTML)
+    section1 = "https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Catalogo/IEMensual/m1800/m1800_77.htm"
+    section2 = "https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Catalogo/IEMensual/m1800/m1800_78.htm"
+    httpx_mock.add_response(url=section1, content=_FRAMESET_SECTION_HTML.encode("cp1252"))
+    httpx_mock.add_response(
+        url=section2, content="<H3>1.2 Otra Seccion</H3><TABLE><TR><TD>x</TABLE>".encode("cp1252")
+    )
+
+    tables = await bce_iem_client._fetch_tables_for_bulletin(bulletin)
+
+    assert len(tables) == 2
+    assert tables[0]["formato_origen"] == "html_frameset"
+
+
+@pytest.mark.asyncio
+async def test_get_table_returns_grid_preview_for_frameset_table(httpx_mock):
+    bulletin = dict(_PARSED_BULLETINS[0])
+    bulletin["numero"] = 1800
+    bce_iem_client._bulletins_cache.set("bulletins", [bulletin])
+    httpx_mock.add_response(url=bulletin["url"], html=_FRAMESET_BULLETIN_HTML)
+    section1 = "https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Catalogo/IEMensual/m1800/m1800_77.htm"
+    section2 = "https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Catalogo/IEMensual/m1800/m1800_78.htm"
+    section_bytes = _FRAMESET_SECTION_HTML.encode("cp1252")
+    httpx_mock.add_response(url=section1, content=section_bytes)
+    httpx_mock.add_response(
+        url=section2, content="<H3>1.2 Otra Seccion</H3><TABLE><TR><TD>x</TABLE>".encode("cp1252")
+    )
+    # get_table re-downloads the section page to read it -- register the
+    # response a second time.
+    httpx_mock.add_response(url=section1, content=section_bytes)
+
+    result = await bce_iem_client.get_table(
+        "iem-legado-frameset-1-1-principales-indicadores-monetarios",
+        boletin_numero=1800,
+    )
+
+    assert result["formato"] == "vista"
+    assert result["tabla"]["formato_origen"] == "html_frameset"
+    assert result["hojas"][0]["vista"] == [
+        ["PERIODO", "BANCO CENTRAL", "BANCO CENTRAL"],
+        ["PERIODO", "Total", "Otro"],
+        ["1999", "872.7", "577.9"],
+    ]
+    assert result["tabla"]["sha256"] == hashlib.sha256(section_bytes).hexdigest()

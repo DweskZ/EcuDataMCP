@@ -20,6 +20,7 @@ import re
 import zipfile
 from datetime import UTC, datetime
 from html import unescape
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
 from urllib.parse import urljoin
@@ -98,13 +99,20 @@ _WS_RE = re.compile(r"\s+")
 #     -- not an unknown format. Handled by _fetch_legacy_zip_tables below.
 #   - No. 1727-1853 (Jan 1996 - Jul 2006, ~126 bulletins): pre-modern-HTML
 #     frameset pages (uppercase, unquoted <A HREF = ... TARGET="_top">,
-#     confirmed live on No. 1800) that link to per-SECTION .htm pages
-#     instead of a table or a ZIP directly -- a further scrape needed to
-#     even find the underlying files, not just a different container
-#     format. NOT handled -- _parse_complete_files/_parse_tables' href="
-#     regex doesn't match this markup at all, so these bulletins still
-#     raise "no expuso tablas XLSX individuales".
+#     confirmed live on No. 1800/1780) that link to ~60 per-SECTION .htm
+#     pages instead of a table or a ZIP directly. The table data lives
+#     nowhere else -- it's a raw HTML <TABLE> embedded in each section
+#     page, with real ROWSPAN/COLSPAN multi-level headers and no closing
+#     </TR>/</TH>/</TD> tags (implicit-close markup, pre-XHTML). Handled
+#     by _fetch_legacy_frameset_tables/_TableGridParser below as a
+#     layout-preserving grid (like the existing "vista" fallback for
+#     unrecognized XLSX shapes) -- the header hierarchy is genuinely
+#     irregular enough across bulletins that guessing a semantic
+#     wide/long shape isn't attempted, same philosophy as _inspect_xlsx.
 _LEGACY_XLS_MEMBER_RE = re.compile(r"\.xls$", re.IGNORECASE)
+_LEGACY_FRAMESET_LINK_RE = re.compile(r"<A\s+HREF\s*=\s*(?P<url>[^\s>]+)", re.IGNORECASE)
+_LEGACY_FRAMESET_SECTION_RE = re.compile(r"/m\d+_\d+\.htm$", re.IGNORECASE)
+_LEGACY_FRAMESET_TITLE_RE = re.compile(r"<H\d[^>]*>(?P<title>.*?)</H\d>", re.IGNORECASE | re.DOTALL)
 
 
 def _clean(text: str) -> str:
@@ -343,6 +351,176 @@ async def _fetch_legacy_zip_tables(
     return tables
 
 
+class _TableGridParser(HTMLParser):
+    """Collect one or more HTML <TABLE>s worth of (text, rowspan, colspan)
+    cells, tolerating the pre-XHTML BCE markup this era actually uses: no
+    closing </TR>/</TH>/</TD> at all. A tokenizer, not a tree builder, so
+    it replicates the browser's implicit-close inference itself -- a new
+    TR/TH/TD start tag ends whatever same-level element was open before
+    it, exactly like handle_endtag would for well-formed markup.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.tables: list[list[list[tuple[str, int, int]]]] = []
+        self._in_table = False
+        self._rows: list[list[tuple[str, int, int]]] | None = None
+        self._row: list[tuple[str, int, int]] | None = None
+        self._cell: list[str] | None = None
+        self._cell_span = (1, 1)
+
+    def _close_cell(self) -> None:
+        if self._cell is None or self._row is None:
+            return
+        text = _WS_RE.sub(" ", "".join(self._cell)).strip()
+        rowspan, colspan = self._cell_span
+        self._row.append((text, max(rowspan, 1), max(colspan, 1)))
+        self._cell = None
+
+    def _close_row(self) -> None:
+        self._close_cell()
+        if self._row is not None and self._rows is not None:
+            self._rows.append(self._row)
+        self._row = None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        tag = tag.lower()
+        if tag == "table":
+            self._in_table = True
+            self._rows = []
+            self._row = None
+            self._cell = None
+            return
+        if not self._in_table:
+            return
+        if tag == "tr":
+            self._close_row()
+            self._row = []
+        elif tag in {"th", "td"}:
+            self._close_cell()
+            if self._row is None:
+                self._row = []
+            values = dict(attrs)
+            try:
+                rowspan = int(values.get("rowspan") or 1)
+            except ValueError:
+                rowspan = 1
+            try:
+                colspan = int(values.get("colspan") or 1)
+            except ValueError:
+                colspan = 1
+            self._cell_span = (rowspan, colspan)
+            self._cell = []
+
+    def handle_endtag(self, tag: str) -> None:
+        tag = tag.lower()
+        if tag == "table" and self._in_table:
+            self._close_row()
+            if self._rows:
+                self.tables.append(self._rows)
+            self._in_table = False
+            self._rows = None
+
+    def handle_data(self, data: str) -> None:
+        if self._cell is not None:
+            self._cell.append(data)
+
+
+def _expand_table_grid(rows: list[list[tuple[str, int, int]]]) -> list[list[str]]:
+    """Resolve ROWSPAN/COLSPAN cells into a plain rectangular grid.
+
+    Standard algorithm: track cells still "hanging" into future rows from
+    an earlier ROWSPAN, filling them in before placing each row's own new
+    cells at the first free column.
+    """
+    grid: list[list[str]] = []
+    carry: dict[int, tuple[int, str]] = {}  # column -> (rows_remaining, text)
+    for row in rows:
+        col = 0
+        out_row: list[str] = []
+
+        def fill_carried(col: int, out_row: list[str]) -> int:
+            while col in carry:
+                remaining, text = carry[col]
+                out_row.append(text)
+                if remaining > 1:
+                    carry[col] = (remaining - 1, text)
+                else:
+                    del carry[col]
+                col += 1
+            return col
+
+        col = fill_carried(col, out_row)
+        for text, rowspan, colspan in row:
+            col = fill_carried(col, out_row)
+            for offset in range(colspan):
+                out_row.append(text)
+                if rowspan > 1:
+                    carry[col + offset] = (rowspan - 1, text)
+            col += colspan
+        grid.append(out_row)
+    return grid
+
+
+def _legacy_frameset_table_id(title: str, fallback_index: int) -> str:
+    """table_id for a frameset-era section table, derived from its own
+    title text rather than the m{boletin}_{k}.htm index -- that index
+    isn't confirmed stable across bulletins, but the section title (e.g.
+    "1.1 Principales Indicadores Monetarios") is the same kind of stable,
+    human-assigned label BCE still uses today."""
+    normalized = re.sub(r"[^a-z0-9]+", "-", _strip(title).lower()).strip("-")
+    if not normalized:
+        normalized = f"seccion-{fallback_index}"
+    return f"iem-legado-frameset-{normalized}"
+
+
+async def _fetch_legacy_frameset_tables(
+    bulletin: dict[str, Any], html: str
+) -> list[dict[str, Any]]:
+    """Discover section pages linked from a pre-Aug-2006 bulletin's
+    uppercase/unquoted <A HREF = ...> frameset markup, which
+    _parse_tables/_parse_complete_files' href="..." regex never matches."""
+    section_urls: list[str] = []
+    seen: set[str] = set()
+    for match in _LEGACY_FRAMESET_LINK_RE.finditer(html):
+        raw_url = match.group("url").strip("'\"")
+        if not _LEGACY_FRAMESET_SECTION_RE.search(raw_url):
+            continue
+        url = urljoin(bulletin["url"], raw_url)
+        if url in seen:
+            continue
+        seen.add(url)
+        section_urls.append(url)
+
+    tables: list[dict[str, Any]] = []
+    for index, url in enumerate(section_urls, start=1):
+        try:
+            raw_section, truncated = await download_bytes(url)
+        except Exception as exc:
+            logger.warning("No se pudo leer la sección %s del boletín IEM: %s", url, exc)
+            continue
+        if truncated:
+            continue
+        section_html = raw_section.decode("cp1252", errors="replace")
+        title_match = _LEGACY_FRAMESET_TITLE_RE.search(section_html)
+        title = _clean(unescape(title_match.group("title"))) if title_match else f"Sección {index}"
+        tables.append(
+            {
+                "table_id": _legacy_frameset_table_id(title, index),
+                "titulo": title or f"Sección {index}",
+                "seccion": "",
+                "url": url,
+                "formato_origen": "html_frameset",
+                "boletin_numero": bulletin["numero"],
+                "boletin_mes": bulletin["mes"],
+                "boletin_anio": bulletin["anio"],
+                "boletin_url": bulletin["url"],
+                "catalogado_en": datetime.now(UTC).isoformat(),
+            }
+        )
+    return tables
+
+
 async def _fetch_tables_for_bulletin(bulletin: dict[str, Any]) -> list[dict[str, Any]]:
     key = bulletin["numero"]
     cached = _bulletin_tables_cache.get(key)
@@ -366,6 +544,8 @@ async def _fetch_tables_for_bulletin(bulletin: dict[str, Any]) -> list[dict[str,
             )
             if zip_info is not None:
                 tables = await _fetch_legacy_zip_tables(bulletin, zip_info)
+        if not tables:
+            tables = await _fetch_legacy_frameset_tables(bulletin, html)
         if not tables:
             raise ValueError(
                 f"El boletín IEM {bulletin['numero']} no expuso tablas XLSX individuales"
@@ -1050,6 +1230,31 @@ def _inspect_legacy_xls(raw: bytes, max_rows: int) -> dict[str, Any]:
     return {"hojas": sheets}
 
 
+def _inspect_frameset_table(raw: bytes, max_rows: int) -> dict[str, Any]:
+    """Layout-preserving preview for a frameset-era section page's raw HTML
+    <TABLE>(s) -- see _inspect_xlsx. Never attempted as wide/long/matrix:
+    this era's header hierarchies (nested ROWSPAN/COLSPAN groups, footnote
+    markers mixed into header text) are genuinely irregular enough that
+    guessing a semantic shape isn't safe -- the resolved grid is the
+    honest result.
+    """
+    html = raw.decode("cp1252", errors="replace")
+    parser = _TableGridParser()
+    parser.feed(html)
+    sheets = []
+    for index, rows in enumerate(parser.tables, start=1):
+        grid = [row for row in _expand_table_grid(rows) if any(cell for cell in row)]
+        sheets.append(
+            {
+                "nombre": f"Tabla {index}",
+                "vista": grid[:max_rows],
+                "filas_mostradas": min(len(grid), max_rows),
+                "truncada": len(grid) > max_rows,
+            }
+        )
+    return {"hojas": sheets}
+
+
 def clear_caches() -> None:
     """Clear IEM discovery caches; useful for refresh jobs and tests."""
     _catalog_cache.clear()
@@ -1105,6 +1310,15 @@ async def get_table(
             structured = _extract_long_table(worksheet, desde, hasta, max_rows)
         if structured is None:
             structured = _extract_matrix_series(worksheet, desde, hasta, max_rows)
+    elif table.get("formato_origen") == "html_frameset":
+        # Pre-Aug-2006 bulletin: the table is a raw HTML <TABLE> on its own
+        # section page, not a downloadable file (see
+        # _fetch_legacy_frameset_tables). Never attempt structured
+        # extraction here -- go straight to the grid preview.
+        raw, truncated = await download_bytes(table["url"])
+        if truncated:
+            raise ValueError("La página de la sección IEM superó el límite de descarga")
+        structured = None
     else:
         raw, truncated = await download_bytes(table["url"])
         if truncated:
@@ -1128,5 +1342,10 @@ async def get_table(
     }
     if structured is not None:
         return {**result, **structured}
-    inspector = _inspect_legacy_xls if table.get("zip_member") else _inspect_xlsx
+    if table.get("zip_member"):
+        inspector = _inspect_legacy_xls
+    elif table.get("formato_origen") == "html_frameset":
+        inspector = _inspect_frameset_table
+    else:
+        inspector = _inspect_xlsx
     return {**result, "formato": "vista", **inspector(raw, max_rows=max_rows)}

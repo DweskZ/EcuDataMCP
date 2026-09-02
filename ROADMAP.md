@@ -137,34 +137,39 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
         openpyxl. Verificado en vivo extremo a extremo contra boletines
         reales (No. 1975, No. 1900, No. 1950), no solo con mocks. 8 tests
         nuevos.
-      - **No. 1727–1853 (enero 1996 – julio 2006, ~126 boletines, ~34%): sin
-        construir, investigado 2026-09-02.** Confirmado en vivo (No. 1800,
-        No. 1780) que estas páginas usan HTML pre-moderno de framesets —
+      - **No. 1727–1853 (enero 1996 – julio 2006, ~126 boletines, ~34%):
+        construido 2026-09-02.** Confirmado en vivo (No. 1800, No. 1780)
+        que estas páginas usan HTML pre-moderno de framesets —
         `<A HREF = ... TARGET="_top">` en mayúsculas y sin comillas — que
         enlazan páginas `.htm` por sección (`m{boletin}_{k}.htm`, ~60 por
-        boletín). **El dato en sí no está en ningún archivo descargable —
+        boletín). El dato en sí no está en ningún archivo descargable —
         vive como una `<TABLE>` HTML cruda embebida directamente en cada
-        página de sección**, con encabezados multinivel de ROWSPAN/COLSPAN
-        genuinamente irregulares (grupos anidados tipo "BANCO CENTRAL" /
-        "SISTEMA FINANCIERO" con sub-encabezados y marcadores de nota al
-        pie tipo "(1)" mezclados en el texto del encabezado), filas
-        dispersas (un año solo, luego sus meses en filas siguientes), y
-        contenido en `cp1252`/entidades HTML mixtas. Construir esto
-        exigiría: (1) un resolutor de grilla ROWSPAN/COLSPAN real, no solo
-        extraer texto de celdas; (2) una clave de identidad de tabla
-        distinta, porque el índice `k` en `m{boletin}_{k}.htm` no está
-        confirmado estable entre boletines — probablemente hay que igualar
-        por texto de sección ("1.1 Principales Indicadores Monetarios")
-        en vez de número; (3) tolerar variación real de formato en 126
-        boletines a lo largo de una década. No es un formato desconocido
-        (es HTML), pero es bastante más trabajo y más frágil que el ZIP —
-        y son los datos más viejos del archivo. Pendiente decisión de
-        Daniel sobre si vale la pena construirlo.
-      Con estas tres fronteras, "cobertura completa 1996-2026" ahora es un
-      problema de un solo tramo real, no dos: 1996-2006 (formato distinto,
-      sin empezar, ~126 boletines). El resto (2006-2026, ~240 boletines, el
-      65% del archivo) ya es legible hoy, aunque sin hashing masivo
-      confirmado para la porción ZIP.
+        página de sección, con encabezados multinivel de ROWSPAN/COLSPAN
+        genuinamente irregulares y contenido en `cp1252`. `_TableGridParser`
+        (subclase de `html.parser.HTMLParser`, sin dependencia nueva —
+        el mismo patrón ya usado en `sri_ruc_client.py`, adaptado porque
+        esta era no cierra `</TR>`/`</TH>`/`</TD>`, así que el cierre
+        implícito se infiere por el siguiente tag de apertura, no por
+        `handle_endtag`) captura las celdas con su rowspan/colspan reales;
+        `_expand_table_grid` las resuelve al algoritmo estándar de grilla
+        rectangular. `table_id` se deriva del texto de sección
+        (`_legacy_frameset_table_id`, ej. "1.1 Principales Indicadores
+        Monetarios"), no del índice `k`, que no está confirmado estable.
+        Expuesto siempre como vista de grilla (`formato: "vista"`, mismo
+        contrato que `_inspect_xlsx`/`_inspect_legacy_xls`) — nunca se
+        intenta wide/long/matrix aquí: la jerarquía de encabezados es
+        irregular a propósito de sección en sección, adivinar una forma
+        semántica sería menos honesto que mostrar la grilla real.
+        **Verificado en vivo extremo a extremo contra el boletín No. 1800
+        real**: 63 tablas descubiertas, valores de una fila de datos real
+        (diciembre 1999, tabla "1.1 Principales Indicadores Monetarios")
+        coinciden exactamente con el HTML fuente, celda por celda. 6 tests
+        nuevos.
+      Con estas tres fronteras, el archivo completo 1996–2026 (367
+      boletines) es legible hoy — sin hashing masivo confirmado todavía
+      para las porciones ZIP/frameset, y sin garantía de que cada una de
+      las 126 secciones del tramo más viejo tenga exactamente esta forma
+      (no se revisaron los 126 boletines uno por uno, solo una muestra).
 - [~] **IEM completo — lectura de tablas**: hacer buscables los valores de
       todas las tablas individuales, no solo sus títulos. Añadir lectores para
       las familias de formatos que difieren del diseño común; conservar también
