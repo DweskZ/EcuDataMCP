@@ -61,9 +61,9 @@ copiada tal cual:
 | BCE, oro/WTI/Dow Jones/SOFR | Diaria | Mercados y precios internacionales | [x] hecho — `datos_diarios.json` |
 | CENACE, Información Operativa | Horaria/diaria | Demanda eléctrica, generación, despacho | [x] hecho — `get_cenace_tablero`, snapshot en vivo (no serie histórica), ver más abajo |
 | SIPA/MAG, precios mayoristas | Diaria o quincenal según producto | Precios mayoristas de alimentos | [ ] **Descartado como fuente de alta frecuencia, 2026-08-31.** Dos páginas revisadas, ninguna es diaria/quincenal: "Precios Mayoristas" (boletines PDF mensuales) y `precios-referenciales` — el "api"/"json" en su HTML era solo el token CSRF de Joomla, falso positivo. `precios-referenciales` en realidad enlaza a "Mercado Mayorista Quito/Guayaquil/Cuenca", cada uno un PDF embebido (`descargas/mercados/precios_referenciales/{ciudad}_precios_referenciales_2026.pdf`) con los rangos de precio del Decreto Nº1438 vigentes — un documento regulatorio de piso/techo de precio, con fecha de emisión y vigencia mensual (confirmado: "Fecha de emisión: 4 de agosto de 2026", vigente desde el 4 de septiembre), no una serie de observaciones diarias de mercado. El archivo se sobreescribe en el mismo nombre cada vez — sin historia. Bajo valor como para priorizarlo (3 PDFs, una foto del mes, sin serie), pero real y fácil si algún día se justifica. La app móvil "cgsin.precios" sigue sin explorar — podría ser la fuente diaria real detrás de escena, no confirmado. |
-| INAMHI, Geoportal | Horaria/diaria | Lluvia, temperatura, caudales, estaciones | [ ] ya en el roadmap (`geoservicios.inamhi.gob.ec`) — GeoServer WMS confirmado, sin listar capas ni confirmar datos tabulares de estaciones todavía |
+| INAMHI, Geoportal | Horaria/diaria | Lluvia, temperatura, caudales, estaciones | [x] hecho parcial (`geoservicios.inamhi.gob.ec`) — 222 capas WMS catalogadas, 199 con datos WFS reales; ver ítem detallado más abajo. Sin capa de estaciones puntuales. |
 | IG-EPN, sismos | Casi tiempo real | Sismos, magnitud, ubicación, profundidad | [x] hecho — `search_sismos`, la única fuente genuinamente de alta frecuencia ya integrada antes de esta pasada |
-| DGAC/IFIS | Diaria | Vuelos y movimientos por aeropuerto | [ ] ya en el roadmap como "Aviación civil" (`ais.aviacioncivil.gob.ec`) bajo METAR/NOTAM/SIGMET — la fila de Daniel apunta más bien a estadísticas de movimientos/vuelos por aeropuerto, que puede ser una sección distinta del mismo sitio (IFIS) sin explorar todavía; no asumir que es la misma sub-fuente que METAR/NOTAM/SIGMET sin confirmar. |
+| DGAC/IFIS | Diaria | Vuelos y movimientos por aeropuerto | [x] METAR/NOTAM/SIGMET hecho (`ais.aviacioncivil.gob.ec`, ver ítem detallado más abajo) — pero la fila de Daniel apunta más bien a estadísticas de movimientos/vuelos por aeropuerto, que puede ser una sección distinta del mismo sitio (IFIS) sin explorar todavía; no asumir que es la misma sub-fuente que METAR/NOTAM/SIGMET. |
 
 ### Objetivo prioritario: cobertura completa del BCEData y del IEM
 
@@ -356,12 +356,24 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
   2010-2026). **Sigue pendiente**: agricultura — no se encontró ninguna página
   BCE dedicada (ni en el sitemap de índices ni en el menú de "Estadísticas");
   probablemente vive en otra institución (MAG/INEC), no en BCE.
-- [ ] BCE — **índices de precios de comercio exterior**: verificar si las series IPX/IPM/ITI que aparecen en BCEData tienen la misma cobertura que la página dedicada; integrar la metodología, series históricas y archivos de exportación/importación solo si aportan detalle adicional. → https://contenido.bce.fin.ec/estadisticas-de-indice-de-precios-de-comercio-exterior/
-  **Nota 2026-09-01**: no cubierto por el sistema de índices de arriba — las
-  páginas de esta sección (`indices-de-precios-de-importacion`,
-  `indices-de-precios-de-exportacion`, `serie-historica-indices-de-precios-comercio-exterior-y-terminos-de-intercambio`)
-  no terminan en "-indice(s)", quedan fuera del filtro del sitemap; siguen sin
-  investigar directamente.
+- [x] BCE — **índices de precios de comercio exterior**: verificar si las series IPX/IPM/ITI que aparecen en BCEData tienen la misma cobertura que la página dedicada; integrar la metodología, series históricas y archivos de exportación/importación solo si aportan detalle adicional. → https://contenido.bce.fin.ec/estadisticas-de-indice-de-precios-de-comercio-exterior/
+  **Resuelto 2026-09-02.** BCEData (`id_grupo=134`, "3.5.3 Índices IPX - IPM
+  - ITI") ya cubre las tres series *agregadas* (1990-01→2026-06). De las
+  tres páginas dedicadas (fuera del sistema de índices de arriba porque su
+  slug no termina en "-indice(s)"): `serie-historica-indices-de-precios-...`
+  resultó un duplicado exacto de esa misma serie (cruzado en vivo, ITI
+  jun-2026 = 90.2604172608485 en ambos) — descartada. `indices-de-precios-
+  de-importacion` e `indices-de-precios-de-exportacion` sí aportan detalle
+  real y ausente en BCEData: precios/valor/volumen desagregados por
+  categoría de uso económico (importaciones — combustibles, materias
+  primas, bienes de consumo/capital) y por producto individual
+  (exportaciones — petróleo, camarón, banano, cacao, oro, rosas, etc.).
+  Las tres páginas usan un widget distinto al `.bce-gi`/`.bce-gi-weekly` de
+  `bce_indices_client.py` (un solo archivo vigente por página, sin archivo
+  por año), así que se construyó `search_bce_precios_comex`
+  (`helpers/bce_precios_comex_client.py`), con las dos páginas útiles
+  hardcodeadas (mismo patrón que `_EXTRA_TOPICS` en `helpers/inec_client.py`)
+  y cada archivo real scrapeado en vivo.
 - [~] BCE — **EMOE y coyuntura**: investigar el Estudio Mensual de Opinión Empresarial, metodologías, expectativas económicas, confianza del consumidor, ciclo económico, inflación, mercado laboral, pobreza/desigualdad y crédito. Reutilizar BCEData/IEM cuando ya sean la misma serie; añadir solo archivos, cortes o metadatos que falten. → https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Indicador_coy.html
   **Resuelto 2026-09-01 vía el sistema de índices de arriba**, parcialmente:
   expectativas económicas (`indice-de-expectativas-de-la-economia-indice`, 43
@@ -410,17 +422,72 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
 - [ ] Superbancos — Balances Generales/Patrimonio Técnico/indicadores de morosidad-liquidez-solvencia siguen sin resolver — a diferencia de Resoluciones (arriba, ya resuelto), estos viven detrás de una herramienta de consulta propia, no de un widget OneDrive, y probablemente necesitan una pasada con browser para confirmar si son automatizables. Catastro de Compañías bloqueado por login, descartado. → RESEARCH.md § Séptima pasada
 - [ ] MEF — workbook fiscal (recaudación arancelaria y series GFSM 2013-2026, actualizado mensualmente). → RESEARCH.md § Recaudación arancelaria
 - [ ] MINEDEC — registro histórico de matrícula básica 2009-2025. → RESEARCH.md § Sitios de ministerios individuales
-- [ ] SEPS — boletines de calificadoras de riesgo (`estadisticas.seps.gob.ec`, subdominio alcanzable aunque el sitio principal bloquea bots). → RESEARCH.md § Sitios de ministerios individuales
-- [ ] CNIG — matriz de femicidios (actualización semanal), sin confirmar link exacto de descarga. → RESEARCH.md § Sitios de ministerios individuales
+- [x] SEPS — boletines de calificadoras de riesgo (`estadisticas.seps.gob.ec`, subdominio alcanzable aunque el sitio principal bloquea bots). → RESEARCH.md § Sitios de ministerios individuales
+  **Resuelto 2026-09-02.** Confirmado en vivo: sitio WordPress normal (200
+  vía httpx plano, sin problema TLS), sin organización CKAN propia. 26
+  secciones reales entre `estadisticas-sfps/` (22, cinco pestañas:
+  Situación Financiera, Depósitos, Cartera de crédito, Tasas de interés,
+  Inclusión financiera) y `estadisticas-eps/` (4) — cada una una lista de
+  períodos con PDF/ZIP directo o redirect `?sdm_process_download`/
+  `?smd_process_download` (dos grafías inconsistentes en la misma página,
+  no un bug). Incluye `sfps_reportes_calificacion_de_riesgos`, el objetivo
+  original: boletines PDF anuales 2020-2025 más corte a marzo 2026, 112
+  entidades calificadas. Construido como `list_seps_secciones`/
+  `get_seps_seccion_archivos` (`helpers/seps_client.py`), mismo patrón que
+  Superbancos. Al menos una sección (Alivio Financiero) tiene un período
+  listado sin archivo todavía — manejado como 0 archivos, no como error.
+- [x] CNIG — matriz de femicidios (actualización semanal), sin confirmar link exacto de descarga. → RESEARCH.md § Sitios de ministerios individuales
+  **Resuelto 2026-09-02.** `igualdadgenero.gob.ec` es el Consejo Nacional
+  para la Igualdad de *Género* confirmado (no confundir con Fiscalía, que
+  publica cifras de femicidios por separado, ni con los otros Consejos
+  Nacionales para la Igualdad). Su página "Violencia" (`/violencia/`) tiene
+  20 tablas estadísticas en PDF vía WordPress download-monitor, incluida
+  "Femicidios y Homicidios Intencionales de Mujeres" — confirmado vivo, sin
+  login ni CAPTCHA. Gotcha real: el dominio raíz cierra la conexión TLS a
+  `curl`/`httpx` sin un User-Agent identificable (parecía caído); responde
+  200 con el User-Agent propio del proyecto — mismo patrón de filtrado ya
+  visto en `seps.gob.ec`. El PDF dice actualizarse "semanalmente" con datos
+  de Judicatura, Fiscalía e Interior, pero el archivo publicado hoy tiene
+  corte real al 09-abr-2023 y los 20 archivos comparten el mismo
+  Last-Modified (22-feb-2025, timestamp de migración) — "semanal" es la
+  intención declarada del indicador, no la cadencia real de lo publicado
+  ahora mismo. Construido como `search_cnig_femicidios`
+  (`helpers/cnig_client.py`).
 - [ ] Permisos y portales municipales — sin investigar, alcance grande (~221 GADs). → RESEARCH.md § Permisos municipales
 - [ ] IGM Geoportal — cartografía gated tras registro/login, no automatizable tal cual. → RESEARCH.md § Sitios de ministerios individuales
 - [ ] Fuentes externas de sociedad civil (FCD, FARO) — corregido: sí hay datasets tabulares reales (votaciones de la Asamblea, declaraciones patrimoniales de funcionarios, ordenanzas municipales de Quito/Guayaquil), verificados en vivo; decisión de alcance sigue pendiente (no es "gobierno"). FARO en sí no tiene portal de datos. `cuentasclaras.org` está comprometido con spam, no tocar. → RESEARCH.md § Fuentes externas
 - [ ] Gremios privados (AEADE, ASOBANCA, FEDEXPOR) — AEADE y FEDEXPOR confirmados y descargables; ASOBANCA Datalab sin resolver extracción (SPA). → RESEARCH.md § Gremios
 - [ ] **CORDES — Corporación de Estudios para el Desarrollo** — investigar su [base de variables macroeconómicas y entregas periódicas](https://www.cordes.org/): cobertura histórica, frecuencia, acceso descargable/API, definiciones y traslape con BCE/INEC. El sitio tiene protección anti-bot, así que primero hay que confirmar qué parte es automatizable y qué parte queda como publicación/documento. CORDES aparece también entre los participantes de la Encuesta de Expertos, pero no asumir que ambos productos son la misma fuente. → RESEARCH.md § Fuentes externas
 - [ ] **Nowcast / Encuesta de Expertos — Previsiones de la Economía del Ecuador** — investigar e integrar, si el acceso y la licencia lo permiten, las previsiones/nowcasts de PIB, empleo adecuado, desempleo e inflación. Separar claramente estimación de dato observado y conservar fecha de publicación, horizonte, metodología, participantes y revisiones. El [sitio público de Nowcast](https://www.expertoseconomia.org/es/) presenta estos cuatro indicadores mediante visualizaciones Datawrapper; sus páginas anuales incluyen además déficit fiscal, riesgo país y precio del petróleo. → RESEARCH.md § Fuentes externas
-- [ ] **INAMHI — `geoservicios.inamhi.gob.ec`, dominio nuevo, pedido explícito de Daniel 2026-08-31.** Confirmado vivo, corre un backend GeoServer real (`geoserver/wms` visible en el HTML) — probablemente capas de precipitación, temperatura, estaciones hidrometeorológicas, alertas. Sin profundizar más allá de confirmar que el servidor existe: falta el listado de capas (GetCapabilities de WMS/WFS), si hay datos tabulares de estaciones descargables además de los mapas, y si INAMHI tiene organización CKAN propia (sin verificar todavía).
+- [x] **INAMHI — `geoservicios.inamhi.gob.ec`, dominio nuevo, pedido explícito de Daniel 2026-08-31.** Confirmado vivo, corre un backend GeoServer real (`geoserver/wms` visible en el HTML) — probablemente capas de precipitación, temperatura, estaciones hidrometeorológicas, alertas. Sin profundizar más allá de confirmar que el servidor existe: falta el listado de capas (GetCapabilities de WMS/WFS), si hay datos tabulares de estaciones descargables además de los mapas, y si INAMHI tiene organización CKAN propia (sin verificar todavía).
+  **Resuelto 2026-09-02.** WMS GetCapabilities expone 222 capas (workspace
+  `geonode`): normales climáticas de precipitación 1985-2015, ~180
+  composites diarios de anomalías de lluvia, grillas del modelo WRF
+  (precipitación/temperatura/humedad/presión/viento), límites de
+  cuencas/provincias/cantones/parroquias. WFS confirma 199/222 con datos de
+  atributos reales vía GetFeature (JSON); las 23 restantes (grillas de
+  normales y WRF) son solo ráster, verificado con un GetFeature que
+  devuelve error. TLS limpio con httpx/certifi. Sin organización CKAN
+  propia para INAMHI en ningún lugar del proyecto — este cliente es la
+  única cobertura automatizable hoy. Limitación real: no existe una capa de
+  estaciones con observaciones puntuales de precipitación/temperatura/
+  caudal — todo lo disponible vía WFS son productos agregados por polígono
+  (zonal stats, límites), no series de estación cruda. Construido como
+  `search_inamhi_capas`/`get_inamhi_capa_datos` (`helpers/inamhi_client.py`).
 - [ ] **Calidad del aire de Quito — `aireambiente.quito.gob.ec`, dominio nuevo, pedido explícito de Daniel 2026-08-31.** Confirmado que el dominio responde (HTTP 200) pero sin `<title>` ni contenido en el HTML crudo — parece ser una aplicación de una sola página (SPA) que renderiza todo por JS, así que monitoreo de calidad del aire en tiempo real (probablemente la red de estaciones REMMAQ) necesitará una pasada con browser real o encontrar su API subyacente antes de saber si es automatizable.
-- [ ] **Aviación civil — `www.ais.aviacioncivil.gob.ec` (IFIS: Internet Flight Information System), dominio nuevo, pedido explícito de Daniel 2026-08-31.** Confirmado vivo con secciones públicas reales: `/metar` (reportes meteorológicos de aeródromo), `/notam` (avisos a aviadores), `/sigmet` (alertas meteorológicas significativas), `/aerodromo/show` — todos genuinamente de alta frecuencia (METAR se actualiza cada 30-60 min por aeródromo). Los planes de vuelo (`/fpl/*`) están detrás de `/usuario/login`, descartados. Sin confirmar todavía: si `/metar`/`/notam`/`/sigmet` son de acceso público sin cuenta, y en qué formato (HTML/texto plano/XML) — el estándar aeronáutico internacional para estos tres es texto plano de ancho fijo, generalmente sí público sin autenticación en portales AIS oficiales, pero no verificado en este caso concreto.
+- [x] **Aviación civil — `www.ais.aviacioncivil.gob.ec` (IFIS: Internet Flight Information System), dominio nuevo, pedido explícito de Daniel 2026-08-31.** Confirmado vivo con secciones públicas reales: `/metar` (reportes meteorológicos de aeródromo), `/notam` (avisos a aviadores), `/sigmet` (alertas meteorológicas significativas), `/aerodromo/show` — todos genuinamente de alta frecuencia (METAR se actualiza cada 30-60 min por aeródromo). Los planes de vuelo (`/fpl/*`) están detrás de `/usuario/login`, descartados. Sin confirmar todavía: si `/metar`/`/notam`/`/sigmet` son de acceso público sin cuenta, y en qué formato (HTML/texto plano/XML) — el estándar aeronáutico internacional para estos tres es texto plano de ancho fijo, generalmente sí público sin autenticación en portales AIS oficiales, pero no verificado en este caso concreto.
+  **Resuelto 2026-09-02.** `/metar/{icao}`, `/notam?designador={icao}` y
+  `/sigmet` son públicos sin sesión — el link "Entrar" existe pero solo
+  `/fpl/*` exige login; verificado contra SEQM (Quito) y capturado en vivo
+  un SIGMET activo de ceniza volcánica del Reventador. El formato es HTML
+  servidor (no texto de ancho fijo ni JSON) — el texto crudo ICAO viene
+  embebido en `<div>`/`<td class="codificacion">` junto a una tabla de
+  campos decodificados en español, extraída de forma genérica campo→valor
+  porque cada campo lleva un sufijo numérico opaco que cambia por request.
+  SIGMET es a nivel de FIR completo (Ecuador tiene un solo FIR, SEFG) sin
+  parámetro de aeródromo. Un ICAO desconocido no da error: METAR devuelve
+  "No existe registro..." y NOTAM una tabla vacía. Construido como
+  `get_metar`/`get_notam`/`get_sigmet` (`helpers/aviacion_client.py`).
 - [ ] **Cancillería y embajadas — dominio(s) sin identificar, pedido explícito de Daniel 2026-08-31** ("cancilleria, embajadas, etc."). Sin investigar: `cancilleria.gob.ec` ya aparece mencionado de pasada en la Séptima pasada como uno de los dominios vivos del hosting compartido del Estado, pero nunca se hizo una pasada de contenido dedicada — trámites consulares, apostillas, estadísticas migratorias, o datos de la red de embajadas/consulados son candidatos sin confirmar.
 - [~] **ARCSA (Agencia Nacional de Regulación, Control y Vigilancia Sanitaria) — investigado 2026-08-31, pedido explícito de Daniel.** Organización CKAN real (`agencia-nacional-de-regulacion-control-y-vigilancia-sanitaria-arcsa...`) con solo 4 datasets, todos sobre registros sanitarios/permisos de funcionamiento **suspendidos o cancelados** de medicamentos — actualización semestral, ya alcanzable con `search_organizations`/`list_dataset_resources` sin cliente nuevo. El dato realmente valioso — el registro sanitario completo *vigente* (no solo lo cancelado), confirmado por búsqueda web como "Base de Registros Emitidos" en `controlsanitario.gob.ec/base-de-datos/` (productos naturales, medicamentos homeopáticos, actualizado a junio 2026) — **no se pudo verificar**: `www.controlsanitario.gob.ec` está caído (reset de conexión TLS tras renegociación, confirmado con `curl` y con `httpx` en Python — mismo patrón exacto que `inclusion.gob.ec`, no es un problema del cliente). Un subdominio sí vive (`permisosfuncionamiento.controlsanitario.gob.ec/consultorciudadano/`, "ARCSA-Notificaciones") pero es un formulario de login real, sin acceso de invitado visible — mismo patrón de bloqueo ya descartado para Superbancos Catastro/SENESCYT. Pendiente: reintentar `controlsanitario.gob.ec` más adelante (podría ser una caída transitoria, a diferencia de `inclusion.gob.ec` que lleva meses muerto) antes de descartar la "Base de Registros Emitidos" del todo.
 - [ ] Vivienda MIDUVI — dominio caído a nivel TLS, sin reemplazo encontrado; CKAN cubre parcialmente. → RESEARCH.md § Vivienda

@@ -4,6 +4,32 @@
 
 ### Added
 
+- **`get_metar` / `get_notam` / `get_sigmet`** — Ecuador's civil aviation AIS
+  (DGAC's IFIS, `ais.aviacioncivil.gob.ec`): aerodrome weather reports,
+  notices to airmen, and significant-weather advisories. Confirmed publicly
+  queryable with no login (only flight plans require auth); METAR/NOTAM/
+  SIGMET are genuinely high-frequency, so caches are short (5-10 min).
+- **`search_inamhi_capas` / `get_inamhi_capa_datos`** — INAMHI's geoportal
+  (`geoservicios.inamhi.gob.ec`), a GeoServer WMS/WFS instance: 222 spatial
+  layers cataloged (precipitation climate normals, rainfall anomalies, WRF
+  weather-model grids, watershed/administrative boundaries), 199 with real
+  queryable attribute data via WFS. No raw per-station observation layer
+  exists there — everything is polygon-aggregated.
+- **`list_seps_secciones` / `get_seps_seccion_archivos`** — SEPS's
+  statistics subdomain (`estadisticas.seps.gob.ec`), unaffected by the main
+  site's bot-blocking. 26 sections across SFPS/EPS statistics, including
+  the risk-rating agency bulletins (`sfps_reportes_calificacion_de_riesgos`).
+- **`search_cnig_femicidios`** — CNIG's (Consejo Nacional para la Igualdad
+  de Género) "Violencia" page, including the femicide/intentional-
+  homicide-of-women matrix plus 19 related gender-violence tables. The root
+  domain silently drops requests without an identifying User-Agent (same
+  pattern already seen on `seps.gob.ec`), which briefly looked like an
+  outage before the project's own UA resolved it.
+- **`search_bce_precios_comex`** — BCE's disaggregated foreign-trade
+  price-index pages (import prices by economic-use category, export prices
+  by individual product) — genuinely distinct from BCEData's aggregate
+  IPX/IPM/ITI series (`id_grupo=134`), which turned out to duplicate one of
+  the three candidate pages exactly.
 - **`get_tramite_estadisticas`** — monthly atenciones/quejas transparency
   series for one trámite (`gob.ec/api/v1/tramites-transparencia/{id}`),
   since mid-2021. No bulk endpoint; fetches one trámite's series at a time.

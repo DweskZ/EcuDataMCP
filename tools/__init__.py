@@ -18,6 +18,7 @@ from tools.get_contraloria_informe import register_get_contraloria_informe_tool
 from tools.get_contrato_info import register_get_contrato_info_tool
 from tools.get_dataset_info import register_get_dataset_info_tool
 from tools.get_financials import register_get_financials_tool
+from tools.get_inamhi_capa_datos import register_get_inamhi_capa_datos_tool
 from tools.get_indicador_bce import register_get_indicador_bce_tool
 from tools.get_inec_estadistica_files import register_get_inec_estadistica_files_tool
 from tools.get_inec_publicacion_archivos import (
@@ -25,9 +26,13 @@ from tools.get_inec_publicacion_archivos import (
 )
 from tools.get_informe_igepn import register_get_informe_igepn_tool
 from tools.get_institucion_info import register_get_institucion_info_tool
+from tools.get_metar import register_get_metar_tool
+from tools.get_notam import register_get_notam_tool
 from tools.get_organization_info import register_get_organization_info_tool
 from tools.get_regulacion_info import register_get_regulacion_info_tool
 from tools.get_resource_info import register_get_resource_info_tool
+from tools.get_seps_seccion_archivos import register_get_seps_seccion_archivos_tool
+from tools.get_sigmet import register_get_sigmet_tool
 from tools.get_sipa_modulo_archivos import register_get_sipa_modulo_archivos_tool
 from tools.get_sri_ruc_info import register_get_sri_ruc_info_tool
 from tools.get_superbancos_seccion_archivos import (
@@ -47,6 +52,7 @@ from tools.list_dataset_resources import register_list_dataset_resources_tool
 from tools.list_instituciones import register_list_instituciones_tool
 from tools.list_recent_datasets import register_list_recent_datasets_tool
 from tools.list_sat_tsunami import register_list_sat_tsunami_tool
+from tools.list_seps_secciones import register_list_seps_secciones_tool
 from tools.list_sipa_modulos import register_list_sipa_modulos_tool
 from tools.list_sri_saiku_cubes import register_list_sri_saiku_cubes_tool
 from tools.list_superbancos_secciones import register_list_superbancos_secciones_tool
@@ -62,15 +68,18 @@ from tools.search_anda import register_search_anda_tool
 from tools.search_auditores import register_search_auditores_tool
 from tools.search_bce_iem import register_search_bce_iem_tool
 from tools.search_bce_indices import register_search_bce_indices_tool
+from tools.search_bce_precios_comex import register_search_bce_precios_comex_tool
 from tools.search_bce_publicaciones import register_search_bce_publicaciones_tool
 from tools.search_bce_remesas import register_search_bce_remesas_tool
 from tools.search_biinec_extras import register_search_biinec_extras_tool
 from tools.search_censo_recursos import register_search_censo_recursos_tool
+from tools.search_cnig_femicidios import register_search_cnig_femicidios_tool
 from tools.search_companias import register_search_companias_tool
 from tools.search_contratos import register_search_contratos_tool
 from tools.search_datasets import register_search_datasets_tool
 from tools.search_ecuador import register_search_ecuador_tool
 from tools.search_eventos_riesgo import register_search_eventos_riesgo_tool
+from tools.search_inamhi_capas import register_search_inamhi_capas_tool
 from tools.search_indicadores_bce import register_search_indicadores_bce_tool
 from tools.search_inec_estadisticas import register_search_inec_estadisticas_tool
 from tools.search_inec_publicaciones import register_search_inec_publicaciones_tool
@@ -93,10 +102,15 @@ def register_tools(mcp: FastMCP) -> None:
     register_search_ecuador_tool(mcp)
     register_lookup_ubicacion_tool(mcp)
     register_search_eventos_riesgo_tool(mcp)
+    register_search_inamhi_capas_tool(mcp)
+    register_get_inamhi_capa_datos_tool(mcp)
     register_list_sat_tsunami_tool(mcp)
     register_search_sismos_tool(mcp)
     register_search_informes_igepn_tool(mcp)
     register_get_informe_igepn_tool(mcp)
+    register_get_metar_tool(mcp)
+    register_get_notam_tool(mcp)
+    register_get_sigmet_tool(mcp)
 
     register_search_datasets_tool(mcp)
     register_list_recent_datasets_tool(mcp)
@@ -138,6 +152,7 @@ def register_tools(mcp: FastMCP) -> None:
     register_get_inec_publicacion_archivos_tool(mcp)
     register_search_biinec_extras_tool(mcp)
     register_search_censo_recursos_tool(mcp)
+    register_search_cnig_femicidios_tool(mcp)
 
     register_search_regulaciones_tool(mcp)
     register_get_regulacion_info_tool(mcp)
@@ -147,6 +162,9 @@ def register_tools(mcp: FastMCP) -> None:
 
     register_list_superbancos_secciones_tool(mcp)
     register_get_superbancos_seccion_archivos_tool(mcp)
+
+    register_list_seps_secciones_tool(mcp)
+    register_get_seps_seccion_archivos_tool(mcp)
 
     register_list_sut_indicadores_tool(mcp)
     register_get_sut_indicador_schema_tool(mcp)
@@ -168,6 +186,7 @@ def register_tools(mcp: FastMCP) -> None:
     register_search_bce_indices_tool(mcp)
     register_get_bce_indice_archivo_tool(mcp)
     register_search_bce_remesas_tool(mcp)
+    register_search_bce_precios_comex_tool(mcp)
     register_list_bce_indicadores_diarios_tool(mcp)
     register_get_bce_indicador_diario_tool(mcp)
     register_get_cenace_tablero_tool(mcp)
