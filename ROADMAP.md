@@ -632,7 +632,19 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
   adivinada en el pase anterior. Construido como
   `search_infomies_bases_mensuales`/`search_infomies_boletines_zonales`
   (`helpers/infomies_client.py`).
-- [ ] Salarios mínimos sectoriales (tablas salariales por rama de actividad) — **a considerar, pedido por Daniel 2026-08-29**. Ya se investigó una vez (ver Trabajo/SUT arriba) y salió débil: no hay dominio propio del Consejo de Salarios (`consejosalarios.gob.ec` no resuelve), las tablas se publican como PDFs sueltos del ministerio con URLs impredecibles, y no se publicó tabla 2026 según cobertura de prensa (queda vigente la de 2025 por inacción). No descartado del todo — vale la pena una pasada dedicada a enumerar todos los PDFs históricos encontrables (por año/rama) antes de decidir si es viable como serie. → RESEARCH.md § Octava pasada
+- [x] Salarios mínimos sectoriales (tablas salariales por rama de actividad) — **a considerar, pedido por Daniel 2026-08-29**. Ya se investigó una vez (ver Trabajo/SUT arriba) y salió débil: no hay dominio propio del Consejo de Salarios (`consejosalarios.gob.ec` no resuelve), las tablas se publican como PDFs sueltos del ministerio con URLs impredecibles, y no se publicó tabla 2026 según cobertura de prensa (queda vigente la de 2025 por inacción). No descartado del todo — vale la pena una pasada dedicada a enumerar todos los PDFs históricos encontrables (por año/rama) antes de decidir si es viable como serie. → RESEARCH.md § Octava pasada
+  **Resuelto 2026-09-03, revirtiendo el veredicto "débil".** El hallazgo
+  nuevo: `trabajo.gob.ec/biblioteca/` (a diferencia de `/salario-basico/`
+  y `/tablas-sectoriales/`, que siguen sin responder) sí carga — una
+  página estática de ~2.3 MB con toda la biblioteca legal del ministerio,
+  cada documento real con un enlace estable `download.php?id=<N>`, lo que
+  sí permite enumerar por texto del título. Confirmado en vivo: una
+  entrada por año 2020-2025 (la mayoría con XLS/XLSX y PDF del anexo
+  firmado), nada antes de 2020, y sin tabla 2026 — el Acuerdo
+  MDT-2025-195 (2025-12-15) solo fijó el SBU en USD 482, la tabla
+  sectorial de 2025 sigue vigente por inacción según prensa (El Universo,
+  El Diario). Construido como `search_salarios_sectoriales`
+  (`helpers/salarios_sectoriales_client.py`).
 
 ## Cabos operativos sueltos
 

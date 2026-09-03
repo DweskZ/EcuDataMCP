@@ -4,6 +4,9 @@
 
 ### Added
 
+- **`search_salarios_sectoriales`** — sectoral minimum wage tables
+  (2020-2025), found via the ministry's document library page rather than
+  the unpredictable direct-PDF URLs a prior pass had ruled out.
 - **`search_trabajo_boletin_anual`** — Ministerio del Trabajo's annual
   labor-market report. Only 3 editions (2020-2022) are recoverable; the
   index page violates HTTP/1.1 (duplicated Transfer-Encoding headers), so

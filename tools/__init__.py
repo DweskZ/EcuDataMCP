@@ -111,6 +111,7 @@ from tools.search_minedec_matricula import register_search_minedec_matricula_too
 from tools.search_organizations import register_search_organizations_tool
 from tools.search_ranking import register_search_ranking_tool
 from tools.search_regulaciones import register_search_regulaciones_tool
+from tools.search_salarios_sectoriales import register_search_salarios_sectoriales_tool
 from tools.search_sgr_sitreps import register_search_sgr_sitreps_tool
 from tools.search_sismos import register_search_sismos_tool
 from tools.search_sri_datasets import register_search_sri_datasets_tool
@@ -196,6 +197,7 @@ def register_tools(mcp: FastMCP) -> None:
     register_search_infomies_bases_mensuales_tool(mcp)
     register_search_infomies_boletines_zonales_tool(mcp)
     register_search_trabajo_boletin_anual_tool(mcp)
+    register_search_salarios_sectoriales_tool(mcp)
 
     register_search_regulaciones_tool(mcp)
     register_get_regulacion_info_tool(mcp)
