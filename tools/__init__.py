@@ -99,6 +99,12 @@ from tools.search_inamhi_capas import register_search_inamhi_capas_tool
 from tools.search_indicadores_bce import register_search_indicadores_bce_tool
 from tools.search_inec_estadisticas import register_search_inec_estadisticas_tool
 from tools.search_inec_publicaciones import register_search_inec_publicaciones_tool
+from tools.search_infomies_bases_mensuales import (
+    register_search_infomies_bases_mensuales_tool,
+)
+from tools.search_infomies_boletines_zonales import (
+    register_search_infomies_boletines_zonales_tool,
+)
 from tools.search_informes_igepn import register_search_informes_igepn_tool
 from tools.search_mef_fiscal import register_search_mef_fiscal_tool
 from tools.search_minedec_matricula import register_search_minedec_matricula_tool
@@ -184,6 +190,8 @@ def register_tools(mcp: FastMCP) -> None:
     register_search_cnig_femicidios_tool(mcp)
     register_search_minedec_matricula_tool(mcp)
     register_search_mef_fiscal_tool(mcp)
+    register_search_infomies_bases_mensuales_tool(mcp)
+    register_search_infomies_boletines_zonales_tool(mcp)
 
     register_search_regulaciones_tool(mcp)
     register_get_regulacion_info_tool(mcp)

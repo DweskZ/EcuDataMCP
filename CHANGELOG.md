@@ -4,6 +4,11 @@
 
 ### Added
 
+- **`search_infomies_bases_mensuales` / `search_infomies_boletines_zonales`**
+  — infoMIES's (`info.desarrollohumano.gob.ec`) monthly databases (richer
+  than this project's existing quarterly CKAN coverage for the same
+  programs) and a newly-discovered, still-updated consolidated annual
+  report series, plus the discontinued per-zone bulletins.
 - **`get_sipa_resumen_indicadores`** — SIPA's "Resumen de Indicadores"
   monthly PDF listing (2018-2026), the one real item on a page whose other
   six named entries turned out to be either Tableau Server dashboards or
