@@ -237,6 +237,7 @@ name = "ecuador-mcp"
 version = "0.8.5"
 source = { editable = "." }
 dependencies = [
+    { name = "certifi" },
     { name = "httpx" },
     { name = "mcp" },
     { name = "odfpy" },
@@ -257,6 +258,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "certifi" },
     { name = "httpx", specifier = ">=0.28.0" },
     { name = "mcp", specifier = ">=1.25.0,<2" },
     { name = "odfpy", specifier = ">=1.4.1" },

@@ -172,9 +172,9 @@ async def download_bytes(
         except httpx.ConnectError as exc:
             if should_retry_with_os_trust(exc, url):
                 logger.warning(
-                    "TLS verification failed for %s against the bundled CA "
-                    "store; retrying against the OS trust store (still "
-                    "fully verified)",
+                    "TLS verification failed for %s: server didn't send its "
+                    "intermediate CA; retrying with it bundled locally "
+                    "(still fully verified)",
                     url,
                 )
                 async with httpx.AsyncClient(
@@ -802,9 +802,9 @@ async def _fetch_range(
         except httpx.ConnectError as exc:
             if should_retry_with_os_trust(exc, url):
                 logger.warning(
-                    "TLS verification failed for %s against the bundled CA "
-                    "store; retrying against the OS trust store (still "
-                    "fully verified)",
+                    "TLS verification failed for %s: server didn't send its "
+                    "intermediate CA; retrying with it bundled locally "
+                    "(still fully verified)",
                     url,
                 )
                 async with httpx.AsyncClient(

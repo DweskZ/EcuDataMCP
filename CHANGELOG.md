@@ -47,6 +47,15 @@
 
 ### Fixed
 
+- **TLS fallback for `cenace.gob.ec`/`censoecuador.gob.ec`/`superbancos.gob.ec`**
+  — these hosts never send their intermediate CA certificate in the TLS
+  handshake. The previous fallback (retry against the OS trust store)
+  worked on a developer machine but failed the same way on a clean GitHub
+  Actions Linux runner, breaking the daily smoke test (`get_cenace_tablero`).
+  Fixed by bundling the two missing Sectigo intermediates directly
+  (`helpers/certs/sectigo_public_server_auth_intermediates.pem`) and
+  building the retry context from certifi's roots plus that bundle instead
+  — deterministic across platforms.
 - **IEM legacy ZIP era** — some pre-2016 bulletin ZIP members keep a legacy
   `.xls` filename while actually containing a modern XLSX payload, which made
   `xlrd` fail outright; `get_bce_iem_table` now sniffs the bytes instead of

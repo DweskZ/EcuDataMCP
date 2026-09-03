@@ -1,6 +1,9 @@
 import os
 import ssl
+from pathlib import Path
 from urllib.parse import urlparse
+
+import certifi
 
 # Portal domains known to ship an expired/broken cert. Keep this narrow so
 # third-party resource hosts are never silently downgraded.
@@ -61,23 +64,42 @@ def should_retry_insecure(exc: BaseException, url: str) -> bool:
     return host_allows_insecure_tls(url) and is_cert_verification_error(exc)
 
 
-# Hosts whose certificate chain verifies fine against the OS trust store but
-# not against httpx's bundled certifi CAs -- a missing intermediate CA in
-# certifi, not a broken/expired/self-signed cert. Verified for
-# www.censoecuador.gob.ec: a raw ssl.create_default_context() (which reads
-# the OS store, no cafile override) handshake succeeds where httpx's
-# certifi-only default fails with CERTIFICATE_VERIFY_FAILED. Unlike
-# _INSECURE_TLS_HOST_SUFFIXES, this keeps full certificate verification on --
-# not a security downgrade, so it isn't gated behind CKAN_INSECURE_TLS and
-# is kept in its own list rather than merged with either existing one.
-# superbancos.gob.ec and cenace.gob.ec have the same failure mode, confirmed
-# the same way.
+# Hosts whose server never sends its intermediate CA certificate in the TLS
+# handshake -- a real server misconfiguration, not a broken/expired/
+# self-signed leaf cert. certifi already trusts the root each of these
+# chains up to ("Sectigo Public Server Authentication Root R46", confirmed
+# live for all three below); only the intermediate is missing, so it's
+# bundled locally (helpers/certs/sectigo_public_server_auth_intermediates.pem,
+# both the DV R36 and OV R36 intermediates Sectigo issues under that root)
+# and loaded alongside certifi's roots instead.
+#
+# This used to retry against ssl.create_default_context()'s OS trust store
+# instead -- that worked on a developer's own Windows/macOS machine (which
+# opportunistically fetches and caches a missing intermediate via the AIA
+# extension during verification) but confirmed FAILING the same way on a
+# clean GitHub Actions Linux runner 2026-09-02 (get_cenace_tablero smoke-test
+# failure: OpenSSL/Linux does not do AIA chasing, and a fresh runner's
+# ca-certificates package doesn't have this specific intermediate cached
+# either). Bundling the intermediate explicitly is deterministic across
+# platforms instead of depending on OS-specific, non-guaranteed behavior.
+# Unlike _INSECURE_TLS_HOST_SUFFIXES, this keeps full certificate
+# verification on -- not a security downgrade, so it isn't gated behind
+# CKAN_INSECURE_TLS and is kept in its own list rather than merged with
+# either existing one. censoecuador.gob.ec and superbancos.gob.ec use the DV
+# and OV R36 intermediates respectively; cenace.gob.ec uses DV R36 too.
 _OS_TRUST_HOST_SUFFIXES = ("censoecuador.gob.ec", "superbancos.gob.ec", "cenace.gob.ec")
+
+_INTERMEDIATE_BUNDLE_PATH = (
+    Path(__file__).parent / "certs" / "sectigo_public_server_auth_intermediates.pem"
+)
 
 
 def host_needs_os_trust_store(url: str) -> bool:
-    """Return True only for hosts known to need the OS trust store instead
-    of httpx's bundled certifi CAs (still fully verified either way)."""
+    """Return True only for hosts known to need the bundled intermediate CA
+    instead of httpx's bundled certifi CAs alone (still fully verified
+    either way). Name kept for backward compatibility even though the fix
+    is no longer literally "the OS trust store" -- see the comment above
+    _OS_TRUST_HOST_SUFFIXES."""
     host = (urlparse(url).hostname or "").lower()
     if not host:
         return False
@@ -87,18 +109,22 @@ def host_needs_os_trust_store(url: str) -> bool:
 
 
 def should_retry_with_os_trust(exc: BaseException, url: str) -> bool:
-    """True when a cert failure on an allowlisted host may be retried against
-    the OS trust store -- still fully verified, just a different CA bundle."""
+    """True when a cert failure on an allowlisted host may be retried with
+    the bundled intermediate CA -- still fully verified, just a complete
+    chain this time."""
     return host_needs_os_trust_store(url) and is_cert_verification_error(exc)
 
 
 def os_trust_context() -> ssl.SSLContext:
-    """Full certificate verification via the OS trust store instead of
-    httpx's bundled certifi CAs. Build fresh per use, same reasoning as
-    legacy_cipher_context(): SSLContext isn't guaranteed safe to share
-    across concurrent connections.
+    """Full certificate verification via certifi's CA roots plus the
+    intermediate CA certificates these specific hosts fail to send
+    themselves (see the comment above _OS_TRUST_HOST_SUFFIXES). Build fresh
+    per use, same reasoning as legacy_cipher_context(): SSLContext isn't
+    guaranteed safe to share across concurrent connections.
     """
-    return ssl.create_default_context()
+    ctx = ssl.create_default_context(cafile=certifi.where())
+    ctx.load_verify_locations(cafile=str(_INTERMEDIATE_BUNDLE_PATH))
+    return ctx
 
 
 # Hosts that fail the TLS handshake outright under OpenSSL 3's default

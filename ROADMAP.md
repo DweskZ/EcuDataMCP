@@ -526,6 +526,27 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
 ## Cabos operativos sueltos
 
 - [x] Renovación de certificado TLS.
+- [x] **`helpers/tls.py` — fallback "OS trust store" reemplazado por CA
+      intermedia embebida, 2026-09-02.** El smoke test diario falló en vivo
+      (`get_cenace_tablero`, ejecución del 2026-09-02T13:38 en GitHub
+      Actions) con `CERTIFICATE_VERIFY_FAILED`. Diagnóstico con
+      `openssl s_client`: `cenace.gob.ec`/`censoecuador.gob.ec` (Sectigo
+      "Public Server Authentication CA DV R36") y `superbancos.gob.ec`
+      (mismo emisor, variante "OV R36") nunca envían su CA intermedia en el
+      handshake — un error real de configuración del servidor, no un
+      certificado roto. El fallback anterior (`ssl.create_default_context()`
+      sin `cafile`, "OS trust store") funcionaba en una máquina de
+      desarrollo (Windows/macOS completan la cadena automáticamente vía la
+      extensión AIA) pero fallaba igual en un runner Linux limpio de GitHub
+      Actions, que no hace ese fetch. Corregido: las dos CAs intermedias
+      (confirmado que ambas encadenan a la misma raíz ya confiable en
+      certifi, "Sectigo Public Server Authentication Root R46") se
+      descargaron y se embebieron en
+      `helpers/certs/sectigo_public_server_auth_intermediates.pem`;
+      `os_trust_context()` ahora construye el contexto desde
+      `certifi.where()` + ese bundle, determinista en cualquier plataforma.
+      Verificado en vivo contra los tres hosts tras el cambio. `certifi`
+      pasó a dependencia explícita (antes solo transitiva vía `httpx`).
 
 ## Calidad de búsqueda y detección de series
 
