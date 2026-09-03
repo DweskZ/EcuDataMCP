@@ -24,6 +24,7 @@ from tools.get_inec_estadistica_files import register_get_inec_estadistica_files
 from tools.get_inec_publicacion_archivos import (
     register_get_inec_publicacion_archivos_tool,
 )
+from tools.get_ineval_familia_archivos import register_get_ineval_familia_archivos_tool
 from tools.get_informe_igepn import register_get_informe_igepn_tool
 from tools.get_institucion_info import register_get_institucion_info_tool
 from tools.get_metar import register_get_metar_tool
@@ -32,6 +33,10 @@ from tools.get_organization_info import register_get_organization_info_tool
 from tools.get_regulacion_info import register_get_regulacion_info_tool
 from tools.get_resource_info import register_get_resource_info_tool
 from tools.get_seps_seccion_archivos import register_get_seps_seccion_archivos_tool
+from tools.get_sgr_biblioteca_categoria_archivos import (
+    register_get_sgr_biblioteca_categoria_archivos_tool,
+)
+from tools.get_sgr_sitrep_archivos import register_get_sgr_sitrep_archivos_tool
 from tools.get_sigmet import register_get_sigmet_tool
 from tools.get_sipa_modulo_archivos import register_get_sipa_modulo_archivos_tool
 from tools.get_sri_ruc_info import register_get_sri_ruc_info_tool
@@ -49,10 +54,14 @@ from tools.list_capabilities import register_list_capabilities_tool
 from tools.list_categories import register_list_categories_tool
 from tools.list_contraloria_informes import register_list_contraloria_informes_tool
 from tools.list_dataset_resources import register_list_dataset_resources_tool
+from tools.list_ineval_familias import register_list_ineval_familias_tool
 from tools.list_instituciones import register_list_instituciones_tool
 from tools.list_recent_datasets import register_list_recent_datasets_tool
 from tools.list_sat_tsunami import register_list_sat_tsunami_tool
 from tools.list_seps_secciones import register_list_seps_secciones_tool
+from tools.list_sgr_biblioteca_categorias import (
+    register_list_sgr_biblioteca_categorias_tool,
+)
 from tools.list_sipa_modulos import register_list_sipa_modulos_tool
 from tools.list_sri_saiku_cubes import register_list_sri_saiku_cubes_tool
 from tools.list_superbancos_secciones import register_list_superbancos_secciones_tool
@@ -65,6 +74,10 @@ from tools.query_sri_saiku_aggregate import register_query_sri_saiku_aggregate_t
 from tools.query_sut_indicador import register_query_sut_indicador_tool
 from tools.read_pdf import register_read_pdf_tool
 from tools.search_anda import register_search_anda_tool
+from tools.search_arcotel_boletines import register_search_arcotel_boletines_tool
+from tools.search_arcotel_reportes_mensuales import (
+    register_search_arcotel_reportes_mensuales_tool,
+)
 from tools.search_auditores import register_search_auditores_tool
 from tools.search_bce_iem import register_search_bce_iem_tool
 from tools.search_bce_indices import register_search_bce_indices_tool
@@ -84,9 +97,12 @@ from tools.search_indicadores_bce import register_search_indicadores_bce_tool
 from tools.search_inec_estadisticas import register_search_inec_estadisticas_tool
 from tools.search_inec_publicaciones import register_search_inec_publicaciones_tool
 from tools.search_informes_igepn import register_search_informes_igepn_tool
+from tools.search_mef_fiscal import register_search_mef_fiscal_tool
+from tools.search_minedec_matricula import register_search_minedec_matricula_tool
 from tools.search_organizations import register_search_organizations_tool
 from tools.search_ranking import register_search_ranking_tool
 from tools.search_regulaciones import register_search_regulaciones_tool
+from tools.search_sgr_sitreps import register_search_sgr_sitreps_tool
 from tools.search_sismos import register_search_sismos_tool
 from tools.search_sri_datasets import register_search_sri_datasets_tool
 from tools.search_sri_estadisticas_recaudacion import (
@@ -102,6 +118,10 @@ def register_tools(mcp: FastMCP) -> None:
     register_search_ecuador_tool(mcp)
     register_lookup_ubicacion_tool(mcp)
     register_search_eventos_riesgo_tool(mcp)
+    register_search_sgr_sitreps_tool(mcp)
+    register_get_sgr_sitrep_archivos_tool(mcp)
+    register_list_sgr_biblioteca_categorias_tool(mcp)
+    register_get_sgr_biblioteca_categoria_archivos_tool(mcp)
     register_search_inamhi_capas_tool(mcp)
     register_get_inamhi_capa_datos_tool(mcp)
     register_list_sat_tsunami_tool(mcp)
@@ -111,6 +131,9 @@ def register_tools(mcp: FastMCP) -> None:
     register_get_metar_tool(mcp)
     register_get_notam_tool(mcp)
     register_get_sigmet_tool(mcp)
+
+    register_list_ineval_familias_tool(mcp)
+    register_get_ineval_familia_archivos_tool(mcp)
 
     register_search_datasets_tool(mcp)
     register_list_recent_datasets_tool(mcp)
@@ -146,6 +169,9 @@ def register_tools(mcp: FastMCP) -> None:
     register_get_anda_survey_info_tool(mcp)
     register_download_anda_microdata_tool(mcp)
 
+    register_search_arcotel_reportes_mensuales_tool(mcp)
+    register_search_arcotel_boletines_tool(mcp)
+
     register_search_inec_estadisticas_tool(mcp)
     register_get_inec_estadistica_files_tool(mcp)
     register_search_inec_publicaciones_tool(mcp)
@@ -153,6 +179,8 @@ def register_tools(mcp: FastMCP) -> None:
     register_search_biinec_extras_tool(mcp)
     register_search_censo_recursos_tool(mcp)
     register_search_cnig_femicidios_tool(mcp)
+    register_search_minedec_matricula_tool(mcp)
+    register_search_mef_fiscal_tool(mcp)
 
     register_search_regulaciones_tool(mcp)
     register_get_regulacion_info_tool(mcp)

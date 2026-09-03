@@ -4,6 +4,30 @@
 
 ### Added
 
+- **`list_ineval_familias` / `get_ineval_familia_archivos`** — INEVAL's
+  national exam-evaluation archive (`evaluaciones.evaluacion.gob.ec/BI/`):
+  9 families (Ser Bachiller, Ser Estudiante ×4, Ser Maestro ×2, Ser
+  Profesional, Llece/ERCE-SERCE-TERCE), 557 confirmed download links, no
+  login. The site's own top nav links to a decoy informational page for at
+  least one family (`historico-ser-bachiller`) — the real data page lives
+  at a different, otherwise-undiscoverable slug.
+- **`search_arcotel_reportes_mensuales` / `search_arcotel_boletines`** —
+  ARCOTEL's institutional-site PDF series (outside its frozen-since-2021
+  CKAN org): monthly telecom statistics (2017-2026) and annual/topical
+  bulletins (2015-2024).
+- **`search_mef_fiscal`** — MEF/MDEP's SPNF fiscal-operations workbook
+  archive (GFSM methodology, 76 files, 2025-2026 publications) plus SENAE's
+  stale-but-real customs-collection breakdown by levy type (2012-2021).
+- **`search_minedec_matricula`** — MINEDEC's historical basic-education
+  (K-12) enrollment registry, 2009-present, distinct from this project's
+  existing SENESCYT/higher-education CKAN coverage.
+- **`search_sgr_sitreps` / `get_sgr_sitrep_archivos` /
+  `list_sgr_biblioteca_categorias` / `get_sgr_biblioteca_categoria_archivos`**
+  — SGR's document archive (`gestionderiesgos.gob.ec`), distinct from the
+  existing live ArcGIS snapshot: 54 historical adverse-event dossiers
+  (2016-2026) with their SITREP PDFs, plus a 19-category, ~1660-document
+  library (some links 404 — surfaced as a candidate catalog, not a
+  guarantee).
 - **`get_metar` / `get_notam` / `get_sigmet`** — Ecuador's civil aviation AIS
   (DGAC's IFIS, `ais.aviacioncivil.gob.ec`): aerodrome weather reports,
   notices to airmen, and significant-weather advisories. Confirmed publicly

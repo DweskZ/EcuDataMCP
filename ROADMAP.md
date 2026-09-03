@@ -408,20 +408,87 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
 - [ ] Sector eléctrico — **`sisdatbi.arconel.gob.ec` (SISDAT BI), revisitar**. Descartado en la Octava pasada como "sistema BI interno con login", pero no se profundizó más allá de la pantalla de login — pedido explícito de Daniel 2026-08-30: confirmar si hay un modo público/embed (dashboards Power BI a veces exponen un `reportEmbed`/iframe público sin credenciales, o un rol de "invitado"), si el login es realmente obligatorio para todo contenido o solo para ciertos tableros, y si hay una API REST detrás del BI que no requiera la sesión del portal. Tratar como sospecha sin confirmar, no como bloqueo definitivo.
 - [ ] Sector eléctrico — **CELEC EP: reportes propios de transparencia/rendición de cuentas**, pedido explícito de Daniel 2026-08-30. CELEC (generación) es distinta de CENACE/ARCONEL/CNEL, ya evaluadas; no se ha confirmado todavía si sus informes de rendición de cuentas/LOTAIP están en `celec.gob.ec` como PDFs sueltos, en un portal de transparencia separado, o si ya están cubiertos indirectamente por la organización CKAN de CENACE. Investigar desde cero: URL del portal, formato, frecuencia, y si duplica algo de lo que ya expone CENACE Biblioteca.
 - [x] Sector eléctrico — **CENACE: `www.cenace.gob.ec/info-operativa/InformacionOperativa.htm`** → `helpers/cenace_client.py`, `get_cenace_tablero`. Confirmado con browser (network tab vacío en los 5 cambios de pestaña): la página entera es server-rendered en una sola carga, sin AJAX — 5 tableros fijos (produccion_tiempo_real, demanda_tiempo_real, operativa_diaria, acumulada_mensual, acumulada_anual), cada uno un snapshot "a este instante" (hoy/ayer/mes a la fecha/año a la fecha) sin selector de fecha y sin serie histórica real detrás — confirmado que no la hay, no solo "sin confirmar". Extrae los 6 números de resumen (producción total/exportación/importación/hidráulica/térmica/renovable no convencional, o el equivalente de demanda) desde `<div class="resumen-box">`, más el desglose por distribuidora (19 empresas eléctricas/CNEL) desde los `<title>` del mapa SVG en demanda_tiempo_real. Deliberadamente no se extrae el desglose por planta/tipo de combustible ni la curva horaria de 24h — ambos solo viven dentro de blobs `Plotly.newPlot(...)` envueltos en una plantilla de tema compartida de 15+ KB; los 6 números de resumen ya cubren el valor real del tablero (mezcla de generación y demanda en vivo). `www.cenace.gob.ec` necesitó el mismo fallback OS-trust-store que `censoecuador.gob.ec`/`superbancos.gob.ec` (cadena de certificado le falta una CA intermedia en el bundle de certifi, no un cert roto). TTL de caché corto (180s) porque el tablero "tiempo real" cambia constantemente.
-- [ ] CNT/ARCOTEL (telecomunicaciones) — **dominio nuevo**. ARCOTEL ya tiene org CKAN (9 datasets, pero congelada desde 2021/2022) y CNT también (2 datasets, frescos). El hallazgo real está fuera de CKAN: Reportes Estadísticos Mensuales de ARCOTEL (PDF, serie completa 2023-2026, ~4 meses de rezago) — solo PDF, sin CSV/API. → RESEARCH.md § Octava pasada
+- [x] CNT/ARCOTEL (telecomunicaciones) — **dominio nuevo**. ARCOTEL ya tiene org CKAN (9 datasets, pero congelada desde 2021/2022) y CNT también (2 datasets, frescos). El hallazgo real está fuera de CKAN: Reportes Estadísticos Mensuales de ARCOTEL (PDF, serie completa 2023-2026, ~4 meses de rezago) — solo PDF, sin CSV/API. → RESEARCH.md § Octava pasada
+  **Resuelto 2026-09-03.** Confirmado en vivo: `www.arcotel.gob.ec` es HTML
+  estático plano (tema WordPress "Sitio-32", sin JS/acordeón). **Reportes
+  Estadísticos Mensuales** (`/reportes-estadisticos-mensuales/`): serie
+  ene-2017 a jun-2026, ~2 meses de rezago (mejor que el ~4 estimado antes).
+  **Boletín Estadístico** (`/boletines-estadisticos/`, URL no confirmada en
+  el pase anterior — `/boletin-estadistico/` redirige aquí): serie
+  anual/temática 2015-2024. Ambas solo PDF, sin login/captcha. Construido
+  como `search_arcotel_reportes_mensuales`/`search_arcotel_boletines`
+  (`helpers/arcotel_client.py`).
 - [x] IG-EPN — `servicios/busqueda-informes` (`search_informes_igepn`/`get_informe_igepn`, `helpers/igepn_informes_client.py`), construido 2026-08-31. Resultó ser bastante más complejo de lo que sugería la descripción original ("buscador filtrable por tipo/volcán/fecha, sin login visible"): la página es una app JSF/PrimeFaces separada en `informes.igepn.edu.ec`, sin URL estable por documento — cada descarga requiere una sesión (`javax.faces.ViewState` + cookie), un POST AJAX de "Buscar" que re-renderiza la lista con un ViewState nuevo, y un POST plano del botón "Descargar Informe" de esa fila reusando la misma sesión. Confirmado en vivo extremo a extremo, incluida una descarga PDF real y extracción de texto. Hallazgo real durante la construcción: los filtros "Tipo de informe" y "Volcán" del propio sitio **no acotan resultados en el servidor** — confirmado repitiendo el payload AJAX exacto de un browser real capturado con un hook a `jQuery.ajax`, byte a byte, y aun así obteniendo resultados mezclados de todos los volcanes. Solo "Tipo" (Sísmico/Volcánico) y "Año" filtran de verdad; `search_informes_igepn` solo envía esos dos y filtra el resto client-side sobre la página más reciente (mismo patrón de `search_sismos`: reciente y no exhaustivo, no una cobertura completa), documentándolo en la propia respuesta. `helpers/pdf_reader.py` ganó `extract_text_from_bytes()` (separado de `read_pdf`) para no duplicar el manejo de pypdf en un flujo que, a diferencia de cualquier otro PDF de este proyecto, nunca tuvo URL.
-- [ ] SGR — archivo de "Informes de Situación" (SITREP, 2016-2026) y "Biblioteca" (mapas de amenaza/vulnerabilidad, rutas de evacuación) en `gestionderiesgos.gob.ec`, fuera del snapshot ArcGIS ya integrado. Formato exacto por confirmar. → RESEARCH.md § Séptima pasada
+- [x] SGR — archivo de "Informes de Situación" (SITREP, 2016-2026) y "Biblioteca" (mapas de amenaza/vulnerabilidad, rutas de evacuación) en `gestionderiesgos.gob.ec`, fuera del snapshot ArcGIS ya integrado. Formato exacto por confirmar. → RESEARCH.md § Séptima pasada
+  **Resuelto 2026-09-03.** `gestionderiesgos.gob.ec` (sitio WordPress,
+  distinto del backend ArcGIS de `helpers/sgr_client.py`) tiene un índice
+  plano de 54 eventos adversos 2016-2026 con estado (EN CURSO/CERRADO/EN
+  OBSERVACIÓN) — cada evento enlaza a su propia página con los PDFs SITREP
+  reales, organizados por encabezados Nacional/Provincial/Cantonal (el
+  evento "Época Lluviosa 2026", aún abierto, tiene 700+ PDFs). Biblioteca
+  (`/biblioteca/`) es un acordeón `download-monitor` (mismo patrón de
+  `helpers/cnig_client.py`) con anidamiento real: 19 categorías de primer
+  nivel, varias con subcategorías por provincia, ~1660 documentos —
+  resoluciones, planes de contingencia, mapas de amenaza y rutas de
+  evacuación por tsunami. Hallazgo real: una parte de los enlaces de
+  Biblioteca da 404 en vivo, sin patrón claro por rango de id ni categoría
+  — se expone como catálogo candidato, no garantía de descarga; el formato
+  se reporta desconocido porque `download.php` no lleva extensión.
+  Construido como `search_sgr_sitreps`/`get_sgr_sitrep_archivos`/
+  `list_sgr_biblioteca_categorias`/`get_sgr_biblioteca_categoria_archivos`
+  (`helpers/sgr_publicaciones_client.py`).
 - [ ] SIPA — geoportal (`geoportal.agricultura.gob.ec`, solo HTTP) corre un backend GeoServer WMS completo (uso de suelo, suelos, riesgos agroclimáticos, catastro rural), mucho más allá de las ortofotos ya anotadas — falta confirmar si expone WFS para exportar vectores, no solo teselas de mapa. Los boletines nacionales (Panorama Agroestadístico y similares) son PDFs directos, sin fricción. Los tableros "Cifras Agroproductivas/Territoriales" están confirmados rotos en producción — no perseguir. → RESEARCH.md § Séptima pasada
 - [ ] SIPA — **`sipa.agricultura.gob.ec/index.php/sipa-estadisticas/tablero-dinamico/indicadores-sectoriales`, encontrado 2026-08-31**, distinto de los 4 módulos "estadisticas-descargas" ya cubiertos por `helpers/sipa_client.py`. Página real (título "Indicadores Sectoriales"), con nav propio hacia "Indicador Agroeconómico", "Indicador Agrosocial", "Informe de Rendimientos Objetivos" (arroz), "Hoja de Balance de Alimentos", "Atlas Agroeconómico del Ecuador", "Panorama Agroeconómico" — sin confirmar todavía si son PDFs directos (como los boletines ya cubiertos) o un tablero interactivo tipo Power BI/Tableau que necesitaría el mismo tipo de descifrado que SUT.
 - [ ] Ministerio de Salud Pública (`salud.gob.ec`) — dominio confirmado vivo con contenido real (barrido de endpoints 2026-08-29), sección de transparencia/LOTAIP presente, pero sin sección de estadísticas/datos abiertos visible en la portada — no se profundizó más allá de confirmar que el sitio está vivo, falta una pasada de contenido completa. → RESEARCH.md § Séptima pasada
 - [ ] Registro Oficial (gaceta oficial) — candidato de alta prioridad para búsqueda por fecha; posiblemente no relevante, ver nota de alcance. → RESEARCH.md § Datos legislativos
-- [ ] INEVAL — exámenes nacionales (Ser Bachiller/ENES, Ser Estudiante, Ser Maestro...), archivo real sin login/captcha. → RESEARCH.md § INEVAL
+- [x] INEVAL — exámenes nacionales (Ser Bachiller/ENES, Ser Estudiante, Ser Maestro...), archivo real sin login/captcha. → RESEARCH.md § INEVAL
+  **Resuelto 2026-09-02/03.** `evaluaciones.evaluacion.gob.ec/BI/` — 9
+  familias reales con datos descargables (Ser Bachiller, Ser Estudiante +3
+  variantes, Ser Maestro +Recategorización, Ser Profesional, Llece/ERCE-
+  SERCE-TERCE), cada una un acordeón Bootstrap estático (sin JS) con
+  paneles por año lectivo/calendario y tablas de enlaces por
+  dataset×formato — 557 enlaces de descarga confirmados en total, sin
+  login/CAPTCHA. **Corrección a la investigación previa:** el slug de
+  navegación `historico-ser-bachiller` es una página informativa señuelo
+  sin descargas; la página real de datos usa un slug distinto
+  (`ser-bachiller-2`), solo descubrible desde el hub "Categoría Bases de
+  Datos" del sitio — cada familia se verificó independientemente así.
+  Gotcha real: `ser-maestro-2` esconde una fila `<tr>` obsoleta dentro de
+  un comentario HTML, idéntica a la fila vigente — el parser descarta
+  comentarios antes de procesar. Construido como
+  `list_ineval_familias`/`get_ineval_familia_archivos`
+  (`helpers/ineval_client.py`).
 - [x] Superbancos — `list_superbancos_secciones`/`get_superbancos_seccion_archivos` (`helpers/superbancos_client.py`), construido 2026-08-30. Cubre Boletines Financieros Mensuales, Servicios Financieros, Información Histórica (comportamiento financiero anual + Reporte de Estabilidad Financiera) y Calendario Estadístico.
 - [x] Superbancos — **widget OneDrive de Boletines Financieros, descifrado 2026-08-30 (pedido explícito de Daniel: "fix!").** El diagnóstico inicial de "URLs firmadas de corta duración, no descifrable sin más" era incorrecto — se resolvió conduciendo el widget real en un browser (`mcp__Claude_Browser__*`), capturando el POST que dispara (`wp-admin/admin-ajax.php`, `action=shareonedrive-get-filelist`) con `listtoken`/`account_id`/`drive_id` (atributos `data-*` del propio widget) y `_ajax_nonce` (`ShareoneDrive_vars.refresh_nonce` inline en la página) — los cuatro valores están en el HTML estático de la página, sin sesión ni cookies, confirmado replicando la llamada con `httpx.post` puro. Las URLs de descarga que devuelve son un proxy same-site (`action=shareonedrive-download`) estable, no un token de Microsoft Graph de corta duración — otra suposición incorrecta corregida. `boletines_financieros` ahora trae 224 archivos verificados en vivo: 1997-2008 desde la tabla estática + carpetas "Año 2009"…"Año 2026" (12 boletines/año, 2026 con los meses publicados hasta la fecha) desde OneDrive, con nombre, tamaño y fecha de modificación reales. Un bug real de extracción (el nombre se tomaba del `data-name` del `<div>` contenedor, que no lleva extensión, en vez del `data-name` del propio `<a>` de descarga) se detectó revisando la salida real end-to-end, no solo por los tests, y se corrigió antes de cerrar el ítem.
 - [x] **Superbancos — `servicios_financieros` sus 3 widgets OneDrive conectados 2026-08-31, pedido explícito de Daniel ("Let's do 1").** El tercer widget sin encabezado identificado resultó ser "Estadísticas Generales" (encabezado real, hallado ampliando la ventana de búsqueda a 5000 caracteres) — 9 categorías numeradas (A06, A09, A10, A12, POS/A13, Puntos de Atención/C71, Gestión de Cobranzas, Recaudación de Pagos a Terceros, Retiros de Dinero), cada una organizada por año. Es la consolidación "Estadísticas Puntos de Atención" que la propia página dice reemplazó las tablas estáticas desde mayo 2021. Los otros dos widgets también resueltos: "Solicitudes de Servicios Financieros, Canales y Medios de Pago" (plantillas de formularios de registro, no series) y "Resoluciones de Servicios Financieros, Tarjetas y Canales" — **esto cierra el ítem de abajo, "Resoluciones y Circulares AJAX-blocked", que llevaba mucho tiempo marcado sin resolver.** A diferencia de boletines (carpetas planas "Año NNNN"), la llamada raíz del widget aquí ya devuelve el árbol COMPLETO con punteros a padre (confirmado en vivo) — se generalizó el crawler (`_wpcp_crawl_tree`) para recorrer cualquier profundidad en vez de asumir un solo nivel, y cada resultado lleva el breadcrumb completo como `grupo` (varias categorías reutilizan nombres de subcarpeta como "Otros Años", así que el nombre solo sin el camino completo sería ambiguo). Total: 312 archivos en `servicios_financieros` (antes ~68 solo estático). **Bug real encontrado y corregido en el proceso** (detectado revisando la salida real, no solo que el regex matcheara): el enlace "entry_link" que el parser usaba cambia de clase según si OneDrive puede previsualizar el archivo en línea (`entry_action_download` para ZIP, `ilightbox-group` para XLSX/PDF) — como casi todo en este widget es XLSX, el regex anterior (anclado a una sola variante) descartaba silenciosamente ~35% de los archivos reales con una advertencia fácil de pasar por alto. Corregido apuntando al botón de descarga dedicado (`class='entry_action_download '`, sin prefijo "entry_link"), presente y con la misma forma para cualquier tipo de archivo — también más simple, su propio atributo `download='...'` da el nombre con extensión directamente. → RESEARCH.md § Décima pasada
 - [ ] Superbancos — Balances Generales/Patrimonio Técnico/indicadores de morosidad-liquidez-solvencia siguen sin resolver — a diferencia de Resoluciones (arriba, ya resuelto), estos viven detrás de una herramienta de consulta propia, no de un widget OneDrive, y probablemente necesitan una pasada con browser para confirmar si son automatizables. Catastro de Compañías bloqueado por login, descartado. → RESEARCH.md § Séptima pasada
-- [ ] MEF — workbook fiscal (recaudación arancelaria y series GFSM 2013-2026, actualizado mensualmente). → RESEARCH.md § Recaudación arancelaria
-- [ ] MINEDEC — registro histórico de matrícula básica 2009-2025. → RESEARCH.md § Sitios de ministerios individuales
+- [x] MEF — workbook fiscal (recaudación arancelaria y series GFSM 2013-2026, actualizado mensualmente). → RESEARCH.md § Recaudación arancelaria
+  **Resuelto 2026-09-03.** `finanzas.gob.ec/estadistica-nueva-metodologia-
+  2017-2022/` redirige a `www.economicoproductivo.gob.ec/...` (el host
+  viejo presenta un certificado TLS para el dominio nuevo, mismatch real).
+  **No es un solo workbook** como asumió el pase anterior — es un archivo
+  corriente de 76 XLSX reales (Ingresos y Gastos, Activos y Pasivos, BLL,
+  Financiamiento SPNF), publicaciones 2025-01 a 2026-09, metodología GFSM.
+  Se agregó también SENAE (`www.aduana.gob.ec/de-interes/tributos-
+  recaudados/` — sin `www` no resuelve): 60 archivos confirmados, sin
+  cambios desde el pase anterior (2012-2021, ADVALOREM/FODINFA/IVA/ICE/
+  OTROS TRIBUTOS/TOTALES) — incluido pese a estar desactualizado porque es
+  la única fuente con desglose por tipo de gravamen. Ambos expuestos vía
+  `search_mef_fiscal(fuente="mef"|"senae")` (`helpers/mef_fiscal_client.py`).
+  Ojo con el alcance: "Arancelarios"/"ADVALOREM" son solo el arancel, más
+  chico que la "recaudación aduanera" total que cita la prensa.
+- [x] MINEDEC — registro histórico de matrícula básica 2009-2025. → RESEARCH.md § Sitios de ministerios individuales
+  **Resuelto 2026-09-03.** `educacion.gob.ec/datos-abiertos-minedec/`
+  (WordPress/Elementor, no CKAN) expone 5 archivos reales, no los 2
+  implicados por el patrón de nombre asumido antes: dos registros XLSX
+  grandes (`...2009-202X-Inicio.xlsx` ~139 MB — "202X" es un placeholder
+  literal en el nombre real, no un año — y `...2009-2024-Fin.xlsx` ~31 MB),
+  un metadato por cada uno y un diccionario de datos compartido, todos con
+  `Last-Modified` 2026-04/05 — vigente. El archivo de metadato "Fin" tiene
+  dos inconsistencias reales en su propio nombre (dice "MINEDUC" en vez de
+  "MINEDEC", y el rango de años está truncado). Distinto de la cobertura
+  CKAN ya existente de SENESCYT/educación superior. Construido como
+  `search_minedec_matricula` (`helpers/minedec_client.py`).
 - [x] SEPS — boletines de calificadoras de riesgo (`estadisticas.seps.gob.ec`, subdominio alcanzable aunque el sitio principal bloquea bots). → RESEARCH.md § Sitios de ministerios individuales
   **Resuelto 2026-09-02.** Confirmado en vivo: sitio WordPress normal (200
   vía httpx plano, sin problema TLS), sin organización CKAN propia. 26
