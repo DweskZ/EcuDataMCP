@@ -437,7 +437,23 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
   Construido como `search_sgr_sitreps`/`get_sgr_sitrep_archivos`/
   `list_sgr_biblioteca_categorias`/`get_sgr_biblioteca_categoria_archivos`
   (`helpers/sgr_publicaciones_client.py`).
-- [ ] SIPA — geoportal (`geoportal.agricultura.gob.ec`, solo HTTP) corre un backend GeoServer WMS completo (uso de suelo, suelos, riesgos agroclimáticos, catastro rural), mucho más allá de las ortofotos ya anotadas — falta confirmar si expone WFS para exportar vectores, no solo teselas de mapa. Los boletines nacionales (Panorama Agroestadístico y similares) son PDFs directos, sin fricción. Los tableros "Cifras Agroproductivas/Territoriales" están confirmados rotos en producción — no perseguir. → RESEARCH.md § Séptima pasada
+- [x] SIPA — geoportal (`geoportal.agricultura.gob.ec`, solo HTTP) corre un backend GeoServer WMS completo (uso de suelo, suelos, riesgos agroclimáticos, catastro rural), mucho más allá de las ortofotos ya anotadas — falta confirmar si expone WFS para exportar vectores, no solo teselas de mapa. Los boletines nacionales (Panorama Agroestadístico y similares) son PDFs directos, sin fricción. Los tableros "Cifras Agroproductivas/Territoriales" están confirmados rotos en producción — no perseguir. → RESEARCH.md § Séptima pasada
+  **Resuelto 2026-09-03.** El GeoServer real no vive en `/geoserver/*`
+  (eso da 404 genuino de Apache) sino en 24 endpoints "virtuales" por
+  workspace (`/<categoria>/<store>/wms|wfs`), descubiertos leyendo la
+  config del propio visor oficial (`/geovisor/config/dataconfig.js`).
+  277 capas WMS confirmadas en vivo, 257 con WFS `GetFeature` real (una
+  consulta devolvió 724.971 features con 20+ atributos reales por
+  polígono — zonificación agroecológica). `https://` sigue fallando en el
+  handshake TLS, reconfirmado. 20 capas son solo-WMS en 4 stores,
+  incluyendo `sigtierras/catastro_rural` (predios/construcciones, la más
+  valiosa según investigación previa) — WFS está deshabilitado
+  explícitamente en el servidor ahí ("Service WFS is disabled"). Gotcha
+  real: el `<Name>` WMS va sin prefijo pero el `<Name>` WFS lleva el
+  prefijo del *store*, no de la categoría — el cliente empareja por
+  nombre base. Construido como `search_sipa_geoportal_capas`/
+  `get_sipa_geoportal_capa_datos` (`helpers/sipa_geoportal_client.py`),
+  mismo patrón que `helpers/inamhi_client.py`.
 - [x] SIPA — **`sipa.agricultura.gob.ec/index.php/sipa-estadisticas/tablero-dinamico/indicadores-sectoriales`, encontrado 2026-08-31**, distinto de los 4 módulos "estadisticas-descargas" ya cubiertos por `helpers/sipa_client.py`. Página real (título "Indicadores Sectoriales"), con nav propio hacia "Indicador Agroeconómico", "Indicador Agrosocial", "Informe de Rendimientos Objetivos" (arroz), "Hoja de Balance de Alimentos", "Atlas Agroeconómico del Ecuador", "Panorama Agroeconómico" — sin confirmar todavía si son PDFs directos (como los boletines ya cubiertos) o un tablero interactivo tipo Power BI/Tableau que necesitaría el mismo tipo de descifrado que SUT.
   **Resuelto 2026-09-03.** Los seis ítems nombrados resultaron callejones
   sin salida: "Indicador Agroeconómico", "Indicador Agrosocial" y el

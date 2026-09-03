@@ -4,6 +4,12 @@
 
 ### Added
 
+- **`search_sipa_geoportal_capas` / `get_sipa_geoportal_capa_datos`** —
+  Ministry of Agriculture's geoportal (`geoportal.agricultura.gob.ec`),
+  277 WMS layers across 24 per-workspace GeoServer endpoints (discovered
+  via the official map viewer's own config, not `/geoserver/*`), 257 with
+  real WFS attribute data. The rural land cadastre (`sigtierras/
+  catastro_rural`) has WFS explicitly disabled server-side.
 - **`search_salarios_sectoriales`** — sectoral minimum wage tables
   (2020-2025), found via the ministry's document library page rather than
   the unpredictable direct-PDF URLs a prior pass had ruled out.
