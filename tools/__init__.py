@@ -39,6 +39,9 @@ from tools.get_sgr_biblioteca_categoria_archivos import (
 from tools.get_sgr_sitrep_archivos import register_get_sgr_sitrep_archivos_tool
 from tools.get_sigmet import register_get_sigmet_tool
 from tools.get_sipa_modulo_archivos import register_get_sipa_modulo_archivos_tool
+from tools.get_sipa_resumen_indicadores import (
+    register_get_sipa_resumen_indicadores_tool,
+)
 from tools.get_sri_ruc_info import register_get_sri_ruc_info_tool
 from tools.get_superbancos_seccion_archivos import (
     register_get_superbancos_seccion_archivos_tool,
@@ -187,6 +190,7 @@ def register_tools(mcp: FastMCP) -> None:
 
     register_list_sipa_modulos_tool(mcp)
     register_get_sipa_modulo_archivos_tool(mcp)
+    register_get_sipa_resumen_indicadores_tool(mcp)
 
     register_list_superbancos_secciones_tool(mcp)
     register_get_superbancos_seccion_archivos_tool(mcp)

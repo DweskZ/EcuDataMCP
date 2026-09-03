@@ -4,6 +4,10 @@
 
 ### Added
 
+- **`get_sipa_resumen_indicadores`** — SIPA's "Resumen de Indicadores"
+  monthly PDF listing (2018-2026), the one real item on a page whose other
+  six named entries turned out to be either Tableau Server dashboards or
+  fliphtml5.com flipbooks with no direct file.
 - **`list_ineval_familias` / `get_ineval_familia_archivos`** — INEVAL's
   national exam-evaluation archive (`evaluaciones.evaluacion.gob.ec/BI/`):
   9 families (Ser Bachiller, Ser Estudiante ×4, Ser Maestro ×2, Ser

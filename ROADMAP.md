@@ -438,7 +438,22 @@ fechas, boletines y archivos encontró, y cuáles no pudo leer.
   `list_sgr_biblioteca_categorias`/`get_sgr_biblioteca_categoria_archivos`
   (`helpers/sgr_publicaciones_client.py`).
 - [ ] SIPA — geoportal (`geoportal.agricultura.gob.ec`, solo HTTP) corre un backend GeoServer WMS completo (uso de suelo, suelos, riesgos agroclimáticos, catastro rural), mucho más allá de las ortofotos ya anotadas — falta confirmar si expone WFS para exportar vectores, no solo teselas de mapa. Los boletines nacionales (Panorama Agroestadístico y similares) son PDFs directos, sin fricción. Los tableros "Cifras Agroproductivas/Territoriales" están confirmados rotos en producción — no perseguir. → RESEARCH.md § Séptima pasada
-- [ ] SIPA — **`sipa.agricultura.gob.ec/index.php/sipa-estadisticas/tablero-dinamico/indicadores-sectoriales`, encontrado 2026-08-31**, distinto de los 4 módulos "estadisticas-descargas" ya cubiertos por `helpers/sipa_client.py`. Página real (título "Indicadores Sectoriales"), con nav propio hacia "Indicador Agroeconómico", "Indicador Agrosocial", "Informe de Rendimientos Objetivos" (arroz), "Hoja de Balance de Alimentos", "Atlas Agroeconómico del Ecuador", "Panorama Agroeconómico" — sin confirmar todavía si son PDFs directos (como los boletines ya cubiertos) o un tablero interactivo tipo Power BI/Tableau que necesitaría el mismo tipo de descifrado que SUT.
+- [x] SIPA — **`sipa.agricultura.gob.ec/index.php/sipa-estadisticas/tablero-dinamico/indicadores-sectoriales`, encontrado 2026-08-31**, distinto de los 4 módulos "estadisticas-descargas" ya cubiertos por `helpers/sipa_client.py`. Página real (título "Indicadores Sectoriales"), con nav propio hacia "Indicador Agroeconómico", "Indicador Agrosocial", "Informe de Rendimientos Objetivos" (arroz), "Hoja de Balance de Alimentos", "Atlas Agroeconómico del Ecuador", "Panorama Agroeconómico" — sin confirmar todavía si son PDFs directos (como los boletines ya cubiertos) o un tablero interactivo tipo Power BI/Tableau que necesitaría el mismo tipo de descifrado que SUT.
+  **Resuelto 2026-09-03.** Los seis ítems nombrados resultaron callejones
+  sin salida: "Indicador Agroeconómico", "Indicador Agrosocial" y el
+  tablero de "Rendimientos Objetivos" son embeds genuinos de **Tableau
+  Server** (`bi.mag.gob.ec`, vía `servicios.mag.gob.ec/tableros/...` con
+  JWT firmado) — reproducirlo exige decodificar el protocolo de Tableau,
+  esfuerzo comparable al de `helpers/sut_powerbi_client.py`, fuera de
+  alcance. "Panorama Agroeconómico", "Atlas Agroeconómico" y "Hoja de
+  Balance de Alimentos" están cada uno atrapados en un flipbook JS de
+  `fliphtml5.com` con `bookConfig` codificado — confirmado en vivo para
+  los tres. Pero la misma página tiene un séptimo ítem no nombrado
+  originalmente, **"Resumen de Indicadores"**, que sí es real: una página
+  Joomla estática con PDFs mensuales directos, 2018-2026 confirmado en
+  vivo (convención de nombre de archivo distinta en 2018 vs. 2019+, cada
+  año en su propia URL). Construido como `get_sipa_resumen_indicadores`
+  (`helpers/sipa_resumen_indicadores_client.py`).
 - [ ] Ministerio de Salud Pública (`salud.gob.ec`) — dominio confirmado vivo con contenido real (barrido de endpoints 2026-08-29), sección de transparencia/LOTAIP presente, pero sin sección de estadísticas/datos abiertos visible en la portada — no se profundizó más allá de confirmar que el sitio está vivo, falta una pasada de contenido completa. → RESEARCH.md § Séptima pasada
 - [ ] Registro Oficial (gaceta oficial) — candidato de alta prioridad para búsqueda por fecha; posiblemente no relevante, ver nota de alcance. → RESEARCH.md § Datos legislativos
 - [x] INEVAL — exámenes nacionales (Ser Bachiller/ENES, Ser Estudiante, Ser Maestro...), archivo real sin login/captcha. → RESEARCH.md § INEVAL
