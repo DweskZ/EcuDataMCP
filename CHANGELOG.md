@@ -4,6 +4,10 @@
 
 ### Added
 
+- **`search_trabajo_boletin_anual`** — Ministerio del Trabajo's annual
+  labor-market report. Only 3 editions (2020-2022) are recoverable; the
+  index page violates HTTP/1.1 (duplicated Transfer-Encoding headers), so
+  this is a small hand-verified set, not a live scraper.
 - **`search_infomies_bases_mensuales` / `search_infomies_boletines_zonales`**
   — infoMIES's (`info.desarrollohumano.gob.ec`) monthly databases (richer
   than this project's existing quarterly CKAN coverage for the same

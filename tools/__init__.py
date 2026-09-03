@@ -118,6 +118,9 @@ from tools.search_sri_estadisticas_recaudacion import (
     register_search_sri_estadisticas_recaudacion_tool,
 )
 from tools.search_sri_ruc import register_search_sri_ruc_tool
+from tools.search_trabajo_boletin_anual import (
+    register_search_trabajo_boletin_anual_tool,
+)
 from tools.search_tramites import register_search_tramites_tool
 
 
@@ -192,6 +195,7 @@ def register_tools(mcp: FastMCP) -> None:
     register_search_mef_fiscal_tool(mcp)
     register_search_infomies_bases_mensuales_tool(mcp)
     register_search_infomies_boletines_zonales_tool(mcp)
+    register_search_trabajo_boletin_anual_tool(mcp)
 
     register_search_regulaciones_tool(mcp)
     register_get_regulacion_info_tool(mcp)
