@@ -18,6 +18,7 @@ from tools.get_contraloria_informe import register_get_contraloria_informe_tool
 from tools.get_contrato_info import register_get_contrato_info_tool
 from tools.get_dataset_info import register_get_dataset_info_tool
 from tools.get_financials import register_get_financials_tool
+from tools.get_iess_archivos import register_get_iess_archivos_tool
 from tools.get_inamhi_capa_datos import register_get_inamhi_capa_datos_tool
 from tools.get_indicador_bce import register_get_indicador_bce_tool
 from tools.get_inec_estadistica_files import register_get_inec_estadistica_files_tool
@@ -60,6 +61,7 @@ from tools.list_capabilities import register_list_capabilities_tool
 from tools.list_categories import register_list_categories_tool
 from tools.list_contraloria_informes import register_list_contraloria_informes_tool
 from tools.list_dataset_resources import register_list_dataset_resources_tool
+from tools.list_iess_colecciones import register_list_iess_colecciones_tool
 from tools.list_ineval_familias import register_list_ineval_familias_tool
 from tools.list_instituciones import register_list_instituciones_tool
 from tools.list_recent_datasets import register_list_recent_datasets_tool
@@ -224,6 +226,9 @@ def register_tools(mcp: FastMCP) -> None:
 
     register_list_contraloria_informes_tool(mcp)
     register_get_contraloria_informe_tool(mcp)
+
+    register_list_iess_colecciones_tool(mcp)
+    register_get_iess_archivos_tool(mcp)
 
     register_search_contratos_tool(mcp)
     register_get_contrato_info_tool(mcp)

@@ -167,6 +167,12 @@ de cobertura que falta en cada una.
 |---|---|---|
 | infoMIES — bases mensuales + boletines zonales | `search_infomies_bases_mensuales`, `search_infomies_boletines_zonales` | Bases mensuales solo año en curso (años cerrados = 1 archivo/diciembre); Reporte Boletines Zonales consolidado 2021-2026 → RESEARCH.md § Décima pasada, § Decimocuarta pasada |
 
+### IESS
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Boletines Estadísticos + Estudios Actuariales + Informes de Auditoría | `list_iess_colecciones`, `get_iess_archivos` | 3 archivos Liferay (`document_library_display`) resueltos a URL directa: 26 boletines anuales 1978-2024, 47 estudios actuariales en 4 años publicados (2010/2013/2018/2020), 325 informes de auditoría en 20 carpetas por año 2007-2026; detección de formato por el ícono de la página de detalle, no por la extensión de la URL (varios enlaces reales no tienen `.pdf`) → RESEARCH.md § IESS |
+
 ### Calidad, formatos y operación
 
 Capacidades transversales, no atadas a una sola fuente de datos.
@@ -251,7 +257,6 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 | Fuente | Estado | Qué falta |
 |---|---|---|
 | Registro Civil / demográfico-salud | Parcial | Cobertura CKAN sólida; falta soporte de lector para `.xlsb` (dataset de defunciones individuales 2020-2025) → RESEARCH.md § Séptima pasada |
-| IESS | Parcial | Boletines/auditorías/estudios actuariales scrapeables y confirmados; sin tool nuevo construido todavía → RESEARCH.md § IESS |
 | SENESCYT/Educación Superior | Parcial | Cubierto vía CKAN + biblioteca de Educación Superior; registro de títulos bloqueado por captcha (no automatizable) → RESEARCH.md § SENESCYT |
 | SRI Saiku | Parcial | Superficie anónima construida (ver Hecho); falta verificación contra el endpoint vivo desde un entorno con conectividad real |
 | INEC — preview de archivos grandes | Parcial | `list_zip_contents` lista miembros de ZIP vía HTTP Range sin descargar todo; decidido en contra de un índice pre-construido por dataset y de cualquier transferencia completa de archivo |

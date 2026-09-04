@@ -4,6 +4,16 @@
 
 ### Added
 
+- **`list_iess_colecciones` / `get_iess_archivos`** — IESS's (Instituto
+  Ecuatoriano de Seguridad Social) three Liferay document archives:
+  Boletines Estadísticos (26 annual bulletins, 1978-2024), Estudios
+  Actuariales (47 documents across the 4 years currently published: 2010,
+  2013, 2018, 2020), and Informes de Auditoría (325 documents across 20
+  year-folders, 2007-2026). Every real download link is resolved from a
+  document's own Liferay detail page rather than trusting the listing
+  page's URL — several real links (mostly in Informes de Auditoría, some
+  in Estudios Actuariales) carry no `.pdf` extension at all, so format is
+  read from the detail page's own "Descargar" icon instead of the URL.
 - **`source="latacunga"`** on the generic CKAN tools — a third CKAN
   instance, "Data Mashca" (`datosabiertos.latacunga.gob.ec`), alongside
   the existing national portal and Cuenca en Datos. 15 datasets (predial

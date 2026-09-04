@@ -378,6 +378,86 @@ portales que tenemos"):
   IESS — si este patrón resulta automatizable en algún portal,
   probablemente se repite en decenas de instituciones.
 
+**Construido 2026-09-04** (`helpers/iess_client.py`,
+`tools/list_iess_colecciones.py`, `tools/get_iess_archivos.py`): las tres
+colecciones documentadas arriba (Boletines Estadísticos, Estudios
+Actuariales, Informes de Auditoría) quedaron cubiertas por dos tools —
+`list_iess_colecciones` (catálogo: qué años/conteos tiene cada colección) y
+`get_iess_archivos(coleccion, anio=None, query="")` (documentos resueltos a
+URL directa, filtrables por colección/año/texto). Antes de escribir el
+parser se re-verificó en vivo la estructura exacta de las tres páginas con
+`httpx`/`curl` plano (sin browser) — varias correcciones reales a las notas
+de arriba:
+
+- **Boletines: 26 confirmados, no ~19.** La nota de 2026-08-28 sólo revisó
+  la primera página de la lista (20 filas) y concluyó "2006-2024". La lista
+  está paginada (`cur2`/`delta2`, requiere además los parámetros de ruteo
+  de portlet Liferay `p_p_id=110_INSTANCE_zIm8&p_p_lifecycle=0&...` — un
+  `cur2` "pelado" sin esos parámetros re-sirve la página 1 en silencio, un
+  bug real que se encontró y corrigió en el mismo pase). La página 2 trae 6
+  boletines más, hasta "BOLETIN ESTADISTICO 01" de **1978** — el archivo
+  real cubre 1978-2024, no solo 2006-2024.
+- **Estudios Actuariales: 4 años confirmados en vivo, no solo mencionados.**
+  El índice (`iess.gob.ec/estudios-actuariales/`) enlaza hoy exactamente
+  2010, 2013, 2018 y 2020 (confirmado además que `-2007` a `-2025` dan 404
+  salvo esos tres años con sufijo; el "2013" es un caso especial: su enlace
+  visible dice "Estudios Actuariales 2013" pero apunta a la URL *base* sin
+  sufijo de año, `estudios-actuariales` sin `-2013` — no es un typo, es
+  como está publicado). El scraper descubre estos años leyendo el índice en
+  vivo (no están hardcodeados), así que un año nuevo que IESS agregue
+  aparece sin cambio de código. 47 documentos totales resueltos (7 en el
+  set base/2013, 8 en 2010, 13 en 2018, 14 en 2020 — coincide con el conteo
+  de 14 ya documentado arriba). Dos formas de página confirmadas: 2018/2020
+  (y el set base) enlazan directo a `documents/10162/<carpeta>/<archivo>`;
+  2010 usa una ruta estática completamente distinta,
+  `iess.gob.ec/informacion/Estudios_Actuariales_2010/<archivo>.pdf` — no es
+  el patrón Liferay en absoluto, hay que soportar ambas formas.
+- **Informes de Auditoría: 325 documentos confirmados en 20 carpetas
+  (2007-2026), no ~344 en 2007-2025.** La cifra de "~344" de la nota
+  anterior venía de una revisión parcial; la tabla de carpetas por año
+  (columna "Número de documentos" de la página índice) suma exactamente
+  325 en vivo. Además ya existe una carpeta 2026 (vacía, 0 documentos) que
+  no existía cuando se escribió la nota original. El bug de "el link real
+  no tiene extensión `.pdf`" que la nota de arriba ya había corregido se
+  resolvió aquí de forma distinta a lo sugerido (`Content-Type` por
+  request): la página de detalle de cada documento (patrón Liferay
+  `document_library_display`, compartido con Boletines) trae un enlace
+  "Descargar" cuyo ícono (`file_system/large/<ext>.png`) declara el
+  formato real sin necesidad de una petición `HEAD`/`Content-Type` por
+  documento — confirmado en vivo con el ejemplo exacto de la nota
+  (`DNA7-SySS-0001-2024`, ícono `large/pdf.png`, URL sin `.pdf`). El mismo
+  patrón de ícono resuelve Boletines y (donde aplica) los enlaces sin
+  extensión de Estudios Actuariales 2018 ("Seguro Riesgos del Trabajo",
+  "Seguro Desempleo" — confirmado antes con `Content-Type: application/pdf`
+  vía header, y ahora también coherente con el ícono).
+- **Paginación dentro de un año**: un año con más de 20 documentos (ej.
+  2009, 42 documentos, el máximo confirmado) pagina con
+  `_110_INSTANCE_vu7F_cur2=N&_110_INSTANCE_vu7F_delta2=20` sobre la misma
+  URL amigable `.../document_library_display/vu7F/view/<carpeta>` — sin
+  necesitar los parámetros `p_p_id` completos que sí hacen falta en la
+  página raíz de Boletines/Informes (esas son rutas Liferay "amigables"
+  con el portlet ya codificado en el path, a diferencia de la página
+  índice que se sirve por query string). Verificado en vivo: 2009 pagina a
+  3 páginas (20+20+2) y las 42 URLs distintas coinciden con el conteo de
+  la tabla de carpetas.
+- **Caché**: las tres colecciones son archivos históricos/append-only (un
+  boletín o año de auditoría nuevo aparece a lo sumo unas pocas veces al
+  año), TTL de 6 horas (21600s) igual que `helpers/sgr_publicaciones_client.py`.
+  `get_iess_archivos(coleccion="informes_auditoria")` exige `anio` (a
+  diferencia de las otras dos colecciones, que siempre se resuelven
+  completas): un año puede traer hasta 42 documentos, cada uno con su
+  propia petición a la página de detalle para resolver la URL real, así
+  que no hay una llamada barata de "todos los años" — `list_iess_colecciones`
+  expone el catálogo de años/conteos primero para que el llamador elija.
+- Verificado en vivo con las funciones reales del MCP (no solo con
+  `httpx`/`curl` sueltos): `list_iess_colecciones`,
+  `get_iess_archivos(coleccion="boletines", anio=2024)`,
+  `get_iess_archivos(coleccion="estudios_actuariales", anio=2020)`,
+  `get_iess_archivos(coleccion="informes_auditoria", anio=2025)` (carpeta
+  de 1 solo documento) y el caso de error cuando falta `anio` para
+  `informes_auditoria` — todos devuelven datos reales y URLs que resuelven
+  a `documents/10162/...`.
+
 ### SENESCYT / Educación Superior / MINEDEC
 
 Pedido explícitamente por Daniel. Datos de educación superior, becas,
