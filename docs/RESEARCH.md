@@ -3934,6 +3934,53 @@ construirlos, siguiendo el mismo patrón que `helpers/inamhi_client.py`/
 
 ---
 
+## Decimoséptima pasada — soporte de lectura `.xlsb`
+
+**Pedido de Daniel 2026-09-04:** cerrar el pendiente técnico anotado en la
+Séptima pasada — `.xlsb` (Excel Binary Workbook) no estaba soportado por
+`helpers/csv_reader.py`.
+
+**Construido:** `preview_xlsb()` (vía `pyxlsb`), siguiendo el mismo patrón
+que `preview_xls`. Verificado en vivo extremo a extremo contra el archivo
+real que motivó el pendiente
+(`registrocivil.gob.ec/wp-content/uploads/downloads/2025/05/
+Defunciones_Generales_act_11_MAY_2025.xlsb`, 9.3 MB, descargado y parseado
+completo fuera del límite del preview para confirmar la lectura): hoja
+única `DEFUNCIONES`, encabezados reales (`ZONA`, `PROVINCIA`, `CANTÓN`,
+`PARROQUIA`, `FECHA DEFUNCIÓN`, `MES`, `DÍA`, ...), primera fila de datos
+real (`ZONA 8`, `GUAYAS`, `PEDRO CARBO`, ...). Fechas llegan como número de
+serie de Excel crudo (44114.0), sin convertir — mismo comportamiento que
+`preview_xls` ya tiene para fechas, no una regresión nueva.
+
+**Hallazgo real, no anticipado en la nota original:** `.xlsb` es en
+realidad un contenedor ZIP (registros BIFF12 en vez de XML, pero mismo
+formato de contenedor que XLSX) — así que hereda exactamente el mismo modo
+de falla que un `.zip` truncado: el índice central del ZIP vive al final
+del archivo, así que una descarga cortada en el límite de 5 MB no puede
+abrirse en absoluto (`zipfile.BadZipFile: File is not a zip file`),
+confirmado en vivo recortando el archivo real de 9.3 MB a 5 MB. Se agregó
+el mismo chequeo de truncamiento *antes* de intentar parsear que ya existe
+para `.zip` (`preview_zip`), con el mismo mensaje accionable. **Esto
+significa que el dataset de defunciones que motivó todo el pendiente
+sigue sin poder previsualizarse como tabla** — 9.3 MB supera el límite de
+5 MB — pero el soporte de formato en sí es real y genérico: cualquier
+`.xlsb` de 5 MB o menos en cualquier fuente del proyecto ahora se
+previsualiza igual que un `.xls`/`.xlsx`/`.ods`. `download_resource`
+sigue siendo la vía para bajar el archivo completo.
+
+Wired en los tres puntos de despliegue por formato que existen en el
+proyecto (`tools/preview_resource_data.py`, `tools/investigate_dataset.py`,
+`tools/detect_series_pattern.py`) — cada uno mantiene su propio dict de
+despacho por `kind`. De paso se encontró que `detect_series_pattern.py`
+nunca tuvo `ODS` en su propio dispatch (aunque `classify_resource_format`
+sí lo reconoce) — un `KeyError` crudo pendiente desde antes, no introducido
+en esta pasada; se corrigió con el mismo guard defensivo que ahora protege
+cualquier formato reconocido-pero-no-despachado, en vez de agregar soporte
+completo de ODS a ese archivo específico (fuera de alcance de este
+pendiente).
+
+---
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

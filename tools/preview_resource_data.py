@@ -9,6 +9,7 @@ from helpers.csv_reader import (
     preview_ods,
     preview_targz,
     preview_xls,
+    preview_xlsb,
     preview_xlsx,
     preview_zip,
     sniff_content_type,
@@ -22,7 +23,7 @@ _XLSX_FORMATS = {"XLSX", "EXCEL"}
 
 
 def classify_resource_format(fmt: str, url: str) -> str:
-    """Classify a resource as RAR/TARGZ/ZIP/XLS/XLSX/JSON/CSV/UNKNOWN.
+    """Classify a resource as RAR/TARGZ/ZIP/XLS/XLSB/XLSX/ODS/JSON/CSV/UNKNOWN.
 
     CKAN's declared `format` is frequently wrong (e.g. a .tar.gz or .xlsx
     file tagged "CSV" by whoever published it), so a recognizable URL
@@ -40,6 +41,8 @@ def classify_resource_format(fmt: str, url: str) -> str:
         return "XLSX"
     if url_lower.endswith(".xls"):
         return "XLS"
+    if url_lower.endswith(".xlsb"):
+        return "XLSB"
     if url_lower.endswith(".ods"):
         return "ODS"
     if url_lower.endswith((".json", ".geojson")):
@@ -53,6 +56,8 @@ def classify_resource_format(fmt: str, url: str) -> str:
         return "ZIP"
     if fmt == "XLS":
         return "XLS"
+    if fmt == "XLSB":
+        return "XLSB"
     if fmt == "ODS":
         return "ODS"
     if fmt in _XLSX_FORMATS:
@@ -71,6 +76,7 @@ _CONTENT_TYPE_KIND = {
     "application/json": "JSON",
     "application/geo+json": "JSON",
     "application/vnd.ms-excel": "XLS",
+    "application/vnd.ms-excel.sheet.binary.macroenabled.12": "XLSB",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "XLSX",
     "application/vnd.oasis.opendocument.spreadsheet": "ODS",
     "application/zip": "ZIP",
@@ -105,7 +111,7 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
         """
         Download and preview a resource from Ecuador's open data portal.
 
-        Supports CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX), OpenDocument (ODS),
+        Supports CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX/XLSB), OpenDocument (ODS),
         and .tar.gz/.zip archives
         that wrap a CSV/TSV/TXT file. Returns the first N rows as a formatted table
         so the model can inspect data without a local download. Geometry/WKT columns
@@ -188,6 +194,8 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
                 result = await preview_zip(url, max_rows=rows)
             elif kind == "XLS":
                 result = await preview_xls(url, max_rows=rows)
+            elif kind == "XLSB":
+                result = await preview_xlsb(url, max_rows=rows)
             elif kind == "XLSX":
                 result = await preview_xlsx(url, max_rows=rows)
             elif kind == "ODS":
@@ -207,7 +215,7 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
                     format,
                     text_builder=lambda d: (
                         f"Este recurso tiene formato '{d.get('format_detectado') or 'desconocido'}'. "
-                        "preview_resource_data soporta CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX), "
+                        "preview_resource_data soporta CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX/XLSB), "
                         "OpenDocument (ODS) y .tar.gz/.zip (si envuelven un CSV/TSV/TXT). "
                         "Si está en DataStore prueba query_resource_data. "
                         f"Descarga directa: {d['url']}"

@@ -62,6 +62,14 @@ def test_classify_legacy_xls_distinct_from_xlsx():
     assert classify_resource_format("", "https://x/reporte.xlsx") == "XLSX"
 
 
+def test_classify_xlsb_by_extension_even_if_declared_csv():
+    # Real case: Registro Civil's "Defunciones Generales" is declared
+    # nothing useful by the page it's linked from, but the URL and the
+    # server's own Content-Type both agree it's .xlsb.
+    assert classify_resource_format("CSV", "https://x/defunciones.xlsb") == "XLSB"
+    assert classify_resource_format("XLSB", "https://x/download?id=123") == "XLSB"
+
+
 def test_classify_ods_by_extension_even_if_declared_csv():
     assert classify_resource_format("CSV", "https://x/reporte.ods") == "ODS"
     assert classify_resource_format("ODS", "https://x/download?id=123") == "ODS"
@@ -90,6 +98,13 @@ def test_classify_from_content_type_maps_common_mimes():
         == "XLSX"
     )
     assert classify_from_content_type("application/vnd.ms-excel") == "XLS"
+    # Real header confirmed live against Registro Civil's defunciones.xlsb.
+    assert (
+        classify_from_content_type(
+            "application/vnd.ms-excel.sheet.binary.macroEnabled.12"
+        )
+        == "XLSB"
+    )
     assert (
         classify_from_content_type("application/vnd.oasis.opendocument.spreadsheet")
         == "ODS"
@@ -246,6 +261,39 @@ async def test_xls_is_routed_to_xls_parser(monkeypatch):
     payload = json.loads(result)
     assert payload["headers"] == ["producto", "precio"]
     assert calls == ["https://x/reporte.xls"]
+
+
+async def test_xlsb_is_routed_to_xlsb_parser(monkeypatch):
+    async def fake_get_resource(resource_id, source="nacional", session=None):
+        return {
+            "url": "https://x/defunciones.xlsb",
+            "format": "",
+            "name": "Defunciones Generales",
+        }
+
+    calls = []
+
+    async def fake_preview_xlsb(url, max_rows=20, session=None):
+        calls.append(url)
+        return {
+            "headers": ["provincia", "canton"],
+            "rows": [["GUAYAS", "PEDRO CARBO"]],
+            "total_rows_in_preview": 1,
+            "format": "xlsb",
+        }
+
+    async def fail_preview_csv(*args, **kwargs):
+        raise AssertionError("preview_csv should not be called for a .xlsb resource")
+
+    monkeypatch.setattr(ckan_client, "get_resource", fake_get_resource)
+    monkeypatch.setattr(preview_resource_data_module, "preview_xlsb", fake_preview_xlsb)
+    monkeypatch.setattr(preview_resource_data_module, "preview_csv", fail_preview_csv)
+
+    tool = _make_tool()
+    result = await tool(resource_id="abc123", format="json")
+    payload = json.loads(result)
+    assert payload["headers"] == ["provincia", "canton"]
+    assert calls == ["https://x/defunciones.xlsb"]
 
 
 async def test_ods_is_routed_to_ods_parser(monkeypatch):

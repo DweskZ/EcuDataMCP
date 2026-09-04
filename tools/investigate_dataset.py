@@ -9,6 +9,7 @@ from helpers.csv_reader import (
     preview_ods,
     preview_targz,
     preview_xls,
+    preview_xlsb,
     preview_xlsx,
     preview_zip,
     sniff_content_type,
@@ -23,12 +24,13 @@ from tools.preview_resource_data import (
 
 # Prefer previewing a resource whose format we can actually parse into a
 # table over one search ranks higher but we'd just bounce off (RAR/UNKNOWN).
-_PREVIEWABLE_KINDS = {"CSV", "JSON", "XLS", "XLSX", "ODS", "ZIP", "TARGZ"}
+_PREVIEWABLE_KINDS = {"CSV", "JSON", "XLS", "XLSB", "XLSX", "ODS", "ZIP", "TARGZ"}
 
 _PREVIEW_DISPATCH = {
     "TARGZ": preview_targz,
     "ZIP": preview_zip,
     "XLS": preview_xls,
+    "XLSB": preview_xlsb,
     "XLSX": preview_xlsx,
     "ODS": preview_ods,
     "JSON": preview_json,
@@ -64,7 +66,7 @@ def register_investigate_dataset_tool(mcp: FastMCP) -> None:
 
         Picks the top-ranked search result and, among its resources, the
         first one in a format this server can actually parse into a table
-        (CSV/JSON/XLS/XLSX/ODS/ZIP/TARGZ), skipping unreadable ones
+        (CSV/JSON/XLS/XLSB/XLSX/ODS/ZIP/TARGZ), skipping unreadable ones
         (.rar, unrecognized formats) rather than previewing whichever
         resource happens to be listed first.
 

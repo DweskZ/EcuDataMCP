@@ -21,6 +21,7 @@ from helpers.csv_reader import (
     normalize_eu_decimal_columns,
     preview_ods,
     preview_targz,
+    preview_xlsb,
     preview_zip,
     sniff_content_type,
     strip_geometry_columns,
@@ -404,6 +405,28 @@ async def test_preview_zip_over_5mb_gives_actionable_truncation_message(httpx_mo
 
     with pytest.raises(ValueError, match="supera el límite de 5 MB"):
         await preview_zip(url)
+
+
+async def test_preview_xlsb_over_5mb_gives_actionable_truncation_message(
+    httpx_mock, monkeypatch
+):
+    # .xlsb is a ZIP container too (BIFF12 records instead of XLSX's XML),
+    # so it fails the exact same way as a truncated .zip: confirmed against
+    # a real 9.3MB resource (Registro Civil's "Defunciones Generales") --
+    # zipfile can't open it at all once the central directory is cut off.
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+
+    # The truncation check happens before any parsing, so the padding
+    # doesn't need to be valid xlsb content -- only its size matters.
+    big_body = b"0" * (MAX_DOWNLOAD_BYTES + 10)
+    url = "https://example.com/defunciones.xlsb"
+    httpx_mock.add_response(url=url, content=big_body)
+
+    with pytest.raises(ValueError, match="supera el límite de 5 MB"):
+        await preview_xlsb(url)
 
 
 async def test_preview_zip_with_no_tabular_member_gives_clear_message(httpx_mock, monkeypatch):

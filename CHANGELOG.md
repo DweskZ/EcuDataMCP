@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Added
+
+- **`.xlsb` (Excel Binary Workbook) support** — `preview_xlsb()` in
+  `helpers/csv_reader.py`, wired into `preview_resource_data`,
+  `investigate_dataset`, and `detect_series_pattern`. Closes the gap
+  Registro Civil's "Defunciones Generales" dataset needed, though that
+  specific file (9.3 MB) still exceeds the 5 MB preview cap — `.xlsb` is a
+  ZIP container, so it fails a truncated download the same way a `.zip`
+  does, now with the same actionable message pointing at
+  `download_resource`.
+
 ## 0.8.6 — 2026-09-04
 
 ### Added

@@ -9,6 +9,7 @@ from helpers.csv_reader import (
     preview_json,
     preview_targz,
     preview_xls,
+    preview_xlsb,
     preview_xlsx,
     preview_zip,
     sniff_content_type,
@@ -161,10 +162,18 @@ async def _fetch_table(res: dict, session: httpx.AsyncClient) -> dict:
         "TARGZ": preview_targz,
         "ZIP": preview_zip,
         "XLS": preview_xls,
+        "XLSB": preview_xlsb,
         "XLSX": preview_xlsx,
         "JSON": preview_json,
         "CSV": preview_csv,
     }
+    if kind not in dispatch:
+        # classify_resource_format/classify_from_content_type recognize a
+        # few kinds (ODS today) that this function has never dispatched --
+        # a real, pre-existing gap, not something introduced here. Fail
+        # with the same clean message as an actually-unknown format rather
+        # than a raw KeyError.
+        raise ValueError(f"formato '{kind}' reconocido pero no soportado aquí")
     return await dispatch[kind](url, max_rows=_ANALYZE_MAX_ROWS, session=session)
 
 

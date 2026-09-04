@@ -1,10 +1,12 @@
 import json
 
+import pytest
 from mcp.server.fastmcp import FastMCP
 
 import tools.detect_series_pattern as detect_series_pattern_module
 from helpers import ckan_client
 from tools.detect_series_pattern import (
+    _fetch_table,
     _find_period_columns,
     _locate_header_row,
     _period_keys,
@@ -380,3 +382,17 @@ async def test_no_series_detected_without_ids(monkeypatch):
     payload = json.loads(result)
 
     assert payload["error"] == "sin_serie_detectada"
+
+
+# -- _fetch_table --------------------------------------------------------
+
+
+async def test_fetch_table_recognized_but_undispatched_format_gives_clear_error():
+    # ODS is recognized by classify_resource_format but was never added to
+    # this function's own dispatch table -- a real, pre-existing gap. This
+    # confirms it now fails with a clear message instead of a raw KeyError,
+    # the same guard that keeps a newly-recognized format (e.g. a future
+    # one) from crashing here before its parser is wired in.
+    res = {"url": "https://x/reporte.ods", "format": "ODS"}
+    with pytest.raises(ValueError, match="reconocido pero no soportado"):
+        await _fetch_table(res, session=None)

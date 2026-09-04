@@ -507,6 +507,77 @@ async def preview_xls(
     }
 
 
+async def preview_xlsb(
+    url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
+) -> dict[str, Any]:
+    """Preview the first sheet of an Excel Binary Workbook (.xlsb)."""
+    from pyxlsb import open_workbook
+
+    raw, truncated = await download_bytes(url, session=session)
+    if truncated:
+        # .xlsb is a ZIP container (BIFF12 records instead of XLSX's XML),
+        # so it fails the exact same way a truncated .zip does: the central
+        # directory lives at the end of the file, a download cut off at
+        # MAX_DOWNLOAD_BYTES is missing it, and zipfile can't open it at
+        # all -- confirmed against a real 9.3 MB resource (Registro Civil's
+        # "Defunciones Generales") with "File is not a zip file". Skip the
+        # doomed parse attempt and say what actually happened, same as
+        # preview_zip.
+        raise ValueError(
+            "El archivo .xlsb supera el límite de 5 MB de este preview, así "
+            "que se descargó incompleto y no se puede abrir (el índice del "
+            "contenedor ZIP interno vive al final del archivo). Usa "
+            "download_resource para bajarlo completo, o el enlace directo."
+        )
+
+    wb = open_workbook(io.BytesIO(raw))
+    try:
+        if not wb.sheets:
+            return {
+                "headers": [],
+                "rows": [],
+                "total_rows_in_preview": 0,
+                "truncated": truncated,
+                "format": "xlsb",
+            }
+        ws = wb.get_sheet(1)
+        try:
+            rows_iter = ws.rows()
+
+            def cell_str(value: Any) -> str:
+                return "" if value is None else str(value)
+
+            try:
+                header_row = next(rows_iter)
+            except StopIteration:
+                return {
+                    "headers": [],
+                    "rows": [],
+                    "total_rows_in_preview": 0,
+                    "truncated": truncated,
+                    "format": "xlsb",
+                }
+            headers = [cell_str(c.v) for c in header_row]
+            data_rows: list[list[str]] = []
+            for i, row in enumerate(rows_iter):
+                if i >= max_rows:
+                    truncated = True
+                    break
+                data_rows.append([cell_str(c.v) for c in row])
+            return {
+                "headers": headers,
+                "rows": data_rows,
+                "total_rows_in_preview": len(data_rows),
+                "truncated": truncated,
+                "format": "xlsb",
+                "sheet": wb.sheets[0],
+            }
+        finally:
+            ws.close()
+    finally:
+        wb.close()
+
+
 async def preview_ods(
     url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
 ) -> dict[str, Any]:
