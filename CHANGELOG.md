@@ -7,11 +7,16 @@
 - **`.xlsb` (Excel Binary Workbook) support** — `preview_xlsb()` in
   `helpers/csv_reader.py`, wired into `preview_resource_data`,
   `investigate_dataset`, and `detect_series_pattern`. Closes the gap
-  Registro Civil's "Defunciones Generales" dataset needed, though that
-  specific file (9.3 MB) still exceeds the 5 MB preview cap — `.xlsb` is a
-  ZIP container, so it fails a truncated download the same way a `.zip`
-  does, now with the same actionable message pointing at
-  `download_resource`.
+  Registro Civil's "Defunciones Generales" dataset (9.3 MB) needed —
+  confirmed live end-to-end, real headers/rows now returned.
+- **Raised the download cap to 20 MB for `.xlsx`/`.xlsb`/`.ods`** (via a
+  new `max_bytes` parameter on `download_bytes()`, default unchanged at
+  5 MB for everything else). These three are ZIP containers whose central
+  directory lives at the end of the file, so a truncated download fails
+  outright instead of degrading gracefully the way a truncated CSV does —
+  there's no safety benefit to stopping at 5 MB, only a guaranteed
+  failure. 20 MB matches the decompression cap this project already used
+  elsewhere, not a new number.
 
 ## 0.8.6 — 2026-09-04
 

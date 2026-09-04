@@ -3960,13 +3960,24 @@ del archivo, así que una descarga cortada en el límite de 5 MB no puede
 abrirse en absoluto (`zipfile.BadZipFile: File is not a zip file`),
 confirmado en vivo recortando el archivo real de 9.3 MB a 5 MB. Se agregó
 el mismo chequeo de truncamiento *antes* de intentar parsear que ya existe
-para `.zip` (`preview_zip`), con el mismo mensaje accionable. **Esto
-significa que el dataset de defunciones que motivó todo el pendiente
-sigue sin poder previsualizarse como tabla** — 9.3 MB supera el límite de
-5 MB — pero el soporte de formato en sí es real y genérico: cualquier
-`.xlsb` de 5 MB o menos en cualquier fuente del proyecto ahora se
-previsualiza igual que un `.xls`/`.xlsx`/`.ods`. `download_resource`
-sigue siendo la vía para bajar el archivo completo.
+para `.zip` (`preview_zip`), con el mismo mensaje accionable.
+
+**Resuelto el mismo día (segunda parte del pedido):** el dataset de
+defunciones que motivó todo el pendiente seguía sin poder previsualizarse
+—9.3 MB superaba el límite de descarga de 5 MB, que hasta ahora era único
+para todo el proyecto. Como `.xlsx`/`.xlsb`/`.ods` son los tres contenedores
+ZIP del proyecto (índice central al final del archivo), truncar su
+descarga no es una degradación útil como en un CSV — es una falla total
+garantizada. Se agregó un parámetro `max_bytes` explícito a
+`download_bytes()`/`_download()` (por defecto sigue en `MAX_DOWNLOAD_BYTES`,
+5 MB, para todo lo demás) y los tres previsualizadores de contenedor ZIP
+ahora piden `_MAX_DECOMPRESSED_BYTES` (20 MB — el mismo techo que ya usaba
+`_gunzip_capped` para límite de descompresión, reutilizado como techo de
+descarga en vez de inventar un número nuevo). **Verificado en vivo
+extremo a extremo contra el archivo real de 9.3 MB**: ahora se
+previsualiza con datos reales (`DEFUNCIONES`, encabezados y primera fila
+reales, 20 filas devueltas). `download_resource` sigue siendo la vía para
+bajar el archivo completo si hiciera falta más de una previsualización.
 
 Wired en los tres puntos de despliegue por formato que existen en el
 proyecto (`tools/preview_resource_data.py`, `tools/investigate_dataset.py`,

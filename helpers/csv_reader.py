@@ -23,6 +23,7 @@ from helpers.user_agent import USER_AGENT
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 MAX_DOWNLOAD_BYTES = 5 * 1024 * 1024  # 5 MB
+_MAX_DECOMPRESSED_BYTES = 20 * 1024 * 1024  # 20 MB
 _TIMEOUT = 30.0
 
 _GEOM_COLUMN_NAMES = {"geom", "geometry", "the_geom", "wkt", "wkt_geom", "shape"}
@@ -117,7 +118,11 @@ def normalize_eu_decimal_columns(
 
 
 async def _download(
-    session: httpx.AsyncClient, url: str, *, raise_for_status: bool = True
+    session: httpx.AsyncClient,
+    url: str,
+    *,
+    raise_for_status: bool = True,
+    max_bytes: int = MAX_DOWNLOAD_BYTES,
 ) -> tuple[bytes, bool]:
     truncated = False
     # `url` comes from CKAN resource metadata -- external, not first-party --
@@ -128,7 +133,7 @@ async def _download(
             resp.raise_for_status()
 
         content_length = resp.headers.get("content-length")
-        if content_length and int(content_length) > MAX_DOWNLOAD_BYTES:
+        if content_length and int(content_length) > max_bytes:
             truncated = True
 
         chunks: list[bytes] = []
@@ -136,7 +141,7 @@ async def _download(
         async for chunk in resp.aiter_bytes(chunk_size=64 * 1024):
             chunks.append(chunk)
             total += len(chunk)
-            if total > MAX_DOWNLOAD_BYTES:
+            if total > max_bytes:
                 truncated = True
                 break
 
@@ -148,14 +153,25 @@ async def download_bytes(
     session: httpx.AsyncClient | None = None,
     *,
     raise_for_status: bool = True,
+    max_bytes: int = MAX_DOWNLOAD_BYTES,
 ) -> tuple[bytes, bool]:
-    """Download up to MAX_DOWNLOAD_BYTES with TLS fallback for portal hosts.
+    """Download up to `max_bytes` (default MAX_DOWNLOAD_BYTES) with TLS
+    fallback for portal hosts.
 
     raise_for_status=False is a narrow escape hatch for a confirmed host
     quirk (a WordPress/Elementor bug on censoecuador.gob.ec's
     /data-y-resultados/ page serves a real, substantial page under an HTTP
     404) -- default stays True so every other caller keeps failing loudly
     on a genuine error response.
+
+    max_bytes is an explicit override for callers whose format offers no
+    partial-download benefit -- a ZIP-container spreadsheet (.xlsx/.xlsb/
+    .ods) needs its central directory, which lives at the end of the file,
+    so a truncated download at the default cap fails outright rather than
+    degrading gracefully the way a truncated CSV still yields some rows.
+    Raising the cap for those formats specifically (see preview_xlsx/
+    preview_xlsb/preview_ods) trades a bounded amount of extra worst-case
+    bandwidth for turning a guaranteed failure into a successful preview.
     """
     own = session is None
     if own:
@@ -166,9 +182,11 @@ async def download_bytes(
         session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
     assert session is not None
     try:
-        logger.debug("Downloading from %s (max %d bytes)", url, MAX_DOWNLOAD_BYTES)
+        logger.debug("Downloading from %s (max %d bytes)", url, max_bytes)
         try:
-            return await _download(session, url, raise_for_status=raise_for_status)
+            return await _download(
+                session, url, raise_for_status=raise_for_status, max_bytes=max_bytes
+            )
         except httpx.ConnectError as exc:
             if should_retry_with_os_trust(exc, url):
                 logger.warning(
@@ -182,7 +200,10 @@ async def download_bytes(
                     verify=os_trust_context(),
                 ) as os_trust_session:
                     return await _download(
-                        os_trust_session, url, raise_for_status=raise_for_status
+                        os_trust_session,
+                        url,
+                        raise_for_status=raise_for_status,
+                        max_bytes=max_bytes,
                     )
             if not should_retry_insecure(exc, url):
                 raise
@@ -196,7 +217,10 @@ async def download_bytes(
                 verify=False,
             ) as insecure_session:
                 return await _download(
-                    insecure_session, url, raise_for_status=raise_for_status
+                    insecure_session,
+                    url,
+                    raise_for_status=raise_for_status,
+                    max_bytes=max_bytes,
                 )
     finally:
         if own:
@@ -422,10 +446,19 @@ async def preview_json(
 async def preview_xlsx(
     url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
 ) -> dict[str, Any]:
-    """Preview the first sheet of an Excel workbook."""
+    """Preview the first sheet of an Excel workbook.
+
+    .xlsx is a ZIP container whose central directory lives at the end of
+    the file, so a download truncated at the default cap can't open at all
+    (not a degraded-but-useful partial read the way a truncated CSV is) --
+    see download_bytes' max_bytes docstring. Worth the larger cap since the
+    alternative is a guaranteed failure, not a safety margin.
+    """
     from openpyxl import load_workbook
 
-    raw, truncated = await download_bytes(url, session=session)
+    raw, truncated = await download_bytes(
+        url, session=session, max_bytes=_MAX_DECOMPRESSED_BYTES
+    )
     wb = load_workbook(filename=io.BytesIO(raw), read_only=True, data_only=True)
     try:
         ws = wb.active
@@ -513,18 +546,24 @@ async def preview_xlsb(
     """Preview the first sheet of an Excel Binary Workbook (.xlsb)."""
     from pyxlsb import open_workbook
 
-    raw, truncated = await download_bytes(url, session=session)
+    raw, truncated = await download_bytes(
+        url, session=session, max_bytes=_MAX_DECOMPRESSED_BYTES
+    )
     if truncated:
         # .xlsb is a ZIP container (BIFF12 records instead of XLSX's XML),
         # so it fails the exact same way a truncated .zip does: the central
-        # directory lives at the end of the file, a download cut off at
-        # MAX_DOWNLOAD_BYTES is missing it, and zipfile can't open it at
-        # all -- confirmed against a real 9.3 MB resource (Registro Civil's
-        # "Defunciones Generales") with "File is not a zip file". Skip the
+        # directory lives at the end of the file, a download cut off before
+        # the end is missing it, and zipfile can't open it at all -- same
+        # reasoning as preview_xlsx/preview_ods, so this uses the same
+        # raised _MAX_DECOMPRESSED_BYTES cap (20 MB) rather than the default
+        # MAX_DOWNLOAD_BYTES (5 MB). Confirmed live against a real 9.3 MB
+        # resource (Registro Civil's "Defunciones Generales", now well
+        # inside the 20 MB cap) that a truncated read fails outright with
+        # "File is not a zip file", not a partial/degraded one -- skip the
         # doomed parse attempt and say what actually happened, same as
         # preview_zip.
         raise ValueError(
-            "El archivo .xlsb supera el límite de 5 MB de este preview, así "
+            "El archivo .xlsb supera el límite de 20 MB de este preview, así "
             "que se descargó incompleto y no se puede abrir (el índice del "
             "contenedor ZIP interno vive al final del archivo). Usa "
             "download_resource para bajarlo completo, o el enlace directo."
@@ -581,12 +620,20 @@ async def preview_xlsb(
 async def preview_ods(
     url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
 ) -> dict[str, Any]:
-    """Preview the first sheet of an OpenDocument Spreadsheet (.ods)."""
+    """Preview the first sheet of an OpenDocument Spreadsheet (.ods).
+
+    .ods is a ZIP container like .xlsx/.xlsb (see download_bytes' max_bytes
+    docstring) -- same higher cap, same reasoning: a truncated download
+    can't open at all, so there's no safety benefit to stopping early at
+    the default cap, only a guaranteed failure.
+    """
     from odf.opendocument import load
     from odf.table import Table, TableCell, TableRow
     from odf.teletype import extractText
 
-    raw, truncated = await download_bytes(url, session=session)
+    raw, truncated = await download_bytes(
+        url, session=session, max_bytes=_MAX_DECOMPRESSED_BYTES
+    )
     doc = load(io.BytesIO(raw))
     tables = doc.spreadsheet.getElementsByType(Table)
     empty = {
@@ -641,9 +688,6 @@ async def preview_ods(
         "format": "ods",
         "sheet": sheet.getAttribute("name"),
     }
-
-
-_MAX_DECOMPRESSED_BYTES = 20 * 1024 * 1024  # 20 MB
 
 
 def _gunzip_capped(raw: bytes, cap: int = _MAX_DECOMPRESSED_BYTES) -> tuple[bytes, bool]:

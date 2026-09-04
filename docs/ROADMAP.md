@@ -181,7 +181,7 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 |---|---|
 | Detección de patrón de serie | `detect_series_pattern` — clasifica acumulado/incremental/indeterminado, verificado contra IESS y MPCEIP → RESEARCH.md § `detect_series_pattern` — verificación end-to-end |
 | Búsqueda por siglas/acrónimos | Expansión de siglas/acrónimos en `search_datasets` y afines |
-| Formatos de archivo | `read_pdf` valida extensión/Content-Type antes de descargar; soporte para `.ods`, `.tar.gz`, `.xls` legado, `.zip` (truncado / sin miembro tabular / CSV malformado); `.rar` descartado explícitamente (ver Descartado) |
+| Formatos de archivo | `read_pdf` valida extensión/Content-Type antes de descargar; soporte para `.ods`, `.tar.gz`, `.xls` legado, `.xlsb`, `.zip` (truncado / sin miembro tabular / CSV malformado); `.rar` descartado explícitamente (ver Descartado). XLSX/XLSB/ODS (contenedores ZIP, fallan por completo si se truncan) usan un límite de descarga de 20 MB en vez del de 5 MB del resto → RESEARCH.md § Decimoséptima pasada |
 | Verificación end-to-end de cifras | Cifras reales verificadas contra el portal para SRI, IESS, MPCEIP, `.xls`/`.zip`, degradación cuando el portal no responde → RESEARCH.md § Verificación end-to-end de cifras |
 | Investigación "one-shot" | `investigate_dataset` — encadena `search_datasets` → `list_dataset_resources` → `preview_resource_data`, señala `detect_series_pattern` cuando aplica |
 | Protección HTTP base | `/mcp` admite Bearer token opcional, bind local por defecto a loopback, límite global de concurrencia; `/health` libre para health checks |
@@ -256,7 +256,6 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 
 | Fuente | Estado | Qué falta |
 |---|---|---|
-| Registro Civil / demográfico-salud | Parcial | Cobertura CKAN sólida; soporte de lector `.xlsb` construido (`preview_xlsb`, genérico para cualquier fuente) — pero el propio dataset de defunciones individuales (9.3 MB) supera el límite de 5 MB de `preview_resource_data`, así que sigue sin previsualizarse como tabla; alcanzable con `download_resource` → RESEARCH.md § Séptima pasada, § Decimoséptima pasada |
 | SENESCYT/Educación Superior | Parcial | Cubierto vía CKAN + biblioteca de Educación Superior; registro de títulos bloqueado por captcha (no automatizable) → RESEARCH.md § SENESCYT |
 | SRI Saiku | Parcial | Superficie anónima construida (ver Hecho); falta verificación contra el endpoint vivo desde un entorno con conectividad real |
 | INEC — preview de archivos grandes | Parcial | `list_zip_contents` lista miembros de ZIP vía HTTP Range sin descargar todo; decidido en contra de un índice pre-construido por dataset y de cualquier transferencia completa de archivo |
