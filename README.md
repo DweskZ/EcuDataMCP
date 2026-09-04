@@ -26,8 +26,8 @@ En lugar de navegar manualmente por portales gubernamentales, simplemente pregun
 
 ## Documentación del proyecto
 
-- **[ROADMAP.md](ROADMAP.md)** — qué fuentes están integradas y qué falta.
-- **[RESEARCH.md](RESEARCH.md)** — el porqué de cada fila del roadmap:
+- **[docs/ROADMAP.md](docs/ROADMAP.md)** — qué fuentes están integradas y qué falta.
+- **[docs/RESEARCH.md](docs/RESEARCH.md)** — el porqué de cada fila del roadmap:
   hallazgos verificados en vivo, dominios investigados, dead ends.
 - **[CHANGELOG.md](CHANGELOG.md)** — qué se publicó recientemente.
 

@@ -262,7 +262,7 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 | Fuente | Estado | Qué falta |
 |---|---|---|
 | Búsqueda semántica | No iniciado | `search_datasets` sigue siendo keyword puro de CKAN, sin comprensión semántica sobre el catálogo completo |
-| Simplificar y armonizar la arquitectura MCP | No iniciado | Reducir duplicaciones en la superficie pública, separar tools de mantenimiento, migrar a schemas/resultados/errores estructurados — diagnóstico y diseño en [docs/MCP_ARCHITECTURE.md](docs/MCP_ARCHITECTURE.md) |
+| Simplificar y armonizar la arquitectura MCP | No iniciado | Reducir duplicaciones en la superficie pública, separar tools de mantenimiento, migrar a schemas/resultados/errores estructurados — diagnóstico y diseño en [MCP_ARCHITECTURE.md](MCP_ARCHITECTURE.md) |
 | `outputSchema` en los tools MCP | No iniciado | — |
 | Manejo geoespacial | No iniciado | WKT/GeoJSON más allá del stripping actual |
 | Type-checking en CI | No iniciado | ruff cubre estilo/imports pero no errores de tipo; riesgo de destapar errores preexistentes en 40+ archivos — evaluar alcance antes de activar el gate |
@@ -293,7 +293,7 @@ Bloqueos reales confirmados en vivo, o decisiones explícitas de no construir �
 ## Arquitectura
 
 Cada fuente sigue el mismo patrón de 3 piezas, documentado en
-[CLAUDE.md](CLAUDE.md):
+[CLAUDE.md](../CLAUDE.md):
 
 ```
 helpers/<source>_client.py   # cliente HTTP + parseo
@@ -305,7 +305,7 @@ Cacheo TTL por fuente vía `helpers/cache.py`; nunca confiar en el `format`
 declarado por CKAN antes que la extensión de la URL (ver CLAUDE.md,
 "Conventions"). El diagnóstico y diseño propuesto para simplificar la
 superficie pública de tools vive en
-[docs/MCP_ARCHITECTURE.md](docs/MCP_ARCHITECTURE.md).
+[MCP_ARCHITECTURE.md](MCP_ARCHITECTURE.md).
 
 ## Agregar una fuente nueva
 

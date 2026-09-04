@@ -4,41 +4,72 @@ Revisión realizada el 2026-08-31 para decidir si EcuDataMCP debe simplificar,
 armonizar o reducir su número de tools. Este documento es una guía de diseño;
 no implica que todos los cambios deban hacerse de una sola vez.
 
-> **Cifras desactualizadas (nota 2026-09-04):** este documento cuenta 74
-> tools registradas al 2026-08-31; hoy son 103. El diagnóstico y el diseño
-> propuesto (perfil público vs. perfil de mantenimiento) probablemente
-> siguen siendo válidos, pero las cifras concretas de esta página (74, "~69
-> visibles") no se recalcularon — tratarlas como orientativas, no exactas,
-> hasta una revisión completa.
+> **Recalculado 2026-09-04.** La revisión original (2026-08-31) contaba 74
+> tools; hoy son 103 — se volvió a correr toda la evidencia de esta página
+> contra el repositorio actual, no solo se ajustó el número. Conclusión: el
+> diagnóstico y el diseño propuesto (perfil público vs. perfil de
+> mantenimiento) siguen siendo válidos sin cambios — no apareció duplicación
+> nueva entre las 29 tools agregadas desde entonces, y el bug de versión fija
+> en `list_capabilities` que esta página señalaba ya se corrigió
+> (`helpers/version.py` es ahora la única fuente de verdad del string de
+> versión). Solo cambió la escala: la superficie pública objetivo pasa de
+> ~69 a ~99, con el mismo puñado de reducciones de siempre.
 
 ## Conclusión corta
 
-El servidor tiene 74 tools registradas. Ese número no es, por sí solo, un
+El servidor tiene 103 tools registradas. Ese número no es, por sí solo, un
 problema de MCP: `tools/list` admite paginación y la especificación no fija un
 máximo pequeño. El problema actual es la forma de describir y devolver esas
 tools.
 
 La recomendación es mantener las capacidades específicas de cada fuente, pero
 reducir la superficie pública solo donde existe una duplicación clara. El
-objetivo inicial razonable es aproximadamente 69 tools visibles para usuarios,
+objetivo inicial razonable es aproximadamente 99 tools visibles para usuarios,
 con 2 o 3 tools de mantenimiento en un perfil separado.
 
 ## Evidencia del repositorio
 
-- Hay 74 módulos en `tools/` y 74 decoradores `@mcp.tool()` registrados.
-- Las 74 tools aceptan `format: str`, normalmente con los valores `text` o
-  `json`.
-- Las 74 declaran retorno `str`. Con el SDK MCP 1.29.0 usado por el entorno,
+- Hay 103 módulos en `tools/` y 103 decoradores `@mcp.tool()` registrados
+  (confirmado por tres vías independientes que coinciden: conteo de
+  archivos, conteo de decoradores, y llamadas `register_*_tool(mcp)` dentro
+  de `tools/__init__.py:register_tools`).
+- Las 103 tools aceptan `format: str`, normalmente con los valores `text` o
+  `json` — sin excepción, confirmado sobre las 103.
+- Las 103 declaran retorno `str` — también sin excepción. Con el SDK MCP
+  1.29.0 usado por el entorno (versión resuelta confirmada en `uv.lock`),
   `tools/list` las presenta con un output schema equivalente a un resultado
   textual (`result: string`), aunque muchas internamente construyen objetos
   JSON dentro de una cadena.
-- Ninguna tool define actualmente `title` ni anotaciones MCP.
-- No hay `Annotated`, `Field`, `Literal`, `BaseModel` o `TypedDict` en las
-  firmas públicas de las tools.
-- `list_capabilities` repite información del recurso `ecuador://fuentes` y
-  además tiene la versión fija `0.8.2`, mientras el servidor actual es `0.8.5`.
-- `search_datasets` y `list_recent_datasets` consultan el mismo catálogo y
-  entidad; la segunda cambia principalmente el criterio de orden.
+- Ninguna tool define actualmente `title` ni anotaciones MCP (0/103).
+- No hay `Annotated`, `Field`, `Literal[...]`, `BaseModel` ni `TypedDict` en
+  las firmas públicas de las tools (0/103) — la migración de esquemas de
+  entrada propuesta más abajo sigue sin empezar.
+- **Corregido desde la revisión original:** `list_capabilities` ya no tiene
+  una versión fija hardcodeada — usa `helpers.version.get_version()`, cuyo
+  propio docstring documenta que existe justamente para eliminar el bug que
+  esta página señalaba (versión de `list_capabilities` y del servidor
+  divergiendo por ser dos literales independientes). El resto del punto
+  original sigue en pie: `list_capabilities` sigue repitiendo información
+  ya disponible en el recurso `ecuador://fuentes`, así que la recomendación
+  de retirarlo de la superficie pública se mantiene por esa razón sola.
+- `search_datasets` y `list_recent_datasets` siguen consultando el mismo
+  catálogo y entidad; la segunda cambia principalmente el criterio de
+  orden — la única duplicación real identificada, sin cambios desde la
+  revisión original.
+- **Sin duplicación nueva entre las 29 tools agregadas desde el 2026-08-31**
+  (revisado nombre por nombre): los pares que a primera vista parecen
+  candidatos — `search_arcotel_boletines`/`search_arcotel_reportes_mensuales`,
+  `search_infomies_bases_mensuales`/`search_infomies_boletines_zonales` —
+  cubren series de datos genuinamente distintas de la misma institución
+  (confirmado contra RESEARCH.md), no el mismo catálogo con dos nombres.
+  Los pares `search_X`/`get_X_info` y `list_X`/`get_X_archivos` nuevos
+  (SRI RUC, SIPA geoportal, SEPS, SGR, Superbancos, INEVAL, IG-EPN informes)
+  son flujos de dos pasos, la misma forma que la regla 4 de abajo ya
+  protege — no candidatos a fusión.
+- Las únicas tools de "mantenimiento" (`audit_bce_catalog`,
+  `compare_bce_sources`) siguen siendo exactamente las mismas dos; no se
+  agregó ninguna tool nueva de ese tipo (`audit_*`/`compare_*`) desde la
+  revisión original.
 
 Esto indica que el mayor problema no es la cantidad bruta, sino que el cliente
 debe escoger entre muchos nombres y luego interpretar respuestas textuales.
