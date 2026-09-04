@@ -75,7 +75,8 @@ def register_investigate_dataset_tool(mcp: FastMCP) -> None:
 
         Args:
             query: Search keywords (e.g. "empleo", "SRI recaudación")
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             preview_rows: Data rows to preview from the chosen resource (default: 10, max: 50)
             format: text | json
         """

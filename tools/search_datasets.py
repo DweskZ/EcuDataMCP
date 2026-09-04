@@ -30,9 +30,11 @@ def register_search_datasets_tool(mcp: FastMCP) -> None:
             page_size: Results per page (default: 20, max: 100)
             category: Optional category filter (e.g. "sal" for Salud, "edu" for Educación).
                       Use list_categories to see all available categories.
-            source: "nacional" (www.datosabiertos.gob.ec, default) or "cuenca"
+            source: "nacional" (www.datosabiertos.gob.ec, default), "cuenca"
                     (cuencaendatos.cuenca.gob.ec, the Cuenca municipal open-data
-                    portal — a separate, smaller CKAN catalog)
+                    portal), or "latacunga" (datosabiertos.latacunga.gob.ec,
+                    the Latacunga municipal open-data portal) — separate,
+                    smaller CKAN catalogs
             format: text | json
         """
         page_size = min(max(page_size, 1), 100)

@@ -31,7 +31,8 @@ def register_download_resource_tool(mcp: FastMCP) -> None:
 
         Args:
             resource_id: The resource UUID (get it from list_dataset_resources)
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             format: text | json (json includes content_base64; use this to
                 actually retrieve the file)
         """

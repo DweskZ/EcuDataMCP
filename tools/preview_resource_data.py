@@ -117,7 +117,8 @@ def register_preview_resource_data_tool(mcp: FastMCP) -> None:
         Args:
             resource_id: The resource UUID (get it from list_dataset_resources)
             rows: Number of data rows to preview (default: 20, max: 100)
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             format: text | json
         """
         rows = min(max(rows, 1), 100)

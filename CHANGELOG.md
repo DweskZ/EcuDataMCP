@@ -4,6 +4,11 @@
 
 ### Added
 
+- **`source="latacunga"`** on the generic CKAN tools — a third CKAN
+  instance, "Data Mashca" (`datosabiertos.latacunga.gob.ec`), alongside
+  the existing national portal and Cuenca en Datos. 15 datasets (predial
+  cadastre, pet adoption/sterilization, active ordinances, waste
+  collection routes, heritage sites).
 - **`search_sipa_geoportal_capas` / `get_sipa_geoportal_capa_datos`** —
   Ministry of Agriculture's geoportal (`geoportal.agricultura.gob.ec`),
   277 WMS layers across 24 per-workspace GeoServer endpoints (discovered

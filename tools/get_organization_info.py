@@ -18,7 +18,8 @@ def register_get_organization_info_tool(mcp: FastMCP) -> None:
 
         Args:
             organization_id: The organization slug (e.g. "sri-servicio-de-rentas-internas")
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             format: text | json
         """
         try:

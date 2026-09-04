@@ -82,15 +82,17 @@ async def _fetch_json(
             await session.aclose()
 
 
-# A second CKAN instance the tools can target via `source=` -- the same
+# Other CKAN instances the tools can target via `source=` -- the same
 # API shape (package_search/package_show/resource_show/...), just a
-# different portal, so no separate client module is needed. "nacional" is
-# the historical default (www.datosabiertos.gob.ec); "cuenca" is the
-# municipal portal (cuencaendatos.cuenca.gob.ec, confirmed live: CKAN
-# 2.9.6, 92 datasets).
+# different portal, so no separate client module is needed per source.
+# "nacional" is the historical default (www.datosabiertos.gob.ec); "cuenca"
+# is the municipal portal (cuencaendatos.cuenca.gob.ec, confirmed live: CKAN
+# 2.9.6, 92 datasets); "latacunga" is another municipal portal, "Data
+# Mashca" (datosabiertos.latacunga.gob.ec, confirmed live: 15 datasets).
 _SOURCES = {
     "nacional": ("ckan", "ckan_site"),
     "cuenca": ("cuenca", "cuenca_site"),
+    "latacunga": ("latacunga", "latacunga_site"),
 }
 
 
@@ -99,7 +101,8 @@ def _resolve_source(source: str) -> tuple[str, str]:
         return _SOURCES[source]
     except KeyError:
         raise ValueError(
-            f"source inválido: {source!r}. Usa 'nacional' o 'cuenca'."
+            f"source inválido: {source!r}. Usa 'nacional', 'cuenca' o "
+            "'latacunga'."
         ) from None
 
 

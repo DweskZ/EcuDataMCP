@@ -146,11 +146,12 @@ de cobertura que falta en cada una.
 | API REST de publicaciones (WordPress) | `search_inec_publicaciones`, `get_inec_publicacion_archivos` | Búsqueda de texto completo sobre 1.707 posts — cubre páginas que el menú mega-menu de una sola semilla no alcanza (ENEMDU anual, etc.) → RESEARCH.md § Novena pasada |
 | Censo (censoecuador.gob.ec) | `search_censo_recursos` | 36 archivos reales, solo metadata + URL → RESEARCH.md § Novena pasada |
 
-### Cuenca en Datos
+### CKAN municipales (Cuenca, Latacunga)
 
 | Fuente | Herramientas | Qué cubre |
 |---|---|---|
-| CKAN municipal (Cuenca) | Tools CKAN genéricos con `source="cuenca"` | 92 datasets, 13 categorías, mismo shape de API que el portal nacional → RESEARCH.md § Cuenca en Datos |
+| Cuenca en Datos | Tools CKAN genéricos con `source="cuenca"` | 92 datasets, 13 categorías, mismo shape de API que el portal nacional → RESEARCH.md § Cuenca en Datos |
+| Data Mashca (Latacunga) | Tools CKAN genéricos con `source="latacunga"` | 15 datasets (catastro predial, adopción/esterilización de mascotas, ordenanzas vigentes, rutas de recolección de desechos, sitios patrimoniales, puntos wifi) → RESEARCH.md § Decimosexta pasada |
 
 ### Ministerio del Trabajo
 
@@ -237,6 +238,8 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 | Nowcast / Encuesta de Expertos | No iniciado | Previsiones de PIB/empleo/desempleo/inflación; separar estimación de dato observado, conservar metodología y revisiones |
 | Calidad del aire de Quito | No iniciado | `aireambiente.quito.gob.ec` responde pero sin contenido en HTML crudo (SPA); necesita browser real o su API subyacente |
 | Cancillería y embajadas | No iniciado | Dominio vivo (`cancilleria.gob.ec`), sin pasada de contenido dedicada — trámites consulares, apostillas, estadísticas migratorias sin confirmar |
+| CNE (Consejo Nacional Electoral) | Potencial, revisar de nuevo | Marcado descartado en una pasada anterior por WAF Incapsula en el micrositio de resultados; pedido explícito de Daniel 2026-09-04 de reevaluar — confirmar si el bloqueo aplica a todo `cne.gob.ec` o solo a ese micrositio, y si hay datasets/API alcanzables (padrón, resultados históricos, financiamiento de campañas) fuera de la zona bloqueada |
+| Geoportales municipales (Quito, Riobamba, Portoviejo/Fénix, Ambato) | No iniciado | Encontrados vía directorio de "Municipios Abiertos" (`municipiosabiertos.gob.ec`); patrón WMS/WFS como INAMHI/SIPA, no CKAN. URL exacta del GeoServer/ArcGIS sin confirmar para ninguno; Quito además tenía "la primera plataforma de datos abiertos del país" (2014) sin catálogo vivo encontrado en esta pasada → RESEARCH.md § Decimosexta pasada |
 | ARCSA | Parcial | 4 datasets CKAN reales, solo registros suspendidos/cancelados; el registro sanitario vigente (`controlsanitario.gob.ec`) está caído (reset TLS) — reintentar más adelante → RESEARCH.md § Décima pasada |
 | Vivienda MIDUVI | No iniciado | Dominio caído a nivel TLS, sin reemplazo encontrado; CKAN cubre parcialmente (5 datasets) → RESEARCH.md § Vivienda (MIDUVI) |
 | Prensa | No iniciado | SECOM/Presidencia (boletines) y Fundamedios (agresiones a prensa); sin confirmar si hay datasets descargables → RESEARCH.md § Prensa |
@@ -277,7 +280,7 @@ Bloqueos reales confirmados en vivo, o decisiones explícitas de no construir �
 | `.rar` | Riesgo de subprocess/CVE — decidido explícitamente en contra |
 | SIPA/MAG — precios mayoristas como fuente de alta frecuencia | Solo boletines PDF mensuales y un documento regulatorio de piso/techo sin historia; app móvil "cgsin.precios" sin explorar → RESEARCH.md § Duodécima pasada |
 | BCE — prueba de completitud y frescura programada | Requiere scheduler con almacenamiento persistente de snapshots; Daniel decidió no construir esa infraestructura (la comparación bajo demanda ya existe vía `audit_bce_catalog`) |
-| CNE y micrositio de Interior (`cifras.ministeriodelinterior.gob.ec`) | WAF Incapsula |
+| Micrositio de Interior (`cifras.ministeriodelinterior.gob.ec`) | WAF Incapsula |
 | Aduana/SENAE — comercio exterior | No publicado en portal abierto, solo por oficio (FEDEXPOR cubre el hueco, ver gremios privados) |
 | Fiscalía General del Estado | Sin dataset agregado propio; sus herramientas de consulta son caso-por-caso |
 | Supercías — Valores y Seguros | Login-gated casi por completo; un solo PDF estático encontrado |

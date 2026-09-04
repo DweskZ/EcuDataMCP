@@ -46,6 +46,12 @@ def _fuentes_payload() -> dict:
                 "tools": _CKAN_TOOLS,
             },
             {
+                "id": "latacunga",
+                "nombre": "Data Mashca (portal municipal CKAN de Latacunga, independiente del nacional)",
+                "base": "https://datosabiertos.latacunga.gob.ec/",
+                "tools": _CKAN_TOOLS,
+            },
+            {
                 "id": "sri",
                 "nombre": (
                     "SRI: datasets fuera de CKAN, RUC, estadísticas de "

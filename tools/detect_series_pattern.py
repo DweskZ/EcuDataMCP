@@ -219,7 +219,8 @@ def register_detect_series_pattern_tool(mcp: FastMCP) -> None:
             resource_id_old: Optional -- older resource ID to compare (auto-detected
                 if omitted). Both resource_id_new/resource_id_old must be given
                 together, or neither.
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             format: text | json
         """
         if bool(resource_id_new) != bool(resource_id_old):

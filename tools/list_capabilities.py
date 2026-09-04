@@ -10,8 +10,9 @@ _CAPABILITIES = {
     "fuentes": [
         "CKAN datos abiertos (nacional, www.datosabiertos.gob.ec)",
         (
-            "Cuenca en Datos (portal municipal CKAN independiente, "
-            "source='cuenca' en los mismos tools CKAN)"
+            "Cuenca en Datos y Data Mashca/Latacunga (portales municipales "
+            "CKAN independientes, source='cuenca'/'latacunga' en los "
+            "mismos tools CKAN)"
         ),
         "gob.ec trámites/instituciones/regulaciones + estadísticas de transparencia por trámite",
         "SERCOP OCDS contratos",

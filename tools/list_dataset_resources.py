@@ -107,7 +107,8 @@ def register_list_dataset_resources_tool(mcp: FastMCP) -> None:
 
         Args:
             dataset_id: The dataset ID or slug
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             format: text | json
         """
         try:

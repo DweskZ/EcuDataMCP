@@ -3772,6 +3772,88 @@ que ya existen en cualquier institución.
 
 ---
 
+## Decimosexta pasada — otras instancias CKAN municipales, geoportales de "Municipios Abiertos"
+
+**Pedido de Daniel 2026-09-04:** buscar otros portales CKAN ecuatorianos más
+allá de `datosabiertos.gob.ec` (nacional) y `cuencaendatos.cuenca.gob.ec`
+(municipal, ya integrado como `source="cuenca"`).
+
+### `datosabiertos.latacunga.gob.ec` — "Data Mashca", CKAN real confirmado
+
+Encontrado vía búsqueda web ("CKAN Ecuador datos abiertos municipio").
+Confirmado en vivo con la API estándar de CKAN
+(`/api/3/action/package_list`): **15 datasets** — atenciones médicas
+(incluida la del Patronato), catastro predial rural/urbano, adopción y
+esterilización de mascotas 2025, emprendimientos en ferias, graduados del
+CIEDES, inventario de establecimientos turísticos, ordenanzas vigentes
+(marzo 2026), puntos wifi gratuitos, rutas de recolección de desechos,
+sitios patrimoniales arquitectónicos, sitios seguros de evacuación. Mismo
+patrón exacto que Cuenca. **Construido el mismo día**: tercera entrada en
+`helpers/ckan_client._SOURCES` (`source="latacunga"`) más las URLs
+correspondientes en `helpers/env_config.py` — ningún cliente nuevo, los
+tools genéricos (`search_datasets`, `list_dataset_resources`,
+`preview_resource_data`, etc.) ya soportaban múltiples fuentes CKAN vía el
+parámetro `source`, así que solo hizo falta extender el diccionario de
+fuentes y las 13 docstrings que enumeran los valores válidos de `source`.
+Verificado en vivo extremo a extremo (`search_datasets(query="catastro",
+source="latacunga")` → 3 resultados reales).
+
+### Municipios que NO tienen CKAN en el patrón `datosabiertos.<ciudad>.gob.ec`
+
+Probado en vivo (`curl` contra `/api/3/action/package_list`, timeout 10s):
+Riobamba, Portoviejo, Ambato, Guayaquil, Loja, Ibarra, Machala,
+Esmeraldas — los ocho dieron timeout de conexión (sin servidor en ese
+subdominio), no un error HTTP. No se puede descartar que tengan un CKAN
+en otra URL, pero no siguen el patrón de Cuenca/Latacunga.
+
+### `municipiosabiertos.gob.ec` — directorio de "buenas prácticas" de gobierno abierto municipal
+
+Sitio WordPress (Fundación Datalat + AME + FCD + apoyo USAID/NED, parte
+del 2do Plan de Acción de Gobierno Abierto Ecuador). Expone un custom post
+type `buenas-practicas` vía su API REST
+(`/wp-json/wp/v2/buenas-practicas?per_page=100`, confirmado `X-WP-Total:
+20`, una sola página) — catálogo completo de 20 iniciativas municipales de
+gobierno abierto/datos abiertos, útil como directorio para futuras pasadas
+en vez de tener que descubrir cada portal por separado. Ninguna de las
+entradas trae un link directo al portal en el HTML (`href` ausente en casi
+todos los posts) — el nombre de cada práctica hay que resolverlo a mano a
+una URL real. Relevantes, pero **ninguno es CKAN** — son geoportales
+(GeoServer/ArcGIS, mismo patrón ya usado para INAMHI/SIPA) o páginas
+WordPress descriptivas sin catálogo real detrás:
+
+- **Geoportal Quito** — geovisualizador + descargas + ráster + mapoteca,
+  cobertura política-administrativa/ambiente/riesgos/movilidad/turismo/
+  cultura. `gobiernoabierto.quito.gob.ec` (el portal "Gobierno Abierto
+  Quito" enlazado desde el directorio) es WordPress puro, sin catálogo
+  CKAN ni API propia — solo páginas descriptivas del modelo de gobierno
+  abierto y un enlace de salida al geoportal real. Quito declara haber
+  tenido "la primera plataforma de datos abiertos del país" en 2014, pero
+  no se encontró un catálogo vivo en la URL esperada
+  (`datosabiertos.quito.gob.ec`/`datos.quito.gob.ec`: ambas sin DNS) —
+  posible plataforma descontinuada o migrada a otra URL no descubierta
+  todavía.
+- **Geoportal Riobamba**, **Fénix Geoportal** (Portoviejo, ligado a la
+  Ordenanza Plan Portoviejo 2035), **Geoportal Servicios Virtuales**
+  (Ambato — catastro predial, POT/PUGS, contenedores, rutas de buses,
+  gestión de riesgos, obras públicas) — mismo patrón: visor geoespacial
+  municipal, sin más detalle de URL confirmado en esta pasada.
+- **Visor georeferenciado de obras públicas** — sin institución identificada
+  en el título, contenido describe búsqueda por zona/parroquia/barrio/
+  estado de obra.
+- Cuatro entradas de "Gobierno Abierto"/"Portal de Gobierno Abierto" (Quito
+  x2, Riobamba, Cuenca) son solo páginas institucionales sobre el modelo de
+  gestión (ordenanzas, comités, planes de acción), no fuentes de datos.
+
+**Conclusión:** el único hallazgo CKAN nuevo y accionable de esta pasada es
+Latacunga. Los geoportales municipales (Quito/Riobamba/Portoviejo/Ambato)
+son candidatos reales pero de un tipo distinto (WMS/WFS, no CKAN) — cada
+uno necesitaría su propia pasada de investigación (confirmar URL exacta del
+GeoServer/ArcGIS REST, capas disponibles) antes de decidir si vale la pena
+construirlos, siguiendo el mismo patrón que `helpers/inamhi_client.py`/
+`helpers/sipa_geoportal_client.py`.
+
+---
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

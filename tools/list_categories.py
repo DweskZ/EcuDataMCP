@@ -20,7 +20,8 @@ def register_list_categories_tool(mcp: FastMCP) -> None:
         to filter results by topic.
 
         Args:
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             format: text | json
         """
         try:

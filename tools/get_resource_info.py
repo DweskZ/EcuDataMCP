@@ -32,7 +32,8 @@ def register_get_resource_info_tool(mcp: FastMCP) -> None:
 
         Args:
             resource_id: The resource UUID
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             format: text | json
         """
         try:

@@ -24,7 +24,8 @@ def register_search_organizations_tool(mcp: FastMCP) -> None:
             query: Optional search term (e.g. "salud", "SRI", "INEC")
             page: Page number (1-based, default: 1)
             page_size: Results per page (default: 20, max: 100)
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             format: text | json
         """
         page_size = min(max(page_size, 1), 100)

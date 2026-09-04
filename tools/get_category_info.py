@@ -23,7 +23,8 @@ def register_get_category_info_tool(mcp: FastMCP) -> None:
         Args:
             category: Category slug/name from list_categories
             include_datasets: Include sample datasets in the category (default True)
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             format: text | json
         """
         try:
