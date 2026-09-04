@@ -244,6 +244,7 @@ async def main() -> int:
             ("sut: list -> schema", chain_sut(client)),
             ("superbancos: list -> archivos", chain_superbancos(client)),
             ("igepn: search -> informe", chain_igepn(client)),
+            ("ckan: search -> resources -> preview", chain_ckan_preview(client)),
         ]:
             chains += 1
             try:
@@ -308,6 +309,52 @@ async def chain_igepn(client: httpx.AsyncClient) -> None:
     )
     if "Traceback" in texto[:200] or texto.strip().startswith(("Error:", "ERROR:")):
         raise AssertionError(texto[:200])
+
+
+async def chain_ckan_preview(client: httpx.AsyncClient) -> None:
+    search = json.loads(
+        await call_tool(
+            client,
+            "search_datasets",
+            {"query": "SRI recaudacion", "page_size": 5, "format": "json"},
+        )
+    )
+    datasets = search.get("results") or []
+    if not datasets:
+        raise AssertionError("search_datasets returned no results for 'SRI recaudacion'")
+
+    tabular_formats = {"csv", "xlsx", "xls", "ods"}
+    for dataset in datasets:
+        dataset_id = dataset.get("name") or dataset.get("id")
+        if not dataset_id:
+            continue
+        listing = json.loads(
+            await call_tool(
+                client,
+                "list_dataset_resources",
+                {"dataset_id": dataset_id, "format": "json"},
+            )
+        )
+        resources = listing.get("resources") or []
+        resource = next(
+            (r for r in resources if (r.get("format") or "").lower() in tabular_formats),
+            resources[0] if resources else None,
+        )
+        if resource is None:
+            continue
+
+        preview = await call_tool(
+            client,
+            "preview_resource_data",
+            {"resource_id": resource["id"], "rows": 3, "format": "json"},
+        )
+        if "Traceback" in preview[:200] or preview.strip().startswith(("Error:", "ERROR:")):
+            raise AssertionError(preview[:200])
+        return
+
+    raise AssertionError(
+        "no dataset among the top 5 'SRI recaudacion' results had a previewable resource"
+    )
 
 
 if __name__ == "__main__":

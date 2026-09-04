@@ -4,6 +4,13 @@ Revisión realizada el 2026-08-31 para decidir si EcuDataMCP debe simplificar,
 armonizar o reducir su número de tools. Este documento es una guía de diseño;
 no implica que todos los cambios deban hacerse de una sola vez.
 
+> **Cifras desactualizadas (nota 2026-09-04):** este documento cuenta 74
+> tools registradas al 2026-08-31; hoy son 103. El diagnóstico y el diseño
+> propuesto (perfil público vs. perfil de mantenimiento) probablemente
+> siguen siendo válidos, pero las cifras concretas de esta página (74, "~69
+> visibles") no se recalcularon — tratarlas como orientativas, no exactas,
+> hasta una revisión completa.
+
 ## Conclusión corta
 
 El servidor tiene 74 tools registradas. Ese número no es, por sí solo, un

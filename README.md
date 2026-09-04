@@ -24,6 +24,15 @@ En lugar de navegar manualmente por portales gubernamentales, simplemente pregun
 
 ---
 
+## Documentación del proyecto
+
+- **[ROADMAP.md](ROADMAP.md)** — qué fuentes están integradas y qué falta.
+- **[RESEARCH.md](RESEARCH.md)** — el porqué de cada fila del roadmap:
+  hallazgos verificados en vivo, dominios investigados, dead ends.
+- **[CHANGELOG.md](CHANGELOG.md)** — qué se publicó recientemente.
+
+---
+
 ## Beneficios
 
 - **Acceso instantáneo a datos públicos**: Pregunta en lenguaje natural y explora datos de instituciones del Estado ecuatoriano sin navegar portales, descargar archivos ni lidiar con formatos.
