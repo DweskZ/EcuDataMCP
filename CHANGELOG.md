@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.6 — 2026-09-04
+
 ### Added
 
 - **`list_iess_colecciones` / `get_iess_archivos`** — IESS's (Instituto

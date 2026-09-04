@@ -1,6 +1,6 @@
 [project]
 name = "ecuador-mcp"
-version = "0.8.5"
+version = "0.8.6"
 description = "Open public-data infrastructure for Ecuador, connecting official sources to AI assistants and software through MCP."
 authors = [{ name = "Ecuador MCP Contributors" }]
 readme = "README.md"
