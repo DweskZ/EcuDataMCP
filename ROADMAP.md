@@ -1,315 +1,315 @@
 # Roadmap
 
-Lista corta y accionable de lo que falta, lo que está parcial, y lo que se
-decidió no hacer. Las fuentes de datos ya completadas al 100% se sacaron de
-aquí para no inflar la lista — viven en [SOURCES.md](SOURCES.md). Para el
-porqué de cada ítem — hallazgos, cifras verificadas, dominios investigados,
-dead ends confirmados — ver [RESEARCH.md](RESEARCH.md).
+Roadmap público de EcuDataMCP — servidor MCP de datos abiertos del gobierno
+ecuatoriano (CKAN, BCE, SRI, INEC, Supercías, IESS/SENESCYT, SIPA, sector
+eléctrico, y más). Para el porqué de cada fila — hallazgos, cifras
+verificadas, dominios investigados, dead ends confirmados — ver
+[RESEARCH.md](RESEARCH.md).
 
-Leyenda: `[ ]` sin empezar · `[~]` parcial · `[x]` hecho
+Leyenda de Estado (tablas de Pendiente): **No iniciado** · **Parcial — ...**
 
-## Dirección de producto: portable y usable desde móvil
+---
 
-- [ ] **Separar cliente y despliegue** — mantener `stdio` para uso local, pero
-      ofrecer una imagen Docker multi-arquitectura (`linux/amd64` y
-      `linux/arm64`) y una configuración solo por variables de entorno. El
-      agente del teléfono no debe instalar Python, descargar datos ni guardar
-      una base de datos: debe consumir un único endpoint MCP remoto por HTTPS.
-- [~] **Endpoint remoto para agentes** — el proceso ya admite autenticación Bearer,
-      HTTPS directo mediante certificados Uvicorn, límite global y límite por
-      cliente/IP, además de `/health`. Sigue pendiente publicar la instancia
-      estable detrás de un proxy HTTPS, con DNS, secretos y operación real.
-      El endpoint público no debe depender de `localhost`, del disco del
-      desarrollador ni de una terminal abierta.
-- [ ] **Persistencia portable** — separar el proceso MCP del almacenamiento:
-      volumen/objeto persistente para cachés y artefactos grandes, backups,
-      restauración y una ruta de actualización reproducible. El servidor debe
-      poder recrearse desde la imagen sin perder el estado actualizado.
-- [~] **Contrato de respuesta para agentes** — BCEData/IEM ya incluyen el
-      bloque estable `metadatos` con fuente, URL, fecha de publicación/corte,
-      fecha de consulta, frescura y esquema semántico, sin romper los campos
-      históricos. Falta extender el contrato a las demás fuentes y migrar los
-      resultados MCP nativos desde texto dual (`format=text|json`) a schemas
-      estructurados completos. Los archivos grandes deben quedarse en el
-      servidor; el agente debe recibir resultados paginados o enlaces, no
-      cientos de megabytes.
-- [~] **Operación 24/7** — `.github/workflows/smoke.yml` corre
-      `scripts/smoke_e2e.py` diariamente contra un servidor recién
-      levantado (~39/68 tools cubiertos), separado de `ci.yml`.
-      Pendiente: alertas específicas de cambio de esquema. → RESEARCH.md
-      § Infraestructura operativa
+## Hecho
 
-## Nuevas conexiones de datos
+Fuentes de datos ya integradas (herramienta MCP construida y verificada en
+vivo). Varias siguen ampliándose — ver la tabla de Pendiente para el detalle
+de cobertura que falta en cada una.
 
-### Mapa de datos de alta frecuencia, aportado por Daniel 2026-08-31
+### Banco Central del Ecuador (BCE)
 
-Tabla de candidatos de alta frecuencia que Daniel trajo de su propia
-investigación — cruzada contra el estado real de este roadmap, no
-copiada tal cual:
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| BCEData (catálogo) | `search_indicadores_bce`, `get_indicador_bce`, `audit_bce_catalog` | 78 grupos / 2.360 series de la API pública sin auth; auditoría de cobertura en vivo (`guardar_snapshot`/`comparar_anterior`) → RESEARCH.md § Banco Central del Ecuador (BCE), § Duodécima pasada |
+| Información Estadística Mensual (IEM/IEEM) | `search_bce_iem`, `get_bce_iem_table` | Archivo completo 1996-2026 (367 boletines, 3 eras de formato: XLSX individual, ZIP `.xls` legado, HTML de frameset), lectura semántica de tablas → RESEARCH.md § Decimotercera pasada |
+| BCEData ↔ IEM | `compare_bce_sources` | Mapa de coincidencias candidatas por etiqueta/confianza, cola revisable → RESEARCH.md § Decimotercera pasada |
+| Indicadores diarios/mensuales | `list_bce_indicadores_diarios`, `get_bce_indicador_diario` | 49 series en 13 archivos JSON: Riesgo País (D), Producción Petrolera (D), oro/WTI/Dow Jones/SOFR, bonos soberanos, reservas, deuda pública, balanza comercial... → RESEARCH.md § Décima pasada, § Decimotercera pasada |
+| Sistema de páginas índice editoriales | `search_bce_indices`, `get_bce_indice_archivo` | ~35 páginas con archivo histórico completo por publicación con nombre propio (boletines sectoriales, precios/confianza, divisas, balanza de pagos) → RESEARCH.md § Duodécima pasada |
+| Remesas de trabajadores | `search_bce_remesas` | Agregados, serie histórica y bases mensuales, desagregación por entidad desde jul-2025 → RESEARCH.md § Banco Central del Ecuador (BCE) |
+| Precios de comercio exterior | `search_bce_precios_comex` | IPX/IPM/ITI desagregados por categoría de uso económico y producto individual → RESEARCH.md § Decimotercera pasada |
+| Últimas publicaciones | `search_bce_publicaciones` | Ventana rodante (~30 más recientes) → RESEARCH.md § Duodécima pasada |
 
-| Fuente | Frecuencia | Qué mide | Estado en este proyecto |
-|---|---|---|---|
-| BCE, producción petrolera | Diaria | Barriles producidos | [x] hecho — `datos_hid.json` vía `get_bce_indicador_diario`, ver SOURCES.md § BCE |
-| BCE, riesgo país | Diaria | EMBI Ecuador | [x] hecho — `datos_formulario.json`, el hallazgo que arrancó esta familia de indicadores |
-| BCE, oro/WTI/Dow Jones/SOFR | Diaria | Mercados y precios internacionales | [x] hecho — `datos_diarios.json` |
-| CENACE, Información Operativa | Horaria/diaria | Demanda eléctrica, generación, despacho | [x] hecho — `get_cenace_tablero`, snapshot en vivo (no serie histórica), ver SOURCES.md § Sector eléctrico |
-| SIPA/MAG, precios mayoristas | Diaria o quincenal según producto | Precios mayoristas de alimentos | [ ] Descartado como fuente de alta frecuencia — solo boletines PDF mensuales y un documento regulatorio de piso/techo de precio sin historia. App móvil "cgsin.precios" sin explorar. → RESEARCH.md § Duodécima pasada |
-| INAMHI, Geoportal | Horaria/diaria | Lluvia, temperatura, caudales, estaciones | [x] hecho parcial (`geoservicios.inamhi.gob.ec`) — 222 capas WMS catalogadas, 199 con datos WFS reales; ver SOURCES.md § INAMHI. Sin capa de estaciones puntuales. |
-| IG-EPN, sismos | Casi tiempo real | Sismos, magnitud, ubicación, profundidad | [x] hecho — `search_sismos`, la única fuente genuinamente de alta frecuencia ya integrada antes de esta pasada |
-| DGAC/IFIS | Diaria | Vuelos y movimientos por aeropuerto | [x] METAR/NOTAM/SIGMET hecho (`ais.aviacioncivil.gob.ec`, ver SOURCES.md § Aviación civil) — pero la fila de Daniel apunta más bien a estadísticas de movimientos/vuelos por aeropuerto, que puede ser una sección distinta del mismo sitio (IFIS) sin explorar todavía; no asumir que es la misma sub-fuente que METAR/NOTAM/SIGMET. |
+### SRI
 
-### Objetivo prioritario: cobertura completa del BCEData y del IEM
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Página de datasets | `search_sri_datasets` | 130 enlaces directos (CSV/ZIP/XLSX) de un CMS Liferay sin API → RESEARCH.md § SRI — página de datasets |
+| Estadísticas de recaudación | `search_sri_estadisticas_recaudacion` | Reportes XLSX mensuales por provincia/cantón/sector, complementario a `/datasets` → RESEARCH.md § Séptima pasada |
+| Saiku (OLAP) | `list_sri_saiku_cubes`, `describe_sri_saiku_cube`, `query_sri_saiku_aggregate` | Superficie anónima de solo lectura, 1 dimensión/medida, 100 filas; sin MDX arbitrario/drill-through/exportación — ver Pendiente para verificación en vivo |
 
-“Completa” aquí significa que el servidor descubre automáticamente todo lo
-que la fuente expone, no que solo conozca los indicadores más conocidos. La
-integración debe poder demostrar qué grupos, series, frecuencias, unidades,
-fechas, boletines y archivos encontró, y cuáles no pudo leer.
+### Superintendencia de Compañías (Supercías)
 
-- [~] **BCEData completo — catálogo y series**: cubrir todos los nodos hoja de
-      `/tree`, el metadata de cada `/bundle/{id_grupo}` y todos los valores
-      disponibles en `/grid`, con búsqueda de grupos y series internas y
-      consulta explícita de cualquier frecuencia/unidad/período. Descubrimiento
-      y consulta ya implementados; `auditar_grid=true` prueba un período
-      reciente por combinación (límite 500, reporte persistente separado).
-      Sigue pendiente comprobar cambios de revisión — el endpoint no expone
-      ningún marcador explícito hoy, así que la comparación por contenido es
-      la única evidencia disponible. → RESEARCH.md § Duodécima pasada
-- [x] **BCEData completo — verificación de cobertura**: `audit_bce_catalog`
-      consulta el árbol y metadatos de todos los grupos, registra qué falló y
-      cuándo. `guardar_snapshot=true`/`comparar_anterior=true` detectan
-      grupos/series nuevos, retirados o modificados. `scripts/audit_bce_catalog.py`
-      deja el flujo listo para cron/scheduler. No depende de una lista fija de IDs.
-- [~] **IEM completo — archivo y archivos fuente**: `search_bce_iem`
-      reconcilia el índice, "Últimas publicaciones" y el archivo oficial
-      `iem-publicaciones/` (367 boletines, No. 1727–2093, 1996–2026). El
-      archivo completo cubre **tres eras** con lectores distintos: XLSX
-      individuales (No. 1976–2093), ZIP de `.xls` legado por tabla (No.
-      1854–1975) y HTML de frameset pre-moderno parseado a grilla (No.
-      1727–1853). Pendiente: hashing masivo del histórico y confirmar que
-      las 126 secciones más viejas siguen todas la misma forma (solo
-      muestreado). → RESEARCH.md § Decimotercera pasada
-- [x] **IEM completo — lectura de tablas**: valores buscables de todas las
-      tablas individuales (formas ancha, larga, matriz), no solo títulos;
-      normaliza meses numéricos/español, trimestres y tablas sin unidad
-      explícita; vista fiel del original cuando no es seguro normalizar.
-      Barrido en vivo: 98.7% de las tablas del boletín vigente se extraen
-      ya en forma semántica; los `vista` restantes son tablas legadas con
-      jerarquías de encabezado genuinamente irregulares, no una familia
-      repetible. → RESEARCH.md § Duodécima pasada, § Decimotercera pasada
-- [~] **BCEData ↔ IEM — mapa de equivalencias**: `compare_bce_sources` genera
-      coincidencias candidatas por etiquetas normalizadas, confianza y
-      campos pendientes de revisión; `guardar_revision=true` y
-      `scripts/audit_bce_equivalence.py` persisten una cola revisable. Dos
-      candidatos confirmados manualmente con datos en vivo (uno de
-      equivalencia directa, uno de cobertura parcial tabla↔grupo); el
-      resto no se trata como duplicado confirmado sin revisar valores y
-      metodología. → RESEARCH.md § Duodécima pasada, § Decimotercera pasada
-- [x] ~~BCE — prueba de completitud y frescura~~ **Descartado 2026-09-02**:
-      requiere un scheduler con almacenamiento persistente de snapshots, que
-      Daniel decidió no construir. `audit_bce_catalog`/`audit_bce_iem` ya
-      hacen la comparación bajo demanda (no programada) cuando se invocan
-      con `guardar_snapshot=true`/`guardar_catalogo=true`.
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Directorio de compañías | `search_companias`, `get_compania_info` | 226k+ compañías, actualizado a diario desde el export Excel estático del portal → RESEARCH.md § Superintendencia de Compañías (Supercías) |
+| Ranking financiero | `search_ranking`, `get_financials` | ~38 ratios financieros por compañía/año fiscal, sobre SQLite local (`scripts/build_supercias_financials_db.py`) — ver Pendiente para portabilidad/actualización |
+| Auditores externos | `search_auditores`, `get_auditor_info` | Registro de auditores externos |
 
-- [~] BCE — indicadores vía BCEData (`search_indicadores_bce`/`get_indicador_bce`).
-      La cobertura confirmada es el catálogo BCEData que expone sus cuatro
-      secciones principales (monetaria/financiera, finanzas públicas, sector
-      externo y sector real); no debe describirse como todo el sistema de
-      información del BCE.
-- [~] Supercías — compañías, ranking financiero, auditores. La integración
-      funciona, pero el ranking financiero todavía depende de una base SQLite
-      local construida manualmente; la portabilidad y actualización automática
-      quedan en los ítems específicos de abajo.
-- [ ] **Supercías: pipeline financiero actualizable** — usar como fuente de
-      datos masiva la página oficial de [Ranking de Compañías](https://appscvsmovil.supercias.gob.ec/ranking/reporte.html), que expone
-      `bi_ranking.csv`, las tablas auxiliares y rankings anuales, y declara que
-      sus archivos se actualizan cada 24 horas. Separar descarga, validación,
-      transformación y publicación; no descargar los ~356 MB dentro de una
-      solicitud MCP.
-- [ ] **Supercías: refresh seguro y reproducible** — implementar un comando de
-      actualización idempotente que compruebe metadatos/huella del archivo,
-      descargue a staging, valide esquema, tamaño, filas, años, duplicados,
-      nulos y tasas de conversión, construya índices SQLite y haga un reemplazo
-      atómico solo después de pasar la validación. Guardar `source_url`,
-      `fetched_at`, `source_last_modified` si existe y el hash de cada insumo.
-- [ ] **Supercías: actualización diaria fuera del MCP** — ejecutar el refresh
-      con cron, GitHub Actions o un scheduler del servidor; conservar la última
-      base válida si la descarga falla y exponer su estado en `/health` o en un
-      recurso de diagnóstico. El almacenamiento debe ser un volumen persistente
-      o un artefacto remoto, no el filesystem efímero del contenedor.
-- [ ] **Supercías: conservar toda la historia disponible** — dejar de eliminar
-      automáticamente los años anteriores al último bloque de cinco. Construir
-      una base histórica completa (la fuente actual documenta `bi_ranking.csv`
-      desde 2008), con retención configurable (`all` o un número de años) y una
-      tabla/recurso que informe exactamente qué años y variables están
-      disponibles después de cada refresh.
-- [ ] **Supercías: consultas históricas sin respuestas gigantes** — mantener
-      cinco años como valor por defecto para una respuesta móvil, pero añadir
-      filtros explícitos `desde`, `hasta` y `anio` para pedir cualquier período.
-      Para análisis largos, añadir consultas resumidas por año, compañía, CIIU y
-      métrica (crecimiento, promedio, máximo/mínimo), además de paginación para
-      rankings; nunca enviar toda la historia de miles de compañías a un agente.
-- [ ] **Supercías: almacenamiento histórico por capas** — usar SQLite completo
-      e indexado para búsquedas por expediente/RUC y rankings pequeños; conservar
-      los archivos fuente comprimidos por año como respaldo; evaluar Parquet o
-      DuckDB solo para agregaciones grandes. La primera versión debe seguir
-      funcionando en Docker sin exigir una base externa.
-- [ ] **Supercías: comparabilidad entre años** — conservar columnas que hayan
-      desaparecido como `null`, registrar cambios de esquema y documentar cuándo
-      una razón financiera no es comparable entre años. No rellenar valores
-      faltantes ni comparar silenciosamente definiciones distintas de CIIU,
-      estados financieros o indicadores.
-- [ ] **Supercías: distinguir diario de tiempo real** — etiquetar
-      `search_ranking`/`get_financials` como `daily_bulk` con año fiscal y fecha
-      de corte. Investigar aparte una consulta bajo demanda al Portal de
-      Información oficial para una compañía concreta; usarla solo como
-      `live_lookup` cuando el portal responda, con timeout, trazabilidad y
-      fallback explícito a la última descarga válida. Nunca presentar el CSV
-      diario como información en tiempo real.
-- [~] Registro Civil / demográfico-salud — cobertura CKAN sólida, pero **corregido 2026-08-29**: "sin gaps" era incorrecto — `registrocivil.gob.ec` publica un dataset propio de defunciones a nivel de registro individual (2020-2025, `.xlsb`, con diccionario de variables) que no está en ninguno de los 6 datasets CKAN de la organización. `.xlsb` no está soportado hoy por `helpers/csv_reader.py`. → RESEARCH.md § Séptima pasada
-- [~] IESS — boletines/auditorías/actuariales scrapeables y confirmados, sin construir tool nuevo. → RESEARCH.md § IESS
-- [~] SENESCYT/Educación Superior — cubierto vía CKAN; registro de títulos bloqueado por captcha (no automatizable). → RESEARCH.md § SENESCYT
-- [~] BCE — IEM/IEEM: mismo ítem que "IEM completo — archivo y archivos
-      fuente" arriba (`search_bce_iem`/`get_bce_iem_table`), duplicado
-      histórico de este roadmap. → RESEARCH.md § Séptima pasada
-- [x] BCE — mismo ítem que "BCEData completo — verificación de cobertura"
-      arriba (`audit_bce_catalog`). Conectarlo a un scheduler persistente
-      fue descartado — Daniel decidió no construir esa infraestructura.
-- [~] BCE — mismo ítem que "IEM completo — archivo y archivos fuente"
-      arriba (catálogo histórico vía `guardar_catalogo=true`/
-      `scripts/audit_bce_iem.py`).
-- [ ] BCE — **búsqueda ampliada y mapa completo de fuentes**: revisar más allá de BCEData e IEM el sitio institucional, publicaciones temáticas, catálogos, archivos históricos y descargas por sector. Inventariar cada fuente, su cobertura, frecuencia, formato, API/archivo y traslape con lo ya integrado; priorizar únicamente tablas que añadan detalle ecuatoriano verificable, no duplicados de una misma serie. El resultado debe ser un mapa de cobertura y una lista corta de integraciones justificadas.
-- [ ] BCE — **Cuentas Nacionales completas**: investigar los paquetes anual, trimestral y regional, retropolación, Tabla Oferta-Utilización, Cuadro Económico Integrado y Matriz de Empleo e Ingresos. IEM/BCEData pueden contener partes, pero la integración debe conservar la metodología de base móvil, revisiones, frecuencia y carácter provisional/definitivo. → https://contenido.bce.fin.ec/estadisticas-de-cuentas-nacionales/
-- [~] BCE — **EMOE y coyuntura**: resuelto parcialmente vía el sistema de
-  índices — expectativas económicas, confianza del consumidor, inflación y
-  ciclo económico. Sigue pendiente: mercado laboral y pobreza/desigualdad,
-  sin página índice encontrada para ninguno de los dos. → RESEARCH.md
-  § Duodécima pasada
-- [~] BCE — **catálogo de publicaciones, calendario y archivo histórico**:
-  `search_bce_publicaciones` (`helpers/bce_publicaciones_client.py`) cubre
-  "Últimas Publicaciones", pero solo expone su ventana rodante (~30 más
-  recientes), sin parámetro de fecha ni paginación. Sigue pendiente: Cifras
-  Económicas del Ecuador y el calendario de publicaciones futuras, en
-  páginas distintas no investigadas todavía. → RESEARCH.md § Duodécima pasada
-- [ ] Sector eléctrico (CENACE/ARCONEL/CNEL) — **dominio nuevo, pedido explícito
-      de Daniel 2026-08-29**. CENACE (45), CNEL EP (40), ARCONEL/ARCERNNR (1
-      dataset pero 54 recursos BNEE), e IIGE (19) ya tienen organización CKAN,
-      alcanzables hoy. `reportes.arconel.gob.ec` **descifrado técnicamente**
-      (ASP.NET ReportViewer, 3 POSTs con replay de ViewState + un POST final
-      renderiza tablas HTML reales, sin login, 1998-2026 por parroquia/
-      empresa/mes) — falta solo construir el scraper stateful; la fuente más
-      rica del proyecto. CENACE Biblioteca tiene documentos de planificación
-      sin tocar. EEQ/Centrosur/EERSA/EEASA sin organización CKAN propia.
-      → RESEARCH.md § Octava pasada
-- [ ] Sector eléctrico — **archivo histórico de cortes de luz programados,
-      crisis sep-dic 2024** (registro de incidente histórico, no fuente
-      continua). EEQ (Quito) sigue sirviendo en vivo los PDFs originales
-      barrio/hora de la crisis — solo hace falta enumerar los slugs. CNEL
-      (Guayaquil/costa, el objetivo más grande) probablemente perdió el
-      archivo de su sitio en vivo; reintentar con Wayback Machine. → RESEARCH.md
-      § Octava pasada
-- [ ] Ministerio de Salud Pública (`salud.gob.ec`) — dominio confirmado vivo con contenido real (barrido de endpoints 2026-08-29), sección de transparencia/LOTAIP presente, pero sin sección de estadísticas/datos abiertos visible en la portada — no se profundizó más allá de confirmar que el sitio está vivo, falta una pasada de contenido completa. → RESEARCH.md § Séptima pasada
-- [ ] Registro Oficial (gaceta oficial) — candidato de alta prioridad para búsqueda por fecha; posiblemente no relevante, ver nota de alcance. → RESEARCH.md § Datos legislativos
-- [ ] Superbancos — Balances Generales/Patrimonio Técnico/indicadores de
-      morosidad-liquidez-solvencia siguen sin resolver — viven detrás de una
-      herramienta de consulta propia, no de un widget OneDrive; necesitan una
-      pasada con browser. Catastro de Compañías bloqueado por login,
-      descartado. → RESEARCH.md § Séptima pasada
-- [ ] Permisos y portales municipales — sin investigar, alcance grande (~221 GADs). → RESEARCH.md § Permisos municipales
-- [ ] IGM Geoportal — cartografía gated tras registro/login, no automatizable tal cual. → RESEARCH.md § Sitios de ministerios individuales
-- [ ] Fuentes externas de sociedad civil (FCD, FARO) — corregido: sí hay datasets tabulares reales (votaciones de la Asamblea, declaraciones patrimoniales de funcionarios, ordenanzas municipales de Quito/Guayaquil), verificados en vivo; decisión de alcance sigue pendiente (no es "gobierno"). FARO en sí no tiene portal de datos. `cuentasclaras.org` está comprometido con spam, no tocar. → RESEARCH.md § Fuentes externas
-- [ ] Gremios privados (AEADE, ASOBANCA, FEDEXPOR) — AEADE y FEDEXPOR confirmados y descargables; ASOBANCA Datalab sin resolver extracción (SPA). → RESEARCH.md § Gremios
-- [ ] **CORDES — Corporación de Estudios para el Desarrollo** — investigar su [base de variables macroeconómicas y entregas periódicas](https://www.cordes.org/): cobertura histórica, frecuencia, acceso descargable/API, definiciones y traslape con BCE/INEC. El sitio tiene protección anti-bot, así que primero hay que confirmar qué parte es automatizable y qué parte queda como publicación/documento. CORDES aparece también entre los participantes de la Encuesta de Expertos, pero no asumir que ambos productos son la misma fuente. → RESEARCH.md § Fuentes externas
-- [ ] **Nowcast / Encuesta de Expertos — Previsiones de la Economía del Ecuador** — investigar e integrar, si el acceso y la licencia lo permiten, las previsiones/nowcasts de PIB, empleo adecuado, desempleo e inflación. Separar claramente estimación de dato observado y conservar fecha de publicación, horizonte, metodología, participantes y revisiones. El [sitio público de Nowcast](https://www.expertoseconomia.org/es/) presenta estos cuatro indicadores mediante visualizaciones Datawrapper; sus páginas anuales incluyen además déficit fiscal, riesgo país y precio del petróleo. → RESEARCH.md § Fuentes externas
-- [ ] **Calidad del aire de Quito — `aireambiente.quito.gob.ec`.** El dominio
-      responde pero sin contenido en el HTML crudo — parece SPA que renderiza
-      todo por JS (probablemente la red REMMAQ); necesita una pasada con
-      browser real o encontrar su API subyacente.
-- [ ] **Cancillería y embajadas — dominio(s) sin identificar, pedido explícito de Daniel 2026-08-31** ("cancilleria, embajadas, etc."). Sin investigar: `cancilleria.gob.ec` ya aparece mencionado de pasada en la Séptima pasada como uno de los dominios vivos del hosting compartido del Estado, pero nunca se hizo una pasada de contenido dedicada — trámites consulares, apostillas, estadísticas migratorias, o datos de la red de embajadas/consulados son candidatos sin confirmar.
-- [~] **ARCSA** — 4 datasets CKAN reales, pero solo registros
-      suspendidos/cancelados. El dato valioso (registro sanitario *vigente*,
-      "Base de Registros Emitidos" en `controlsanitario.gob.ec`) no se pudo
-      verificar: el dominio está caído (reset TLS). Pendiente: reintentar
-      más adelante antes de descartarlo del todo. → RESEARCH.md § Décima
-      pasada
-- [ ] Vivienda MIDUVI — dominio caído a nivel TLS, sin reemplazo encontrado; CKAN cubre parcialmente. → RESEARCH.md § Vivienda
-- [ ] Prensa — SECOM/Presidencia y Fundamedios, sin profundizar. → RESEARCH.md § Prensa
-- [ ] Datos legislativos/normativos (jurisprudencia, proyectos de ley) — investigado a fondo; **Daniel señaló que puede no ser relevante** para el alcance del proyecto. → RESEARCH.md § Datos legislativos
-- [ ] Fuentes internacionales con foco Ecuador — investigar **CEPAL/CEPALSTAT**, el **FMI/IMF** (pedido explícito de Daniel 2026-08-30: variables macro trimestrales — candidatos concretos son IFS/International Financial Statistics para series trimestrales de balanza de pagos/reservas/tipo de cambio, el WEO database para proyecciones, y los Article IV Staff Reports para el análisis narrativo con series propias), agencias de la **ONU** y, cuando tengan datos específicamente útiles para Ecuador, Banco Mundial, OIT, FAO, OMS/OPS, UNESCO, OIM y organismos regionales. Para cada fuente: confirmar acceso real (API/bulk/archivo — el FMI tiene una API REST pública para IFS/WEO sin key, por confirmar cobertura y campos exactos para Ecuador), indicador y desagregación disponibles para Ecuador, historia, frecuencia, licencia, fecha de actualización y duplicación frente a INEC/BCE/ministerios. Integrar solo lo que aporte una serie, corte o frecuencia (ej. trimestral cuando BCE solo publica mensual/anual) que la fuente ecuatoriana no publique; conservar siempre fuente y definición original — el valor de estas fuentes suele ser la comparabilidad internacional y la metodología armonizada, no un dato más nuevo que el de BCE/INEC. CEPAL y FMI son los primeros candidatos. → RESEARCH.md § Fuentes externas
-- Confirmados sin acción posible (bloqueos reales, no falta de esfuerzo): CNE y micrositio de Interior (WAF Incapsula), Aduana/SENAE comercio exterior (no publicado, solo por oficio — FEDEXPOR cubre el hueco), Fiscalía (sin dataset agregado propio), Supercías Valores/Seguros (login-gated, casi todo, un solo PDF estático encontrado), SERCOP catálogo/órdenes de compra (CAPTCHA), IG-EPN `descarga-de-datos` (cuenta obligatoria), Superbancos Catastro de Compañías (login obligatorio). → RESEARCH.md § Sitios de ministerios individuales / § Séptima pasada
-- [~] **SRI Saiku — `list_sri_saiku_cubes`, `describe_sri_saiku_cube`, `query_sri_saiku_aggregate`**: construidos como superficie anónima, de solo lectura y limitada a una dimensión/medida y 100 filas. La sesión, descubrimiento y metadatos se validan antes de consultar; no se permite MDX arbitrario, drill-through, exportación ni escritura. Pendiente: verificación contra el endpoint vivo desde un entorno con conectividad; la sesión actual no pudo alcanzar el host SRI.
-- ANDA — reconfirmado 2026-08-29: cobertura completa (437 encuestas, coincide con lo ya documentado), sin gap real, solo una limitación menor de UX (no se puede filtrar por tema del lado del servidor). **Corregido 2026-08-29 (segunda revisión, pedido de Daniel): "sin gap real" era incorrecto para ENEMDU específicamente** — ver el ítem nuevo de abajo (ENEMDU/mercado laboral post-2023 sin cubrir en ningún tool actual). → RESEARCH.md § Séptima pasada / § Novena pasada
-- [x] `read_pdf` ahora valida extensión/Content-Type antes de descargar (2026-08-30) — rechaza extensiones conocidas no-PDF (.zip/.xlsx/.csv/...) sin hacer ninguna petición, y cuando la URL no tiene extensión reconocible cae a un sniff de Content-Type (solo headers, sin cuerpo) antes de comprometerse a la descarga completa. Antes bajaba hasta 5 MB de un ZIP grande inútilmente antes de fallar con "no es un PDF válido".
-- [~] **INEC (y en general): no hay preview de archivos grandes (ZIP/BDD), a
-      diferencia de CKAN.** `get_inec_publicacion_archivos`/`get_topic_files`
-      solo devuelven metadata (label/url/formato) por diseño (igual que
-      SIPA). **Hecho:** `list_zip_contents` lee solo el directorio central
-      del ZIP vía HTTP Range para listar miembros sin descargar todo (no
-      soporta ZIP64). Decidido en contra: un índice local pre-construido por
-      dataset (solo si se justifica por uso repetido) y cualquier mecanismo
-      general de transferencia de archivo completo — la respuesta correcta
-      para una descarga puntual sigue siendo la URL directa.
-- [~] **CEPAL — geoportal del Censo Ecuador (`geo.cepal.org/censo-ecuador/`).**
-      9 capas reales de Ecuador vía `geoportal.cepal.org/api/v2/datasets/`,
-      pero derivadas del Clasificador Geográfico de INEC (fuente primaria,
-      ver SOURCES.md § INEC / Ecuador en Cifras) — bajo valor salvo que
-      interese la geometría ya lista para mapas. `geodata.cepal.org/api/v1`
-      seguía devolviendo 502.
+### SIPA (Ministerio de Agricultura)
 
-## Cabos operativos sueltos
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Módulos económico/productivo/social/censos | `list_sipa_modulos`, `get_sipa_modulo_archivos` | 30 archivos Excel reales en 4 módulos → RESEARCH.md § Quinta pasada |
+| Geoportal (GeoServer) | `search_sipa_geoportal_capas`, `get_sipa_geoportal_capa_datos` | 277 capas WMS, 257 con WFS real, en 24 endpoints por workspace → RESEARCH.md § Decimocuarta pasada |
+| Resumen de Indicadores Sectoriales | `get_sipa_resumen_indicadores` | PDFs mensuales 2018-2026 (el único de 7 ítems del tablero que no es Tableau/flipbook) → RESEARCH.md § Decimocuarta pasada |
 
-- [x] Renovación de certificado TLS.
-- [x] **`helpers/tls.py` — fallback "OS trust store" reemplazado por CA
-      intermedia embebida.** El smoke test diario falló en un runner Linux
-      limpio (`CERTIFICATE_VERIFY_FAILED`) porque el fallback anterior
-      dependía de la extensión AIA de Windows/macOS. Las dos CAs intermedias
-      faltantes (Sectigo) se embebieron en
-      `helpers/certs/sectigo_public_server_auth_intermediates.pem`, y
-      `os_trust_context()` construye el contexto de forma determinista en
-      cualquier plataforma. → RESEARCH.md § Infraestructura operativa
+### Contraloría General del Estado
 
-## Calidad de búsqueda y detección de series
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Informes aprobados + Plan anual de control | `list_contraloria_informes`, `get_contraloria_informe` | CSV trimestrales de informes de auditoría a cualquier institución pública; mismo patrón `WFDescarga.aspx` para el plan anual → RESEARCH.md § Quinta y sexta pasada, § Séptima pasada |
 
-- [x] Expansión de siglas/acrónimos en búsqueda.
-- [x] `detect_series_pattern` — clasifica acumulado/incremental/indeterminado, verificado en vivo contra IESS y MPCEIP. → RESEARCH.md § detect_series_pattern
-- [ ] Búsqueda semántica sobre el catálogo completo (hoy es solo keyword de CKAN).
+### gob.ec
 
-## Formatos y tipos de recursos
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Estadísticas de trámites | `get_tramite_estadisticas` | Serie mensual de atenciones/quejas por trámite desde 2021, sin auth, trámite por trámite (sin endpoint masivo) → RESEARCH.md § Séptima pasada |
 
-- [x] `read_pdf`, prompts, stripping de geometría/WKT, decimales europeos, `.ods`, recursos sin extensión, `.tar.gz`, `.xls` legacy, `.zip` (truncado / sin miembro tabular / CSV malformado).
-- [x] `.rar` — decidido explícitamente en contra (riesgo de subprocess/CVE), no implementar.
+### Sector eléctrico
 
-## Verificación end-to-end
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| CENACE — Información Operativa | `get_cenace_tablero` | 5 tableros server-rendered, snapshot "a este instante" (no serie histórica), TTL de caché 180s → RESEARCH.md § Décima pasada |
 
-- [x] Cifras reales verificadas contra el portal: SRI, IESS, MPCEIP, `.xls`/`.zip`, degradación cuando el portal no responde. → RESEARCH.md § Verificación end-to-end de cifras
+### CNT/ARCOTEL (telecomunicaciones)
 
-## Arquitectura, más adelante
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Reportes mensuales + Boletín Estadístico | `search_arcotel_reportes_mensuales`, `search_arcotel_boletines` | Serie mensual ene-2017→jun-2026 (~2 meses de rezago) y boletín anual/temático 2015-2024, solo PDF → RESEARCH.md § Octava pasada, § Decimocuarta pasada |
 
-- [ ] **Simplificar y armonizar la arquitectura MCP** — reducir duplicaciones
-      en la superficie pública, separar las herramientas de mantenimiento,
-      conservar nombres existentes por compatibilidad y migrar gradualmente a
-      esquemas, resultados y errores estructurados. El diagnóstico, el diseño
-      propuesto y los criterios para decidir qué fusionar están en
-      [docs/MCP_ARCHITECTURE.md](docs/MCP_ARCHITECTURE.md).
-- [ ] `outputSchema` en los tools MCP.
-- [ ] Manejo geoespacial (WKT/GeoJSON más allá del stripping actual).
-- [x] Tool de investigación "one-shot" — `investigate_dataset`, construido 2026-08-31. Encadena `search_datasets` → `list_dataset_resources` → `preview_resource_data` en una sola llamada (toma el dataset mejor rankeado y previsualiza su primer recurso en un formato legible, saltando `.rar`/desconocidos en vez de previsualizar ciegamente lo primero de la lista) y avisa cuando el dataset parece publicar una serie periódica, señalando `detect_series_pattern` en vez de reimplementar esa heurística.
-- [x] Protección HTTP base — `/mcp` admite Bearer token opcional, el bind local
-      es loopback por defecto y existe un límite global de concurrencia; `/health`
-      queda libre para health checks.
-- [~] Rate limiting por usuario/IP y proxy HTTPS — el servidor ya aplica cuotas
-      por cliente/IP además del límite global, exige token cuando
-      `MCP_REQUIRE_AUTH=1` y puede terminar TLS directamente con Uvicorn.
-      Sigue pendiente configurar el proxy HTTPS, DNS y la política operativa
-      del endpoint remoto real.
-- [ ] Type-checking en CI (mypy/pyright) — ruff cubre estilo/imports pero no
-      errores de tipo; el repo ya está tipado casi en su totalidad. Riesgo:
-      podría destapar errores preexistentes en los 40+ archivos que
-      necesitarían triage antes de que CI pase en verde — no es un cambio
-      chico, evaluar alcance antes de prender el gate.
+### IG-EPN (Instituto Geofísico)
 
-## Notas
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Catálogo sísmico | `search_sismos` | Feed CSV de sismos en casi tiempo real |
+| Archivo de informes | `search_informes_igepn`, `get_informe_igepn` | App JSF/PrimeFaces separada, sesión+ViewState+POST; solo Tipo/Año filtran de verdad en servidor → RESEARCH.md § Undécima pasada |
 
-- 2026-08-13: el 403 de CKAN que parecía bloqueo geográfico era un bug de vhost (`www.datosabiertos.gob.ec` es el único subdominio conectado) — ya corregido.
-- 2026-08-29: la conclusión "FCD/FARO son solo análisis narrativo, sin datos crudos" era incorrecta — se basaba en revisar un solo dominio (`gastopublico.org`) de los nueve que tiene FCD. Daniel señaló que el Observatorio Legislativo sí tabula las votaciones de la Asamblea; verificado en vivo, y de paso se encontraron datasets reales en otros tres dominios de la red. → RESEARCH.md § Fuentes externas
-- 2026-08-29: escaneo profundo de Superbancos + segunda pasada sobre toda fuente ya integrada (menos INEC) + sector eléctrico como dominio nuevo. Patrón que se repite: una conclusión "sin gaps" o "ya cubierto" basada en revisar un solo lugar (CKAN, o un solo scraper) casi siempre se equivoca — Registro Civil es el ejemplo más claro (dataset real de defunciones fuera de CKAN). Lección para futuras pasadas: siempre revisar el sitio propio de la institución, no solo su organización CKAN. → RESEARCH.md § Séptima pasada
-- 2026-08-29: barrido de endpoints muertos/renombrados en ministerios y funciones del Estado no auditados antes. Dos renombres nuevos confirmados vía falla de certificado TLS (no redirect): Transporte y Obras Públicas → MIT (`mit.gob.ec`), MIES → fusionado en "Ministerio de Trabajo y Desarrollo Humano" (`desarrollohumano.gob.ec`, tiene un portal "InfoDH" sin explorar). Un redirect correcto nuevo: Planificación → Presidencia. Se confirmó directamente (por primera vez, no por inferencia) la lista completa de dominios que comparten el certificado TLS del hosting compartido del Estado — ~26 dominios. Todo lo demás revisado (Salud, Cancillería, Defensa, Telecomunicaciones, Presidencia, Vicepresidencia, Asamblea sitio propio, Judicatura, TCE) está vivo con contenido real. → RESEARCH.md § Octava pasada
+### SGR (Secretaría de Gestión de Riesgos)
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| SITREP + Biblioteca | `search_sgr_sitreps`, `get_sgr_sitrep_archivos`, `list_sgr_biblioteca_categorias`, `get_sgr_biblioteca_categoria_archivos` | 54 eventos adversos 2016-2026 con PDFs; Biblioteca con 19 categorías, ~1660 documentos (mapas de amenaza, rutas de evacuación) → RESEARCH.md § Decimocuarta pasada |
+
+### INEVAL
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Familias de exámenes nacionales | `list_ineval_familias`, `get_ineval_familia_archivos` | 9 familias (Ser Bachiller, Ser Estudiante, Ser Maestro, Ser Profesional, Llece), 557 enlaces, sin login/CAPTCHA → RESEARCH.md § INEVAL |
+
+### Superbancos
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Secciones estadísticas + widgets OneDrive | `list_superbancos_secciones`, `get_superbancos_seccion_archivos` | Boletines Financieros Mensuales (224 archivos, 1997-2026), Servicios Financieros (312 archivos vía 3 widgets OneDrive descifrados), Información Histórica, Calendario Estadístico → RESEARCH.md § Séptima, Décima y Duodécima pasada |
+
+### MEF/SENAE
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Fiscal (MEF) + recaudación aduanera (SENAE) | `search_mef_fiscal` (`fuente="mef"\|"senae"`) | 76 XLSX del MEF (metodología GFSM, 2025-01→2026-09) y 60 archivos de SENAE (recaudación aduanera por tipo de gravamen, 2012-2021) → RESEARCH.md § Recaudación arancelaria, § Decimocuarta pasada |
+
+### MINEDEC
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Matrícula histórica | `search_minedec_matricula` | Registro 2009-2025, 5 archivos reales (WordPress, no CKAN) → RESEARCH.md § Decimocuarta pasada |
+
+### SEPS (Economía Popular y Solidaria)
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Secciones SFPS/EPS | `list_seps_secciones`, `get_seps_seccion_archivos` | 26 secciones reales, incluida calificación de riesgo (112 entidades, 2020-2025) → RESEARCH.md § Decimotercera pasada |
+
+### CNIG (Igualdad de Género)
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Violencia — femicidios | `search_cnig_femicidios` | 20 tablas PDF, incluida la matriz de femicidios/homicidios de mujeres → RESEARCH.md § Decimotercera pasada |
+
+### INAMHI
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Geoservicios (WMS/WFS) | `search_inamhi_capas`, `get_inamhi_capa_datos` | 222 capas WMS, 199 con WFS real (precipitación, WRF, límites administrativos); sin capa de estaciones puntuales → RESEARCH.md § Decimotercera pasada |
+
+### Aviación civil
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| IFIS — METAR/NOTAM/SIGMET | `get_metar`, `get_notam`, `get_sigmet` | Públicos sin sesión (solo `/fpl/*` exige login); SIGMET a nivel de FIR completo (SEFG) → RESEARCH.md § Decimotercera pasada |
+
+### INEC / Ecuador en Cifras
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Páginas de tema + BIINEC exclusivos | `search_inec_estadisticas`, `get_inec_estadistica_files`, `search_biinec_extras` | ~75 temas (boletines + series históricas); 3 registros BIINEC confirmados exclusivos (desechos peligrosos en salud, módulos ambientales ENEMDU/ECV) → RESEARCH.md § Ecuador en Cifras / portal BI del INEC |
+| API REST de publicaciones (WordPress) | `search_inec_publicaciones`, `get_inec_publicacion_archivos` | Búsqueda de texto completo sobre 1.707 posts — cubre páginas que el menú mega-menu de una sola semilla no alcanza (ENEMDU anual, etc.) → RESEARCH.md § Novena pasada |
+| Censo (censoecuador.gob.ec) | `search_censo_recursos` | 36 archivos reales, solo metadata + URL → RESEARCH.md § Novena pasada |
+
+### Cuenca en Datos
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| CKAN municipal (Cuenca) | Tools CKAN genéricos con `source="cuenca"` | 92 datasets, 13 categorías, mismo shape de API que el portal nacional → RESEARCH.md § Cuenca en Datos |
+
+### Ministerio del Trabajo
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| SUT — Power BI descifrado | `list_sut_indicadores`, `get_sut_indicador_schema`, `query_sut_indicador` | 8 dashboards (contratos mensual desde 2015, demanda laboral, sentencia/género, capacitación SETEC, PND, empleabilidad, denuncias, Encuentra Empleo) vía protocolo Power BI genérico → RESEARCH.md § Décima pasada |
+| Boletín Estadístico Anual | `search_trabajo_boletin_anual` | 3 ediciones confirmadas (2020/2021/2022, lista fija); sin ediciones 2023-2025 encontradas → RESEARCH.md § Décima pasada, § Decimocuarta pasada |
+| Salarios mínimos sectoriales | `search_salarios_sectoriales` | Una entrada por año 2020-2025, sin tabla 2026 (vigente 2025 por inacción) → RESEARCH.md § Octava pasada, § Decimocuarta pasada |
+
+### MIES / Ministerio de Desarrollo Humano
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| infoMIES — bases mensuales + boletines zonales | `search_infomies_bases_mensuales`, `search_infomies_boletines_zonales` | Bases mensuales solo año en curso (años cerrados = 1 archivo/diciembre); Reporte Boletines Zonales consolidado 2021-2026 → RESEARCH.md § Décima pasada, § Decimocuarta pasada |
+
+### Calidad, formatos y operación
+
+Capacidades transversales, no atadas a una sola fuente de datos.
+
+| Área | Qué cubre |
+|---|---|
+| Detección de patrón de serie | `detect_series_pattern` — clasifica acumulado/incremental/indeterminado, verificado contra IESS y MPCEIP → RESEARCH.md § `detect_series_pattern` — verificación end-to-end |
+| Búsqueda por siglas/acrónimos | Expansión de siglas/acrónimos en `search_datasets` y afines |
+| Formatos de archivo | `read_pdf` valida extensión/Content-Type antes de descargar; soporte para `.ods`, `.tar.gz`, `.xls` legado, `.zip` (truncado / sin miembro tabular / CSV malformado); `.rar` descartado explícitamente (ver Descartado) |
+| Verificación end-to-end de cifras | Cifras reales verificadas contra el portal para SRI, IESS, MPCEIP, `.xls`/`.zip`, degradación cuando el portal no responde → RESEARCH.md § Verificación end-to-end de cifras |
+| Investigación "one-shot" | `investigate_dataset` — encadena `search_datasets` → `list_dataset_resources` → `preview_resource_data`, señala `detect_series_pattern` cuando aplica |
+| Protección HTTP base | `/mcp` admite Bearer token opcional, bind local por defecto a loopback, límite global de concurrencia; `/health` libre para health checks |
+| TLS | Renovación de certificado; CA intermedia Sectigo embebida en `helpers/tls.py` (reemplaza el fallback "OS trust store", que fallaba en runners Linux limpios) → RESEARCH.md § Infraestructura operativa |
+
+---
+
+## Pendiente
+
+### Producto: portable y usable desde móvil
+
+| Fuente | Estado | Qué falta |
+|---|---|---|
+| Separar cliente y despliegue | No iniciado | Imagen Docker multi-arquitectura (amd64/arm64) + configuración solo por variables de entorno; el cliente móvil solo debe consumir un endpoint MCP remoto por HTTPS |
+| Endpoint remoto para agentes | Parcial — falta proxy HTTPS estable | Bearer/HTTPS directo/límites de concurrencia y por IP ya existen; falta publicar la instancia detrás de un proxy HTTPS con DNS, secretos y operación real (no depender de `localhost`) |
+| Persistencia portable | No iniciado | Separar el proceso MCP del almacenamiento: volumen/objeto persistente, backups, restauración, ruta de actualización reproducible |
+| Contrato de respuesta para agentes | Parcial — falta extender a otras fuentes | BCEData/IEM ya tienen bloque `metadatos` estable; falta migrar el resto de resultados de texto dual (`format=text\|json`) a schemas estructurados, y paginar/enlazar archivos grandes en vez de enviarlos completos |
+| Operación 24/7 | Parcial — falta alertas de esquema | Smoke test diario (`scripts/smoke_e2e.py`, ~39/68 tools) corre en GitHub Actions, separado de CI; falta alertar sobre cambios de esquema específicos → RESEARCH.md § Infraestructura operativa |
+| Rate limiting por usuario/IP y proxy HTTPS | Parcial — falta el proxy real | Cuotas por cliente/IP + límite global + Bearer opcional + TLS directo vía Uvicorn ya existen; falta proxy HTTPS/DNS/política operativa del endpoint remoto |
+
+### BCE — cobertura completa de BCEData e IEM
+
+| Fuente | Estado | Qué falta |
+|---|---|---|
+| BCEData — catálogo y series | Parcial | Descubrimiento y consulta completos; falta detectar cambios de revisión (el endpoint no expone marcador explícito, solo comparación por contenido) |
+| IEM — archivo y archivos fuente | Parcial | 367 boletines legibles en 3 eras de formato; falta hashing masivo del histórico y confirmar que las 126 secciones más viejas siguen la misma forma (solo muestreado) |
+| BCEData ↔ IEM — mapa de equivalencias | Parcial | 2 candidatos confirmados manualmente con datos en vivo; el resto no se trata como duplicado sin revisar valores y metodología |
+| EMOE y coyuntura | Parcial | Expectativas económicas, confianza del consumidor, inflación y ciclo económico resueltos vía sistema de índices; falta mercado laboral y pobreza/desigualdad (sin página índice encontrada) |
+| Catálogo de publicaciones y calendario | Parcial | `search_bce_publicaciones` solo expone ventana rodante (~30 recientes), sin fecha ni paginación; falta Cifras Económicas del Ecuador y el calendario de publicaciones futuras |
+| Búsqueda ampliada del sitio BCE | No iniciado | Mapear publicaciones temáticas, catálogos y archivos históricos más allá de BCEData/IEM; priorizar solo lo que añada detalle verificable, no duplicados |
+| Cuentas Nacionales completas | No iniciado | Paquetes anual/trimestral/regional, retropolación, Tabla Oferta-Utilización, Cuadro Económico Integrado, Matriz de Empleo e Ingresos — conservando metodología de base móvil y carácter provisional/definitivo |
+
+### Supercías — pipeline financiero
+
+| Fuente | Estado | Qué falta |
+|---|---|---|
+| Fuente masiva actualizable | No iniciado | Usar el Ranking de Compañías oficial (`bi_ranking.csv` + tablas auxiliares, actualización cada 24h) en vez del proceso manual actual |
+| Refresh idempotente y automatización diaria | No iniciado | Comando que valide esquema/tamaño/filas/duplicados/nulos, construya índices y reemplace atómicamente solo tras pasar validación; ejecutarlo por cron/Actions, conservando la última base válida si falla |
+| Conservar toda la historia disponible | No iniciado | Dejar de eliminar años anteriores al último bloque de cinco (la fuente documenta datos desde 2008); retención configurable (`all` o N años) |
+| Consultas históricas sin respuestas gigantes | No iniciado | Filtros `desde`/`hasta`/`anio`, consultas resumidas por año/compañía/CIIU/métrica, paginación de rankings |
+| Almacenamiento histórico por capas | No iniciado | SQLite indexado para búsquedas puntuales/rankings chicos, archivos fuente comprimidos por año como respaldo, Parquet/DuckDB solo para agregaciones grandes |
+| Comparabilidad entre años | No iniciado | Conservar columnas desaparecidas como `null`, registrar cambios de esquema, documentar razones no comparables entre años |
+| Distinguir diario de tiempo real | No iniciado | Etiquetar `search_ranking`/`get_financials` como `daily_bulk`; investigar aparte un `live_lookup` bajo demanda contra el Portal de Información oficial, con fallback explícito |
+
+### Otras fuentes por explorar
+
+| Fuente | Estado | Qué falta |
+|---|---|---|
+| Sector eléctrico — dominio profundo (CENACE/ARCONEL/CNEL) | No iniciado | CENACE (45 datasets), CNEL EP (40), ARCONEL/ARCERNNR (54 recursos BNEE) e IIGE (19) ya alcanzables vía CKAN genérico; `reportes.arconel.gob.ec` descifrado técnicamente (ASP.NET ReportViewer, replay de ViewState, sin login, 1998-2026) — falta construir el scraper stateful; CENACE Biblioteca (documentos de planificación) sin tocar; EEQ/Centrosur/EERSA/EEASA sin organización CKAN propia → RESEARCH.md § Octava pasada |
+| Archivo histórico de cortes de luz (crisis sep-dic 2024) | No iniciado | EEQ sigue sirviendo los PDFs originales en vivo (solo falta enumerar slugs); CNEL probablemente perdió el archivo de su sitio, reintentar con Wayback Machine → RESEARCH.md § Octava pasada |
+| DGAC/IFIS — movimientos/vuelos por aeropuerto | No iniciado | METAR/NOTAM/SIGMET ya cubiertos (ver Hecho); estadísticas de movimientos por aeropuerto puede ser una sección distinta del mismo sitio, sin explorar |
+| Ministerio de Salud Pública | No iniciado | Dominio vivo con contenido real y sección LOTAIP; sin pasada de contenido completa más allá de confirmar que el sitio responde → RESEARCH.md § Séptima pasada |
+| Registro Oficial (gaceta oficial) | No iniciado | Candidato de alta prioridad para búsqueda por fecha (leyes/decretos/resoluciones/circulares, gratis, sin paywall, archivo desde 2001); posible fuera de alcance, ver nota de alcance → RESEARCH.md § Datos legislativos |
+| Superbancos — Balances/Patrimonio Técnico/indicadores | No iniciado | Morosidad/liquidez/solvencia viven detrás de una herramienta de consulta propia, no de un widget OneDrive; necesita pasada con browser real → RESEARCH.md § Séptima pasada |
+| Permisos y portales municipales | No iniciado | ~221 GADs sin investigar; empezar por Quito y Guayaquil si se persigue → RESEARCH.md § Permisos municipales |
+| IGM Geoportal | No iniciado | Cartografía gated tras registro/login, no automatizable tal cual → RESEARCH.md § Sitios de ministerios individuales |
+| Fuentes externas de sociedad civil (FCD, FARO) | Decisión de alcance pendiente | Datasets tabulares reales confirmados (votaciones de la Asamblea, declaraciones patrimoniales, ordenanzas municipales Quito/Guayaquil); `cuentasclaras.org` tiene spam inyectado — no tocar sin verificar que está limpio → RESEARCH.md § Fuentes externas de sociedad civil |
+| Gremios privados (AEADE, ASOBANCA, FEDEXPOR) | Parcial | AEADE y FEDEXPOR confirmados y descargables; ASOBANCA Datalab sin resolver extracción (SPA) → RESEARCH.md § Gremios/asociaciones privadas |
+| CORDES | No iniciado | Base de variables macroeconómicas; sitio con protección anti-bot, confirmar primero qué parte es automatizable → RESEARCH.md § Fuentes externas de sociedad civil |
+| Nowcast / Encuesta de Expertos | No iniciado | Previsiones de PIB/empleo/desempleo/inflación; separar estimación de dato observado, conservar metodología y revisiones |
+| Calidad del aire de Quito | No iniciado | `aireambiente.quito.gob.ec` responde pero sin contenido en HTML crudo (SPA); necesita browser real o su API subyacente |
+| Cancillería y embajadas | No iniciado | Dominio vivo (`cancilleria.gob.ec`), sin pasada de contenido dedicada — trámites consulares, apostillas, estadísticas migratorias sin confirmar |
+| ARCSA | Parcial | 4 datasets CKAN reales, solo registros suspendidos/cancelados; el registro sanitario vigente (`controlsanitario.gob.ec`) está caído (reset TLS) — reintentar más adelante → RESEARCH.md § Décima pasada |
+| Vivienda MIDUVI | No iniciado | Dominio caído a nivel TLS, sin reemplazo encontrado; CKAN cubre parcialmente (5 datasets) → RESEARCH.md § Vivienda (MIDUVI) |
+| Prensa | No iniciado | SECOM/Presidencia (boletines) y Fundamedios (agresiones a prensa); sin confirmar si hay datasets descargables → RESEARCH.md § Prensa |
+| Datos legislativos/normativos | Investigado, alcance en duda | Jurisprudencia y proyectos de ley investigados a fondo; Daniel señaló que puede no ser relevante para el alcance del proyecto → RESEARCH.md § Datos legislativos |
+| Fuentes internacionales con foco Ecuador | No iniciado | CEPAL/CEPALSTAT, FMI (IFS/WEO/Article IV), ONU y agencias regionales; integrar solo lo que aporte frecuencia/corte que la fuente ecuatoriana no publique → RESEARCH.md § Fuentes externas de sociedad civil |
+
+### Otros ítems parciales
+
+| Fuente | Estado | Qué falta |
+|---|---|---|
+| Registro Civil / demográfico-salud | Parcial | Cobertura CKAN sólida; falta soporte de lector para `.xlsb` (dataset de defunciones individuales 2020-2025) → RESEARCH.md § Séptima pasada |
+| IESS | Parcial | Boletines/auditorías/estudios actuariales scrapeables y confirmados; sin tool nuevo construido todavía → RESEARCH.md § IESS |
+| SENESCYT/Educación Superior | Parcial | Cubierto vía CKAN + biblioteca de Educación Superior; registro de títulos bloqueado por captcha (no automatizable) → RESEARCH.md § SENESCYT |
+| SRI Saiku | Parcial | Superficie anónima construida (ver Hecho); falta verificación contra el endpoint vivo desde un entorno con conectividad real |
+| INEC — preview de archivos grandes | Parcial | `list_zip_contents` lista miembros de ZIP vía HTTP Range sin descargar todo; decidido en contra de un índice pre-construido por dataset y de cualquier transferencia completa de archivo |
+| CEPAL — geoportal del Censo Ecuador | Parcial | 9 capas reales vía API, pero derivadas del Clasificador Geográfico de INEC (fuente primaria); bajo valor salvo interés específico en la geometría → RESEARCH.md § CEPAL |
+
+### Calidad y arquitectura
+
+| Fuente | Estado | Qué falta |
+|---|---|---|
+| Búsqueda semántica | No iniciado | `search_datasets` sigue siendo keyword puro de CKAN, sin comprensión semántica sobre el catálogo completo |
+| Simplificar y armonizar la arquitectura MCP | No iniciado | Reducir duplicaciones en la superficie pública, separar tools de mantenimiento, migrar a schemas/resultados/errores estructurados — diagnóstico y diseño en [docs/MCP_ARCHITECTURE.md](docs/MCP_ARCHITECTURE.md) |
+| `outputSchema` en los tools MCP | No iniciado | — |
+| Manejo geoespacial | No iniciado | WKT/GeoJSON más allá del stripping actual |
+| Type-checking en CI | No iniciado | ruff cubre estilo/imports pero no errores de tipo; riesgo de destapar errores preexistentes en 40+ archivos — evaluar alcance antes de activar el gate |
+
+---
+
+## Descartado
+
+Bloqueos reales confirmados en vivo, o decisiones explícitas de no construir — no falta de esfuerzo.
+
+| Fuente | Por qué |
+|---|---|
+| `sisdatbi.arconel.gob.ec` | Bloqueo geográfico confirmado con VPN; app PHP con login obligatorio, sin contenido de invitado → RESEARCH.md § Decimoquinta pasada |
+| CELEC EP (transparencia/rendición de cuentas) | Contenido real solo LOTAIP genérico por unidad de negocio, no dato sectorial → RESEARCH.md § Decimoquinta pasada |
+| `.rar` | Riesgo de subprocess/CVE — decidido explícitamente en contra |
+| SIPA/MAG — precios mayoristas como fuente de alta frecuencia | Solo boletines PDF mensuales y un documento regulatorio de piso/techo sin historia; app móvil "cgsin.precios" sin explorar → RESEARCH.md § Duodécima pasada |
+| BCE — prueba de completitud y frescura programada | Requiere scheduler con almacenamiento persistente de snapshots; Daniel decidió no construir esa infraestructura (la comparación bajo demanda ya existe vía `audit_bce_catalog`) |
+| CNE y micrositio de Interior (`cifras.ministeriodelinterior.gob.ec`) | WAF Incapsula |
+| Aduana/SENAE — comercio exterior | No publicado en portal abierto, solo por oficio (FEDEXPOR cubre el hueco, ver gremios privados) |
+| Fiscalía General del Estado | Sin dataset agregado propio; sus herramientas de consulta son caso-por-caso |
+| Supercías — Valores y Seguros | Login-gated casi por completo; un solo PDF estático encontrado |
+| SERCOP — catálogo/órdenes de compra | CAPTCHA |
+| IG-EPN — `descarga-de-datos` | Cuenta obligatoria |
+| Superbancos — Catastro de Compañías | Login obligatorio (app JSF aparte) |
+
+---
+
+## Arquitectura
+
+Cada fuente sigue el mismo patrón de 3 piezas, documentado en
+[CLAUDE.md](CLAUDE.md):
+
+```
+helpers/<source>_client.py   # cliente HTTP + parseo
+tools/<name>.py               # tool(s) MCP, registrados en tools/__init__.py
+tests/test_<name>_client.py   # mocks con pytest-httpx
+```
+
+Cacheo TTL por fuente vía `helpers/cache.py`; nunca confiar en el `format`
+declarado por CKAN antes que la extensión de la URL (ver CLAUDE.md,
+"Conventions"). El diagnóstico y diseño propuesto para simplificar la
+superficie pública de tools vive en
+[docs/MCP_ARCHITECTURE.md](docs/MCP_ARCHITECTURE.md).
+
+## Agregar una fuente nueva
+
+Seguir el patrón de arquitectura de arriba: un `helpers/<source>_client.py`
+nuevo más su `tools/*.py`, registrados en `tools/__init__.py`. Antes de
+construir, investigar en vivo (no solo leer el HTML) y dejar el hallazgo —
+cifras verificadas, bugs encontrados, dead ends — documentado en
+[RESEARCH.md](RESEARCH.md); la fila correspondiente en este roadmap se
+agrega o mueve de Pendiente a Hecho una vez que el tool está construido y
+verificado.

@@ -37,6 +37,16 @@ Hecho: tools `search_indicadores_bce`/`get_indicador_bce` +
 (`contenido.bce.fin.ec/wp-json/bcedata/v1/`), no documentada oficialmente
 pero confirmada con `curl` plano.
 
+**Remesas de trabajadores — `search_bce_remesas`
+(`helpers/bce_remesas_client.py`).** Cubre resultados agregados, serie
+histórica y bases mensuales de remesas, incluida la desagregación por
+entidad remisora/receptora disponible desde julio de 2025
+(`https://contenido.bce.fin.ec/series-de-datos-remesas-de-trabajadores/`).
+Ojo con el corte metodológico: la serie "Histórica" (pre-cambio de
+metodología) y la serie "BDD" (post-cambio) no son directamente
+comparables — son dos series distintas, no una continuación simple una de
+la otra.
+
 **Hallazgo grande (2026-08-29): la "Información Estadística Mensual"
 (IEM/IEEM)**, el boletín insignia del Banco Central, mucho más allá de lo
 que cubre la API BCEData ya integrada.
@@ -1769,8 +1779,9 @@ Interactivos", no explorado a fondo.
 **gob.ec — un endpoint de transparencia real y sin explotar.**
 `www.gob.ec/api/v1/tramites-transparencia/{tramite_id}` devuelve una
 serie mensual real (atenciones/quejas por trámite) desde 2021, en vivo,
-sin auth (confirmado con el trámite de Cédula de Identidad: 253,729
-atenciones / 6 quejas en julio 2026). No es un dataset masivo — hay que
+sin auth (confirmado con el trámite de Cédula de Identidad: 63 meses de
+serie, mayo 2021 → julio 2026, con 253,729 atenciones / 6 quejas en el mes
+más reciente). No es un dataset masivo — hay que
 pedirlo trámite por trámite, no existe un endpoint masivo — pero es dato
 de uso/satisfacción real que hoy no expone ningún tool. El resto de la
 API (`tramites-canales`, `tramites-costo`, `tramites-categorias`,
@@ -2497,6 +2508,10 @@ BCE en el sistema estadístico ecuatoriano (ya cubierto por
   que Daniel ya sabía) — la página de tema solo tiene archivos
   `ENSANUT_2018`, y buscar "ensanut 2023/2024/ii" no encontró nada
   relevante más nuevo.
+
+`search_censo_recursos` cataloga **36 archivos reales** de
+`censoecuador.gob.ec` (metadata + URL directa, sin descarga a través de
+este MCP, mismo patrón que `get_inec_estadistica_files`).
 
 **Construido 2026-08-30: `search_censo_recursos` (censoecuador.gob.ec) y
 descubrimiento del Clasificador Geográfico vía la infraestructura ya
