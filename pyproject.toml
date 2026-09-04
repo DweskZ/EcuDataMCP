@@ -9,7 +9,7 @@ requires-python = ">=3.11"
 dependencies = [
     "certifi",
     "httpx>=0.28.0",
-    "mcp>=1.25.0,<2",
+    "mcp>=1.25.0,<3",
     "odfpy>=1.4.1",
     "openpyxl>=3.1.0",
     "pypdf>=6.16.2",
