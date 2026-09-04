@@ -3091,6 +3091,64 @@ confirmado el formato de resultado.
 
 ---
 
+## Duodécima pasada — `sisdatbi.arconel.gob.ec` confirmado login-gated, CELEC EP evaluado y descartado
+
+**Pedido de Daniel 2026-08-30/2026-09-04:** revisitar los dos ítems abiertos
+del sector eléctrico marcados "sin profundizar" en la Octava pasada.
+
+### `sisdatbi.arconel.gob.ec` — confirmado con VPN, sigue descartado
+
+Desde la red normal de este entorno, el host da **timeout TCP puro** en los
+puertos 80 y 443 (`curl` exit 28, sin handshake TLS, sin respuesta HTTP) —
+parecía caído o renombrado. Con VPN activada (2026-09-04) el host responde
+de inmediato: **es un bloqueo geográfico/por rango de IP del lado del
+servidor, no una caída real ni un dominio movido.** `arconel.gob.ec/
+estadistica-del-sector-electrico/` sigue enlazando `sisdatbi.arconel.gob.ec`
+como "SisdatBI" bajo "Consultas de Infraestructura y Transacciones", junto a
+`reportes.arconel.gob.ec` (ya descifrado, ítem separado) bajo "Bases de
+datos" — confirma que es el mismo enlace vigente, no un dominio obsoleto.
+
+Con VPN: HTTP responde 301 a HTTPS; HTTPS sirve `<title>SISDAT - BI</title>`,
+`<body id="login">`, plantilla AdminLTE, con un único `<form
+class="form-signin">` que pide solo un campo `<input type="password"
+name="txtupass">` (sin campo de usuario visible, sin rol de invitado, sin
+iframe/embed público en el HTML servido). Es una aplicación PHP propia con
+login obligatorio de punta a punta, no un dashboard tipo Power BI con modo
+`reportEmbed` público. **Confirmado, no solo sospechado: descartar
+definitivamente**, sin contenido alcanzable sin credenciales.
+
+### CELEC EP — transparencia/rendición de cuentas evaluado, no se recomienda construir
+
+Las páginas genéricas de transparencia (`celec.gob.ec/lotaip/` y los
+reportes de gestión/financieros/plan-anual a nivel corporativo) son solo
+shells de navegación con 1-5 links cada una. Las páginas sector-específicas
+("Balance Energético Nacional", "Plan Maestro de Electricidad") tienen 1-2
+PDFs estáticos, aparentemente los mismos documentos que CENACE Biblioteca ya
+expone (Plan Maestro de Electricidad 2023-2032 ya catalogado ahí, ver
+Octava pasada) — probable duplicado, no contenido nuevo.
+
+El contenido real y sustancial vive en las páginas LOTAIP **por unidad de
+negocio** (13 unidades: celecsur, cocacodo, electroguayas, hidroagoyan,
+gensur, hidroazogues, hidronacion, hidrotoapi, termoesmeraldas,
+termogasmachala, termomanabi, termopichincha, transelectric), cada una con
+subpáginas por año. Confirmado en vivo: `celec.gob.ec/celecsur/lotaip/
+transparencia-2023/` sola tiene 227 links reales a archivos XLS/XLSX/PDF.
+Pero sigue la estructura literal LOTAIP estándar (organigramas, escalas
+salariales, contratos, auditorías, presupuestos) — la misma que publica
+cualquier institución pública ecuatoriana bajo la Ley Orgánica de
+Transparencia y Acceso a la Información Pública, no información específica
+del sector eléctrico. La cobertura es además inconsistente entre unidades
+(`transelectric/lotaip/` solo tenía 1 link vs. 227 de celecsur).
+
+**Recomendación: no construir.** Un scraper aquí sería de alcance similar a
+SGR Biblioteca (13 unidades × ~6 años × ~20 literales) pero catalogando
+cumplimiento administrativo genérico, no datos del sector eléctrico —
+inconsistente con el criterio del proyecto de integrar solo fuentes que
+aportan detalle sectorial real, no repetir filings de cumplimiento LOTAIP
+que ya existen en cualquier institución.
+
+---
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un
