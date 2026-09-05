@@ -54,8 +54,7 @@ def _fuentes_payload() -> dict:
             {
                 "id": "sri",
                 "nombre": (
-                    "SRI: datasets fuera de CKAN, RUC y estadísticas de "
-                    "recaudación"
+                    "SRI: datasets fuera de CKAN, RUC y estadísticas de recaudación"
                 ),
                 "base": "https://www.sri.gob.ec/datasets",
                 "tools": [
@@ -64,6 +63,12 @@ def _fuentes_payload() -> dict:
                     "search_sri_ruc",
                     "search_sri_estadisticas_recaudacion",
                 ],
+            },
+            {
+                "id": "arcsa",
+                "nombre": "ARCSA Base de Registros Emitidos (registro sanitario vigente)",
+                "base": "https://www.controlsanitario.gob.ec/base-de-datos/",
+                "tools": ["list_arcsa_categorias", "get_arcsa_categoria_archivos"],
             },
             {
                 "id": "gobec",

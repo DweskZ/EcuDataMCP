@@ -28,6 +28,8 @@ aceptan `format="json"` además de texto.
 | `search_sri_estadisticas_recaudacion` | Buscar reportes públicos de recaudación por impuesto, provincia, cantón y actividad económica. |
 | `get_sri_ruc_info` | Consultar la ficha pública de un RUC exacto, incluidos establecimientos. |
 | `search_sri_ruc` | Buscar contribuyentes en el RUC por razón social o nombre comercial. |
+| `list_arcsa_categorias` | Listar las categorías del registro sanitario vigente de ARCSA (alimentos, medicamentos, cosméticos, etc.). |
+| `get_arcsa_categoria_archivos` | Listar los archivos descargables de una categoría del registro sanitario de ARCSA. |
 
 Los tools CKAN aceptan `source="nacional"` (default) o `source="cuenca"`
 para consultar el catálogo nacional o el portal municipal Cuenca en Datos.

@@ -13,6 +13,18 @@
 
 ### Added
 
+- **ARCSA Base de Registros Emitidos** (`list_arcsa_categorias`,
+  `get_arcsa_categoria_archivos`) — the live sanitary registry
+  (`controlsanitario.gob.ec/base-de-datos/`) by category: alimentos,
+  medicamentos, cosméticos, dispositivos médicos, plaguicidas, and more,
+  27 categories / 77 files. The roadmap previously marked this domain
+  "caído (reset TLS)" — turned out to be a bare `curl`/`httpx` request
+  with no identifying User-Agent getting blocked, not an actual outage;
+  it responds normally to this project's own `USER_AGENT` header. Reuses
+  `helpers/sgr_publicaciones_client.py`'s Biblioteca parsing logic
+  verbatim (confirmed byte-for-byte the same WordPress download-monitor
+  markup), just retargeted at a new domain. Tool count rises from 100 to
+  102.
 - **INEC topic coverage: Laboratorio de Dinámica Laboral y Empresarial
   (LDLE)** — added to `helpers/inec_client.py`'s `_EXTRA_TOPICS`, so
   `search_inec_estadisticas`/`get_inec_estadistica_files` now surface it.

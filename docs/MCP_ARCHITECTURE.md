@@ -25,6 +25,10 @@ no implica que todos los cambios deban hacerse de una sola vez.
 > números de esta página que preceden a esta nota reflejan el conteo exacto
 > a la fecha de cada revisión y no se reescriben retroactivamente.
 
+> **Actualizado 2026-09-05 (mismo día).** Se agregaron 2 tools de ARCSA
+> (`list_arcsa_categorias`, `get_arcsa_categoria_archivos`) — el total sube
+> de 100 a 102.
+
 ## Conclusión corta
 
 El servidor tiene 103 tools registradas. Ese número no es, por sí solo, un

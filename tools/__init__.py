@@ -6,6 +6,9 @@ from tools.detect_series_pattern import register_detect_series_pattern_tool
 from tools.download_anda_microdata import register_download_anda_microdata_tool
 from tools.download_resource import register_download_resource_tool
 from tools.get_anda_survey_info import register_get_anda_survey_info_tool
+from tools.get_arcsa_categoria_archivos import (
+    register_get_arcsa_categoria_archivos_tool,
+)
 from tools.get_auditor_info import register_get_auditor_info_tool
 from tools.get_bce_iem_table import register_get_bce_iem_table_tool
 from tools.get_bce_indicador_diario import register_get_bce_indicador_diario_tool
@@ -53,6 +56,7 @@ from tools.get_sut_indicador_schema import register_get_sut_indicador_schema_too
 from tools.get_tramite_estadisticas import register_get_tramite_estadisticas_tool
 from tools.get_tramite_info import register_get_tramite_info_tool
 from tools.investigate_dataset import register_investigate_dataset_tool
+from tools.list_arcsa_categorias import register_list_arcsa_categorias_tool
 from tools.list_bce_indicadores_diarios import (
     register_list_bce_indicadores_diarios_tool,
 )
@@ -248,3 +252,6 @@ def register_tools(mcp: FastMCP) -> None:
     register_get_financials_tool(mcp)
     register_search_auditores_tool(mcp)
     register_get_auditor_info_tool(mcp)
+
+    register_list_arcsa_categorias_tool(mcp)
+    register_get_arcsa_categoria_archivos_tool(mcp)

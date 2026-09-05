@@ -36,6 +36,13 @@ de cobertura que falta en cada una.
 | Página de datasets | `search_sri_datasets` | 130 enlaces directos (CSV/ZIP/XLSX) de un CMS Liferay sin API → RESEARCH.md § SRI — página de datasets |
 | Estadísticas de recaudación | `search_sri_estadisticas_recaudacion` | Reportes XLSX mensuales por provincia/cantón/sector, complementario a `/datasets` → RESEARCH.md § Séptima pasada |
 
+### ARCSA
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Base de Registros Emitidos | `list_arcsa_categorias`, `get_arcsa_categoria_archivos` | Registro sanitario vigente por categoría (alimentos, medicamentos, cosméticos, dispositivos médicos, plaguicidas, etc.), 27 categorías / 77 archivos; reutiliza el mismo parser de la Biblioteca de SGR (mismo plugin WordPress download-monitor) → RESEARCH.md § Decimoctava pasada |
+| Datasets CKAN (registros suspendidos/cancelados) | tools CKAN genéricos | 4 datasets ya alcanzables sin código nuevo, complementarios al registro vigente de arriba → RESEARCH.md § Décima pasada |
+
 ### Superintendencia de Compañías (Supercías)
 
 | Fuente | Herramientas | Qué cubre |
@@ -245,7 +252,6 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 | Cancillería y embajadas | No iniciado | Dominio vivo (`cancilleria.gob.ec`), sin pasada de contenido dedicada — trámites consulares, apostillas, estadísticas migratorias sin confirmar |
 | CNE (Consejo Nacional Electoral) | Potencial, revisar de nuevo | Marcado descartado en una pasada anterior por WAF Incapsula en el micrositio de resultados; pedido explícito de Daniel 2026-09-04 de reevaluar — confirmar si el bloqueo aplica a todo `cne.gob.ec` o solo a ese micrositio, y si hay datasets/API alcanzables (padrón, resultados históricos, financiamiento de campañas) fuera de la zona bloqueada |
 | Geoportales municipales (Quito, Riobamba, Portoviejo/Fénix, Ambato) | No iniciado | Encontrados vía directorio de "Municipios Abiertos" (`municipiosabiertos.gob.ec`); patrón WMS/WFS como INAMHI/SIPA, no CKAN. URL exacta del GeoServer/ArcGIS sin confirmar para ninguno; Quito además tenía "la primera plataforma de datos abiertos del país" (2014) sin catálogo vivo encontrado en esta pasada → RESEARCH.md § Decimosexta pasada |
-| ARCSA | Parcial | 4 datasets CKAN reales, solo registros suspendidos/cancelados; el registro sanitario vigente (`controlsanitario.gob.ec`) está caído (reset TLS) — reintentar más adelante → RESEARCH.md § Décima pasada |
 | Vivienda MIDUVI | No iniciado | Dominio caído a nivel TLS, sin reemplazo encontrado; CKAN cubre parcialmente (5 datasets) → RESEARCH.md § Vivienda (MIDUVI) |
 | Prensa | No iniciado | SECOM/Presidencia (boletines) y Fundamedios (agresiones a prensa); sin confirmar si hay datasets descargables → RESEARCH.md § Prensa |
 | Datos legislativos/normativos | Investigado, alcance en duda | Jurisprudencia y proyectos de ley investigados a fondo; Daniel señaló que puede no ser relevante para el alcance del proyecto → RESEARCH.md § Datos legislativos |

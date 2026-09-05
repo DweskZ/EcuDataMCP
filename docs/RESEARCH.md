@@ -4023,10 +4023,24 @@ sanitario de ARCSA). De las cinco:
   pendiente.
 - **"acess registration"** = registro sanitario de ARCSA. Confirmado en
   vivo: `controlsanitario.gob.ec/base-de-datos/` responde 200 (el ROADMAP
-  lo tenía marcado "caído" desde la Décima pasada) con ~25 categorías y
-  77 entradas, markup idéntico al de la Biblioteca de SGR
-  (`ul-downloads`/`li-gray1`/`download-monitor`) — mismo parser
-  reutilizable; queda pendiente.
+  lo tenía marcado "caído" desde la Décima pasada) — la falla anterior era
+  un `curl`/`httpx` sin User-Agent identificable, no una caída real del
+  dominio: con `helpers.user_agent.USER_AGENT` responde 200 sin problema.
+  **Construido el mismo día:** `helpers/arcsa_client.py` +
+  `list_arcsa_categorias`/`get_arcsa_categoria_archivos`, reutilizando
+  literalmente la misma lógica de parsing que
+  `helpers/sgr_publicaciones_client.py`'s Biblioteca (`ul-downloads`/
+  `li-gray1`/`download-monitor`, confirmado byte a byte que es el mismo
+  plugin WordPress) — solo cambia el dominio verificado
+  (`controlsanitario.gob.ec`). Confirmado en vivo contra la página real:
+  27 categorías top-level, 77 archivos, 9 sub-categorías anidadas un nivel
+  (la mayoría por año, ej. "Inspecciones en Establecimientos
+  Farmacéuticos Controlados" > 2016-2023), 2 categorías vacías (0
+  archivos, listadas igual por ser parte genuina de la estructura de la
+  página). Un nombre de categoría se reproduce tal cual viene en el HTML
+  aunque parezca un typo: "+NotiAlertas - Farmacovigilancia" trae un "+"
+  literal en el texto, aparte del ícono "+" que antecede a toda categoría
+  — confirmado leyendo el markup crudo, no es un artefacto del parser.
 
 **SRI Saiku removido.** Pedido de Daniel: reverificar en vivo el pendiente
 de la Décima pasada ("falta verificación contra el endpoint vivo"). Falló

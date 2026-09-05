@@ -35,6 +35,7 @@ _CAPABILITIES = {
         "Supercías ranking financiero (últimos años, requiere build local)",
         "SRI consulta pública del Registro Único de Contribuyentes (RUC)",
         "SRI estadísticas de recaudación: reportes mensuales pre-agregados por impuesto/provincia/actividad",
+        "ARCSA Base de Registros Emitidos: registro sanitario vigente por categoría (alimentos, medicamentos, cosméticos, dispositivos médicos, etc.)",
         (
             "SIPA (Ministerio de Agricultura, Ganadería y Pesca): series "
             "agropecuarias reales — precios, comercio exterior, crédito, "
@@ -121,6 +122,7 @@ _CAPABILITIES = {
             "get_sri_ruc_info",
             "search_sri_ruc",
         ],
+        "arcsa": ["list_arcsa_categorias", "get_arcsa_categoria_archivos"],
         "financieros": ["search_ranking", "get_financials"],
         "agropecuario": ["list_sipa_modulos", "get_sipa_modulo_archivos"],
         "auditoria": ["list_contraloria_informes", "get_contraloria_informe"],
