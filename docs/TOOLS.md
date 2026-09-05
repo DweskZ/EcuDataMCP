@@ -28,9 +28,6 @@ aceptan `format="json"` además de texto.
 | `search_sri_estadisticas_recaudacion` | Buscar reportes públicos de recaudación por impuesto, provincia, cantón y actividad económica. |
 | `get_sri_ruc_info` | Consultar la ficha pública de un RUC exacto, incluidos establecimientos. |
 | `search_sri_ruc` | Buscar contribuyentes en el RUC por razón social o nombre comercial. |
-| `list_sri_saiku_cubes` | Listar cubos OLAP visibles en la instancia pública de Saiku del SRI. |
-| `describe_sri_saiku_cube` | Ver dimensiones, jerarquías, niveles y medidas de un cubo Saiku público. |
-| `query_sri_saiku_aggregate` | Ejecutar una consulta agregada limitada con una dimensión y una medida. |
 
 Los tools CKAN aceptan `source="nacional"` (default) o `source="cuenca"`
 para consultar el catálogo nacional o el portal municipal Cuenca en Datos.

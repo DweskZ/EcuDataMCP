@@ -54,8 +54,8 @@ def _fuentes_payload() -> dict:
             {
                 "id": "sri",
                 "nombre": (
-                    "SRI: datasets fuera de CKAN, RUC, estadísticas de "
-                    "recaudación y cubos Saiku"
+                    "SRI: datasets fuera de CKAN, RUC y estadísticas de "
+                    "recaudación"
                 ),
                 "base": "https://www.sri.gob.ec/datasets",
                 "tools": [
@@ -63,9 +63,6 @@ def _fuentes_payload() -> dict:
                     "get_sri_ruc_info",
                     "search_sri_ruc",
                     "search_sri_estadisticas_recaudacion",
-                    "list_sri_saiku_cubes",
-                    "describe_sri_saiku_cube",
-                    "query_sri_saiku_aggregate",
                 ],
             },
             {

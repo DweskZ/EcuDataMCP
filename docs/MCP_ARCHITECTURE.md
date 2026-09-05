@@ -15,6 +15,16 @@ no implica que todos los cambios deban hacerse de una sola vez.
 > versión). Solo cambió la escala: la superficie pública objetivo pasa de
 > ~69 a ~99, con el mismo puñado de reducciones de siempre.
 
+> **Actualizado 2026-09-05.** Se removieron las 3 tools de SRI Saiku
+> (`list_sri_saiku_cubes`, `describe_sri_saiku_cube`,
+> `query_sri_saiku_aggregate`) tras confirmar en vivo, desde tres entornos
+> distintos (servidor MCP desplegado, `curl` local, navegador real), que
+> `srienlinea.sri.gob.ec` cierra la conexión TLS abruptamente sin excepción
+> — no es un problema de conectividad puntual del entorno de desarrollo, el
+> dominio completo está inalcanzable. El total baja de 103 a 100; los
+> números de esta página que preceden a esta nota reflejan el conteo exacto
+> a la fecha de cada revisión y no se reescriben retroactivamente.
+
 ## Conclusión corta
 
 El servidor tiene 103 tools registradas. Ese número no es, por sí solo, un
@@ -139,7 +149,7 @@ list_sipa_modulos() → get_sipa_modulo_archivos("economico")
 
 Fusionarlos normalmente produce una tool con argumentos opcionales, respuestas
 de varios tipos y reglas difíciles de explicar. Se mantienen separados, en
-particular para SIPA, Superbancos, Contraloría, SRI Saiku y BCEData/IEM.
+particular para SIPA, Superbancos, Contraloría y BCEData/IEM.
 
 ## Armonización de nombres
 
@@ -157,7 +167,7 @@ audit    → revisar el estado del sistema
 ```
 
 También conviene definir una convención para tools nuevas, preferiblemente con
-la fuente primero, como `bce.search_indicators` o `sri.query_saiku`. No se debe
+la fuente primero, como `bce.search_indicators` o `sri.search_ruc`. No se debe
 renombrar toda la API actual en un solo cambio.
 
 Cada tool nueva debería tener un `title` legible en español y una descripción

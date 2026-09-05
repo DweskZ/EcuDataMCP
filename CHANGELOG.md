@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Removed
+
+- **SRI Saiku tools** (`list_sri_saiku_cubes`, `describe_sri_saiku_cube`,
+  `query_sri_saiku_aggregate`) — `srienlinea.sri.gob.ec` confirmed
+  unreachable in live verification from three independent environments
+  (deployed MCP server, local `curl`, real browser navigation): the TLS
+  connection closes abruptly every time, not the deployed-server-only
+  connectivity gap previously suspected. Tool count drops from 103 to 100.
+
 ### Added
 
 - **INEC topic coverage: Laboratorio de Dinámica Laboral y Empresarial

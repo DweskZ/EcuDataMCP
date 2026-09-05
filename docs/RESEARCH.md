@@ -3992,6 +3992,66 @@ pendiente).
 
 ---
 
+## Decimoctava pasada — LDLE agregado a INEC, SRI Saiku removido (2026-09-05)
+
+**LDLE.** Pedido de Daniel: investigar varias siglas de fuentes nuevas
+(CEAACES/CES cierre y planes de contingencia, SNIESE, RAS, LDLE, y una
+quinta pedida como "acess registration" que resultó ser el registro
+sanitario de ARCSA). De las cinco:
+
+- **RAS** = "Recursos y Actividades de Salud" de INEC — ya cubierto sin
+  código nuevo: `search_inec_estadisticas(query="salud")` ya lo lista y
+  `get_inec_estadistica_files` ya devuelve sus 15 archivos reales
+  (SPSS/R/XLSX/ZIP, metodología, formulario).
+- **LDLE** ("Laboratorio de Dinámica Laboral y Empresarial", INEC+IESS,
+  `ecuadorencifras.gob.ec/laboratorio-de-dinamica-laboral-y-empresarial/`)
+  **no** aparecía en `search_inec_estadisticas` (0 resultados para
+  "laboratorio"/"dinamica") pese a que `get_inec_estadistica_files` ya
+  parseaba su página correctamente al recibir la URL directa — el gap era
+  puramente de descubrimiento (no está linkeada desde ninguno de los dos
+  menús semilla de `_SEED_PAGE_URLS`), no de parsing. Agregada a
+  `_EXTRA_TOPICS` en `helpers/inec_client.py`, mismo patrón que el
+  Geoportal DPA ya existente ahí. El total de temas pasa de ~90 a ~91.
+- **SNIESE** — sin dataset masivo propio (es un registro interno). El
+  contenido real es `educacion.gob.ec/edusuperior/biblioteca/` (1,259
+  documentos WordPress `download-monitor`, ya documentado en la sección
+  SENESCYT/MINEDEC de este archivo) — reachable pero nunca construido
+  como tool; queda pendiente.
+- **CEAACES/CES cierre y contingencia** — resuelto a
+  `ces.gob.ec/lotaip/AAAA/Mes/...` (resoluciones RPC-SO-XX-No.XXX,
+  patrón LOTAIP-por-categoría-legal ya visto en IESS/Contraloría); queda
+  pendiente.
+- **"acess registration"** = registro sanitario de ARCSA. Confirmado en
+  vivo: `controlsanitario.gob.ec/base-de-datos/` responde 200 (el ROADMAP
+  lo tenía marcado "caído" desde la Décima pasada) con ~25 categorías y
+  77 entradas, markup idéntico al de la Biblioteca de SGR
+  (`ul-downloads`/`li-gray1`/`download-monitor`) — mismo parser
+  reutilizable; queda pendiente.
+
+**SRI Saiku removido.** Pedido de Daniel: reverificar en vivo el pendiente
+de la Décima pasada ("falta verificación contra el endpoint vivo"). Falló
+de forma consistente (2 intentos con horas de diferencia) desde **tres**
+entornos independientes: el servidor MCP desplegado
+(`list_sri_saiku_cubes` → "Server disconnected without sending a
+response"), `curl` local contra `srienlinea.sri.gob.ec/saiku/rest/saiku/
+session` (`schannel: server closed abruptly`), y navegación de browser
+real contra el dominio raíz `srienlinea.sri.gob.ec/` (denegada/fallida).
+No es el gap de conectividad puntual que se sospechaba antes — el dominio
+completo parece inalcanzable en este momento, no solo la ruta de Saiku.
+Por indicación explícita de Daniel ("try again, then if not, remove"), se
+removieron `helpers/sri_saiku_client.py`, los tres tools
+(`list_sri_saiku_cubes`, `describe_sri_saiku_cube`,
+`query_sri_saiku_aggregate`), su registro en `tools/__init__.py`, sus
+menciones en `resources/catalog.py`/`tools/list_capabilities.py`/
+`docs/TOOLS.md`, y se actualizó el conteo de tools (103→100) en
+`CLAUDE.md` y `docs/MCP_ARCHITECTURE.md` (con nota fechada en vez de
+reescribir los conteos históricos de esa página). Si el dominio vuelve a
+responder más adelante, reconstruir desde este mismo punto — la lógica de
+sesión anónima/discovery/query ya estaba resuelta, el bloqueo es
+puramente de alcanzabilidad de red.
+
+---
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

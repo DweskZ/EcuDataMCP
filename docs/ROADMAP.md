@@ -35,7 +35,6 @@ de cobertura que falta en cada una.
 |---|---|---|
 | Página de datasets | `search_sri_datasets` | 130 enlaces directos (CSV/ZIP/XLSX) de un CMS Liferay sin API → RESEARCH.md § SRI — página de datasets |
 | Estadísticas de recaudación | `search_sri_estadisticas_recaudacion` | Reportes XLSX mensuales por provincia/cantón/sector, complementario a `/datasets` → RESEARCH.md § Séptima pasada |
-| Saiku (OLAP) | `list_sri_saiku_cubes`, `describe_sri_saiku_cube`, `query_sri_saiku_aggregate` | Superficie anónima de solo lectura, 1 dimensión/medida, 100 filas; sin MDX arbitrario/drill-through/exportación — ver Pendiente para verificación en vivo |
 
 ### Superintendencia de Compañías (Supercías)
 
@@ -257,7 +256,6 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 | Fuente | Estado | Qué falta |
 |---|---|---|
 | SENESCYT/Educación Superior | Parcial | Cubierto vía CKAN + biblioteca de Educación Superior; registro de títulos bloqueado por captcha (no automatizable) → RESEARCH.md § SENESCYT |
-| SRI Saiku | Parcial | Superficie anónima construida (ver Hecho); falta verificación contra el endpoint vivo desde un entorno con conectividad real |
 | INEC — preview de archivos grandes | Parcial | `list_zip_contents` lista miembros de ZIP vía HTTP Range sin descargar todo; decidido en contra de un índice pre-construido por dataset y de cualquier transferencia completa de archivo |
 | CEPAL — geoportal del Censo Ecuador | Parcial | 9 capas reales vía API, pero derivadas del Clasificador Geográfico de INEC (fuente primaria); bajo valor salvo interés específico en la geometría → RESEARCH.md § CEPAL |
 
@@ -291,6 +289,7 @@ Bloqueos reales confirmados en vivo, o decisiones explícitas de no construir �
 | SERCOP — catálogo/órdenes de compra | CAPTCHA |
 | IG-EPN — `descarga-de-datos` | Cuenta obligatoria |
 | Superbancos — Catastro de Compañías | Login obligatorio (app JSF aparte) |
+| SRI Saiku (OLAP) | Tools removidas 2026-09-05 — `srienlinea.sri.gob.ec` confirmado inalcanzable en vivo desde tres entornos distintos (servidor MCP desplegado, `curl` local, navegador real): la conexión TLS se cierra abruptamente sin excepción, no es el gap de conectividad puntual que se sospechaba antes → RESEARCH.md § Décima pasada |
 
 ---
 
