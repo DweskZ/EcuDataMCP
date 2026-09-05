@@ -4,6 +4,13 @@
 
 ### Added
 
+- **INEC topic coverage: Laboratorio de Dinámica Laboral y Empresarial
+  (LDLE)** — added to `helpers/inec_client.py`'s `_EXTRA_TOPICS`, so
+  `search_inec_estadisticas`/`get_inec_estadistica_files` now surface it.
+  The page (INEC+IESS joint labor/business statistics hub) wasn't linked
+  from either menu seed page and so was invisible to the topic crawl, even
+  though the existing parser already reads its file list correctly once
+  given the URL directly.
 - **`.xlsb` (Excel Binary Workbook) support** — `preview_xlsb()` in
   `helpers/csv_reader.py`, wired into `preview_resource_data`,
   `investigate_dataset`, and `detect_series_pattern`. Closes the gap

@@ -142,7 +142,7 @@ de cobertura que falta en cada una.
 
 | Fuente | Herramientas | Qué cubre |
 |---|---|---|
-| Páginas de tema + BIINEC exclusivos | `search_inec_estadisticas`, `get_inec_estadistica_files`, `search_biinec_extras` | ~75 temas (boletines + series históricas); 3 registros BIINEC confirmados exclusivos (desechos peligrosos en salud, módulos ambientales ENEMDU/ECV) → RESEARCH.md § Ecuador en Cifras / portal BI del INEC |
+| Páginas de tema + BIINEC exclusivos | `search_inec_estadisticas`, `get_inec_estadistica_files`, `search_biinec_extras` | ~91 temas (boletines + series históricas), incluyendo el Laboratorio de Dinámica Laboral y Empresarial (LDLE, añadido a `_EXTRA_TOPICS` por no estar linkeado en ningún menú); 3 registros BIINEC confirmados exclusivos (desechos peligrosos en salud, módulos ambientales ENEMDU/ECV) → RESEARCH.md § Ecuador en Cifras / portal BI del INEC |
 | API REST de publicaciones (WordPress) | `search_inec_publicaciones`, `get_inec_publicacion_archivos` | Búsqueda de texto completo sobre 1.707 posts — cubre páginas que el menú mega-menu de una sola semilla no alcanza (ENEMDU anual, etc.) → RESEARCH.md § Novena pasada |
 | Censo (censoecuador.gob.ec) | `search_censo_recursos` | 36 archivos reales, solo metadata + URL → RESEARCH.md § Novena pasada |
 
