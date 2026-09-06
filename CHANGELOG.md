@@ -46,6 +46,21 @@
   failure. 20 MB matches the decompression cap this project already used
   elsewhere, not a new number.
 
+### Fixed
+
+- **Smoke workflow failing daily on a known upstream 403** — the four
+  dynamic `list -> get` chains in `scripts/smoke_e2e.py` each hand-rolled
+  their own `Traceback`/`Error:` check instead of going through
+  `helpers/smoke_status.assess_response`, so the recurring
+  `datosabiertos.gob.ec` 403 hard-failed the run even though the flat
+  checks classify the identical response as degraded. Adding
+  `chain_ckan_preview` is what turned CKAN-403 days from green into red:
+  the 2026-09-03 and 2026-09-04 runs saw the same 403 and passed at
+  `failed=0/44; degraded=1`, while 09-05 and 09-06 failed at 45 checks.
+  Chains now share the classifier via a new `chain_step()` helper and
+  report `DegradedChain` separately from a real failure, so a genuine
+  CKAN change still fails the workflow.
+
 ## 0.8.6 — 2026-09-04
 
 ### Added
