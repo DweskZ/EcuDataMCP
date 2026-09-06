@@ -1,4 +1,4 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers.csv_reader import list_zip_contents as _list_zip_contents
 from helpers.format_out import render_output
@@ -14,7 +14,7 @@ def _human_size(n: int) -> str:
     return f"{size:.1f} GB"
 
 
-def register_list_zip_contents_tool(mcp: FastMCP) -> None:
+def register_list_zip_contents_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def list_zip_contents(

@@ -1,11 +1,11 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import sipa_geoportal_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_search_sipa_geoportal_capas_tool(mcp: FastMCP) -> None:
+def register_search_sipa_geoportal_capas_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def search_sipa_geoportal_capas(

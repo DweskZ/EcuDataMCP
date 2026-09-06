@@ -1,5 +1,5 @@
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ckan_client
 from helpers.csv_reader import (
@@ -99,7 +99,7 @@ def classify_from_content_type(content_type: str | None) -> str:
     return _CONTENT_TYPE_KIND.get(mime, "UNKNOWN")
 
 
-def register_preview_resource_data_tool(mcp: FastMCP) -> None:
+def register_preview_resource_data_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def preview_resource_data(

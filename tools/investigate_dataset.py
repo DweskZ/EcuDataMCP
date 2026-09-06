@@ -1,5 +1,5 @@
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ckan_client
 from helpers.csv_reader import (
@@ -48,7 +48,7 @@ async def _classify(res: dict, session: httpx.AsyncClient) -> str:
     return kind
 
 
-def register_investigate_dataset_tool(mcp: FastMCP) -> None:
+def register_investigate_dataset_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def investigate_dataset(

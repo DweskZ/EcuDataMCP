@@ -1,6 +1,6 @@
 import re
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ckan_client
 from helpers.format_out import render_output
@@ -84,7 +84,7 @@ def _format_size(size: int | None) -> str:
     return f"{size / (1024 * 1024 * 1024):.1f} GB"
 
 
-def register_list_dataset_resources_tool(mcp: FastMCP) -> None:
+def register_list_dataset_resources_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def list_dataset_resources(

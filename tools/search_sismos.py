@@ -1,4 +1,4 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import igepn_client
 from helpers.format_out import render_output
@@ -11,7 +11,7 @@ _ESTADOS = {
 }
 
 
-def register_search_sismos_tool(mcp: FastMCP) -> None:
+def register_search_sismos_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def search_sismos(

@@ -1,5 +1,5 @@
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers.format_out import render_output
 from helpers.logging import log_tool
@@ -7,7 +7,7 @@ from helpers.pdf_reader import MAX_PAGES_PER_CALL
 from helpers.pdf_reader import read_pdf as extract_pdf_text
 
 
-def register_read_pdf_tool(mcp: FastMCP) -> None:
+def register_read_pdf_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def read_pdf(

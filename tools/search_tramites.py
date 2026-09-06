@@ -1,6 +1,6 @@
 from functools import partial
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import gobec_client
 from helpers.format_out import render_output
@@ -20,7 +20,7 @@ def _matches_query(tramite: dict, words: list[str]) -> bool:
     return all(w in searchable for w in words)
 
 
-def register_search_tramites_tool(mcp: FastMCP) -> None:
+def register_search_tramites_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def search_tramites(

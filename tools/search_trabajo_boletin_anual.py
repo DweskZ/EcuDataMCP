@@ -1,11 +1,11 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import trabajo_boletin_anual_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_search_trabajo_boletin_anual_tool(mcp: FastMCP) -> None:
+def register_search_trabajo_boletin_anual_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def search_trabajo_boletin_anual(query: str = "", format: str = "text") -> str:

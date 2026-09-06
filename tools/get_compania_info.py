@@ -1,11 +1,11 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import supercias_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_get_compania_info_tool(mcp: FastMCP) -> None:
+def register_get_compania_info_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def get_compania_info(ruc: str, format: str = "text") -> str:

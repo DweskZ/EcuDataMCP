@@ -1,7 +1,7 @@
 import json
 
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 import tools.preview_resource_data as preview_resource_data_module
 from helpers import ckan_client
@@ -13,7 +13,7 @@ from tools.preview_resource_data import (
 
 
 def _make_tool():
-    mcp = FastMCP("test")
+    mcp = MCPServer("test")
     register_preview_resource_data_tool(mcp)
     return mcp._tool_manager.get_tool("preview_resource_data").fn
 

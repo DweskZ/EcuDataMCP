@@ -1,7 +1,7 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 
-def register_workflow_prompts(mcp: FastMCP) -> None:
+def register_workflow_prompts(mcp: MCPServer) -> None:
     @mcp.prompt(
         name="explorar_datos",
         title="Explorar datos abiertos",

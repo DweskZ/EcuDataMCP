@@ -1,11 +1,11 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ineval_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_get_ineval_familia_archivos_tool(mcp: FastMCP) -> None:
+def register_get_ineval_familia_archivos_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def get_ineval_familia_archivos(familia: str, format: str = "text") -> str:

@@ -1,4 +1,4 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from tools.audit_bce_catalog import register_audit_bce_catalog_tool
 from tools.compare_bce_sources import register_compare_bce_sources_tool
@@ -132,8 +132,8 @@ from tools.search_trabajo_boletin_anual import (
 from tools.search_tramites import register_search_tramites_tool
 
 
-def register_tools(mcp: FastMCP) -> None:
-    """Register all MCP tools with the provided FastMCP instance."""
+def register_tools(mcp: MCPServer) -> None:
+    """Register all MCP tools with the provided MCPServer instance."""
     register_list_capabilities_tool(mcp)
     register_search_ecuador_tool(mcp)
     register_lookup_ubicacion_tool(mcp)
