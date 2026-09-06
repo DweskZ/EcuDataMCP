@@ -1,6 +1,6 @@
 import json
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 import tools.investigate_dataset as investigate_dataset_module
 from helpers import ckan_client
@@ -8,7 +8,7 @@ from tools.investigate_dataset import register_investigate_dataset_tool
 
 
 def _make_tool():
-    mcp = FastMCP("test")
+    mcp = MCPServer("test")
     register_investigate_dataset_tool(mcp)
     return mcp._tool_manager.get_tool("investigate_dataset").fn
 

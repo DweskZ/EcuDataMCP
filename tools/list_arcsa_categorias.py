@@ -1,11 +1,11 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import arcsa_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_list_arcsa_categorias_tool(mcp: FastMCP) -> None:
+def register_list_arcsa_categorias_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def list_arcsa_categorias(format: str = "text") -> str:

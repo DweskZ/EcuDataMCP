@@ -1,11 +1,11 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import inec_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_get_inec_estadistica_files_tool(mcp: FastMCP) -> None:
+def register_get_inec_estadistica_files_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def get_inec_estadistica_files(url: str, format: str = "text") -> str:

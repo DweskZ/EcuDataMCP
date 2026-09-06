@@ -61,6 +61,23 @@
   report `DegradedChain` separately from a real failure, so a genuine
   CKAN change still fails the workflow.
 
+### Changed
+
+- **`mcp` 1.29.0 → 2.1.1** — v2 removed `mcp.server.fastmcp` outright
+  (`FastMCP` renamed to `MCPServer`, now imported from
+  `mcp.server.mcpserver`). Every `register_*_tool`/`register_*` function
+  signature across `tools/`, `prompts/`, and `resources/` updates its type
+  hint accordingly; `main.py` moves `stateless_http` off the `MCPServer`
+  constructor onto `streamable_http_app(stateless_http=True)`, where v2
+  now expects transport-specific parameters. No tool-visible behavior
+  changes: `@mcp.tool()`/`@mcp.prompt()` decorators and plain `str`
+  tool-return handling are unchanged between v1 and v2, and every tool
+  here already catches its own exceptions before returning, so v2's
+  stricter handling of an *unhandled* exception escaping a tool handler
+  doesn't apply. Verified live: stdio startup, `/health`, and an
+  `initialize` + `tools/list` round trip over `/mcp` all succeed
+  end-to-end under the new stateless HTTP setup.
+
 ## 0.8.6 — 2026-09-04
 
 ### Added

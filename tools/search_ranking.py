@@ -1,6 +1,6 @@
 import logging
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import supercias_financials
 from helpers.format_out import render_output
@@ -9,7 +9,7 @@ from helpers.logging import MAIN_LOGGER_NAME, log_tool
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 
-def register_search_ranking_tool(mcp: FastMCP) -> None:
+def register_search_ranking_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def search_ranking(

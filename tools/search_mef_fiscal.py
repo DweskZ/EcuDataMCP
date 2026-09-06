@@ -1,4 +1,4 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import mef_fiscal_client
 from helpers.format_out import render_output
@@ -7,7 +7,7 @@ from helpers.logging import log_tool
 _FUENTES = {"mef", "senae"}
 
 
-def register_search_mef_fiscal_tool(mcp: FastMCP) -> None:
+def register_search_mef_fiscal_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def search_mef_fiscal(

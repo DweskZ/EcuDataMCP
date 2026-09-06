@@ -1,11 +1,11 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import sgr_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_list_sat_tsunami_tool(mcp: FastMCP) -> None:
+def register_list_sat_tsunami_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def list_sat_tsunami(limit: int = 30, format: str = "text") -> str:

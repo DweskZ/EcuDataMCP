@@ -1,11 +1,11 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import seps_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_get_seps_seccion_archivos_tool(mcp: FastMCP) -> None:
+def register_get_seps_seccion_archivos_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def get_seps_seccion_archivos(seccion: str, format: str = "text") -> str:

@@ -1,6 +1,6 @@
 import json
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers.geo_data import list_cantones, list_parroquias, list_provincias
 
@@ -237,7 +237,7 @@ def _fuentes_payload() -> dict:
     }
 
 
-def register_catalog_resources(mcp: FastMCP) -> None:
+def register_catalog_resources(mcp: MCPServer) -> None:
     @mcp.resource(
         "ecuador://fuentes",
         name="fuentes_ecuador",

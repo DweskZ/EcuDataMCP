@@ -1,11 +1,11 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers.biinec_extras import BIINEC_URL, search_extras
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_search_biinec_extras_tool(mcp: FastMCP) -> None:
+def register_search_biinec_extras_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def search_biinec_extras(query: str = "", format: str = "text") -> str:

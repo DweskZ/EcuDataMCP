@@ -2,7 +2,7 @@ import base64
 import json
 
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 import tools.download_resource as download_resource_module
 from helpers import ckan_client
@@ -11,7 +11,7 @@ from tools.download_resource import register_download_resource_tool
 
 
 def _make_tool():
-    mcp = FastMCP("test")
+    mcp = MCPServer("test")
     register_download_resource_tool(mcp)
     return mcp._tool_manager.get_tool("download_resource").fn
 

@@ -6,7 +6,7 @@ from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime
 
 import uvicorn
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers.env_config import (
     get_mcp_auth_token,
@@ -34,10 +34,7 @@ VERSION = get_version()
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
-mcp = FastMCP(
-    "Ecuador Datos Abiertos MCP",
-    stateless_http=True,
-)
+mcp = MCPServer("Ecuador Datos Abiertos MCP")
 register_tools(mcp)
 register_prompts(mcp)
 register_resources(mcp)
@@ -77,7 +74,7 @@ def with_health_endpoint(
 
 asgi_app = with_health_endpoint(
     with_http_security(
-        mcp.streamable_http_app(),
+        mcp.streamable_http_app(stateless_http=True),
         auth_token=get_mcp_auth_token(),
         max_concurrent_requests=get_mcp_max_concurrent_requests(),
         rate_limit_requests=get_mcp_rate_limit_requests(),

@@ -1,6 +1,6 @@
 import logging
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import bce_client
 from helpers.format_out import render_output
@@ -10,7 +10,7 @@ from helpers.response_contract import with_response_metadata
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 
-def register_audit_bce_catalog_tool(mcp: FastMCP) -> None:
+def register_audit_bce_catalog_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def audit_bce_catalog(

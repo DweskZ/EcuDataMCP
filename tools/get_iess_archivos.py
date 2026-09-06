@@ -1,6 +1,6 @@
 from typing import Literal
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import iess_client
 from helpers.format_out import render_output
@@ -9,7 +9,7 @@ from helpers.logging import log_tool
 _COLECCIONES = ("boletines", "estudios_actuariales", "informes_auditoria")
 
 
-def register_get_iess_archivos_tool(mcp: FastMCP) -> None:
+def register_get_iess_archivos_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def get_iess_archivos(

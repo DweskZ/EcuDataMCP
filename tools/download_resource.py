@@ -1,7 +1,7 @@
 import base64
 
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ckan_client
 from helpers.csv_reader import MAX_DOWNLOAD_BYTES, download_bytes
@@ -9,7 +9,7 @@ from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_download_resource_tool(mcp: FastMCP) -> None:
+def register_download_resource_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def download_resource(

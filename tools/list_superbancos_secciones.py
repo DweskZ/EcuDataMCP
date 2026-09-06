@@ -1,11 +1,11 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import superbancos_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_list_superbancos_secciones_tool(mcp: FastMCP) -> None:
+def register_list_superbancos_secciones_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def list_superbancos_secciones(format: str = "text") -> str:

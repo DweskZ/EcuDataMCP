@@ -1,4 +1,4 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import anda_client
 from helpers.format_out import render_output
@@ -14,7 +14,7 @@ def _trim(text: str, n: int = _MAX_TEXT_CHARS) -> str | None:
     return clean[:n] + "..." if len(clean) > n else clean
 
 
-def register_get_anda_survey_info_tool(mcp: FastMCP) -> None:
+def register_get_anda_survey_info_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def get_anda_survey_info(idno: str, format: str = "text") -> str:

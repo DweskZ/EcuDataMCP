@@ -1,7 +1,7 @@
 import json
 
 import pytest
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 import tools.detect_series_pattern as detect_series_pattern_module
 from helpers import ckan_client
@@ -18,7 +18,7 @@ from tools.detect_series_pattern import (
 
 
 def _make_tool():
-    mcp = FastMCP("test")
+    mcp = MCPServer("test")
     register_detect_series_pattern_tool(mcp)
     return mcp._tool_manager.get_tool("detect_series_pattern").fn
 

@@ -1,11 +1,11 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import gobec_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_list_instituciones_tool(mcp: FastMCP) -> None:
+def register_list_instituciones_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def list_instituciones(

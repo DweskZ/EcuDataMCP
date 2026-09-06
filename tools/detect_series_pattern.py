@@ -1,7 +1,7 @@
 from functools import partial
 
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ckan_client
 from helpers.csv_reader import (
@@ -195,7 +195,7 @@ def _pick_pair(resources: list[dict]) -> tuple[dict, dict] | None:
     return group[0], group[1]
 
 
-def register_detect_series_pattern_tool(mcp: FastMCP) -> None:
+def register_detect_series_pattern_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def detect_series_pattern(

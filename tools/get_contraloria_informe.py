@@ -1,4 +1,4 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import contraloria_client
 from helpers.csv_reader import format_table
@@ -6,7 +6,7 @@ from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_get_contraloria_informe_tool(mcp: FastMCP) -> None:
+def register_get_contraloria_informe_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def get_contraloria_informe(

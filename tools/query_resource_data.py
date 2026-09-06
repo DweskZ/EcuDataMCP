@@ -1,7 +1,7 @@
 import json
 
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ckan_client
 from helpers.csv_reader import format_table
@@ -9,7 +9,7 @@ from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_query_resource_data_tool(mcp: FastMCP) -> None:
+def register_query_resource_data_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def query_resource_data(
