@@ -4064,6 +4064,219 @@ responder más adelante, reconstruir desde este mismo punto — la lógica de
 sesión anónima/discovery/query ya estaba resuelta, el bloqueo es
 puramente de alcanzabilidad de red.
 
+## Decimonovena pasada — CNE reevaluado, WAF caracterizado a fondo (2026-09-06)
+
+Pedido explícito de Daniel del 2026-09-04 (registrado en el ROADMAP):
+reevaluar si el bloqueo de Incapsula en `cne.gob.ec` aplica a todo el
+dominio o solo al micrositio de resultados marcado en la Sexta pasada, y
+si hay datasets alcanzables fuera de la zona bloqueada.
+
+**El bloqueo es de todo el dominio, a nivel de challenge JS de Incapsula —
+no de un micrositio ni de un simple filtro de User-Agent.** Confirmado con
+tres clientes:
+
+- `curl` (build de Windows/schannel de este entorno) falla el *handshake*
+  TLS contra `cne.gob.ec` con `SEC_E_ILLEGAL_MESSAGE`/
+  `CRYPT_E_NO_REVOCATION_CHECK` — pero el segundo error también aparece
+  contra `google.com` y `datosabiertos.gob.ec`, así que es una limitación
+  de este entorno con OCSP, no evidencia de bloqueo específico de CNE.
+- `httpx` (Python, sin necesidad de TLS especial) sí conecta, y recibe
+  consistentemente un 403 con el cuerpo característico de Incapsula
+  (`<script src="/_Incapsula_Resource?...">` + iframe "Request
+  unsuccessful. Incapsula incident ID: ...") — probado contra `/`,
+  `/estadisticas/bases-de-datos/`, y directamente contra un enlace de
+  descarga real (`/download/segunda-vuelta-2/?wpdmdl=57399`). Se repitió
+  con un User-Agent de Chrome completo y headers `Accept`/
+  `Accept-Language` realistas — sin diferencia, sigue siendo 403. Es un
+  challenge JS que un cliente sin motor de JavaScript no puede resolver,
+  no una verificación de cabecera.
+- El navegador real (`mcp__Claude_Browser`, Chromium con JS) sí logra
+  pasar el challenge — pero de forma inconsistente: la primera navegación
+  a `cne.gob.ec` devolvió el mismo iframe de Incapsula ("Request
+  unsuccessful") que ve `httpx`; una segunda navegación a una URL interna
+  (`/estadisticas/bases-de-datos/`) cargó la página completa sin
+  problema. Consistente con un WAF que puntúa por reputación de IP/sesión
+  en vez de bloquear de forma binaria — no hay una URL "segura" fija.
+
+**Contenido real confirmado detrás del challenge, vía navegador.** La
+página `/estadisticas/bases-de-datos/` es un WordPress con el plugin WP
+Download Manager (WPDM), con un acordeón de un nivel superior por proceso
+electoral (Elecciones Generales 2025, Referéndum 2024, ... hasta
+Elecciones Generales 2002 — 19 procesos listados). Cada proceso es a su
+vez una categoría WPDM con subcategorías; para "Elecciones Generales
+2025" las subcategorías son Diccionarios, Organizaciones Políticas,
+Registro Electoral y Resultados, y "Resultados" lista archivos reales
+descargables (ej. "Segunda Vuelta", 703.80 KB, con contador de
+1,245 descargas).
+
+**El acordeón está roto para cualquier visitante, no solo para scraping —
+hallazgo colateral.** El sitio se queda en "Loading…" indefinidamente
+porque el propio parche JS de CNE (comentario inline "CNE WPDM FIX
+v1.0.2") que dispara la carga AJAX solo se activa si la URL contiene
+`/informacion-publica-lotaip` o `/secretaria/orden-del-dia`, o si el DOM
+tiene los selectores `.accordion-groups .accord-handle`/
+`.w3eden .accord-handle` — ninguna de esas condiciones se cumple en
+`/estadisticas/bases-de-datos/`, así que el fix nunca corre ahí. El
+endpoint WPDM nativo que ese parche llama sí funciona igual reproducido a
+mano, sin el fix:
+
+```
+GET https://www.cne.gob.ec/?wpdmactask=listsub&orderby=date&order=DESC
+    &acccount=1&sac=default&linktpl=link-template-default-wdc&showsub=1
+    &__wpdmacn=<nonce>&parent=<id_categoria_wpdm>
+```
+
+El `<nonce>` (`__wpdmacn`) se extrae de un `<script>` inline de la página
+ya cargada (patrón `__wpdmacn=([a-zA-Z0-9]+)`); `parent` es el `rel` del
+enlace del acordeón (ej. `8325` para "Elecciones Generales 2025", que a su
+vez devuelve subcategorías con sus propios `rel` como `8329` para
+"Resultados"). Esta llamada solo se pudo ejecutar dentro de la sesión del
+navegador real (mismo origen, cookies de Incapsula ya resueltas) — no se
+probó ni se espera que funcione contra `httpx` sin pasar antes el
+challenge.
+
+**Veredicto: sigue fuera de alcance para un backend Python puro.** El
+403/challenge de Incapsula cubre el dominio completo, incluyendo el
+enlace de descarga final, no solo el HTML de listado — confirmado que
+`httpx` recibe el mismo challenge contra `?wpdmdl=57399` directamente. Sin
+un navegador real ejecutando JS (Playwright o similar) no hay forma de
+obtener las cookies de sesión que el WAF exige, y este proyecto no tiene
+esa dependencia en ningún otro helper (todos usan `httpx`, ver
+`CLAUDE.md`). Agregar Playwright solo para CNE es una dependencia pesada
+y nueva para el proyecto — decisión pendiente de Daniel antes de
+construir `helpers/cne_client.py`. Si se decide seguir, la estructura de
+datos (procesos electorales 2002-2025 × subcategorías × archivos WPDM) y
+el endpoint `wpdmactask=listsub` ya están mapeados en esta pasada, listos
+para reutilizar.
+
+## Vigésima pasada — `reportes.arconel.gob.ec` mapeado a nivel de protocolo, pendiente construir (2026-09-06)
+
+Pedido de Daniel: avanzar el sector eléctrico, específicamente
+`reportes.arconel.gob.ec` (marcado "descifrado, falta construir" desde la
+Séptima pasada). Esta pasada fue solo de reconocimiento en vivo (browser
+real, instrumentando `XMLHttpRequest.prototype.send` para capturar el
+payload exacto de cada postback) — **no se escribió código todavía**, por
+decisión explícita de Daniel al final de la pasada (ver "Decisión" al
+final de esta sección).
+
+**Flujo de sesión completo, confirmado byte a byte.** Es un ASP.NET
+WebForms clásico con `ScriptManager`/`UpdatePanel` (MS AJAX, no JSF como
+BIINEC/IG-EPN) más un control **Microsoft ReportViewer 11.0.3452.0**. Los
+tres filtros (`ctl00$dpTipo`, `ctl00$dpAnio`, `ctl00$dpGrupoEmpresa`) y el
+opcional `ctl00$dpMes` disparan `__doPostBack` en su `onchange`; cada uno
+debe enviarse como un POST separado y secuencial a `https://reportes.
+arconel.gob.ec/` (no hay atajo para fijar los cuatro de una sola vez) con
+este cuerpo (URL-encoded):
+
+```
+ctl00$ScriptManager1=ctl00$UpdatePanel1|<campo_que_cambió>
+ctl00$dpTipo=<texto exacto de la opción, ej. "Balance Energía">
+ctl00$dpAnio=<año o "0">
+ctl00$dpMes=<mes 1-12 o "0">
+ctl00$dpGrupoEmpresa=<"0"|"1" Todos|"2" CNEL|"3" Empresas Eléctricas>
+ctl00$txtObservacion=
+ctl00$contenidoCentro$ReportViewer1$ctl03$ctl00=
+ctl00$contenidoCentro$ReportViewer1$ctl03$ctl01=
+ctl00$contenidoCentro$ReportViewer1$ctl10=
+ctl00$contenidoCentro$ReportViewer1$ctl11=standards
+ctl00$contenidoCentro$ReportViewer1$AsyncWait$HiddenCancelField=False
+ctl00$contenidoCentro$ReportViewer1$ToggleParam$store=
+ctl00$contenidoCentro$ReportViewer1$ToggleParam$collapse=false
+ctl00$contenidoCentro$ReportViewer1$ctl08$ClientClickedId=
+ctl00$contenidoCentro$ReportViewer1$ctl07$store=
+ctl00$contenidoCentro$ReportViewer1$ctl07$collapse=false
+ctl00$contenidoCentro$ReportViewer1$ctl09$VisibilityState$ctl00=None
+ctl00$contenidoCentro$ReportViewer1$ctl09$ScrollPosition=
+ctl00$contenidoCentro$ReportViewer1$ctl09$ReportControl$ctl02=
+ctl00$contenidoCentro$ReportViewer1$ctl09$ReportControl$ctl03=
+ctl00$contenidoCentro$ReportViewer1$ctl09$ReportControl$ctl04=100
+__EVENTTARGET=ctl00$<campo_que_cambió>
+__EVENTARGUMENT=
+__LASTFOCUS=
+__VIEWSTATE=<del paso anterior>
+__VIEWSTATEGENERATOR=<constante de la sesión>
+__EVENTVALIDATION=<del paso anterior>
+__ASYNCPOST=true
+```
+
+Todos los campos deben reenviarse en cada POST (incluido `ctl00$dpMes`
+aunque esté `disabled` — el control ReportViewer arma el body iterando
+`form.elements` a mano, no vía `FormData` del navegador, así que sí lo
+incluye incluso deshabilitado). El GET inicial a `/` siembra
+`__VIEWSTATE`/`__VIEWSTATEGENERATOR`/`__EVENTVALIDATION` desde atributos
+`value="..."` normales en el HTML; de ahí en adelante **cada respuesta
+llega en el formato "delta" de MS AJAX**, no HTML de página completa:
+bloques `<largoEnBytes>|<tipo>|<id>|<contenido>|` concatenados sin
+separador fijo entre bloques (el largo es el delimitador real, no buscar
+un cierre). Los bloques `hiddenField` traen como `id` el nombre exacto del
+campo (`__VIEWSTATE`, `__EVENTVALIDATION`, etc.) y como contenido su valor
+nuevo — alcanza con parsear estos bloques genéricamente para tener todo lo
+necesario para el siguiente POST, sin tocar HTML para eso. Confirmado
+parseable sin `BeautifulSoup`/`lxml` (que este proyecto no usa en ningún
+helper, ver `igepn_informes_client.py`) con un parser de bloques por
+longitud, no regex sobre el HTML.
+
+**`dpMes` cambia de habilitado/deshabilitado según el tipo de reporte,
+confirmado en vivo con dos casos reales:** deshabilitado para "Balance
+Energía" (reporte ya anual/mensual embebido en la tabla vía columna "Mes",
+no filtrable), habilitado para "Medidores Catastro". Un cliente tiene que
+detectar esto leyendo el HTML del `UpdatePanel1` devuelto tras el postback
+de `dpTipo` (buscar `disabled="disabled"` junto a `id="dpMes"`), no
+asumirlo fijo por nombre de reporte.
+
+**"Generar Reporte" es un botón `type="submit"` normal, sin `onclick`**
+— dispara el mismo tipo de postback delta (sin `__EVENTTARGET`, en cambio
+se incluye `ctl00$contenidoCentro$brtGenerar=Generar Reporte` en el body).
+La respuesta a este POST trae varios bloques `updatePanel` a la vez,
+incluido uno enorme (`ctl00_contenidoCentro_ReportViewer1_ctl09_
+ReportArea`, ~220 KB en la prueba real) con la tabla del reporte ya
+renderizada como HTML por el motor SSRS del lado servidor.
+
+**La tabla real está enterrada bajo envoltorios 1×1, no es el primer
+`<table>` del fragmento.** Estructura confirmada navegando el DOM real:
+`table > tr > td > table` (envoltorio, 1 fila×1 celda) → recién en el
+segundo nivel aparece la grilla real (50 filas × 37 celdas en la prueba de
+"Balance Energía" 2023/Todos). La primera fila de la grilla real es un
+separador vacío (todas las celdas ""), la segunda es el encabezado real
+("Id Empresa", "Empresa", "Tipo Empresa", "Año", "Id Mes", "Mes", más ~30
+columnas de energía/pérdidas), y de ahí en adelante los datos (ej. fila
+real: `E.E. Ambato, Distribuidora, 2023, 1, Ene, 64769,242139, ...`). Los
+valores numéricos usan coma decimal sin separador de miles (ej.
+`5,1664676821650855`), igual que el resto de fuentes ecuatorianas ya
+documentadas. Este anidamiento se puede recorrer de forma genérica sin
+`BeautifulSoup`: extraer bloques de nivel superior de una etiqueta dada
+(contando apertura/cierre de esa misma etiqueta, ignorando qué hay
+adentro) y bajar un nivel mientras la fila tope tenga exactamente 1 celda
+y esa celda tenga exactamente 1 tabla anidada adentro — el mismo truco
+sirve para cualquier tipo de reporte, no es específico de "Balance
+Energía".
+
+**Hallazgo nuevo que la Séptima pasada no había marcado: el reporte está
+paginado (SSRS ReportViewer, "página X de Y"), no todo llega en una sola
+respuesta.** Confirmado en vivo: "Balance Energía" 2023/Todos mostró
+"de 2 ?" páginas (el "?" es el propio ReportViewer indicando que todavía
+no terminó de contar el total exacto). Pasar de página es otro postback
+del mismo tipo, con un botón `<input type="image" name="ctl00$
+contenidoCentro$ReportViewer1$ctl05$ctl00$Next$ctl00$ctl01">` (necesita
+sufijos `.x`/`.y` como cualquier image-submit de ASP.NET) — mismo
+mecanismo que "Generar Reporte", nada nuevo que aprender ahí. **Lo que
+falta confirmar en vivo antes de construir:** el criterio de "última
+página" (¿el botón Next aparece `disabled` en el HTML cuando ya no hay
+más, o hay que comparar el número de página actual contra `TotalPages`
+sabiendo que ese total puede llegar como "N ?" -- incierto -- en vez de un
+número cerrado?). Sin esto confirmado, un cliente corre el riesgo real de
+cortar el reporte a la mitad sin avisar, o de loopear de más; cualquier
+implementación futura debe resolver esto primero, no asumirlo.
+
+**Decisión de Daniel al cierre de esta pasada: documentar el mecanismo,
+no construir el helper todavía.** Se ofrecieron tres alcances (build
+completo con paginación, MVP de una sola página con límite documentado, o
+solo documentar) y se eligió la tercera. Queda como el próximo paso
+natural para `helpers/arconel_reportes_client.py`: toda la mecánica de
+sesión/postback/delta/anidamiento de tabla ya está resuelta y verificada
+en vivo arriba; lo único pendiente de verificar antes de escribir código
+es el criterio de fin de paginación.
+
 ---
 
 ## Notas históricas
