@@ -4279,6 +4279,93 @@ es el criterio de fin de paginación.
 
 ---
 
+## Vigésimo primera pasada — AIP Ecuador (eAIP público en IFIS3), y "movimientos por aeropuerto" descartado (2026-09-06)
+
+Pedido de Daniel: seguir buscando fuentes más allá de la integración CKAN
+del sector eléctrico recién cerrada. Se exploró el dominio ya integrado
+`ais.aviacioncivil.gob.ec` (base de `helpers/aviacion_client.py`,
+METAR/NOTAM/SIGMET) más allá de las tres secciones ya cubiertas.
+
+**"Movimientos/vuelos por aeropuerto" (el ítem que estaba en el
+roadmap como "sin explorar") — descartado, no existe como sección
+pública.** El menú principal del IFIS solo expone Aeródromos,
+NOTAM/METAR/SIGMET, Cámaras y AIP sin sesión; cualquier estadística de
+movimientos/vuelos vive detrás de "Planes de vuelo" (`/fpl/*`), que
+`aviacion_client.py` ya documenta como la única sección que exige login.
+No hay una sección de estadísticas de tráfico aéreo separada y pública en
+este dominio.
+
+**Hallazgo real: `/ifis3/` es un eAIP completo, público, servido como
+HTML server-rendered (no SPA, no login) — dominio de datos nuevo y
+sustancial dentro de un host ya confiable.** Confirmado en vivo con
+`curl --ssl-no-revoke` (el intento inicial vía navegador con `navigate`
+directo a la URL falló porque `/ifis3/` enruta client-side desde la
+página raíz, pero una petición HTTP directa a cualquier ruta interna
+sirve HTML completo sin necesitar la sesión del navegador):
+
+```
+GET https://www.ais.aviacioncivil.gob.ec/ifis3/aip/AD%202%20SEQM   -> 200, 172 846 bytes
+GET https://www.ais.aviacioncivil.gob.ec/ifis3/aip/GEN%204.1       -> 200, 137 988 bytes
+```
+
+Estructura confirmada, generada por un motor tipo MediaWiki (anclas
+`#SEQM_AD_2.1_...`, tabla de contenidos automática): tres partes AIP
+estándar OACI —
+
+- **GEN** (generalidades): autoridades, entrada/tránsito/salida de
+  aeronaves y pasajeros, tablas de códigos/abreviaturas/símbolos,
+  servicios (AIS, cartas, ATS, comunicaciones, MET, búsqueda y
+  salvamento), derechos por uso de aeródromos (GEN 4.1).
+- **ENR** (en ruta): reglas de vuelo VFR/IFR, clasificación del espacio
+  aéreo ATS, procedimientos de espera/aproximación/salida, rutas ATS
+  (inferiores/superiores/RNAV), radioayudas, zonas prohibidas/
+  restringidas/peligrosas.
+- **AD** (aeródromos): una página **AD 2.x por cada aeródromo/helipuerto
+  del país** (confirmados: SEGU Guayaquil, SELT Latacunga, SEMT Manta,
+  SEQM Quito como internacionales; más ~15 aeródromos nacionales — SEJD
+  Ahuano, SEAM Ambato, SEGS Baltra, SECA Catamayo, SECO Coca, SECU
+  Cuenca, SEBZ Cumbaratza, SEII Isabela, SEMC Macas, SENL Nueva Loja,
+  SERB Riobamba, SESA Salinas, SEST San Cristóbal, SESV San Vicente,
+  entre otros).
+
+**Cada página AD 2.x trae datos estructurados en tablas numeradas
+(formato ICAO Anexo 15 estándar), no solo prosa** — confirmado en el
+contenido real de SEQM: AD 2.1 (indicador de lugar), AD 2.2 (coordenadas
+ARP en grados/min/seg, dirección/distancia desde la ciudad, elevación/
+temperatura de referencia, ondulación geoidal, variación magnética con
+tasa de cambio anual, administración/teléfonos/AFS del aeródromo, tipos
+de tránsito IFR/VFR permitido), AD 2.3 (horas de funcionamiento por
+dependencia: aduanas, sanidad, AIS, MET, ATS, combustible), y continúa
+hasta ~AD 2.20+ (instalaciones de pasajeros, servicio de salvamento y
+extinción de incendios/categoría RFF, remoción de obstáculos estacional,
+plataforma/calles de rodaje, señales, obstáculos, datos meteorológicos
+suministrados, características físicas de pista, distancias declaradas,
+luces de aproximación/pista, ayudas radioeléctricas de navegación y
+aterrizaje, reglamentación local de tránsito, procedimientos de
+atenuación de ruido, procedimientos de vuelo, información suplementaria).
+Esto es, en esencia, la ficha técnica completa y oficial de cada
+aeródromo ecuatoriano — coordenadas, pista, frecuencias, tarifas, horas
+de operación — en un solo lugar público.
+
+Pestañas adicionales del mismo sistema, sin explorar en detalle esta
+pasada: **AMDT** (registro de enmiendas AIP), **SUP** (suplementos AIP),
+**AIC** (circulares de información aeronáutica) — probablemente PDFs
+descargables por edición/fecha, complementarios al contenido HTML de
+AIP/GEN/ENR/AD.
+
+**Por qué no se construyó ya:** el AIP completo es grande (GEN+ENR+AD
+decenas de subsecciones × ~20 aeródromos) y cada subsección tiene su
+propio layout de tabla; conviene decidir alcance (¿todo el árbol, o solo
+AD 2.x por aeródromo, que es la parte con mayor valor inmediato para un
+caller tipo LLM?) antes de escribir el parser. Candidato fuerte para
+`helpers/aip_client.py` + `tools/get_aip_aerodromo.py` (y opcionalmente
+`search_aip`/`get_aip_seccion` genérico para GEN/ENR), reutilizando
+`download_bytes` y el mismo patrón de limpieza HTML que
+`aviacion_client.py` ya tiene. Nada bloqueante encontrado: sin login, sin
+JS, sin WAF, mismo dominio ya en la allowlist operativa del proyecto.
+
+---
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un
