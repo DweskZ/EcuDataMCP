@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.7 — 2026-09-07
+
 ### Removed
 
 - **SRI Saiku tools** (`list_sri_saiku_cubes`, `describe_sri_saiku_cube`,
