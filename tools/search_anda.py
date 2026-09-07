@@ -1,6 +1,6 @@
 from functools import partial
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import anda_client
 from helpers.format_out import render_output
@@ -24,7 +24,7 @@ def _matches_query(row: dict, words: list[str]) -> bool:
     return all(w in blob for w in words)
 
 
-def register_search_anda_tool(mcp: FastMCP) -> None:
+def register_search_anda_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def search_anda(query: str = "", limit: int = 10, format: str = "text") -> str:

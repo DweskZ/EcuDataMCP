@@ -1,11 +1,11 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ckan_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_get_category_info_tool(mcp: FastMCP) -> None:
+def register_get_category_info_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def get_category_info(
@@ -23,7 +23,8 @@ def register_get_category_info_tool(mcp: FastMCP) -> None:
         Args:
             category: Category slug/name from list_categories
             include_datasets: Include sample datasets in the category (default True)
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             format: text | json
         """
         try:

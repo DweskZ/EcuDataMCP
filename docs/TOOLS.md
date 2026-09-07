@@ -28,9 +28,8 @@ aceptan `format="json"` además de texto.
 | `search_sri_estadisticas_recaudacion` | Buscar reportes públicos de recaudación por impuesto, provincia, cantón y actividad económica. |
 | `get_sri_ruc_info` | Consultar la ficha pública de un RUC exacto, incluidos establecimientos. |
 | `search_sri_ruc` | Buscar contribuyentes en el RUC por razón social o nombre comercial. |
-| `list_sri_saiku_cubes` | Listar cubos OLAP visibles en la instancia pública de Saiku del SRI. |
-| `describe_sri_saiku_cube` | Ver dimensiones, jerarquías, niveles y medidas de un cubo Saiku público. |
-| `query_sri_saiku_aggregate` | Ejecutar una consulta agregada limitada con una dimensión y una medida. |
+| `list_arcsa_categorias` | Listar las categorías del registro sanitario vigente de ARCSA (alimentos, medicamentos, cosméticos, etc.). |
+| `get_arcsa_categoria_archivos` | Listar los archivos descargables de una categoría del registro sanitario de ARCSA. |
 
 Los tools CKAN aceptan `source="nacional"` (default) o `source="cuenca"`
 para consultar el catálogo nacional o el portal municipal Cuenca en Datos.
@@ -74,6 +73,9 @@ para consultar el catálogo nacional o el portal municipal Cuenca en Datos.
 | `compare_bce_sources` | Generar un mapa candidato de traslapes entre etiquetas de BCEData e IEM, sin declarar equivalencias metodológicas automáticamente. |
 | `search_bce_iem` | Buscar tablas XLSX individuales del archivo IEM, actual o histórico; `hash_archivos=true` permite un manifiesto SHA-256 acotado. |
 | `get_bce_iem_table` | Leer una tabla XLSX IEM con filtro de período y elegir una versión histórica. |
+| `search_bce_publicaciones` | Catálogo de "Últimas Publicaciones" del BCE (boletines, reportes): fecha, título, URL directa y formato. Solo la ventana de las ~30 publicaciones más recientes; sin paginación. |
+| `search_bce_indices` | Catálogo de páginas "índice" del BCE (petróleo, minería, cemento, precios de comercio exterior, EMOE, divisas, balanza de pagos, boletín monetario semanal, etc.), cada una con archivo histórico completo. |
+| `get_bce_indice_archivo` | Leer el archivo de una página "índice" (por año o completo). |
 
 ## Compañías (Supercías)
 

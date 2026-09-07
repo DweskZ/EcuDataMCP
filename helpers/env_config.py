@@ -11,6 +11,8 @@ _API_URLS = {
     "anda_site": "https://anda.inec.gob.ec/anda5/",
     "cuenca": "https://cuencaendatos.cuenca.gob.ec/api/3/action/",
     "cuenca_site": "https://cuencaendatos.cuenca.gob.ec/",
+    "latacunga": "https://datosabiertos.latacunga.gob.ec/api/3/action/",
+    "latacunga_site": "https://datosabiertos.latacunga.gob.ec/",
 }
 
 _ENV_OVERRIDES = {
@@ -24,6 +26,8 @@ _ENV_OVERRIDES = {
     "anda_site": "ANDA_SITE_URL",
     "cuenca": "CUENCA_API_URL",
     "cuenca_site": "CUENCA_SITE_URL",
+    "latacunga": "LATACUNGA_API_URL",
+    "latacunga_site": "LATACUNGA_SITE_URL",
 }
 
 

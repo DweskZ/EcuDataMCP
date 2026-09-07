@@ -1,7 +1,7 @@
 import base64
 
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ckan_client
 from helpers.csv_reader import MAX_DOWNLOAD_BYTES, download_bytes
@@ -9,7 +9,7 @@ from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_download_resource_tool(mcp: FastMCP) -> None:
+def register_download_resource_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def download_resource(
@@ -31,7 +31,8 @@ def register_download_resource_tool(mcp: FastMCP) -> None:
 
         Args:
             resource_id: The resource UUID (get it from list_dataset_resources)
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             format: text | json (json includes content_base64; use this to
                 actually retrieve the file)
         """

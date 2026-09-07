@@ -2,11 +2,213 @@
 
 ## Unreleased
 
+## 0.8.7 — 2026-09-07
+
+### Removed
+
+- **SRI Saiku tools** (`list_sri_saiku_cubes`, `describe_sri_saiku_cube`,
+  `query_sri_saiku_aggregate`) — `srienlinea.sri.gob.ec` confirmed
+  unreachable in live verification from three independent environments
+  (deployed MCP server, local `curl`, real browser navigation): the TLS
+  connection closes abruptly every time, not the deployed-server-only
+  connectivity gap previously suspected. Tool count drops from 103 to 100.
+
 ### Added
 
+- **AIP Ecuador (`list_aip_aerodromos`, `get_aip_aerodromo`)** — DGAC's
+  public eAIP (`ais.aviacioncivil.gob.ec/ifis3`), the same domain already
+  serving METAR/NOTAM/SIGMET. Returns the full AD 2.x data sheet per
+  Ecuadorian aerodrome/helipad (~22 covered): ARP coordinates, elevation,
+  magnetic variation, operating hours, operator contacts, and the rest of
+  the numbered ICAO Annex 15 subsections. No login, no JS, no WAF —
+  server-rendered HTML from a MediaWiki-style exporter. GEN/ENR sections
+  and the AMDT/SUP/AIC tabs are out of scope for now (see ROADMAP.md).
+- **ARCSA Base de Registros Emitidos** (`list_arcsa_categorias`,
+  `get_arcsa_categoria_archivos`) — the live sanitary registry
+  (`controlsanitario.gob.ec/base-de-datos/`) by category: alimentos,
+  medicamentos, cosméticos, dispositivos médicos, plaguicidas, and more,
+  27 categories / 77 files. The roadmap previously marked this domain
+  "caído (reset TLS)" — turned out to be a bare `curl`/`httpx` request
+  with no identifying User-Agent getting blocked, not an actual outage;
+  it responds normally to this project's own `USER_AGENT` header. Reuses
+  `helpers/sgr_publicaciones_client.py`'s Biblioteca parsing logic
+  verbatim (confirmed byte-for-byte the same WordPress download-monitor
+  markup), just retargeted at a new domain. Tool count rises from 100 to
+  102.
+- **INEC topic coverage: Laboratorio de Dinámica Laboral y Empresarial
+  (LDLE)** — added to `helpers/inec_client.py`'s `_EXTRA_TOPICS`, so
+  `search_inec_estadisticas`/`get_inec_estadistica_files` now surface it.
+  The page (INEC+IESS joint labor/business statistics hub) wasn't linked
+  from either menu seed page and so was invisible to the topic crawl, even
+  though the existing parser already reads its file list correctly once
+  given the URL directly.
+- **`.xlsb` (Excel Binary Workbook) support** — `preview_xlsb()` in
+  `helpers/csv_reader.py`, wired into `preview_resource_data`,
+  `investigate_dataset`, and `detect_series_pattern`. Closes the gap
+  Registro Civil's "Defunciones Generales" dataset (9.3 MB) needed —
+  confirmed live end-to-end, real headers/rows now returned.
+- **Raised the download cap to 20 MB for `.xlsx`/`.xlsb`/`.ods`** (via a
+  new `max_bytes` parameter on `download_bytes()`, default unchanged at
+  5 MB for everything else). These three are ZIP containers whose central
+  directory lives at the end of the file, so a truncated download fails
+  outright instead of degrading gracefully the way a truncated CSV does —
+  there's no safety benefit to stopping at 5 MB, only a guaranteed
+  failure. 20 MB matches the decompression cap this project already used
+  elsewhere, not a new number.
+
+### Fixed
+
+- **Smoke workflow failing daily on a known upstream 403** — the four
+  dynamic `list -> get` chains in `scripts/smoke_e2e.py` each hand-rolled
+  their own `Traceback`/`Error:` check instead of going through
+  `helpers/smoke_status.assess_response`, so the recurring
+  `datosabiertos.gob.ec` 403 hard-failed the run even though the flat
+  checks classify the identical response as degraded. Adding
+  `chain_ckan_preview` is what turned CKAN-403 days from green into red:
+  the 2026-09-03 and 2026-09-04 runs saw the same 403 and passed at
+  `failed=0/44; degraded=1`, while 09-05 and 09-06 failed at 45 checks.
+  Chains now share the classifier via a new `chain_step()` helper and
+  report `DegradedChain` separately from a real failure, so a genuine
+  CKAN change still fails the workflow.
+
+### Changed
+
+- **`mcp` 1.29.0 → 2.1.1** — v2 removed `mcp.server.fastmcp` outright
+  (`FastMCP` renamed to `MCPServer`, now imported from
+  `mcp.server.mcpserver`). Every `register_*_tool`/`register_*` function
+  signature across `tools/`, `prompts/`, and `resources/` updates its type
+  hint accordingly; `main.py` moves `stateless_http` off the `MCPServer`
+  constructor onto `streamable_http_app(stateless_http=True)`, where v2
+  now expects transport-specific parameters. No tool-visible behavior
+  changes: `@mcp.tool()`/`@mcp.prompt()` decorators and plain `str`
+  tool-return handling are unchanged between v1 and v2, and every tool
+  here already catches its own exceptions before returning, so v2's
+  stricter handling of an *unhandled* exception escaping a tool handler
+  doesn't apply. Verified live: stdio startup, `/health`, and an
+  `initialize` + `tools/list` round trip over `/mcp` all succeed
+  end-to-end under the new stateless HTTP setup.
+
+## 0.8.6 — 2026-09-04
+
+### Added
+
+- **`list_iess_colecciones` / `get_iess_archivos`** — IESS's (Instituto
+  Ecuatoriano de Seguridad Social) three Liferay document archives:
+  Boletines Estadísticos (26 annual bulletins, 1978-2024), Estudios
+  Actuariales (47 documents across the 4 years currently published: 2010,
+  2013, 2018, 2020), and Informes de Auditoría (325 documents across 20
+  year-folders, 2007-2026). Every real download link is resolved from a
+  document's own Liferay detail page rather than trusting the listing
+  page's URL — several real links (mostly in Informes de Auditoría, some
+  in Estudios Actuariales) carry no `.pdf` extension at all, so format is
+  read from the detail page's own "Descargar" icon instead of the URL.
+- **`source="latacunga"`** on the generic CKAN tools — a third CKAN
+  instance, "Data Mashca" (`datosabiertos.latacunga.gob.ec`), alongside
+  the existing national portal and Cuenca en Datos. 15 datasets (predial
+  cadastre, pet adoption/sterilization, active ordinances, waste
+  collection routes, heritage sites).
+- **`search_sipa_geoportal_capas` / `get_sipa_geoportal_capa_datos`** —
+  Ministry of Agriculture's geoportal (`geoportal.agricultura.gob.ec`),
+  277 WMS layers across 24 per-workspace GeoServer endpoints (discovered
+  via the official map viewer's own config, not `/geoserver/*`), 257 with
+  real WFS attribute data. The rural land cadastre (`sigtierras/
+  catastro_rural`) has WFS explicitly disabled server-side.
+- **`search_salarios_sectoriales`** — sectoral minimum wage tables
+  (2020-2025), found via the ministry's document library page rather than
+  the unpredictable direct-PDF URLs a prior pass had ruled out.
+- **`search_trabajo_boletin_anual`** — Ministerio del Trabajo's annual
+  labor-market report. Only 3 editions (2020-2022) are recoverable; the
+  index page violates HTTP/1.1 (duplicated Transfer-Encoding headers), so
+  this is a small hand-verified set, not a live scraper.
+- **`search_infomies_bases_mensuales` / `search_infomies_boletines_zonales`**
+  — infoMIES's (`info.desarrollohumano.gob.ec`) monthly databases (richer
+  than this project's existing quarterly CKAN coverage for the same
+  programs) and a newly-discovered, still-updated consolidated annual
+  report series, plus the discontinued per-zone bulletins.
+- **`get_sipa_resumen_indicadores`** — SIPA's "Resumen de Indicadores"
+  monthly PDF listing (2018-2026), the one real item on a page whose other
+  six named entries turned out to be either Tableau Server dashboards or
+  fliphtml5.com flipbooks with no direct file.
+- **`list_ineval_familias` / `get_ineval_familia_archivos`** — INEVAL's
+  national exam-evaluation archive (`evaluaciones.evaluacion.gob.ec/BI/`):
+  9 families (Ser Bachiller, Ser Estudiante ×4, Ser Maestro ×2, Ser
+  Profesional, Llece/ERCE-SERCE-TERCE), 557 confirmed download links, no
+  login. The site's own top nav links to a decoy informational page for at
+  least one family (`historico-ser-bachiller`) — the real data page lives
+  at a different, otherwise-undiscoverable slug.
+- **`search_arcotel_reportes_mensuales` / `search_arcotel_boletines`** —
+  ARCOTEL's institutional-site PDF series (outside its frozen-since-2021
+  CKAN org): monthly telecom statistics (2017-2026) and annual/topical
+  bulletins (2015-2024).
+- **`search_mef_fiscal`** — MEF/MDEP's SPNF fiscal-operations workbook
+  archive (GFSM methodology, 76 files, 2025-2026 publications) plus SENAE's
+  stale-but-real customs-collection breakdown by levy type (2012-2021).
+- **`search_minedec_matricula`** — MINEDEC's historical basic-education
+  (K-12) enrollment registry, 2009-present, distinct from this project's
+  existing SENESCYT/higher-education CKAN coverage.
+- **`search_sgr_sitreps` / `get_sgr_sitrep_archivos` /
+  `list_sgr_biblioteca_categorias` / `get_sgr_biblioteca_categoria_archivos`**
+  — SGR's document archive (`gestionderiesgos.gob.ec`), distinct from the
+  existing live ArcGIS snapshot: 54 historical adverse-event dossiers
+  (2016-2026) with their SITREP PDFs, plus a 19-category, ~1660-document
+  library (some links 404 — surfaced as a candidate catalog, not a
+  guarantee).
+- **`get_metar` / `get_notam` / `get_sigmet`** — Ecuador's civil aviation AIS
+  (DGAC's IFIS, `ais.aviacioncivil.gob.ec`): aerodrome weather reports,
+  notices to airmen, and significant-weather advisories. Confirmed publicly
+  queryable with no login (only flight plans require auth); METAR/NOTAM/
+  SIGMET are genuinely high-frequency, so caches are short (5-10 min).
+- **`search_inamhi_capas` / `get_inamhi_capa_datos`** — INAMHI's geoportal
+  (`geoservicios.inamhi.gob.ec`), a GeoServer WMS/WFS instance: 222 spatial
+  layers cataloged (precipitation climate normals, rainfall anomalies, WRF
+  weather-model grids, watershed/administrative boundaries), 199 with real
+  queryable attribute data via WFS. No raw per-station observation layer
+  exists there — everything is polygon-aggregated.
+- **`list_seps_secciones` / `get_seps_seccion_archivos`** — SEPS's
+  statistics subdomain (`estadisticas.seps.gob.ec`), unaffected by the main
+  site's bot-blocking. 26 sections across SFPS/EPS statistics, including
+  the risk-rating agency bulletins (`sfps_reportes_calificacion_de_riesgos`).
+- **`search_cnig_femicidios`** — CNIG's (Consejo Nacional para la Igualdad
+  de Género) "Violencia" page, including the femicide/intentional-
+  homicide-of-women matrix plus 19 related gender-violence tables. The root
+  domain silently drops requests without an identifying User-Agent (same
+  pattern already seen on `seps.gob.ec`), which briefly looked like an
+  outage before the project's own UA resolved it.
+- **`search_bce_precios_comex`** — BCE's disaggregated foreign-trade
+  price-index pages (import prices by economic-use category, export prices
+  by individual product) — genuinely distinct from BCEData's aggregate
+  IPX/IPM/ITI series (`id_grupo=134`), which turned out to duplicate one of
+  the three candidate pages exactly.
 - **`get_tramite_estadisticas`** — monthly atenciones/quejas transparency
   series for one trámite (`gob.ec/api/v1/tramites-transparencia/{id}`),
   since mid-2021. No bulk endpoint; fetches one trámite's series at a time.
+- **`search_bce_publicaciones`** — BCE's "Últimas Publicaciones" feed
+  (bulletins/reports with date, title, direct URL, format); complements
+  BCEData/IEM rather than duplicating them, since most listed publications
+  have no equivalent numeric series in either. Only the ~30-most-recent
+  rolling window the page itself exposes — no pagination on the source.
+- **`search_bce_indices` / `get_bce_indice_archivo`** — BCE's site-wide
+  "índice" archive pages (~35 series: sector bulletins, trade/confidence
+  indices, FX buy/sell, balance of payments, weekly monetary bulletin,
+  etc.), each with a full year-by-year or week-by-week file archive (some
+  back to 2004). Resolves most of the "sector packages" and "EMOE/coyuntura"
+  roadmap items via one generic parser instead of five one-off clients.
+
+### Fixed
+
+- **TLS fallback for `cenace.gob.ec`/`censoecuador.gob.ec`/`superbancos.gob.ec`**
+  — these hosts never send their intermediate CA certificate in the TLS
+  handshake. The previous fallback (retry against the OS trust store)
+  worked on a developer machine but failed the same way on a clean GitHub
+  Actions Linux runner, breaking the daily smoke test (`get_cenace_tablero`).
+  Fixed by bundling the two missing Sectigo intermediates directly
+  (`helpers/certs/sectigo_public_server_auth_intermediates.pem`) and
+  building the retry context from certifi's roots plus that bundle instead
+  — deterministic across platforms.
+- **IEM legacy ZIP era** — some pre-2016 bulletin ZIP members keep a legacy
+  `.xls` filename while actually containing a modern XLSX payload, which made
+  `xlrd` fail outright; `get_bce_iem_table` now sniffs the bytes instead of
+  trusting the extension.
 
 ## 0.8.5 — 2026-08-31
 

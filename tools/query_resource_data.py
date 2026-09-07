@@ -1,7 +1,7 @@
 import json
 
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ckan_client
 from helpers.csv_reader import format_table
@@ -9,7 +9,7 @@ from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_query_resource_data_tool(mcp: FastMCP) -> None:
+def register_query_resource_data_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def query_resource_data(
@@ -37,7 +37,8 @@ def register_query_resource_data_tool(mcp: FastMCP) -> None:
             rows: Number of records to return (default 20, max 100)
             offset: Pagination offset (default 0)
             sort: Optional sort expression, e.g. "anio desc"
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             format: text | json
         """
         rows = min(max(rows, 1), 100)

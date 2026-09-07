@@ -1,4 +1,4 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import gobec_client
 from helpers.format_out import render_output
@@ -6,7 +6,7 @@ from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
 
 
-def register_get_institucion_info_tool(mcp: FastMCP) -> None:
+def register_get_institucion_info_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def get_institucion_info(

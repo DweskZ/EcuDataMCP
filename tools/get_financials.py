@@ -1,6 +1,6 @@
 import logging
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import supercias_financials
 from helpers.format_out import render_output
@@ -22,7 +22,7 @@ _DISPLAY_FIELDS = (
 )
 
 
-def register_get_financials_tool(mcp: FastMCP) -> None:
+def register_get_financials_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def get_financials(

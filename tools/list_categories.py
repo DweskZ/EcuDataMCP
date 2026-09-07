@@ -1,11 +1,11 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ckan_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_list_categories_tool(mcp: FastMCP) -> None:
+def register_list_categories_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def list_categories(source: str = "nacional", format: str = "text") -> str:
@@ -20,7 +20,8 @@ def register_list_categories_tool(mcp: FastMCP) -> None:
         to filter results by topic.
 
         Args:
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             format: text | json
         """
         try:

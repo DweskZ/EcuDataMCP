@@ -97,6 +97,12 @@ def test_ckan_url_routes_to_cuenca_portal():
     )
 
 
+def test_ckan_url_routes_to_latacunga_portal():
+    assert ckan_client._ckan_url("package_search", source="latacunga") == (
+        "https://datosabiertos.latacunga.gob.ec/api/3/action/package_search"
+    )
+
+
 def test_ckan_url_rejects_unknown_source():
     with pytest.raises(ValueError, match="source inválido"):
         ckan_client._ckan_url("package_search", source="otro")
@@ -105,6 +111,10 @@ def test_ckan_url_rejects_unknown_source():
 def test_site_url_matches_source():
     assert ckan_client.site_url() == "https://www.datosabiertos.gob.ec/"
     assert ckan_client.site_url("cuenca") == "https://cuencaendatos.cuenca.gob.ec/"
+    assert (
+        ckan_client.site_url("latacunga")
+        == "https://datosabiertos.latacunga.gob.ec/"
+    )
 
 
 async def test_search_datasets_hits_cuenca_endpoint(httpx_mock):
@@ -129,6 +139,18 @@ async def test_get_dataset_hits_cuenca_endpoint(httpx_mock):
     result = await ckan_client.get_dataset("silla-vacia", source="cuenca")
 
     assert result["id"] == "silla-vacia"
+
+
+async def test_search_datasets_hits_latacunga_endpoint(httpx_mock):
+    url = "https://datosabiertos.latacunga.gob.ec/api/3/action/package_search"
+    httpx_mock.add_response(
+        url=httpx.URL(url, params={"q": "catastro", "rows": 20, "start": 0}),
+        json={"success": True, "result": {"count": 1, "results": []}},
+    )
+
+    result = await ckan_client.search_datasets(query="catastro", source="latacunga")
+
+    assert result["count"] == 1
 
 
 async def test_list_groups_caches_nacional_and_cuenca_separately(httpx_mock):

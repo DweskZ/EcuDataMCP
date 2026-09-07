@@ -123,6 +123,31 @@ async def check_tool(
     return assessment.status, assessment.source
 
 
+class DegradedChain(Exception):
+    """A chain step blocked by a known external source, not by a regression."""
+
+    def __init__(self, source: str, detail: str) -> None:
+        super().__init__(detail)
+        self.source = source
+
+
+def chain_step(text: str, required: list[str] | None = None) -> str:
+    """Assert one chain step through the same classifier the flat checks use.
+
+    Each chain used to hand-roll a Traceback/`Error:` check, so a known
+    upstream degradation (the recurring datosabiertos.gob.ec 403) failed the
+    whole workflow even though `check_tool` classifies the identical response
+    as degraded. Routing both paths through `assess_response` keeps a real
+    source change failing while a known outage only degrades.
+    """
+    assessment = assess_response(text, required or [])
+    if assessment.status == "degraded":
+        raise DegradedChain(assessment.source or "unknown", assessment.detail)
+    if assessment.status == "failed":
+        raise AssertionError(assessment.detail)
+    return text
+
+
 def write_summary(total: int, failed: int, degraded: set[str]) -> None:
     """Write a compact GitHub Actions summary while keeping local runs plain."""
     path = os.getenv("GITHUB_STEP_SUMMARY")
@@ -193,6 +218,8 @@ async def main() -> int:
             ("search_sri_ruc", {"razon_social": "BANCO", "max_resultados": 3}, []),
             ("search_indicadores_bce", {"query": "inflacion", "limit": 5}, []),
             ("search_bce_iem", {"query": "inflacion", "limit": 5}, []),
+            ("search_bce_publicaciones", {"query": ""}, []),
+            ("search_bce_indices", {"query": "petrolero"}, []),
             ("search_bce_remesas", {"query": ""}, []),
             ("audit_bce_catalog", {}, ["grupos", "series"]),
             ("list_bce_indicadores_diarios", {}, ["Riesgo", "serie"]),
@@ -242,11 +269,15 @@ async def main() -> int:
             ("sut: list -> schema", chain_sut(client)),
             ("superbancos: list -> archivos", chain_superbancos(client)),
             ("igepn: search -> informe", chain_igepn(client)),
+            ("ckan: search -> resources -> preview", chain_ckan_preview(client)),
         ]:
             chains += 1
             try:
                 await coro
                 print(f"  OK   {label}")
+            except DegradedChain as exc:
+                degraded.add(exc.source)
+                print(f"  DEGRADED {label} [{exc.source}]: {str(exc)[:160]}")
             except Exception as exc:
                 failed += 1
                 print(f"  FAIL {label}: {exc}")
@@ -259,53 +290,113 @@ async def main() -> int:
 
 
 async def chain_sut(client: httpx.AsyncClient) -> None:
-    listing = json.loads(await call_tool(client, "list_sut_indicadores", {"format": "json"}))
-    indicador = listing[0]["indicador"]
-    schema = await call_tool(
-        client, "get_sut_indicador_schema", {"indicador": indicador, "format": "json"}
+    listing = json.loads(
+        chain_step(await call_tool(client, "list_sut_indicadores", {"format": "json"}))
     )
-    if "Traceback" in schema[:200] or schema.strip().startswith(("Error:", "ERROR:")):
-        raise AssertionError(schema[:200])
+    indicador = listing[0]["indicador"]
+    chain_step(
+        await call_tool(
+            client,
+            "get_sut_indicador_schema",
+            {"indicador": indicador, "format": "json"},
+        )
+    )
 
 
 async def chain_superbancos(client: httpx.AsyncClient) -> None:
     listing = json.loads(
-        await call_tool(client, "list_superbancos_secciones", {"format": "json"})
+        chain_step(
+            await call_tool(client, "list_superbancos_secciones", {"format": "json"})
+        )
     )
     seccion = listing[0]["seccion"]
-    archivos = await call_tool(
-        client, "get_superbancos_seccion_archivos", {"seccion": seccion, "format": "json"}
+    chain_step(
+        await call_tool(
+            client,
+            "get_superbancos_seccion_archivos",
+            {"seccion": seccion, "format": "json"},
+        )
     )
-    if "Traceback" in archivos[:200] or archivos.strip().startswith(("Error:", "ERROR:")):
-        raise AssertionError(archivos[:200])
 
 
 async def chain_igepn(client: httpx.AsyncClient) -> None:
     resultado = json.loads(
-        await call_tool(
-            client,
-            "search_informes_igepn",
-            {"anio": 2022, "grupo": "volcanico", "limit": 1, "format": "json"},
+        chain_step(
+            await call_tool(
+                client,
+                "search_informes_igepn",
+                {"anio": 2022, "grupo": "volcanico", "limit": 1, "format": "json"},
+            )
         )
     )
     informes = resultado.get("informes") or []
     if not informes:
         raise AssertionError("search_informes_igepn returned no reports for 2022/volcanico")
     informe = informes[0]
-    texto = await call_tool(
-        client,
-        "get_informe_igepn",
-        {
-            "nombre": informe["nombre"],
-            "volcan": informe.get("volcan") or "",
-            "grupo": "volcanico",
-            "anio": 2022,
-            "pages": "1",
-            "format": "json",
-        },
+    chain_step(
+        await call_tool(
+            client,
+            "get_informe_igepn",
+            {
+                "nombre": informe["nombre"],
+                "volcan": informe.get("volcan") or "",
+                "grupo": "volcanico",
+                "anio": 2022,
+                "pages": "1",
+                "format": "json",
+            },
+        )
     )
-    if "Traceback" in texto[:200] or texto.strip().startswith(("Error:", "ERROR:")):
-        raise AssertionError(texto[:200])
+
+
+async def chain_ckan_preview(client: httpx.AsyncClient) -> None:
+    search = json.loads(
+        chain_step(
+            await call_tool(
+                client,
+                "search_datasets",
+                {"query": "SRI recaudacion", "page_size": 5, "format": "json"},
+            )
+        )
+    )
+    datasets = search.get("results") or []
+    if not datasets:
+        raise AssertionError("search_datasets returned no results for 'SRI recaudacion'")
+
+    tabular_formats = {"csv", "xlsx", "xls", "ods"}
+    for dataset in datasets:
+        dataset_id = dataset.get("name") or dataset.get("id")
+        if not dataset_id:
+            continue
+        listing = json.loads(
+            chain_step(
+                await call_tool(
+                    client,
+                    "list_dataset_resources",
+                    {"dataset_id": dataset_id, "format": "json"},
+                )
+            )
+        )
+        resources = listing.get("resources") or []
+        resource = next(
+            (r for r in resources if (r.get("format") or "").lower() in tabular_formats),
+            resources[0] if resources else None,
+        )
+        if resource is None:
+            continue
+
+        chain_step(
+            await call_tool(
+                client,
+                "preview_resource_data",
+                {"resource_id": resource["id"], "rows": 3, "format": "json"},
+            )
+        )
+        return
+
+    raise AssertionError(
+        "no dataset among the top 5 'SRI recaudacion' results had a previewable resource"
+    )
 
 
 if __name__ == "__main__":

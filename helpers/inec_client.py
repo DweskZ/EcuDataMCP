@@ -82,6 +82,10 @@ _EXTRA_TOPICS = (
             "Geografia_Estadistica/Micrositio_geoportal/index.html"
         ),
     },
+    {
+        "nombre": "Laboratorio de Dinámica Laboral y Empresarial (LDLE)",
+        "url": "https://www.ecuadorencifras.gob.ec/laboratorio-de-dinamica-laboral-y-empresarial/",
+    },
 )
 _SITE_PREFIX = "https://www.ecuadorencifras.gob.ec/"
 _API_BASE = "https://www.ecuadorencifras.gob.ec/wp-json/wp/v2"

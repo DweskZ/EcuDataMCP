@@ -1,4 +1,4 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import sercop_client
 from helpers.env_config import get_base_url
@@ -15,7 +15,7 @@ def _money(amount: object, currency: str = "") -> str:
     return f"{text} {currency}".strip()
 
 
-def register_get_contrato_info_tool(mcp: FastMCP) -> None:
+def register_get_contrato_info_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def get_contrato_info(ocid: str, format: str = "text") -> str:

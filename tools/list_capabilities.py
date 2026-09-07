@@ -1,4 +1,4 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers.format_out import render_output
 from helpers.logging import log_tool
@@ -10,8 +10,9 @@ _CAPABILITIES = {
     "fuentes": [
         "CKAN datos abiertos (nacional, www.datosabiertos.gob.ec)",
         (
-            "Cuenca en Datos (portal municipal CKAN independiente, "
-            "source='cuenca' en los mismos tools CKAN)"
+            "Cuenca en Datos y Data Mashca/Latacunga (portales municipales "
+            "CKAN independientes, source='cuenca'/'latacunga' en los "
+            "mismos tools CKAN)"
         ),
         "gob.ec trámites/instituciones/regulaciones + estadísticas de transparencia por trámite",
         "SERCOP OCDS contratos",
@@ -33,8 +34,8 @@ _CAPABILITIES = {
         "Supercías registro de auditores externos autorizados",
         "Supercías ranking financiero (últimos años, requiere build local)",
         "SRI consulta pública del Registro Único de Contribuyentes (RUC)",
-        "SRI Saiku OLAP público: descubrimiento de cubos y consultas agregadas limitadas",
         "SRI estadísticas de recaudación: reportes mensuales pre-agregados por impuesto/provincia/actividad",
+        "ARCSA Base de Registros Emitidos: registro sanitario vigente por categoría (alimentos, medicamentos, cosméticos, dispositivos médicos, etc.)",
         (
             "SIPA (Ministerio de Agricultura, Ganadería y Pesca): series "
             "agropecuarias reales — precios, comercio exterior, crédito, "
@@ -102,6 +103,9 @@ _CAPABILITIES = {
             "compare_bce_sources",
             "search_bce_iem",
             "get_bce_iem_table",
+            "search_bce_publicaciones",
+            "search_bce_indices",
+            "get_bce_indice_archivo",
             "list_bce_indicadores_diarios",
             "get_bce_indicador_diario",
             "search_bce_remesas",
@@ -117,10 +121,8 @@ _CAPABILITIES = {
             "search_sri_estadisticas_recaudacion",
             "get_sri_ruc_info",
             "search_sri_ruc",
-            "list_sri_saiku_cubes",
-            "describe_sri_saiku_cube",
-            "query_sri_saiku_aggregate",
         ],
+        "arcsa": ["list_arcsa_categorias", "get_arcsa_categoria_archivos"],
         "financieros": ["search_ranking", "get_financials"],
         "agropecuario": ["list_sipa_modulos", "get_sipa_modulo_archivos"],
         "auditoria": ["list_contraloria_informes", "get_contraloria_informe"],
@@ -186,12 +188,6 @@ _CAPABILITIES = {
             "montos tributarios individuales"
         ),
         (
-            "Saiku SRI usa sesión anónima, descubrimiento público y una sola "
-            "dimensión/medida por consulta; query_sri_saiku_aggregate limita "
-            "el resultado a 100 filas, no acepta MDX arbitrario y no hace "
-            "drill-through"
-        ),
-        (
             "search_ranking/get_financials: requieren que el operador del "
             "servidor haya corrido scripts/build_supercias_financials_db.py "
             "de antemano (no se construye solo); cubren solo los últimos "
@@ -213,7 +209,7 @@ _CAPABILITIES = {
 }
 
 
-def register_list_capabilities_tool(mcp: FastMCP) -> None:
+def register_list_capabilities_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def list_capabilities(format: str = "text") -> str:

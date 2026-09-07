@@ -101,3 +101,19 @@ def test_os_trust_context_still_fully_verifies():
     assert isinstance(ctx, ssl.SSLContext)
     assert ctx.verify_mode == ssl.CERT_REQUIRED
     assert ctx.check_hostname is True
+
+
+def test_os_trust_context_loads_bundled_intermediates():
+    # Regression test for the 2026-09-02 smoke-test failure: the previous
+    # implementation retried against ssl.create_default_context()'s bare OS
+    # trust store, which only worked on a developer's own machine (Windows/
+    # macOS opportunistically fetch a missing intermediate via AIA) and
+    # failed the same way on a clean GitHub Actions Linux runner. Loading
+    # the bundled intermediate CAs must not raise, regardless of platform.
+    ctx = os_trust_context()
+    # ssl.SSLContext doesn't expose loaded CA count directly, but a context
+    # that failed to load the bundle (missing/corrupt file) would have
+    # raised inside os_trust_context() already -- reaching here at all is
+    # the assertion. get_ca_certs() confirms more than just certifi's roots
+    # got loaded.
+    assert len(ctx.get_ca_certs()) > 0

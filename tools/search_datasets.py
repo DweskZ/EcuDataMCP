@@ -1,11 +1,11 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ckan_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_search_datasets_tool(mcp: FastMCP) -> None:
+def register_search_datasets_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def search_datasets(
@@ -30,9 +30,11 @@ def register_search_datasets_tool(mcp: FastMCP) -> None:
             page_size: Results per page (default: 20, max: 100)
             category: Optional category filter (e.g. "sal" for Salud, "edu" for Educación).
                       Use list_categories to see all available categories.
-            source: "nacional" (www.datosabiertos.gob.ec, default) or "cuenca"
+            source: "nacional" (www.datosabiertos.gob.ec, default), "cuenca"
                     (cuencaendatos.cuenca.gob.ec, the Cuenca municipal open-data
-                    portal — a separate, smaller CKAN catalog)
+                    portal), or "latacunga" (datosabiertos.latacunga.gob.ec,
+                    the Latacunga municipal open-data portal) — separate,
+                    smaller CKAN catalogs
             format: text | json
         """
         page_size = min(max(page_size, 1), 100)

@@ -1,4 +1,4 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import sut_powerbi_client
 from helpers.format_out import render_output
@@ -7,7 +7,7 @@ from helpers.logging import log_tool
 _TEXT_ROW_CAP = 200
 
 
-def register_query_sut_indicador_tool(mcp: FastMCP) -> None:
+def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def query_sut_indicador(

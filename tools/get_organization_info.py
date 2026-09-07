@@ -1,11 +1,11 @@
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ckan_client
 from helpers.format_out import render_output
 from helpers.logging import log_tool
 
 
-def register_get_organization_info_tool(mcp: FastMCP) -> None:
+def register_get_organization_info_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def get_organization_info(
@@ -18,7 +18,8 @@ def register_get_organization_info_tool(mcp: FastMCP) -> None:
 
         Args:
             organization_id: The organization slug (e.g. "sri-servicio-de-rentas-internas")
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             format: text | json
         """
         try:

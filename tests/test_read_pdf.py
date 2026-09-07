@@ -1,13 +1,13 @@
 import json
 import socket
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from tools.read_pdf import register_read_pdf_tool
 
 
 def _make_tool():
-    mcp = FastMCP("test")
+    mcp = MCPServer("test")
     register_read_pdf_tool(mcp)
     return mcp._tool_manager.get_tool("read_pdf").fn
 

@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import hashlib
 import io
+import zipfile
 
 import openpyxl
 import pytest
+import xlrd
 
 from helpers import bce_iem_client
 from helpers.cache import TtlCache
@@ -44,7 +46,52 @@ def _reset_cache():
     bce_iem_client._bulletins_cache = TtlCache(ttl_seconds=60)
     bce_iem_client._bulletin_tables_cache = TtlCache(ttl_seconds=60, max_entries=512)
     bce_iem_client._bulletin_fetch_locks = {}
+    bce_iem_client._zip_bytes_cache = TtlCache(ttl_seconds=60, max_entries=16)
     yield
+
+
+def _zip_bytes(members: dict[str, bytes]) -> bytes:
+    out = io.BytesIO()
+    with zipfile.ZipFile(out, "w") as archive:
+        for name, content in members.items():
+            archive.writestr(name, content)
+    return out.getvalue()
+
+
+class _FakeXlrdCell:
+    def __init__(self, ctype: int, value) -> None:
+        self.ctype = ctype
+        self.value = value
+
+
+class _FakeXlrdSheet:
+    """rows: list of [(ctype, value), ...] -- one tuple per cell."""
+
+    def __init__(self, name: str, rows: list[list[tuple[int, object]]]) -> None:
+        self.name = name
+        self.nrows = len(rows)
+        self.ncols = max((len(row) for row in rows), default=0)
+        self._rows = rows
+
+    def cell(self, row_index: int, col_index: int) -> _FakeXlrdCell:
+        row = self._rows[row_index]
+        if col_index < len(row):
+            ctype, value = row[col_index]
+        else:
+            ctype, value = (xlrd.XL_CELL_EMPTY, "")
+        return _FakeXlrdCell(ctype, value)
+
+
+class _FakeXlrdBook:
+    def __init__(self, sheets: list[_FakeXlrdSheet], datemode: int = 0) -> None:
+        self.datemode = datemode
+        self._sheets = sheets
+
+    def sheet_by_index(self, index: int) -> _FakeXlrdSheet:
+        return self._sheets[index]
+
+    def sheets(self) -> list[_FakeXlrdSheet]:
+        return self._sheets
 
 
 def _xlsx() -> bytes:
@@ -366,3 +413,309 @@ async def test_get_table_returns_layout_preview(httpx_mock):
         {"nombre": "PIB", "valores": {"2025": 130.2}}
     ]
     assert result["tabla"]["sha256"] == hashlib.sha256(xlsx).hexdigest()
+
+
+# ---- pre-Oct-2016 bulk ZIP fallback (bulletins before No. 1976) -----------
+
+
+@pytest.mark.parametrize(
+    ("filename", "expected"),
+    [
+        ("IEM-315.xls", "iem-legado-iem-315"),
+        ("IEM-315a.xls", "iem-legado-iem-315a"),
+        ("5_SectorPetrolero.xls", "iem-legado-5-sectorpetrolero"),
+        ("7_GraficosIDEAC.xls", "iem-legado-7-graficosideac"),
+    ],
+)
+def test_legacy_table_id_normalizes_filename(filename, expected):
+    assert bce_iem_client._legacy_table_id(filename) == expected
+
+
+_LEGACY_ZIP_URL = "https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Catalogo/IEMensual/m1975/IEM1975.zip"
+_LEGACY_BULLETIN_HTML = f"""
+<a href="{_LEGACY_ZIP_URL}">BAJAR PUBLICACIÓN COMPLETA</a>
+"""
+
+
+@pytest.mark.asyncio
+async def test_fetch_tables_for_bulletin_falls_back_to_zip_when_no_individual_xlsx(
+    httpx_mock,
+):
+    # No IEM-*-e.xlsx anchors on the page at all -- only the bulk ZIP link,
+    # matching every real bulletin before No. 1976 (see module docstring).
+    bulletin = dict(_PARSED_BULLETINS[0])
+    httpx_mock.add_response(url=bulletin["url"], html=_LEGACY_BULLETIN_HTML)
+    zip_url = _LEGACY_ZIP_URL
+    httpx_mock.add_response(
+        url=zip_url,
+        content=_zip_bytes({"IEM-315.xls": b"fake", "5_SectorPetrolero.xls": b"fake"}),
+    )
+
+    tables = await bce_iem_client._fetch_tables_for_bulletin(bulletin)
+
+    by_id = {t["table_id"]: t for t in tables}
+    assert set(by_id) == {"iem-legado-iem-315", "iem-legado-5-sectorpetrolero"}
+    assert by_id["iem-legado-iem-315"]["zip_member"] == "IEM-315.xls"
+    assert by_id["iem-legado-iem-315"]["formato_origen"] == "xls_legado_zip"
+    assert by_id["iem-legado-iem-315"]["url"] == zip_url
+
+
+@pytest.mark.asyncio
+async def test_fetch_tables_for_bulletin_still_raises_without_zip_or_tables(httpx_mock):
+    # A bulletin page with neither individual XLSX links nor a ZIP -- the
+    # 4 genuinely dead/incomplete bulletins found in 1996 look like this.
+    bulletin = dict(_PARSED_BULLETINS[0])
+    httpx_mock.add_response(url=bulletin["url"], html="<p>nada aquí</p>")
+
+    with pytest.raises(ValueError, match="no expuso tablas XLSX individuales"):
+        await bce_iem_client._fetch_tables_for_bulletin(bulletin)
+
+
+@pytest.mark.asyncio
+async def test_get_table_reads_legacy_xls_from_zip_member(httpx_mock, monkeypatch):
+    bulletin = dict(_PARSED_BULLETINS[0])
+    bulletin["numero"] = 1975
+    # get_table(boletin_numero=...) resolves via _fetch_bulletins() first --
+    # bulletin discovery itself is covered elsewhere, so seed the cache
+    # directly instead of also mocking the index/latest/archive pages.
+    bce_iem_client._bulletins_cache.set("bulletins", [bulletin])
+    httpx_mock.add_response(url=bulletin["url"], html=_LEGACY_BULLETIN_HTML)
+    zip_url = _LEGACY_ZIP_URL
+    member_bytes = b"not a real xls -- xlrd.open_workbook is mocked below"
+    httpx_mock.add_response(
+        url=zip_url, content=_zip_bytes({"IEM-315.xls": member_bytes})
+    )
+
+    fake_sheet = _FakeXlrdSheet(
+        "Cuadro",
+        [
+            [
+                (xlrd.XL_CELL_TEXT, "Período"),
+                (xlrd.XL_CELL_NUMBER, 2024.0),
+                (xlrd.XL_CELL_NUMBER, 2025.0),
+            ],
+            [
+                (xlrd.XL_CELL_TEXT, "Millones USD"),
+                (xlrd.XL_CELL_EMPTY, ""),
+                (xlrd.XL_CELL_EMPTY, ""),
+            ],
+            [
+                (xlrd.XL_CELL_TEXT, "PIB"),
+                (xlrd.XL_CELL_NUMBER, 123.4),
+                (xlrd.XL_CELL_NUMBER, 130.2),
+            ],
+        ],
+    )
+    fake_book = _FakeXlrdBook([fake_sheet])
+    seen_bytes = []
+
+    def fake_open_workbook(file_contents: bytes) -> _FakeXlrdBook:
+        seen_bytes.append(file_contents)
+        return fake_book
+
+    monkeypatch.setattr(xlrd, "open_workbook", fake_open_workbook)
+
+    result = await bce_iem_client.get_table(
+        "iem-legado-iem-315", desde="2025", boletin_numero=1975
+    )
+
+    assert seen_bytes == [member_bytes]
+    assert result["tabla"]["formato_origen"] == "xls_legado_zip"
+    assert result["tabla"]["sha256"] == hashlib.sha256(member_bytes).hexdigest()
+    assert result["formato"] == "series_ancho"
+    assert result["bloques"][0]["unidad"] == "Millones USD"
+    assert result["bloques"][0]["series"] == [
+        {"nombre": "PIB", "valores": {"2025": 130.2}}
+    ]
+
+
+@pytest.mark.asyncio
+async def test_get_table_reads_xlsx_mislabeled_as_legacy_xls_from_zip_member(
+    httpx_mock, monkeypatch
+):
+    # Confirmed live in bulletin No. 1975: some ZIP members keep a legacy
+    # ".xls" filename but the bytes are actually a modern XLSX (OOXML zip
+    # container) -- xlrd.open_workbook used to blow up on these outright.
+    bulletin = dict(_PARSED_BULLETINS[0])
+    bulletin["numero"] = 1975
+    bce_iem_client._bulletins_cache.set("bulletins", [bulletin])
+    httpx_mock.add_response(url=bulletin["url"], html=_LEGACY_BULLETIN_HTML)
+    zip_url = _LEGACY_ZIP_URL
+    member_bytes = _xlsx()
+    httpx_mock.add_response(
+        url=zip_url, content=_zip_bytes({"IEM-316b.xls": member_bytes})
+    )
+
+    def fail_open_workbook(file_contents: bytes):
+        raise AssertionError("xlrd should not be invoked for a PK-prefixed member")
+
+    monkeypatch.setattr(xlrd, "open_workbook", fail_open_workbook)
+
+    result = await bce_iem_client.get_table(
+        "iem-legado-iem-316b", desde="2025", boletin_numero=1975
+    )
+
+    assert result["tabla"]["sha256"] == hashlib.sha256(member_bytes).hexdigest()
+    assert result["formato"] == "series_ancho"
+    assert result["bloques"][0]["series"] == [
+        {"nombre": "PIB", "valores": {"2025": 130.2}}
+    ]
+
+
+@pytest.mark.asyncio
+async def test_download_zip_cached_only_fetches_once(httpx_mock):
+    zip_url = _LEGACY_ZIP_URL
+    httpx_mock.add_response(
+        url=zip_url, content=_zip_bytes({"IEM-315.xls": b"fake"})
+    )
+
+    first = await bce_iem_client._download_zip_cached(zip_url)
+    second = await bce_iem_client._download_zip_cached(zip_url)
+
+    assert first == second
+    assert len(httpx_mock.get_requests()) == 1
+
+
+# ---- pre-Aug-2006 frameset HTML fallback (bulletins before No. 1854) ------
+
+# Real shape confirmed live on bulletin No. 1800/1780: uppercase, unquoted
+# <A HREF = ...>, no closing </TR>/</TH>/</TD>, real ROWSPAN/COLSPAN.
+_FRAMESET_BULLETIN_HTML = """
+<HTML>
+<A HREF = /documentos/PublicacionesNotas/Catalogo/IEMensual/m1800/m1800_77.htm TARGET="_top"><IMG SRC = x.gif> <B>1.1 Principales Indicadores</B></A><BR>
+<A HREF = /documentos/PublicacionesNotas/Catalogo/IEMensual/m1800/m1800_78.htm TARGET="_top"><IMG SRC = x.gif> <B>1.2 Otra Seccion</B></A><BR>
+</HTML>
+"""
+
+_FRAMESET_SECTION_HTML = """
+<HTML>
+<HEAD><TITLE> Boletin</TITLE></HEAD>
+<BODY>
+<H3><CENTER>1.1 PRINCIPALES INDICADORES MONETARIOS</CENTER></H3>
+<P>
+<TABLE BORDER=2>
+<TR>
+<TH ROWSPAN=2 colspan=1><B>PERIODO</B></TH>
+<TH COLSPAN=2><B>BANCO CENTRAL</B></TH>
+</TR>
+<TR>
+<TH><B>Total</B></TH>
+<TH><B>Otro</B></TH>
+</TR>
+<TR><TD>1999<TD>872.7<TD>577.9
+</TABLE>
+<HR>
+FUENTE: BCE.
+</BODY>
+</HTML>
+"""
+
+
+def test_table_grid_parser_caps_prose_cell_length():
+    # Some "sections" are methodology notes, not data -- one <TD colspan=N>
+    # wrapping several paragraphs (confirmed live, bulletin No. 1820), not
+    # a parser bug. Must not blow up an otherwise agent-sized response.
+    long_html = f"<TABLE><TR><TD colspan=30>{'x' * 2000}</TABLE>"
+    parser = bce_iem_client._TableGridParser()
+    parser.feed(long_html)
+
+    grid = bce_iem_client._expand_table_grid(parser.tables[0])
+    assert len(grid) == 1
+    for cell in grid[0]:
+        assert len(cell) == bce_iem_client._MAX_FRAMESET_CELL_CHARS + 1  # +1 for "…"
+        assert cell.endswith("…")
+
+
+def test_table_grid_parser_resolves_rowspan_and_colspan():
+    parser = bce_iem_client._TableGridParser()
+    parser.feed(_FRAMESET_SECTION_HTML)
+
+    assert len(parser.tables) == 1
+    grid = bce_iem_client._expand_table_grid(parser.tables[0])
+    assert grid == [
+        ["PERIODO", "BANCO CENTRAL", "BANCO CENTRAL"],
+        ["PERIODO", "Total", "Otro"],
+        ["1999", "872.7", "577.9"],
+    ]
+
+
+@pytest.mark.parametrize(
+    ("title", "expected"),
+    [
+        ("1.1 Principales Indicadores Monetarios", "iem-legado-frameset-1-1-principales-indicadores-monetarios"),
+        ("", "iem-legado-frameset-seccion-3"),
+    ],
+)
+def test_legacy_frameset_table_id_normalizes_title(title, expected):
+    assert bce_iem_client._legacy_frameset_table_id(title, fallback_index=3) == expected
+
+
+@pytest.mark.asyncio
+async def test_fetch_legacy_frameset_tables_discovers_sections(httpx_mock):
+    bulletin = dict(_PARSED_BULLETINS[0])
+    section1 = "https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Catalogo/IEMensual/m1800/m1800_77.htm"
+    section2 = "https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Catalogo/IEMensual/m1800/m1800_78.htm"
+    httpx_mock.add_response(url=section1, content=_FRAMESET_SECTION_HTML.encode("cp1252"))
+    httpx_mock.add_response(
+        url=section2, content="<H3>1.2 Otra Seccion</H3><TABLE><TR><TD>x</TABLE>".encode("cp1252")
+    )
+
+    tables = await bce_iem_client._fetch_legacy_frameset_tables(
+        bulletin, _FRAMESET_BULLETIN_HTML
+    )
+
+    assert [t["table_id"] for t in tables] == [
+        "iem-legado-frameset-1-1-principales-indicadores-monetarios",
+        "iem-legado-frameset-1-2-otra-seccion",
+    ]
+    assert tables[0]["formato_origen"] == "html_frameset"
+    assert tables[0]["url"] == section1
+
+
+@pytest.mark.asyncio
+async def test_fetch_tables_for_bulletin_falls_back_to_frameset_when_no_zip(httpx_mock):
+    bulletin = dict(_PARSED_BULLETINS[0])
+    httpx_mock.add_response(url=bulletin["url"], html=_FRAMESET_BULLETIN_HTML)
+    section1 = "https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Catalogo/IEMensual/m1800/m1800_77.htm"
+    section2 = "https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Catalogo/IEMensual/m1800/m1800_78.htm"
+    httpx_mock.add_response(url=section1, content=_FRAMESET_SECTION_HTML.encode("cp1252"))
+    httpx_mock.add_response(
+        url=section2, content="<H3>1.2 Otra Seccion</H3><TABLE><TR><TD>x</TABLE>".encode("cp1252")
+    )
+
+    tables = await bce_iem_client._fetch_tables_for_bulletin(bulletin)
+
+    assert len(tables) == 2
+    assert tables[0]["formato_origen"] == "html_frameset"
+
+
+@pytest.mark.asyncio
+async def test_get_table_returns_grid_preview_for_frameset_table(httpx_mock):
+    bulletin = dict(_PARSED_BULLETINS[0])
+    bulletin["numero"] = 1800
+    bce_iem_client._bulletins_cache.set("bulletins", [bulletin])
+    httpx_mock.add_response(url=bulletin["url"], html=_FRAMESET_BULLETIN_HTML)
+    section1 = "https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Catalogo/IEMensual/m1800/m1800_77.htm"
+    section2 = "https://contenido.bce.fin.ec/documentos/PublicacionesNotas/Catalogo/IEMensual/m1800/m1800_78.htm"
+    section_bytes = _FRAMESET_SECTION_HTML.encode("cp1252")
+    httpx_mock.add_response(url=section1, content=section_bytes)
+    httpx_mock.add_response(
+        url=section2, content="<H3>1.2 Otra Seccion</H3><TABLE><TR><TD>x</TABLE>".encode("cp1252")
+    )
+    # get_table re-downloads the section page to read it -- register the
+    # response a second time.
+    httpx_mock.add_response(url=section1, content=section_bytes)
+
+    result = await bce_iem_client.get_table(
+        "iem-legado-frameset-1-1-principales-indicadores-monetarios",
+        boletin_numero=1800,
+    )
+
+    assert result["formato"] == "vista"
+    assert result["tabla"]["formato_origen"] == "html_frameset"
+    assert result["hojas"][0]["vista"] == [
+        ["PERIODO", "BANCO CENTRAL", "BANCO CENTRAL"],
+        ["PERIODO", "Total", "Otro"],
+        ["1999", "872.7", "577.9"],
+    ]
+    assert result["tabla"]["sha256"] == hashlib.sha256(section_bytes).hexdigest()

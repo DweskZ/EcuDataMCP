@@ -1,17 +1,19 @@
 [project]
 name = "ecuador-mcp"
-version = "0.8.5"
+version = "0.8.7"
 description = "Open public-data infrastructure for Ecuador, connecting official sources to AI assistants and software through MCP."
 authors = [{ name = "Ecuador MCP Contributors" }]
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
 dependencies = [
+    "certifi",
     "httpx>=0.28.0",
-    "mcp>=1.25.0,<2",
+    "mcp>=2.1.1,<3",
     "odfpy>=1.4.1",
     "openpyxl>=3.1.0",
     "pypdf>=6.16.2",
+    "pyxlsb>=1.0.10",
     "uvicorn>=0.30.0",
     "xlrd>=2.0.2",
 ]
@@ -24,7 +26,7 @@ build-backend = "setuptools.build_meta"
 include = ["helpers*", "tools*", "prompts*", "resources*"]
 
 [tool.setuptools.package-data]
-helpers = ["data/*.json"]
+helpers = ["data/*.json", "certs/*.pem"]
 
 [dependency-groups]
 dev = [

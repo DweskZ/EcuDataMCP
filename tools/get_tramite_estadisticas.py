@@ -1,6 +1,6 @@
 import re
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import gobec_client
 from helpers.format_out import render_output
@@ -23,7 +23,7 @@ def _periodo(anio, mes) -> str:
     return f"{anio}-{mes}"
 
 
-def register_get_tramite_estadisticas_tool(mcp: FastMCP) -> None:
+def register_get_tramite_estadisticas_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def get_tramite_estadisticas(tramite_id: str, format: str = "text") -> str:

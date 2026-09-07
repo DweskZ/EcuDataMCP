@@ -10,6 +10,7 @@ def test_fuentes_lists_every_integrated_source_family():
     assert {
         "ckan",
         "cuenca",
+        "latacunga",
         "sri",
         "gobec",
         "sercop",

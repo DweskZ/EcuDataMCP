@@ -37,6 +37,16 @@ Hecho: tools `search_indicadores_bce`/`get_indicador_bce` +
 (`contenido.bce.fin.ec/wp-json/bcedata/v1/`), no documentada oficialmente
 pero confirmada con `curl` plano.
 
+**Remesas de trabajadores — `search_bce_remesas`
+(`helpers/bce_remesas_client.py`).** Cubre resultados agregados, serie
+histórica y bases mensuales de remesas, incluida la desagregación por
+entidad remisora/receptora disponible desde julio de 2025
+(`https://contenido.bce.fin.ec/series-de-datos-remesas-de-trabajadores/`).
+Ojo con el corte metodológico: la serie "Histórica" (pre-cambio de
+metodología) y la serie "BDD" (post-cambio) no son directamente
+comparables — son dos series distintas, no una continuación simple una de
+la otra.
+
 **Hallazgo grande (2026-08-29): la "Información Estadística Mensual"
 (IEM/IEEM)**, el boletín insignia del Banco Central, mucho más allá de lo
 que cubre la API BCEData ya integrada.
@@ -367,6 +377,86 @@ portales que tenemos"):
   obligatorio por ley para *toda* institución pública ecuatoriana, no solo
   IESS — si este patrón resulta automatizable en algún portal,
   probablemente se repite en decenas de instituciones.
+
+**Construido 2026-09-04** (`helpers/iess_client.py`,
+`tools/list_iess_colecciones.py`, `tools/get_iess_archivos.py`): las tres
+colecciones documentadas arriba (Boletines Estadísticos, Estudios
+Actuariales, Informes de Auditoría) quedaron cubiertas por dos tools —
+`list_iess_colecciones` (catálogo: qué años/conteos tiene cada colección) y
+`get_iess_archivos(coleccion, anio=None, query="")` (documentos resueltos a
+URL directa, filtrables por colección/año/texto). Antes de escribir el
+parser se re-verificó en vivo la estructura exacta de las tres páginas con
+`httpx`/`curl` plano (sin browser) — varias correcciones reales a las notas
+de arriba:
+
+- **Boletines: 26 confirmados, no ~19.** La nota de 2026-08-28 sólo revisó
+  la primera página de la lista (20 filas) y concluyó "2006-2024". La lista
+  está paginada (`cur2`/`delta2`, requiere además los parámetros de ruteo
+  de portlet Liferay `p_p_id=110_INSTANCE_zIm8&p_p_lifecycle=0&...` — un
+  `cur2` "pelado" sin esos parámetros re-sirve la página 1 en silencio, un
+  bug real que se encontró y corrigió en el mismo pase). La página 2 trae 6
+  boletines más, hasta "BOLETIN ESTADISTICO 01" de **1978** — el archivo
+  real cubre 1978-2024, no solo 2006-2024.
+- **Estudios Actuariales: 4 años confirmados en vivo, no solo mencionados.**
+  El índice (`iess.gob.ec/estudios-actuariales/`) enlaza hoy exactamente
+  2010, 2013, 2018 y 2020 (confirmado además que `-2007` a `-2025` dan 404
+  salvo esos tres años con sufijo; el "2013" es un caso especial: su enlace
+  visible dice "Estudios Actuariales 2013" pero apunta a la URL *base* sin
+  sufijo de año, `estudios-actuariales` sin `-2013` — no es un typo, es
+  como está publicado). El scraper descubre estos años leyendo el índice en
+  vivo (no están hardcodeados), así que un año nuevo que IESS agregue
+  aparece sin cambio de código. 47 documentos totales resueltos (7 en el
+  set base/2013, 8 en 2010, 13 en 2018, 14 en 2020 — coincide con el conteo
+  de 14 ya documentado arriba). Dos formas de página confirmadas: 2018/2020
+  (y el set base) enlazan directo a `documents/10162/<carpeta>/<archivo>`;
+  2010 usa una ruta estática completamente distinta,
+  `iess.gob.ec/informacion/Estudios_Actuariales_2010/<archivo>.pdf` — no es
+  el patrón Liferay en absoluto, hay que soportar ambas formas.
+- **Informes de Auditoría: 325 documentos confirmados en 20 carpetas
+  (2007-2026), no ~344 en 2007-2025.** La cifra de "~344" de la nota
+  anterior venía de una revisión parcial; la tabla de carpetas por año
+  (columna "Número de documentos" de la página índice) suma exactamente
+  325 en vivo. Además ya existe una carpeta 2026 (vacía, 0 documentos) que
+  no existía cuando se escribió la nota original. El bug de "el link real
+  no tiene extensión `.pdf`" que la nota de arriba ya había corregido se
+  resolvió aquí de forma distinta a lo sugerido (`Content-Type` por
+  request): la página de detalle de cada documento (patrón Liferay
+  `document_library_display`, compartido con Boletines) trae un enlace
+  "Descargar" cuyo ícono (`file_system/large/<ext>.png`) declara el
+  formato real sin necesidad de una petición `HEAD`/`Content-Type` por
+  documento — confirmado en vivo con el ejemplo exacto de la nota
+  (`DNA7-SySS-0001-2024`, ícono `large/pdf.png`, URL sin `.pdf`). El mismo
+  patrón de ícono resuelve Boletines y (donde aplica) los enlaces sin
+  extensión de Estudios Actuariales 2018 ("Seguro Riesgos del Trabajo",
+  "Seguro Desempleo" — confirmado antes con `Content-Type: application/pdf`
+  vía header, y ahora también coherente con el ícono).
+- **Paginación dentro de un año**: un año con más de 20 documentos (ej.
+  2009, 42 documentos, el máximo confirmado) pagina con
+  `_110_INSTANCE_vu7F_cur2=N&_110_INSTANCE_vu7F_delta2=20` sobre la misma
+  URL amigable `.../document_library_display/vu7F/view/<carpeta>` — sin
+  necesitar los parámetros `p_p_id` completos que sí hacen falta en la
+  página raíz de Boletines/Informes (esas son rutas Liferay "amigables"
+  con el portlet ya codificado en el path, a diferencia de la página
+  índice que se sirve por query string). Verificado en vivo: 2009 pagina a
+  3 páginas (20+20+2) y las 42 URLs distintas coinciden con el conteo de
+  la tabla de carpetas.
+- **Caché**: las tres colecciones son archivos históricos/append-only (un
+  boletín o año de auditoría nuevo aparece a lo sumo unas pocas veces al
+  año), TTL de 6 horas (21600s) igual que `helpers/sgr_publicaciones_client.py`.
+  `get_iess_archivos(coleccion="informes_auditoria")` exige `anio` (a
+  diferencia de las otras dos colecciones, que siempre se resuelven
+  completas): un año puede traer hasta 42 documentos, cada uno con su
+  propia petición a la página de detalle para resolver la URL real, así
+  que no hay una llamada barata de "todos los años" — `list_iess_colecciones`
+  expone el catálogo de años/conteos primero para que el llamador elija.
+- Verificado en vivo con las funciones reales del MCP (no solo con
+  `httpx`/`curl` sueltos): `list_iess_colecciones`,
+  `get_iess_archivos(coleccion="boletines", anio=2024)`,
+  `get_iess_archivos(coleccion="estudios_actuariales", anio=2020)`,
+  `get_iess_archivos(coleccion="informes_auditoria", anio=2025)` (carpeta
+  de 1 solo documento) y el caso de error cuando falta `anio` para
+  `informes_auditoria` — todos devuelven datos reales y URLs que resuelven
+  a `documents/10162/...`.
 
 ### SENESCYT / Educación Superior / MINEDEC
 
@@ -1271,6 +1361,23 @@ sitio institucional, distinto del subdominio
 sección "Resoluciones del Ineval" — mismo patrón de archivo real, vigente
 hasta 2026 — pero es normativa/administrativa, no datos de exámenes.
 
+**Construido 2026-09-02/03.** `evaluaciones.evaluacion.gob.ec/BI/` — 9
+familias reales con datos descargables (Ser Bachiller, Ser Estudiante +3
+variantes, Ser Maestro +Recategorización, Ser Profesional, Llece/ERCE-
+SERCE-TERCE), cada una un acordeón Bootstrap estático (sin JS) con paneles
+por año lectivo/calendario y tablas de enlaces por dataset×formato — 557
+enlaces de descarga confirmados en total, sin login/CAPTCHA.
+
+**Corrección a la investigación previa:** el slug de navegación
+`historico-ser-bachiller` (el mismo que motivó el hallazgo original de
+arriba) es una página informativa señuelo sin descargas; la página real de
+datos usa un slug distinto (`ser-bachiller-2`), solo descubrible desde el
+hub "Categoría Bases de Datos" del sitio — cada familia se verificó
+independientemente así. Gotcha real: `ser-maestro-2` esconde una fila
+`<tr>` obsoleta dentro de un comentario HTML, idéntica a la fila vigente —
+el parser descarta comentarios antes de procesar. Construido como
+`list_ineval_familias`/`get_ineval_familia_archivos` (`helpers/ineval_client.py`).
+
 ---
 
 ## Recaudación arancelaria / tributos aduaneros
@@ -1752,8 +1859,9 @@ Interactivos", no explorado a fondo.
 **gob.ec — un endpoint de transparencia real y sin explotar.**
 `www.gob.ec/api/v1/tramites-transparencia/{tramite_id}` devuelve una
 serie mensual real (atenciones/quejas por trámite) desde 2021, en vivo,
-sin auth (confirmado con el trámite de Cédula de Identidad: 253,729
-atenciones / 6 quejas en julio 2026). No es un dataset masivo — hay que
+sin auth (confirmado con el trámite de Cédula de Identidad: 63 meses de
+serie, mayo 2021 → julio 2026, con 253,729 atenciones / 6 quejas en el mes
+más reciente). No es un dataset masivo — hay que
 pedirlo trámite por trámite, no existe un endpoint masivo — pero es dato
 de uso/satisfacción real que hoy no expone ningún tool. El resto de la
 API (`tramites-canales`, `tramites-costo`, `tramites-categorias`,
@@ -2481,6 +2589,10 @@ BCE en el sistema estadístico ecuatoriano (ya cubierto por
   `ENSANUT_2018`, y buscar "ensanut 2023/2024/ii" no encontró nada
   relevante más nuevo.
 
+`search_censo_recursos` cataloga **36 archivos reales** de
+`censoecuador.gob.ec` (metadata + URL directa, sin descarga a través de
+este MCP, mismo patrón que `get_inec_estadistica_files`).
+
 **Construido 2026-08-30: `search_censo_recursos` (censoecuador.gob.ec) y
 descubrimiento del Clasificador Geográfico vía la infraestructura ya
 existente.** El Clasificador no necesitó un cliente nuevo — solo dos
@@ -2783,6 +2895,31 @@ descartado para trámites individuales en otras instituciones (Fiscalía,
 inspecciones laborales). **Conclusión: no queda ningún dashboard o
 sección de datos sin explorar en `sut.trabajo.gob.ec`** más allá de los
 8 ya catalogados en `helpers/sut_powerbi_client.py`.
+
+### ARCSA (Agencia Nacional de Regulación, Control y Vigilancia Sanitaria)
+
+**Investigado 2026-08-31, pedido explícito de Daniel.** Organización CKAN
+real (`agencia-nacional-de-regulacion-control-y-vigilancia-sanitaria-arcsa...`)
+con solo 4 datasets, todos sobre registros sanitarios/permisos de
+funcionamiento **suspendidos o cancelados** de medicamentos —
+actualización semestral, ya alcanzable con
+`search_organizations`/`list_dataset_resources` sin cliente nuevo.
+
+El dato realmente valioso — el registro sanitario completo *vigente* (no
+solo lo cancelado), confirmado por búsqueda web como "Base de Registros
+Emitidos" en `controlsanitario.gob.ec/base-de-datos/` (productos
+naturales, medicamentos homeopáticos, actualizado a junio 2026) — **no se
+pudo verificar**: `www.controlsanitario.gob.ec` está caído (reset de
+conexión TLS tras renegociación, confirmado con `curl` y con `httpx` en
+Python — mismo patrón exacto que `inclusion.gob.ec`, no es un problema del
+cliente). Un subdominio sí vive
+(`permisosfuncionamiento.controlsanitario.gob.ec/consultorciudadano/`,
+"ARCSA-Notificaciones") pero es un formulario de login real, sin acceso de
+invitado visible — mismo patrón de bloqueo ya descartado para Superbancos
+Catastro/SENESCYT. Pendiente: reintentar `controlsanitario.gob.ec` más
+adelante (podría ser una caída transitoria, a diferencia de
+`inclusion.gob.ec` que lleva meses muerto) antes de descartar la "Base de
+Registros Emitidos" del todo.
 
 ### Superbancos — los 3 widgets OneDrive de `servicios_financieros`
 
@@ -3088,6 +3225,1144 @@ confirmado el formato de resultado.
    para que `get_informe_igepn` reutilice el manejo de pypdf/rangos de
    página en vez de duplicarlo, ya que aquí no hay URL que descargar con
    `download_bytes`.
+
+---
+
+## Duodécima pasada — Superbancos boletines OneDrive, sistema de índices editoriales del BCE, catálogo BCEData y archivo IEM (2026-08-30/2026-09-01)
+
+### SIPA/MAG — precios mayoristas descartados como fuente de alta frecuencia (2026-08-31)
+
+Daniel trajo una tabla propia de candidatos de alta frecuencia; cruzada
+contra el estado real del proyecto, "precios mayoristas" de SIPA/MAG no
+calificó. Dos páginas revisadas, ninguna es diaria/quincenal: "Precios
+Mayoristas" (boletines PDF mensuales, ya cubiertos como uno de los 12
+archivos del módulo económico) y `precios-referenciales` — el "api"/"json"
+que aparecía en su HTML era solo el token CSRF de Joomla, falso positivo.
+`precios-referenciales` en realidad enlaza a "Mercado Mayorista Quito/
+Guayaquil/Cuenca", cada uno un PDF embebido
+(`descargas/mercados/precios_referenciales/{ciudad}_precios_referenciales_2026.pdf`)
+con los rangos de precio del Decreto Nº1438 vigentes — un documento
+regulatorio de piso/techo de precio, con fecha de emisión y vigencia
+mensual (confirmado: "Fecha de emisión: 4 de agosto de 2026", vigente desde
+el 4 de septiembre), no una serie de observaciones diarias de mercado. El
+archivo se sobreescribe en el mismo nombre cada vez — sin historia. Bajo
+valor como para priorizarlo (3 PDFs, una foto del mes, sin serie), pero
+real y fácil si algún día se justifica. La app móvil "cgsin.precios" sigue
+sin explorar — podría ser la fuente diaria real detrás de escena, no
+confirmado.
+
+### Superbancos — widget OneDrive de Boletines Financieros descifrado (2026-08-30, pedido explícito de Daniel: "fix!")
+
+El diagnóstico inicial de la Séptima pasada ("URLs firmadas de corta
+duración, no descifrable sin más") era incorrecto. Se resolvió conduciendo
+el widget real en un browser (`mcp__Claude_Browser__*`), capturando el POST
+que dispara (`wp-admin/admin-ajax.php`,
+`action=shareonedrive-get-filelist`) con `listtoken`/`account_id`/
+`drive_id` (atributos `data-*` del propio widget) y `_ajax_nonce`
+(`ShareoneDrive_vars.refresh_nonce` inline en la página) — los cuatro
+valores están en el HTML estático de la página, sin sesión ni cookies,
+confirmado replicando la llamada con `httpx.post` puro. Las URLs de
+descarga que devuelve son un proxy same-site
+(`action=shareonedrive-download`) estable, no un token de Microsoft Graph
+de corta duración — otra suposición incorrecta corregida.
+
+`boletines_financieros` ahora trae **224 archivos verificados en vivo**:
+1997-2008 desde la tabla estática + carpetas "Año 2009"…"Año 2026" (12
+boletines/año, 2026 con los meses publicados hasta la fecha) desde
+OneDrive, con nombre, tamaño y fecha de modificación reales. Un bug real de
+extracción (el nombre se tomaba del `data-name` del `<div>` contenedor, que
+no lleva extensión, en vez del `data-name` del propio `<a>` de descarga) se
+detectó revisando la salida real end-to-end, no solo por los tests, y se
+corrigió antes de cerrar el ítem.
+
+### BCE — BCEData: auditoría viva de cobertura, resultado del primer barrido completo (2026-09-01)
+
+`audit_bce_catalog` corrió por primera vez sobre el catálogo completo:
+**78/78 grupos y 2.360 series cargaron correctamente**; de 154
+combinaciones frecuencia/unidad probadas por `auditar_grid=true`, 108
+devolvieron valores y **46 recibieron una página HTML de rechazo por la
+propia política de seguridad del BCE, con HTTP 200** — no hay que tratar
+esas 46 como datos ausentes ni como error JSON del servidor, es un
+bloqueo explícito del origen disfrazado de éxito HTTP. La auditoría
+también registra si existe algún marcador explícito de revisión
+(campo de revisión/version, `ETag`/`Last-Modified`); comprobación en vivo
+2026-08-31: BCEData responde 200 pero no publica ninguno, así que la
+comparación por contenido sigue siendo la única evidencia disponible.
+
+### BCE — sistema genérico de páginas "índice" editorial, descubierto 2026-09-01
+
+Investigando el ítem de paquetes sectoriales, se encontró que BCE publica
+~35 páginas cuyo slug termina en "-indice(s)" (localizadas vía su propio
+`wp-sitemap-posts-page-1.xml`), cada una un archivo histórico completo (año
+por año, algunas desde 2004-2010, o semana por semana) para una serie de
+publicación con nombre propio: boletines sectoriales, índices de precios/
+confianza, compra y venta de divisas, balanza de pagos, boletín monetario
+semanal, remesas, etc. Dos formas de widget, ambas estáticas (sin AJAX,
+todo presente en el HTML inicial — confirmado comparando bytes crudos vs.
+DOM del navegador): `.bce-gi` (pestañas por año → tarjetas con período +
+formato) y `.bce-gi-weekly` (tarjetas de año → meses → enlaces con número
+de semana + fecha).
+
+**Construido:** `search_bce_indices`/`get_bce_indice_archivo`
+(`helpers/bce_indices_client.py`). El catálogo se construye descubriendo
+las páginas candidatas en el sitemap y leyendo cada una una vez (cacheado
+6h); `search_bce_indices` devuelve solo resúmenes (para no inflar la
+respuesta), `get_bce_indice_archivo` lee los archivos ya cacheados de una
+página, con filtro por año y tope de resultados.
+
+Verificado en vivo extremo a extremo: 30 de 36 páginas candidatas exponen
+realmente el widget (las otras 6, p. ej. `memoria-anual-indice`, solo
+cargan el CSS del plugin pero no tienen contenido publicado con este
+sistema — se omiten del catálogo, no son un bug). Dos bugs reales de
+parseo corregidos durante la verificación en vivo: (1) el lookahead que
+separa un panel de año del siguiente confundía `bce-gi-panel` con
+`bce-gi-panelhead` (prefijo compartido) y devolvía cuerpos vacíos; (2) en
+`.bce-gi-weekly`, todo panel de año que no es el activo lleva un atributo
+`hidden` en vez de cerrar el tag con `>` a secas — el regex original solo
+aceptaba la forma activa y silenciosamente perdía 7 de los 8 años de
+boletín monetario semanal hasta corregirlo.
+
+### BCE — paquetes sectoriales resueltos vía el sistema de índices (2026-09-01)
+
+4 de 5 paquetes sectoriales quedaron resueltos por el sistema de índices de
+arriba: petróleo (`boletin-analitico-del-sector-petrolero-indice`, 67
+archivos, 2006-2026), minería (`boletin-analitico-del-sector-minero-indice`,
+26, 2016-2026), cemento (`estadisticas-de-cemento-indice`, 11, 2025-2026) y
+compra/venta de divisas (3 páginas índice distintas, mensual y trimestral,
+2010-2026). Sigue pendiente agricultura — no se encontró ninguna página BCE
+dedicada (ni en el sitemap de índices ni en el menú de "Estadísticas");
+probablemente vive en otra institución (MAG/INEC), no en BCE.
+
+### BCE — Estudio Mensual de Opinión Empresarial y coyuntura, resuelto parcialmente (2026-09-01)
+
+Vía el sistema de índices de arriba: expectativas económicas
+(`indice-de-expectativas-de-la-economia-indice`, 43 archivos, 2023-2026),
+confianza del consumidor
+(`indice-de-confianza-al-consumidor-icc-indice`, 198, 2009-2026), inflación
+(`boletin-mensual-de-inflacion-indice`, 268, 2004-2026) y ciclo económico
+(`reporte-de-indicadores-del-ciclo-economico-...-indice`). Sigue pendiente
+mercado laboral y pobreza/desigualdad — ninguna página índice encontrada
+para esos dos, no investigado más allá del sistema de índices.
+
+### BCE — catálogo de "Últimas Publicaciones" (construido 2026-09-01)
+
+`search_bce_publicaciones` (`helpers/bce_publicaciones_client.py`).
+Confirmado en vivo: la página renderiza una sola tabla HTML estática vía un
+shortcode (`bce-ultimas-publicaciones`) — sin AJAX, sin ruta `wp-json`
+propia, sin paginación. Extrae fecha (texto español largo, parseado a
+ISO), título, URL directa y formato — el formato se deriva de la extensión
+de la URL, no del ícono decorativo de la fila (confirmado en vivo: dos
+filas con el mismo formato real HTML usan íconos `file-web` distintos
+según criterio editorial, uno de ellos genérico "gráfico"). Verificado en
+vivo extremo a extremo contra la página real: 30/30 filas parseadas
+correctamente, cero fechas o formatos sin reconocer. Límite real, no
+solucionable desde esta página: solo expone su ventana rodante (~30
+publicaciones más recientes), sin parámetro de fecha ni paginación — no es
+un archivo histórico completo. Sigue pendiente: Cifras Económicas del
+Ecuador y cualquier calendario de publicaciones futuras viven en páginas
+distintas, no investigadas todavía.
+
+### BCE — IEM: lectura de tablas, barrido en vivo sobre 78 tablas del boletín vigente y 4 boletines de la era ZIP (2026-09-01)
+
+Sobre las 78 tablas del boletín vigente: 77 (98.7 %) se extraen ya como
+`series_ancho`/`tabla_larga`/`series_matriz`; la única `vista`
+(`iem-1111-e`, "Encaje Legal") es de periodicidad semanal con columnas
+Año/Mes/Rango dispersas y una hoja de cálculo interna del BCE — un caso
+genuinamente único, no una familia recurrente.
+
+Repetido sobre 4 boletines de la era ZIP (No. 1854, 1900, 1950, 1975):
+encontró un bug real, no una forma de tabla nueva — 4 miembros del ZIP del
+boletín No. 1975 (`IEM-316b/312b/315a/322a.xls`) resultaban en `ValueError`
+porque son en realidad XLSX modernos (contenedor ZIP OOXML) con extensión
+`.xls` heredada; `xlrd.open_workbook` fallaba directo. Corregido con
+sniffing de bytes (`raw.startswith(b"PK")`) en vez de confiar en la
+extensión, igual que la regla ya documentada en `CLAUDE.md` para el campo
+`format` de CKAN — ver `_open_legacy_zip_member` en
+`helpers/bce_iem_client.py`. Tras la corrección, cero errores en los 4
+boletines muestreados; los 4-7 `vista` restantes por boletín son tablas
+legadas con jerarquías de encabezado genuinamente irregulares (tasas por
+semana, PIB por industria con encabezados fusionados a varios niveles), no
+una familia repetible. No se identificó ninguna familia de formato
+adicional que justifique un normalizador dedicado; la combinación actual
+de extractores + vista honesta ya cubre el archivo.
+
+### BCE — BCEData ↔ IEM, primer barrido de candidatos (2026-09-01)
+
+`compare_bce_sources` corrió por primera vez sobre el boletín disponible:
+77 candidatos, una tabla IEM sin traslape y 2.352 etiquetas solo BCEData;
+72 son posibles componentes de tabla, cuatro posibles tabla/grupo y solo
+una posible equivalencia directa. Ninguna se trató como duplicado
+confirmado sin revisar valores y metodología primero — ver la revisión
+manual del 2026-09-02 más abajo.
+
+---
+
+## Decimotercera pasada — fronteras exactas del archivo IEM, equivalencias BCEData↔IEM confirmadas, INAMHI, aviación civil, SEPS, CNIG, indicadores diarios ampliados (2026-09-02)
+
+### BCE — IEM: las tres eras del archivo histórico 1996-2026, fronteras exactas por búsqueda binaria en vivo
+
+El archivo completo del boletín IEM (No. 1727-2093, enero 1996 - hoy)
+resulta ser **tres eras**, no dos, encontradas por búsqueda binaria en vivo
+por boletín:
+
+- **No. 1976-2093 (octubre 2016→hoy, ~118 boletines, ~32 %).** XLSX
+  individuales por tabla. Ya cubierto antes de esta pasada.
+- **No. 1854-1975 (agosto 2006 - septiembre 2016, ~122 boletines, ~33 %),
+  construido 2026-09-02.** La página no linkea XLSX individuales, pero sí
+  un ZIP de la publicación completa (`archivos_completos`, tipo `zip`) que
+  ya trae un archivo por tabla con el mismo esquema `IEM-{numero}`, solo
+  que en `.xls` legado (no `.xlsx`) — confirmado en vivo con
+  `list_zip_contents` sobre `IEM1975.zip` antes de construir nada.
+  `_fetch_legacy_zip_tables` lista los miembros del ZIP como tablas
+  (`table_id` con prefijo `iem-legado-` porque la numeración 1:1 contra la
+  era moderna no está confirmada — vistos `IEM-315a.xls`,
+  `5_SectorPetrolero.xls`, `7_GraficosIDEAC.xls` sin equivalente obvio
+  hoy); `get_table` lee el miembro con `xlrd` (`.xls` legado) a través de
+  un adaptador (`_XlsSheetAdapter`) que reutiliza sin cambios los mismos
+  `_extract_wide_series`/`_extract_long_table`/`_extract_matrix_series` ya
+  probados contra XLSX moderno. Encontrado y corregido en el proceso: xlrd
+  no distingue int de float (todo número es float), así que un encabezado
+  de año como `2025.0` rompía la regex de 4 dígitos de `_period_key`
+  (`"2025.0"` → `.replace(".", "")` → `"20250"`) — el adaptador ahora
+  normaliza floats enteros a `int`, igual que openpyxl. Verificado en vivo
+  extremo a extremo contra boletines reales (No. 1975, No. 1900, No. 1950),
+  no solo con mocks. 8 tests nuevos.
+- **No. 1727-1853 (enero 1996 - julio 2006, ~126 boletines, ~34 %),
+  construido 2026-09-02.** Confirmado en vivo (No. 1800, No. 1780) que
+  estas páginas usan HTML pre-moderno de framesets — `<A HREF = ...
+  TARGET="_top">` en mayúsculas y sin comillas — que enlazan páginas `.htm`
+  por sección (`m{boletin}_{k}.htm`, ~60 por boletín). El dato en sí no
+  está en ningún archivo descargable — vive como una `<TABLE>` HTML cruda
+  embebida directamente en cada página de sección, con encabezados
+  multinivel de ROWSPAN/COLSPAN genuinamente irregulares y contenido en
+  `cp1252`. `_TableGridParser` (subclase de `html.parser.HTMLParser`, sin
+  dependencia nueva — el mismo patrón ya usado en `sri_ruc_client.py`,
+  adaptado porque esta era no cierra `</TR>`/`</TH>`/`</TD>`, así que el
+  cierre implícito se infiere por el siguiente tag de apertura, no por
+  `handle_endtag`) captura las celdas con su rowspan/colspan reales;
+  `_expand_table_grid` las resuelve al algoritmo estándar de grilla
+  rectangular. `table_id` se deriva del texto de sección
+  (`_legacy_frameset_table_id`, ej. "1.1 Principales Indicadores
+  Monetarios"), no del índice `k`, que no está confirmado estable. Expuesto
+  siempre como vista de grilla (`formato: "vista"`, mismo contrato que
+  `_inspect_xlsx`/`_inspect_legacy_xls`) — nunca se intenta wide/long/matrix
+  aquí: la jerarquía de encabezados es irregular a propósito de sección en
+  sección, adivinar una forma semántica sería menos honesto que mostrar la
+  grilla real. **Verificado en vivo extremo a extremo contra el boletín No.
+  1800 real**: 63 tablas descubiertas, valores de una fila de datos real
+  (diciembre 1999, tabla "1.1 Principales Indicadores Monetarios") coinciden
+  exactamente con el HTML fuente, celda por celda. 6 tests nuevos.
+
+Con estas tres fronteras, el archivo completo 1996-2026 (367 boletines) es
+legible hoy — sin hashing masivo confirmado todavía para las porciones
+ZIP/frameset, y sin garantía de que cada una de las 126 secciones del
+tramo más viejo tenga exactamente esta forma (no se revisaron los 126
+boletines uno por uno, solo una muestra).
+
+### BCE — BCEData ↔ IEM, dos equivalencias confirmadas con datos en vivo (revisión manual 2026-09-02)
+
+1. **Confirmada — equivalencia directa.** `id_grupo=101` (BCEData, "4.1.4
+   Ingresos y egresos por comercialización interna de derivados
+   importados") ↔ `iem-414-e` (misma sección/título). Las 8 series de
+   BCEData (4 productos × precio importación/venta nacional) igualan los
+   valores de `iem-414-e` mes a mes hasta ~13 cifras significativas
+   (ene-2025 verificado en las 4 líneas de producto). Es la misma tabla,
+   republicada por dos rutas.
+2. **Confirmada parcial — tabla↔grupo.** `id_grupo=65` ↔ `iem-423-e`
+   ("Salario Básico Unificado y Componentes Salariales"): la serie
+   "SALARIO REAL PROMEDIO" de BCEData iguala exactamente la segunda fila de
+   `iem-423-e` (ene-2025: 122.414726663655 en ambas). Pero `id_grupo=65`
+   solo expone esa fila — el SBU nominal (fila 1 de la tabla IEM,
+   548.2638888888889 constante) no aparece bajo ninguna unidad de ese
+   id_grupo. Confirma que la clasificación
+   "posible_correspondencia_tabla_grupo" del tool es correcta aquí:
+   cobertura parcial, no equivalencia completa.
+
+Los otros tres candidatos "tabla↔grupo" (riesgo país↔producción petrolera,
+derivados↔IPC, salario↔IPP) son falsos positivos por similitud de
+etiqueta — sin relación real, no revisados en detalle más allá de notar
+que los títulos no corresponden.
+
+### BCE — indicadores diarios: barrido completo del mega-menú, 4 archivos nuevos (2026-09-02)
+
+Solo 4 de las 7 secciones de nivel superior de "Estadísticas" se habían
+revisado en la Décima pasada. Las 2 no revisadas
+(`estadisticas-del-sector-monetario-d-2`, `estadisticas-del-sector-fiscal`)
+sí tenían el widget, y `estadisticas-del-sector-externo-d` — ya "revisada"
+— tenía 7 widgets más que el barrido original no encontró por seguir solo
+los que compartían archivo con indicadores ya conocidos. 4 archivos nuevos:
+
+- `datos.json` (`view_ind_monetario`): Reservas Internacionales, Liquidez
+  Total M2, Crédito al Sector Privado (empresas y hogares), Captaciones
+  OSD (Total), Tasa Activa/Pasiva Referencial — mensual, 2000/2003/2015→hoy.
+- `datos_fiscales.json` (`view_ind_fiscales`): Total Ingresos SPNF, Total
+  Erogaciones SPNF, Resultado Global SPNF (% del PIB), Saldo Deuda Pública
+  Interna — mensual, 2000→hoy.
+- `datos_bpa.json` (`view_ind_externo_bpa`): Cuenta Corriente, Remesas de
+  Trabajadores Recibidas (trimestral, 2016→hoy), Índice Tipo de Cambio
+  Efectivo Real (mensual, 1995→hoy).
+- `datos_cxt.json` (`view_ind_externo_cxt`): Saldo Balanza Comercial,
+  Balanza Comercial no Petrolera, Exportaciones de Bienes, Importaciones
+  de Bienes — mensual, 1990→hoy. Usa "Código Variable Dinámica" como los 9
+  archivos originales, no "id_serie".
+
+Los 3 archivos nuevos "id_serie" (`datos.json`/`datos_fiscales.json`/
+`datos_bpa.json`) no tienen "Código Variable Dinámica" — el código de serie
+es un int en `id_serie`, y añaden un campo "Grupo" que los 9 archivos
+originales no tienen. `_codigo()` unifica ambos esquemas detrás de una
+sola interfaz string. Catálogo total: 49 series (antes 29). Verificado
+completo contra la página de inicio de `contenido.bce.fin.ec`, que agrega
+los widgets de todas las secciones en un solo lugar (40 `data-dd-title`
+distintos) — los 40 resuelven ahora a un archivo conocido.
+
+### BCE — índices de precios de comercio exterior (IPX/IPM/ITI), resuelto 2026-09-02
+
+BCEData (`id_grupo=134`, "3.5.3 Índices IPX - IPM - ITI") ya cubre las tres
+series *agregadas* (1990-01→2026-06). De las tres páginas dedicadas (fuera
+del sistema de índices porque su slug no termina en "-indice(s)"):
+`serie-historica-indices-de-precios-...` resultó un duplicado exacto de esa
+misma serie (cruzado en vivo, ITI jun-2026 = 90.2604172608485 en ambos) —
+descartada. `indices-de-precios-de-importacion` e
+`indices-de-precios-de-exportacion` sí aportan detalle real y ausente en
+BCEData: precios/valor/volumen desagregados por categoría de uso económico
+(importaciones — combustibles, materias primas, bienes de consumo/capital)
+y por producto individual (exportaciones — petróleo, camarón, banano,
+cacao, oro, rosas, etc.). Las tres páginas usan un widget distinto al
+`.bce-gi`/`.bce-gi-weekly` de `bce_indices_client.py` (un solo archivo
+vigente por página, sin archivo por año), así que se construyó
+`search_bce_precios_comex` (`helpers/bce_precios_comex_client.py`), con las
+dos páginas útiles hardcodeadas (mismo patrón que `_EXTRA_TOPICS` en
+`helpers/inec_client.py`) y cada archivo real scrapeado en vivo.
+
+### INAMHI — `geoservicios.inamhi.gob.ec` resuelto (2026-09-02)
+
+WMS GetCapabilities expone 222 capas (workspace `geonode`): normales
+climáticas de precipitación 1985-2015, ~180 composites diarios de
+anomalías de lluvia, grillas del modelo WRF (precipitación/temperatura/
+humedad/presión/viento), límites de cuencas/provincias/cantones/
+parroquias. WFS confirma 199/222 con datos de atributos reales vía
+GetFeature (JSON); las 23 restantes (grillas de normales y WRF) son solo
+ráster, verificado con un GetFeature que devuelve error. TLS limpio con
+httpx/certifi. Sin organización CKAN propia para INAMHI en ningún lugar
+del proyecto — este cliente es la única cobertura automatizable hoy.
+Limitación real: no existe una capa de estaciones con observaciones
+puntuales de precipitación/temperatura/caudal — todo lo disponible vía WFS
+son productos agregados por polígono (zonal stats, límites), no series de
+estación cruda. Construido como `search_inamhi_capas`/
+`get_inamhi_capa_datos` (`helpers/inamhi_client.py`).
+
+### Aviación civil — IFIS (`www.ais.aviacioncivil.gob.ec`) resuelto (2026-09-02)
+
+`/metar/{icao}`, `/notam?designador={icao}` y `/sigmet` son públicos sin
+sesión — el link "Entrar" existe pero solo `/fpl/*` exige login; verificado
+contra SEQM (Quito) y capturado en vivo un SIGMET activo de ceniza
+volcánica del Reventador. El formato es HTML servidor (no texto de ancho
+fijo ni JSON) — el texto crudo ICAO viene embebido en
+`<div>`/`<td class="codificacion">` junto a una tabla de campos
+decodificados en español, extraída de forma genérica campo→valor porque
+cada campo lleva un sufijo numérico opaco que cambia por request. SIGMET
+es a nivel de FIR completo (Ecuador tiene un solo FIR, SEFG) sin parámetro
+de aeródromo. Un ICAO desconocido no da error: METAR devuelve "No existe
+registro..." y NOTAM una tabla vacía. Construido como
+`get_metar`/`get_notam`/`get_sigmet` (`helpers/aviacion_client.py`).
+
+### SEPS — `estadisticas.seps.gob.ec` resuelto (2026-09-02)
+
+Confirmado en vivo: sitio WordPress normal (200 vía httpx plano, sin
+problema TLS), sin organización CKAN propia. 26 secciones reales entre
+`estadisticas-sfps/` (22, cinco pestañas: Situación Financiera, Depósitos,
+Cartera de crédito, Tasas de interés, Inclusión financiera) y
+`estadisticas-eps/` (4) — cada una una lista de períodos con PDF/ZIP
+directo o redirect `?sdm_process_download`/`?smd_process_download` (dos
+grafías inconsistentes en la misma página, no un bug). Incluye
+`sfps_reportes_calificacion_de_riesgos`, el objetivo original: boletines
+PDF anuales 2020-2025 más corte a marzo 2026, 112 entidades calificadas.
+Construido como `list_seps_secciones`/`get_seps_seccion_archivos`
+(`helpers/seps_client.py`), mismo patrón que Superbancos. Al menos una
+sección (Alivio Financiero) tiene un período listado sin archivo
+todavía — manejado como 0 archivos, no como error.
+
+### CNIG — matriz de femicidios resuelto (2026-09-02)
+
+`igualdadgenero.gob.ec` es el Consejo Nacional para la Igualdad de
+*Género* confirmado (no confundir con Fiscalía, que publica cifras de
+femicidios por separado, ni con los otros Consejos Nacionales para la
+Igualdad). Su página "Violencia" (`/violencia/`) tiene 20 tablas
+estadísticas en PDF vía WordPress download-monitor, incluida "Femicidios y
+Homicidios Intencionales de Mujeres" — confirmado vivo, sin login ni
+CAPTCHA. Gotcha real: el dominio raíz cierra la conexión TLS a
+`curl`/`httpx` sin un User-Agent identificable (parecía caído); responde
+200 con el User-Agent propio del proyecto — mismo patrón de filtrado ya
+visto en `seps.gob.ec`. El PDF dice actualizarse "semanalmente" con datos
+de Judicatura, Fiscalía e Interior, pero el archivo publicado hoy tiene
+corte real al 09-abr-2023 y los 20 archivos comparten el mismo
+Last-Modified (22-feb-2025, timestamp de migración) — "semanal" es la
+intención declarada del indicador, no la cadencia real de lo publicado
+ahora mismo. Construido como `search_cnig_femicidios`
+(`helpers/cnig_client.py`).
+
+---
+
+## Decimocuarta pasada — ARCOTEL, SGR, SIPA geoportal y resumen de indicadores, MEF/SENAE, MINEDEC, y correcciones a boletín laboral anual/infoMIES/salarios sectoriales (2026-09-03)
+
+### ARCOTEL — reportes estadísticos mensuales y boletín estadístico resueltos
+
+Confirmado en vivo: `www.arcotel.gob.ec` es HTML estático plano (tema
+WordPress "Sitio-32", sin JS/acordeón). **Reportes Estadísticos
+Mensuales** (`/reportes-estadisticos-mensuales/`): serie ene-2017 a
+jun-2026, ~2 meses de rezago (mejor que el ~4 estimado en la Octava
+pasada). **Boletín Estadístico** (`/boletines-estadisticos/`, URL no
+confirmada en el pase anterior — `/boletin-estadistico/` redirige aquí):
+serie anual/temática 2015-2024. Ambas solo PDF, sin login/captcha.
+Construido como `search_arcotel_reportes_mensuales`/
+`search_arcotel_boletines` (`helpers/arcotel_client.py`).
+
+### SGR — Informes de Situación (SITREP) y Biblioteca resueltos
+
+`gestionderiesgos.gob.ec` (sitio WordPress, distinto del backend ArcGIS de
+`helpers/sgr_client.py`) tiene un índice plano de 54 eventos adversos
+2016-2026 con estado (EN CURSO/CERRADO/EN OBSERVACIÓN) — cada evento
+enlaza a su propia página con los PDFs SITREP reales, organizados por
+encabezados Nacional/Provincial/Cantonal (el evento "Época Lluviosa 2026",
+aún abierto, tiene 700+ PDFs). Biblioteca (`/biblioteca/`) es un acordeón
+`download-monitor` (mismo patrón de `helpers/cnig_client.py`) con
+anidamiento real: 19 categorías de primer nivel, varias con subcategorías
+por provincia, ~1660 documentos — resoluciones, planes de contingencia,
+mapas de amenaza y rutas de evacuación por tsunami. Hallazgo real: una
+parte de los enlaces de Biblioteca da 404 en vivo, sin patrón claro por
+rango de id ni categoría — se expone como catálogo candidato, no garantía
+de descarga; el formato se reporta desconocido porque `download.php` no
+lleva extensión. Construido como `search_sgr_sitreps`/
+`get_sgr_sitrep_archivos`/`list_sgr_biblioteca_categorias`/
+`get_sgr_biblioteca_categoria_archivos` (`helpers/sgr_publicaciones_client.py`).
+
+### SIPA — geoportal GeoServer (WMS/WFS) resuelto
+
+El GeoServer real no vive en `/geoserver/*` (eso da 404 genuino de
+Apache) sino en 24 endpoints "virtuales" por workspace
+(`/<categoria>/<store>/wms|wfs`), descubiertos leyendo la config del
+propio visor oficial (`/geovisor/config/dataconfig.js`). 277 capas WMS
+confirmadas en vivo, 257 con WFS `GetFeature` real (una consulta devolvió
+724.971 features con 20+ atributos reales por polígono — zonificación
+agroecológica). `https://` sigue fallando en el handshake TLS,
+reconfirmado. 20 capas son solo-WMS en 4 stores, incluyendo
+`sigtierras/catastro_rural` (predios/construcciones, la más valiosa según
+investigación previa) — WFS está deshabilitado explícitamente en el
+servidor ahí ("Service WFS is disabled"). Gotcha real: el `<Name>` WMS va
+sin prefijo pero el `<Name>` WFS lleva el prefijo del *store*, no de la
+categoría — el cliente empareja por nombre base. Construido como
+`search_sipa_geoportal_capas`/`get_sipa_geoportal_capa_datos`
+(`helpers/sipa_geoportal_client.py`), mismo patrón que
+`helpers/inamhi_client.py`.
+
+### SIPA — Resumen de Indicadores Sectoriales resuelto, los otros 6 ítems del tablero son callejones sin salida
+
+De los siete ítems nombrados bajo "tablero-dinámico/indicadores-sectoriales"
+(hallazgo de 2026-08-31), seis resultaron callejones sin salida:
+"Indicador Agroeconómico", "Indicador Agrosocial" y el tablero de
+"Rendimientos Objetivos" son embeds genuinos de **Tableau Server**
+(`bi.mag.gob.ec`, vía `servicios.mag.gob.ec/tableros/...` con JWT firmado)
+— reproducirlo exige decodificar el protocolo de Tableau, esfuerzo
+comparable al de `helpers/sut_powerbi_client.py`, fuera de alcance.
+"Panorama Agroeconómico", "Atlas Agroeconómico" y "Hoja de Balance de
+Alimentos" están cada uno atrapados en un flipbook JS de `fliphtml5.com`
+con `bookConfig` codificado — confirmado en vivo para los tres. Pero la
+misma página tiene un séptimo ítem no nombrado originalmente, **"Resumen
+de Indicadores"**, que sí es real: una página Joomla estática con PDFs
+mensuales directos, 2018-2026 confirmado en vivo (convención de nombre de
+archivo distinta en 2018 vs. 2019+, cada año en su propia URL). Construido
+como `get_sipa_resumen_indicadores`
+(`helpers/sipa_resumen_indicadores_client.py`).
+
+### MEF/SENAE — archivo fiscal corriente y recaudación aduanera resueltos
+
+`finanzas.gob.ec/estadistica-nueva-metodologia-2017-2022/` redirige a
+`www.economicoproductivo.gob.ec/...` (el host viejo presenta un
+certificado TLS para el dominio nuevo, mismatch real). No es un solo
+workbook como asumía el pase de la Quinta pasada — es un archivo corriente
+de 76 XLSX reales (Ingresos y Gastos, Activos y Pasivos, BLL, Financiamiento
+SPNF), publicaciones 2025-01 a 2026-09, metodología GFSM. Se agregó también
+SENAE (`www.aduana.gob.ec/de-interes/tributos-recaudados/` — sin `www` no
+resuelve): 60 archivos confirmados, sin cambios desde el pase anterior
+(2012-2021, ADVALOREM/FODINFA/IVA/ICE/OTROS TRIBUTOS/TOTALES) — incluido
+pese a estar desactualizado porque es la única fuente con desglose por
+tipo de gravamen. Ambos expuestos vía `search_mef_fiscal(fuente="mef"|"senae")`
+(`helpers/mef_fiscal_client.py`). Ojo con el alcance:
+"Arancelarios"/"ADVALOREM" son solo el arancel, más chico que la
+"recaudación aduanera" total que cita la prensa.
+
+### MINEDEC — registro histórico de matrícula resuelto
+
+`educacion.gob.ec/datos-abiertos-minedec/` (WordPress/Elementor, no CKAN)
+expone 5 archivos reales, no los 2 implicados por el patrón de nombre
+asumido antes: dos registros XLSX grandes
+(`...2009-202X-Inicio.xlsx` ~139 MB — "202X" es un placeholder literal en
+el nombre real, no un año — y `...2009-2024-Fin.xlsx` ~31 MB), un metadato
+por cada uno y un diccionario de datos compartido, todos con
+`Last-Modified` 2026-04/05 — vigente. El archivo de metadato "Fin" tiene
+dos inconsistencias reales en su propio nombre (dice "MINEDUC" en vez de
+"MINEDEC", y el rango de años está truncado). Distinto de la cobertura
+CKAN ya existente de SENESCYT/educación superior. Construido como
+`search_minedec_matricula` (`helpers/minedec_client.py`).
+
+### Ministerio del Trabajo — Boletín Estadístico Anual, corrección al diagnóstico de "timeout"
+
+El diagnóstico previo de "timeout" era impreciso: la página índice
+(`trabajo.gob.ec/direccion-de-investigacion-y-estudios-laborales/`) viola
+HTTP/1.1 con cabeceras `Transfer-Encoding` duplicadas (httpx/h11 la
+rechaza correctamente por seguridad; `curl` la tolera) — un bug real del
+WAF del origen (Citrix NetScaler), no un timeout. El dominio raíz
+`trabajo.gob.ec` además falla por certificado (`*.trabajo.gob.ec` no cubre
+el apex; usar `www.`). Con la página en vivo inutilizable, un snapshot de
+Wayback Machine de enero 2024 (accesible esta pasada) reveló una tercera
+edición (2021) y reconfirmó el nombre exacto de 2020 — las tres
+(2020/2021/2022) reverificadas en vivo hoy. La página índice actual solo
+enlaza ya la edición 2022, aunque 2020/2021 siguen descargables. No se
+halló ninguna edición 2023-2025 pese a búsqueda en la API REST del propio
+sitio y variantes de nombre de archivo plausibles — cobertura marcada
+explícitamente como incompleta (3 ediciones, no la serie completa).
+Construido como `search_trabajo_boletin_anual`
+(`helpers/trabajo_boletin_anual_client.py`, lista fija sin scraping en
+vivo).
+
+### MIES/infoMIES — correcciones a "bases mensuales" y nueva serie de boletines zonales consolidados
+
+"Bases mensuales" solo aplica al año en curso — todo año cerrado
+(2019-2025) tiene un único archivo (diciembre), no 12, confirmado
+reverificando en vivo cada año de ambas series (Aseguramiento No
+Contributivo, Usuarios del SIIMIES). Se encontró además una serie nueva no
+vista antes, "Reporte Boletines Zonales"
+(`reportes-boletines-zonales-{año}`), un XLSX consolidado por año,
+2021-2026, **aún actualizándose** (a diferencia de los boletines zonales
+por zona, descontinuados desde 2021 y confirmados `.rar` vía HEAD). La URL
+real de los boletines zonales por zona difiere de la adivinada en el pase
+anterior. Construido como `search_infomies_bases_mensuales`/
+`search_infomies_boletines_zonales` (`helpers/infomies_client.py`).
+
+### Salarios mínimos sectoriales — veredicto "débil" de la Octava pasada revertido
+
+El hallazgo nuevo: `trabajo.gob.ec/biblioteca/` (a diferencia de
+`/salario-basico/` y `/tablas-sectoriales/`, que siguen sin responder) sí
+carga — una página estática de ~2.3 MB con toda la biblioteca legal del
+ministerio, cada documento real con un enlace estable
+`download.php?id=<N>`, lo que sí permite enumerar por texto del título.
+Confirmado en vivo: una entrada por año 2020-2025 (la mayoría con
+XLS/XLSX y PDF del anexo firmado), nada antes de 2020, y sin tabla 2026 —
+el Acuerdo MDT-2025-195 (2025-12-15) solo fijó el SBU en USD 482, la tabla
+sectorial de 2025 sigue vigente por inacción según prensa (El Universo, El
+Diario). Construido como `search_salarios_sectoriales`
+(`helpers/salarios_sectoriales_client.py`).
+
+---
+
+## Infraestructura operativa
+
+### Smoke test diario end-to-end (`.github/workflows/smoke.yml`, construido 2026-08-31)
+
+`.github/workflows/smoke.yml` ejecuta diariamente `scripts/smoke_e2e.py`
+(~39 de 68 tools cubiertos, antes 13, más 3 cadenas dinámicas list→get que
+descubren un ID real en vivo para SUT/Superbancos/IG-EPN en vez de fijar
+uno que pueda quedar obsoleto) contra un servidor recién levantado,
+separado de `ci.yml` (que solo corre tests unitarios con HTTP mockeado en
+cada push). GitHub avisa por correo a quienes ven el repo cuando una
+ejecución programada falla — sin infraestructura de alertas nueva. Desde
+2026-08-31 reintenta fuentes externas conocidas y distingue `degraded`
+(CKAN con bloqueo regional o TLS de CENACE) de un fallo duro del servidor;
+el resumen de Actions muestra las fuentes afectadas. Pendiente: alertas
+específicas de cambio de esquema.
+
+### `helpers/tls.py` — fallback "OS trust store" reemplazado por CA intermedia embebida (2026-09-02)
+
+El smoke test diario falló en vivo (`get_cenace_tablero`, ejecución del
+2026-09-02T13:38 en GitHub Actions) con `CERTIFICATE_VERIFY_FAILED`.
+Diagnóstico con `openssl s_client`: `cenace.gob.ec`/`censoecuador.gob.ec`
+(Sectigo "Public Server Authentication CA DV R36") y `superbancos.gob.ec`
+(mismo emisor, variante "OV R36") nunca envían su CA intermedia en el
+handshake — un error real de configuración del servidor, no un
+certificado roto. El fallback anterior (`ssl.create_default_context()` sin
+`cafile`, "OS trust store") funcionaba en una máquina de desarrollo
+(Windows/macOS completan la cadena automáticamente vía la extensión AIA)
+pero fallaba igual en un runner Linux limpio de GitHub Actions, que no
+hace ese fetch. Corregido: las dos CAs intermedias (confirmado que ambas
+encadenan a la misma raíz ya confiable en certifi, "Sectigo Public Server
+Authentication Root R46") se descargaron y se embebieron en
+`helpers/certs/sectigo_public_server_auth_intermediates.pem`;
+`os_trust_context()` ahora construye el contexto desde `certifi.where()` +
+ese bundle, determinista en cualquier plataforma. Verificado en vivo
+contra los tres hosts tras el cambio. `certifi` pasó a dependencia
+explícita (antes solo transitiva vía `httpx`).
+
+---
+
+## Decimoquinta pasada — `sisdatbi.arconel.gob.ec` confirmado login-gated, CELEC EP evaluado y descartado
+
+**Pedido de Daniel 2026-08-30/2026-09-04:** revisitar los dos ítems abiertos
+del sector eléctrico marcados "sin profundizar" en la Octava pasada.
+
+### `sisdatbi.arconel.gob.ec` — confirmado con VPN, sigue descartado
+
+Desde la red normal de este entorno, el host da **timeout TCP puro** en los
+puertos 80 y 443 (`curl` exit 28, sin handshake TLS, sin respuesta HTTP) —
+parecía caído o renombrado. Con VPN activada (2026-09-04) el host responde
+de inmediato: **es un bloqueo geográfico/por rango de IP del lado del
+servidor, no una caída real ni un dominio movido.** `arconel.gob.ec/
+estadistica-del-sector-electrico/` sigue enlazando `sisdatbi.arconel.gob.ec`
+como "SisdatBI" bajo "Consultas de Infraestructura y Transacciones", junto a
+`reportes.arconel.gob.ec` (ya descifrado, ítem separado) bajo "Bases de
+datos" — confirma que es el mismo enlace vigente, no un dominio obsoleto.
+
+Con VPN: HTTP responde 301 a HTTPS; HTTPS sirve `<title>SISDAT - BI</title>`,
+`<body id="login">`, plantilla AdminLTE, con un único `<form
+class="form-signin">` que pide solo un campo `<input type="password"
+name="txtupass">` (sin campo de usuario visible, sin rol de invitado, sin
+iframe/embed público en el HTML servido). Es una aplicación PHP propia con
+login obligatorio de punta a punta, no un dashboard tipo Power BI con modo
+`reportEmbed` público. **Confirmado, no solo sospechado: descartar
+definitivamente**, sin contenido alcanzable sin credenciales.
+
+### CELEC EP — transparencia/rendición de cuentas evaluado, no se recomienda construir
+
+Las páginas genéricas de transparencia (`celec.gob.ec/lotaip/` y los
+reportes de gestión/financieros/plan-anual a nivel corporativo) son solo
+shells de navegación con 1-5 links cada una. Las páginas sector-específicas
+("Balance Energético Nacional", "Plan Maestro de Electricidad") tienen 1-2
+PDFs estáticos, aparentemente los mismos documentos que CENACE Biblioteca ya
+expone (Plan Maestro de Electricidad 2023-2032 ya catalogado ahí, ver
+Octava pasada) — probable duplicado, no contenido nuevo.
+
+El contenido real y sustancial vive en las páginas LOTAIP **por unidad de
+negocio** (13 unidades: celecsur, cocacodo, electroguayas, hidroagoyan,
+gensur, hidroazogues, hidronacion, hidrotoapi, termoesmeraldas,
+termogasmachala, termomanabi, termopichincha, transelectric), cada una con
+subpáginas por año. Confirmado en vivo: `celec.gob.ec/celecsur/lotaip/
+transparencia-2023/` sola tiene 227 links reales a archivos XLS/XLSX/PDF.
+Pero sigue la estructura literal LOTAIP estándar (organigramas, escalas
+salariales, contratos, auditorías, presupuestos) — la misma que publica
+cualquier institución pública ecuatoriana bajo la Ley Orgánica de
+Transparencia y Acceso a la Información Pública, no información específica
+del sector eléctrico. La cobertura es además inconsistente entre unidades
+(`transelectric/lotaip/` solo tenía 1 link vs. 227 de celecsur).
+
+**Recomendación: no construir.** Un scraper aquí sería de alcance similar a
+SGR Biblioteca (13 unidades × ~6 años × ~20 literales) pero catalogando
+cumplimiento administrativo genérico, no datos del sector eléctrico —
+inconsistente con el criterio del proyecto de integrar solo fuentes que
+aportan detalle sectorial real, no repetir filings de cumplimiento LOTAIP
+que ya existen en cualquier institución.
+
+---
+
+## Decimosexta pasada — otras instancias CKAN municipales, geoportales de "Municipios Abiertos"
+
+**Pedido de Daniel 2026-09-04:** buscar otros portales CKAN ecuatorianos más
+allá de `datosabiertos.gob.ec` (nacional) y `cuencaendatos.cuenca.gob.ec`
+(municipal, ya integrado como `source="cuenca"`).
+
+### `datosabiertos.latacunga.gob.ec` — "Data Mashca", CKAN real confirmado
+
+Encontrado vía búsqueda web ("CKAN Ecuador datos abiertos municipio").
+Confirmado en vivo con la API estándar de CKAN
+(`/api/3/action/package_list`): **15 datasets** — atenciones médicas
+(incluida la del Patronato), catastro predial rural/urbano, adopción y
+esterilización de mascotas 2025, emprendimientos en ferias, graduados del
+CIEDES, inventario de establecimientos turísticos, ordenanzas vigentes
+(marzo 2026), puntos wifi gratuitos, rutas de recolección de desechos,
+sitios patrimoniales arquitectónicos, sitios seguros de evacuación. Mismo
+patrón exacto que Cuenca. **Construido el mismo día**: tercera entrada en
+`helpers/ckan_client._SOURCES` (`source="latacunga"`) más las URLs
+correspondientes en `helpers/env_config.py` — ningún cliente nuevo, los
+tools genéricos (`search_datasets`, `list_dataset_resources`,
+`preview_resource_data`, etc.) ya soportaban múltiples fuentes CKAN vía el
+parámetro `source`, así que solo hizo falta extender el diccionario de
+fuentes y las 13 docstrings que enumeran los valores válidos de `source`.
+Verificado en vivo extremo a extremo (`search_datasets(query="catastro",
+source="latacunga")` → 3 resultados reales).
+
+### Municipios que NO tienen CKAN en el patrón `datosabiertos.<ciudad>.gob.ec`
+
+Probado en vivo (`curl` contra `/api/3/action/package_list`, timeout 10s):
+Riobamba, Portoviejo, Ambato, Guayaquil, Loja, Ibarra, Machala,
+Esmeraldas — los ocho dieron timeout de conexión (sin servidor en ese
+subdominio), no un error HTTP. No se puede descartar que tengan un CKAN
+en otra URL, pero no siguen el patrón de Cuenca/Latacunga.
+
+### `municipiosabiertos.gob.ec` — directorio de "buenas prácticas" de gobierno abierto municipal
+
+Sitio WordPress (Fundación Datalat + AME + FCD + apoyo USAID/NED, parte
+del 2do Plan de Acción de Gobierno Abierto Ecuador). Expone un custom post
+type `buenas-practicas` vía su API REST
+(`/wp-json/wp/v2/buenas-practicas?per_page=100`, confirmado `X-WP-Total:
+20`, una sola página) — catálogo completo de 20 iniciativas municipales de
+gobierno abierto/datos abiertos, útil como directorio para futuras pasadas
+en vez de tener que descubrir cada portal por separado. Ninguna de las
+entradas trae un link directo al portal en el HTML (`href` ausente en casi
+todos los posts) — el nombre de cada práctica hay que resolverlo a mano a
+una URL real. Relevantes, pero **ninguno es CKAN** — son geoportales
+(GeoServer/ArcGIS, mismo patrón ya usado para INAMHI/SIPA) o páginas
+WordPress descriptivas sin catálogo real detrás:
+
+- **Geoportal Quito** — geovisualizador + descargas + ráster + mapoteca,
+  cobertura política-administrativa/ambiente/riesgos/movilidad/turismo/
+  cultura. `gobiernoabierto.quito.gob.ec` (el portal "Gobierno Abierto
+  Quito" enlazado desde el directorio) es WordPress puro, sin catálogo
+  CKAN ni API propia — solo páginas descriptivas del modelo de gobierno
+  abierto y un enlace de salida al geoportal real. Quito declara haber
+  tenido "la primera plataforma de datos abiertos del país" en 2014, pero
+  no se encontró un catálogo vivo en la URL esperada
+  (`datosabiertos.quito.gob.ec`/`datos.quito.gob.ec`: ambas sin DNS) —
+  posible plataforma descontinuada o migrada a otra URL no descubierta
+  todavía.
+- **Geoportal Riobamba**, **Fénix Geoportal** (Portoviejo, ligado a la
+  Ordenanza Plan Portoviejo 2035), **Geoportal Servicios Virtuales**
+  (Ambato — catastro predial, POT/PUGS, contenedores, rutas de buses,
+  gestión de riesgos, obras públicas) — mismo patrón: visor geoespacial
+  municipal, sin más detalle de URL confirmado en esta pasada.
+- **Visor georeferenciado de obras públicas** — sin institución identificada
+  en el título, contenido describe búsqueda por zona/parroquia/barrio/
+  estado de obra.
+- Cuatro entradas de "Gobierno Abierto"/"Portal de Gobierno Abierto" (Quito
+  x2, Riobamba, Cuenca) son solo páginas institucionales sobre el modelo de
+  gestión (ordenanzas, comités, planes de acción), no fuentes de datos.
+
+**Conclusión:** el único hallazgo CKAN nuevo y accionable de esta pasada es
+Latacunga. Los geoportales municipales (Quito/Riobamba/Portoviejo/Ambato)
+son candidatos reales pero de un tipo distinto (WMS/WFS, no CKAN) — cada
+uno necesitaría su propia pasada de investigación (confirmar URL exacta del
+GeoServer/ArcGIS REST, capas disponibles) antes de decidir si vale la pena
+construirlos, siguiendo el mismo patrón que `helpers/inamhi_client.py`/
+`helpers/sipa_geoportal_client.py`.
+
+---
+
+## Decimoséptima pasada — soporte de lectura `.xlsb`
+
+**Pedido de Daniel 2026-09-04:** cerrar el pendiente técnico anotado en la
+Séptima pasada — `.xlsb` (Excel Binary Workbook) no estaba soportado por
+`helpers/csv_reader.py`.
+
+**Construido:** `preview_xlsb()` (vía `pyxlsb`), siguiendo el mismo patrón
+que `preview_xls`. Verificado en vivo extremo a extremo contra el archivo
+real que motivó el pendiente
+(`registrocivil.gob.ec/wp-content/uploads/downloads/2025/05/
+Defunciones_Generales_act_11_MAY_2025.xlsb`, 9.3 MB, descargado y parseado
+completo fuera del límite del preview para confirmar la lectura): hoja
+única `DEFUNCIONES`, encabezados reales (`ZONA`, `PROVINCIA`, `CANTÓN`,
+`PARROQUIA`, `FECHA DEFUNCIÓN`, `MES`, `DÍA`, ...), primera fila de datos
+real (`ZONA 8`, `GUAYAS`, `PEDRO CARBO`, ...). Fechas llegan como número de
+serie de Excel crudo (44114.0), sin convertir — mismo comportamiento que
+`preview_xls` ya tiene para fechas, no una regresión nueva.
+
+**Hallazgo real, no anticipado en la nota original:** `.xlsb` es en
+realidad un contenedor ZIP (registros BIFF12 en vez de XML, pero mismo
+formato de contenedor que XLSX) — así que hereda exactamente el mismo modo
+de falla que un `.zip` truncado: el índice central del ZIP vive al final
+del archivo, así que una descarga cortada en el límite de 5 MB no puede
+abrirse en absoluto (`zipfile.BadZipFile: File is not a zip file`),
+confirmado en vivo recortando el archivo real de 9.3 MB a 5 MB. Se agregó
+el mismo chequeo de truncamiento *antes* de intentar parsear que ya existe
+para `.zip` (`preview_zip`), con el mismo mensaje accionable.
+
+**Resuelto el mismo día (segunda parte del pedido):** el dataset de
+defunciones que motivó todo el pendiente seguía sin poder previsualizarse
+—9.3 MB superaba el límite de descarga de 5 MB, que hasta ahora era único
+para todo el proyecto. Como `.xlsx`/`.xlsb`/`.ods` son los tres contenedores
+ZIP del proyecto (índice central al final del archivo), truncar su
+descarga no es una degradación útil como en un CSV — es una falla total
+garantizada. Se agregó un parámetro `max_bytes` explícito a
+`download_bytes()`/`_download()` (por defecto sigue en `MAX_DOWNLOAD_BYTES`,
+5 MB, para todo lo demás) y los tres previsualizadores de contenedor ZIP
+ahora piden `_MAX_DECOMPRESSED_BYTES` (20 MB — el mismo techo que ya usaba
+`_gunzip_capped` para límite de descompresión, reutilizado como techo de
+descarga en vez de inventar un número nuevo). **Verificado en vivo
+extremo a extremo contra el archivo real de 9.3 MB**: ahora se
+previsualiza con datos reales (`DEFUNCIONES`, encabezados y primera fila
+reales, 20 filas devueltas). `download_resource` sigue siendo la vía para
+bajar el archivo completo si hiciera falta más de una previsualización.
+
+Wired en los tres puntos de despliegue por formato que existen en el
+proyecto (`tools/preview_resource_data.py`, `tools/investigate_dataset.py`,
+`tools/detect_series_pattern.py`) — cada uno mantiene su propio dict de
+despacho por `kind`. De paso se encontró que `detect_series_pattern.py`
+nunca tuvo `ODS` en su propio dispatch (aunque `classify_resource_format`
+sí lo reconoce) — un `KeyError` crudo pendiente desde antes, no introducido
+en esta pasada; se corrigió con el mismo guard defensivo que ahora protege
+cualquier formato reconocido-pero-no-despachado, en vez de agregar soporte
+completo de ODS a ese archivo específico (fuera de alcance de este
+pendiente).
+
+---
+
+## Decimoctava pasada — LDLE agregado a INEC, SRI Saiku removido (2026-09-05)
+
+**LDLE.** Pedido de Daniel: investigar varias siglas de fuentes nuevas
+(CEAACES/CES cierre y planes de contingencia, SNIESE, RAS, LDLE, y una
+quinta pedida como "acess registration" que resultó ser el registro
+sanitario de ARCSA). De las cinco:
+
+- **RAS** = "Recursos y Actividades de Salud" de INEC — ya cubierto sin
+  código nuevo: `search_inec_estadisticas(query="salud")` ya lo lista y
+  `get_inec_estadistica_files` ya devuelve sus 15 archivos reales
+  (SPSS/R/XLSX/ZIP, metodología, formulario).
+- **LDLE** ("Laboratorio de Dinámica Laboral y Empresarial", INEC+IESS,
+  `ecuadorencifras.gob.ec/laboratorio-de-dinamica-laboral-y-empresarial/`)
+  **no** aparecía en `search_inec_estadisticas` (0 resultados para
+  "laboratorio"/"dinamica") pese a que `get_inec_estadistica_files` ya
+  parseaba su página correctamente al recibir la URL directa — el gap era
+  puramente de descubrimiento (no está linkeada desde ninguno de los dos
+  menús semilla de `_SEED_PAGE_URLS`), no de parsing. Agregada a
+  `_EXTRA_TOPICS` en `helpers/inec_client.py`, mismo patrón que el
+  Geoportal DPA ya existente ahí. El total de temas pasa de ~90 a ~91.
+- **SNIESE** — sin dataset masivo propio (es un registro interno). El
+  contenido real es `educacion.gob.ec/edusuperior/biblioteca/` (1,259
+  documentos WordPress `download-monitor`, ya documentado en la sección
+  SENESCYT/MINEDEC de este archivo) — reachable pero nunca construido
+  como tool; queda pendiente.
+- **CEAACES/CES cierre y contingencia** — resuelto a
+  `ces.gob.ec/lotaip/AAAA/Mes/...` (resoluciones RPC-SO-XX-No.XXX,
+  patrón LOTAIP-por-categoría-legal ya visto en IESS/Contraloría); queda
+  pendiente.
+- **"acess registration"** = registro sanitario de ARCSA. Confirmado en
+  vivo: `controlsanitario.gob.ec/base-de-datos/` responde 200 (el ROADMAP
+  lo tenía marcado "caído" desde la Décima pasada) — la falla anterior era
+  un `curl`/`httpx` sin User-Agent identificable, no una caída real del
+  dominio: con `helpers.user_agent.USER_AGENT` responde 200 sin problema.
+  **Construido el mismo día:** `helpers/arcsa_client.py` +
+  `list_arcsa_categorias`/`get_arcsa_categoria_archivos`, reutilizando
+  literalmente la misma lógica de parsing que
+  `helpers/sgr_publicaciones_client.py`'s Biblioteca (`ul-downloads`/
+  `li-gray1`/`download-monitor`, confirmado byte a byte que es el mismo
+  plugin WordPress) — solo cambia el dominio verificado
+  (`controlsanitario.gob.ec`). Confirmado en vivo contra la página real:
+  27 categorías top-level, 77 archivos, 9 sub-categorías anidadas un nivel
+  (la mayoría por año, ej. "Inspecciones en Establecimientos
+  Farmacéuticos Controlados" > 2016-2023), 2 categorías vacías (0
+  archivos, listadas igual por ser parte genuina de la estructura de la
+  página). Un nombre de categoría se reproduce tal cual viene en el HTML
+  aunque parezca un typo: "+NotiAlertas - Farmacovigilancia" trae un "+"
+  literal en el texto, aparte del ícono "+" que antecede a toda categoría
+  — confirmado leyendo el markup crudo, no es un artefacto del parser.
+
+**SRI Saiku removido.** Pedido de Daniel: reverificar en vivo el pendiente
+de la Décima pasada ("falta verificación contra el endpoint vivo"). Falló
+de forma consistente (2 intentos con horas de diferencia) desde **tres**
+entornos independientes: el servidor MCP desplegado
+(`list_sri_saiku_cubes` → "Server disconnected without sending a
+response"), `curl` local contra `srienlinea.sri.gob.ec/saiku/rest/saiku/
+session` (`schannel: server closed abruptly`), y navegación de browser
+real contra el dominio raíz `srienlinea.sri.gob.ec/` (denegada/fallida).
+No es el gap de conectividad puntual que se sospechaba antes — el dominio
+completo parece inalcanzable en este momento, no solo la ruta de Saiku.
+Por indicación explícita de Daniel ("try again, then if not, remove"), se
+removieron `helpers/sri_saiku_client.py`, los tres tools
+(`list_sri_saiku_cubes`, `describe_sri_saiku_cube`,
+`query_sri_saiku_aggregate`), su registro en `tools/__init__.py`, sus
+menciones en `resources/catalog.py`/`tools/list_capabilities.py`/
+`docs/TOOLS.md`, y se actualizó el conteo de tools (103→100) en
+`CLAUDE.md` y `docs/MCP_ARCHITECTURE.md` (con nota fechada en vez de
+reescribir los conteos históricos de esa página). Si el dominio vuelve a
+responder más adelante, reconstruir desde este mismo punto — la lógica de
+sesión anónima/discovery/query ya estaba resuelta, el bloqueo es
+puramente de alcanzabilidad de red.
+
+## Decimonovena pasada — CNE reevaluado, WAF caracterizado a fondo (2026-09-06)
+
+Pedido explícito de Daniel del 2026-09-04 (registrado en el ROADMAP):
+reevaluar si el bloqueo de Incapsula en `cne.gob.ec` aplica a todo el
+dominio o solo al micrositio de resultados marcado en la Sexta pasada, y
+si hay datasets alcanzables fuera de la zona bloqueada.
+
+**El bloqueo es de todo el dominio, a nivel de challenge JS de Incapsula —
+no de un micrositio ni de un simple filtro de User-Agent.** Confirmado con
+tres clientes:
+
+- `curl` (build de Windows/schannel de este entorno) falla el *handshake*
+  TLS contra `cne.gob.ec` con `SEC_E_ILLEGAL_MESSAGE`/
+  `CRYPT_E_NO_REVOCATION_CHECK` — pero el segundo error también aparece
+  contra `google.com` y `datosabiertos.gob.ec`, así que es una limitación
+  de este entorno con OCSP, no evidencia de bloqueo específico de CNE.
+- `httpx` (Python, sin necesidad de TLS especial) sí conecta, y recibe
+  consistentemente un 403 con el cuerpo característico de Incapsula
+  (`<script src="/_Incapsula_Resource?...">` + iframe "Request
+  unsuccessful. Incapsula incident ID: ...") — probado contra `/`,
+  `/estadisticas/bases-de-datos/`, y directamente contra un enlace de
+  descarga real (`/download/segunda-vuelta-2/?wpdmdl=57399`). Se repitió
+  con un User-Agent de Chrome completo y headers `Accept`/
+  `Accept-Language` realistas — sin diferencia, sigue siendo 403. Es un
+  challenge JS que un cliente sin motor de JavaScript no puede resolver,
+  no una verificación de cabecera.
+- El navegador real (`mcp__Claude_Browser`, Chromium con JS) sí logra
+  pasar el challenge — pero de forma inconsistente: la primera navegación
+  a `cne.gob.ec` devolvió el mismo iframe de Incapsula ("Request
+  unsuccessful") que ve `httpx`; una segunda navegación a una URL interna
+  (`/estadisticas/bases-de-datos/`) cargó la página completa sin
+  problema. Consistente con un WAF que puntúa por reputación de IP/sesión
+  en vez de bloquear de forma binaria — no hay una URL "segura" fija.
+
+**Contenido real confirmado detrás del challenge, vía navegador.** La
+página `/estadisticas/bases-de-datos/` es un WordPress con el plugin WP
+Download Manager (WPDM), con un acordeón de un nivel superior por proceso
+electoral (Elecciones Generales 2025, Referéndum 2024, ... hasta
+Elecciones Generales 2002 — 19 procesos listados). Cada proceso es a su
+vez una categoría WPDM con subcategorías; para "Elecciones Generales
+2025" las subcategorías son Diccionarios, Organizaciones Políticas,
+Registro Electoral y Resultados, y "Resultados" lista archivos reales
+descargables (ej. "Segunda Vuelta", 703.80 KB, con contador de
+1,245 descargas).
+
+**El acordeón está roto para cualquier visitante, no solo para scraping —
+hallazgo colateral.** El sitio se queda en "Loading…" indefinidamente
+porque el propio parche JS de CNE (comentario inline "CNE WPDM FIX
+v1.0.2") que dispara la carga AJAX solo se activa si la URL contiene
+`/informacion-publica-lotaip` o `/secretaria/orden-del-dia`, o si el DOM
+tiene los selectores `.accordion-groups .accord-handle`/
+`.w3eden .accord-handle` — ninguna de esas condiciones se cumple en
+`/estadisticas/bases-de-datos/`, así que el fix nunca corre ahí. El
+endpoint WPDM nativo que ese parche llama sí funciona igual reproducido a
+mano, sin el fix:
+
+```
+GET https://www.cne.gob.ec/?wpdmactask=listsub&orderby=date&order=DESC
+    &acccount=1&sac=default&linktpl=link-template-default-wdc&showsub=1
+    &__wpdmacn=<nonce>&parent=<id_categoria_wpdm>
+```
+
+El `<nonce>` (`__wpdmacn`) se extrae de un `<script>` inline de la página
+ya cargada (patrón `__wpdmacn=([a-zA-Z0-9]+)`); `parent` es el `rel` del
+enlace del acordeón (ej. `8325` para "Elecciones Generales 2025", que a su
+vez devuelve subcategorías con sus propios `rel` como `8329` para
+"Resultados"). Esta llamada solo se pudo ejecutar dentro de la sesión del
+navegador real (mismo origen, cookies de Incapsula ya resueltas) — no se
+probó ni se espera que funcione contra `httpx` sin pasar antes el
+challenge.
+
+**Veredicto: sigue fuera de alcance para un backend Python puro.** El
+403/challenge de Incapsula cubre el dominio completo, incluyendo el
+enlace de descarga final, no solo el HTML de listado — confirmado que
+`httpx` recibe el mismo challenge contra `?wpdmdl=57399` directamente. Sin
+un navegador real ejecutando JS (Playwright o similar) no hay forma de
+obtener las cookies de sesión que el WAF exige, y este proyecto no tiene
+esa dependencia en ningún otro helper (todos usan `httpx`, ver
+`CLAUDE.md`). Agregar Playwright solo para CNE es una dependencia pesada
+y nueva para el proyecto — decisión pendiente de Daniel antes de
+construir `helpers/cne_client.py`. Si se decide seguir, la estructura de
+datos (procesos electorales 2002-2025 × subcategorías × archivos WPDM) y
+el endpoint `wpdmactask=listsub` ya están mapeados en esta pasada, listos
+para reutilizar.
+
+## Vigésima pasada — `reportes.arconel.gob.ec` mapeado a nivel de protocolo, pendiente construir (2026-09-06)
+
+Pedido de Daniel: avanzar el sector eléctrico, específicamente
+`reportes.arconel.gob.ec` (marcado "descifrado, falta construir" desde la
+Séptima pasada). Esta pasada fue solo de reconocimiento en vivo (browser
+real, instrumentando `XMLHttpRequest.prototype.send` para capturar el
+payload exacto de cada postback) — **no se escribió código todavía**, por
+decisión explícita de Daniel al final de la pasada (ver "Decisión" al
+final de esta sección).
+
+**Flujo de sesión completo, confirmado byte a byte.** Es un ASP.NET
+WebForms clásico con `ScriptManager`/`UpdatePanel` (MS AJAX, no JSF como
+BIINEC/IG-EPN) más un control **Microsoft ReportViewer 11.0.3452.0**. Los
+tres filtros (`ctl00$dpTipo`, `ctl00$dpAnio`, `ctl00$dpGrupoEmpresa`) y el
+opcional `ctl00$dpMes` disparan `__doPostBack` en su `onchange`; cada uno
+debe enviarse como un POST separado y secuencial a `https://reportes.
+arconel.gob.ec/` (no hay atajo para fijar los cuatro de una sola vez) con
+este cuerpo (URL-encoded):
+
+```
+ctl00$ScriptManager1=ctl00$UpdatePanel1|<campo_que_cambió>
+ctl00$dpTipo=<texto exacto de la opción, ej. "Balance Energía">
+ctl00$dpAnio=<año o "0">
+ctl00$dpMes=<mes 1-12 o "0">
+ctl00$dpGrupoEmpresa=<"0"|"1" Todos|"2" CNEL|"3" Empresas Eléctricas>
+ctl00$txtObservacion=
+ctl00$contenidoCentro$ReportViewer1$ctl03$ctl00=
+ctl00$contenidoCentro$ReportViewer1$ctl03$ctl01=
+ctl00$contenidoCentro$ReportViewer1$ctl10=
+ctl00$contenidoCentro$ReportViewer1$ctl11=standards
+ctl00$contenidoCentro$ReportViewer1$AsyncWait$HiddenCancelField=False
+ctl00$contenidoCentro$ReportViewer1$ToggleParam$store=
+ctl00$contenidoCentro$ReportViewer1$ToggleParam$collapse=false
+ctl00$contenidoCentro$ReportViewer1$ctl08$ClientClickedId=
+ctl00$contenidoCentro$ReportViewer1$ctl07$store=
+ctl00$contenidoCentro$ReportViewer1$ctl07$collapse=false
+ctl00$contenidoCentro$ReportViewer1$ctl09$VisibilityState$ctl00=None
+ctl00$contenidoCentro$ReportViewer1$ctl09$ScrollPosition=
+ctl00$contenidoCentro$ReportViewer1$ctl09$ReportControl$ctl02=
+ctl00$contenidoCentro$ReportViewer1$ctl09$ReportControl$ctl03=
+ctl00$contenidoCentro$ReportViewer1$ctl09$ReportControl$ctl04=100
+__EVENTTARGET=ctl00$<campo_que_cambió>
+__EVENTARGUMENT=
+__LASTFOCUS=
+__VIEWSTATE=<del paso anterior>
+__VIEWSTATEGENERATOR=<constante de la sesión>
+__EVENTVALIDATION=<del paso anterior>
+__ASYNCPOST=true
+```
+
+Todos los campos deben reenviarse en cada POST (incluido `ctl00$dpMes`
+aunque esté `disabled` — el control ReportViewer arma el body iterando
+`form.elements` a mano, no vía `FormData` del navegador, así que sí lo
+incluye incluso deshabilitado). El GET inicial a `/` siembra
+`__VIEWSTATE`/`__VIEWSTATEGENERATOR`/`__EVENTVALIDATION` desde atributos
+`value="..."` normales en el HTML; de ahí en adelante **cada respuesta
+llega en el formato "delta" de MS AJAX**, no HTML de página completa:
+bloques `<largoEnBytes>|<tipo>|<id>|<contenido>|` concatenados sin
+separador fijo entre bloques (el largo es el delimitador real, no buscar
+un cierre). Los bloques `hiddenField` traen como `id` el nombre exacto del
+campo (`__VIEWSTATE`, `__EVENTVALIDATION`, etc.) y como contenido su valor
+nuevo — alcanza con parsear estos bloques genéricamente para tener todo lo
+necesario para el siguiente POST, sin tocar HTML para eso. Confirmado
+parseable sin `BeautifulSoup`/`lxml` (que este proyecto no usa en ningún
+helper, ver `igepn_informes_client.py`) con un parser de bloques por
+longitud, no regex sobre el HTML.
+
+**`dpMes` cambia de habilitado/deshabilitado según el tipo de reporte,
+confirmado en vivo con dos casos reales:** deshabilitado para "Balance
+Energía" (reporte ya anual/mensual embebido en la tabla vía columna "Mes",
+no filtrable), habilitado para "Medidores Catastro". Un cliente tiene que
+detectar esto leyendo el HTML del `UpdatePanel1` devuelto tras el postback
+de `dpTipo` (buscar `disabled="disabled"` junto a `id="dpMes"`), no
+asumirlo fijo por nombre de reporte.
+
+**"Generar Reporte" es un botón `type="submit"` normal, sin `onclick`**
+— dispara el mismo tipo de postback delta (sin `__EVENTTARGET`, en cambio
+se incluye `ctl00$contenidoCentro$brtGenerar=Generar Reporte` en el body).
+La respuesta a este POST trae varios bloques `updatePanel` a la vez,
+incluido uno enorme (`ctl00_contenidoCentro_ReportViewer1_ctl09_
+ReportArea`, ~220 KB en la prueba real) con la tabla del reporte ya
+renderizada como HTML por el motor SSRS del lado servidor.
+
+**La tabla real está enterrada bajo envoltorios 1×1, no es el primer
+`<table>` del fragmento.** Estructura confirmada navegando el DOM real:
+`table > tr > td > table` (envoltorio, 1 fila×1 celda) → recién en el
+segundo nivel aparece la grilla real (50 filas × 37 celdas en la prueba de
+"Balance Energía" 2023/Todos). La primera fila de la grilla real es un
+separador vacío (todas las celdas ""), la segunda es el encabezado real
+("Id Empresa", "Empresa", "Tipo Empresa", "Año", "Id Mes", "Mes", más ~30
+columnas de energía/pérdidas), y de ahí en adelante los datos (ej. fila
+real: `E.E. Ambato, Distribuidora, 2023, 1, Ene, 64769,242139, ...`). Los
+valores numéricos usan coma decimal sin separador de miles (ej.
+`5,1664676821650855`), igual que el resto de fuentes ecuatorianas ya
+documentadas. Este anidamiento se puede recorrer de forma genérica sin
+`BeautifulSoup`: extraer bloques de nivel superior de una etiqueta dada
+(contando apertura/cierre de esa misma etiqueta, ignorando qué hay
+adentro) y bajar un nivel mientras la fila tope tenga exactamente 1 celda
+y esa celda tenga exactamente 1 tabla anidada adentro — el mismo truco
+sirve para cualquier tipo de reporte, no es específico de "Balance
+Energía".
+
+**Hallazgo nuevo que la Séptima pasada no había marcado: el reporte está
+paginado (SSRS ReportViewer, "página X de Y"), no todo llega en una sola
+respuesta.** Confirmado en vivo: "Balance Energía" 2023/Todos mostró
+"de 2 ?" páginas (el "?" es el propio ReportViewer indicando que todavía
+no terminó de contar el total exacto). Pasar de página es otro postback
+del mismo tipo, con un botón `<input type="image" name="ctl00$
+contenidoCentro$ReportViewer1$ctl05$ctl00$Next$ctl00$ctl01">` (necesita
+sufijos `.x`/`.y` como cualquier image-submit de ASP.NET) — mismo
+mecanismo que "Generar Reporte", nada nuevo que aprender ahí. **Lo que
+falta confirmar en vivo antes de construir:** el criterio de "última
+página" (¿el botón Next aparece `disabled` en el HTML cuando ya no hay
+más, o hay que comparar el número de página actual contra `TotalPages`
+sabiendo que ese total puede llegar como "N ?" -- incierto -- en vez de un
+número cerrado?). Sin esto confirmado, un cliente corre el riesgo real de
+cortar el reporte a la mitad sin avisar, o de loopear de más; cualquier
+implementación futura debe resolver esto primero, no asumirlo.
+
+**Decisión de Daniel al cierre de esta pasada: documentar el mecanismo,
+no construir el helper todavía.** Se ofrecieron tres alcances (build
+completo con paginación, MVP de una sola página con límite documentado, o
+solo documentar) y se eligió la tercera. Queda como el próximo paso
+natural para `helpers/arconel_reportes_client.py`: toda la mecánica de
+sesión/postback/delta/anidamiento de tabla ya está resuelta y verificada
+en vivo arriba; lo único pendiente de verificar antes de escribir código
+es el criterio de fin de paginación.
+
+---
+
+## Vigésimo primera pasada — AIP Ecuador (eAIP público en IFIS3), y "movimientos por aeropuerto" descartado (2026-09-06)
+
+Pedido de Daniel: seguir buscando fuentes más allá de la integración CKAN
+del sector eléctrico recién cerrada. Se exploró el dominio ya integrado
+`ais.aviacioncivil.gob.ec` (base de `helpers/aviacion_client.py`,
+METAR/NOTAM/SIGMET) más allá de las tres secciones ya cubiertas.
+
+**"Movimientos/vuelos por aeropuerto" (el ítem que estaba en el
+roadmap como "sin explorar") — descartado, no existe como sección
+pública.** El menú principal del IFIS solo expone Aeródromos,
+NOTAM/METAR/SIGMET, Cámaras y AIP sin sesión; cualquier estadística de
+movimientos/vuelos vive detrás de "Planes de vuelo" (`/fpl/*`), que
+`aviacion_client.py` ya documenta como la única sección que exige login.
+No hay una sección de estadísticas de tráfico aéreo separada y pública en
+este dominio.
+
+**Hallazgo real: `/ifis3/` es un eAIP completo, público, servido como
+HTML server-rendered (no SPA, no login) — dominio de datos nuevo y
+sustancial dentro de un host ya confiable.** Confirmado en vivo con
+`curl --ssl-no-revoke` (el intento inicial vía navegador con `navigate`
+directo a la URL falló porque `/ifis3/` enruta client-side desde la
+página raíz, pero una petición HTTP directa a cualquier ruta interna
+sirve HTML completo sin necesitar la sesión del navegador):
+
+```
+GET https://www.ais.aviacioncivil.gob.ec/ifis3/aip/AD%202%20SEQM   -> 200, 172 846 bytes
+GET https://www.ais.aviacioncivil.gob.ec/ifis3/aip/GEN%204.1       -> 200, 137 988 bytes
+```
+
+Estructura confirmada, generada por un motor tipo MediaWiki (anclas
+`#SEQM_AD_2.1_...`, tabla de contenidos automática): tres partes AIP
+estándar OACI —
+
+- **GEN** (generalidades): autoridades, entrada/tránsito/salida de
+  aeronaves y pasajeros, tablas de códigos/abreviaturas/símbolos,
+  servicios (AIS, cartas, ATS, comunicaciones, MET, búsqueda y
+  salvamento), derechos por uso de aeródromos (GEN 4.1).
+- **ENR** (en ruta): reglas de vuelo VFR/IFR, clasificación del espacio
+  aéreo ATS, procedimientos de espera/aproximación/salida, rutas ATS
+  (inferiores/superiores/RNAV), radioayudas, zonas prohibidas/
+  restringidas/peligrosas.
+- **AD** (aeródromos): una página **AD 2.x por cada aeródromo/helipuerto
+  del país** (confirmados: SEGU Guayaquil, SELT Latacunga, SEMT Manta,
+  SEQM Quito como internacionales; más ~15 aeródromos nacionales — SEJD
+  Ahuano, SEAM Ambato, SEGS Baltra, SECA Catamayo, SECO Coca, SECU
+  Cuenca, SEBZ Cumbaratza, SEII Isabela, SEMC Macas, SENL Nueva Loja,
+  SERB Riobamba, SESA Salinas, SEST San Cristóbal, SESV San Vicente,
+  entre otros).
+
+**Cada página AD 2.x trae datos estructurados en tablas numeradas
+(formato ICAO Anexo 15 estándar), no solo prosa** — confirmado en el
+contenido real de SEQM: AD 2.1 (indicador de lugar), AD 2.2 (coordenadas
+ARP en grados/min/seg, dirección/distancia desde la ciudad, elevación/
+temperatura de referencia, ondulación geoidal, variación magnética con
+tasa de cambio anual, administración/teléfonos/AFS del aeródromo, tipos
+de tránsito IFR/VFR permitido), AD 2.3 (horas de funcionamiento por
+dependencia: aduanas, sanidad, AIS, MET, ATS, combustible), y continúa
+hasta ~AD 2.20+ (instalaciones de pasajeros, servicio de salvamento y
+extinción de incendios/categoría RFF, remoción de obstáculos estacional,
+plataforma/calles de rodaje, señales, obstáculos, datos meteorológicos
+suministrados, características físicas de pista, distancias declaradas,
+luces de aproximación/pista, ayudas radioeléctricas de navegación y
+aterrizaje, reglamentación local de tránsito, procedimientos de
+atenuación de ruido, procedimientos de vuelo, información suplementaria).
+Esto es, en esencia, la ficha técnica completa y oficial de cada
+aeródromo ecuatoriano — coordenadas, pista, frecuencias, tarifas, horas
+de operación — en un solo lugar público.
+
+Pestañas adicionales del mismo sistema, sin explorar en detalle esta
+pasada: **AMDT** (registro de enmiendas AIP), **SUP** (suplementos AIP),
+**AIC** (circulares de información aeronáutica) — probablemente PDFs
+descargables por edición/fecha, complementarios al contenido HTML de
+AIP/GEN/ENR/AD.
+
+**Por qué no se construyó ya:** el AIP completo es grande (GEN+ENR+AD
+decenas de subsecciones × ~20 aeródromos) y cada subsección tiene su
+propio layout de tabla; conviene decidir alcance (¿todo el árbol, o solo
+AD 2.x por aeródromo, que es la parte con mayor valor inmediato para un
+caller tipo LLM?) antes de escribir el parser. Candidato fuerte para
+`helpers/aip_client.py` + `tools/get_aip_aerodromo.py` (y opcionalmente
+`search_aip`/`get_aip_seccion` genérico para GEN/ENR), reutilizando
+`download_bytes` y el mismo patrón de limpieza HTML que
+`aviacion_client.py` ya tiene. Nada bloqueante encontrado: sin login, sin
+JS, sin WAF, mismo dominio ya en la allowlist operativa del proyecto.
 
 ---
 

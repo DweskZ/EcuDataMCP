@@ -1,5 +1,5 @@
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import igepn_informes_client
 from helpers.format_out import render_output
@@ -7,7 +7,7 @@ from helpers.logging import log_tool
 from helpers.pdf_reader import MAX_PAGES_PER_CALL, extract_text_from_bytes
 
 
-def register_get_informe_igepn_tool(mcp: FastMCP) -> None:
+def register_get_informe_igepn_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def get_informe_igepn(

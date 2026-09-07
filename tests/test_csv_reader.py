@@ -12,6 +12,7 @@ import pytest
 
 import helpers.csv_reader as csv_reader_module
 from helpers.csv_reader import (
+    _MAX_DECOMPRESSED_BYTES,
     MAX_DOWNLOAD_BYTES,
     _gunzip_capped,
     _parse_csv_bytes,
@@ -21,6 +22,7 @@ from helpers.csv_reader import (
     normalize_eu_decimal_columns,
     preview_ods,
     preview_targz,
+    preview_xlsb,
     preview_zip,
     sniff_content_type,
     strip_geometry_columns,
@@ -404,6 +406,33 @@ async def test_preview_zip_over_5mb_gives_actionable_truncation_message(httpx_mo
 
     with pytest.raises(ValueError, match="supera el límite de 5 MB"):
         await preview_zip(url)
+
+
+async def test_preview_xlsb_over_20mb_gives_actionable_truncation_message(
+    httpx_mock, monkeypatch
+):
+    # .xlsb is a ZIP container too (BIFF12 records instead of XLSX's XML),
+    # so it fails the exact same way as a truncated .zip: confirmed live
+    # that zipfile can't open it at all once the central directory is cut
+    # off. Uses the raised _MAX_DECOMPRESSED_BYTES cap (20MB), not the
+    # default MAX_DOWNLOAD_BYTES (5MB) -- see preview_xlsb's docstring for
+    # why these ZIP-container spreadsheet formats get the higher cap. A
+    # real 9.3MB resource (Registro Civil's "Defunciones Generales") is
+    # comfortably inside 20MB and previews correctly (verified live, not
+    # covered by this test since it needs a real file over the network).
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+
+    # The truncation check happens before any parsing, so the padding
+    # doesn't need to be valid xlsb content -- only its size matters.
+    big_body = b"0" * (_MAX_DECOMPRESSED_BYTES + 10)
+    url = "https://example.com/defunciones.xlsb"
+    httpx_mock.add_response(url=url, content=big_body)
+
+    with pytest.raises(ValueError, match="supera el límite de 20 MB"):
+        await preview_xlsb(url)
 
 
 async def test_preview_zip_with_no_tabular_member_gives_clear_message(httpx_mock, monkeypatch):

@@ -1,5 +1,5 @@
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ckan_client
 from helpers.format_out import render_output
@@ -18,7 +18,7 @@ def _format_size(size: int | None) -> str:
     return f"{size / (1024 * 1024 * 1024):.1f} GB"
 
 
-def register_get_resource_info_tool(mcp: FastMCP) -> None:
+def register_get_resource_info_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def get_resource_info(
@@ -32,7 +32,8 @@ def register_get_resource_info_tool(mcp: FastMCP) -> None:
 
         Args:
             resource_id: The resource UUID
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             format: text | json
         """
         try:

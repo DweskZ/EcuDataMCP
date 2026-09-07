@@ -2,7 +2,7 @@ import asyncio
 from datetime import UTC, datetime
 from functools import partial
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ckan_client, gobec_client, sercop_client, sgr_client
 from helpers.format_out import render_output
@@ -13,7 +13,7 @@ from helpers.text_utils import strip_accents
 _strip_accents = partial(strip_accents, lower=False)
 
 
-def register_search_ecuador_tool(mcp: FastMCP) -> None:
+def register_search_ecuador_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def search_ecuador(query: str, limit: int = 5, format: str = "text") -> str:

@@ -1,6 +1,6 @@
 import json
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers.geo_data import list_cantones, list_parroquias, list_provincias
 
@@ -46,10 +46,15 @@ def _fuentes_payload() -> dict:
                 "tools": _CKAN_TOOLS,
             },
             {
+                "id": "latacunga",
+                "nombre": "Data Mashca (portal municipal CKAN de Latacunga, independiente del nacional)",
+                "base": "https://datosabiertos.latacunga.gob.ec/",
+                "tools": _CKAN_TOOLS,
+            },
+            {
                 "id": "sri",
                 "nombre": (
-                    "SRI: datasets fuera de CKAN, RUC, estadísticas de "
-                    "recaudación y cubos Saiku"
+                    "SRI: datasets fuera de CKAN, RUC y estadísticas de recaudación"
                 ),
                 "base": "https://www.sri.gob.ec/datasets",
                 "tools": [
@@ -57,10 +62,13 @@ def _fuentes_payload() -> dict:
                     "get_sri_ruc_info",
                     "search_sri_ruc",
                     "search_sri_estadisticas_recaudacion",
-                    "list_sri_saiku_cubes",
-                    "describe_sri_saiku_cube",
-                    "query_sri_saiku_aggregate",
                 ],
+            },
+            {
+                "id": "arcsa",
+                "nombre": "ARCSA Base de Registros Emitidos (registro sanitario vigente)",
+                "base": "https://www.controlsanitario.gob.ec/base-de-datos/",
+                "tools": ["list_arcsa_categorias", "get_arcsa_categoria_archivos"],
             },
             {
                 "id": "gobec",
@@ -151,6 +159,9 @@ def _fuentes_payload() -> dict:
                     "compare_bce_sources",
                     "search_bce_iem",
                     "get_bce_iem_table",
+                    "search_bce_publicaciones",
+                    "search_bce_indices",
+                    "get_bce_indice_archivo",
                     "list_bce_indicadores_diarios",
                     "get_bce_indicador_diario",
                     "search_bce_remesas",
@@ -226,7 +237,7 @@ def _fuentes_payload() -> dict:
     }
 
 
-def register_catalog_resources(mcp: FastMCP) -> None:
+def register_catalog_resources(mcp: MCPServer) -> None:
     @mcp.resource(
         "ecuador://fuentes",
         name="fuentes_ecuador",

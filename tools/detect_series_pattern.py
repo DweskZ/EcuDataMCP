@@ -1,7 +1,7 @@
 from functools import partial
 
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ckan_client
 from helpers.csv_reader import (
@@ -9,6 +9,7 @@ from helpers.csv_reader import (
     preview_json,
     preview_targz,
     preview_xls,
+    preview_xlsb,
     preview_xlsx,
     preview_zip,
     sniff_content_type,
@@ -161,10 +162,18 @@ async def _fetch_table(res: dict, session: httpx.AsyncClient) -> dict:
         "TARGZ": preview_targz,
         "ZIP": preview_zip,
         "XLS": preview_xls,
+        "XLSB": preview_xlsb,
         "XLSX": preview_xlsx,
         "JSON": preview_json,
         "CSV": preview_csv,
     }
+    if kind not in dispatch:
+        # classify_resource_format/classify_from_content_type recognize a
+        # few kinds (ODS today) that this function has never dispatched --
+        # a real, pre-existing gap, not something introduced here. Fail
+        # with the same clean message as an actually-unknown format rather
+        # than a raw KeyError.
+        raise ValueError(f"formato '{kind}' reconocido pero no soportado aquí")
     return await dispatch[kind](url, max_rows=_ANALYZE_MAX_ROWS, session=session)
 
 
@@ -186,7 +195,7 @@ def _pick_pair(resources: list[dict]) -> tuple[dict, dict] | None:
     return group[0], group[1]
 
 
-def register_detect_series_pattern_tool(mcp: FastMCP) -> None:
+def register_detect_series_pattern_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def detect_series_pattern(
@@ -219,7 +228,8 @@ def register_detect_series_pattern_tool(mcp: FastMCP) -> None:
             resource_id_old: Optional -- older resource ID to compare (auto-detected
                 if omitted). Both resource_id_new/resource_id_old must be given
                 together, or neither.
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             format: text | json
         """
         if bool(resource_id_new) != bool(resource_id_old):

@@ -1,5 +1,5 @@
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 from helpers import ckan_client
 from helpers.csv_reader import (
@@ -9,6 +9,7 @@ from helpers.csv_reader import (
     preview_ods,
     preview_targz,
     preview_xls,
+    preview_xlsb,
     preview_xlsx,
     preview_zip,
     sniff_content_type,
@@ -23,12 +24,13 @@ from tools.preview_resource_data import (
 
 # Prefer previewing a resource whose format we can actually parse into a
 # table over one search ranks higher but we'd just bounce off (RAR/UNKNOWN).
-_PREVIEWABLE_KINDS = {"CSV", "JSON", "XLS", "XLSX", "ODS", "ZIP", "TARGZ"}
+_PREVIEWABLE_KINDS = {"CSV", "JSON", "XLS", "XLSB", "XLSX", "ODS", "ZIP", "TARGZ"}
 
 _PREVIEW_DISPATCH = {
     "TARGZ": preview_targz,
     "ZIP": preview_zip,
     "XLS": preview_xls,
+    "XLSB": preview_xlsb,
     "XLSX": preview_xlsx,
     "ODS": preview_ods,
     "JSON": preview_json,
@@ -46,7 +48,7 @@ async def _classify(res: dict, session: httpx.AsyncClient) -> str:
     return kind
 
 
-def register_investigate_dataset_tool(mcp: FastMCP) -> None:
+def register_investigate_dataset_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def investigate_dataset(
@@ -64,7 +66,7 @@ def register_investigate_dataset_tool(mcp: FastMCP) -> None:
 
         Picks the top-ranked search result and, among its resources, the
         first one in a format this server can actually parse into a table
-        (CSV/JSON/XLS/XLSX/ODS/ZIP/TARGZ), skipping unreadable ones
+        (CSV/JSON/XLS/XLSB/XLSX/ODS/ZIP/TARGZ), skipping unreadable ones
         (.rar, unrecognized formats) rather than previewing whichever
         resource happens to be listed first.
 
@@ -75,7 +77,8 @@ def register_investigate_dataset_tool(mcp: FastMCP) -> None:
 
         Args:
             query: Search keywords (e.g. "empleo", "SRI recaudación")
-            source: "nacional" (default) or "cuenca" (Cuenca municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
+                    "latacunga" (Latacunga municipal portal)
             preview_rows: Data rows to preview from the chosen resource (default: 10, max: 50)
             format: text | json
         """
