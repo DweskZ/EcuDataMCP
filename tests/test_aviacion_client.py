@@ -172,6 +172,69 @@ _SIGMET_EMPTY_HTML = """
 """
 
 
+# Trimmed real shapes confirmed live on
+# www.ais.aviacioncivil.gob.ec/ifis3 (2026-09-06), captured with curl
+# (no auth needed).
+
+_AIP_AD2_SEQM_HTML = """
+<html><body>
+<div class="node-content">
+<h2>AD 2 SEQM - QUITO</h2>
+<p>
+<h1><span class="mw-headline" id="SEQM_AD_2.1">SEQM AD 2.1       INDICADOR DE LUGAR Y NOMBRE DEL AERÓDROMO</span></h1>
+<div class="center">SEQM – QUITO / Mariscal Sucre Intl.</div>
+<h1><span class="mw-headline" id="SEQM_AD_2.2">SEQM AD 2.2       DATOS GEOGRÁFICOS Y ADMINISTRATIVOS DEL AERÓDROMO</span></h1>
+<div style="page-break-inside: avoid;">
+<table border="1">
+<tr>
+<td align="center" width="75"><b><i>1</i></b></td>
+<td><b><i>Coordenadas del ARP y emplazamiento en<br/>el AD</i></b></td>
+<td>000727S 0782116W<br/>Centro de RWY 18/36
+</td></tr>
+<tr>
+<td align="center"><b><i>3</i></b></td>
+<td><b><i>Elevación / temperatura de referencia</i></b></td>
+<td>2411 M / 25°C
+</td></tr>
+</table></div>
+<h1><span class="mw-headline" id="SEQM_AD_2.3">SEQM AD 2.3       HORAS DE FUNCIONAMIENTO</span></h1>
+<div style="page-break-inside: avoid;">
+<table border="1">
+<tr>
+<td align="center" width="75"><b><i>1</i></b></td>
+<td><b><i>Horas funcionamiento del AD</i></b></td>
+<td>H24
+</td></tr>
+</table></div>
+</p>
+</div>
+</body></html>
+"""
+
+_AIP_AD2_INDEX_HTML = """
+<html><body>
+<li id="node-list-317" nid="312" style="display:none;" >
+    <a href="/ifis3/aip/AD%202%20SEGU%2028.4"
+        style="padding-left:45px;" >
+        AD 2 SEGU 28.4 RNAV SID 4 - RNAV BIVAN 1, USOGI 1 RWY 21
+    </a>
+</li>
+<li id="node-list-318" nid="313" style="display:none;" >
+    <a href="/ifis3/aip/AD%202%20SEQM"
+        style="padding-left:45px;" >
+        AD 2 SEQM - QUITO
+    </a>
+</li>
+<li id="node-list-320" nid="315" style="display:none;" >
+    <a href="/ifis3/aip/AD%202%20SECU"
+        style="padding-left:45px;" >
+        AD 2 SECU - CUENCA
+    </a>
+</li>
+</body></html>
+"""
+
+
 @pytest.fixture(autouse=True)
 def clear_cache():
     aviacion_client.clear_cache()
@@ -337,6 +400,110 @@ async def test_get_sigmet_is_cached_across_calls(httpx_mock):
 
     first = await aviacion_client.get_sigmet()
     second = await aviacion_client.get_sigmet()
+
+    assert first == second
+    assert len(httpx_mock.get_requests()) == 1
+
+
+# --- AIP -------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_get_aip_aerodromo_parses_sections_and_fields(httpx_mock):
+    httpx_mock.add_response(
+        url="https://www.ais.aviacioncivil.gob.ec/ifis3/aip/AD%202%20SEQM",
+        html=_AIP_AD2_SEQM_HTML,
+    )
+
+    result = await aviacion_client.get_aip_aerodromo("SEQM")
+
+    assert result["designador"] == "SEQM"
+    assert result["nombre"] == "SEQM – QUITO / Mariscal Sucre Intl."
+    assert result["total_secciones"] == 3
+
+    geograficos = result["secciones"][1]
+    assert "DATOS GEOGRÁFICOS" in geograficos["titulo"]
+    assert geograficos["campos"][0]["etiqueta"] == (
+        "Coordenadas del ARP y emplazamiento en el AD"
+    )
+    assert geograficos["campos"][0]["valor"] == (
+        "000727S 0782116W\nCentro de RWY 18/36"
+    )
+    assert geograficos["campos"][1]["etiqueta"] == "Elevación / temperatura de referencia"
+    assert geograficos["campos"][1]["valor"] == "2411 M / 25°C"
+
+    horas = result["secciones"][2]
+    assert "HORAS DE FUNCIONAMIENTO" in horas["titulo"]
+    assert horas["campos"][0]["valor"] == "H24"
+
+
+@pytest.mark.asyncio
+async def test_get_aip_aerodromo_normalizes_lowercase_designador(httpx_mock):
+    httpx_mock.add_response(
+        url="https://www.ais.aviacioncivil.gob.ec/ifis3/aip/AD%202%20SEQM",
+        html=_AIP_AD2_SEQM_HTML,
+    )
+
+    result = await aviacion_client.get_aip_aerodromo("seqm")
+
+    assert result["designador"] == "SEQM"
+
+
+@pytest.mark.asyncio
+async def test_get_aip_aerodromo_unknown_designador_raises(httpx_mock):
+    httpx_mock.add_response(
+        url="https://www.ais.aviacioncivil.gob.ec/ifis3/aip/AD%202%20ZZZZ",
+        status_code=404,
+    )
+
+    with pytest.raises(ValueError, match="ZZZZ"):
+        await aviacion_client.get_aip_aerodromo("ZZZZ")
+
+
+@pytest.mark.asyncio
+async def test_get_aip_aerodromo_rejects_blank_designador():
+    with pytest.raises(ValueError):
+        await aviacion_client.get_aip_aerodromo("  ")
+
+
+@pytest.mark.asyncio
+async def test_get_aip_aerodromo_is_cached_across_calls(httpx_mock):
+    httpx_mock.add_response(
+        url="https://www.ais.aviacioncivil.gob.ec/ifis3/aip/AD%202%20SEQM",
+        html=_AIP_AD2_SEQM_HTML,
+    )
+
+    first = await aviacion_client.get_aip_aerodromo("SEQM")
+    second = await aviacion_client.get_aip_aerodromo("SEQM")
+
+    assert first == second
+    assert len(httpx_mock.get_requests()) == 1
+
+
+@pytest.mark.asyncio
+async def test_list_aip_aerodromos_excludes_subprocedure_pages(httpx_mock):
+    httpx_mock.add_response(
+        url="https://www.ais.aviacioncivil.gob.ec/ifis3/aip/AD%202",
+        html=_AIP_AD2_INDEX_HTML,
+    )
+
+    result = await aviacion_client.list_aip_aerodromos()
+
+    assert result["total"] == 2
+    designadores = {a["designador"] for a in result["aerodromos"]}
+    assert designadores == {"SEQM", "SECU"}
+    assert {a["nombre"] for a in result["aerodromos"]} == {"QUITO", "CUENCA"}
+
+
+@pytest.mark.asyncio
+async def test_list_aip_aerodromos_is_cached_across_calls(httpx_mock):
+    httpx_mock.add_response(
+        url="https://www.ais.aviacioncivil.gob.ec/ifis3/aip/AD%202",
+        html=_AIP_AD2_INDEX_HTML,
+    )
+
+    first = await aviacion_client.list_aip_aerodromos()
+    second = await aviacion_client.list_aip_aerodromos()
 
     assert first == second
     assert len(httpx_mock.get_requests()) == 1

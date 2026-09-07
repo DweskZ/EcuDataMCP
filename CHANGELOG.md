@@ -13,6 +13,14 @@
 
 ### Added
 
+- **AIP Ecuador (`list_aip_aerodromos`, `get_aip_aerodromo`)** — DGAC's
+  public eAIP (`ais.aviacioncivil.gob.ec/ifis3`), the same domain already
+  serving METAR/NOTAM/SIGMET. Returns the full AD 2.x data sheet per
+  Ecuadorian aerodrome/helipad (~22 covered): ARP coordinates, elevation,
+  magnetic variation, operating hours, operator contacts, and the rest of
+  the numbered ICAO Annex 15 subsections. No login, no JS, no WAF —
+  server-rendered HTML from a MediaWiki-style exporter. GEN/ENR sections
+  and the AMDT/SUP/AIC tabs are out of scope for now (see ROADMAP.md).
 - **ARCSA Base de Registros Emitidos** (`list_arcsa_categorias`,
   `get_arcsa_categoria_archivos`) — the live sanitary registry
   (`controlsanitario.gob.ec/base-de-datos/`) by category: alimentos,

@@ -144,6 +144,7 @@ de cobertura que falta en cada una.
 | Fuente | Herramientas | Qué cubre |
 |---|---|---|
 | IFIS — METAR/NOTAM/SIGMET | `get_metar`, `get_notam`, `get_sigmet` | Públicos sin sesión (solo `/fpl/*` exige login); SIGMET a nivel de FIR completo (SEFG) → RESEARCH.md § Decimotercera pasada |
+| IFIS3 — AIP Ecuador (eAIP) | `list_aip_aerodromos`, `get_aip_aerodromo` | Ficha AD 2.x completa por aeródromo (~22 aeródromos/helipuertos): coordenadas ARP, elevación, variación magnética, horas de operación, contactos, tipos de tránsito, y el resto de subsecciones OACI Anexo 15; sin login/JS/WAF → RESEARCH.md § Vigésimo primera pasada |
 
 ### INEC / Ecuador en Cifras
 
@@ -237,9 +238,9 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 
 | Fuente | Estado | Qué falta |
 |---|---|---|
+| IFIS3 — AIP Ecuador (GEN/ENR + AMDT/SUP/AIC) | Parcial | Ficha AD 2.x por aeródromo ya cubierta (ver Hecho); falta GEN (regulaciones/servicios nacionales) y ENR (espacio aéreo, rutas ATS, radioayudas) del mismo eAIP, y las pestañas AMDT/SUP/AIC (enmiendas/suplementos/circulares, probablemente PDFs por edición) sin explorar → RESEARCH.md § Vigésimo primera pasada |
 | Sector eléctrico — dominio profundo (CENACE/ARCONEL/CNEL) | No iniciado, protocolo mapeado a fondo | Datasets CKAN de CENACE/CNEL EP/ARCONEL/IIGE ya cubiertos (ver Hecho); falta `reportes.arconel.gob.ec` (ASP.NET ReportViewer, sin login, 1998-2026), mapeado byte a byte en la Vigésima pasada (2026-09-06) — secuencia exacta de postbacks, formato delta de MS AJAX, y algoritmo para ubicar la grilla real bajo envoltorios anidados, todo sin `BeautifulSoup`/`lxml`; **falta confirmar el criterio de fin de paginación (SSRS reporta "de N ?" páginas) antes de escribir el cliente** — decisión explícita de Daniel de documentar primero, construir después; CENACE Biblioteca (documentos de planificación) sin tocar; EEQ/Centrosur/EERSA/EEASA sin organización CKAN propia → RESEARCH.md § Vigésima pasada |
 | Archivo histórico de cortes de luz (crisis sep-dic 2024) | No iniciado | EEQ sigue sirviendo los PDFs originales en vivo (solo falta enumerar slugs); CNEL probablemente perdió el archivo de su sitio, reintentar con Wayback Machine → RESEARCH.md § Octava pasada |
-| DGAC/IFIS — AIP Ecuador (eAIP) | No iniciado, investigado a fondo | "Movimientos/vuelos por aeropuerto" descartado — no existe como sección pública, vive tras el login de Planes de vuelo. Hallazgo real: `/ifis3/` es un eAIP completo público (GEN/ENR/AD, sin login/JS/WAF) con una página AD 2.x estructurada (coordenadas, pista, horas, tarifas, frecuencias) por cada aeródromo del país — candidato fuerte para `helpers/aip_client.py` → RESEARCH.md § Vigésimo primera pasada |
 | Ministerio de Salud Pública | No iniciado | Dominio vivo con contenido real y sección LOTAIP; sin pasada de contenido completa más allá de confirmar que el sitio responde → RESEARCH.md § Séptima pasada |
 | Registro Oficial (gaceta oficial) | No iniciado | Candidato de alta prioridad para búsqueda por fecha (leyes/decretos/resoluciones/circulares, gratis, sin paywall, archivo desde 2001); posible fuera de alcance, ver nota de alcance → RESEARCH.md § Datos legislativos |
 | Superbancos — Balances/Patrimonio Técnico/indicadores | No iniciado | Morosidad/liquidez/solvencia viven detrás de una herramienta de consulta propia, no de un widget OneDrive; necesita pasada con browser real → RESEARCH.md § Séptima pasada |
