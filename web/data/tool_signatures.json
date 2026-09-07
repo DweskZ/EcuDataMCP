@@ -53,21 +53,9 @@
         "default": "False"
       },
       {
-        "name": "format",
-        "type": "str",
-        "default": "'text'"
-      }
-    ],
-    "summary": "Build a cautious BCEData ↔ IEM candidate-equivalence map. Matching uses normalized group/series/table labels. It reports candidate overlaps and source-only entries, but does not claim that two labels have identical definitions. Confirm unit, frequency, coverage, values and revisions before combining them.",
-    "args_doc": {}
-  },
-  "describe_sri_saiku_cube": {
-    "file": "describe_sri_saiku_cube.py",
-    "params": [
-      {
-        "name": "cube_id",
-        "type": "str",
-        "default": null
+        "name": "guardar_revision",
+        "type": "bool",
+        "default": "False"
       },
       {
         "name": "format",
@@ -75,11 +63,8 @@
         "default": "'text'"
       }
     ],
-    "summary": "Describir un cubo Saiku público del SRI: dimensiones, jerarquías, niveles, medidas y metadatos OLAP. Usa solo rutas de descubrimiento de lectura. No consulta filas ni devuelve la configuración Oracle de las fuentes.",
-    "args_doc": {
-      "cube_id": "Identificador devuelto por list_sri_saiku_cubes",
-      "format": "text | json"
-    }
+    "summary": "Build a cautious BCEData ↔ IEM candidate-equivalence map. Matching uses normalized group/series/table labels. It reports candidate overlaps and source-only entries, but does not claim that two labels have identical definitions. Confirm unit, frequency, coverage, values and revisions before combining them.",
+    "args_doc": {}
   },
   "detect_series_pattern": {
     "file": "detect_series_pattern.py",
@@ -115,7 +100,7 @@
       "dataset_id": "The dataset ID or slug",
       "resource_id_new": "Optional -- newer resource ID to compare (auto-detected from the dataset's periodic-name group if omitted)",
       "resource_id_old": "Optional -- older resource ID to compare (auto-detected if omitted). Both resource_id_new/resource_id_old must be given together, or neither.",
-      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), or \"latacunga\" (Latacunga municipal portal)",
       "format": "text | json"
     }
   },
@@ -161,8 +146,28 @@
     "summary": "Download a resource's raw bytes from Ecuador's open data portal, base64-encoded. Use this for formats preview_resource_data can't parse into a table (.rar, or anything unrecognized) — it fetches the file as-is instead of trying to read it. Max size: 5 MB (same cap as preview_resource_data). Larger files come back with an error and the direct URL instead, since they'd be too big to embed in a response. Call with format=\"json\" to get the actual file content — the default format=\"text\" only confirms the download and tells you to retry with json; it never includes content_base64.",
     "args_doc": {
       "resource_id": "The resource UUID (get it from list_dataset_resources)",
-      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), or \"latacunga\" (Latacunga municipal portal)",
       "format": "text | json (json includes content_base64; use this to actually retrieve the file)"
+    }
+  },
+  "get_aip_aerodromo": {
+    "file": "get_aip_aerodromo.py",
+    "params": [
+      {
+        "name": "designador",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Fetch the published AIP AD 2.x data sheet for an Ecuadorian aerodrome or helipad, from DGAC's public eAIP (ais.aviacioncivil.gob.ec/ifis3) — no login required. Returns every numbered field the AIP publishes for that aerodrome, grouped by ICAO Annex 15 subsection: AD 2.1 location indicator/name, AD 2.2 geographic/administrative data (ARP coordinates, elevation, magnetic variation, operator contacts), AD 2.3 operating hours, and onward through handling/passenger/rescue-and-firefighting services, obstacle removal, apron/taxiway data, surface movement guidance, obstacles, meteorological info supplied, runway physical characteristics, declared distances, lighting, radio navigation aids, local traffic regulations, noise abatement, flight procedures, and supplementary information. Use list_aip_aerodromos to see which designators are published.",
+    "args_doc": {
+      "designador": "ICAO code of the aerodrome/helipad, e.g. SEQM (Quito — Mariscal Sucre), SEGU (Guayaquil — José Joaquín de Olmedo), SECU (Cuenca — Mariscal Lamar).",
+      "format": "text | json"
     }
   },
   "get_anda_survey_info": {
@@ -182,6 +187,26 @@
     "summary": "Get full metadata for one ANDA (INEC) survey/census by its idno. Get the idno from search_anda results — it's the string identifier (e.g. \"IDD-ECU-INEC-CGTPE-DECON-ENESEM-2023-v1.3\"), not the numeric id. Returns scope/abstract, variable count, whether microdata is actually downloadable, confidentiality terms, and a contact email for requesting restricted data when it isn't.",
     "args_doc": {
       "idno": "Survey identifier from search_anda (the \"idno\" field)",
+      "format": "text | json"
+    }
+  },
+  "get_arcsa_categoria_archivos": {
+    "file": "get_arcsa_categoria_archivos.py",
+    "params": [
+      {
+        "name": "categoria",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List one ARCSA \"Base de Registros Emitidos\" category's documents. Get categoria (an id or nombre) from list_arcsa_categorias. Returns each document's subgrupo (nested sub-category, e.g. a year, when the category nests one — None otherwise), titulo, id, and direct URL. Format is reported as \"DESCONOCIDO\": the download link carries no file extension (a spot check confirmed real files behind it, e.g. a PDF listado).",
+    "args_doc": {
+      "categoria": "A category \"id\" or \"nombre\" from list_arcsa_categorias (nombre match is accent/case-insensitive).",
       "format": "text | json"
     }
   },
@@ -286,6 +311,38 @@
       "format": "text | json"
     }
   },
+  "get_bce_indice_archivo": {
+    "file": "get_bce_indice_archivo.py",
+    "params": [
+      {
+        "name": "pagina_id",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "anio",
+        "type": "int",
+        "default": "0"
+      },
+      {
+        "name": "max_archivos",
+        "type": "int",
+        "default": "30"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Read the file archive for one BCE \"índice\" page (from search_bce_indices). Each item is one published file: year, period label (a quarter, month, or week number), a Spanish date when the source gives one (weekly series only), direct URL, and format.",
+    "args_doc": {
+      "pagina_id": "The page's slug, from search_bce_indices' `pagina_id` field (e.g. \"boletin-analitico-del-sector-petrolero-indice\").",
+      "anio": "Restrict to one calendar year. 0 returns all years found.",
+      "max_archivos": "Cap on returned files (most recent years first), 1-200. Use `anio` to reach further back than the cap allows.",
+      "format": "text | json"
+    }
+  },
   "get_category_info": {
     "file": "get_category_info.py",
     "params": [
@@ -314,7 +371,7 @@
     "args_doc": {
       "category": "Category slug/name from list_categories",
       "include_datasets": "Include sample datasets in the category (default True)",
-      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), or \"latacunga\" (Latacunga municipal portal)",
       "format": "text | json"
     }
   },
@@ -426,7 +483,7 @@
     "summary": "Get detailed metadata about a specific dataset from Ecuador's open data portal. Returns title, description, organization, tags, resource count, creation/update dates, license, update frequency, the publisher's source URL (where the entity keeps the authoritative data, if any), and any custom metadata fields the publisher added.",
     "args_doc": {
       "dataset_id": "The dataset ID or slug (e.g. \"registro-estadistico-de-recursos-y-actividades-de-salud-2019\")",
-      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), or \"latacunga\" (Latacunga municipal portal)",
       "format": "text | json"
     }
   },
@@ -453,6 +510,64 @@
     "args_doc": {
       "expediente_or_ruc": "The company's Supercías \"expediente\" number (from search_companias/get_compania_info) or its 13-digit RUC.",
       "anio": "Optional single fiscal year filter.",
+      "format": "text | json"
+    }
+  },
+  "get_iess_archivos": {
+    "file": "get_iess_archivos.py",
+    "params": [
+      {
+        "name": "coleccion",
+        "type": "Literal['boletines', 'estudios_actuariales', 'informes_auditoria']",
+        "default": null
+      },
+      {
+        "name": "anio",
+        "type": "int | None",
+        "default": "None"
+      },
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List one IESS (Instituto Ecuatoriano de Seguridad Social) document collection's actual documents, each resolved to a direct download URL, título, and formato. Call list_iess_colecciones first to see what years/counts each collection has.",
+    "args_doc": {
+      "coleccion": "\"boletines\" (Boletines Estadísticos, annual, 1978- 2024 confirmed), \"estudios_actuariales\" (actuarial valuation studies per fund, published only for a handful of years so far), or \"informes_auditoria\" (audit reports, 2007-2026 confirmed, folders by year).",
+      "anio": "Filter to one year. REQUIRED for \"informes_auditoria\" (a year can hold up to ~42 documents, each needing its own detail-page fetch to resolve — there's no cheap \"all years\" call). Optional for the other two collections, which are small enough to always resolve in full.",
+      "query": "Free text matched (accent-insensitive) against título (and descripción/grupo where the collection has one).",
+      "format": "text | json"
+    }
+  },
+  "get_inamhi_capa_datos": {
+    "file": "get_inamhi_capa_datos.py",
+    "params": [
+      {
+        "name": "layer_name",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "count",
+        "type": "int",
+        "default": "5"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Fetch a small, bounded sample of a WFS-enabled INAMHI geoportal layer's real feature attributes (via WFS GetFeature, JSON output) -- confirms and previews what a vector layer actually contains. Use search_inamhi_capas first to find layer names and check wfs_disponible=True (raster-only layers, e.g. the wrf_tiempo_* weather-model grids or the precipitation climate-normal grids, have no attribute data and will raise an error here). This is a sample tool, not a spatial query engine: no bbox/CQL filtering, no reprojection, geometry coordinates are dropped from the output (only the geometry type is kept) to keep the response small.",
+    "args_doc": {
+      "layer_name": "Layer name as returned by search_inamhi_capas, including the \"geonode:\" workspace prefix, e.g. \"geonode:regiones_precip\", \"geonode:cuencas_inamhi\".",
+      "count": "Number of features to fetch (1-20, default 5).",
       "format": "text | json"
     }
   },
@@ -540,6 +655,26 @@
       "format": "text | json"
     }
   },
+  "get_ineval_familia_archivos": {
+    "file": "get_ineval_familia_archivos.py",
+    "params": [
+      {
+        "name": "familia",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List the direct download links published on one INEVAL evaluation family's \"Bases de Datos\" page. Get the familia key from list_ineval_familias. Returns each file's grupo (Llece's ERCE/SERCE/TERCE round, or the standalone-button section like \"Fichas metodológicas vigentes\" — None for most entries), periodo (the accordion panel's year label, e.g. \"Año lectivo 2024-2025\" or \"Año 2019\" — None for standalone-button entries, which carry no year context), titulo (dataset name, e.g. \"Micro\", \"Factores Asociados estudiantes\" — or the button's own label), direct URL, and formato (e.g. CSV, SAV, XLSX, SINTAXIS, METADATO, DICCIONARIO, or DESCONOCIDO for standalone buttons whose format isn't stated on the page) — not the file contents. GET on the URL returns the file directly (no login, no CAPTCHA); some IDs 308-redirect to a static archivosPD/uploads/... URL instead — both work through a redirect-following client. Files can be several MB (one PDF manual confirmed at 3.8 MB); download the URL directly instead of routing it through preview_resource_data or download_resource, which cap at 5 MB.",
+    "args_doc": {
+      "familia": "A family key from list_ineval_familias, e.g. \"ser_bachiller\", \"ser_estudiante\", \"llece\".",
+      "format": "text | json"
+    }
+  },
   "get_informe_igepn": {
     "file": "get_informe_igepn.py",
     "params": [
@@ -604,6 +739,46 @@
       "format": "text | json"
     }
   },
+  "get_metar": {
+    "file": "get_metar.py",
+    "params": [
+      {
+        "name": "designador",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Fetch the most recent METAR/SPECI aerodrome weather reports for an Ecuadorian aerodrome or helipad, from DGAC's IFIS site (ais.aviacioncivil.gob.ec) — the country's real aeronautical information service, publicly queryable with no login. Returns each report's type (METAR or SPECI), its UTC observation timestamp, and the raw ICAO-format codification text (e.g. \"SEQM 030100Z 30004KT 9999 FEW030 17/08 Q1026 NOSIG RMK A3032=\") — decode it yourself if you need the plain-language breakdown. Reports are usually hourly with occasional SPECI in between; an unknown designador returns an empty result rather than an error.",
+    "args_doc": {
+      "designador": "ICAO code of the aerodrome/helipad, e.g. SEQM (Quito — Mariscal Sucre), SEGU (Guayaquil — José Joaquín de Olmedo), SECU (Cuenca — Mariscal Lamar).",
+      "format": "text | json"
+    }
+  },
+  "get_notam": {
+    "file": "get_notam.py",
+    "params": [
+      {
+        "name": "designador",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Fetch active NOTAMs (Notices to Airmen) for an Ecuadorian aerodrome or helipad, from DGAC's IFIS site (ais.aviacioncivil.gob.ec) — publicly queryable with no login. Each NOTAM includes its series number (e.g. \"A1784/26\"), the raw ICAO-format text (Q)/A)/B)/C)/D)/E)/F)/G) lines, e.g. runway/navaid outages, temporary restrictions, obstacle warnings), and the site's own decoded field table (a label -> value map: Tipo, FIR, Código, Tránsito, Objetivo, Alcance, Limites, Coordenadas, Comienzo/Término validez, Horario, etc. — present when the site fills them in for that NOTAM). An unknown designador returns zero NOTAMs rather than an error.",
+    "args_doc": {
+      "designador": "ICAO code of the aerodrome/helipad, e.g. SEQM (Quito — Mariscal Sucre), SEGU (Guayaquil — José Joaquín de Olmedo), SECU (Cuenca — Mariscal Lamar).",
+      "format": "text | json"
+    }
+  },
   "get_organization_info": {
     "file": "get_organization_info.py",
     "params": [
@@ -626,7 +801,7 @@
     "summary": "Get detailed information about a public institution and its published datasets. Returns the institution name, description, dataset count, and a list of its datasets.",
     "args_doc": {
       "organization_id": "The organization slug (e.g. \"sri-servicio-de-rentas-internas\")",
-      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), or \"latacunga\" (Latacunga municipal portal)",
       "format": "text | json"
     }
   },
@@ -672,7 +847,107 @@
     "summary": "Get detailed information about a specific resource (file) from Ecuador's open data portal. Returns format, size, MIME type, download URL, and dataset association. For CSV files, you can then use preview_resource_data to see the actual data.",
     "args_doc": {
       "resource_id": "The resource UUID",
-      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), or \"latacunga\" (Latacunga municipal portal)",
+      "format": "text | json"
+    }
+  },
+  "get_seps_seccion_archivos": {
+    "file": "get_seps_seccion_archivos.py",
+    "params": [
+      {
+        "name": "seccion",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List the direct download links published on one SEPS statistics section page (estadisticas.seps.gob.ec). Get the seccion key from list_seps_secciones. Returns the section's own short description plus each file's grupo (a sub-heading some sections split entries under, e.g. cooperative segments 1-3 vs 4-5 -- None where the section has no such split), periodo/titulo (the published period label, e.g. \"2026\", \"Años anteriores\", or \"2026 con corte al 31 de marzo\" for the latest entry), direct URL, and format -- not the file contents. Some links are direct static PDF/ZIP URLs; others go through the site's \"Simple Download Monitor\" plugin (?sdm_process_download=1&download_id=N) and redirect (302) to the same kind of static file when fetched -- format comes back DESCONOCIDO for those since the download-monitor URL itself carries no extension. Download the URL directly rather than routing it through preview_resource_data or download_resource, which cap at 5 MB.",
+    "args_doc": {
+      "seccion": "A section key from list_seps_secciones, e.g. \"sfps_reportes_calificacion_de_riesgos\".",
+      "format": "text | json"
+    }
+  },
+  "get_sgr_biblioteca_categoria_archivos": {
+    "file": "get_sgr_biblioteca_categoria_archivos.py",
+    "params": [
+      {
+        "name": "categoria",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List one SGR Biblioteca top-level category's documents. Get categoria (an id or nombre) from list_sgr_biblioteca_categorias. Returns each document's subgrupo (nested sub-category, e.g. a province name, when the category nests one — None otherwise), titulo, id, and direct URL. Format is reported as \"DESCONOCIDO\": the download link carries no file extension, and per-entry verification isn't feasible at this scale — a live sample confirmed PDF, but expect other types (e.g. map images) among the \"Mapas de...\" categories. Some links 404 instead of serving a file (confirmed live, not correlated with a clean id range or category) — this is a candidate catalog of what the page lists, not a guarantee every document resolves.",
+    "args_doc": {
+      "categoria": "A category \"id\" or \"nombre\" from list_sgr_biblioteca_categorias (nombre match is accent/case-insensitive).",
+      "format": "text | json"
+    }
+  },
+  "get_sgr_sitrep_archivos": {
+    "file": "get_sgr_sitrep_archivos.py",
+    "params": [
+      {
+        "name": "evento_url",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List the SITREP PDF report links published on one SGR adverse-event page. Get evento_url from search_sgr_sitreps's \"url\" field. Returns each report's grupo (the page's own section heading, e.g. \"SITREP NACIONALES\", \"SITREP PROVINCIALES – AZUAY\", when the page separates national/provincial/cantonal reports), titulo, and direct PDF URL — not the file contents. A long-running event (e.g. an ongoing rainy season) can carry 700+ PDFs across national, provincial, and cantonal reports plus matching \"Infografía\" summaries; a closed single-incident event (e.g. one earthquake) usually has far fewer. Download the URL directly, or via download_resource / read_pdf.",
+    "args_doc": {
+      "evento_url": "An event URL from search_sgr_sitreps's \"url\" field (must be on gestionderiesgos.gob.ec).",
+      "format": "text | json"
+    }
+  },
+  "get_sigmet": {
+    "file": "get_sigmet.py",
+    "params": [
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Fetch currently active SIGMETs (significant meteorological information — volcanic ash, severe turbulence/icing, thunderstorms, etc.) for Ecuador's FIR, from DGAC's IFIS site (ais.aviacioncivil.gob.ec) — publicly queryable with no login. Ecuador has a single FIR (SEFG), so this covers the whole country; there is no per-aerodrome parameter. Each SIGMET includes the raw ICAO-format codification text and the site's own decoded field table (Tipo, País, FIR Origen, Número, Desde/Hasta, MWO, FIR Afectado, Causa, Fenómeno, Observación, Coordenadas, Posición Pronosticada, etc.). Zero results means no advisories are currently active, not an error.",
+    "args_doc": {
+      "format": "text | json"
+    }
+  },
+  "get_sipa_geoportal_capa_datos": {
+    "file": "get_sipa_geoportal_capa_datos.py",
+    "params": [
+      {
+        "name": "layer_id",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "count",
+        "type": "int",
+        "default": "5"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Fetch a small, bounded sample of a WFS-enabled Ministry of Agriculture geoportal layer's real feature attributes (via WFS GetFeature, JSON output) -- confirms and previews what a vector layer actually contains. Use search_sipa_geoportal_capas first to find layer ids and check wfs_disponible=True (raster-only stores, e.g. tematicas/Rraster or fisiografia/Rraster, and stores with WFS explicitly disabled server-side, e.g. sigtierras/catastro_rural or agroestadistica/ tipologias_territorio_hih, have no attribute data and will raise an error here). This is a sample tool, not a spatial query engine: no bbox/CQL filtering, no reprojection, geometry coordinates are dropped from the output (only the geometry type is kept) to keep the response small.",
+    "args_doc": {
+      "layer_id": "Layer id as returned by search_sipa_geoportal_capas, the \"categoria/store/name\" triple, e.g. \"demarcacion/E25k/vw_hg000_zae_cafe_arabigo\", \"agroestadistica/riesgos_agroclimaticos/vw_02c3_multiriesgo_forestal\".",
+      "count": "Number of features to fetch (1-20, default 5).",
       "format": "text | json"
     }
   },
@@ -693,6 +968,26 @@
     "summary": "List the direct download links published on one SIPA statistics module. Get the modulo key from list_sipa_modulos. Returns each file's title, description, direct XLSX/XLS URL, and format — not the file contents. Files can be large (one confirmed at 41 MB); download the URL directly instead of routing it through preview_resource_data or download_resource, which cap at 5 MB.",
     "args_doc": {
       "modulo": "A module key from list_sipa_modulos, e.g. \"economico\", \"productivo\", \"social\", \"censos\".",
+      "format": "text | json"
+    }
+  },
+  "get_sipa_resumen_indicadores": {
+    "file": "get_sipa_resumen_indicadores.py",
+    "params": [
+      {
+        "name": "anio",
+        "type": "int",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List the direct monthly PDF links for one year of SIPA's (Ministerio de Agricultura) \"Resumen de Indicadores\" report — reached from the \"Indicadores Sectoriales\" tablero dinámico page (sipa.agricultura.gob.ec/index.php/sipa-estadisticas/tablero-dinamico/indicadores-sectoriales) via its \"Resumen de Indicadores\" icon. Confirmed live 2018-2026. Each year is a separate page; the earliest (2018) is at the bare URL with no year suffix. Filename conventions differ across years, so URLs always come straight from the scraped page, never constructed. The other items reachable from the same \"Indicadores Sectoriales\" page (\"Indicador Agroeconómico\", \"Indicador Agrosocial\", the rice \"Rendimientos Objetivos\" dashboard) are genuine Tableau Server embeds (bi.mag.gob.ec), and \"Panorama Agroeconómico\", \"Atlas Agroeconómico\", and \"Hoja de Balance de Alimentos\" are each a JS flipbook (fliphtml5.com) with no direct file found — none of those are covered by this tool.",
+    "args_doc": {
+      "anio": "Year, e.g. 2025. Earliest confirmed live: 2018.",
       "format": "text | json"
     }
   },
@@ -826,11 +1121,39 @@
         "default": "'text'"
       }
     ],
-    "summary": "One-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of \"find me data about X and show me what's in it\". Picks the top-ranked search result and, among its resources, the first one in a format this server can actually parse into a table (CSV/JSON/XLS/XLSX/ODS/ZIP/TARGZ), skipping unreadable ones (.rar, unrecognized formats) rather than previewing whichever resource happens to be listed first. Not a replacement for the individual tools: if the top search result isn't the right dataset, or you need a specific resource within it, use search_datasets/list_dataset_resources/ preview_resource_data directly instead of re-running this.",
+    "summary": "One-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of \"find me data about X and show me what's in it\". Picks the top-ranked search result and, among its resources, the first one in a format this server can actually parse into a table (CSV/JSON/XLS/XLSB/XLSX/ODS/ZIP/TARGZ), skipping unreadable ones (.rar, unrecognized formats) rather than previewing whichever resource happens to be listed first. Not a replacement for the individual tools: if the top search result isn't the right dataset, or you need a specific resource within it, use search_datasets/list_dataset_resources/ preview_resource_data directly instead of re-running this.",
     "args_doc": {
       "query": "Search keywords (e.g. \"empleo\", \"SRI recaudación\")",
-      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), or \"latacunga\" (Latacunga municipal portal)",
       "preview_rows": "Data rows to preview from the chosen resource (default: 10, max: 50)",
+      "format": "text | json"
+    }
+  },
+  "list_aip_aerodromos": {
+    "file": "list_aip_aerodromos.py",
+    "params": [
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List the ICAO designators and names of every aerodrome/helipad with a published AIP AD 2.x page, from DGAC's public eAIP (ais.aviacioncivil.gob.ec/ifis3) — no login required. Use get_aip_aerodromo with one of these designators to fetch that aerodrome's full published data sheet (coordinates, runway, operating hours, fees, ATS frequencies, etc.).",
+    "args_doc": {
+      "format": "text | json"
+    }
+  },
+  "list_arcsa_categorias": {
+    "file": "list_arcsa_categorias.py",
+    "params": [
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List ARCSA's \"Base de Registros Emitidos\" categories (controlsanitario.gob.ec/base-de-datos/) — the sanitary registry for food, medications, cosmetics, medical devices, natural products, pesticides, and related establishments/permits, 27 top-level categories with 77 documents total. This is a DIFFERENT source from search_datasets/get_dataset_info for the ARCSA CKAN organization: this page is the live registry (current authorizations/notifications), the CKAN datasets only cover suspended/cancelled records. A few categories nest further sub-categories (e.g. by year) — those show up as each document's \"subgrupo\" from get_arcsa_categoria_archivos, not as separate entries here. Two categories are currently empty (0 archivos) but still listed, since they're a genuine part of the page's own structure.",
+    "args_doc": {
       "format": "text | json"
     }
   },
@@ -843,7 +1166,7 @@
         "default": "'text'"
       }
     ],
-    "summary": "List BCE's family of daily/monthly \"indicador\" widgets published outside both BCEData and IEM (contenido.bce.fin.ec's Highcharts widget pages) — includes Riesgo País (EMBI) as a genuine daily series back to 2004, which BCEData only exposes as a monthly end-of-period aggregate. Also covers: Precio del Oro, Petróleo WTI, Índice Dow Jones, Tasa SOFR/LIBOR, Ecuador sovereign bond prices (all daily); Sistema de Pagos/Cobros Interbancarios, Sistema de Pagos en Línea, Cámara de Compensación de Cheques (monthly); Producción Petrolera Nacional (daily); inflación, desempleo, confianza del consumidor, PIB (monthly/quarterly/annual, likely duplicates BCEData). The catalog is discovered live from each file's own data, not hardcoded — a \"codigo\" only means one thing within its own \"archivo\", not across files. Follow up with get_bce_indicador_diario(archivo, codigo) for one series.",
+    "summary": "List BCE's family of daily/monthly \"indicador\" widgets published outside both BCEData and IEM (contenido.bce.fin.ec's Highcharts widget pages) — includes Riesgo País (EMBI) as a genuine daily series back to 2004, which BCEData only exposes as a monthly end-of-period aggregate. Also covers: Precio del Oro, Petróleo WTI, Índice Dow Jones, Tasa SOFR/LIBOR, Ecuador sovereign bond prices (all daily); Sistema de Pagos/Cobros Interbancarios, Sistema de Pagos en Línea, Cámara de Compensación de Cheques (monthly); Producción Petrolera Nacional (daily); inflación, desempleo, confianza del consumidor, PIB (monthly/quarterly/annual, likely duplicates BCEData); Reservas Internacionales, Liquidez Total M2, Crédito al Sector Privado, Tasas Activa/Pasiva Referencial, Captaciones OSD (monetary, monthly); Ingresos/Erogaciones/Resultado Global SPNF, Deuda Pública Interna (fiscal, monthly); Cuenta Corriente, Remesas de Trabajadores, Tipo de Cambio Efectivo Real, Balanza Comercial (total/no petrolera), Exportaciones/Importaciones de Bienes (external sector, monthly/quarterly). The catalog is discovered live from each file's own data, not hardcoded — a \"codigo\" only means one thing within its own \"archivo\", not across files. Follow up with get_bce_indicador_diario(archivo, codigo) for one series.",
     "args_doc": {
       "format": "text | json"
     }
@@ -878,7 +1201,7 @@
     ],
     "summary": "List all thematic categories of Ecuador's open data portal. Categories include: Salud, Educación, Economía y Finanzas, Seguridad y Defensa, Anticorrupción, Ambiente y Agua, Transporte, Turismo, and more. Each category shows the number of datasets it contains. Use the category 'name' field as the 'category' parameter in search_datasets to filter results by topic.",
     "args_doc": {
-      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), or \"latacunga\" (Latacunga municipal portal)",
       "format": "text | json"
     }
   },
@@ -918,7 +1241,35 @@
     "summary": "List all resources (files) in a dataset with their metadata. Returns resource ID, title, format, size, download URL, and creation/ last-modified dates for each file. The dates let you tell whether a dataset's files are periodic snapshots (compare last_modified across resources to find the most recent one) before reading any of them. Also flags groups of resources whose names look like a periodic series (e.g. weekly files) — that's only a hint that they might need combining or picking the latest one; it does not tell you which, since that depends on the dataset (some periodic files replace previous ones, others complement them). Next step: use preview_resource_data on a CSV resource to see its contents, or use get_resource_info for detailed metadata.",
     "args_doc": {
       "dataset_id": "The dataset ID or slug",
-      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), or \"latacunga\" (Latacunga municipal portal)",
+      "format": "text | json"
+    }
+  },
+  "list_iess_colecciones": {
+    "file": "list_iess_colecciones.py",
+    "params": [
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List IESS's (Instituto Ecuatoriano de Seguridad Social) three document-archive collections (iess.gob.ec) — Boletines Estadísticos, Estudios Actuariales, and Informes de Auditoría — with the years/counts each currently has published. Call get_iess_archivos(coleccion, anio=...) next to get one collection's actual documents (título, url, formato).",
+    "args_doc": {
+      "format": "text | json"
+    }
+  },
+  "list_ineval_familias": {
+    "file": "list_ineval_familias.py",
+    "params": [
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List INEVAL (Instituto Nacional de Evaluación Educativa) evaluation families with a real \"Bases de Datos\" download page (evaluaciones.evaluacion.gob.ec/BI/) — a completely different institution from SENESCYT/MINEDUC. Nine families are published: Ser Bachiller (2013-2020, merged with ENES for university admissions in 2017), Ser Estudiante (plus the \"en la Infancia\", \"en la Mitad del Mundo\", and \"Galápagos\" variants), Ser Maestro (plus \"Recategorización\"), Ser Profesional, and Llece (the international ERCE/SERCE/TERCE evaluation rounds). IMPORTANT: the site's top navigation also links to informational pages (e.g. \"historico-ser-bachiller\") that share the family name but carry no downloads at all — only the family keys returned here (sourced from the site's own \"Categoría Bases de Datos\" hub) point at pages with real files. Follow up with get_ineval_familia_archivos(familia) for one family's file listing.",
+    "args_doc": {
       "format": "text | json"
     }
   },
@@ -976,7 +1327,7 @@
     "args_doc": {
       "page": "Page number (1-based, default 1)",
       "page_size": "Results per page (default 15, max 50)",
-      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), or \"latacunga\" (Latacunga municipal portal)",
       "format": "text | json"
     }
   },
@@ -1000,6 +1351,34 @@
       "format": "text | json"
     }
   },
+  "list_seps_secciones": {
+    "file": "list_seps_secciones.py",
+    "params": [
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List the SEPS (Superintendencia de Economía Popular y Solidaria) statistics sections (estadisticas.seps.gob.ec). SEPS' main site (seps.gob.ec) actively blocks automated connections, but this statistics subdomain is a normal WordPress site and has no CKAN organization, so this is the only path to its published data: 22 sections on \"Estadísticas SFPS\" (Sector Financiero Popular y Solidario -- cooperatives, mutualistas, cajas: financial statements, deposits, credit portfolio, interest rates, financial inclusion, and risk ratings) plus 4 on \"Estadísticas EPS\" (non-financial popular/solidarity-economy organizations). Includes sfps_reportes_calificacion_de_riesgos: risk-rating bulletins (PDF) issued by SEPS-authorized rating agencies for SFPS entities, one per year 2020-2025 plus a 2026 Q1 cut. Follow up with get_seps_seccion_archivos(seccion) for one section's actual file listing.",
+    "args_doc": {
+      "format": "text | json"
+    }
+  },
+  "list_sgr_biblioteca_categorias": {
+    "file": "list_sgr_biblioteca_categorias.py",
+    "params": [
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List SGR's Biblioteca document-library categories (gestionderiesgos.gob.ec/biblioteca/) — resolutions, contingency plans, threat maps, tsunami evacuation routes, and more, ~1660 documents across 19 top-level categories. This is a DIFFERENT source from search_eventos_riesgo / search_sgr_sitreps: a standing document library, not event reports. Several categories nest further sub-categories (e.g. by province or place) — those show up as each document's \"subgrupo\" from get_sgr_biblioteca_categoria_archivos, not as separate entries here. IMPORTANT: a real share of Biblioteca's links 404 (confirmed live across several categories, not correlated with a clean id range or category) — treat this as a candidate catalog of what the page lists, not a guarantee every document resolves. Format is also reported as unknown for every entry (the download link carries no file extension).",
+    "args_doc": {
+      "format": "text | json"
+    }
+  },
   "list_sipa_modulos": {
     "file": "list_sipa_modulos.py",
     "params": [
@@ -1010,20 +1389,6 @@
       }
     ],
     "summary": "List SIPA's statistics-download modules (sipa.agricultura.gob.ec). SIPA (Sistema de Información Pública Agropecuaria) is the Ministry of Agriculture, Livestock and Fisheries' statistics portal — distinct from MPCEIP (industry/trade). It publishes real Excel files with agropecuario price, trade, credit, production, and census series back to the early 2000s, organized into four modules: económico, productivo, social, and censos y registros administrativos. Follow up with get_sipa_modulo_archivos(modulo) for one module's file listing.",
-    "args_doc": {
-      "format": "text | json"
-    }
-  },
-  "list_sri_saiku_cubes": {
-    "file": "list_sri_saiku_cubes.py",
-    "params": [
-      {
-        "name": "format",
-        "type": "str",
-        "default": "'text'"
-      }
-    ],
-    "summary": "Listar los cubos OLAP visibles en la instancia pública de Saiku del SRI. Esta herramienta solo consulta la sesión anónima y la ruta pública de descubrimiento. No lee la configuración administrativa ni devuelve registros de contribuyentes.",
     "args_doc": {
       "format": "text | json"
     }
@@ -1156,11 +1521,11 @@
         "default": "'text'"
       }
     ],
-    "summary": "Download and preview a resource from Ecuador's open data portal. Supports CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX), OpenDocument (ODS), and .tar.gz/.zip archives that wrap a CSV/TSV/TXT file. Returns the first N rows as a formatted table so the model can inspect data without a local download. Geometry/WKT columns are dropped from the table (they can be tens of KB per cell); CSV columns in European decimal notation (7.760,2) are normalized to standard notation (7760.2). Max download size: 5 MB. For large tabular DataStore resources prefer query_resource_data.",
+    "summary": "Download and preview a resource from Ecuador's open data portal. Supports CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX/XLSB), OpenDocument (ODS), and .tar.gz/.zip archives that wrap a CSV/TSV/TXT file. Returns the first N rows as a formatted table so the model can inspect data without a local download. Geometry/WKT columns are dropped from the table (they can be tens of KB per cell); CSV columns in European decimal notation (7.760,2) are normalized to standard notation (7760.2). Max download size: 5 MB. For large tabular DataStore resources prefer query_resource_data.",
     "args_doc": {
       "resource_id": "The resource UUID (get it from list_dataset_resources)",
       "rows": "Number of data rows to preview (default: 20, max: 100)",
-      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), or \"latacunga\" (Latacunga municipal portal)",
       "format": "text | json"
     }
   },
@@ -1216,57 +1581,7 @@
       "rows": "Number of records to return (default 20, max 100)",
       "offset": "Pagination offset (default 0)",
       "sort": "Optional sort expression, e.g. \"anio desc\"",
-      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
-      "format": "text | json"
-    }
-  },
-  "query_sri_saiku_aggregate": {
-    "file": "query_sri_saiku_aggregate.py",
-    "params": [
-      {
-        "name": "cube_id",
-        "type": "str",
-        "default": null
-      },
-      {
-        "name": "row_dimension",
-        "type": "str",
-        "default": null
-      },
-      {
-        "name": "row_hierarchy",
-        "type": "str",
-        "default": null
-      },
-      {
-        "name": "row_level",
-        "type": "str",
-        "default": null
-      },
-      {
-        "name": "measure",
-        "type": "str",
-        "default": null
-      },
-      {
-        "name": "limit",
-        "type": "int",
-        "default": "25"
-      },
-      {
-        "name": "format",
-        "type": "str",
-        "default": "'text'"
-      }
-    ],
-    "summary": "Ejecutar una consulta agregada y limitada en un cubo público de Saiku. La consulta tiene una sola dimensión en filas y una medida. El cubo, dimensión, jerarquía, nivel y medida deben salir de list_sri_saiku_cubes/describe_sri_saiku_cube. El límite máximo es 100. No acepta MDX arbitrario, no hace drill-through y no busca RUCs.",
-    "args_doc": {
-      "cube_id": "Identificador completo del cubo",
-      "row_dimension": "Nombre de la dimensión para las filas",
-      "row_hierarchy": "Nombre de la jerarquía",
-      "row_level": "Nivel que se mostrará en las filas",
-      "measure": "Medida agregada",
-      "limit": "Máximo de filas solicitado (1-100)",
+      "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), or \"latacunga\" (Latacunga municipal portal)",
       "format": "text | json"
     }
   },
@@ -1357,6 +1672,46 @@
     "args_doc": {
       "query": "Search keywords (e.g. \"empleo\", \"REEM\", \"censo agropecuario\")",
       "limit": "Max results (default: 10, max: 50)",
+      "format": "text | json"
+    }
+  },
+  "search_arcotel_boletines": {
+    "file": "search_arcotel_boletines.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List ARCOTEL's (Agencia de Regulación y Control de las Telecomunicaciones) \"Boletín Estadístico del Sector de las Telecomunicaciones\" PDFs — annual/topical statistical bulletins published on the institutional site (www.arcotel.gob.ec), outside CKAN. Confirmed live range: 2015 through 2024 (no 2025/2026 bulletin published yet as of this check). Lower-frequency and more topic-driven than search_arcotel_reportes_mensuales (one-per-month series, 2017-2026) -- entries here are things like \"Servicio Portador — Agosto\" or \"Roaming-Nacional Automático\", not a uniform monthly cadence. Also separate from ARCOTEL's frozen-since-2021/2022 CKAN organization. PDF only — no CSV/XLSX/API. Returns direct URLs, not parsed table data — download them yourself, via download_resource, or via read_pdf.",
+    "args_doc": {
+      "query": "Free text matched against the entry's label, year, or URL (accent-insensitive), e.g. \"roaming\", \"2020\", \"portabilidad\". Empty returns all entries.",
+      "format": "text | json"
+    }
+  },
+  "search_arcotel_reportes_mensuales": {
+    "file": "search_arcotel_reportes_mensuales.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List ARCOTEL's (Agencia de Regulación y Control de las Telecomunicaciones) \"Reportes Estadísticos Mensuales\" PDFs — the regulator's monthly telecom-sector statistics series, published on the institutional site (www.arcotel.gob.ec), outside CKAN. Confirmed live range: January 2017 through June 2026 (most recent upload lags today by roughly 2 months). 2023-2026 is one PDF per month; 2017-2022 mixes months with ad hoc topical infographics. This is a separate, higher-frequency series from search_arcotel_boletines (annual/topical bulletins, 2015-2024) and from ARCOTEL's frozen-since-2021/2022 CKAN organization. PDF only — no CSV/XLSX/API. Returns direct URLs, not parsed table data — download them yourself, via download_resource, or via read_pdf.",
+    "args_doc": {
+      "query": "Free text matched against the entry's label, year, or URL (accent-insensitive), e.g. \"junio 2026\", \"2025\", \"internet\". Empty returns all entries.",
       "format": "text | json"
     }
   },
@@ -1455,6 +1810,72 @@
     "summary": "Search individual Excel tables in the BCE's latest IEM bulletin. Use this for detailed BCE tables not conveniently available through search_indicadores_bce/BCEData: trade by country, debt, public finance by government level, oil, GDP breakdowns, and more. It lists tables from the current monthly bulletin; use get_bce_iem_table with a returned table_id to inspect one official XLSX file. Set historico=true (or provide desde_anio/hasta_anio) to search across all matching monthly bulletin pages; this is slower on the first call because the archive pages must be read. Set guardar_catalogo=true to persist the complete catalog assembled by this search under IEM_CATALOG_DIR (or data/iem_catalog_snapshots by default). Pagination still keeps the MCP response bounded. Set hash_archivos=true for an operator-style SHA-256 audit of the discovered XLSX files. This downloads complete files, so it is deliberately opt-in and bounded by max_hash_archivos.",
     "args_doc": {}
   },
+  "search_bce_indices": {
+    "file": "search_bce_indices.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List BCE \"índice\" archive pages — one per named publication series (sector bulletins for petroleum/mining/cement, trade price indices, EMOE/confidence indices, FX buy/sell, balance of payments, weekly monetary bulletins, remittance bulletins, and more), each with a year-by-year or week-by-week file archive going back as far as 2004 for some series. A dedicated catalog separate from BCEData/IEM/search_bce_publicaciones: these are named documents (PDF/XLSX/HTML reports) with a real historical archive per series, not a rolling recent-items window and not raw numeric series. Returns summaries only — pass the returned pagina_id to get_bce_indice_archivo to read one series' file list.",
+    "args_doc": {
+      "query": "Free text matched (accent-insensitive) against the page's title or URL. Empty returns all discovered pages.",
+      "format": "text | json"
+    }
+  },
+  "search_bce_precios_comex": {
+    "file": "search_bce_precios_comex.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List BCE's disaggregated foreign-trade price-index file links — import prices by economic-use category (fuels/lubricants, raw materials, consumer goods, capital goods) and export prices by individual product (crude oil, shrimp, banana, cacao, copper, gold, roses, ...), each with separate price/value/volume sheets and monthly/annual/cumulative variation sheets. Genuinely distinct from search_indicadores_bce's BCEData catalog (id_grupo 134 \"Índices IPX - IPM - ITI\" only has the three *aggregate* series — general export index, general import index, ITI) and from search_bce_indices (a different, year-archived widget that doesn't cover trade prices). Returns direct URLs, not file contents — download them yourself or via download_resource.",
+    "args_doc": {
+      "query": "Free text matched against the file's label, page title, or page id (accent-insensitive), e.g. \"importacion\", \"exportacion\". Empty returns all files.",
+      "format": "text | json"
+    }
+  },
+  "search_bce_publicaciones": {
+    "file": "search_bce_publicaciones.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "formato",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List recent BCE publications from \"Últimas Publicaciones\" — named bulletins and reports (weekly/monthly monetary bulletins, interest-rate reports, sector-analysis bulletins, IEM release notices, etc.), each with its publication date, title, direct URL, and format. A dedicated catalog separate from BCEData/IEM (search_indicadores_bce, search_bce_iem): most of what shows up here has no equivalent numeric series in either — it's the BCE's own editorial feed of published reports, not raw data. Only the rolling window the page itself shows (currently the ~30 most recent publications, newest first) — there is no server-side pagination or date-range filter to reach further back. Returns direct URLs, not file contents — download them yourself or via download_resource.",
+    "args_doc": {
+      "query": "Free text matched against the publication's title (accent-insensitive). Empty returns all.",
+      "formato": "Exact match against the derived format — PDF, XLSX, XLS, CSV, ZIP, HTML. Empty returns all formats.",
+      "format": "text | json"
+    }
+  },
   "search_bce_remesas": {
     "file": "search_bce_remesas.py",
     "params": [
@@ -1524,6 +1945,26 @@
       "query": "Free text matched (accent-insensitive) against the file label, e.g. \"manlo\" (city-block level), \"sector\", \"2010\", \"spss\", \"diccionario\", \"metodologia\". Empty returns every file found.",
       "limit": "Max results (default 30, max 100).",
       "offset": "Pagination offset over the matched set.",
+      "format": "text | json"
+    }
+  },
+  "search_cnig_femicidios": {
+    "file": "search_cnig_femicidios.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List CNIG's (Consejo Nacional para la Igualdad de Género) \"Violencia\" page statistical PDFs — includes the femicide / intentional- homicide-of-women matrix (\"Femicidios y Homicidios Intencionales de Mujeres\") plus 19 related gender-violence tables (by province, ethnicity, disability, age, income quintile, LGBTI, judicialized cases, etc.) from the same page. Institution note: this is CNIG (the gender-equality council), not Fiscalía General del Estado — a different institution that also publishes femicide figures elsewhere. The PDF itself states its figures are compiled from Consejo de la Judicatura, Fiscalía General del Estado, and Ministerio del Interior source data, and describes the underlying indicator as updated weekly — but the PDF actually posted on this page is a dated snapshot (content cut-off April 2023), not a live rolling feed, so treat \"weekly\" as the institution's stated intent rather than a guarantee about what's currently posted. Returns direct URLs to PDFs, not parsed table data — download them yourself, via download_resource, or via read_pdf.",
+    "args_doc": {
+      "query": "Free text matched against the entry's label (accent-insensitive), e.g. \"femicidio\", \"lgbti\", \"provincia\". Empty returns all 20 entries on the page.",
       "format": "text | json"
     }
   },
@@ -1655,7 +2096,7 @@
       "page": "Page number (1-based, default: 1)",
       "page_size": "Results per page (default: 20, max: 100)",
       "category": "Optional category filter (e.g. \"sal\" for Salud, \"edu\" for Educación). Use list_categories to see all available categories.",
-      "source": "\"nacional\" (www.datosabiertos.gob.ec, default) or \"cuenca\" (cuencaendatos.cuenca.gob.ec, the Cuenca municipal open-data portal — a separate, smaller CKAN catalog)",
+      "source": "\"nacional\" (www.datosabiertos.gob.ec, default), \"cuenca\" (cuencaendatos.cuenca.gob.ec, the Cuenca municipal open-data portal), or \"latacunga\" (datosabiertos.latacunga.gob.ec, the Latacunga municipal open-data portal) — separate, smaller CKAN catalogs",
       "format": "text | json"
     }
   },
@@ -1732,6 +2173,32 @@
       "evento": "Event type filter (e.g. \"Deslizamiento\", \"Inundación\", \"Aluvión\")",
       "estado": "Status filter (e.g. \"Seguimiento\", \"Cierre\")",
       "limit": "Max events to return (default 15, max 100)",
+      "format": "text | json"
+    }
+  },
+  "search_inamhi_capas": {
+    "file": "search_inamhi_capas.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "solo_wfs",
+        "type": "bool",
+        "default": "False"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Search INAMHI's geoportal (geoservicios.inamhi.gob.ec) layer catalog -- a GeoNode-backed GeoServer exposing Ecuador's meteorology/hydrology institute's spatial layers via WMS/WFS. 222 layers confirmed live: monthly/annual precipitation climate normals (1985-2015), ~180 dated daily rainfall-anomaly composites (\"anomalias_DDmonYYYY\"), WRF numerical weather model output grids (precipitación, temperatura, humedad, presión, viento), watershed and administrative boundaries (cuencas, provincias, cantones, parroquias), and a handful of named regional layers. 199 of the 222 also expose WFS (real per-feature attribute data, e.g. zonal precipitation/anomaly statistics per polygon); the other 23 are raster-only (map-tile/GetMap access only, no attribute data) -- filter to solo_wfs=True to see only the queryable ones. Use get_inamhi_capa_datos(layer_name) to sample a WFS-enabled layer's actual attribute values. IMPORTANT: this catalog does NOT include a per-station raw precipitación/temperatura/caudal observation layer -- everything here is polygon-aggregated (zonal statistics, boundaries), not a station time series. If you need raw INAMHI station data, it isn't exposed via this geoportal today.",
+    "args_doc": {
+      "query": "Free text matched (accent-insensitive) against the layer's name, title, or abstract, e.g. \"precipitacion\", \"cuencas\", \"anomalias\". Empty returns all layers.",
+      "solo_wfs": "If True, only return layers with WFS (attribute data) available.",
       "format": "text | json"
     }
   },
@@ -1831,6 +2298,76 @@
       "format": "text | json"
     }
   },
+  "search_infomies_bases_mensuales": {
+    "file": "search_infomies_bases_mensuales.py",
+    "params": [
+      {
+        "name": "serie",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "anio",
+        "type": "int | None",
+        "default": "None"
+      },
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List infoMIES's (info.desarrollohumano.gob.ec, the statistics portal of what used to be MIES) monthly BDD (base de datos) files for one program: \"anc\" (Aseguramiento No Contributivo / inclusión económica) or \"is\" (Usuarios de Unidad de Atención del SIIMIES / inclusión social). Richer than this project's existing CKAN coverage for the same programs (organization=ministerio-de-inclusion-economica-y- social), which only has quarterly snapshots. Confirmed live 2026-09-03: only the current, in-progress year has one file per month so far published; every closed year (2019-2025 for \"anc\", 2019-2025 for \"is\") has exactly ONE file, the December/ year-end snapshot -- don't assume every year is a 12-file monthly archive. Files are .rar (this project's format-support decision excludes reading .rar -- subprocess/CVE risk -- so only metadata + the direct URL are returned here, not contents); fetch the URL yourself if you need the bytes.",
+    "args_doc": {
+      "serie": "\"anc\" or \"is\".",
+      "anio": "Specific year to fetch, e.g. 2024. Omit to fetch every known year for the series and aggregate (multiple requests on a cold cache -- prefer passing anio when you know it).",
+      "query": "Free text matched (accent-insensitive) against the file's label, year, or URL, e.g. \"julio\", \"2023\". Empty returns all files for the selected year(s).",
+      "format": "text | json"
+    }
+  },
+  "search_infomies_boletines_zonales": {
+    "file": "search_infomies_boletines_zonales.py",
+    "params": [
+      {
+        "name": "modo",
+        "type": "str",
+        "default": "'zonal'"
+      },
+      {
+        "name": "zona",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "anio",
+        "type": "int | None",
+        "default": "None"
+      },
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List infoMIES's (info.desarrollohumano.gob.ec) zonal bulletin files. Two distinct series live under this name, confirmed live 2026-09-03 -- pick one with `modo`: - modo=\"zonal\" (default): the original \"Boletín Zonal\" series, one .rar per zone per month. DISCONTINUED -- confirmed range 2017-2021 across all 9 zones, nothing since. Requires `zona` (get valid keys from the same tool with modo=\"zonal\" and no zona, or use \"zona-1-bz\"..\"zona-9-bz\" directly). - modo=\"consolidado\": the newer \"Reporte Boletines Zonales\" successor -- one consolidated XLSX per year, 2021-2026, STILL BEING UPDATED (unlike the zonal series). `zona` is ignored in this mode. Both series are large files (the zonal .rar are small per file but there are ~9 zones x ~5 years x ~11 months of them; the consolidado XLSX are 9-15 MB each) -- this tool returns metadata + direct URLs only, never file contents. The .rar files are additionally out of this project's supported-format list (subprocess/CVE risk) even at a size that would otherwise fit.",
+    "args_doc": {
+      "modo": "\"zonal\" or \"consolidado\".",
+      "zona": "Required for modo=\"zonal\": one of \"zona-1-bz\"..\"zona-9-bz\". Ignored for modo=\"consolidado\". Leave empty with modo=\"zonal\" to just get the list of valid zone keys.",
+      "anio": "Specific year to fetch. For \"zonal\", omit to fetch every year found on that zone's index page (typically 2017-2021). For \"consolidado\", omit to fetch 2021-2026. Either way, omitting means multiple HTTP requests on a cold cache.",
+      "query": "Free text matched (accent-insensitive) against the file's label, year, or URL.",
+      "format": "text | json"
+    }
+  },
   "search_informes_igepn": {
     "file": "search_informes_igepn.py",
     "params": [
@@ -1869,6 +2406,52 @@
       "format": "text | json"
     }
   },
+  "search_mef_fiscal": {
+    "file": "search_mef_fiscal.py",
+    "params": [
+      {
+        "name": "fuente",
+        "type": "str",
+        "default": "'mef'"
+      },
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List Ecuador's fiscal-operations workbook links from either of two sources — MEF/MDEP (primary, current) or SENAE (secondary, stale). fuente=\"mef\" (default): Ministerio de Economía y Finanzas / MDEP's \"Estadística Nueva Metodología\" archive — IMF GFSM-methodology SPNF (Sector Público No Financiero) fiscal accounts, updated monthly. NOT one static workbook: 76 XLSX files confirmed live (income/ expense and assets/liabilities snapshots, each numbered per publication, plus \"BLL\"/financing files), publication folders from 2025-01 through 2026-09. For tariff income specifically, download the newest \"Operaciones de Ingresos y Gastos SPNF\" file and read row \"1214 Arancelarios\" (within \"121 Ingresos tributarios\", sheet \"GC\" = Gobierno Central) — annual series 2013-2025 plus quarterly breakdown confirmed in a prior pass (2023 = USD 1,180.4M, 2024 = USD 1,117.3M, 2025 = USD 1,231.4M). fuente=\"senae\": SENAE's \"Tributos Recaudados\" archive — 60 XLSX files confirmed live, but stale (2012-2021 only, nothing since). Breaks customs collection down by ADVALOREM/FODINFA/IVA/ICE/OTROS TRIBUTOS/TOTALES per year — useful for the category breakdown MEF doesn't expose this cheaply, despite being frozen at 2021. IMPORTANT scope distinction: \"Arancelarios\" (MEF) and \"ADVALOREM\" (SENAE) are the tariff/derecho aduanero ALONE — smaller than the ~USD 3,776M press coverage cites for 2024 \"recaudación aduanera\", which also includes IVA and ICE collected at the border. Use \"Arancelarios\"/\"ADVALOREM\" for tariff revenue narrowly; use SENAE's TOTALES category (2012-2021 only) or sum the individual lines for the broader \"everything Aduana collects\" figure. Returns direct URLs to XLSX files, not parsed table data — download them yourself or via download_resource, then read with the xlsx skill.",
+    "args_doc": {
+      "fuente": "\"mef\" (default) or \"senae\".",
+      "query": "Free text matched (accent-insensitive) against the file's label (and, for \"senae\", its category too), e.g. \"ingresos\", \"2026-06\", \"advalorem\", \"totales\". Empty returns all files for the chosen fuente.",
+      "format": "text | json"
+    }
+  },
+  "search_minedec_matricula": {
+    "file": "search_minedec_matricula.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List MINEDEC's (Ministerio de Educación, Deporte y Cultura) historical basic-education (K-12 / educación básica y bachillerato) enrollment registry files: \"Registro Administrativo Histórico\" 2009-present. This is a DIFFERENT ministry sub-domain from this project's existing SENESCYT/higher-education CKAN coverage (organization=ministerio-de- educacion) — that's universities/institutos técnicos, this is basic education matrícula. Returns direct XLSX links, not file contents — the registry files are 30-140 MB (too large to preview/download through this server), so fetch them yourself or via download_resource if you specifically need the bytes. Files: two large registry XLSX (start-of-year \"Inicio\" and end-of-year \"Fin\" snapshots), a metadata file for each, and one shared data dictionary. Note the Inicio/Fin files disagree slightly on the exact final year covered (confirmed live in the real filenames) — treat the file contents as authoritative over any year-range claim in this tool's output.",
+    "args_doc": {
+      "query": "Free text matched (accent-insensitive) against the file's label, tipo (\"registro\"/\"metadato\"/\"diccionario\"), periodo (\"inicio\"/\"fin\"), or URL, e.g. \"inicio\", \"diccionario\", \"metadato fin\". Empty returns all files.",
+      "format": "text | json"
+    }
+  },
   "search_organizations": {
     "file": "search_organizations.py",
     "params": [
@@ -1903,7 +2486,7 @@
       "query": "Optional search term (e.g. \"salud\", \"SRI\", \"INEC\")",
       "page": "Page number (1-based, default: 1)",
       "page_size": "Results per page (default: 20, max: 100)",
-      "source": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)",
+      "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), or \"latacunga\" (Latacunga municipal portal)",
       "format": "text | json"
     }
   },
@@ -1980,6 +2563,78 @@
     "args_doc": {
       "query": "Keywords (e.g. \"datos personales\", \"tránsito\", \"LOTAIP\")",
       "page": "Page number when query is empty (1-based)",
+      "format": "text | json"
+    }
+  },
+  "search_salarios_sectoriales": {
+    "file": "search_salarios_sectoriales.py",
+    "params": [
+      {
+        "name": "anio",
+        "type": "int | None",
+        "default": "None"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List Ecuador's sectoral minimum wage table documents (salarios mínimos sectoriales — wage floors per branch of economic activity, set by the Consejo Nacional de Trabajo y Salarios, distinct from the single national Salario Básico Unificado). Scraped from the Ministerio del Trabajo's document library (trabajo.gob.ec/biblioteca/), which — unlike the ministry's dynamic pages — actually responds and lists the whole legal library with stable per-document download links. Confirmed coverage: one entry per year for 2020-2025 (most years have both a spreadsheet and a PDF of the signed annex). No 2026 table has been published — the 2025 table remains in force by inaction; see the returned \"nota\" field. Some entries are the underlying Acuerdo Ministerial rather than the table itself, titled by the year it was *signed* (often the year before the table it sets applies to) — if a specific year looks thin, also check the year before it. Returns document metadata and a \"Ver\" link per entry, not file contents — the link redirects to the real PDF/XLS/XLSX; download it via download_resource or preview it via preview_resource_data.",
+    "args_doc": {
+      "anio": "Filter to this year (as printed in the document's own title). None returns every year found.",
+      "format": "text | json"
+    }
+  },
+  "search_sgr_sitreps": {
+    "file": "search_sgr_sitreps.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List SGR's SITREP (\"Informes de Situación\") archive of adverse-event dossiers (gestionderiesgos.gob.ec), 2016-2026. This is a DIFFERENT source from search_eventos_riesgo, which reads SGR's live ArcGIS COE2 snapshot (current/in-progress events only, no history). This tool instead lists ~54 multi-year dossiers — earthquakes, forest-fire seasons, rainy seasons, landslides, volcanic activity — each a real event with a status (EN CURSO / CERRADO / EN OBSERVACIÓN) and its own page. Follow up with get_sgr_sitrep_archivos(url) on one event's \"url\" to get its actual SITREP PDF report links.",
+    "args_doc": {
+      "query": "Free text matched (accent-insensitive) against the event's titulo, estado, or descripcion, e.g. \"terremoto\", \"en curso\", \"manabi\". Empty returns all events.",
+      "format": "text | json"
+    }
+  },
+  "search_sipa_geoportal_capas": {
+    "file": "search_sipa_geoportal_capas.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "solo_wfs",
+        "type": "bool",
+        "default": "False"
+      },
+      {
+        "name": "categoria",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Search the Ministry of Agriculture's geoportal (geoportal.agricultura.gob.ec, \"Geoportal del Agro Ecuatoriano\") layer catalog -- a GeoServer instance exposing Ecuador's agriculture spatial layers via WMS/WFS. 277 layers confirmed live across 24 endpoints in 8 categories: registros (censos/registros administrativos, e.g. censo palmicultor, porcícola, avícola), demarcacion (zonificación agroecológica, económica-agroecológica, zonificación de pastos), infraestructura (industrias y servicios del agro), tematicas (inventario de recursos naturales, redes comerciales), cobertura (cobertura y uso de la tierra, estimaciones de cultivos), fisiografia (geomorfología, pendientes, relieve), sigtierras (catastro rural, cobertura de tierra, geomorfología, geopedología, zonificaciones -- SIGTIERRAS' national rural land program), and agroestadistica (riesgos agroclimáticos por cultivo, tipologías de territorio). 257 of the 277 also expose WFS (real per-feature attribute data, confirmed live to return substantial results, e.g. a zonificación agroecológica layer with ~725,000 features and 20+ real attributes per polygon); the other 20 are WMS-only, either pure-raster stores or stores with WFS explicitly disabled server-side -- notably the rural cadastre (sigtierras/catastro_rural: predios, construcciones) and agroestadistica/tipologias_territorio_hih, both confirmed WFS-disabled (\"Service WFS is disabled\"). Filter to solo_wfs=True to see only the queryable ones. Use get_sipa_geoportal_capa_datos(id) to sample a WFS-enabled layer's actual attribute values.",
+    "args_doc": {
+      "query": "Free text matched (accent-insensitive) against the layer's id, name, title, or abstract, e.g. \"catastro\", \"zonificacion\", \"riesgo\", \"palmicultor\". Empty returns all layers.",
+      "solo_wfs": "If True, only return layers with WFS (attribute data) available.",
+      "categoria": "Optional exact filter on one of the 8 top-level categories (registros, demarcacion, infraestructura, tematicas, cobertura, fisiografia, sigtierras, agroestadistica). Empty returns all categories.",
       "format": "text | json"
     }
   },
@@ -2108,6 +2763,26 @@
     "args_doc": {
       "razon_social": "Texto a buscar (mínimo 4 caracteres), ej. \"BANANERA\"",
       "max_resultados": "Cuántos resultados con detalle completo devolver (máx 100)",
+      "format": "text | json"
+    }
+  },
+  "search_trabajo_boletin_anual": {
+    "file": "search_trabajo_boletin_anual.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "str",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List known editions of Ministerio del Trabajo's \"Boletín Estadístico Anual: El Mercado Laboral en el Ecuador\" — an annual PDF report on the Ecuadorian labor market, sourced from INEC's ENEMDU survey plus the ministry's own administrative registries (a derived analysis, not a primary survey of its own). IMPORTANT — this is NOT a complete historical series: only 3 editions are known (2020, 2021, 2022). The only page that ever listed multiple editions cannot be scraped live (it violates HTTP/1.1 with duplicated Transfer-Encoding headers, confirmed reproducible, not a timeout as prior notes assumed) and today only links the 2022 edition even when fetched by hand — 2020 and 2021 were recovered from a January 2024 Wayback Machine snapshot of that same page and re-verified live. No 2023-2025 edition was found despite checking the site's search API and a handful of plausible filename guesses. Returns direct PDF URLs, not file contents — download them yourself or via download_resource / read_pdf.",
+    "args_doc": {
+      "query": "Free text matched (accent-insensitive) against the edition's year, title, or URL, e.g. \"2021\". Empty returns all known editions.",
       "format": "text | json"
     }
   },

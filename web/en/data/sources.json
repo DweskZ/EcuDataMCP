@@ -94,6 +94,24 @@
             "coverage": "sgrportal.gestionderiesgos.gob.ec",
             "url": "https://sgrportal.gestionderiesgos.gob.ec",
             "status": "live"
+          },
+          {
+            "id": "sgr-biblioteca",
+            "name": "Risk document library",
+            "tag": "SGR",
+            "description": "Resolutions, contingency plans, threat maps, and tsunami evacuation routes (~1660 documents)",
+            "coverage": "gestionderiesgos.gob.ec/biblioteca",
+            "url": "https://www.gestionderiesgos.gob.ec/biblioteca/",
+            "status": "live"
+          },
+          {
+            "id": "sgr-sitrep",
+            "name": "SITREP",
+            "tag": "SGR",
+            "description": "Historical archive of situation reports per adverse event, 2016-2026",
+            "coverage": "gestionderiesgos.gob.ec",
+            "url": "https://www.gestionderiesgos.gob.ec",
+            "status": "live"
           }
         ]
       },
@@ -116,6 +134,20 @@
             "description": "Technical report search by type (seismic/volcanic), volcano and year, with PDF text extraction",
             "coverage": "informes.igepn.edu.ec",
             "url": "https://www.igepn.edu.ec/servicios/busqueda-informes",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "INAMHI",
+        "sources": [
+          {
+            "id": "inamhi-geoportal",
+            "name": "INAMHI geoportal",
+            "tag": "INAMHI",
+            "description": "222 meteorology and hydrology layers via WMS/WFS",
+            "coverage": "geoservicios.inamhi.gob.ec",
+            "url": "https://geoservicios.inamhi.gob.ec",
             "status": "live"
           }
         ]
@@ -165,6 +197,24 @@
             "coverage": "contenido.bce.fin.ec/series-de-datos-remesas",
             "url": "https://contenido.bce.fin.ec/series-de-datos-remesas-de-trabajadores/",
             "status": "live"
+          },
+          {
+            "id": "bce-indices",
+            "name": "Indices and publications",
+            "tag": "BCE",
+            "description": "Per-series historical file archive of sector bulletins, plus the BCE's recent editorial publications feed",
+            "coverage": "contenido.bce.fin.ec",
+            "url": "https://contenido.bce.fin.ec",
+            "status": "live"
+          },
+          {
+            "id": "bce-precios-comex",
+            "name": "Foreign-trade prices",
+            "tag": "BCE",
+            "description": "Disaggregated import/export price indices by category/product",
+            "coverage": "contenido.bce.fin.ec",
+            "url": "https://contenido.bce.fin.ec",
+            "status": "live"
           }
         ]
       },
@@ -187,15 +237,6 @@
             "description": "Public taxpayer data by RUC number or business name",
             "coverage": "srienlinea.sri.gob.ec",
             "url": "https://srienlinea.sri.gob.ec/facturacion-internet/consultas/publico/",
-            "status": "live"
-          },
-          {
-            "id": "sri-saiku",
-            "name": "SRI Saiku",
-            "tag": "SRI",
-            "description": "Bounded, read-only exploration of the public tax-collection OLAP cubes (one dimension/measure, no arbitrary MDX)",
-            "coverage": "srienlinea.sri.gob.ec/saiku",
-            "url": "https://srienlinea.sri.gob.ec/saiku",
             "status": "live"
           }
         ]
@@ -233,6 +274,34 @@
             "description": "Monthly financial bulletins, financial services, historical information and statistical calendar",
             "coverage": "superbancos.gob.ec",
             "url": "https://www.superbancos.gob.ec/estadisticas/portalestudios",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Superintendencia de Economía Popular y Solidaria (SEPS)",
+        "sources": [
+          {
+            "id": "seps-estadisticas",
+            "name": "SEPS statistics",
+            "tag": "SEPS",
+            "description": "26 statistics sections for the popular/solidarity financial sector and non-financial popular economy organizations",
+            "coverage": "estadisticas.seps.gob.ec",
+            "url": "https://estadisticas.seps.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Ministerio de Economía y Finanzas (MEF)",
+        "sources": [
+          {
+            "id": "mef-fiscal",
+            "name": "SPNF fiscal statistics",
+            "tag": "MEF",
+            "description": "Non-financial public sector fiscal accounts under IMF GFSM methodology, plus SENAE's historical archive",
+            "coverage": "economicoproductivo.gob.ec",
+            "url": "https://www.economicoproductivo.gob.ec/estadistica-nueva-metodologia-2017-2022/",
             "status": "live"
           }
         ]
@@ -302,6 +371,48 @@
             "status": "offline"
           }
         ]
+      },
+      {
+        "name": "MINEDEC",
+        "sources": [
+          {
+            "id": "minedec-matricula",
+            "name": "K-12 enrollment registry",
+            "tag": "MINEDEC",
+            "description": "Historical administrative K-12 enrollment registry, 2009-present",
+            "coverage": "educacion.gob.ec",
+            "url": "https://educacion.gob.ec/datos-abiertos-minedec/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "CNIG",
+        "sources": [
+          {
+            "id": "cnig-violencia",
+            "name": "Gender-violence statistics",
+            "tag": "CNIG",
+            "description": "Femicide matrix and 19 related gender-violence tables",
+            "coverage": "igualdadgenero.gob.ec",
+            "url": "https://www.igualdadgenero.gob.ec/violencia/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "INEVAL",
+        "sources": [
+          {
+            "id": "ineval-evaluacion",
+            "name": "Educational evaluation",
+            "tag": "INEVAL",
+            "description": "Databases for Ser Bachiller, Ser Estudiante, Ser Maestro, Ser Profesional, and Llece",
+            "coverage": "evaluaciones.evaluacion.gob.ec",
+            "url": "https://evaluaciones.evaluacion.gob.ec/BI/",
+            "status": "live"
+          }
+        ]
       }
     ]
   },
@@ -320,6 +431,15 @@
             "description": "Agricultural statistics and download modules",
             "coverage": "sipa.agricultura.gob.ec",
             "url": "https://sipa.agricultura.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "sipa-geoportal",
+            "name": "SIPA geoportal",
+            "tag": "Agriculture",
+            "description": "277 agriculture spatial layers via WMS/WFS",
+            "coverage": "geoportal.agricultura.gob.ec",
+            "url": "http://geoportal.agricultura.gob.ec",
             "status": "live"
           }
         ]
@@ -363,6 +483,52 @@
             "coverage": "sut.trabajo.gob.ec",
             "url": "https://sut.trabajo.gob.ec",
             "status": "live"
+          },
+          {
+            "id": "salarios-sectoriales",
+            "name": "Sectoral wages",
+            "tag": "Labour",
+            "description": "Sectoral minimum wage tables, 2020-2025",
+            "coverage": "trabajo.gob.ec/biblioteca",
+            "url": "https://www.trabajo.gob.ec/biblioteca/",
+            "status": "live"
+          },
+          {
+            "id": "boletin-laboral-anual",
+            "name": "Annual labour bulletin",
+            "tag": "Labour",
+            "description": "Annual statistical bulletin on the Ecuadorian labor market (known editions 2020-2022)",
+            "coverage": "trabajo.gob.ec",
+            "url": "https://www.trabajo.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "IESS",
+        "sources": [
+          {
+            "id": "iess-documentos",
+            "name": "IESS documents",
+            "tag": "IESS",
+            "description": "Statistical bulletins, actuarial studies, and audit reports",
+            "coverage": "iess.gob.ec",
+            "url": "https://www.iess.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "MIES",
+        "sources": [
+          {
+            "id": "infomies",
+            "name": "infoMIES",
+            "tag": "MIES",
+            "description": "Monthly databases and zonal bulletins for economic and social inclusion programs",
+            "coverage": "info.desarrollohumano.gob.ec",
+            "url": "https://info.desarrollohumano.gob.ec",
+            "status": "live"
           }
         ]
       }
@@ -383,6 +549,78 @@
             "description": "Open audit data and the Annual Control Plan",
             "coverage": "contraloria.gob.ec",
             "url": "https://www.contraloria.gob.ec",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "transport-aviation",
+    "theme": "Transport & civil aviation",
+    "lede": "Aerodromes, aeronautical weather, and notices to airmen, straight from DGAC.",
+    "institutions": [
+      {
+        "name": "Dirección General de Aviación Civil (DGAC)",
+        "sources": [
+          {
+            "id": "dgac-aip",
+            "name": "AIP Ecuador (eAIP)",
+            "tag": "DGAC",
+            "description": "AIP AD 2.x data sheets per aerodrome/helipad: coordinates, runway, operating hours, frequencies",
+            "coverage": "ais.aviacioncivil.gob.ec",
+            "url": "https://www.ais.aviacioncivil.gob.ec/ifis3",
+            "status": "live"
+          },
+          {
+            "id": "dgac-ifis",
+            "name": "METAR / NOTAM / SIGMET",
+            "tag": "DGAC",
+            "description": "Real-time weather reports and notices to airmen",
+            "coverage": "ais.aviacioncivil.gob.ec",
+            "url": "https://www.ais.aviacioncivil.gob.ec",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "health",
+    "theme": "Health",
+    "lede": "The live sanitary registry for food, medications, and medical devices.",
+    "institutions": [
+      {
+        "name": "ARCSA",
+        "sources": [
+          {
+            "id": "arcsa-registro",
+            "name": "Sanitary registry",
+            "tag": "ARCSA",
+            "description": "Base de Registros Emitidos: food, medications, cosmetics, medical devices, and more (27 categories)",
+            "coverage": "controlsanitario.gob.ec",
+            "url": "https://www.controlsanitario.gob.ec/base-de-datos/",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "telecommunications",
+    "theme": "Telecommunications",
+    "lede": "Sector statistics from the telecommunications regulator.",
+    "institutions": [
+      {
+        "name": "ARCOTEL",
+        "sources": [
+          {
+            "id": "arcotel-reportes",
+            "name": "Reports and bulletins",
+            "tag": "ARCOTEL",
+            "description": "Monthly statistical reports (2017-2026) and annual/topical bulletins (2015-2024)",
+            "coverage": "arcotel.gob.ec",
+            "url": "https://www.arcotel.gob.ec",
             "status": "live"
           }
         ]

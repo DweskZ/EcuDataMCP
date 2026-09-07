@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.8.7",
+    "date": "2026-09-07",
+    "summary": "Fichas AIP de aeródromos y helipuertos ecuatorianos (DGAC) y el registro sanitario vigente de ARCSA por categoría, soporte de previsualización .xlsb, y un tope de descarga elevado a 20 MB para XLSX/XLSB/ODS. Se retiran las tools de SRI Saiku (endpoint confirmado inalcanzable en verificación en vivo)."
+  },
+  {
+    "version": "0.8.6",
+    "date": "2026-09-04",
+    "summary": "IESS (boletines estadísticos, estudios actuariales, informes de auditoría), Data Mashca (tercer portal CKAN municipal), y todo lo acumulado desde 0.8.5: ARCOTEL, la biblioteca y los SITREP de la SGR, el geoportal y resumen de indicadores de SIPA, MEF/SENAE, MINEDEC, SEPS, CNIG, INAMHI, INEVAL, y más."
+  },
+  {
     "version": "0.8.5",
     "date": "2026-08-31",
     "summary": "Diez fuentes nuevas — SRI Saiku, RUC del SRI, indicadores diarios del BCE, SUT, Superbancos, IG-EPN, CENACE, recaudación SRI, remesas BCE y más — más snapshots de auditoría BCEData/IEM, investigate_dataset, y despliegue remoto con autenticación y límites por cliente. Incluye un fix de seguimiento: sincronizar la versión del paquete editable en uv.lock con la versión del release, para que `uv sync --locked` pueda instalar el proyecto en GitHub Actions."

@@ -94,6 +94,24 @@
             "coverage": "sgrportal.gestionderiesgos.gob.ec",
             "url": "https://sgrportal.gestionderiesgos.gob.ec",
             "status": "live"
+          },
+          {
+            "id": "sgr-biblioteca",
+            "name": "Biblioteca de riesgos",
+            "tag": "SGR",
+            "description": "Resoluciones, planes de contingencia, mapas de amenaza y rutas de evacuación (~1660 documentos)",
+            "coverage": "gestionderiesgos.gob.ec/biblioteca",
+            "url": "https://www.gestionderiesgos.gob.ec/biblioteca/",
+            "status": "live"
+          },
+          {
+            "id": "sgr-sitrep",
+            "name": "SITREP",
+            "tag": "SGR",
+            "description": "Archivo histórico de informes de situación por evento adverso, 2016-2026",
+            "coverage": "gestionderiesgos.gob.ec",
+            "url": "https://www.gestionderiesgos.gob.ec",
+            "status": "live"
           }
         ]
       },
@@ -116,6 +134,20 @@
             "description": "Buscador de informes técnicos por tipo (sísmico/volcánico), volcán y año, con extracción de texto del PDF",
             "coverage": "informes.igepn.edu.ec",
             "url": "https://www.igepn.edu.ec/servicios/busqueda-informes",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "INAMHI",
+        "sources": [
+          {
+            "id": "inamhi-geoportal",
+            "name": "Geoportal INAMHI",
+            "tag": "INAMHI",
+            "description": "222 capas meteorológicas e hidrológicas vía WMS/WFS",
+            "coverage": "geoservicios.inamhi.gob.ec",
+            "url": "https://geoservicios.inamhi.gob.ec",
             "status": "live"
           }
         ]
@@ -165,6 +197,24 @@
             "coverage": "contenido.bce.fin.ec/series-de-datos-remesas",
             "url": "https://contenido.bce.fin.ec/series-de-datos-remesas-de-trabajadores/",
             "status": "live"
+          },
+          {
+            "id": "bce-indices",
+            "name": "Índices y publicaciones",
+            "tag": "BCE",
+            "description": "Archivo histórico por serie de boletines sectoriales y últimas publicaciones editoriales del BCE",
+            "coverage": "contenido.bce.fin.ec",
+            "url": "https://contenido.bce.fin.ec",
+            "status": "live"
+          },
+          {
+            "id": "bce-precios-comex",
+            "name": "Precios de comercio exterior",
+            "tag": "BCE",
+            "description": "Índices de precios de importación y exportación desagregados por categoría/producto",
+            "coverage": "contenido.bce.fin.ec",
+            "url": "https://contenido.bce.fin.ec",
+            "status": "live"
           }
         ]
       },
@@ -187,15 +237,6 @@
             "description": "Datos públicos de un contribuyente por número de RUC o razón social",
             "coverage": "srienlinea.sri.gob.ec",
             "url": "https://srienlinea.sri.gob.ec/facturacion-internet/consultas/publico/",
-            "status": "live"
-          },
-          {
-            "id": "sri-saiku",
-            "name": "SRI Saiku",
-            "tag": "SRI",
-            "description": "Exploración acotada y de solo lectura de los cubos OLAP públicos de recaudación (una dimensión/medida, sin MDX arbitrario)",
-            "coverage": "srienlinea.sri.gob.ec/saiku",
-            "url": "https://srienlinea.sri.gob.ec/saiku",
             "status": "live"
           }
         ]
@@ -233,6 +274,34 @@
             "description": "Boletines financieros mensuales, servicios financieros, información histórica y calendario estadístico",
             "coverage": "superbancos.gob.ec",
             "url": "https://www.superbancos.gob.ec/estadisticas/portalestudios",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Superintendencia de Economía Popular y Solidaria (SEPS)",
+        "sources": [
+          {
+            "id": "seps-estadisticas",
+            "name": "Estadísticas SEPS",
+            "tag": "SEPS",
+            "description": "26 secciones de estadísticas del sector financiero popular y solidario y de la economía popular y solidaria",
+            "coverage": "estadisticas.seps.gob.ec",
+            "url": "https://estadisticas.seps.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Ministerio de Economía y Finanzas (MEF)",
+        "sources": [
+          {
+            "id": "mef-fiscal",
+            "name": "Estadística fiscal SPNF",
+            "tag": "MEF",
+            "description": "Cuentas fiscales del Sector Público No Financiero bajo metodología FMI/GFSM, más el archivo histórico de SENAE",
+            "coverage": "economicoproductivo.gob.ec",
+            "url": "https://www.economicoproductivo.gob.ec/estadistica-nueva-metodologia-2017-2022/",
             "status": "live"
           }
         ]
@@ -302,6 +371,48 @@
             "status": "offline"
           }
         ]
+      },
+      {
+        "name": "MINEDEC",
+        "sources": [
+          {
+            "id": "minedec-matricula",
+            "name": "Matrícula educación básica",
+            "tag": "MINEDEC",
+            "description": "Registro administrativo histórico de matrícula K-12, 2009 en adelante",
+            "coverage": "educacion.gob.ec",
+            "url": "https://educacion.gob.ec/datos-abiertos-minedec/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "CNIG",
+        "sources": [
+          {
+            "id": "cnig-violencia",
+            "name": "Estadísticas de violencia de género",
+            "tag": "CNIG",
+            "description": "Matriz de femicidios y 19 tablas relacionadas de violencia de género",
+            "coverage": "igualdadgenero.gob.ec",
+            "url": "https://www.igualdadgenero.gob.ec/violencia/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "INEVAL",
+        "sources": [
+          {
+            "id": "ineval-evaluacion",
+            "name": "Evaluación educativa",
+            "tag": "INEVAL",
+            "description": "Bases de datos de Ser Bachiller, Ser Estudiante, Ser Maestro, Ser Profesional y Llece",
+            "coverage": "evaluaciones.evaluacion.gob.ec",
+            "url": "https://evaluaciones.evaluacion.gob.ec/BI/",
+            "status": "live"
+          }
+        ]
       }
     ]
   },
@@ -320,6 +431,15 @@
             "description": "Módulos de descargas y estadísticas agropecuarias",
             "coverage": "sipa.agricultura.gob.ec",
             "url": "https://sipa.agricultura.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "sipa-geoportal",
+            "name": "Geoportal SIPA",
+            "tag": "Agricultura",
+            "description": "277 capas espaciales agropecuarias vía WMS/WFS",
+            "coverage": "geoportal.agricultura.gob.ec",
+            "url": "http://geoportal.agricultura.gob.ec",
             "status": "live"
           }
         ]
@@ -363,6 +483,52 @@
             "coverage": "sut.trabajo.gob.ec",
             "url": "https://sut.trabajo.gob.ec",
             "status": "live"
+          },
+          {
+            "id": "salarios-sectoriales",
+            "name": "Salarios sectoriales",
+            "tag": "Trabajo",
+            "description": "Tablas de salarios mínimos sectoriales, 2020-2025",
+            "coverage": "trabajo.gob.ec/biblioteca",
+            "url": "https://www.trabajo.gob.ec/biblioteca/",
+            "status": "live"
+          },
+          {
+            "id": "boletin-laboral-anual",
+            "name": "Boletín laboral anual",
+            "tag": "Trabajo",
+            "description": "Boletín estadístico anual del mercado laboral ecuatoriano (ediciones 2020-2022 conocidas)",
+            "coverage": "trabajo.gob.ec",
+            "url": "https://www.trabajo.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "IESS",
+        "sources": [
+          {
+            "id": "iess-documentos",
+            "name": "Documentos IESS",
+            "tag": "IESS",
+            "description": "Boletines estadísticos, estudios actuariales e informes de auditoría",
+            "coverage": "iess.gob.ec",
+            "url": "https://www.iess.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "MIES",
+        "sources": [
+          {
+            "id": "infomies",
+            "name": "infoMIES",
+            "tag": "MIES",
+            "description": "Bases de datos mensuales y boletines zonales de inclusión económica y social",
+            "coverage": "info.desarrollohumano.gob.ec",
+            "url": "https://info.desarrollohumano.gob.ec",
+            "status": "live"
           }
         ]
       }
@@ -383,6 +549,78 @@
             "description": "Datos abiertos de auditorías y Plan Anual de Control",
             "coverage": "contraloria.gob.ec",
             "url": "https://www.contraloria.gob.ec",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "transporte-aviacion",
+    "theme": "Transporte y aviación civil",
+    "lede": "Aeródromos, meteorología aeronáutica y avisos a aviadores, directo de la DGAC.",
+    "institutions": [
+      {
+        "name": "Dirección General de Aviación Civil (DGAC)",
+        "sources": [
+          {
+            "id": "dgac-aip",
+            "name": "AIP Ecuador (eAIP)",
+            "tag": "DGAC",
+            "description": "Fichas AIP AD 2.x por aeródromo/helipuerto: coordenadas, pista, horarios, frecuencias",
+            "coverage": "ais.aviacioncivil.gob.ec",
+            "url": "https://www.ais.aviacioncivil.gob.ec/ifis3",
+            "status": "live"
+          },
+          {
+            "id": "dgac-ifis",
+            "name": "METAR / NOTAM / SIGMET",
+            "tag": "DGAC",
+            "description": "Reportes meteorológicos y avisos a aviadores en tiempo real",
+            "coverage": "ais.aviacioncivil.gob.ec",
+            "url": "https://www.ais.aviacioncivil.gob.ec",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "salud",
+    "theme": "Salud",
+    "lede": "El registro sanitario vigente de alimentos, medicamentos y dispositivos médicos.",
+    "institutions": [
+      {
+        "name": "ARCSA",
+        "sources": [
+          {
+            "id": "arcsa-registro",
+            "name": "Registro sanitario",
+            "tag": "ARCSA",
+            "description": "Base de Registros Emitidos: alimentos, medicamentos, cosméticos, dispositivos médicos y más (27 categorías)",
+            "coverage": "controlsanitario.gob.ec",
+            "url": "https://www.controlsanitario.gob.ec/base-de-datos/",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "telecomunicaciones",
+    "theme": "Telecomunicaciones",
+    "lede": "Estadísticas sectoriales del regulador de telecomunicaciones.",
+    "institutions": [
+      {
+        "name": "ARCOTEL",
+        "sources": [
+          {
+            "id": "arcotel-reportes",
+            "name": "Reportes y boletines",
+            "tag": "ARCOTEL",
+            "description": "Reportes estadísticos mensuales (2017-2026) y boletines anuales/temáticos (2015-2024)",
+            "coverage": "arcotel.gob.ec",
+            "url": "https://www.arcotel.gob.ec",
             "status": "live"
           }
         ]

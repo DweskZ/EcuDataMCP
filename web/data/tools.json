@@ -1092,6 +1092,126 @@
           }
         ],
         "long_description": "Busca sismos recientes en Ecuador del Instituto Geofísico (IG-EPN). Devuelve el feed del catálogo sísmico del IG-EPN: magnitud, profundidad, coordenadas, hora local/UTC, estado de revisión y descripción del lugar más cercano, con enlace a la página de cada evento. Los datos se cachean ~2 minutos."
+      },
+      {
+        "name": "search_sgr_sitreps",
+        "description": "Archivo histórico de eventos adversos de la SGR (2016-2026).",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra el título, estado o descripción del evento (ignora tildes), ej. \"terremoto\", \"en curso\", \"manabi\". Vacío devuelve todos los eventos."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista el archivo de dosieres de eventos adversos SITREP (\"Informes de Situación\") de la Secretaría de Gestión de Riesgos, 2016-2026. Es una fuente distinta de search_eventos_riesgo, que lee el snapshot en vivo de ArcGIS (solo eventos actuales, sin historia). Lista cerca de 54 dosieres multianuales — terremotos, temporadas de incendios forestales, temporadas de lluvia, deslizamientos, actividad volcánica —, cada uno con un estado y su propia página. Continúa con get_sgr_sitrep_archivos(url) sobre la \"url\" de un evento."
+      },
+      {
+        "name": "get_sgr_sitrep_archivos",
+        "description": "Reportes SITREP en PDF de un evento adverso de la SGR.",
+        "params": [
+          {
+            "name": "evento_url",
+            "type": "str",
+            "default": null,
+            "description": "Una URL de evento tomada del campo \"url\" de search_sgr_sitreps (debe ser de gestionderiesgos.gob.ec)."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista los enlaces a los reportes SITREP en PDF publicados en la página de un evento adverso de la SGR. Devuelve, por reporte, el grupo (el encabezado de sección de la propia página, ej. nacional/provincial/cantonal), el título y la URL directa del PDF. Un evento prolongado puede tener más de 700 PDF; uno cerrado y puntual suele tener muchos menos."
+      },
+      {
+        "name": "list_sgr_biblioteca_categorias",
+        "description": "Categorías de la biblioteca documental de la SGR (~1660 documentos).",
+        "params": [
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista las categorías de la biblioteca documental de la Secretaría de Gestión de Riesgos (gestionderiesgos.gob.ec/biblioteca/) — resoluciones, planes de contingencia, mapas de amenaza, rutas de evacuación por tsunami y más, cerca de 1660 documentos en 19 categorías de nivel superior. Es una fuente distinta de search_eventos_riesgo/search_sgr_sitreps: una biblioteca permanente, no reportes de eventos. Una parte real de los enlaces da error 404 (confirmado en vivo) — trata esto como un catálogo candidato, no una garantía de que todo documento resuelve."
+      },
+      {
+        "name": "get_sgr_biblioteca_categoria_archivos",
+        "description": "Documentos de una categoría de la biblioteca de la SGR.",
+        "params": [
+          {
+            "name": "categoria",
+            "type": "str",
+            "default": null,
+            "description": "Un \"id\" o \"nombre\" de categoría, tomado de list_sgr_biblioteca_categorias (la coincidencia por nombre ignora tildes y mayúsculas)."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista los documentos de una categoría de nivel superior de la Biblioteca de la SGR. Devuelve, por documento, el subgrupo (subcategoría anidada, cuando existe), título, id y URL directa. El formato se reporta como desconocido para toda entrada, porque el enlace de descarga no trae extensión de archivo."
+      },
+      {
+        "name": "search_inamhi_capas",
+        "description": "Catálogo de capas del geoportal de INAMHI (meteorología e hidrología).",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra el nombre, título o resumen de la capa (ignora tildes), ej. \"precipitacion\", \"cuencas\", \"anomalias\". Vacío devuelve todas las capas."
+          },
+          {
+            "name": "solo_wfs",
+            "type": "bool",
+            "default": "False",
+            "description": "Si es True, devuelve solo las capas con WFS (datos de atributo) disponible."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Busca en el catálogo de capas del geoportal de INAMHI (geoservicios.inamhi.gob.ec) — un GeoServer/GeoNode que expone las capas espaciales del instituto de meteorología e hidrología de Ecuador vía WMS/WFS. 222 capas confirmadas en vivo: normales climáticas de precipitación, compuestos diarios de anomalía de lluvia, salidas del modelo numérico WRF, límites de cuencas y divisiones administrativas. 199 de las 222 exponen WFS; el resto son solo raster. Esta fuente no incluye una capa de observación cruda por estación — todo aquí está agregado por polígono."
+      },
+      {
+        "name": "get_inamhi_capa_datos",
+        "description": "Muestra de atributos reales de una capa del geoportal de INAMHI.",
+        "params": [
+          {
+            "name": "layer_name",
+            "type": "str",
+            "default": null,
+            "description": "Nombre de capa devuelto por search_inamhi_capas, incluyendo el prefijo de workspace \"geonode:\", ej. \"geonode:regiones_precip\"."
+          },
+          {
+            "name": "count",
+            "type": "int",
+            "default": "5",
+            "description": "Número de entidades a traer (1-20, default 5)."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Trae una muestra pequeña y acotada de los atributos reales de una capa WFS del geoportal de INAMHI (vía WFS GetFeature, salida JSON). Usa primero search_inamhi_capas para encontrar el nombre de capa y verificar wfs_disponible=True (las capas solo-raster, como las grillas del modelo WRF, no tienen datos de atributo). No es un motor de consulta espacial: sin filtro por bbox/CQL, sin reproyección."
       }
     ]
   },
@@ -1467,6 +1587,100 @@
           }
         ],
         "long_description": "Lista los enlaces directos a archivos de Remesas de Trabajadores del BCE. Una serie separada de BCEData/IEM (search_indicadores_bce, search_bce_iem): la serie agregada de flujos, la serie histórica completa, una nota metodológica para el usuario, y — desde un cambio a recolección basada en microdatos en julio de 2025 — bases de datos (BDD) agregadas mensuales y por entidad. Trata los archivos \"histórica\" (previo al cambio) y \"BDD\" (posterior al cambio) como series metodológicamente distintas, no como una sola continua — revisa la nota al usuario (Nota_al_usuario) para el detalle de comparabilidad. Devuelve URLs directas, no el contenido de los archivos — descárgalos tú mismo o vía download_resource."
+      },
+      {
+        "name": "search_bce_publicaciones",
+        "description": "Publicaciones recientes del BCE (boletines, reportes, avisos).",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra el título de la publicación (ignora tildes). Vacío devuelve todas."
+          },
+          {
+            "name": "formato",
+            "type": "str",
+            "default": "''",
+            "description": "Coincidencia exacta con el formato derivado — PDF, XLSX, XLS, CSV, ZIP, HTML. Vacío devuelve todos los formatos."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista las publicaciones recientes del Banco Central del Ecuador desde su sección \"Últimas Publicaciones\": boletines monetarios, reportes de tasas de interés, boletines sectoriales, avisos del IEM, entre otros, cada uno con fecha, título, URL directa y formato. Es un catálogo distinto de BCEData/IEM (search_indicadores_bce, search_bce_iem): la mayoría de lo que aparece aquí no tiene una serie numérica equivalente. Solo muestra la ventana reciente que exhibe la propia página (unas 30 publicaciones más recientes) — no hay paginación ni filtro de rango de fechas."
+      },
+      {
+        "name": "search_bce_indices",
+        "description": "Catálogo de páginas \"índice\" del BCE con archivo histórico por serie.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra el título o la URL de la página (ignora tildes). Vacío devuelve todas las páginas encontradas."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista las páginas \"índice\" del BCE — una por cada serie de publicaciones con nombre propio (boletines sectoriales de petróleo/minería/cemento, índices de precios de comercio exterior, índices de confianza EMOE, tipo de cambio, balanza de pagos, boletines de remesas, y más), cada una con un archivo histórico año por año o semana por semana que en algunas series llega hasta 2004. Devuelve solo resúmenes — usa el pagina_id devuelto en get_bce_indice_archivo para leer el archivo de una serie."
+      },
+      {
+        "name": "get_bce_indice_archivo",
+        "description": "Archivo de archivos de una página \"índice\" del BCE.",
+        "params": [
+          {
+            "name": "pagina_id",
+            "type": "str",
+            "default": null,
+            "description": "El slug de la página, tomado del campo pagina_id de search_bce_indices (ej. \"boletin-analitico-del-sector-petrolero-indice\")."
+          },
+          {
+            "name": "anio",
+            "type": "int",
+            "default": "0",
+            "description": "Restringe a un año calendario. 0 devuelve todos los años encontrados."
+          },
+          {
+            "name": "max_archivos",
+            "type": "int",
+            "default": "30",
+            "description": "Tope de archivos devueltos (años más recientes primero), 1-200. Usa anio para llegar más atrás del tope."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lee el archivo de archivos publicados de una página \"índice\" del BCE (obtenida con search_bce_indices). Cada elemento es un archivo publicado: año, etiqueta de período (trimestre, mes o número de semana), fecha en español cuando la fuente la da (solo series semanales), URL directa y formato."
+      },
+      {
+        "name": "search_bce_precios_comex",
+        "description": "Índices de precios de comercio exterior del BCE, desagregados.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra la etiqueta del archivo, el título de la página o el id de página (ignora tildes), ej. \"importacion\", \"exportacion\". Vacío devuelve todos los archivos."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista los enlaces a los archivos desagregados de índices de precios de comercio exterior del BCE — precios de importación por categoría de uso económico y precios de exportación por producto individual (petróleo crudo, camarón, banano, cacao, cobre, oro, rosas), cada uno con hojas separadas de precio/valor/volumen y variaciones. Es una fuente distinta del catálogo BCEData de search_indicadores_bce (que solo tiene las tres series *agregadas*) y de search_bce_indices (que no cubre precios de comercio exterior). Devuelve URLs directas, no el contenido de los archivos."
       }
     ]
   },
@@ -1626,27 +1840,8 @@
     ]
   },
   {
-    "category": "SRI: RUC, recaudación y Saiku",
+    "category": "SRI: RUC y recaudación",
     "tools": [
-      {
-        "name": "describe_sri_saiku_cube",
-        "description": "Describir un cubo Saiku público del SRI: dimensiones, jerarquías, niveles, medidas y metadatos OLAP.",
-        "params": [
-          {
-            "name": "cube_id",
-            "type": "str",
-            "default": null,
-            "description": "Identificador devuelto por list_sri_saiku_cubes"
-          },
-          {
-            "name": "format",
-            "type": "str",
-            "default": "'text'",
-            "description": "text | json"
-          }
-        ],
-        "long_description": "Describir un cubo Saiku público del SRI: dimensiones, jerarquías, niveles, medidas y metadatos OLAP. Usa solo rutas de descubrimiento de lectura. No consulta filas ni devuelve la configuración Oracle de las fuentes."
-      },
       {
         "name": "get_sri_ruc_info",
         "description": "Consultar la información pública de un contribuyente por RUC en el SRI.",
@@ -1671,68 +1866,6 @@
           }
         ],
         "long_description": "Consultar la información pública de un contribuyente por RUC en el SRI. Devuelve razón social, estado, tipo, actividad económica, fechas de registro y establecimientos públicos registrados. No devuelve declaraciones ni montos tributarios individuales."
-      },
-      {
-        "name": "list_sri_saiku_cubes",
-        "description": "Listar los cubos OLAP visibles en la instancia pública de Saiku del SRI.",
-        "params": [
-          {
-            "name": "format",
-            "type": "str",
-            "default": "'text'",
-            "description": "text | json"
-          }
-        ],
-        "long_description": "Listar los cubos OLAP visibles en la instancia pública de Saiku del SRI. Esta herramienta solo consulta la sesión anónima y la ruta pública de descubrimiento. No lee la configuración administrativa ni devuelve registros de contribuyentes."
-      },
-      {
-        "name": "query_sri_saiku_aggregate",
-        "description": "Ejecutar una consulta agregada y limitada en un cubo público de Saiku.",
-        "params": [
-          {
-            "name": "cube_id",
-            "type": "str",
-            "default": null,
-            "description": "Identificador completo del cubo"
-          },
-          {
-            "name": "row_dimension",
-            "type": "str",
-            "default": null,
-            "description": "Nombre de la dimensión para las filas"
-          },
-          {
-            "name": "row_hierarchy",
-            "type": "str",
-            "default": null,
-            "description": "Nombre de la jerarquía"
-          },
-          {
-            "name": "row_level",
-            "type": "str",
-            "default": null,
-            "description": "Nivel que se mostrará en las filas"
-          },
-          {
-            "name": "measure",
-            "type": "str",
-            "default": null,
-            "description": "Medida agregada"
-          },
-          {
-            "name": "limit",
-            "type": "int",
-            "default": "25",
-            "description": "Máximo de filas solicitado (1-100)"
-          },
-          {
-            "name": "format",
-            "type": "str",
-            "default": "'text'",
-            "description": "text | json"
-          }
-        ],
-        "long_description": "Ejecutar una consulta agregada y limitada en un cubo público de Saiku. La consulta tiene una sola dimensión en filas y una medida. El cubo, dimensión, jerarquía, nivel y medida deben salir de list_sri_saiku_cubes/describe_sri_saiku_cube. El límite máximo es 100. No acepta MDX arbitrario, no hace drill-through y no busca RUCs."
       },
       {
         "name": "search_sri_estadisticas_recaudacion",
@@ -1896,6 +2029,81 @@
           }
         ],
         "long_description": "Lista las secciones de estadísticas de la Superintendencia de Bancos (superbancos.gob.ec/estadisticas/portalestudios/). Superbancos no tiene organización CKAN ni sección de \"datos abiertos\", así que este es el único camino a sus estadísticas publicadas: boletines financieros mensuales, estadísticas de servicios de tarjetas/cajeros/corresponsales, comportamiento financiero anual comparativo, y el calendario de publicaciones. IMPORTANTE: cada página de sección también incrusta un widget de OneDrive del lado del cliente que carga de forma diferida los archivos de los años *más recientes* fuera del HTML de la página — no cubierto aquí. Este tool solo devuelve lo que está en las tablas estáticas de archivo de la página, que para la mayoría de secciones se detienen alrededor de 2020-2021 (boletines financieros: solo 1997-2008). Continúa con get_superbancos_seccion_archivos(seccion) para el listado real de archivos y cobertura de una sección."
+      },
+      {
+        "name": "get_sipa_resumen_indicadores",
+        "description": "PDF mensuales del \"Resumen de Indicadores\" de SIPA (Ministerio de Agricultura), por año.",
+        "params": [
+          {
+            "name": "anio",
+            "type": "int",
+            "default": null,
+            "description": "Año, ej. 2025. El más antiguo confirmado en vivo es 2018."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista los enlaces directos a los PDF mensuales del \"Resumen de Indicadores\" de SIPA para un año dado, alcanzado desde el tablero dinámico de \"Indicadores Sectoriales\" (sipa.agricultura.gob.ec). Confirmado en vivo 2018-2026; cada año es una página separada y las convenciones de nombre de archivo cambian entre años. Otros elementos del mismo tablero son incrustaciones de Tableau Server o flipbooks en JS sin archivo directo — ninguno de esos está cubierto por este tool."
+      },
+      {
+        "name": "search_sipa_geoportal_capas",
+        "description": "Catálogo de capas del geoportal del Ministerio de Agricultura (SIPA).",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra el id, nombre, título o resumen de la capa (ignora tildes), ej. \"catastro\", \"zonificacion\", \"riesgo\", \"palmicultor\". Vacío devuelve todas las capas."
+          },
+          {
+            "name": "solo_wfs",
+            "type": "bool",
+            "default": "False",
+            "description": "Si es True, devuelve solo las capas con WFS (datos de atributo) disponible."
+          },
+          {
+            "name": "categoria",
+            "type": "str",
+            "default": "''",
+            "description": "Filtro exacto opcional por una de las 8 categorías de nivel superior. Vacío devuelve todas."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Busca en el catálogo de capas del geoportal del Ministerio de Agricultura (geoportal.agricultura.gob.ec) — un GeoServer que expone las capas espaciales agropecuarias de Ecuador vía WMS/WFS. 277 capas confirmadas en vivo en 24 endpoints y 8 categorías: censos y registros administrativos, zonificación agroecológica, infraestructura agroindustrial, inventario de recursos naturales, cobertura de tierra, geomorfología, el catastro rural de SIGTIERRAS y estadística agropecuaria. 257 de las 277 exponen WFS; el resto son solo WMS. Filtra con solo_wfs=True para ver solo las consultables. Usa get_sipa_geoportal_capa_datos(id) para muestrear los valores reales de una capa."
+      },
+      {
+        "name": "get_sipa_geoportal_capa_datos",
+        "description": "Muestra de atributos reales de una capa del geoportal de SIPA.",
+        "params": [
+          {
+            "name": "layer_id",
+            "type": "str",
+            "default": null,
+            "description": "Id de capa devuelto por search_sipa_geoportal_capas, la tripleta \"categoria/store/name\", ej. \"demarcacion/E25k/vw_hg000_zae_cafe_arabigo\"."
+          },
+          {
+            "name": "count",
+            "type": "int",
+            "default": "5",
+            "description": "Número de entidades a traer (1-20, default 5)."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Trae una muestra pequeña y acotada de los atributos reales de una capa WFS del geoportal del Ministerio de Agricultura (vía WFS GetFeature, salida JSON). Usa primero search_sipa_geoportal_capas para encontrar el id de capa y verificar wfs_disponible=True. No es un motor de consulta espacial: sin filtro por bbox/CQL, sin reproyección, y las coordenadas de la geometría se descartan del resultado."
       }
     ]
   },
@@ -2161,6 +2369,471 @@
           }
         ],
         "long_description": "Extrae texto de un documento PDF en una URL directa. Útil para PDFs enlazados desde el resultado de otros tools, ej. el archivo del Registro Oficial de get_regulacion_info, o un recurso de dataset que resultó ser un boletín PDF en vez de un archivo tabular. Sin OCR: un PDF escaneado sin capa de texto embebida vendrá vacío. Tamaño máximo de descarga: 5 MB (los archivos más grandes devuelven un error explícito en vez de una lectura parcial -- los PDF no se pueden parsear desde una descarga truncada); máximo 20 páginas extraídas por llamada (vuelve a llamar con un rango de `pages` distinto para el resto)."
+      }
+    ]
+  },
+  {
+    "category": "SEPS y economía popular",
+    "tools": [
+      {
+        "name": "list_seps_secciones",
+        "description": "Secciones de estadísticas de la SEPS (sector financiero popular y solidario).",
+        "params": [
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista las secciones de estadísticas de la Superintendencia de Economía Popular y Solidaria (estadisticas.seps.gob.ec). El sitio principal de la SEPS bloquea conexiones automatizadas, pero este subdominio es un WordPress normal sin organización en CKAN: 22 secciones de \"Estadísticas SFPS\" (cooperativas, mutualistas, cajas) más 4 de \"Estadísticas EPS\". Incluye boletines de calificación de riesgo, uno por año 2020-2025. Continúa con get_seps_seccion_archivos(seccion)."
+      },
+      {
+        "name": "get_seps_seccion_archivos",
+        "description": "Documentos de una sección de estadísticas de la SEPS.",
+        "params": [
+          {
+            "name": "seccion",
+            "type": "str",
+            "default": null,
+            "description": "Una clave de sección tomada de list_seps_secciones, ej. \"sfps_reportes_calificacion_de_riesgos\"."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista los enlaces de descarga directa publicados en una sección de estadísticas de la SEPS. Devuelve la descripción propia de la sección más, por archivo, el grupo, el período/título, la URL directa y el formato. Algunos enlaces son directos; otros pasan por el plugin \"Simple Download Monitor\" del sitio y el formato aparece como desconocido en esos casos."
+      }
+    ]
+  },
+  {
+    "category": "IESS: documentos institucionales",
+    "tools": [
+      {
+        "name": "list_iess_colecciones",
+        "description": "Colecciones documentales del IESS (boletines, estudios actuariales, auditorías).",
+        "params": [
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista las tres colecciones documentales del IESS (Instituto Ecuatoriano de Seguridad Social) — Boletines Estadísticos, Estudios Actuariales e Informes de Auditoría —, con los años y cantidades que tiene publicados cada una. Continúa con get_iess_archivos(coleccion, anio=...) para obtener los documentos reales de una colección."
+      },
+      {
+        "name": "get_iess_archivos",
+        "description": "Documentos de una colección del IESS.",
+        "params": [
+          {
+            "name": "coleccion",
+            "type": "Literal['boletines', 'estudios_actuariales', 'informes_auditoria']",
+            "default": null,
+            "description": "\"boletines\" (anuales, 1978-2024 confirmados), \"estudios_actuariales\" (por fondo, solo algunos años) o \"informes_auditoria\" (2007-2026 confirmados, por año)."
+          },
+          {
+            "name": "anio",
+            "type": "int | None",
+            "default": "None",
+            "description": "Filtra a un año. Obligatorio para \"informes_auditoria\". Opcional para las otras dos colecciones."
+          },
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra el título (y descripción/grupo cuando la colección lo tiene), ignora tildes."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista los documentos reales de una colección del IESS, cada uno resuelto a su URL de descarga directa, título y formato. Llama primero a list_iess_colecciones para ver qué años y cantidades tiene disponible cada colección."
+      }
+    ]
+  },
+  {
+    "category": "INEVAL: evaluación educativa",
+    "tools": [
+      {
+        "name": "list_ineval_familias",
+        "description": "Familias de evaluación del INEVAL con página de bases de datos.",
+        "params": [
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista las familias de evaluación del INEVAL (Instituto Nacional de Evaluación Educativa) con una página real de \"Bases de Datos\" — una institución distinta de SENESCYT/MINEDUC. Publica nueve familias: Ser Bachiller, Ser Estudiante (con variantes), Ser Maestro, Ser Profesional y Llece (ERCE/SERCE/TERCE). El sitio también enlaza páginas informativas sin descargas — solo las claves devueltas aquí apuntan a archivos reales. Continúa con get_ineval_familia_archivos(familia)."
+      },
+      {
+        "name": "get_ineval_familia_archivos",
+        "description": "Enlaces de descarga de una familia de evaluación del INEVAL.",
+        "params": [
+          {
+            "name": "familia",
+            "type": "str",
+            "default": null,
+            "description": "Una clave de familia tomada de list_ineval_familias, ej. \"ser_bachiller\", \"ser_estudiante\", \"llece\"."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista los enlaces de descarga directa publicados en la página \"Bases de Datos\" de una familia de evaluación del INEVAL. Devuelve, por archivo, el grupo, el período, el título y el formato (CSV, SAV, XLSX, SINTAXIS, METADATO, DICCIONARIO, o desconocido). Algunos archivos pesan varios MB — descarga la URL directamente en vez de pasarla por preview_resource_data o download_resource, que tienen un tope de 5 MB."
+      }
+    ]
+  },
+  {
+    "category": "Aviación civil (DGAC)",
+    "tools": [
+      {
+        "name": "get_metar",
+        "description": "Reportes METAR/SPECI recientes de un aeródromo ecuatoriano.",
+        "params": [
+          {
+            "name": "designador",
+            "type": "str",
+            "default": null,
+            "description": "Código ICAO del aeródromo/helipuerto, ej. SEQM (Quito), SEGU (Guayaquil), SECU (Cuenca)."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Consulta los reportes meteorológicos METAR/SPECI más recientes de un aeródromo o helipuerto ecuatoriano, desde el sitio IFIS de la DGAC (ais.aviacioncivil.gob.ec), de acceso público sin login. Devuelve el tipo de reporte, la marca de tiempo UTC de observación y el texto crudo en codificación ICAO (ej. \"SEQM 030100Z 30004KT 9999 FEW030 17/08 Q1026 NOSIG RMK A3032=\"). Un designador desconocido devuelve un resultado vacío, no un error."
+      },
+      {
+        "name": "get_notam",
+        "description": "NOTAMs activos para un aeródromo ecuatoriano.",
+        "params": [
+          {
+            "name": "designador",
+            "type": "str",
+            "default": null,
+            "description": "Código ICAO del aeródromo/helipuerto, ej. SEQM (Quito), SEGU (Guayaquil), SECU (Cuenca)."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Consulta los NOTAM (avisos a aviadores) activos para un aeródromo o helipuerto ecuatoriano, desde el sitio IFIS de la DGAC, también de acceso público sin login. Cada NOTAM incluye su número de serie (ej. \"A1784/26\"), el texto crudo en formato ICAO y la tabla de campos decodificados que publica el propio sitio (Tipo, FIR, vigencia, horario, etc.). Un designador desconocido devuelve cero NOTAM, no un error."
+      },
+      {
+        "name": "get_sigmet",
+        "description": "SIGMET activos para el espacio aéreo ecuatoriano (FIR único).",
+        "params": [
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Consulta los SIGMET (información meteorológica significativa: ceniza volcánica, turbulencia o engelamiento severos, tormentas) actualmente activos para el FIR de Ecuador (SEFG), desde el sitio IFIS de la DGAC. Como el país tiene un único FIR, no existe parámetro por aeródromo. Cero resultados significa que no hay avisos activos, no un error."
+      },
+      {
+        "name": "list_aip_aerodromos",
+        "description": "Lista de aeródromos/helipuertos con ficha AIP publicada.",
+        "params": [
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista los designadores ICAO y nombres de todos los aeródromos y helipuertos con una página AIP AD 2.x publicada, tomada del eAIP público de la DGAC (ais.aviacioncivil.gob.ec/ifis3), sin necesidad de login. Usa get_aip_aerodromo con uno de estos designadores para obtener la ficha completa (coordenadas, pista, horarios, tarifas, frecuencias ATS, etc.)."
+      },
+      {
+        "name": "get_aip_aerodromo",
+        "description": "Ficha AIP AD 2.x completa de un aeródromo ecuatoriano.",
+        "params": [
+          {
+            "name": "designador",
+            "type": "str",
+            "default": null,
+            "description": "Código ICAO del aeródromo/helipuerto, ej. SEQM (Quito), SEGU (Guayaquil), SECU (Cuenca)."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Obtiene la ficha AIP AD 2.x publicada para un aeródromo o helipuerto ecuatoriano, desde el eAIP público de la DGAC. Devuelve los campos numerados que publica el AIP, agrupados por las subsecciones del Anexo 15 de la OACI: ubicación y datos administrativos (coordenadas ARP, elevación, variación magnética, contactos del operador), horarios de operación, servicios de extinción de incendios y rescate, datos de plataforma y calles de rodaje, ayudas de radionavegación, características físicas de pista, distancias declaradas, iluminación, procedimientos de vuelo e información suplementaria. Usa list_aip_aerodromos para ver qué designadores están publicados."
+      }
+    ]
+  },
+  {
+    "category": "ARCOTEL: telecomunicaciones",
+    "tools": [
+      {
+        "name": "search_arcotel_reportes_mensuales",
+        "description": "Reportes estadísticos mensuales de ARCOTEL sobre telecomunicaciones.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra la etiqueta, el año o la URL de cada entrada (ignora tildes), ej. \"junio 2026\", \"2025\", \"internet\". Vacío devuelve todas."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista los PDF de \"Reportes Estadísticos Mensuales\" de ARCOTEL (Agencia de Regulación y Control de las Telecomunicaciones), publicados en el sitio institucional (www.arcotel.gob.ec) fuera de CKAN. Rango confirmado en vivo: enero de 2017 a junio de 2026, con un rezago típico de unos dos meses. Es una serie distinta y de mayor frecuencia que search_arcotel_boletines y del organismo CKAN de ARCOTEL (congelado desde 2021/2022). Solo PDF, sin CSV/XLSX/API — devuelve URLs directas, no datos de tabla ya extraídos."
+      },
+      {
+        "name": "search_arcotel_boletines",
+        "description": "Boletines estadísticos anuales/temáticos de ARCOTEL sobre telecomunicaciones.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra la etiqueta, el año o la URL de cada entrada (ignora tildes), ej. \"roaming\", \"2020\", \"portabilidad\". Vacío devuelve todas."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista los PDF del \"Boletín Estadístico del Sector de las Telecomunicaciones\" de ARCOTEL, publicados en el sitio institucional fuera de CKAN. Rango confirmado en vivo: 2015 a 2024 (sin boletín 2025/2026 todavía). Tiene una frecuencia más baja y más temática que search_arcotel_reportes_mensuales (serie mensual 2017-2026). Solo PDF — devuelve URLs directas, no datos de tabla ya extraídos."
+      }
+    ]
+  },
+  {
+    "category": "ARCSA: registro sanitario",
+    "tools": [
+      {
+        "name": "list_arcsa_categorias",
+        "description": "Categorías del registro sanitario de ARCSA (Base de Registros Emitidos).",
+        "params": [
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista las categorías de la \"Base de Registros Emitidos\" de ARCSA (controlsanitario.gob.ec/base-de-datos/): el registro sanitario vigente de alimentos, medicamentos, cosméticos, dispositivos médicos, productos naturales, plaguicidas y establecimientos/permisos afines — 27 categorías con 77 documentos en total. Es una fuente distinta de los datasets CKAN de ARCSA (que solo cubren registros suspendidos o cancelados): esta es la base viva de autorizaciones vigentes. Algunas categorías anidan subcategorías (por ejemplo, por año), visibles como \"subgrupo\" en get_arcsa_categoria_archivos."
+      },
+      {
+        "name": "get_arcsa_categoria_archivos",
+        "description": "Documentos de una categoría del registro sanitario de ARCSA.",
+        "params": [
+          {
+            "name": "categoria",
+            "type": "str",
+            "default": null,
+            "description": "Un \"id\" o \"nombre\" de categoría, tomado de list_arcsa_categorias (la coincidencia por nombre ignora tildes y mayúsculas)."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista los documentos de una categoría de la \"Base de Registros Emitidos\" de ARCSA. Obtén categoria (un id o nombre) desde list_arcsa_categorias. Devuelve, por documento, el subgrupo (subcategoría anidada, cuando existe), título, id y URL directa. El formato se reporta como \"DESCONOCIDO\" porque el enlace de descarga no trae extensión de archivo, aunque una verificación puntual confirmó archivos reales."
+      }
+    ]
+  },
+  {
+    "category": "Fuentes sectoriales adicionales",
+    "tools": [
+      {
+        "name": "search_cnig_femicidios",
+        "description": "Estadísticas de violencia de género del CNIG, incluyendo femicidios.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra la etiqueta de la entrada (ignora tildes), ej. \"femicidio\", \"lgbti\", \"provincia\". Vacío devuelve las 20 entradas de la página."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista los PDF estadísticos de la página \"Violencia\" del Consejo Nacional para la Igualdad de Género (CNIG) — incluye la matriz de femicidios y homicidios intencionales de mujeres más otras 19 tablas relacionadas (por provincia, etnia, discapacidad, edad, quintil de ingreso, población LGBTI, casos judicializados). El propio PDF indica que sus cifras se compilan a partir de datos del Consejo de la Judicatura, la Fiscalía y el Ministerio del Interior, y describe el indicador como de actualización semanal, aunque lo publicado en la página es un corte fechado (a abril de 2023), no un flujo en vivo."
+      },
+      {
+        "name": "search_minedec_matricula",
+        "description": "Registro histórico de matrícula de educación básica y bachillerato.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra la etiqueta, tipo (\"registro\"/\"metadato\"/\"diccionario\"), período (\"inicio\"/\"fin\") o URL del archivo (ignora tildes). Vacío devuelve todos los archivos."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista los archivos del \"Registro Administrativo Histórico\" de matrícula de educación básica y bachillerato de MINEDEC, 2009 en adelante. Es un subdominio distinto de la cobertura CKAN de educación superior de SENESCYT ya integrada en este proyecto: aquella cubre universidades e institutos técnicos, esta cubre matrícula de educación básica. Devuelve enlaces XLSX directos, no el contenido — los registros pesan entre 30 y 140 MB (demasiado para previsualizar o descargar por este servidor)."
+      },
+      {
+        "name": "search_mef_fiscal",
+        "description": "Cifras fiscales de Ecuador (MEF/MDEP o SENAE), incluyendo ingresos arancelarios.",
+        "params": [
+          {
+            "name": "fuente",
+            "type": "str",
+            "default": "'mef'",
+            "description": "\"mef\" (default) o \"senae\"."
+          },
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra la etiqueta del archivo (y, para \"senae\", su categoría), ignora tildes, ej. \"ingresos\", \"2026-06\", \"advalorem\", \"totales\". Vacío devuelve todos los archivos de la fuente elegida."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista los libros de operaciones fiscales de Ecuador desde dos fuentes posibles. fuente=\"mef\" (default): el archivo \"Estadística Nueva Metodología\" del Ministerio de Economía y Finanzas/MDEP — cuentas fiscales bajo metodología FMI/GFSM, actualizado mensualmente, 76 archivos XLSX confirmados en vivo. Para ingresos arancelarios, descarga el archivo más reciente de \"Operaciones de Ingresos y Gastos SPNF\" y lee la fila \"1214 Arancelarios\". fuente=\"senae\": el archivo \"Tributos Recaudados\" de SENAE, 60 XLSX confirmados pero desactualizados (solo 2012-2021). \"Arancelarios\"/\"ADVALOREM\" son solo el arancel — menor que la cifra de \"recaudación aduanera\" que citan algunos medios, que también incluye IVA e ICE cobrados en frontera."
+      },
+      {
+        "name": "search_infomies_bases_mensuales",
+        "description": "Bases de datos mensuales de infoMIES (inclusión económica y social).",
+        "params": [
+          {
+            "name": "serie",
+            "type": "str",
+            "default": null,
+            "description": "\"anc\" (Aseguramiento No Contributivo / inclusión económica) o \"is\" (usuarios del SIIMIES / inclusión social)."
+          },
+          {
+            "name": "anio",
+            "type": "int | None",
+            "default": "None",
+            "description": "Año específico a traer, ej. 2024. Si se omite, trae todos los años conocidos y los agrega (varias solicitudes en frío)."
+          },
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra la etiqueta, año o URL del archivo (ignora tildes), ej. \"julio\", \"2023\". Vacío devuelve todos los archivos del/los año(s) elegido(s)."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista las bases de datos mensuales de infoMIES (info.desarrollohumano.gob.ec, portal de estadísticas del antiguo MIES) para un programa: \"anc\" o \"is\". Es más detallado que la cobertura CKAN existente de este proyecto para los mismos programas, que solo tiene cortes trimestrales. Confirmado en vivo: solo el año en curso tiene un archivo por mes hasta la fecha; cada año cerrado (2019-2025) tiene exactamente un archivo, el corte de diciembre. Los archivos son .rar (fuera del soporte de formatos de este proyecto por riesgo de subprocess/CVE) — se devuelven metadatos y la URL directa, no el contenido."
+      },
+      {
+        "name": "search_infomies_boletines_zonales",
+        "description": "Boletines zonales de infoMIES, por zona o consolidados por año.",
+        "params": [
+          {
+            "name": "modo",
+            "type": "str",
+            "default": "'zonal'",
+            "description": "\"zonal\" o \"consolidado\"."
+          },
+          {
+            "name": "zona",
+            "type": "str",
+            "default": "''",
+            "description": "Obligatorio para modo=\"zonal\": una de \"zona-1-bz\"..\"zona-9-bz\". Se ignora en modo=\"consolidado\". Déjalo vacío con modo=\"zonal\" para obtener solo la lista de claves de zona válidas."
+          },
+          {
+            "name": "anio",
+            "type": "int | None",
+            "default": "None",
+            "description": "Año específico a traer. Para \"zonal\", si se omite trae todos los años encontrados (típicamente 2017-2021). Para \"consolidado\", si se omite trae 2021-2026."
+          },
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra la etiqueta, año o URL del archivo (ignora tildes)."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista los archivos de boletines zonales de infoMIES. Hay dos series distintas bajo este nombre: \"zonal\" (default), la serie original \"Boletín Zonal\" (un .rar por zona y mes), DESCONTINUADA (2017-2021, nada desde entonces); \"consolidado\", el sucesor \"Reporte Boletines Zonales\" (un XLSX consolidado por año, 2021-2026, sigue actualizándose). Ambas series devuelven metadatos y URLs directas, nunca contenido — los .rar quedan además fuera del soporte de formatos de este proyecto."
+      },
+      {
+        "name": "search_trabajo_boletin_anual",
+        "description": "Boletín estadístico anual del mercado laboral ecuatoriano.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra el año, título o URL de la edición (ignora tildes), ej. \"2021\". Vacío devuelve todas las ediciones conocidas."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista las ediciones conocidas del \"Boletín Estadístico Anual: El Mercado Laboral en el Ecuador\" del Ministerio del Trabajo — un reporte anual en PDF basado en la encuesta ENEMDU del INEC más los registros administrativos propios del ministerio. Importante: no es una serie histórica completa — solo se conocen 3 ediciones (2020, 2021, 2022). La página que alguna vez listó varias ediciones no puede extraerse en vivo hoy y solo enlaza la edición 2022; 2020 y 2021 se recuperaron de una instantánea de Wayback Machine de enero de 2024. No se encontró ninguna edición 2023-2025."
+      },
+      {
+        "name": "search_salarios_sectoriales",
+        "description": "Tablas de salarios mínimos sectoriales de Ecuador.",
+        "params": [
+          {
+            "name": "anio",
+            "type": "int | None",
+            "default": "None",
+            "description": "Filtra a este año (según el título del propio documento). Ninguno devuelve todos los años encontrados."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista los documentos con las tablas de salarios mínimos sectoriales de Ecuador (pisos salariales por rama de actividad económica, fijados por el Consejo Nacional de Trabajo y Salarios, distintos del Salario Básico Unificado nacional). Extraído de la biblioteca documental del Ministerio del Trabajo, que sí responde de forma estable a diferencia de las páginas dinámicas del ministerio. Cobertura confirmada: un registro por año 2020-2025. No se ha publicado tabla 2026 — la de 2025 sigue vigente por defecto de actualización."
       }
     ]
   }
