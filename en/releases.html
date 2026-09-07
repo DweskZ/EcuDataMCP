@@ -8,24 +8,24 @@
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <meta property="og:title" content="Releases – EcuDataMCP">
 <meta property="og:description" content="EcuDataMCP's version history and the real pace of its releases.">
-<meta property="og:image" content="https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png">
+<meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png">
-<link rel="stylesheet" href="../assets/bootstrap-icons.css">
+<meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <link rel="stylesheet" href="../assets/styles.css">
 <link rel="stylesheet" href="../assets/site.css">
+
 <style>html { scroll-behavior: smooth; }</style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg" data-bs-theme="dark">
   <div class="navbar-container container-fluid">
     <div class="navbar-brand-container mx-auto">
-      <a class="navbar-brand" href="../index.html">
+      <a class="navbar-brand" href="index.html">
         <span class="navbar-title">EcuDataMCP</span>
       </a>
     </div>
     <button class="site-search-toggle" type="button" title="Search" aria-label="Search">
-      <i class="bi bi-search"></i>
+      <svg class="icon-search" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.75"/><line x1="10.2" y1="10.2" x2="14" y2="14"/></svg>
     </button>
     <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" data-nav-toggle="navbarCollapse">
       <span class="navbar-toggler-icon"></span>
@@ -34,59 +34,60 @@
       <ul class="navbar-nav navbar-nav-scroll me-auto">
         
         <li class="nav-item">
-          <a class="nav-link" href="../index.html">
+          <a class="nav-link" href="index.html">
             <span class="menu-text">EcuDataMCP</span>
           </a>
         </li>
         
         <li class="nav-item">
-          <a class="nav-link" href="../index.html#how-it-works">
+          <a class="nav-link" href="index.html#how-it-works">
             <span class="menu-text">How it works</span>
           </a>
         </li>
         
         <li class="nav-item">
-          <a class="nav-link" href="../index.html#sources">
+          <a class="nav-link" href="fuentes.html">
             <span class="menu-text">Sources</span>
           </a>
         </li>
         
         <li class="nav-item">
-          <a class="nav-link" href="../atlas.html">
+          <a class="nav-link" href="atlas.html">
             <span class="menu-text">Reference</span>
           </a>
         </li>
         
         <li class="nav-item">
-          <a class="nav-link" href="../examples.html">
+          <a class="nav-link" href="examples.html">
             <span class="menu-text">Examples</span>
           </a>
         </li>
         
         <li class="nav-item">
-          <a class="nav-link active" href="../releases.html" aria-current="page">
+          <a class="nav-link active" href="releases.html" aria-current="page">
             <span class="menu-text">Releases</span>
           </a>
         </li>
         
         <li class="nav-item">
-          <a class="nav-link" href="../about.html">
+          <a class="nav-link" href="about.html">
             <span class="menu-text">About</span>
           </a>
         </li>
         
         <li class="nav-item">
-          <a class="nav-link" href="../colaborar.html">
+          <a class="nav-link" href="colaborar.html">
             <span class="menu-text">Contribute</span>
           </a>
         </li>
         
       </ul>
       <ul class="navbar-nav navbar-nav-scroll ms-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="../index.html">
-            <span class="menu-text">Español</span>
-          </a>
+        <li class="nav-item lang-toggle" role="group" aria-label="Language / Idioma">
+          
+          <a class="lang-toggle-option" href="../releases.html">ES</a>
+          <span class="lang-toggle-option active" aria-current="true">EN</span>
+          
         </li>
         <li class="nav-item">
           <a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP" target="_blank">
@@ -110,8 +111,8 @@
 <section class="landing hero">
 <div class="container-page">
 <p class="kicker">Releases</p>
-<h1>Eleven versions, <span class="accent">a real pace.</span></h1>
-<p class="hero-sub">Eight of the eleven releases shipped on the same day (August 4, 2026), building the server's foundation. Since then, each new version corresponds to an added source or a concrete improvement, not a fixed schedule. The full technical detail for every change lives in the <a href="https://github.com/DweskZ/EcuDataMCP/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG</a>.</p>
+<h1>Fast iteration, <span class="accent">real changes.</span></h1>
+<p class="hero-sub">The first releases laid the server's foundation over the initial weeks of development. Since then, each new version corresponds to an added source or a concrete improvement, not a fixed schedule. The full technical detail for every change lives in the <a href="https://github.com/DweskZ/EcuDataMCP/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG</a>.</p>
 </div>
 </section>
 
@@ -119,13 +120,38 @@
 <div class="container-page">
 
 <div class="release-row">
-<div class="release-meta"><span class="release-version">v0.8.5</span><span class="release-date">2026-08-31</span></div>
-<p class="release-summary">BCEData/IEM audits, a cautious equivalence map, historical IEM reading, and bounded public tools for SRI Saiku. The server keeps results verifiable without claiming equivalence or access that a source does not expose.</p>
+<div class="release-meta"><span class="release-version">v0.8.7</span><span class="release-date">2026-09-07</span></div>
+<p class="release-summary">AIP data sheets for Ecuadorian aerodromes and helipads (DGAC) and ARCSA's live sanitary registry by category, .xlsb preview support, and a download cap raised to 20 MB for XLSX/XLSB/ODS. Removes the SRI Saiku tools (endpoint confirmed unreachable in live verification).</p>
 </div>
 
 <div class="release-row">
-<div class="release-meta"><span class="release-version">v0.8.4</span><span class="release-date">2026-08-31</span></div>
-<p class="release-summary">BCEData revision observability, broader IEM table normalization, remote deployment with authentication and per-client limits, and technical documentation separated from the README.</p>
+<div class="release-meta"><span class="release-version">v0.8.6</span><span class="release-date">2026-09-04</span></div>
+<p class="release-summary">IESS (statistical bulletins, actuarial studies, audit reports), Data Mashca (a third municipal CKAN portal), and everything accumulated since 0.8.5: ARCOTEL, SGR's document library and SITREP archive, SIPA's geoportal and indicator summaries, MEF/SENAE, MINEDEC, SEPS, CNIG, INAMHI, INEVAL, and more.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.8.5</span><span class="release-date">2026-08-31</span></div>
+<p class="release-summary">Ten new sources — SRI Saiku, RUC lookup, BCE daily indicators, SUT, Superbancos, IG-EPN, CENACE, SRI tax-collection stats, BCE remittances, and more — plus BCEData/IEM audit snapshots, investigate_dataset, and remote deployment with authentication and per-client limits. Includes a follow-up fix: synchronized the editable package version in uv.lock with the release version so `uv sync --locked` can install the project in GitHub Actions.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.8.3</span><span class="release-date">2026-08-30</span></div>
+<p class="release-summary">Census 2022 microdata, INEC publications via its REST API, and fixes to DPA geography (La Concordia, Sevilla Don Bosco) that had drifted from the official classifier.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.8.2</span><span class="release-date">2026-08-29</span></div>
+<p class="release-summary">SIPA (agricultural statistics), Contraloría General del Estado, and BCE's IEM monthly bulletin tables. Fixed CSV delimiter sniffing and 26 bugs found in a full adversarial code review.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.8.1</span><span class="release-date">2026-08-29</span></div>
+<p class="release-summary">inec_client now goes through the shared SSRF guard. Consolidated 13 duplicated accent-stripping functions, switched the Docker image to a non-root user, and enabled Dependabot.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.8.0</span><span class="release-date">2026-08-29</span></div>
+<p class="release-summary">Ecuador en Cifras/INEC, Cuenca en Datos (municipal CKAN portal), PDF text extraction (read_pdf), .ods support, and detect_series_pattern to classify periodic series as cumulative or incremental.</p>
 </div>
 
 <div class="release-row">
@@ -207,7 +233,7 @@
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
         <li class="nav-item"><a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP">GitHub</a></li>
-        <li class="nav-item"><a class="nav-link" href="../releases.html">Releases</a></li>
+        <li class="nav-item"><a class="nav-link" href="releases.html">Releases</a></li>
       </ul>
     </div>
   </div>
@@ -215,8 +241,8 @@
 
 <script src="../assets/fuse.min.js"></script>
 <script>
-window.SITE_SEARCH_INDEX_URL = "../search.json";
-window.SITE_ROOT = "../";
+window.SITE_SEARCH_INDEX_URL = "search.json";
+window.SITE_ROOT = "";
 window.COPY_LABEL_COPIED = "Copied!";
 window.SITE_SEARCH_EMPTY_LABEL = "No results.";
 </script>

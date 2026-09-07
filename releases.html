@@ -8,12 +8,12 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <meta property="og:title" content="Releases – EcuDataMCP">
 <meta property="og:description" content="Historial de versiones de EcuDataMCP y el ritmo real de los releases.">
-<meta property="og:image" content="https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png">
+<meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png">
-<link rel="stylesheet" href="assets/bootstrap-icons.css">
+<meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <link rel="stylesheet" href="assets/styles.css">
 <link rel="stylesheet" href="assets/site.css">
+
 <style>html { scroll-behavior: smooth; }</style>
 </head>
 <body>
@@ -25,7 +25,7 @@
       </a>
     </div>
     <button class="site-search-toggle" type="button" title="Buscar" aria-label="Buscar">
-      <i class="bi bi-search"></i>
+      <svg class="icon-search" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.75"/><line x1="10.2" y1="10.2" x2="14" y2="14"/></svg>
     </button>
     <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Navegación de palanca" data-nav-toggle="navbarCollapse">
       <span class="navbar-toggler-icon"></span>
@@ -46,7 +46,7 @@
         </li>
         
         <li class="nav-item">
-          <a class="nav-link" href="index.html#fuentes">
+          <a class="nav-link" href="fuentes.html">
             <span class="menu-text">Fuentes</span>
           </a>
         </li>
@@ -83,10 +83,11 @@
         
       </ul>
       <ul class="navbar-nav navbar-nav-scroll ms-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="en/index.html">
-            <span class="menu-text">English</span>
-          </a>
+        <li class="nav-item lang-toggle" role="group" aria-label="Language / Idioma">
+          
+          <span class="lang-toggle-option active" aria-current="true">ES</span>
+          <a class="lang-toggle-option" href="en/releases.html">EN</a>
+          
         </li>
         <li class="nav-item">
           <a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP" target="_blank">
@@ -110,8 +111,8 @@
 <section class="landing hero">
 <div class="container-page">
 <p class="kicker">Releases</p>
-<h1>Once versiones, <span class="accent">un ritmo real.</span></h1>
-<p class="hero-sub">Ocho de los once releases salieron el mismo día (4 de agosto de 2026), armando la base del servidor. Desde ahí, cada versión nueva corresponde a una fuente agregada o una mejora concreta, no a un calendario fijo. El detalle técnico completo de cada cambio vive en el <a href="https://github.com/DweskZ/EcuDataMCP/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG</a>.</p>
+<h1>Iteración rápida, <span class="accent">cambios reales.</span></h1>
+<p class="hero-sub">Los primeros releases sentaron la base del servidor durante las primeras semanas de desarrollo. Desde ahí, cada versión nueva corresponde a una fuente agregada o una mejora concreta, no a un calendario fijo. El detalle técnico completo de cada cambio vive en el <a href="https://github.com/DweskZ/EcuDataMCP/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG</a>.</p>
 </div>
 </section>
 
@@ -119,13 +120,38 @@
 <div class="container-page">
 
 <div class="release-row">
-<div class="release-meta"><span class="release-version">v0.8.5</span><span class="release-date">2026-08-31</span></div>
-<p class="release-summary">Auditorías BCEData/IEM, mapa de equivalencias cauteloso, lectura histórica IEM y herramientas públicas acotadas para SRI Saiku. El servidor mantiene resultados verificables, sin afirmar equivalencias ni acceso que la fuente no exponga.</p>
+<div class="release-meta"><span class="release-version">v0.8.7</span><span class="release-date">2026-09-07</span></div>
+<p class="release-summary">Fichas AIP de aeródromos y helipuertos ecuatorianos (DGAC) y el registro sanitario vigente de ARCSA por categoría, soporte de previsualización .xlsb, y un tope de descarga elevado a 20 MB para XLSX/XLSB/ODS. Se retiran las tools de SRI Saiku (endpoint confirmado inalcanzable en verificación en vivo).</p>
 </div>
 
 <div class="release-row">
-<div class="release-meta"><span class="release-version">v0.8.4</span><span class="release-date">2026-08-31</span></div>
-<p class="release-summary">Observabilidad de revisiones en BCEData, normalización adicional de tablas IEM, despliegue remoto con autenticación y límites por cliente, y documentación técnica separada del README.</p>
+<div class="release-meta"><span class="release-version">v0.8.6</span><span class="release-date">2026-09-04</span></div>
+<p class="release-summary">IESS (boletines estadísticos, estudios actuariales, informes de auditoría), Data Mashca (tercer portal CKAN municipal), y todo lo acumulado desde 0.8.5: ARCOTEL, la biblioteca y los SITREP de la SGR, el geoportal y resumen de indicadores de SIPA, MEF/SENAE, MINEDEC, SEPS, CNIG, INAMHI, INEVAL, y más.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.8.5</span><span class="release-date">2026-08-31</span></div>
+<p class="release-summary">Diez fuentes nuevas — SRI Saiku, RUC del SRI, indicadores diarios del BCE, SUT, Superbancos, IG-EPN, CENACE, recaudación SRI, remesas BCE y más — más snapshots de auditoría BCEData/IEM, investigate_dataset, y despliegue remoto con autenticación y límites por cliente. Incluye un fix de seguimiento: sincronizar la versión del paquete editable en uv.lock con la versión del release, para que `uv sync --locked` pueda instalar el proyecto en GitHub Actions.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.8.3</span><span class="release-date">2026-08-30</span></div>
+<p class="release-summary">Microdatos del Censo 2022, publicaciones del INEC vía su API REST, y correcciones a la geografía DPA (La Concordia, Sevilla Don Bosco) que estaban desactualizadas frente al clasificador oficial.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.8.2</span><span class="release-date">2026-08-29</span></div>
+<p class="release-summary">SIPA (estadísticas agropecuarias), Contraloría General del Estado, y las tablas IEM del BCE. Corrección del sniffing de delimitador CSV y 26 bugs encontrados en una revisión adversarial completa del repo.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.8.1</span><span class="release-date">2026-08-29</span></div>
+<p class="release-summary">inec_client ahora pasa por el guardia SSRF compartido. Se consolidaron 13 funciones duplicadas de limpieza de tildes, el contenedor Docker corre como usuario no root, y se habilitó Dependabot.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.8.0</span><span class="release-date">2026-08-29</span></div>
+<p class="release-summary">Ecuador en Cifras/INEC, Cuenca en Datos (portal municipal CKAN), lectura de texto en PDF (read_pdf), soporte .ods, y detect_series_pattern para clasificar series periódicas como acumuladas o incrementales.</p>
 </div>
 
 <div class="release-row">

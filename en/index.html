@@ -8,24 +8,24 @@
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <meta property="og:title" content="EcuDataMCP – EcuDataMCP">
 <meta property="og:description" content="Open-source MCP server for exploring Ecuador's open government data from your AI assistant.">
-<meta property="og:image" content="https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png">
+<meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://dsanchezp18.github.io/EcuDataMCP/assets/og-image.png">
-<link rel="stylesheet" href="../assets/bootstrap-icons.css">
+<meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <link rel="stylesheet" href="../assets/styles.css">
 <link rel="stylesheet" href="../assets/site.css">
+
 <style>html { scroll-behavior: smooth; }</style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg" data-bs-theme="dark">
   <div class="navbar-container container-fluid">
     <div class="navbar-brand-container mx-auto">
-      <a class="navbar-brand" href="../index.html">
+      <a class="navbar-brand" href="index.html">
         <span class="navbar-title">EcuDataMCP</span>
       </a>
     </div>
     <button class="site-search-toggle" type="button" title="Search" aria-label="Search">
-      <i class="bi bi-search"></i>
+      <svg class="icon-search" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.75"/><line x1="10.2" y1="10.2" x2="14" y2="14"/></svg>
     </button>
     <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" data-nav-toggle="navbarCollapse">
       <span class="navbar-toggler-icon"></span>
@@ -34,59 +34,60 @@
       <ul class="navbar-nav navbar-nav-scroll me-auto">
         
         <li class="nav-item">
-          <a class="nav-link active" href="../index.html" aria-current="page">
+          <a class="nav-link active" href="index.html" aria-current="page">
             <span class="menu-text">EcuDataMCP</span>
           </a>
         </li>
         
         <li class="nav-item">
-          <a class="nav-link" href="../index.html#how-it-works">
+          <a class="nav-link" href="index.html#how-it-works">
             <span class="menu-text">How it works</span>
           </a>
         </li>
         
         <li class="nav-item">
-          <a class="nav-link" href="../index.html#sources">
+          <a class="nav-link" href="fuentes.html">
             <span class="menu-text">Sources</span>
           </a>
         </li>
         
         <li class="nav-item">
-          <a class="nav-link" href="../atlas.html">
+          <a class="nav-link" href="atlas.html">
             <span class="menu-text">Reference</span>
           </a>
         </li>
         
         <li class="nav-item">
-          <a class="nav-link" href="../examples.html">
+          <a class="nav-link" href="examples.html">
             <span class="menu-text">Examples</span>
           </a>
         </li>
         
         <li class="nav-item">
-          <a class="nav-link" href="../releases.html">
+          <a class="nav-link" href="releases.html">
             <span class="menu-text">Releases</span>
           </a>
         </li>
         
         <li class="nav-item">
-          <a class="nav-link" href="../about.html">
+          <a class="nav-link" href="about.html">
             <span class="menu-text">About</span>
           </a>
         </li>
         
         <li class="nav-item">
-          <a class="nav-link" href="../colaborar.html">
+          <a class="nav-link" href="colaborar.html">
             <span class="menu-text">Contribute</span>
           </a>
         </li>
         
       </ul>
       <ul class="navbar-nav navbar-nav-scroll ms-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="../index.html">
-            <span class="menu-text">Español</span>
-          </a>
+        <li class="nav-item lang-toggle" role="group" aria-label="Language / Idioma">
+          
+          <a class="lang-toggle-option" href="../index.html">ES</a>
+          <span class="lang-toggle-option active" aria-current="true">EN</span>
+          
         </li>
         <li class="nav-item">
           <a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP" target="_blank">
@@ -119,8 +120,8 @@
 </div>
 <div class="hero-stats">
 <div class="hero-stat"><span class="num">1,581</span><span class="label">datasets</span></div>
-<div class="hero-stat"><span class="num">73</span><span class="label">MCP tools</span></div>
-<div class="hero-stat"><span class="num">16</span><span class="label">official sources</span></div>
+<div class="hero-stat"><span class="num">106</span><span class="label">MCP tools</span></div>
+<div class="hero-stat"><span class="num">46</span><span class="label">official sources</span></div>
 <div class="hero-stat"><span class="num">0</span><span class="label">API keys</span></div>
 </div>
 </div>
@@ -168,7 +169,7 @@
 <div class="container-page">
 <p class="kicker">What can you ask?</p>
 <h2 class="section-title">It has never been this easy to navigate Ecuador's data.</h2>
-<p class="section-lede">16 official sources, in a single conversation.</p>
+<p class="section-lede">46 official sources, in a single conversation.</p>
 <div class="questions-grid">
 
 <div class="question-card">&ldquo;What data does the SRI have on tax collection?&rdquo;</div>
@@ -195,106 +196,11 @@
 <div class="container-page" id="sources">
 <p class="kicker">Sources</p>
 <h2 class="section-title">Official data, always cited.</h2>
-<p class="section-lede">EcuDataMCP does not copy or store these catalogs, every query goes live against the source portal.</p>
-<div class="card-grid">
-
-<div class="data-card">
-<h3>Open Data<span class="tag">CKAN</span></h3>
-<p>National catalog + DataStore + CSV/JSON/XLSX preview</p>
-<div class="source-coverage"><a href="https://www.datosabiertos.gob.ec" target="_blank" rel="noopener">www.datosabiertos.gob.ec</a></div>
+<p class="section-lede">EcuDataMCP never copies or stores these catalogs: every query goes live against the source portal. 46 sources grouped by theme — Central Bank, SRI, INEC, Supercías, Superbancos and more — each tied to its own institution.</p>
+<div class="tools-summary">
+<span class="tool-chip">Open data catalogs</span><span class="tool-chip">Procedures, regulations & public procurement</span><span class="tool-chip">Risk & natural hazards</span><span class="tool-chip">Economy & finance</span><span class="tool-chip">Statistics & demographics</span><span class="tool-chip">Agriculture</span><span class="tool-chip">Energy</span><span class="tool-chip">Labour & employment</span><span class="tool-chip">Oversight & transparency</span><span class="tool-chip">Transport & civil aviation</span><span class="tool-chip">Health</span><span class="tool-chip">Telecommunications</span>
 </div>
-
-<div class="data-card">
-<h3>Cuenca en Datos<span class="tag">CKAN</span></h3>
-<p>Independent municipal CKAN portal (92 datasets); same tools with source="cuenca"</p>
-<div class="source-coverage"><a href="https://cuencaendatos.cuenca.gob.ec" target="_blank" rel="noopener">cuencaendatos.cuenca.gob.ec</a></div>
-</div>
-
-<div class="data-card">
-<h3>SRI Datasets</h3>
-<p>Public files, RUC lookup and bounded Saiku cube exploration: tax collection, sales/purchases, vehicles, and more</p>
-<div class="source-coverage"><a href="https://www.sri.gob.ec/datasets" target="_blank" rel="noopener">www.sri.gob.ec/datasets</a></div>
-</div>
-
-<div class="data-card">
-<h3>Procedures & institutions<span class="tag">Gob.ec</span></h3>
-<p>Procedures, requirements, costs</p>
-<div class="source-coverage"><a href="https://www.gob.ec" target="_blank" rel="noopener">gob.ec/api/v1</a></div>
-</div>
-
-<div class="data-card">
-<h3>Regulations<span class="tag">Gob.ec</span></h3>
-<p>Rules, agreements, Official Register</p>
-<div class="source-coverage"><a href="https://www.gob.ec" target="_blank" rel="noopener">gob.ec/api/v1/regulaciones</a></div>
-</div>
-
-<div class="data-card">
-<h3>Public contracts<span class="tag">SERCOP/OCDS</span></h3>
-<p>Tenders, buyers, suppliers</p>
-<div class="source-coverage"><a href="https://datosabiertos.compraspublicas.gob.ec" target="_blank" rel="noopener">datosabiertos.compraspublicas.gob.ec</a></div>
-</div>
-
-<div class="data-card">
-<h3>Risk management<span class="tag">SGR</span></h3>
-<p>COE emergency events + tsunami early-warning stations</p>
-<div class="source-coverage"><a href="https://sgrportal.gestionderiesgos.gob.ec" target="_blank" rel="noopener">sgrportal.gestionderiesgos.gob.ec</a></div>
-</div>
-
-<div class="data-card">
-<h3>Earthquakes<span class="tag">IG-EPN</span></h3>
-<p>Seismic catalog from the Geophysical Institute</p>
-<div class="source-coverage"><a href="https://www.igepn.edu.ec" target="_blank" rel="noopener">www.igepn.edu.ec</a></div>
-</div>
-
-<div class="data-card">
-<h3>Geography<span class="tag">DPA</span><span class="tag">offline</span></h3>
-<p>24 provinces + 224 cantons (INEC codes)</p>
-<div class="source-coverage">offline reference</div>
-</div>
-
-<div class="data-card">
-<h3>ANDA<span class="tag">NADA/IHSN</span></h3>
-<p>INEC's catalog of surveys and censuses</p>
-<div class="source-coverage"><a href="https://anda.inec.gob.ec" target="_blank" rel="noopener">anda.inec.gob.ec</a></div>
-</div>
-
-<div class="data-card">
-<h3>BCE<span class="tag">BCEData</span></h3>
-<p>BCEData, IEM tables and daily series: macroeconomic catalog, trade, public finance, GDP, employment and country risk</p>
-<div class="source-coverage"><a href="https://contenido.bce.fin.ec" target="_blank" rel="noopener">contenido.bce.fin.ec</a></div>
-</div>
-
-<div class="data-card">
-<h3>Supercías</h3>
-<p>Company directory (226k+): legal representative, capital, CIIU code</p>
-<div class="source-coverage"><a href="https://mercadodevalores.supercias.gob.ec" target="_blank" rel="noopener">mercadodevalores.supercias.gob.ec</a></div>
-</div>
-
-<div class="data-card">
-<h3>Supercías Ranking<span class="tag">local build</span></h3>
-<p>Financial statement data (revenue, assets, ROE, ~38 ratios), recent years; requires a local build</p>
-<div class="source-coverage"><a href="https://appscvsmovil.supercias.gob.ec" target="_blank" rel="noopener">appscvsmovil.supercias.gob.ec</a></div>
-</div>
-
-<div class="data-card">
-<h3>INEC Publications<span class="tag">INEC</span></h3>
-<p>Publications, bulletins and linked files from INEC's public index</p>
-<div class="source-coverage"><a href="https://www.ecuadorencifras.gob.ec" target="_blank" rel="noopener">ecuadorencifras.gob.ec</a></div>
-</div>
-
-<div class="data-card">
-<h3>CENACE<span class="tag">Energy</span></h3>
-<p>Operational snapshot of electricity demand, generation and dispatch</p>
-<div class="source-coverage"><a href="https://www.cenace.gob.ec" target="_blank" rel="noopener">cenace.gob.ec</a></div>
-</div>
-
-<div class="data-card">
-<h3>SUT<span class="tag">Labour</span></h3>
-<p>Public Ministry of Labour indicators through its statistical dashboards</p>
-<div class="source-coverage"><a href="https://sut.trabajo.gob.ec" target="_blank" rel="noopener">sut.trabajo.gob.ec</a></div>
-</div>
-
-</div>
+<a class="btn-cta secondary" href="fuentes.html">See the 46 sources, grouped &rarr;</a>
 </div>
 </section>
 
@@ -303,59 +209,10 @@
 <p class="kicker">The backstage</p>
 <h2 class="section-title">Open-source MCP server.</h2>
 <p class="section-lede">EcuDataMCP runs as a <a href="https://github.com/jlowin/fastmcp" target="_blank" rel="noopener">FastMCP</a> server in Python, exposed over Streamable HTTP or stdio. There is no database of its own: every tool calls the matching official portal live (CKAN, gob.ec, SERCOP, BCE, Supercías, IG-EPN, SGR) and returns the formatted response.</p>
-<div class="tools-grid">
-
-<div class="data-card">
-<h3>Unified entry points<span class="tag">3</span></h3>
-<div><a class="tool-chip" href="atlas.html#tool-list_capabilities">list_capabilities</a><a class="tool-chip" href="atlas.html#tool-search_ecuador">search_ecuador</a><a class="tool-chip" href="atlas.html#tool-lookup_ubicacion">lookup_ubicacion</a></div>
+<div class="tools-summary">
+<span class="tool-chip">Unified entry points</span><span class="tool-chip">Open Data</span><span class="tool-chip">Government procedures</span><span class="tool-chip">ANDA (INEC)</span><span class="tool-chip">Macroeconomics (BCE)</span><span class="tool-chip">Companies (Supercías)</span><span class="tool-chip">Regulations & contracts</span><span class="tool-chip">Risk & earthquakes</span><span class="tool-chip">Exploration</span><span class="tool-chip">BCE and specialized series</span><span class="tool-chip">INEC: statistics, BIINEC, and census</span><span class="tool-chip">SRI: RUC and tax collection</span><span class="tool-chip">SIPA, Contraloría, and Superbancos</span><span class="tool-chip">CENACE, SUT, and IG-EPN</span><span class="tool-chip">Research utilities</span><span class="tool-chip">SEPS and the popular and solidarity economy</span><span class="tool-chip">IESS: institutional documents</span><span class="tool-chip">INEVAL: educational evaluation</span><span class="tool-chip">Civil aviation (DGAC)</span><span class="tool-chip">ARCOTEL: telecommunications</span><span class="tool-chip">ARCSA: sanitary registry</span><span class="tool-chip">Additional sector sources</span>
 </div>
-
-<div class="data-card">
-<h3>Open Data<span class="tag">10</span></h3>
-<div><a class="tool-chip" href="atlas.html#tool-search_datasets">search_datasets</a><a class="tool-chip" href="atlas.html#tool-list_recent_datasets">list_recent_datasets</a><a class="tool-chip" href="atlas.html#tool-get_dataset_info">get_dataset_info</a><a class="tool-chip" href="atlas.html#tool-list_dataset_resources">list_dataset_resources</a><a class="tool-chip" href="atlas.html#tool-get_resource_info">get_resource_info</a><a class="tool-chip" href="atlas.html#tool-preview_resource_data">preview_resource_data</a><a class="tool-chip" href="atlas.html#tool-download_resource">download_resource</a><a class="tool-chip" href="atlas.html#tool-query_resource_data">query_resource_data</a><a class="tool-chip" href="atlas.html#tool-detect_series_pattern">detect_series_pattern</a><a class="tool-chip" href="atlas.html#tool-search_sri_datasets">search_sri_datasets</a></div>
-</div>
-
-<div class="data-card">
-<h3>Government procedures<span class="tag">4</span></h3>
-<div><a class="tool-chip" href="atlas.html#tool-search_tramites">search_tramites</a><a class="tool-chip" href="atlas.html#tool-get_tramite_info">get_tramite_info</a><a class="tool-chip" href="atlas.html#tool-list_instituciones">list_instituciones</a><a class="tool-chip" href="atlas.html#tool-get_institucion_info">get_institucion_info</a></div>
-</div>
-
-<div class="data-card">
-<h3>ANDA (INEC)<span class="tag">3</span></h3>
-<div><a class="tool-chip" href="atlas.html#tool-search_anda">search_anda</a><a class="tool-chip" href="atlas.html#tool-get_anda_survey_info">get_anda_survey_info</a><a class="tool-chip" href="atlas.html#tool-download_anda_microdata">download_anda_microdata</a></div>
-</div>
-
-<div class="data-card">
-<h3>Macroeconomics (BCE)<span class="tag">2</span></h3>
-<div><a class="tool-chip" href="atlas.html#tool-search_indicadores_bce">search_indicadores_bce</a><a class="tool-chip" href="atlas.html#tool-get_indicador_bce">get_indicador_bce</a></div>
-</div>
-
-<div class="data-card">
-<h3>Companies (Supercías)<span class="tag">6</span></h3>
-<div><a class="tool-chip" href="atlas.html#tool-search_companias">search_companias</a><a class="tool-chip" href="atlas.html#tool-get_compania_info">get_compania_info</a><a class="tool-chip" href="atlas.html#tool-search_ranking">search_ranking</a><a class="tool-chip" href="atlas.html#tool-get_financials">get_financials</a><a class="tool-chip" href="atlas.html#tool-search_auditores">search_auditores</a><a class="tool-chip" href="atlas.html#tool-get_auditor_info">get_auditor_info</a></div>
-</div>
-
-<div class="data-card">
-<h3>Regulations & contracts<span class="tag">4</span></h3>
-<div><a class="tool-chip" href="atlas.html#tool-search_regulaciones">search_regulaciones</a><a class="tool-chip" href="atlas.html#tool-get_regulacion_info">get_regulacion_info</a><a class="tool-chip" href="atlas.html#tool-search_contratos">search_contratos</a><a class="tool-chip" href="atlas.html#tool-get_contrato_info">get_contrato_info</a></div>
-</div>
-
-<div class="data-card">
-<h3>Risk & earthquakes<span class="tag">3</span></h3>
-<div><a class="tool-chip" href="atlas.html#tool-search_eventos_riesgo">search_eventos_riesgo</a><a class="tool-chip" href="atlas.html#tool-list_sat_tsunami">list_sat_tsunami</a><a class="tool-chip" href="atlas.html#tool-search_sismos">search_sismos</a></div>
-</div>
-
-<div class="data-card">
-<h3>Exploration<span class="tag">4</span></h3>
-<div><a class="tool-chip" href="atlas.html#tool-search_organizations">search_organizations</a><a class="tool-chip" href="atlas.html#tool-get_organization_info">get_organization_info</a><a class="tool-chip" href="atlas.html#tool-list_categories">list_categories</a><a class="tool-chip" href="atlas.html#tool-get_category_info">get_category_info</a></div>
-</div>
-
-<div class="data-card">
-<h3>Recently added tools<span class="tag">34</span></h3>
-<div><a class="tool-chip" href="atlas.html#tool-audit_bce_catalog">audit_bce_catalog</a><a class="tool-chip" href="atlas.html#tool-compare_bce_sources">compare_bce_sources</a><a class="tool-chip" href="atlas.html#tool-describe_sri_saiku_cube">describe_sri_saiku_cube</a><a class="tool-chip" href="atlas.html#tool-get_bce_iem_table">get_bce_iem_table</a><a class="tool-chip" href="atlas.html#tool-get_bce_indicador_diario">get_bce_indicador_diario</a><a class="tool-chip" href="atlas.html#tool-get_cenace_tablero">get_cenace_tablero</a><a class="tool-chip" href="atlas.html#tool-get_contraloria_informe">get_contraloria_informe</a><a class="tool-chip" href="atlas.html#tool-get_inec_estadistica_files">get_inec_estadistica_files</a><a class="tool-chip" href="atlas.html#tool-get_inec_publicacion_archivos">get_inec_publicacion_archivos</a><a class="tool-chip" href="atlas.html#tool-get_informe_igepn">get_informe_igepn</a><a class="tool-chip" href="atlas.html#tool-get_sipa_modulo_archivos">get_sipa_modulo_archivos</a><a class="tool-chip" href="atlas.html#tool-get_sri_ruc_info">get_sri_ruc_info</a><a class="tool-chip" href="atlas.html#tool-get_superbancos_seccion_archivos">get_superbancos_seccion_archivos</a><a class="tool-chip" href="atlas.html#tool-get_sut_indicador_schema">get_sut_indicador_schema</a><a class="tool-chip" href="atlas.html#tool-investigate_dataset">investigate_dataset</a><a class="tool-chip" href="atlas.html#tool-list_bce_indicadores_diarios">list_bce_indicadores_diarios</a><a class="tool-chip" href="atlas.html#tool-list_contraloria_informes">list_contraloria_informes</a><a class="tool-chip" href="atlas.html#tool-list_sipa_modulos">list_sipa_modulos</a><a class="tool-chip" href="atlas.html#tool-list_sri_saiku_cubes">list_sri_saiku_cubes</a><a class="tool-chip" href="atlas.html#tool-list_superbancos_secciones">list_superbancos_secciones</a><a class="tool-chip" href="atlas.html#tool-list_sut_indicadores">list_sut_indicadores</a><a class="tool-chip" href="atlas.html#tool-list_zip_contents">list_zip_contents</a><a class="tool-chip" href="atlas.html#tool-query_sri_saiku_aggregate">query_sri_saiku_aggregate</a><a class="tool-chip" href="atlas.html#tool-query_sut_indicador">query_sut_indicador</a><a class="tool-chip" href="atlas.html#tool-read_pdf">read_pdf</a><a class="tool-chip" href="atlas.html#tool-search_bce_iem">search_bce_iem</a><a class="tool-chip" href="atlas.html#tool-search_bce_remesas">search_bce_remesas</a><a class="tool-chip" href="atlas.html#tool-search_biinec_extras">search_biinec_extras</a><a class="tool-chip" href="atlas.html#tool-search_censo_recursos">search_censo_recursos</a><a class="tool-chip" href="atlas.html#tool-search_inec_estadisticas">search_inec_estadisticas</a><a class="tool-chip" href="atlas.html#tool-search_inec_publicaciones">search_inec_publicaciones</a><a class="tool-chip" href="atlas.html#tool-search_informes_igepn">search_informes_igepn</a><a class="tool-chip" href="atlas.html#tool-search_sri_estadisticas_recaudacion">search_sri_estadisticas_recaudacion</a><a class="tool-chip" href="atlas.html#tool-search_sri_ruc">search_sri_ruc</a></div>
-</div>
-
-</div>
+<a class="btn-cta secondary" href="atlas.html">See the 106 tools in the Reference &rarr;</a>
 </div>
 </section>
 
@@ -566,7 +423,7 @@ Verify the server responds before calling it done.</code></pre>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
         <li class="nav-item"><a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP">GitHub</a></li>
-        <li class="nav-item"><a class="nav-link" href="../releases.html">Releases</a></li>
+        <li class="nav-item"><a class="nav-link" href="releases.html">Releases</a></li>
       </ul>
     </div>
   </div>
@@ -574,8 +431,8 @@ Verify the server responds before calling it done.</code></pre>
 
 <script src="../assets/fuse.min.js"></script>
 <script>
-window.SITE_SEARCH_INDEX_URL = "../search.json";
-window.SITE_ROOT = "../";
+window.SITE_SEARCH_INDEX_URL = "search.json";
+window.SITE_ROOT = "";
 window.COPY_LABEL_COPIED = "Copied!";
 window.SITE_SEARCH_EMPTY_LABEL = "No results.";
 </script>
