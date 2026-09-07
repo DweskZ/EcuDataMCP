@@ -11,7 +11,7 @@
   unreachable in live verification from three independent environments
   (deployed MCP server, local `curl`, real browser navigation): the TLS
   connection closes abruptly every time, not the deployed-server-only
-  connectivity gap previously suspected. Tool count drops from 103 to 100.
+  connectivity gap previously suspected. Tool count drops from 105 to 102.
 
 ### Added
 
@@ -22,7 +22,8 @@
   magnetic variation, operating hours, operator contacts, and the rest of
   the numbered ICAO Annex 15 subsections. No login, no JS, no WAF —
   server-rendered HTML from a MediaWiki-style exporter. GEN/ENR sections
-  and the AMDT/SUP/AIC tabs are out of scope for now (see ROADMAP.md).
+  and the AMDT/SUP/AIC tabs are out of scope for now (see ROADMAP.md). Tool
+  count rises from 104 to 106.
 - **ARCSA Base de Registros Emitidos** (`list_arcsa_categorias`,
   `get_arcsa_categoria_archivos`) — the live sanitary registry
   (`controlsanitario.gob.ec/base-de-datos/`) by category: alimentos,
@@ -33,8 +34,8 @@
   it responds normally to this project's own `USER_AGENT` header. Reuses
   `helpers/sgr_publicaciones_client.py`'s Biblioteca parsing logic
   verbatim (confirmed byte-for-byte the same WordPress download-monitor
-  markup), just retargeted at a new domain. Tool count rises from 100 to
-  102.
+  markup), just retargeted at a new domain. Tool count rises from 102 to
+  104.
 - **INEC topic coverage: Laboratorio de Dinámica Laboral y Empresarial
   (LDLE)** — added to `helpers/inec_client.py`'s `_EXTRA_TOPICS`, so
   `search_inec_estadisticas`/`get_inec_estadistica_files` now surface it.
