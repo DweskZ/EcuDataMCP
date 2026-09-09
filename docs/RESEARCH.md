@@ -4531,8 +4531,36 @@ silenciosa al parser equivocado).
 **Conclusión:** la forma "frameset" está confirmada uniforme en 122 de 127
 boletines (96 %); las 5 excepciones son reales, están documentadas, y ya
 fallan de forma clara en vez de silenciosa — no se requiere ningún cambio
-de código en `bce_iem_client.py`. El hashing masivo del histórico completo
-(367 boletines, todas las eras) sigue pendiente, como ítem aparte.
+de código en `bce_iem_client.py`.
+
+### IEM — bug real corregido en `hash_catalog_tables`; hashing masivo del histórico completo descartado
+
+Al revisar la infraestructura de hashing existente (`hash_catalog_tables`,
+ya expuesta vía `search_bce_iem(hash_archivos=true)` y
+`scripts/audit_bce_iem.py --hash-xlsx`, pero nunca corrida a fondo ni
+cubierta por tests) se encontró un bug real, no solo la falta de una
+corrida: cada miembro de un ZIP legado (era 2006-2016) comparte la misma
+URL — `_fetch_legacy_zip_tables` le asigna la URL del ZIP completo a cada
+uno de sus ~60-90 archivos `.xls` — así que hashear "por tabla" en vez de
+"por URL única" descargaba y hasheaba el mismo ZIP entre 60 y 90 veces por
+boletín. Corregido: `hash_catalog_tables` ahora deduplica por URL antes de
+descargar, hashea cada URL única una sola vez, y aplica el resultado a
+todas las entradas de tabla que comparten esa URL — `max_files` ahora
+acota descargas reales (URLs únicas), no el conteo de entradas de tabla,
+que puede ser mucho mayor. 3 tests nuevos
+(`test_hash_catalog_tables_downloads_shared_url_only_once`,
+`..._reports_errors_without_failing_others`,
+`..._caps_by_unique_url_not_table_count`).
+
+Pedido explícito de Daniel: no ejecutar la corrida masiva real. Estimado
+en vivo: ~17.000-18.000 URLs únicas en total entre las tres eras (era
+frameset ~8.500 páginas de sección, era ZIP ~122 archivos tras la
+corrección de deduplicación, era moderna ~9.200 XLSX), muy por encima del
+límite de 5.000 archivos por llamada — requeriría varias corridas
+encadenadas por rango de años y varias horas de carga sostenida contra el
+servidor del BCE, sin que ninguna parte del proyecto dependa hoy de tener
+ese manifiesto de hashes. La capacidad queda lista para usarse cuando se
+necesite (ver ROADMAP.md § Descartado), sin necesidad de más código.
 
 ---
 

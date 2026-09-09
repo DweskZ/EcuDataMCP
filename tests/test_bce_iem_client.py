@@ -719,3 +719,73 @@ async def test_get_table_returns_grid_preview_for_frameset_table(httpx_mock):
         ["1999", "872.7", "577.9"],
     ]
     assert result["tabla"]["sha256"] == hashlib.sha256(section_bytes).hexdigest()
+
+
+@pytest.mark.asyncio
+async def test_hash_catalog_tables_downloads_shared_url_only_once(httpx_mock):
+    # Every member of a legacy bulk ZIP shares one URL (see
+    # _fetch_legacy_zip_tables) -- hashing must not re-download it per member.
+    zip_url = "https://contenido.bce.fin.ec/Catalogo/IEMensual/m1900/IEM1900.zip"
+    zip_bytes = b"fake-zip-bytes"
+    httpx_mock.add_response(url=zip_url, content=zip_bytes)
+    tables = [
+        {"table_id": "iem-legado-a", "url": zip_url},
+        {"table_id": "iem-legado-b", "url": zip_url},
+        {"table_id": "iem-legado-c", "url": zip_url},
+    ]
+
+    result = await bce_iem_client.hash_catalog_tables(tables)
+
+    requests = httpx_mock.get_requests(url=zip_url)
+    assert len(requests) == 1
+    assert result["total_archivos"] == 3
+    assert result["urls_unicas"] == 1
+    assert result["archivos_consultados"] == 3
+    assert result["archivos_exitosos"] == 3
+    assert result["archivos_con_error"] == 0
+    expected_hash = hashlib.sha256(zip_bytes).hexdigest()
+    assert all(r["sha256"] == expected_hash for r in result["resultados"])
+    assert all(r["bytes"] == len(zip_bytes) for r in result["resultados"])
+
+
+@pytest.mark.asyncio
+async def test_hash_catalog_tables_reports_errors_without_failing_others(httpx_mock):
+    good_url = "https://contenido.bce.fin.ec/Catalogo/IEMensual/m2091/IEM-431-e.xlsx"
+    bad_url = "https://contenido.bce.fin.ec/Catalogo/IEMensual/m2091/IEM-999-e.xlsx"
+    httpx_mock.add_response(url=good_url, content=b"good-bytes")
+    httpx_mock.add_response(url=bad_url, status_code=404, content=b"not found")
+    tables = [
+        {"table_id": "iem-431-e", "url": good_url},
+        {"table_id": "iem-999-e", "url": bad_url},
+    ]
+
+    result = await bce_iem_client.hash_catalog_tables(tables)
+
+    assert result["archivos_exitosos"] == 1
+    assert result["archivos_con_error"] == 1
+    by_id = {r["table_id"]: r for r in result["resultados"]}
+    assert by_id["iem-431-e"]["ok"] is True
+    assert by_id["iem-999-e"]["ok"] is False
+    assert "error" in by_id["iem-999-e"]
+
+
+@pytest.mark.asyncio
+async def test_hash_catalog_tables_caps_by_unique_url_not_table_count(httpx_mock):
+    urls = [
+        f"https://contenido.bce.fin.ec/Catalogo/IEMensual/m2091/IEM-{i}-e.xlsx" for i in range(3)
+    ]
+    # Two table entries per URL (6 entries, 3 unique URLs) -- capping at 2
+    # unique URLs should omit the third URL's *two* entries, not just one, and
+    # never even request it (no mock registered for it -- an unexpected
+    # request would fail the test with "no matching mock", not just an
+    # unused-mock warning at teardown).
+    for url in urls[:2]:
+        httpx_mock.add_response(url=url, content=b"x")
+    tables = [{"table_id": f"t{i}", "url": url} for i, url in enumerate(urls) for _ in range(2)]
+
+    result = await bce_iem_client.hash_catalog_tables(tables, max_files=2)
+
+    assert result["total_archivos"] == 6
+    assert result["urls_unicas"] == 3
+    assert result["archivos_consultados"] == 4
+    assert result["archivos_omitidos_por_limite"] == 1

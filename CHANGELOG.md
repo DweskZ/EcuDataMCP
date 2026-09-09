@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Fixed
+
+- **`search_bce_iem(hash_archivos=true)` / `scripts/audit_bce_iem.py --hash-xlsx`
+  no longer re-downloads the same legacy ZIP dozens of times per bulletin.**
+  Every member of a 2006-2016 bulletin's bulk ZIP shares that ZIP's URL;
+  `hash_catalog_tables` hashed per table entry instead of per unique URL, so
+  one bulletin's ~60-90 members triggered ~60-90 redundant downloads of the
+  identical file. Now deduplicates by URL first — `max_hash_archivos` bounds
+  actual downloads, not table-entry count.
+
 ### Added
 
 - **BCE Cuentas Nacionales** (`search_bce_cuentas_nacionales`,
