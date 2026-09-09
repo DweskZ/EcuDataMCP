@@ -4562,6 +4562,51 @@ servidor del BCE, sin que ninguna parte del proyecto dependa hoy de tener
 ese manifiesto de hashes. La capacidad queda lista para usarse cuando se
 necesite (ver ROADMAP.md § Descartado), sin necesidad de más código.
 
+### Sistema de índices — 4 páginas nuevas encontradas fuera del filtro de slug, incluida Cifras Económicas del Ecuador
+
+Barrido sitewide real (no un muestreo): se descargó cada una de las 221
+URLs del sitemap de `contenido.bce.fin.ec` y se buscó la clase CSS propia
+del widget (`class="bce-gi..."`) directamente en el HTML, en vez de confiar
+en que el slug termine en "-indice(s)" como hace `_discover_paginas` hoy.
+Resultado: 36 páginas totales con el widget real (30 ya cubiertas por el
+filtro de slug — coincide exactamente con lo confirmado en la Duodécima
+pasada — más 6 nuevas fuera de ese filtro).
+
+De las 6, 2 son duplicados confirmados, no candidatos nuevos:
+- `reporte-monetario-semanal` — mismo conteo de archivos y mismo rango de
+  años (349, 2020-2026) que `reporte-monetario-semanal-indices`, ya en el
+  catálogo. Mismo contenido, segunda URL.
+- `iem-publicaciones` — es el propio archivo de boletines IEM (367,
+  1996-2026) que `helpers/bce_iem_client.py` ya usa como
+  `IEM_ARCHIVE_URL`; `search_bce_iem`/`get_bce_iem_table` ya exponen su
+  contenido desglosado en tablas individuales, con más detalle que esta
+  página (solo enlaces al boletín completo).
+
+Las otras 4 son adiciones reales, verificadas en vivo, sin superposición
+con ningún catálogo existente (confirmado buscando "coyuntural",
+"interbancario", "tasas maximas", "cifras economicas" contra el catálogo
+de índices ya construido — cero resultados antes de este cambio):
+
+- **Mercado Interbancario** (`tasas-de-interes-menu-tab`): 264 archivos,
+  2000-2026, mensual.
+- **Entorno Macroeconómico** (`presentacion-coyuntural`): 201 archivos,
+  2009-2026, mensual.
+- **Cifras Económicas del Ecuador** (`cifras-economicas-del-ecuador`): 243
+  archivos, 2005-2025, mensual — cierra el ítem puntual que ROADMAP.md
+  dejaba pendiente bajo "Catálogo de publicaciones y calendario".
+- **Información Histórica de Tasas Máximas y Referenciales**
+  (`informacion-historica-de-tasas-maximas-y-referenciales`): 229
+  archivos, 2007-2026, mensual.
+
+Las 4 ya renderizan el mismo widget `.bce-gi` que `_parse_pagina` ya sabe
+leer — no se necesitó ningún parser nuevo, solo agregar sus slugs a un
+`_EXTRA_SLUGS` hardcodeado (mismo patrón que `_EXTRA_TOPICS` en
+`inec_client.py`) y que `_discover_paginas` busque su entrada en el
+sitemap junto a las que sí matchean por slug. Repetir el barrido completo
+de 221 URLs en cada request sería demasiado costoso, así que no se
+generaliza la detección — se deja como una lista chica, verificada a mano.
+Catálogo total: 30 → 34 páginas. 2 tests nuevos.
+
 ---
 
 ## Notas históricas

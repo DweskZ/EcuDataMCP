@@ -263,3 +263,31 @@ async def test_empty_catalog_is_not_cached(httpx_mock):
 
     second = await bce_indices_client.search_indices()
     assert second["total_paginas"] == 2
+
+
+@pytest.mark.asyncio
+async def test_discover_paginas_includes_hand_verified_extra_slugs(monkeypatch, httpx_mock):
+    # These pages render the same widget but their slug doesn't end in
+    # "-indice(s)" -- confirmed live 2026-09-09 (see _EXTRA_SLUGS docstring).
+    monkeypatch.setattr(bce_indices_client, "_EXTRA_SLUGS", ("cifras-economicas-del-ecuador",))
+    sitemap_with_extra = _SITEMAP_XML.replace(
+        "</urlset>",
+        '<url><loc>https://contenido.bce.fin.ec/cifras-economicas-del-ecuador/</loc>'
+        "<lastmod>2026-08-01T00:00:00-05:00</lastmod></url>\n</urlset>",
+    )
+    httpx_mock.add_response(url=bce_indices_client._SITEMAP_URL, html=sitemap_with_extra)
+
+    candidatos = await bce_indices_client._discover_paginas()
+
+    urls = {c["url"] for c in candidatos}
+    assert "https://contenido.bce.fin.ec/cifras-economicas-del-ecuador/" in urls
+
+
+@pytest.mark.asyncio
+async def test_discover_paginas_skips_extra_slug_absent_from_sitemap(monkeypatch, httpx_mock):
+    monkeypatch.setattr(bce_indices_client, "_EXTRA_SLUGS", ("no-existe-todavia",))
+    httpx_mock.add_response(url=bce_indices_client._SITEMAP_URL, html=_SITEMAP_XML)
+
+    candidatos = await bce_indices_client._discover_paginas()
+
+    assert not any("no-existe-todavia" in c["url"] for c in candidatos)

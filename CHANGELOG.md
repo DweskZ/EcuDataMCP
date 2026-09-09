@@ -29,6 +29,14 @@
   extension-and-path-based file-link parser rather than one shared widget
   parser. See RESEARCH.md for the investigation. Tool count rises from 106
   to 108.
+- **`search_bce_indices` — 4 more publication pages** (Mercado Interbancario,
+  Entorno Macroeconómico, Cifras Económicas del Ecuador, Información
+  Histórica de Tasas Máximas y Referenciales), found via a full sitewide
+  sweep for the índice widget's own CSS class instead of trusting the
+  `-indice(s)` slug pattern. Two sibling pages found in the same sweep
+  (`reporte-monetario-semanal`, `iem-publicaciones`) were confirmed
+  duplicates of already-covered content and excluded. Catalog: 30 → 34
+  pages.
 
 ### Clarified (no new tools)
 

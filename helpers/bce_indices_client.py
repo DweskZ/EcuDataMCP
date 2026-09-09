@@ -29,6 +29,17 @@ Because building the catalog means fetching every discovered page once
 the fully parsed archive per page -- `search_indices` returns summaries
 only (to keep responses agent-sized); `get_archivo` reads the already-
 cached items for one page, no second fetch needed.
+
+2026-09-09: a full sitewide sweep (fetch every sitemap URL, check for the
+widget's own CSS class directly instead of trusting the slug) found 6 more
+pages rendering this widget whose slug doesn't end in "-indice(s)" --
+4 real, non-duplicate additions (Mercado Interbancario, Entorno
+Macroeconómico, Cifras Económicas del Ecuador, Información Histórica de
+Tasas Máximas y Referenciales) hardcoded into `_EXTRA_SLUGS` below, and 2
+confirmed duplicates deliberately excluded (see `_EXTRA_SLUGS` docstring).
+Re-running that full sweep on every request would be far too expensive, so
+`_discover_paginas` only looks up these hand-verified slugs' sitemap entry
+directly, rather than repeating the sweep.
 """
 
 from __future__ import annotations
@@ -63,6 +74,31 @@ _SITEMAP_ENTRY_RE = re.compile(
     r"<url><loc>(?P<url>[^<]+)</loc><lastmod>(?P<lastmod>[^<]+)</lastmod></url>"
 )
 _INDICE_SLUG_RE = re.compile(r"-indices?(?:-\d+)?/?$", re.IGNORECASE)
+
+# Pages confirmed live 2026-09-09 to render the same `.bce-gi`/`.bce-gi-weekly`
+# widget but whose slug doesn't end in "-indice(s)" -- found by fetching
+# every URL in the sitemap and checking for the widget's own CSS class
+# directly, instead of trusting the slug pattern above. Same rationale as
+# `_EXTRA_TOPICS` in helpers/inec_client.py: a small, hand-verified set
+# outside the slug-based discovery, since re-running that full sitewide
+# sweep on every request would be far too expensive.
+#
+# Two sibling pages found in the same sweep were deliberately excluded as
+# confirmed duplicates, not oversights:
+#   - "reporte-monetario-semanal" -- identical file count and year range
+#     (349 archivos, 2020-2026) to "reporte-monetario-semanal-indices",
+#     already in the slug-based catalog. Same content, second URL.
+#   - "iem-publicaciones" -- this is the IEM bulletin archive itself
+#     (367 archivos, 1996-2026), already fully covered structurally by
+#     helpers/bce_iem_client.py's own IEM_ARCHIVE_URL (search_bce_iem/
+#     get_bce_iem_table already parse each bulletin into individual
+#     tables; this page is just its raw link list).
+_EXTRA_SLUGS = (
+    "tasas-de-interes-menu-tab",
+    "presentacion-coyuntural",
+    "cifras-economicas-del-ecuador",
+    "informacion-historica-de-tasas-maximas-y-referenciales",
+)
 
 _GI_ROOT_RE = re.compile(r'<section class="(?P<classes>bce-gi(?:\s[\w-]+)?)"', re.IGNORECASE)
 _GI_WEEKLY_ROOT_RE = re.compile(r'<section class="bce-gi-weekly"[^>]*aria-label="(?P<titulo>[^"]*)"')
@@ -257,11 +293,20 @@ async def _discover_paginas() -> list[dict[str, str]]:
     if truncated:
         raise ValueError(f"El sitemap de {_SITEMAP_URL} superó el límite de descarga.")
     xml = content.decode("utf-8", errors="replace")
-    return [
-        {"url": m.group("url"), "lastmod": m.group("lastmod")}
-        for m in _SITEMAP_ENTRY_RE.finditer(xml)
-        if _INDICE_SLUG_RE.search(m.group("url"))
+    entries = {m.group("url"): m.group("lastmod") for m in _SITEMAP_ENTRY_RE.finditer(xml)}
+
+    candidatos = [
+        {"url": url, "lastmod": lastmod}
+        for url, lastmod in entries.items()
+        if _INDICE_SLUG_RE.search(url)
     ]
+    candidatos_urls = {c["url"] for c in candidatos}
+    for slug in _EXTRA_SLUGS:
+        extra_url = next((url for url in entries if url.rstrip("/").endswith(f"/{slug}")), None)
+        if extra_url is None or extra_url in candidatos_urls:
+            continue
+        candidatos.append({"url": extra_url, "lastmod": entries[extra_url]})
+    return candidatos
 
 
 async def _fetch_catalog() -> list[dict[str, Any]]:
