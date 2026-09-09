@@ -4669,6 +4669,44 @@ Construido `helpers/bce_calendario_client.py` + `search_bce_calendario`
 
 ---
 
+## Vigésimo tercera pasada — barrido del catálogo CKAN nacional (98+ organizaciones) buscando fuentes de alto valor sin explorar (2026-09-09)
+
+**Pedido de Daniel:** "un scan de datos ecuatorianos útiles o importantes, ¿qué hay por ahí?" — no un pedido de construir nada todavía, sino de mapear el terreno. Método: `search_organizations` (herramienta genérica CKAN ya construida) con página vacía y `page_size=100` para listar organizaciones por número de paquetes, más `search_datasets`/`list_dataset_resources` y `WebFetch`/`WebSearch` dirigidos para verificar en vivo (no solo el conteo de paquetes) los candidatos más prometedores. La lista de organizaciones devolvió `"posiblemente_hay_mas": true` con 100 resultados — el portal declara "más de 98 instituciones" en su propia página de bienvenida, así que este barrido cubrió la primera página completa pero no está confirmado que sea exhaustivo; una pasada futura debería paginar hasta agotar el listado.
+
+### Hallazgo principal: ya hay contenido rico y sin explorar dentro del catálogo CKAN genérico, no fuera de él
+
+El patrón repetido en este proyecto (INEC, BCE, Superbancos) es que CKAN es solo "la punta" y el valor real vive en el portal propio de cada institución. Este barrido encontró el caso inverso en varios casos: organizaciones con **decenas o cientos de paquetes CKAN genuinos, actualizados, y nunca antes buscados por este proyecto** porque nadie había preguntado por ellas específicamente. Ya son accesibles hoy con las tools genéricas existentes (`search_datasets`, `list_dataset_resources`, `preview_resource_data`, `download_resource`) — no hace falta ningún cliente nuevo, solo saber que existen.
+
+**Autoridad Portuaria de Puerto Bolívar (APPB) — 246 paquetes, el conteo más alto de todo el barrido.** Verificado en vivo (`WebFetch` sobre la página de la organización): reportes mensuales reales de tráfico de buques (internacional, nacional, cruceros), carga de importación/exportación (general y contenedorizada), productos principales importados/exportados con país de origen/destino y tonelaje métrico, y obras de inversión de operadores privados — patrón de ~6 reportes estandarizados por mes, en ODS/CSV/XLSX, con fechas de actualización progresando cronológicamente hasta agosto de 2026. Es información de comercio exterior/logística portuaria que ninguna otra fuente de este proyecto cubre (BCE cubre comercio exterior agregado a nivel de país, no tráfico portuario). No mencionado en ningún lugar del roadmap hasta ahora.
+
+**Ministerio del Interior — Homicidios Intencionales, ya reachable hoy, verificado con la tool real.** `search_datasets(query="homicidios intencionales")` (la tool MCP de producción, no una simulación) devuelve el dataset completo: 4 archivos XLSX — el acumulado mensual 2026 (enero-julio), la serie histórica 2014-2025, y dos diccionarios de variables (uno de ellos de 93 MB, microdatos 2014-2024) — `metadata_modified` 2026-08-19, organización `ministerio-del-interior`. Actualizado mensualmente y con historial real. Dato de seguridad ciudadana genuinamente valioso, cero código nuevo necesario.
+
+**Otras organizaciones con conteo de paquetes alto y sin buscar antes en este proyecto** (conteo de paquetes vía `search_organizations`, contenido no verificado archivo por archivo todavía — candidatos para una pasada futura, no confirmados como valiosos más allá del conteo):
+- SRI-Servicio de Rentas Internas (CKAN genérico): 127 — separado del scraper dedicado `search_sri_datasets`/`search_sri_estadisticas_recaudacion`; podría tener contenido no cubierto por esos dos.
+- Ministerio de Economía y Finanzas (CKAN genérico): 97 — separado del scraper dedicado `search_mef_fiscal` (76 XLSX); mismo caso.
+- Instituto Nacional de Economía Popular y Solidaria (IEPS): 106 — nunca buscado.
+- Corporación del Seguro de Depósitos, Fondo de Liquidez y Fondo de Seguros Privados (COSEDE): 88 — estabilidad financiera, ángulo que ninguna otra fuente del proyecto cubre.
+- Instituto Público de Investigación Acuicultura y Pesca (IPAIP): 70 — investigación pesquera/acuícola, nunca buscado.
+- Ministerio de Agricultura y Ganadería (CKAN genérico): 69 — separado de SIPA (el portal propio de MAG ya cubierto); podría tener contenido no cubierto por SIPA.
+- CENACE (45) y CNEL EP (40) — ya cubiertos vía datasets CKAN genéricos, confirmado en el roadmap existente (Hecho, sector eléctrico).
+
+### Instituciones con portal propio más rico que su presencia en CKAN — candidatos reales a construir
+
+**Consejo de la Judicatura — solo 1 paquete en CKAN, pero un portal de estadística judicial real y sin explorar.** Verificado en vivo (`WebFetch` sobre `fsweb.funcionjudicial.gob.ec/estadisticas/datoscj/portalestadistica.html`): un dashboard público, sin login visible, con actualización mensual, cubriendo causas, audiencias, productividad de jueces, violencia/femicidio, medidas de protección, mediación, servicios notariales, remates judiciales, causas laborales por juez. No se confirmaron formatos de descarga (CSV/XLSX) desde el texto extraído — parece ser un dashboard interactivo (posible Power BI o visor propio), así que antes de construir haría falta una pasada con browser real para encontrar el mecanismo de exportación real, mismo patrón que se usó para desencriptar los widgets Power BI de `search_sut_indicadores` (Ministerio del Trabajo). No mencionado en el roadmap hasta ahora — dato de justicia/gobernanza genuinamente valioso.
+
+**Ministerio de Salud Pública — 8 paquetes en CKAN, portal propio con más detalle.** `salud.gob.ec/datos-abiertos/` (plataforma de datos COVID-19 con casos por semana epidemiológica) y `salud.gob.ec/direccion-nacional-de-vigilancia-epidemiologica-gaceta-epidemiologica/` (Gacetas de Indicadores, archivo 2012-2026) y `salud.gob.ec/geosalud-en-cifras/`. Ya estaba en el roadmap como "sin pasada de contenido completa" (Séptima pasada); este barrido confirma sub-objetivos concretos (gacetas epidemiológicas con archivo histórico) en vez de solo "dominio vivo".
+
+**Ministerio de Turismo — 5 paquetes en CKAN (catastro turístico), portal "Turismo en Cifras" con más detalle.** `servicios.turismo.gob.ec/turismo-en-cifras/` — entradas/salidas internacionales de turistas por nacionalidad, actualización mensual, cuatro segmentos (indicadores económicos OMT, inteligencia de mercado, oferta turística, boletines estadísticos). Nunca mencionado en el roadmap.
+
+### Candidatos de menor prioridad, evaluados y descartados de este barrido (no del proyecto)
+
+- **SENAGUA/agua.gob.ec** — solo 1 dataset real en CKAN ("Autorizaciones del Recurso Hídrico"); la organización CKAN antigua `senagua-insteliminada` tiene 0 paquetes (eliminada/fusionada en ARCA, la Agencia de Regulación y Control del Agua). Bajo volumen, nicho.
+- **MPCEIP (Ministerio de Producción, Comercio Exterior, Inversiones y Pesca)** — 8 paquetes CKAN (registro de artesanos/emprendedores) más boletines PDF de comercio exterior que ya reutilizan cifras del BCE. Solapamiento alto con lo que el proyecto ya cubre (BCE precios comex, SENAE recaudación aduanera); bajo valor incremental.
+
+Ninguno de los hallazgos de esta pasada se construyó todavía — es un mapeo, no una implementación. Ver ROADMAP.md § Otras fuentes por explorar para las filas nuevas.
+
+---
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un
