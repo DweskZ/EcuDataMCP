@@ -4746,6 +4746,22 @@ Ninguno de los hallazgos de esta pasada se construyó todavía — es un mapeo, 
 
 ---
 
+## Vigésimo quinta pasada — CEPALSTAT, IADB Latin Macro Watch y World Bank/IADB DPI verificados en vivo (2026-09-09)
+
+**Contexto:** Daniel citó un extracto de un paper que usa IFS (FMI), Latin Macro Watch (IADB) y la Database of Political Institutions (Banco Mundial/IADB) — preguntando si son fuentes reales y viables. Verificación en vivo de las tres, más CEPALSTAT (ya mencionado como pendiente de verificar en la Vigésimo cuarta pasada).
+
+**CEPALSTAT — API REST pública real, confirmada con una llamada de datos completa.** `api-cepalstat.cepal.org/apispec_1.json` es un spec OpenAPI 3 real (`CEPALSTAT API - Public`, sin `securityDefinitions` — confirmado sin autenticación). Endpoints bajo `/cepalstat/api/v1/`: `thematic-tree` (árbol completo de áreas/indicadores, 375 KB), e `indicator/{id}/{areas,data,dimensions,footnotes,metadata,publications,records,sources}`. Probado en vivo contra el indicador 4788 ("Total population, by sex"): `/areas` devuelve las áreas temáticas donde vive el indicador; `/data` devuelve un payload real de 2.5 MB con metadata completa (unidad, definición, metodología de cálculo) y los datos 1950-2100 para todos los países de la región. El endpoint `/data` acepta `lang` (en/es), `format` (json/xml/yaml/csv/excel) y `members` (para acotar por dimensión/país) — confirmado en el spec, no probado con un `indicator_id` de Ecuador específico todavía. Necesita un cliente dedicado (no es CKAN).
+
+**IADB Latin Macro Watch — confirmado que vive en un portal CKAN estándar, no en una herramienta propietaria.** `data.iadb.org` responde a `/api/3/action/package_search` exactamente igual que `datosabiertos.gob.ec` (692 datasets totales en el portal, confirmado con una llamada real). El paquete `latin-macro-watch-dataset` tiene **665 recursos CSV**: desempleo, IPC, tipo de cambio nominal bilateral con USD, precios de importación/exportación, y (según los resultados de búsqueda) ingresos/gastos/balance fiscal por nivel de gobierno (gobierno central, gobierno general, sector público no financiero), en moneda local y USD, mensual/trimestral/anual desde 1990, para 26 países prestatarios del BID incluido Ecuador — exactamente el tipo de panel fiscal trimestral que cita el paper de Daniel.
+
+**World Bank/IADB Database of Political Institutions (DPI) — mismo portal CKAN, dataset pequeño y manejable.** El paquete `the-database-of-political-institutions-dpi-2023` tiene solo 3 recursos: el codebook en PDF, y los datos completos en XLSX y CSV — ~180 países, 1975-2023, con fechas de elecciones, medidas de pesos y contrapesos, afiliación/ideología partidaria, y fragmentación de oposición y gobierno en el legislativo. Originalmente compilado por el Banco Mundial (2000), ahora alojado y mantenido por el BID en el mismo portal que Latin Macro Watch.
+
+**Implicación de arquitectura:** como ambos datasets de IADB viven en un CKAN genuino, se podrían exponer agregando `source="iadb"` al cliente CKAN ya existente en este proyecto (mismo patrón que `source="cuenca"`/`"latacunga"` para los portales municipales) — sin necesidad de ningún scraper nuevo, solo apuntar el cliente genérico a una base URL distinta. CEPALSTAT, al ser una API REST propia (no CKAN), sí necesitaría un cliente dedicado nuevo, aunque más simple que la mayoría de los ya construidos en este proyecto (JSON limpio, sin autenticación, sin HTML que parsear).
+
+Nada de esto se construyó todavía — verificación de viabilidad solicitada explícitamente por Daniel, no una implementación.
+
+---
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un
