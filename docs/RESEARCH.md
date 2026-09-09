@@ -4366,7 +4366,7 @@ JS, sin WAF, mismo dominio ya en la allowlist operativa del proyecto.
 
 ---
 
-## Vigésimo segunda pasada — BCE Cuentas Nacionales construido; mercado laboral y pobreza/desigualdad aclarados como ya cubiertos (2026-09-09)
+## Vigésimo segunda pasada — BCE Cuentas Nacionales construido; mercado laboral y pobreza/desigualdad aclarados; verificación en vivo del archivo IEM frameset; revisiones de BCEData descartadas (2026-09-09)
 
 **Pedido de Daniel:** "implementemos mercado laboral, pobreza y cuentas
 nacionales completas" — los tres ítems que EMOE y coyuntura (Duodécima
@@ -4466,6 +4466,73 @@ UTF-8; era un artefacto de la consola, no del cliente.
 6 tests nuevos (`tests/test_bce_cuentas_nacionales_client.py`), con
 `_PAGINAS` reemplazado vía `monkeypatch` a un catálogo de 2 páginas de
 prueba para no tener que mockear las 18 reales. Tool count: 106 → 108.
+
+### BCEData — detección de cambios de revisión, descartada explícitamente
+
+Pedido de Daniel: dejar este ítem fuera de alcance. Ya estaba documentado
+que BCEData no expone ningún marcador de revisión (`ETag`/`Last-Modified`
+ausentes, confirmado en la Duodécima pasada) — la única vía posible es
+comparación de contenido bajo demanda, que ya existe vía
+`audit_bce_catalog`. Movido de Pendiente a Descartado en ROADMAP.md; no
+requiere código.
+
+### IEM — verificación en vivo de los 127 boletines de la era frameset (1996-2006)
+
+Pedido de Daniel: "iem, verify" — cerrar el ítem "confirmar que las
+secciones más viejas siguen la misma forma (solo muestreado)" dejado
+pendiente en la Decimotercera pasada, que solo había verificado 3
+boletines (No. 1800, 1780, y el celda-larga de No. 1820) a mano.
+
+**Método.** Un script puntual (`scripts/_scratch_iem_frameset_verify.py`,
+descartado tras esta pasada — no es una tool ni un artefacto permanente)
+llamó a `_fetch_bulletins()` + `_fetch_tables_for_bulletin()` — el mismo
+código de producción que usa `get_bce_iem_table`, no un parser aparte —
+sobre los 127 boletines descubiertos con `numero` entre 1727 y 1853
+(confirmado: `_fetch_bulletins()` los descubre todos, sin huecos en el
+índice), con concurrencia 10. Corrida completa: ~20 minutos (cada boletín
+hace ~60 fetches secuenciales de página de sección, sin concurrencia
+interna — ver `_fetch_legacy_frameset_tables`).
+
+**Resultado: 122/127 boletines parsean con la misma forma** confirmada en
+la Decimotercera pasada — 100 % `formato_origen: "html_frameset"`, entre
+57 y 86 tablas por boletín (promedio 67.1), consistente con las 63 tablas
+ya verificadas manualmente para el No. 1800. Sin ninguna tabla con 0 filas
+ni con un `formato_origen` inesperado (que habría indicado una caída
+silenciosa al parser equivocado).
+
+**2 excepciones reales, no bugs de este proyecto:**
+
+1. **No. 1727-1730 (enero-abril 1996, los 4 primeros boletines del archivo
+   completo) están rotos en el propio servidor del BCE.** El índice del
+   BCE los lista, pero la página del boletín en sí devuelve HTTP 404 —
+   confirmado con una petición nueva e independiente (`m1727011996.htm` →
+   404; el boletín inmediatamente siguiente, `m1731051996.htm`, mayo 1996,
+   → 200 normal). No es un problema de rate-limit ni de user-agent: es un
+   enlace muerto permanente del lado del BCE, en el extremo más viejo del
+   archivo. `_fetch_tables_for_bulletin` ya falla con un mensaje claro
+   (404 del propio `httpx`) en vez de devolver datos vacíos o incorrectos
+   — no se necesita ningún cambio de código.
+2. **No. 1853 (julio 2006, el último boletín antes de que empiece la era
+   ZIP en el No. 1854/agosto 2006) es una tercera forma, genuinamente
+   única, no antes documentada.** No es un frameset con enlaces a
+   secciones ni un ZIP — es un export crudo de Microsoft Excel
+   (`meta name=ProgId content=Excel.Sheet`, namespaces
+   `urn:schemas-microsoft-com:office:excel`), la hoja completa embebida
+   como un único documento HTML. `_fetch_legacy_frameset_tables` no
+   encuentra enlaces de sección (porque no los hay) y falla con "no
+   expuso tablas XLSX individuales" — confirmado que es un caso aislado
+   exactamente en la frontera de era, no el inicio de una familia nueva:
+   los boletines inmediatamente anteriores (No. 1851 mayo 2006, No. 1852
+   junio 2006) sí son frameset normal (66 y 67 tablas respectivamente).
+   Coherente con la filosofía ya aplicada a `iem-1111-e` ("Encaje Legal")
+   en la Decimotercera pasada: un caso genuinamente único no justifica un
+   normalizador dedicado.
+
+**Conclusión:** la forma "frameset" está confirmada uniforme en 122 de 127
+boletines (96 %); las 5 excepciones son reales, están documentadas, y ya
+fallan de forma clara en vez de silenciosa — no se requiere ningún cambio
+de código en `bce_iem_client.py`. El hashing masivo del histórico completo
+(367 boletines, todas las eras) sigue pendiente, como ítem aparte.
 
 ---
 

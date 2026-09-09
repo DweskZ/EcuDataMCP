@@ -215,8 +215,7 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 
 | Fuente | Estado | Qué falta |
 |---|---|---|
-| BCEData — catálogo y series | Parcial | Descubrimiento y consulta completos; falta detectar cambios de revisión (el endpoint no expone marcador explícito, solo comparación por contenido) |
-| IEM — archivo y archivos fuente | Parcial | 367 boletines legibles en 3 eras de formato; falta hashing masivo del histórico y confirmar que las 126 secciones más viejas siguen la misma forma (solo muestreado) |
+| IEM — archivo y archivos fuente | Parcial | 367 boletines legibles en 3 eras de formato; verificados en vivo los 127 boletines de la era frameset (122/127 con la misma forma, 57-86 tablas), 2 excepciones reales documentadas (No. 1727-1730 muertos en el propio BCE, No. 1853 con un formato único de transición); falta hashing masivo del histórico → RESEARCH.md § Vigésimo segunda pasada |
 | BCEData ↔ IEM — mapa de equivalencias | Parcial | 2 candidatos confirmados manualmente con datos en vivo; el resto no se trata como duplicado sin revisar valores y metodología |
 | EMOE y coyuntura | Parcial | Expectativas económicas, confianza del consumidor, inflación y ciclo económico resueltos vía sistema de índices; mercado laboral (BCEData id_grupo 64/65/68/102) y pobreza/desigualdad (`search_inec_publicaciones`) confirmados ya cubiertos por tools existentes, sin código nuevo → RESEARCH.md § Vigésimo segunda pasada |
 | Catálogo de publicaciones y calendario | Parcial | `search_bce_publicaciones` solo expone ventana rodante (~30 recientes), sin fecha ni paginación; falta Cifras Económicas del Ecuador y el calendario de publicaciones futuras |
@@ -290,6 +289,7 @@ Bloqueos reales confirmados en vivo, o decisiones explícitas de no construir �
 | `.rar` | Riesgo de subprocess/CVE — decidido explícitamente en contra |
 | SIPA/MAG — precios mayoristas como fuente de alta frecuencia | Solo boletines PDF mensuales y un documento regulatorio de piso/techo sin historia; app móvil "cgsin.precios" sin explorar → RESEARCH.md § Duodécima pasada |
 | BCE — prueba de completitud y frescura programada | Requiere scheduler con almacenamiento persistente de snapshots; Daniel decidió no construir esa infraestructura (la comparación bajo demanda ya existe vía `audit_bce_catalog`) |
+| BCEData — detección de cambios de revisión | El endpoint no expone ningún marcador explícito de revisión/versión (`ETag`/`Last-Modified` confirmado ausente, ver Duodécima pasada); solo quedaría comparación por contenido bajo demanda, ya cubierta por `audit_bce_catalog`. Fuera de alcance por decisión explícita de Daniel (2026-09-09) |
 | Micrositio de Interior (`cifras.ministeriodelinterior.gob.ec`) | WAF Incapsula |
 | Aduana/SENAE — comercio exterior | No publicado en portal abierto, solo por oficio (FEDEXPOR cubre el hueco, ver gremios privados) |
 | Fiscalía General del Estado | Sin dataset agregado propio; sus herramientas de consulta son caso-por-caso |
