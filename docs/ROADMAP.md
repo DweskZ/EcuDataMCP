@@ -25,6 +25,7 @@ de cobertura que falta en cada una.
 | BCEData ↔ IEM | `compare_bce_sources` | Mapa de coincidencias candidatas por etiqueta/confianza, cola revisable → RESEARCH.md § Decimotercera pasada |
 | Indicadores diarios/mensuales | `list_bce_indicadores_diarios`, `get_bce_indicador_diario` | 49 series en 13 archivos JSON: Riesgo País (D), Producción Petrolera (D), oro/WTI/Dow Jones/SOFR, bonos soberanos, reservas, deuda pública, balanza comercial... → RESEARCH.md § Décima pasada, § Decimotercera pasada |
 | Sistema de páginas índice editoriales | `search_bce_indices`, `get_bce_indice_archivo` | ~35 páginas con archivo histórico completo por publicación con nombre propio (boletines sectoriales, precios/confianza, divisas, balanza de pagos) → RESEARCH.md § Duodécima pasada |
+| Cuentas Nacionales completas | `search_bce_cuentas_nacionales`, `get_bce_cuentas_nacionales_archivo` | 18 páginas / 244 archivos: anuales, trimestrales, regionales, retropolación desde 1965, TOU, CEI, MEI, matrices insumo-producto y de contabilidad social (base fija y móvil), cuenta temática de bioeconomía, IMAEC (solo mes vigente) → RESEARCH.md § Vigésimo segunda pasada |
 | Remesas de trabajadores | `search_bce_remesas` | Agregados, serie histórica y bases mensuales, desagregación por entidad desde jul-2025 → RESEARCH.md § Banco Central del Ecuador (BCE) |
 | Precios de comercio exterior | `search_bce_precios_comex` | IPX/IPM/ITI desagregados por categoría de uso económico y producto individual → RESEARCH.md § Decimotercera pasada |
 | Últimas publicaciones | `search_bce_publicaciones` | Ventana rodante (~30 más recientes) → RESEARCH.md § Duodécima pasada |
@@ -217,10 +218,9 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 | BCEData — catálogo y series | Parcial | Descubrimiento y consulta completos; falta detectar cambios de revisión (el endpoint no expone marcador explícito, solo comparación por contenido) |
 | IEM — archivo y archivos fuente | Parcial | 367 boletines legibles en 3 eras de formato; falta hashing masivo del histórico y confirmar que las 126 secciones más viejas siguen la misma forma (solo muestreado) |
 | BCEData ↔ IEM — mapa de equivalencias | Parcial | 2 candidatos confirmados manualmente con datos en vivo; el resto no se trata como duplicado sin revisar valores y metodología |
-| EMOE y coyuntura | Parcial | Expectativas económicas, confianza del consumidor, inflación y ciclo económico resueltos vía sistema de índices; falta mercado laboral y pobreza/desigualdad (sin página índice encontrada) |
+| EMOE y coyuntura | Parcial | Expectativas económicas, confianza del consumidor, inflación y ciclo económico resueltos vía sistema de índices; mercado laboral (BCEData id_grupo 64/65/68/102) y pobreza/desigualdad (`search_inec_publicaciones`) confirmados ya cubiertos por tools existentes, sin código nuevo → RESEARCH.md § Vigésimo segunda pasada |
 | Catálogo de publicaciones y calendario | Parcial | `search_bce_publicaciones` solo expone ventana rodante (~30 recientes), sin fecha ni paginación; falta Cifras Económicas del Ecuador y el calendario de publicaciones futuras |
 | Búsqueda ampliada del sitio BCE | No iniciado | Mapear publicaciones temáticas, catálogos y archivos históricos más allá de BCEData/IEM; priorizar solo lo que añada detalle verificable, no duplicados |
-| Cuentas Nacionales completas | No iniciado | Paquetes anual/trimestral/regional, retropolación, Tabla Oferta-Utilización, Cuadro Económico Integrado, Matriz de Empleo e Ingresos — conservando metodología de base móvil y carácter provisional/definitivo |
 
 ### Supercías — pipeline financiero
 

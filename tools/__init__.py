@@ -11,6 +11,9 @@ from tools.get_arcsa_categoria_archivos import (
     register_get_arcsa_categoria_archivos_tool,
 )
 from tools.get_auditor_info import register_get_auditor_info_tool
+from tools.get_bce_cuentas_nacionales_archivo import (
+    register_get_bce_cuentas_nacionales_archivo_tool,
+)
 from tools.get_bce_iem_table import register_get_bce_iem_table_tool
 from tools.get_bce_indicador_diario import register_get_bce_indicador_diario_tool
 from tools.get_bce_indice_archivo import register_get_bce_indice_archivo_tool
@@ -90,6 +93,9 @@ from tools.search_arcotel_reportes_mensuales import (
     register_search_arcotel_reportes_mensuales_tool,
 )
 from tools.search_auditores import register_search_auditores_tool
+from tools.search_bce_cuentas_nacionales import (
+    register_search_bce_cuentas_nacionales_tool,
+)
 from tools.search_bce_iem import register_search_bce_iem_tool
 from tools.search_bce_indices import register_search_bce_indices_tool
 from tools.search_bce_precios_comex import register_search_bce_precios_comex_tool
@@ -246,6 +252,8 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_bce_indice_archivo_tool(mcp)
     register_search_bce_remesas_tool(mcp)
     register_search_bce_precios_comex_tool(mcp)
+    register_search_bce_cuentas_nacionales_tool(mcp)
+    register_get_bce_cuentas_nacionales_archivo_tool(mcp)
     register_list_bce_indicadores_diarios_tool(mcp)
     register_get_bce_indicador_diario_tool(mcp)
     register_get_cenace_tablero_tool(mcp)

@@ -2,6 +2,41 @@
 
 ## Unreleased
 
+### Added
+
+- **BCE Cuentas Nacionales** (`search_bce_cuentas_nacionales`,
+  `get_bce_cuentas_nacionales_archivo`) — the national-accounts publication
+  packages this project previously only touched indirectly via BCEData/IEM
+  aggregates: annual and quarterly national accounts, regional/provincial
+  accounts, the historical PIB retropolation back to 1965, Tabla de Oferta
+  y Utilización (TOU), Cuadro Económico Integrado (CEI), Matriz de Empleo e
+  Ingresos (MEI), input-output and social-accounting matrices, the
+  bioeconomy thematic satellite account, fixed-base (2007=100) series, and
+  IMAEC monthly results — 18 pages, 244 files verified live. Each page
+  renders its own bespoke widget markup with no shared CSS convention, so
+  discovery is a hardcoded page list (same pattern as
+  `helpers/bce_precios_comex_client.py`) with a generic
+  extension-and-path-based file-link parser rather than one shared widget
+  parser. See RESEARCH.md for the investigation. Tool count rises from 106
+  to 108.
+
+### Clarified (no new tools)
+
+- **Mercado laboral (BCE)** — already fully reachable via the generic
+  `search_indicadores_bce`/`get_indicador_bce` tools (id_grupo 64/65/68/102,
+  "4.2 Precios, Salarios y Mercado Laboral"), including quarterly
+  national/urban/rural/city-level employment, underemployment, and wage
+  series back to 2020. ROADMAP.md's earlier "sin página índice encontrada"
+  note was about BCE's `.bce-gi` índice-archive system specifically, not
+  about BCEData coverage — no gap, no new code needed.
+- **Pobreza y desigualdad** — confirmed BCE publishes nothing on this
+  (0 results from `search_indicadores_bce`); it is INEC's domain and is
+  already reachable via `search_inec_publicaciones` ("Pobreza y
+  desigualdad" landing page plus annual "Pobreza por Ingresos" bulletins
+  back to 2019) — the static `search_inec_estadisticas` topic page for
+  "Pobreza" is stale (0 files), same known staleness pattern already
+  documented for other INEC topic pages.
+
 ## 0.8.7 — 2026-09-07
 
 ### Removed

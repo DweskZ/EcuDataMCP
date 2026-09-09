@@ -4366,6 +4366,109 @@ JS, sin WAF, mismo dominio ya en la allowlist operativa del proyecto.
 
 ---
 
+## Vigésimo segunda pasada — BCE Cuentas Nacionales construido; mercado laboral y pobreza/desigualdad aclarados como ya cubiertos (2026-09-09)
+
+**Pedido de Daniel:** "implementemos mercado laboral, pobreza y cuentas
+nacionales completas" — los tres ítems que EMOE y coyuntura (Duodécima
+pasada) había dejado pendientes. Investigación en vivo de los tres, no
+solo lectura de HTML.
+
+### Mercado laboral — ya cubierto, sin código nuevo
+
+`search_indicadores_bce("mercado laboral")` devuelve 4 grupos reales bajo
+"4.2 Precios, Salarios y Mercado Laboral" del propio catálogo BCEData:
+id_grupo 64 (salario unificado sector privado), 65 (SBU nominal/real), 68
+("Indicadores del mercado laboral nacional, urbano y rural") y 102
+("Indicadores del mercado laboral ecuatoriano: Cuenca, Guayaquil, Quito,
+Machala y Ambato"). Verificado en vivo: id_grupo 102 trae series
+trimestrales 2020-IV a 2026-I (empleo global, empleo adecuado/pleno, empleo
+no clasificado, por nivel nacional/urbano/rural y por ciudad) — datos reales
+y ricos, no un stub. La nota de la Duodécima pasada ("sin página índice
+encontrada para mercado laboral") era correcta pero incompleta: se refería
+solo al sistema de páginas "-indice(s)" (`bce_indices_client.py`), no a
+BCEData, que sí lo tiene y ya es accesible con las tools existentes. **No
+hay gap real aquí** — se documenta para cerrar el ítem del roadmap, sin
+tocar código.
+
+### Pobreza y desigualdad — confirmado que no es BCE, ya cubierto vía INEC
+
+`search_indicadores_bce("pobreza")` y `("desigualdad")` devuelven 0
+resultados — confirmado en vivo que BCE no publica nada de esto (coherente
+con el hallazgo de la Novena pasada: pobreza es responsabilidad de INEC en
+el sistema estadístico ecuatoriano, no del BCE). La página estática de INEC
+para "Pobreza" (`search_inec_estadisticas("pobreza")` →
+`ecuadorencifras.gob.ec/pobreza2/`) está vacía (0 archivos) — mismo patrón
+de página de tema desactualizada ya documentado para Empleo en la Novena
+pasada. La fuente viva real es `search_inec_publicaciones("pobreza y
+desigualdad")`: página landing vigente
+(`pobreza-y-desigualdad-2/`, 2026-06-19) más una serie completa de
+boletines anuales "Pobreza por Ingresos – Resultados" 2019-2025. **Ya
+accesible con la tool genérica existente** — no se construyó nada nuevo,
+solo se verificó y documenta la ruta real.
+
+### BCE Cuentas Nacionales — construido: `search_bce_cuentas_nacionales`/`get_bce_cuentas_nacionales_archivo`
+
+Investigación del sitemap de `contenido.bce.fin.ec` (mismo
+`wp-sitemap-posts-page-1.xml` que usa `bce_indices_client.py`) encontró 18
+páginas bajo el árbol "Cuentas Nacionales": anuales, trimestrales,
+regionales, base fija 2007=100, matrices especiales, TOU/CEI/MEI
+independientes, MIP, MCS, cuentas temáticas (bioeconomía), documentos
+metodológicos e IMAEC.
+
+**Por qué no encajan en el sistema de índices existente.** Un barrido
+inicial ingenuo (`t.includes("bce-gi")` sobre dos páginas) sugería
+falsamente que usaban el mismo widget `.bce-gi` que `bce_indices_client.py`
+ya sabe leer — la señal real era solo que el plugin carga su CSS/JS en la
+página (`bce-gi-public-css`/`bce-gi-public-js`), no que el widget esté
+presente en el HTML. Un barrido correcto (regex sobre `class="bce-gi..."`,
+ejecutado vía `httpx` desde dentro del proyecto — un script en `scripts/`
+en vez de un archivo suelto en `/tmp`, porque `uv run python /tmp/archivo.py`
+resulta en un entorno "script mode" distinto al del proyecto que rompe la
+importación de `httpcore`/`h11` con un `AttributeError` en `inspect.signature`
+no relacionado con el código en sí) confirmó **0 páginas de Cuentas
+Nacionales usan `.bce-gi`** — cada una renderiza su propio widget bespoke,
+con su propio prefijo de clases CSS (`cna-`/`cnr-`/`cnt-` para las
+tabuladas por año/vintage, o simples `<a>` sueltos dentro de `.card-body`
+para las de serie única como MEI/TOU/CEI/FBKF/MIP). No hay una convención
+de CSS compartida entre ellas — confirmado inspeccionando doce páginas una
+por una.
+
+**Lo que sí generaliza:** cada descarga real es un `<a href="...">` que
+apunta a `/documentos/.../archivo.{xlsx,xls,pdf,csv,zip,docx}`, sin
+excepción, en las 18 páginas verificadas (desde 3 enlaces en las páginas
+simples hasta 80 en el boletín trimestral). `_extract_archivos` en
+`helpers/bce_cuentas_nacionales_client.py` parsea sobre ese hecho
+estructural (extensión + prefijo de ruta), no sobre las clases CSS
+específicas de cada página — así una sola función cubre las 18 páginas
+pese a que no comparten marcado. Igual que `_EXTRA_TOPICS` en
+`inec_client.py` y `_PAGINAS` en `bce_precios_comex_client.py`, el conjunto
+de 18 páginas está hardcodeado (no hay patrón de slug ni convención de
+sitemap que las identifique como grupo) — se dejaron fuera deliberadamente
+"cuentas-nacionales-anuales"/"cuentas-nacionales-trimestrales" y sus
+"-definicion" (cáscaras de navegación sin enlaces `/documentos/` propios,
+mismo caso que `memoria-anual-indice` en la Duodécima pasada).
+
+**Verificado en vivo extremo a extremo:** 18/18 páginas responden 200,
+244 archivos reales extraídos en total (22 a 80 por página según el
+tamaño real de cada paquete). Contenido real confirmado: serie histórica
+del PIB desde 1965 (`retropolacion_1965_2024p.xlsx`), cuentas trimestrales
+hasta el IT 2026, cuentas regionales/provinciales 2007-2024, matrices
+insumo-producto y de contabilidad social en base fija 2007 y base móvil,
+la cuenta satélite temática de bioeconomía, y resultados IMAEC — este
+último con una limitación real: solo expone el mes más reciente (mismo
+patrón de ventana rodante ya documentado para
+`search_bce_publicaciones`), no un archivo histórico. Bug de codificación
+descartado en el proceso: un `print()` en consola de Windows mostraba
+"Presentaci�n" en vez de "Presentación" — verificado que el dato real
+(escrito a un archivo JSON con `ensure_ascii=False`) está correctamente en
+UTF-8; era un artefacto de la consola, no del cliente.
+
+6 tests nuevos (`tests/test_bce_cuentas_nacionales_client.py`), con
+`_PAGINAS` reemplazado vía `monkeypatch` a un catálogo de 2 páginas de
+prueba para no tener que mockear las 18 reales. Tool count: 106 → 108.
+
+---
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un
