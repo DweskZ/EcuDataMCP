@@ -22,13 +22,14 @@ de cobertura que falta en cada una.
 |---|---|---|
 | BCEData (catálogo) | `search_indicadores_bce`, `get_indicador_bce`, `audit_bce_catalog` | 78 grupos / 2.360 series de la API pública sin auth; auditoría de cobertura en vivo (`guardar_snapshot`/`comparar_anterior`) → RESEARCH.md § Banco Central del Ecuador (BCE), § Duodécima pasada |
 | Información Estadística Mensual (IEM/IEEM) | `search_bce_iem`, `get_bce_iem_table` | Archivo completo 1996-2026 (367 boletines, 3 eras de formato: XLSX individual, ZIP `.xls` legado, HTML de frameset), lectura semántica de tablas; los 127 boletines de la era frameset verificados en vivo (122/127 con la misma forma) → RESEARCH.md § Decimotercera pasada, § Vigésimo segunda pasada |
-| BCEData ↔ IEM | `compare_bce_sources` | Mapa de coincidencias candidatas por etiqueta/confianza, cola revisable → RESEARCH.md § Decimotercera pasada |
+| BCEData ↔ IEM | `compare_bce_sources` | Mapa de coincidencias candidatas por etiqueta/confianza; 2 de 77 confirmadas manualmente, el resto queda como candidato sin revisar (ver Descartado) → RESEARCH.md § Decimotercera pasada |
 | Indicadores diarios/mensuales | `list_bce_indicadores_diarios`, `get_bce_indicador_diario` | 49 series en 13 archivos JSON: Riesgo País (D), Producción Petrolera (D), oro/WTI/Dow Jones/SOFR, bonos soberanos, reservas, deuda pública, balanza comercial... → RESEARCH.md § Décima pasada, § Decimotercera pasada |
 | Sistema de páginas índice editoriales | `search_bce_indices`, `get_bce_indice_archivo` | 34 páginas con archivo histórico completo por publicación con nombre propio (boletines sectoriales, precios/confianza, divisas, balanza de pagos, mercado interbancario, entorno macroeconómico, Cifras Económicas del Ecuador, tasas máximas y referenciales) → RESEARCH.md § Duodécima pasada, § Vigésimo segunda pasada |
 | Cuentas Nacionales completas | `search_bce_cuentas_nacionales`, `get_bce_cuentas_nacionales_archivo` | 18 páginas / 244 archivos: anuales, trimestrales, regionales, retropolación desde 1965, TOU, CEI, MEI, matrices insumo-producto y de contabilidad social (base fija y móvil), cuenta temática de bioeconomía, IMAEC (solo mes vigente) → RESEARCH.md § Vigésimo segunda pasada |
 | Remesas de trabajadores | `search_bce_remesas` | Agregados, serie histórica y bases mensuales, desagregación por entidad desde jul-2025 → RESEARCH.md § Banco Central del Ecuador (BCE) |
 | Precios de comercio exterior | `search_bce_precios_comex` | IPX/IPM/ITI desagregados por categoría de uso económico y producto individual → RESEARCH.md § Decimotercera pasada |
 | Últimas publicaciones | `search_bce_publicaciones` | Ventana rodante (~30 más recientes) → RESEARCH.md § Duodécima pasada |
+| Calendario de publicaciones | `search_bce_calendario` | Calendario anual completo (523 entradas, 2026-01-05 a 2026-12-31, 162 fechas futuras al momento de construirlo): fecha, tipo, nombre, periodicidad, categoría, período de referencia y enlace por cada publicación programada del año → RESEARCH.md § Vigésimo segunda pasada |
 
 ### SRI
 
@@ -215,9 +216,8 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 
 | Fuente | Estado | Qué falta |
 |---|---|---|
-| BCEData ↔ IEM — mapa de equivalencias | Parcial | 2 candidatos confirmados manualmente con datos en vivo; el resto no se trata como duplicado sin revisar valores y metodología |
 | EMOE y coyuntura | Parcial | Expectativas económicas, confianza del consumidor, inflación y ciclo económico resueltos vía sistema de índices; mercado laboral (BCEData id_grupo 64/65/68/102) y pobreza/desigualdad (`search_inec_publicaciones`) confirmados ya cubiertos por tools existentes, sin código nuevo → RESEARCH.md § Vigésimo segunda pasada |
-| Catálogo de publicaciones y calendario | Parcial | `search_bce_publicaciones` solo expone ventana rodante (~30 recientes), sin fecha ni paginación; Cifras Económicas del Ecuador ya cubierta vía `search_bce_indices` (243 archivos, 2005-2025) → RESEARCH.md § Vigésimo segunda pasada; falta el calendario de publicaciones futuras |
+| Catálogo de publicaciones | Parcial | `search_bce_publicaciones` solo expone ventana rodante (~30 recientes), sin fecha ni paginación; Cifras Económicas del Ecuador ya cubierta vía `search_bce_indices` (243 archivos, 2005-2025) y el calendario de publicaciones futuras vía `search_bce_calendario` (523 entradas) → RESEARCH.md § Vigésimo segunda pasada |
 | Búsqueda ampliada del sitio BCE | No iniciado | Mapear publicaciones temáticas, catálogos y archivos históricos más allá de BCEData/IEM; priorizar solo lo que añada detalle verificable, no duplicados |
 
 ### Supercías — pipeline financiero
@@ -289,6 +289,7 @@ Bloqueos reales confirmados en vivo, o decisiones explícitas de no construir �
 | SIPA/MAG — precios mayoristas como fuente de alta frecuencia | Solo boletines PDF mensuales y un documento regulatorio de piso/techo sin historia; app móvil "cgsin.precios" sin explorar → RESEARCH.md § Duodécima pasada |
 | BCE — prueba de completitud y frescura programada | Requiere scheduler con almacenamiento persistente de snapshots; Daniel decidió no construir esa infraestructura (la comparación bajo demanda ya existe vía `audit_bce_catalog`) |
 | BCEData — detección de cambios de revisión | El endpoint no expone ningún marcador explícito de revisión/versión (`ETag`/`Last-Modified` confirmado ausente, ver Duodécima pasada); solo quedaría comparación por contenido bajo demanda, ya cubierta por `audit_bce_catalog`. Fuera de alcance por decisión explícita de Daniel (2026-09-09) |
+| BCEData ↔ IEM — revisar manualmente los ~75 candidatos restantes | De 77 candidatos que `compare_bce_sources` señala por similitud de etiqueta, solo 2 fueron confirmados con datos en vivo (Decimotercera pasada); los otros 75 exigirían comparar valores y metodología uno por uno, sin ninguna garantía de que la mayoría resulte en una equivalencia real (3 de los primeros 5 revisados ya resultaron falsos positivos). Daniel decidió no seguir revisando a mano (2026-09-09) — la cola de candidatos sin revisar queda expuesta tal cual en `compare_bce_sources`, sin tratarla como duplicado confirmado |
 | IEM — hashing masivo del histórico completo | La infraestructura existe y quedó corregida (`hash_catalog_tables` deduplicaba mal — re-descargaba el mismo ZIP legado una vez por tabla miembro en vez de una vez por boletín — corregido 2026-09-09) y es accionable hoy vía `search_bce_iem(hash_archivos=true)`/`scripts/audit_bce_iem.py --hash-xlsx`. Correrla sobre las ~17.000-18.000 URLs únicas de los 367 boletines tomaría varias horas de carga sostenida contra el servidor del BCE sin que nada del proyecto dependa hoy de tener ese manifiesto; Daniel decidió no ejecutarla (2026-09-09) |
 | Micrositio de Interior (`cifras.ministeriodelinterior.gob.ec`) | WAF Incapsula |
 | Aduana/SENAE — comercio exterior | No publicado en portal abierto, solo por oficio (FEDEXPOR cubre el hueco, ver gremios privados) |

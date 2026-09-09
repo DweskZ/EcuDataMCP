@@ -4607,6 +4607,66 @@ de 221 URLs en cada request sería demasiado costoso, así que no se
 generaliza la detección — se deja como una lista chica, verificada a mano.
 Catálogo total: 30 → 34 páginas. 2 tests nuevos.
 
+### BCEData ↔ IEM — revisión manual de los 75 candidatos restantes, descartada
+
+Pedido explícito de Daniel: no seguir revisando a mano. De los 77
+candidatos que `compare_bce_sources` señala por similitud de etiqueta,
+solo 2 fueron confirmados como equivalencia real con datos en vivo
+(Decimotercera pasada) — de los primeros 5 revisados en esa misma pasada,
+3 resultaron falsos positivos (riesgo país↔producción petrolera,
+derivados↔IPC, salario↔IPP), así que la tasa de acierto real es baja y no
+hay atajo: cada candidato exige comparar valores y metodología uno por
+uno, sin garantía de que la mayoría termine siendo una equivalencia real.
+Movido de Pendiente a Descartado en ROADMAP.md — `compare_bce_sources`
+sigue exponiendo la cola completa de 77 candidatos tal cual, sin tratar
+ninguno de los 75 restantes como duplicado confirmado.
+
+### BCE — calendario de publicaciones futuras: construido (`search_bce_calendario`)
+
+Cierra el ítem "falta el calendario de publicaciones futuras" que
+`search_bce_publicaciones` (Duodécima pasada) había dejado pendiente.
+
+**Hallazgo.** La página `calendario-estadistico/` del menú de BCE no es
+en sí misma el dato — solo embebe un `<iframe>` apuntando a
+`/documentos/CalendarioEstadistico/ConsultaCalendario.html`, una app de
+una sola página (JS + CSS estáticos) que a su vez carga todo su contenido
+desde un CSV plano:
+`/documentos/CalendarioEstadistico/calendario_publicaciones.csv`. No hace
+falta ejecutar JS ni simular la app — el CSV es la fuente de verdad
+completa, verificada en vivo: 523 filas, fechas cubriendo el año
+calendario 2026 completo (2026-01-05 a 2026-12-31), 162 de ellas
+genuinamente futuras al momento de esta pasada (2026-09-09) — el
+programa de publicación oficial del BCE para IEM, Cuentas Nacionales,
+IMAEc, balanza de pagos, tasas de interés, reservas internacionales, y
+más, con categoría/periodicidad/período de referencia y enlace directo a
+la página de cada publicación.
+
+**Detalles de parseo reales, no solo teóricos:**
+- El CSV es UTF-8 con BOM — decodificarlo como `cp1252` (el fallback más
+  común en este proyecto para archivos legados del BCE) produce texto
+  corrompido tipo "PUBLICACIÃ“N"; `utf-8-sig` lo decodifica limpio.
+  Confirmado comparando ambos decodificadores contra el mismo archivo.
+- Las fechas vienen como `D/M/YYYY` sin cero a la izquierda (`"14/1/2026"`,
+  no `"14/01/2026"`) — `datetime.strptime(..., "%d/%m/%Y")` las acepta
+  igual, sin necesitar normalización previa.
+- El archivo no lleva año en el nombre (`calendario_publicaciones.csv` a
+  secas) — presumiblemente el BCE lo sobrescribe en el mismo lugar cuando
+  arma el calendario del año siguiente, en vez de publicar un archivo
+  nuevo por año. No confirmado todavía con un segundo año real.
+
+**Decisión de privacidad, no solo de diseño.** El CSV real trae columnas
+`RESPONSABLE`/`CORREO DEL RESPONSABLE` — nombre y correo institucional del
+funcionario del BCE asignado a cada publicación. `helpers/bce_calendario_client.py`
+las descarta explícitamente al parsear: son identificadores directos de
+una persona real, sin ninguna relación con la pregunta que este tool
+responde ("¿cuándo se publica X?"). El resto de columnas (fechas, nombre,
+tipo, periodicidad, categoría, período de referencia, enlace,
+observaciones) se exponen tal cual.
+
+Construido `helpers/bce_calendario_client.py` + `search_bce_calendario`
+(`query`, `categoria`, `periodicidad`, `desde`/`hasta`, `solo_proximas`).
+5 tests nuevos. Tool count: 108 → 109.
+
 ---
 
 ## Notas históricas

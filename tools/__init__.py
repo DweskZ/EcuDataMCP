@@ -93,6 +93,7 @@ from tools.search_arcotel_reportes_mensuales import (
     register_search_arcotel_reportes_mensuales_tool,
 )
 from tools.search_auditores import register_search_auditores_tool
+from tools.search_bce_calendario import register_search_bce_calendario_tool
 from tools.search_bce_cuentas_nacionales import (
     register_search_bce_cuentas_nacionales_tool,
 )
@@ -254,6 +255,7 @@ def register_tools(mcp: MCPServer) -> None:
     register_search_bce_precios_comex_tool(mcp)
     register_search_bce_cuentas_nacionales_tool(mcp)
     register_get_bce_cuentas_nacionales_archivo_tool(mcp)
+    register_search_bce_calendario_tool(mcp)
     register_list_bce_indicadores_diarios_tool(mcp)
     register_get_bce_indicador_diario_tool(mcp)
     register_get_cenace_tablero_tool(mcp)

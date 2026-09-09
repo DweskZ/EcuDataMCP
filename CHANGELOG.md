@@ -37,6 +37,35 @@
   (`reporte-monetario-semanal`, `iem-publicaciones`) were confirmed
   duplicates of already-covered content and excluded. Catalog: 30 → 34
   pages.
+- **BCE publication calendar** (`search_bce_calendario`) — BCE's own
+  forward-looking release schedule for the full calendar year (523
+  entries, 162 of them genuinely future-dated as of this pass), sourced
+  from a plain CSV behind the "Calendario Estadístico" page's iframe
+  widget. Filters by query, category, periodicity, date range, and
+  `solo_proximas` (upcoming only). Deliberately drops the responsible
+  staff member's name/email from the source file — direct personal
+  identifiers with no bearing on "when does X get published". Tool count
+  rises from 108 to 109.
+
+### Removed (scoped out)
+
+- **BCEData ↔ IEM — reviewing the remaining ~75 candidate equivalences.**
+  Only 2 of 77 label-similarity candidates from `compare_bce_sources` were
+  ever confirmed as real equivalences with live data; 3 of the first 5
+  reviewed turned out to be false positives, so the remaining review would
+  need value/methodology comparison per candidate with no shortcut and no
+  guarantee most resolve to anything. Daniel decided against continuing
+  the manual review — the candidate queue stays exposed as-is via
+  `compare_bce_sources`.
+- **IEM — mass-hashing the full 367-bulletin historical archive.** The
+  underlying capability is fixed and ready (see the ZIP-dedup fix above),
+  but a full run means several thousand downloads and hours of sustained
+  load against BCE's server for a manifest nothing in the project
+  currently depends on. Daniel decided not to run it.
+- **BCEData — revision-change detection.** The endpoint exposes no
+  version/ETag marker; the only alternative (content-diff) is already
+  covered on-demand by `audit_bce_catalog`. Daniel decided against
+  building anything further on top of it.
 
 ### Clarified (no new tools)
 
