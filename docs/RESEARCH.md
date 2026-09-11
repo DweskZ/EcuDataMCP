@@ -547,6 +547,62 @@ se encontró una sección específica de resultados del examen ENES/SNNA por
 nombre en este archivo — ver INEVAL más abajo, que sí resultó ser la fuente
 real para eso.
 
+**Construido, 2026-09-10:** el archivo de reportes de SIAU descrito arriba
+se confirmó en vivo otra vez y se construyó como `search_senescyt_estadisticas`
+(`helpers/senescyt_client.py`). La página mezcla dos mecanismos de descarga
+reales en el mismo acordeón WPBakery ("w-tabs", 10 pestañas): 8 paquetes
+WordPress Download Manager (título propio + badges Size/Last Updated + un
+link `data-downloadurl=".../download/<slug>/?wpdmdl=ID&refresh=..."`, real
+pero sin extensión visible en el HTML — `formato` queda "DESCONOCIDO", igual
+que la Biblioteca de SGR) y 4 botones "Descargar" directos en 3 pestañas más
+(un `.zip` propio con extensión real, y 3 enlaces a instancias Nextcloud del
+propio SENESCYT — `cloud-00`/`cloud-pro.senescyt.gob.ec` — también sin
+extensión visible). Total 12 archivos confirmados en vivo, no los 557/1260
+de otras fuentes de este proyecto — es un archivo curado, no una base masiva.
+Una pestaña ("Reporte de indicadores año 2021") anida dos paquetes WPDM
+distintos bajo un solo título de acordeón ("Productos intermedios", "Reporte
+de indicadores"); otra ("Reporte de indicadores año 2024") anida dos links
+directos ("Primera parte", "Segunda parte") — ambos casos reales, confirmados
+leyendo el markup crudo, no duplicados del parser.
+
+**Bloqueado y luego resuelto el mismo día, 2026-09-10:** `educacion.gob.ec`
+(el dominio de la Biblioteca y de `search_minedec_matricula`) estuvo
+inalcanzable en la primera pasada de hoy (`SSL: UNEXPECTED_EOF_WHILE_READING`
+con `httpx`, y timeout de conexión en un segundo intento) — mismo síntoma
+documentado para MIDUVI, y consistente con una caída temporal del lado del
+servidor (no bloqueo geográfico ni WAF: no hubo redirect ni challenge, la
+conexión TLS simplemente no completó). Daniel confirmó estar conectado por
+VPN; un reintento bajo esa VPN conectó sin problema (`educacion.gob.ec/` y
+`search_minedec_matricula` ambos funcionando de nuevo) — sugiere que el corte
+era específico de la ruta de red usada en el primer intento, no del
+servidor. **Construido en el mismo pase, ya con el dominio alcanzable:**
+`list_senescyt_biblioteca_categorias`/`get_senescyt_biblioteca_categoria_archivos`
+(`helpers/senescyt_biblioteca_client.py`), reutilizando exactamente el
+mismo parser de `helpers/sgr_publicaciones_client.py`/
+`helpers/arcsa_client.py` (`ul.ul-downloads`, `li.li-gray1` con `id="cat-N"`,
+pares "ver"/"Descargar" `download.php?id=N&force=0/1`), retargeteado a
+`educacion.gob.ec/edusuperior/biblioteca/`. Confirmado en vivo: 17 categorías
+de primer nivel, 1.259 entradas en el documento completo (coincide
+exactamente con la cifra de la pasada del 2026-08-28), 1.258 tras deduplicar
+por categoría (2 ids se repiten — una vez dentro de la misma categoría,
+correctamente deduplicada; otra vez across dos categorías distintas,
+mantenida en ambas a propósito, igual que SGR/ARCSA). Categorías de primer
+nivel confirmadas: Insumos Construcción Diagnóstico PND-ETN 2025-2029,
+Consejo Ciudadano Sectorial del SNES y SNCTI, PAC SENESCYT 2023/2024/2025
+(una categoría por año, no anidadas bajo un "PAC" compartido), El Concurso
+de Méritos y Oposición, Indicadores ACTI, Mecanismo de Participación
+Ciudadana, Dirección Administrativa, Consejo de Participación Ciudadana,
+Participación Ciudadana, Exámenes Especiales, Publicaciones, Normativa,
+LOES, SNNA, y Acuerdos (694 de las 1.259 entradas por sí sola). **Nesting
+más profundo que cualquier instancia previa del patrón:** confirmado en vivo
+hasta 3 niveles bajo Normativa (Normativa > "Reglamento de Servicios de
+Registro de Títulos" > "a. Documento inicial" > archivo real) — la sección
+"Dirección de Registro de Títulos" que la pasada del 2026-08-28 describió
+como aparentemente propia vive en realidad anidada ahí, no como categoría de
+primer nivel. `get_biblioteca_categoria_archivos` sigue sin construir un
+breadcrumb completo (mismo diseño deliberado de SGR/ARCSA): para una ruta de
+3 niveles, "subgrupo" queda como el encabezado más cercano únicamente.
+
 **IEPI/SENADI (2026-08-29):** IEPI se convirtió en SENADI en 2018 (bajo el
 paraguas de SENESCYT). Su dominio real y vivo es
 `derechosintelectuales.gob.ec` (`propiedadintelectual.gob.ec` redirige
@@ -4759,6 +4815,60 @@ Ninguno de los hallazgos de esta pasada se construyó todavía — es un mapeo, 
 **Implicación de arquitectura:** como ambos datasets de IADB viven en un CKAN genuino, se podrían exponer agregando `source="iadb"` al cliente CKAN ya existente en este proyecto (mismo patrón que `source="cuenca"`/`"latacunga"` para los portales municipales) — sin necesidad de ningún scraper nuevo, solo apuntar el cliente genérico a una base URL distinta. CEPALSTAT, al ser una API REST propia (no CKAN), sí necesitaría un cliente dedicado nuevo, aunque más simple que la mayoría de los ya construidos en este proyecto (JSON limpio, sin autenticación, sin HTML que parsear).
 
 Nada de esto se construyó todavía — verificación de viabilidad solicitada explícitamente por Daniel, no una implementación.
+
+**Construido, 2026-09-10:** los dos candidatos IADB y CEPALSTAT, siguiendo
+exactamente la implicación de arquitectura de arriba.
+
+- **IADB (`source="iadb"`):** agregado a `_SOURCES` en
+  `helpers/ckan_client.py` junto con `helpers/env_config.py`
+  (`https://data.iadb.org/api/3/action/`) — los 15 tools CKAN genéricos
+  existentes (`search_datasets`, `get_dataset_info`,
+  `list_dataset_resources`, etc.) funcionan contra este source sin ningún
+  código nuevo por tool, solo el docstring de cada uno actualizado para
+  mencionarlo. **Hallazgo nuevo no anticipado en la pasada anterior:** el
+  perfil CKAN de `data.iadb.org` (esquema IDB DataCatalog) devuelve
+  `title`/`notes`/`description` a nivel de paquete como un dict
+  multilingüe (`{"es": ..., "en": ..., "fr": ..., "pt_BR": ...}`) en vez de
+  un string plano — confirmado en vivo contra `package_show` del dataset
+  `latin-macro-watch-dataset`. Los campos a nivel de recurso (`name`,
+  `format`, `url`) siguen siendo strings planos. Sin normalizar, todas las
+  tools existentes habrían impreso el dict crudo de Python donde esperaban
+  un título. Resuelto con `_localize()`/`_localize_result()` en
+  `ckan_client.py`, aplicado dentro de `_fetch_json` — colapsa a
+  es→en→primer valor disponible, no-op para cualquier otro source donde el
+  campo ya es un string. Verificado en vivo: `latin-macro-watch-dataset`
+  (665 recursos) y el dataset DPI 2023 (3 recursos) ambos confirmados con
+  el título en español correctamente resuelto.
+- **CEPALSTAT (`search_cepalstat_indicadores`, `get_cepalstat_indicador`,
+  `helpers/cepalstat_client.py`):** confirmado en vivo el endpoint
+  `/thematic-tree` (2.059 indicadores, no 2.059 de memoria — contado en
+  vivo) y, contra el indicador 4788, que `members=<id>` acepta un solo id
+  (no exige uno por dimensión) — pasar solo el id de país filtra
+  correctamente sin restringir año/sexo, bajando el payload de 2.5 MB a
+  ~85 KB. Cada fila de datos cruda llega como pares opacos
+  `dim_<dimension_id>: <member_id>`; decodificados a etiquetas legibles
+  (`"Sexo": "Mujeres"`) usando el bloque `dimensions` de esa misma
+  respuesta, que lista todos los miembros de cada dimensión del indicador,
+  no solo los que coinciden con el filtro. El nombre de dimensión trae un
+  sufijo interno de esquema de clasificación ("País__ESTANDAR") que se
+  recorta para mostrar solo "País". `download_bytes` (mismo límite de 5 MB
+  que el resto del proyecto) en vez de un `httpx.get` sin límite, porque
+  CEPALSTAT no tiene su propio mecanismo de límite de tamaño y un indicador
+  sin filtrar puede superar unos pocos MB.
+
+---
+
+## Vigésimo sexta pasada — verificación de duplicados antes de documentar Homicidios/Puerto Bolívar/Cancillería como "ya reachable" (2026-09-10)
+
+**Contexto:** Daniel preguntó explícitamente si estas tres ya tenían cobertura por otro portal del proyecto antes de marcarlas como Hecho — verificación de duplicados, no investigación desde cero.
+
+**Homicidios Intencionales vs. `search_cnig_femicidios` — no es duplicado.** El docstring de `search_cnig_femicidios` ya advertía que el PDF de CNIG "states its figures are compiled from ... Ministerio del Interior source data" — señal real de posible superposición. Confirmado que no lo es: CNIG publica un snapshot PDF fechado (contenido cortado en abril 2023) de un subconjunto específico, "Femicidios y Homicidios Intencionales **de Mujeres**" — solo víctimas mujeres. El dataset de Interior (`ministerio-del-interior`, organización CKAN con 6 paquetes confirmados en vivo) es el total nacional por todas las víctimas, en XLSX nativo, con mensual 2026 + histórico 2014-2025 + microdatos 2014-2024 (93 MB) — más amplio, más actual, y en mejor formato. Complementario, no redundante.
+
+**Puerto Bolívar vs. cualquier otra fuente — no hay superposición, pero sí una fuente nueva encontrada sin buscarla.** `list_organizations(query="puerto")`/`query="bolivar")` solo devuelve `autoridad-portuaria-de-puerto-bolivar-appb`. Pero `query="portuaria"` reveló dos organizaciones más, nunca documentadas: `autoridad-portuaria-de-guayaquil-apg` (6 paquetes: distributivo de personal, remuneración mensual, buques por muelle, tonelaje y contenedores de importación/exportación) y `apm` (11 paquetes) — que resultó ser la **Autoridad Portuaria de Manta**, no APM Terminals como sugiere el slug (confirmado por el campo `title` real de la organización): buques arribados, TEUs, carga, vehículos, turistas. Las tres autoridades portuarias principales del país tienen organización CKAN real, no solo Puerto Bolívar.
+
+**Cancillería vs. `search_tramites`/`get_tramite_estadisticas` — adyacente, no duplicado.** `tools/search_tramites.py` ya mapea la institución "16" (Ministerio de Relaciones Exteriores) para pasaporte/apostilla/visa — señal real de posible superposición. Confirmado que no lo es: esas tools dan tiempos de atención y quejas por trámite individual (métricas de servicio de gob.ec), no los registros administrativos en sí. La organización CKAN (`ministerio-de-relaciones-exteriores-y-movilidad-humana`, 13 paquetes confirmados en vivo) es más rica de lo documentado en la Vigésimo cuarta pasada: 9 paquetes de "Registro Movilidad Humana" desagregados (Visas, Apostillas y Legalizaciones, Órdenes de Cedulación, Actos Notariales, Pasaportes de Emergencia, Certificado de Migrante Retornado, Naturalizaciones, Solicitantes de Refugio, Histórico Refugiados Anuales), más Autorización de salida de menores, Presupuesto de Misiones Diplomáticas y Ayuda y financiamiento internacional — datos administrativos reales, no estadísticas de servicio.
+
+**Conclusión:** las tres fuentes quedan confirmadas como Hecho sin cliente dedicado (ver ROADMAP.md), con la adyacencia a tools existentes documentada explícitamente para que no se confunda con duplicación en una lectura futura. Bono: dos organizaciones portuarias nuevas (APG, APM/Manta) encontradas sin haber sido buscadas explícitamente.
 
 ---
 

@@ -77,8 +77,10 @@ def register_investigate_dataset_tool(mcp: MCPServer) -> None:
 
         Args:
             query: Search keywords (e.g. "empleo", "SRI recaudación")
-            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
-                    "latacunga" (Latacunga municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal),
+                    "latacunga" (Latacunga municipal portal), or "iadb" (IADB's
+                    open-data portal, data.iadb.org — NOT Ecuador-only, a
+                    regional/global catalog)
             preview_rows: Data rows to preview from the chosen resource (default: 10, max: 50)
             format: text | json
         """

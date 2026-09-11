@@ -37,8 +37,10 @@ def register_query_resource_data_tool(mcp: MCPServer) -> None:
             rows: Number of records to return (default 20, max 100)
             offset: Pagination offset (default 0)
             sort: Optional sort expression, e.g. "anio desc"
-            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
-                    "latacunga" (Latacunga municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal),
+                    "latacunga" (Latacunga municipal portal), or "iadb" (IADB's
+                    open-data portal, data.iadb.org — NOT Ecuador-only, a
+                    regional/global catalog)
             format: text | json
         """
         rows = min(max(rows, 1), 100)

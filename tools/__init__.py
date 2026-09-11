@@ -19,6 +19,7 @@ from tools.get_bce_indicador_diario import register_get_bce_indicador_diario_too
 from tools.get_bce_indice_archivo import register_get_bce_indice_archivo_tool
 from tools.get_category_info import register_get_category_info_tool
 from tools.get_cenace_tablero import register_get_cenace_tablero_tool
+from tools.get_cepalstat_indicador import register_get_cepalstat_indicador_tool
 from tools.get_compania_info import register_get_compania_info_tool
 from tools.get_contraloria_informe import register_get_contraloria_informe_tool
 from tools.get_contrato_info import register_get_contrato_info_tool
@@ -39,6 +40,9 @@ from tools.get_notam import register_get_notam_tool
 from tools.get_organization_info import register_get_organization_info_tool
 from tools.get_regulacion_info import register_get_regulacion_info_tool
 from tools.get_resource_info import register_get_resource_info_tool
+from tools.get_senescyt_biblioteca_categoria_archivos import (
+    register_get_senescyt_biblioteca_categoria_archivos_tool,
+)
 from tools.get_seps_seccion_archivos import register_get_seps_seccion_archivos_tool
 from tools.get_sgr_biblioteca_categoria_archivos import (
     register_get_sgr_biblioteca_categoria_archivos_tool,
@@ -74,6 +78,9 @@ from tools.list_ineval_familias import register_list_ineval_familias_tool
 from tools.list_instituciones import register_list_instituciones_tool
 from tools.list_recent_datasets import register_list_recent_datasets_tool
 from tools.list_sat_tsunami import register_list_sat_tsunami_tool
+from tools.list_senescyt_biblioteca_categorias import (
+    register_list_senescyt_biblioteca_categorias_tool,
+)
 from tools.list_seps_secciones import register_list_seps_secciones_tool
 from tools.list_sgr_biblioteca_categorias import (
     register_list_sgr_biblioteca_categorias_tool,
@@ -104,6 +111,9 @@ from tools.search_bce_publicaciones import register_search_bce_publicaciones_too
 from tools.search_bce_remesas import register_search_bce_remesas_tool
 from tools.search_biinec_extras import register_search_biinec_extras_tool
 from tools.search_censo_recursos import register_search_censo_recursos_tool
+from tools.search_cepalstat_indicadores import (
+    register_search_cepalstat_indicadores_tool,
+)
 from tools.search_cnig_femicidios import register_search_cnig_femicidios_tool
 from tools.search_companias import register_search_companias_tool
 from tools.search_contratos import register_search_contratos_tool
@@ -127,6 +137,9 @@ from tools.search_organizations import register_search_organizations_tool
 from tools.search_ranking import register_search_ranking_tool
 from tools.search_regulaciones import register_search_regulaciones_tool
 from tools.search_salarios_sectoriales import register_search_salarios_sectoriales_tool
+from tools.search_senescyt_estadisticas import (
+    register_search_senescyt_estadisticas_tool,
+)
 from tools.search_sgr_sitreps import register_search_sgr_sitreps_tool
 from tools.search_sipa_geoportal_capas import register_search_sipa_geoportal_capas_tool
 from tools.search_sismos import register_search_sismos_tool
@@ -208,6 +221,9 @@ def register_tools(mcp: MCPServer) -> None:
     register_search_censo_recursos_tool(mcp)
     register_search_cnig_femicidios_tool(mcp)
     register_search_minedec_matricula_tool(mcp)
+    register_search_senescyt_estadisticas_tool(mcp)
+    register_list_senescyt_biblioteca_categorias_tool(mcp)
+    register_get_senescyt_biblioteca_categoria_archivos_tool(mcp)
     register_search_mef_fiscal_tool(mcp)
     register_search_infomies_bases_mensuales_tool(mcp)
     register_search_infomies_boletines_zonales_tool(mcp)
@@ -269,3 +285,6 @@ def register_tools(mcp: MCPServer) -> None:
 
     register_list_arcsa_categorias_tool(mcp)
     register_get_arcsa_categoria_archivos_tool(mcp)
+
+    register_search_cepalstat_indicadores_tool(mcp)
+    register_get_cepalstat_indicador_tool(mcp)

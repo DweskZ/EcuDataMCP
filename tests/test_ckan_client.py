@@ -171,3 +171,115 @@ async def test_list_groups_caches_nacional_and_cuenca_separately(httpx_mock):
 
     assert nacional_groups == [{"name": "salud"}]
     assert cuenca_groups == [{"name": "movilidad"}]
+
+
+# -- source="iadb" (data.iadb.org) --
+
+
+async def test_search_datasets_hits_iadb_endpoint(httpx_mock):
+    url = "https://data.iadb.org/api/3/action/package_search"
+    httpx_mock.add_response(
+        url=httpx.URL(url, params={"q": "Latin Macro Watch", "rows": 20, "start": 0}),
+        json={"success": True, "result": {"count": 1, "results": []}},
+    )
+
+    result = await ckan_client.search_datasets(query="Latin Macro Watch", source="iadb")
+
+    assert result["count"] == 1
+
+
+def test_resolve_source_invalid_mentions_iadb():
+    with pytest.raises(ValueError, match="iadb"):
+        ckan_client._resolve_source("no-existe")
+
+
+# -- IADB's multilingual title/description/notes fields --
+# data.iadb.org's CKAN instance (unlike the national/municipal portals)
+# returns these as a {"es": ..., "en": ...} dict at the package level —
+# confirmed live 2026-09-10 against package_show. Every existing tool's
+# text rendering expects a plain string, so _fetch_json collapses these to
+# one language before returning.
+
+
+def test_localize_prefers_spanish():
+    value = {"en": "English title", "es": "Título en español"}
+    assert ckan_client._localize(value) == "Título en español"
+
+
+def test_localize_falls_back_to_english_then_first_value():
+    assert ckan_client._localize({"en": "English only"}) == "English only"
+    assert ckan_client._localize({"fr": "Seulement en français"}) == "Seulement en français"
+
+
+def test_localize_is_a_noop_for_plain_strings():
+    assert ckan_client._localize("Ya es un string") == "Ya es un string"
+    assert ckan_client._localize(None) is None
+
+
+async def test_package_search_localizes_multilingual_titles(httpx_mock):
+    url = "https://data.iadb.org/api/3/action/package_search"
+    httpx_mock.add_response(
+        url=httpx.URL(url, params={"q": "macro", "rows": 20, "start": 0}),
+        json={
+            "success": True,
+            "result": {
+                "count": 1,
+                "results": [
+                    {
+                        "name": "latin-macro-watch-dataset",
+                        "title": {"en": "Latin Macro Watch", "es": "Latin Macro Watch (ES)"},
+                        "notes": {"en": "English notes", "es": "Notas en español"},
+                        "organization": {"title": {"en": "IDB", "es": "BID"}},
+                        "resources": [],
+                    }
+                ],
+            },
+        },
+    )
+
+    result = await ckan_client.search_datasets(query="macro", source="iadb")
+
+    pkg = result["results"][0]
+    assert pkg["title"] == "Latin Macro Watch (ES)"
+    assert pkg["notes"] == "Notas en español"
+    assert pkg["organization"]["title"] == "BID"
+
+
+async def test_get_dataset_localizes_a_single_package(httpx_mock):
+    url = "https://data.iadb.org/api/3/action/package_show"
+    httpx_mock.add_response(
+        url=httpx.URL(url, params={"id": "latin-macro-watch-dataset"}),
+        json={
+            "success": True,
+            "result": {
+                "name": "latin-macro-watch-dataset",
+                "title": {"en": "Latin Macro Watch", "es": "Latin Macro Watch (ES)"},
+                "resources": [{"name": "Unemployment rate", "format": "CSV"}],
+            },
+        },
+    )
+
+    result = await ckan_client.get_dataset("latin-macro-watch-dataset", source="iadb")
+
+    assert result["title"] == "Latin Macro Watch (ES)"
+    # Resource-level fields are already plain strings on the real portal —
+    # untouched either way.
+    assert result["resources"][0]["name"] == "Unemployment rate"
+
+
+async def test_search_datasets_does_not_touch_plain_string_titles_on_national_portal(httpx_mock):
+    url = "https://www.datosabiertos.gob.ec/api/3/action/package_search"
+    httpx_mock.add_response(
+        url=httpx.URL(url, params={"q": "salud", "rows": 20, "start": 0}),
+        json={
+            "success": True,
+            "result": {
+                "count": 1,
+                "results": [{"name": "salud-dataset", "title": "Dataset de Salud"}],
+            },
+        },
+    )
+
+    result = await ckan_client.search_datasets(query="salud")
+
+    assert result["results"][0]["title"] == "Dataset de Salud"

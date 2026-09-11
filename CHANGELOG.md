@@ -14,6 +14,41 @@
 
 ### Added
 
+- **CEPALSTAT** (`search_cepalstat_indicadores`, `get_cepalstat_indicador`) —
+  CEPAL/ECLAC's regional statistics API, 2,059 indicators across
+  Demográficos y sociales, Económicos, Ambientales, and Temas
+  transversales (ODS). Not Ecuador-only — a regional/global catalog —
+  but every data pull defaults to filtering to Ecuador, dropping the
+  payload from ~2.5 MB (every country) to ~85 KB. Raw dimension ids are
+  decoded into readable labels using the indicator's own dimension
+  catalog.
+- **IADB Latin Macro Watch + World Bank/IADB DPI** (`source="iadb"` on
+  every existing generic CKAN tool) — `data.iadb.org`, a standard CKAN
+  portal: 665 CSV resources (unemployment, CPI, FX, fiscal balance, 26
+  countries since 1990) plus a ~180-country political-institutions
+  dataset (1975-2023). Also not Ecuador-only. Along the way, found and
+  fixed a real compatibility gap: this portal returns package-level
+  title/notes/description as a multilingual dict instead of a plain
+  string, which every existing tool's text rendering expected — now
+  normalized (prefers Spanish) transparently for every CKAN source.
+- **Three CKAN sources documented as already reachable, zero new code**:
+  Homicidios Intencionales (Ministerio del Interior, 4 XLSX files),
+  Autoridad Portuaria de Puerto Bolívar (246 packages — the highest
+  package count of any organization on the national portal), and
+  Cancillería (13 packages: apostillas, visas, movilidad humana).
+- **SENESCYT SIAU — Estadísticas de Educación Superior, CTI**
+  (`search_senescyt_estadisticas`) — 12 reports (fichas metodológicas,
+  indicator reports 2021/2022/2024, national competitiveness index,
+  CTI/ancestral-knowledge indicator inventory, labor-demand
+  characterization, COVID-19 impact study) from a WPBakery accordion
+  mixing WordPress Download Manager gateway links and direct/Nextcloud
+  share links.
+- **Biblioteca de Educación Superior** (`list_senescyt_biblioteca_categorias`,
+  `get_senescyt_biblioteca_categoria_archivos`) — the larger sibling
+  archive (`educacion.gob.ec/edusuperior/biblioteca/`): 1,259 documents
+  across 17 top-level categories (PAC por año, Normativa, LOES, SNNA,
+  Acuerdos, Indicadores ACTI, exámenes especiales), same download-monitor
+  pattern as SGR/ARCSA, nesting up to 3 levels deep.
 - **BCE Cuentas Nacionales** (`search_bce_cuentas_nacionales`,
   `get_bce_cuentas_nacionales_archivo`) — the national-accounts publication
   packages this project previously only touched indirectly via BCEData/IEM

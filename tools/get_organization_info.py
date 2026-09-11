@@ -18,8 +18,10 @@ def register_get_organization_info_tool(mcp: MCPServer) -> None:
 
         Args:
             organization_id: The organization slug (e.g. "sri-servicio-de-rentas-internas")
-            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
-                    "latacunga" (Latacunga municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal),
+                    "latacunga" (Latacunga municipal portal), or "iadb" (IADB's
+                    open-data portal, data.iadb.org — NOT Ecuador-only, a
+                    regional/global catalog)
             format: text | json
         """
         try:

@@ -61,7 +61,7 @@ async def _fetch_json(
         if not data.get("success"):
             error = data.get("error", {})
             raise ValueError(f"CKAN API error: {error}")
-        return data["result"]
+        return _localize_result(data["result"])
     except httpx.HTTPStatusError as exc:
         # Already actionable: raise_for_status()'s own message includes the
         # URL and status code, and 403 is special-cased above.
@@ -88,11 +88,19 @@ async def _fetch_json(
 # "nacional" is the historical default (www.datosabiertos.gob.ec); "cuenca"
 # is the municipal portal (cuencaendatos.cuenca.gob.ec, confirmed live: CKAN
 # 2.9.6, 92 datasets); "latacunga" is another municipal portal, "Data
-# Mashca" (datosabiertos.latacunga.gob.ec, confirmed live: 15 datasets).
+# Mashca" (datosabiertos.latacunga.gob.ec, confirmed live: 15 datasets);
+# "iadb" is the Inter-American Development Bank's open-data portal
+# (data.iadb.org, confirmed live 2026-09-10: standard CKAN
+# package_search/package_show, 692+ datasets) -- NOT Ecuador-only, it's a
+# regional/global catalog (Latin Macro Watch: 665 CSV resources across 26
+# LAC countries including Ecuador; the World Bank/IADB Database of
+# Political Institutions: ~180 countries, 1975-2023). See docs/RESEARCH.md
+# § Fuentes internacionales con foco Ecuador.
 _SOURCES = {
     "nacional": ("ckan", "ckan_site"),
     "cuenca": ("cuenca", "cuenca_site"),
     "latacunga": ("latacunga", "latacunga_site"),
+    "iadb": ("iadb", "iadb_site"),
 }
 
 
@@ -101,9 +109,52 @@ def _resolve_source(source: str) -> tuple[str, str]:
         return _SOURCES[source]
     except KeyError:
         raise ValueError(
-            f"source inválido: {source!r}. Usa 'nacional', 'cuenca' o "
-            "'latacunga'."
+            f"source inválido: {source!r}. Usa 'nacional', 'cuenca', "
+            "'latacunga' o 'iadb'."
         ) from None
+
+
+_LOCALE_KEYS = ("es", "en", "fr", "pt_BR", "pt")
+
+
+def _localize(value: Any, lang: str = "es") -> Any:
+    """IADB's CKAN instance (unlike the national/municipal portals) returns
+    package-level title/description/notes as a {"es": ..., "en": ..., ...}
+    dict instead of a plain string (confirmed live 2026-09-10 against
+    data.iadb.org/api/3/action/package_show — resource-level fields stay
+    plain strings, only the package's own title/description/notes are
+    localized this way). Collapse to one language so every existing tool's
+    text rendering (which does `ds.get("title", ...)` expecting a string)
+    keeps working unchanged for this source too, instead of printing a raw
+    dict. A no-op for every other source, where these fields are already
+    plain strings."""
+    if not isinstance(value, dict):
+        return value
+    for key in (lang, *_LOCALE_KEYS):
+        if value.get(key):
+            return value[key]
+    return next(iter(value.values()), value)
+
+
+def _localize_package(pkg: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(pkg, dict):
+        return pkg
+    for field in ("title", "notes", "description"):
+        if field in pkg:
+            pkg[field] = _localize(pkg[field])
+    org = pkg.get("organization")
+    if isinstance(org, dict) and isinstance(org.get("title"), dict):
+        org["title"] = _localize(org["title"])
+    return pkg
+
+
+def _localize_result(result: Any) -> Any:
+    if isinstance(result, dict) and isinstance(result.get("results"), list):
+        for pkg in result["results"]:
+            _localize_package(pkg)
+    elif isinstance(result, dict) and "resources" in result:
+        _localize_package(result)
+    return result
 
 
 def _ckan_url(action: str, source: str = "nacional") -> str:
