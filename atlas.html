@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Referencia – EcuDataMCP</title>
-<meta name="description" content="Los 106 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
+<meta name="description" content="Los 115 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <meta property="og:title" content="Referencia – EcuDataMCP">
-<meta property="og:description" content="Los 106 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
+<meta property="og:description" content="Los 115 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
 <meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
@@ -111,13 +111,13 @@
 <section class="landing hero">
 <div class="container-page">
 <p class="kicker">Referencia</p>
-<h1>Los <span class="accent">106 tools</span>, uno por uno.</h1>
+<h1>Los <span class="accent">115 tools</span>, uno por uno.</h1>
 <p class="hero-sub">Encuentra un tool por nombre, fuente o tarea. Abre solo el grupo y el detalle que necesitas.</p>
 <div class="atlas-filter-wrap">
 <input type="text" id="atlas-filter" class="atlas-filter" placeholder="Filtrar por nombre o palabra clave…" autocomplete="off">
 </div>
 <div class="atlas-toolbar" aria-live="polite">
-<p id="atlas-result-count">106 tools · abre un grupo para ver sus detalles.</p>
+<p id="atlas-result-count">115 tools · abre un grupo para ver sus detalles.</p>
 <div class="atlas-actions">
 <button type="button" data-atlas-action="open">Expandir grupos</button>
 <button type="button" data-atlas-action="close">Cerrar grupos</button>
@@ -220,7 +220,7 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-search_datasets" data-search="search_datasets buscar datasets por palabras clave. soporta filtro por categoría. busca datasets en el portal de datos abiertos de ecuador (www.datosabiertos.gob.ec). es el punto de partida para explorar datos de 98+ instituciones públicas. usa queries cortos y específicos en español para mejores resultados. flujo típico: search_datasets → list_dataset_resources → preview_resource_data. query palabras clave (ej. &quot;empleo&quot;, &quot;salud&quot;, &quot;presupuesto&quot;, &quot;sri recaudación&quot;) page número de página (base 1, default: 1) page_size resultados por página (default: 20, máx. 100) category filtro opcional por categoría (ej. &quot;sal&quot; para salud, &quot;edu&quot; para educación). usa list_categories para ver todas las categorías disponibles. source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) o &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-search_datasets" data-search="search_datasets buscar datasets por palabras clave. soporta filtro por categoría. busca datasets en el portal de datos abiertos de ecuador (www.datosabiertos.gob.ec). es el punto de partida para explorar datos de 98+ instituciones públicas. usa queries cortos y específicos en español para mejores resultados. flujo típico: search_datasets → list_dataset_resources → preview_resource_data. query palabras clave (ej. &quot;empleo&quot;, &quot;salud&quot;, &quot;presupuesto&quot;, &quot;sri recaudación&quot;) page número de página (base 1, default: 1) page_size resultados por página (default: 20, máx. 100) category filtro opcional por categoría (ej. &quot;sal&quot; para salud, &quot;edu&quot; para educación). usa list_categories para ver todas las categorías disponibles. source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_datasets</code>
 <span class="atlas-tool-desc">Buscar datasets por palabras clave. Soporta filtro por categoría.</span>
@@ -240,7 +240,7 @@
 
 <tr><td><code>category</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Filtro opcional por categoría (ej. "sal" para Salud, "edu" para Educación). Usa list_categories para ver todas las categorías disponibles.</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) o "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente)</td></tr>
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
 <tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -250,7 +250,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-list_recent_datasets" data-search="list_recent_datasets datasets más recientemente actualizados en el portal. lista los datasets más recientemente actualizados en el portal de datos abiertos de ecuador. útil para descubrir datos gubernamentales nuevos o recién actualizados sin un keyword específico. ordenado por metadata_modified descendente. page número de página (base 1, default 1) page_size resultados por página (default 15, máx. 50) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) o &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-list_recent_datasets" data-search="list_recent_datasets datasets más recientemente actualizados en el portal. lista los datasets más recientemente actualizados en el portal de datos abiertos de ecuador. útil para descubrir datos gubernamentales nuevos o recién actualizados sin un keyword específico. ordenado por metadata_modified descendente. page número de página (base 1, default 1) page_size resultados por página (default 15, máx. 50) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">list_recent_datasets</code>
 <span class="atlas-tool-desc">Datasets más recientemente actualizados en el portal.</span>
@@ -266,7 +266,7 @@
 
 <tr><td><code>page_size</code></td><td><code>int</code></td><td><code>15</code></td><td>Resultados por página (default 15, máx. 50)</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) o "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente)</td></tr>
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
 <tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -276,7 +276,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_dataset_info" data-search="get_dataset_info metadata detallada de un dataset: título, descripción, organización, tags, licencia, fechas. metadata detallada de un dataset específico del portal de datos abiertos. devuelve título, descripción, organización, tags, cantidad de recursos, fechas de creación/actualización, licencia, frecuencia de actualización, la url fuente del publicador (dónde la entidad mantiene el dato original, si existe), y cualquier metadato personalizado que haya agregado. dataset_id el id o slug del dataset (ej. &quot;registro-estadistico-de-recursos-y-actividades-de-salud-2019&quot;) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) o &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-get_dataset_info" data-search="get_dataset_info metadata detallada de un dataset: título, descripción, organización, tags, licencia, fechas. metadata detallada de un dataset específico del portal de datos abiertos. devuelve título, descripción, organización, tags, cantidad de recursos, fechas de creación/actualización, licencia, frecuencia de actualización, la url fuente del publicador (dónde la entidad mantiene el dato original, si existe), y cualquier metadato personalizado que haya agregado. dataset_id el id o slug del dataset (ej. &quot;registro-estadistico-de-recursos-y-actividades-de-salud-2019&quot;) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_dataset_info</code>
 <span class="atlas-tool-desc">Metadata detallada de un dataset: título, descripción, organización, tags, licencia, fechas.</span>
@@ -290,7 +290,7 @@
 
 <tr><td><code>dataset_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El ID o slug del dataset (ej. "registro-estadistico-de-recursos-y-actividades-de-salud-2019")</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) o "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente)</td></tr>
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
 <tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -300,7 +300,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-list_dataset_resources" data-search="list_dataset_resources listar todos los archivos (recursos) de un dataset con formato, tamaño, url y fechas de creación/modificación. lista todos los recursos (archivos) de un dataset con su metadata. devuelve id del recurso, título, formato, tamaño, url de descarga, y fechas de creación/última modificación de cada archivo. las fechas permiten saber si los archivos de un dataset son snapshots periódicos (comparando last_modified entre recursos para encontrar el más reciente) antes de leer ninguno. también marca grupos de recursos cuyos nombres parecen una serie periódica (ej. archivos semanales) — es solo una pista de que podrían necesitar combinarse o elegir el más reciente; no indica cuál, ya que depende del dataset (algunos archivos periódicos reemplazan a los anteriores, otros los complementan). siguiente paso: usa preview_resource_data en un recurso csv para ver su contenido, o get_resource_info para metadata detallada. dataset_id el id o slug del dataset source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) o &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-list_dataset_resources" data-search="list_dataset_resources listar todos los archivos (recursos) de un dataset con formato, tamaño, url y fechas de creación/modificación. lista todos los recursos (archivos) de un dataset con su metadata. devuelve id del recurso, título, formato, tamaño, url de descarga, y fechas de creación/última modificación de cada archivo. las fechas permiten saber si los archivos de un dataset son snapshots periódicos (comparando last_modified entre recursos para encontrar el más reciente) antes de leer ninguno. también marca grupos de recursos cuyos nombres parecen una serie periódica (ej. archivos semanales) — es solo una pista de que podrían necesitar combinarse o elegir el más reciente; no indica cuál, ya que depende del dataset (algunos archivos periódicos reemplazan a los anteriores, otros los complementan). siguiente paso: usa preview_resource_data en un recurso csv para ver su contenido, o get_resource_info para metadata detallada. dataset_id el id o slug del dataset source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">list_dataset_resources</code>
 <span class="atlas-tool-desc">Listar todos los archivos (recursos) de un dataset con formato, tamaño, URL y fechas de creación/modificación.</span>
@@ -314,7 +314,7 @@
 
 <tr><td><code>dataset_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El ID o slug del dataset</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) o "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente)</td></tr>
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
 <tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -324,7 +324,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_resource_info" data-search="get_resource_info información detallada de un archivo específico. información detallada de un recurso (archivo) específico del portal de datos abiertos. devuelve formato, tamaño, tipo mime, url de descarga, y el dataset al que pertenece. para archivos csv, puedes usar después preview_resource_data para ver los datos reales. resource_id el uuid del recurso source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) o &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-get_resource_info" data-search="get_resource_info información detallada de un archivo específico. información detallada de un recurso (archivo) específico del portal de datos abiertos. devuelve formato, tamaño, tipo mime, url de descarga, y el dataset al que pertenece. para archivos csv, puedes usar después preview_resource_data para ver los datos reales. resource_id el uuid del recurso source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_resource_info</code>
 <span class="atlas-tool-desc">Información detallada de un archivo específico.</span>
@@ -338,7 +338,7 @@
 
 <tr><td><code>resource_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El UUID del recurso</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) o "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente)</td></tr>
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
 <tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -348,7 +348,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-preview_resource_data" data-search="preview_resource_data preview de csv/tsv, json/geojson o excel (xls/xlsx) como tabla (máx. 5 mb). descarga y previsualiza un recurso del portal de datos abiertos. soporta csv/tsv, json/geojson y excel (xlsx). devuelve las primeras n filas como tabla formateada para que el modelo pueda inspeccionar los datos sin descarga local. las columnas de geometría/wkt se descartan de la tabla (pueden pesar decenas de kb por celda); las columnas csv en notación decimal europea (7.760,2) se normalizan a notación estándar (7760.2). tamaño máximo de descarga: 5 mb. para recursos tabulares grandes en el datastore, preferí query_resource_data. resource_id el uuid del recurso (obtenlo de list_dataset_resources) rows cantidad de filas a previsualizar (default: 20, máx. 100) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) o &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-preview_resource_data" data-search="preview_resource_data preview de csv/tsv, json/geojson o excel (xls/xlsx) como tabla (máx. 5 mb). descarga y previsualiza un recurso del portal de datos abiertos. soporta csv/tsv, json/geojson y excel (xlsx). devuelve las primeras n filas como tabla formateada para que el modelo pueda inspeccionar los datos sin descarga local. las columnas de geometría/wkt se descartan de la tabla (pueden pesar decenas de kb por celda); las columnas csv en notación decimal europea (7.760,2) se normalizan a notación estándar (7760.2). tamaño máximo de descarga: 5 mb. para recursos tabulares grandes en el datastore, preferí query_resource_data. resource_id el uuid del recurso (obtenlo de list_dataset_resources) rows cantidad de filas a previsualizar (default: 20, máx. 100) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">preview_resource_data</code>
 <span class="atlas-tool-desc">Preview de CSV/TSV, JSON/GeoJSON o Excel (XLS/XLSX) como tabla (máx. 5 MB).</span>
@@ -364,7 +364,7 @@
 
 <tr><td><code>rows</code></td><td><code>int</code></td><td><code>20</code></td><td>Cantidad de filas a previsualizar (default: 20, máx. 100)</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) o "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente)</td></tr>
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
 <tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -374,7 +374,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-download_resource" data-search="download_resource baja el archivo crudo de un recurso en base64 (máx. 5 mb), para formatos que no se pueden previsualizar como tabla (.rar, .tar.gz, etc.). descarga los bytes crudos de un recurso del portal de datos abiertos, codificados en base64. úsalo para formatos que preview_resource_data no puede parsear como tabla (.rar, .tar.gz, .xls legacy, o cualquier formato no reconocido) — trae el archivo tal cual en vez de intentar leerlo. tamaño máximo: 5 mb (mismo límite que preview_resource_data). los archivos más grandes vuelven con un error y la url directa en su lugar, ya que serían demasiado grandes para incluir en una respuesta. llama con format=&quot;json&quot; para obtener el contenido real del archivo — el default format=&quot;text&quot; solo confirma la descarga y te indica que reintentes con json; nunca incluye content_base64. resource_id el uuid del recurso (obtenlo de list_dataset_resources) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) o &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente) format text | json (json incluye content_base64; úsalo para obtener el archivo real)">
+<details class="atlas-tool" id="tool-download_resource" data-search="download_resource baja el archivo crudo de un recurso en base64 (máx. 5 mb), para formatos que no se pueden previsualizar como tabla (.rar, .tar.gz, etc.). descarga los bytes crudos de un recurso del portal de datos abiertos, codificados en base64. úsalo para formatos que preview_resource_data no puede parsear como tabla (.rar, .tar.gz, .xls legacy, o cualquier formato no reconocido) — trae el archivo tal cual en vez de intentar leerlo. tamaño máximo: 5 mb (mismo límite que preview_resource_data). los archivos más grandes vuelven con un error y la url directa en su lugar, ya que serían demasiado grandes para incluir en una respuesta. llama con format=&quot;json&quot; para obtener el contenido real del archivo — el default format=&quot;text&quot; solo confirma la descarga y te indica que reintentes con json; nunca incluye content_base64. resource_id el uuid del recurso (obtenlo de list_dataset_resources) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format text | json (json incluye content_base64; úsalo para obtener el archivo real)">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">download_resource</code>
 <span class="atlas-tool-desc">Baja el archivo crudo de un recurso en base64 (máx. 5 MB), para formatos que no se pueden previsualizar como tabla (.rar, .tar.gz, etc.).</span>
@@ -388,7 +388,7 @@
 
 <tr><td><code>resource_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El UUID del recurso (obtenlo de list_dataset_resources)</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) o "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente)</td></tr>
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
 <tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json (json incluye content_base64; úsalo para obtener el archivo real)</td></tr>
 
@@ -398,7 +398,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-query_resource_data" data-search="query_resource_data consulta tabular vía ckan datastore (filtros, texto, paginación) sin descargar el archivo. consulta un recurso tabular vía el datastore de ckan sin descargar el archivo completo. preferí esto sobre preview_resource_data cuando el recurso está en el datastore (la mayoría de los recursos csv del portal). soporta búsqueda de texto completo, filtros json, orden y paginación. resource_id uuid del recurso (de list_dataset_resources) query búsqueda de texto completo opcional sobre los campos del datastore filters_json objeto json opcional de filtros exactos por campo, ej. '{&quot;provincia&quot;:&quot;pichincha&quot;}' rows cantidad de registros a devolver (default 20, máx. 100) offset offset de paginación (default 0) sort expresión de orden opcional, ej. &quot;anio desc&quot; source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) o &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-query_resource_data" data-search="query_resource_data consulta tabular vía ckan datastore (filtros, texto, paginación) sin descargar el archivo. consulta un recurso tabular vía el datastore de ckan sin descargar el archivo completo. preferí esto sobre preview_resource_data cuando el recurso está en el datastore (la mayoría de los recursos csv del portal). soporta búsqueda de texto completo, filtros json, orden y paginación. resource_id uuid del recurso (de list_dataset_resources) query búsqueda de texto completo opcional sobre los campos del datastore filters_json objeto json opcional de filtros exactos por campo, ej. '{&quot;provincia&quot;:&quot;pichincha&quot;}' rows cantidad de registros a devolver (default 20, máx. 100) offset offset de paginación (default 0) sort expresión de orden opcional, ej. &quot;anio desc&quot; source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">query_resource_data</code>
 <span class="atlas-tool-desc">Consulta tabular vía CKAN DataStore (filtros, texto, paginación) sin descargar el archivo.</span>
@@ -422,7 +422,7 @@
 
 <tr><td><code>sort</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Expresión de orden opcional, ej. "anio desc"</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) o "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente)</td></tr>
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
 <tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -432,7 +432,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-detect_series_pattern" data-search="detect_series_pattern para datasets con un archivo por período: determina si cada archivo nuevo reemplaza a los anteriores (acumulado) o los complementa (incremental). cuando un dataset publica un archivo por período (semanal/mensual), no siempre está claro si cada archivo nuevo reemplaza a los anteriores (acumulado, basta con leer el más reciente) o los complementa (incremental, hay que combinarlos todos). descarga los dos recursos más recientes del grupo de nombre periódico que ya detecta list_dataset_resources, ubica una columna de fecha/período por nombre de encabezado (fecha, mes, año, periodo, semana, ...) y compara qué valores de período aparecen en ambos archivos. solapamiento alto → acumulado; solapamiento casi nulo → incremental; si no hay columna de período reconocible o el solapamiento es ambiguo, devuelve indeterminado en vez de adivinar. heurística sobre una muestra de hasta 500 filas por archivo -- confirma con preview_resource_data si el resultado está cerca del umbral. dataset_id el id o slug del dataset resource_id_new opcional -- id del recurso más reciente a comparar (auto-detectado del grupo de nombre periódico del dataset si se omite) resource_id_old opcional -- id del recurso más antiguo a comparar (auto-detectado si se omite). resource_id_new/resource_id_old deben pasarse juntos, o ninguno de los dos. source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) o &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-detect_series_pattern" data-search="detect_series_pattern para datasets con un archivo por período: determina si cada archivo nuevo reemplaza a los anteriores (acumulado) o los complementa (incremental). cuando un dataset publica un archivo por período (semanal/mensual), no siempre está claro si cada archivo nuevo reemplaza a los anteriores (acumulado, basta con leer el más reciente) o los complementa (incremental, hay que combinarlos todos). descarga los dos recursos más recientes del grupo de nombre periódico que ya detecta list_dataset_resources, ubica una columna de fecha/período por nombre de encabezado (fecha, mes, año, periodo, semana, ...) y compara qué valores de período aparecen en ambos archivos. solapamiento alto → acumulado; solapamiento casi nulo → incremental; si no hay columna de período reconocible o el solapamiento es ambiguo, devuelve indeterminado en vez de adivinar. heurística sobre una muestra de hasta 500 filas por archivo -- confirma con preview_resource_data si el resultado está cerca del umbral. dataset_id el id o slug del dataset resource_id_new opcional -- id del recurso más reciente a comparar (auto-detectado del grupo de nombre periódico del dataset si se omite) resource_id_old opcional -- id del recurso más antiguo a comparar (auto-detectado si se omite). resource_id_new/resource_id_old deben pasarse juntos, o ninguno de los dos. source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">detect_series_pattern</code>
 <span class="atlas-tool-desc">Para datasets con un archivo por período: determina si cada archivo nuevo reemplaza a los anteriores (acumulado) o los complementa (incremental).</span>
@@ -450,7 +450,7 @@
 
 <tr><td><code>resource_id_old</code></td><td><code>str | None</code></td><td><code>ninguno</code></td><td>Opcional -- ID del recurso más antiguo a comparar (auto-detectado si se omite). resource_id_new/resource_id_old deben pasarse juntos, o ninguno de los dos.</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) o "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente)</td></tr>
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
 <tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -1266,7 +1266,7 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-search_organizations" data-search="search_organizations buscar entre 98+ instituciones que publican datos (inec, sri, bce, msp, etc.). busca instituciones públicas que publican datos en el portal de datos abiertos de ecuador. hay 98+ organizaciones incluyendo inec, sri, ministerio de salud, bce, etc. query término de búsqueda opcional (ej. &quot;salud&quot;, &quot;sri&quot;, &quot;inec&quot;) page número de página (base 1, default: 1) page_size resultados por página (default: 20, máx. 100) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) o &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-search_organizations" data-search="search_organizations buscar entre 98+ instituciones que publican datos (inec, sri, bce, msp, etc.). busca instituciones públicas que publican datos en el portal de datos abiertos de ecuador. hay 98+ organizaciones incluyendo inec, sri, ministerio de salud, bce, etc. query término de búsqueda opcional (ej. &quot;salud&quot;, &quot;sri&quot;, &quot;inec&quot;) page número de página (base 1, default: 1) page_size resultados por página (default: 20, máx. 100) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_organizations</code>
 <span class="atlas-tool-desc">Buscar entre 98+ instituciones que publican datos (INEC, SRI, BCE, MSP, etc.).</span>
@@ -1284,7 +1284,7 @@
 
 <tr><td><code>page_size</code></td><td><code>int</code></td><td><code>20</code></td><td>Resultados por página (default: 20, máx. 100)</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) o "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente)</td></tr>
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
 <tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -1294,13 +1294,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_organization_info" data-search="get_organization_info info de una organización con listado de sus datasets. información detallada de una institución pública y sus datasets publicados. devuelve el nombre de la institución, descripción, cantidad de datasets, y una lista de sus datasets. organization_id el slug de la organización (ej. &quot;sri-servicio-de-rentas-internas&quot;) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) o &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-get_organization_info" data-search="get_organization_info info de una organización, con datasets filtrables por texto. información detallada de una institución pública y sus datasets publicados — la forma principal de navegar el catálogo completo de una organización ckan, incluyendo organizaciones grandes sin tool propia (ej. &quot;sri-servicio-de-rentas-internas&quot; —127 paquetes—, &quot;ministerio-de-economia-y-finanzas&quot; —97—, &quot;ieps&quot; —106—, &quot;cosede&quot; —88—, &quot;ipaip&quot; —70—, &quot;mag&quot; —69—; consigue el slug exacto con search_organizations si no lo conoces). format=json siempre devuelve todos los datasets; format=text limita lo mostrado e indica cuántos más hay — usa query para acotar una organización grande en vez de depender del tope. organization_id el slug de la organización (ej. &quot;sri-servicio-de-rentas-internas&quot;) query texto libre contra el título de cada dataset (ignora tildes). vacío devuelve todos los datasets. query texto libre contra el título de cada dataset (ignora tildes). vacío devuelve todos los datasets. source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) o &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_organization_info</code>
-<span class="atlas-tool-desc">Info de una organización con listado de sus datasets.</span>
+<span class="atlas-tool-desc">Info de una organización, con datasets filtrables por texto.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Información detallada de una institución pública y sus datasets publicados. Devuelve el nombre de la institución, descripción, cantidad de datasets, y una lista de sus datasets.</p>
+<p class="atlas-tool-long">Información detallada de una institución pública y sus datasets publicados — la forma principal de navegar el catálogo completo de una organización CKAN, incluyendo organizaciones grandes sin tool propia (ej. "sri-servicio-de-rentas-internas" —127 paquetes—, "ministerio-de-economia-y-finanzas" —97—, "ieps" —106—, "cosede" —88—, "ipaip" —70—, "mag" —69—; consigue el slug exacto con search_organizations si no lo conoces). format=json siempre devuelve todos los datasets; format=text limita lo mostrado e indica cuántos más hay — usa query para acotar una organización grande en vez de depender del tope.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
@@ -1308,6 +1308,10 @@
 
 <tr><td><code>organization_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El slug de la organización (ej. "sri-servicio-de-rentas-internas")</td></tr>
 
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el título de cada dataset (ignora tildes). Vacío devuelve todos los datasets.</td></tr>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el título de cada dataset (ignora tildes). Vacío devuelve todos los datasets.</td></tr>
+
 <tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) o "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente)</td></tr>
 
 <tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
@@ -1318,7 +1322,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-list_categories" data-search="list_categories categorías temáticas con conteo de datasets. lista todas las categorías temáticas del portal de datos abiertos de ecuador. incluye: salud, educación, economía y finanzas, seguridad y defensa, anticorrupción, ambiente y agua, transporte, turismo, y más. cada categoría muestra la cantidad de datasets que contiene. usa el campo 'name' de la categoría como parámetro 'category' en search_datasets para filtrar resultados por tema. source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) o &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-list_categories" data-search="list_categories categorías temáticas con conteo de datasets. lista todas las categorías temáticas del portal de datos abiertos de ecuador. incluye: salud, educación, economía y finanzas, seguridad y defensa, anticorrupción, ambiente y agua, transporte, turismo, y más. cada categoría muestra la cantidad de datasets que contiene. usa el campo 'name' de la categoría como parámetro 'category' en search_datasets para filtrar resultados por tema. source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">list_categories</code>
 <span class="atlas-tool-desc">Categorías temáticas con conteo de datasets.</span>
@@ -1330,7 +1334,7 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) o "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente)</td></tr>
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
 <tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -1340,7 +1344,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_category_info" data-search="get_category_info detalle de una categoría y datasets de ejemplo. detalle de una categoría temática (grupo de ckan) del portal de datos abiertos. usa primero list_categories para descubrir ids de categoría válidos (el campo 'name', ej. 'salud', 'educacion', 'economia-y-finanzas'). category slug/nombre de categoría de list_categories include_datasets incluir datasets de ejemplo en la categoría (default true) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) o &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-get_category_info" data-search="get_category_info detalle de una categoría y datasets de ejemplo. detalle de una categoría temática (grupo de ckan) del portal de datos abiertos. usa primero list_categories para descubrir ids de categoría válidos (el campo 'name', ej. 'salud', 'educacion', 'economia-y-finanzas'). category slug/nombre de categoría de list_categories include_datasets incluir datasets de ejemplo en la categoría (default true) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_category_info</code>
 <span class="atlas-tool-desc">Detalle de una categoría y datasets de ejemplo.</span>
@@ -1356,7 +1360,7 @@
 
 <tr><td><code>include_datasets</code></td><td><code>bool</code></td><td><code>True</code></td><td>Incluir datasets de ejemplo en la categoría (default True)</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) o "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente)</td></tr>
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
 <tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -1371,7 +1375,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">BCE y series especializadas<span class="tag">11</span></span>
+<span class="atlas-category-title">BCE y series especializadas<span class="tag">14</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
@@ -1655,6 +1659,88 @@
 <tbody>
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra la etiqueta del archivo, el título de la página o el id de página (ignora tildes), ej. "importacion", "exportacion". Vacío devuelve todos los archivos.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_bce_calendario" data-search="search_bce_calendario calendario de publicaciones estadísticas programadas del bce. busca en el calendario propio de publicaciones estadísticas del bce — fechas programadas de publicación del iem, cuentas nacionales, imaec, balanza de pagos y más, cada una con categoría, periodicidad, período de referencia y un link directo a su página. distinto de search_bce_publicaciones (una ventana rodante de ~30 publicaciones ya salidas, sin fechas futuras): este es el calendario propio del bce, hacia adelante, para todo el año. query texto libre contra el nombre de la publicación o su nota de observaciones (ignora tildes). vacío coincide con todas. categoria filtro exacto de categoría (ignora tildes), ej. &quot;cuentas nacionales&quot;, &quot;balanza de pagos y comercio exterior&quot;. periodicidad filtro exacto de periodicidad, ej. &quot;mensual&quot;, &quot;anual&quot;, &quot;trimestral&quot;, &quot;semanal&quot;. desde restringe a fecha de publicación >= esta fecha (aaaa-mm-dd). hasta restringe a fecha de publicación <= esta fecha (aaaa-mm-dd). solo_proximas si es verdadero, solo publicaciones programadas para hoy o después. limit máximo de resultados (1-200, default 50). offset desplazamiento de paginación sobre el conjunto filtrado. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_bce_calendario</code>
+<span class="atlas-tool-desc">Calendario de publicaciones estadísticas programadas del BCE.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Busca en el calendario propio de publicaciones estadísticas del BCE — fechas programadas de publicación del IEM, Cuentas Nacionales, IMAEC, balanza de pagos y más, cada una con categoría, periodicidad, período de referencia y un link directo a su página. Distinto de search_bce_publicaciones (una ventana rodante de ~30 publicaciones ya salidas, sin fechas futuras): este es el calendario propio del BCE, hacia adelante, para todo el año.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el nombre de la publicación o su nota de observaciones (ignora tildes). Vacío coincide con todas.</td></tr>
+
+<tr><td><code>categoria</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Filtro exacto de categoría (ignora tildes), ej. "cuentas nacionales", "balanza de pagos y comercio exterior".</td></tr>
+
+<tr><td><code>periodicidad</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Filtro exacto de periodicidad, ej. "Mensual", "Anual", "Trimestral", "Semanal".</td></tr>
+
+<tr><td><code>desde</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Restringe a fecha de publicación >= esta fecha (AAAA-MM-DD).</td></tr>
+
+<tr><td><code>hasta</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Restringe a fecha de publicación <= esta fecha (AAAA-MM-DD).</td></tr>
+
+<tr><td><code>solo_proximas</code></td><td><code>bool</code></td><td><code>False</code></td><td>Si es verdadero, solo publicaciones programadas para hoy o después.</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>50</code></td><td>Máximo de resultados (1-200, default 50).</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Desplazamiento de paginación sobre el conjunto filtrado.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_bce_cuentas_nacionales" data-search="search_bce_cuentas_nacionales páginas de publicación de cuentas nacionales del bce. lista las familias de páginas de cuentas nacionales del bce — cuentas anuales, trimestrales y regionales, la serie histórica de retropolación del pib desde 1965, matrices insumo-producto y de contabilidad social, series de base fija (2007=100), la cuenta satélite temática de bioeconomía, y los resultados mensuales del imaec. distinto de search_indicadores_bce (los agregados propios de pib de bcedata) y de get_bce_iem_table (las tablas del boletín mensual iem): esto cubre los paquetes de publicación de cuentas nacionales en sí — tabla de oferta y utilización (tou), cuadro económico integrado (cei), matriz de empleo e ingresos (mei), matriz insumo-producto y sus documentos metodológicos. devuelve solo resúmenes — pasa el pagina_id a get_bce_cuentas_nacionales_archivo para leer el listado de archivos de una página. query texto libre contra el título, categoría o id de la página (ignora tildes), ej. &quot;trimestral&quot;, &quot;mip&quot;, &quot;regional&quot;. vacío devuelve todas las páginas. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_bce_cuentas_nacionales</code>
+<span class="atlas-tool-desc">Páginas de publicación de Cuentas Nacionales del BCE.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Lista las familias de páginas de Cuentas Nacionales del BCE — cuentas anuales, trimestrales y regionales, la serie histórica de retropolación del PIB desde 1965, matrices insumo-producto y de contabilidad social, series de base fija (2007=100), la cuenta satélite temática de bioeconomía, y los resultados mensuales del IMAEC. Distinto de search_indicadores_bce (los agregados propios de PIB de BCEData) y de get_bce_iem_table (las tablas del boletín mensual IEM): esto cubre los paquetes de publicación de cuentas nacionales en sí — Tabla de Oferta y Utilización (TOU), Cuadro Económico Integrado (CEI), Matriz de Empleo e Ingresos (MEI), Matriz Insumo-Producto y sus documentos metodológicos. Devuelve solo resúmenes — pasa el pagina_id a get_bce_cuentas_nacionales_archivo para leer el listado de archivos de una página.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el título, categoría o id de la página (ignora tildes), ej. "trimestral", "mip", "regional". Vacío devuelve todas las páginas.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_bce_cuentas_nacionales_archivo" data-search="get_bce_cuentas_nacionales_archivo listado de archivos de una página de cuentas nacionales del bce. lee el listado de archivos de una página de cuentas nacionales del bce (de search_bce_cuentas_nacionales). cada entrada es un archivo publicado (reporte, paquete de datos o documento metodológico) con etiqueta, url directa y formato. devuelve urls directas, no el contenido — descárgalos tú mismo o vía download_resource. pagina_id el &quot;pagina_id&quot; de la página, de search_bce_cuentas_nacionales (ej. &quot;boletin-de-cuentas-nacionales-trimestrales&quot;). max_archivos tope de archivos devueltos, 1-200. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_bce_cuentas_nacionales_archivo</code>
+<span class="atlas-tool-desc">Listado de archivos de una página de Cuentas Nacionales del BCE.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Lee el listado de archivos de una página de Cuentas Nacionales del BCE (de search_bce_cuentas_nacionales). Cada entrada es un archivo publicado (reporte, paquete de datos o documento metodológico) con etiqueta, URL directa y formato. Devuelve URLs directas, no el contenido — descárgalos tú mismo o vía download_resource.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>pagina_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El "pagina_id" de la página, de search_bce_cuentas_nacionales (ej. "boletin-de-cuentas-nacionales-trimestrales").</td></tr>
+
+<tr><td><code>max_archivos</code></td><td><code>int</code></td><td><code>50</code></td><td>Tope de archivos devueltos, 1-200.</td></tr>
 
 <tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
 
@@ -2282,7 +2368,7 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-investigate_dataset" data-search="investigate_dataset atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de &quot;encuéntrame datos sobre x y muéstrame qué hay dentro&quot; atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de &quot;encuéntrame datos sobre x y muéstrame qué hay dentro&quot;. elige el resultado de búsqueda mejor rankeado y, entre sus recursos, el primero en un formato que este servidor puede parsear a una tabla (csv/json/xls/xlsx/ods/zip/targz), saltando los ilegibles (.rar, formatos no reconocidos) en vez de previsualizar el que aparezca primero en la lista. no reemplaza a los tools individuales: si el resultado top no es el dataset correcto, o necesitas un recurso específico dentro de él, usa search_datasets/list_dataset_resources/preview_resource_data directamente en vez de repetir esta llamada. query palabras clave de búsqueda (ej. &quot;empleo&quot;, &quot;sri recaudación&quot;) source &quot;nacional&quot; (default) o &quot;cuenca&quot; (portal municipal de cuenca) preview_rows filas de datos a previsualizar del recurso elegido (default: 10, máx.: 50) format text | json">
+<details class="atlas-tool" id="tool-investigate_dataset" data-search="investigate_dataset atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de &quot;encuéntrame datos sobre x y muéstrame qué hay dentro&quot; atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de &quot;encuéntrame datos sobre x y muéstrame qué hay dentro&quot;. elige el resultado de búsqueda mejor rankeado y, entre sus recursos, el primero en un formato que este servidor puede parsear a una tabla (csv/json/xls/xlsx/ods/zip/targz), saltando los ilegibles (.rar, formatos no reconocidos) en vez de previsualizar el que aparezca primero en la lista. no reemplaza a los tools individuales: si el resultado top no es el dataset correcto, o necesitas un recurso específico dentro de él, usa search_datasets/list_dataset_resources/preview_resource_data directamente en vez de repetir esta llamada. query palabras clave de búsqueda (ej. &quot;empleo&quot;, &quot;sri recaudación&quot;) source &quot;nacional&quot; (default), &quot;cuenca&quot; (portal municipal de cuenca), &quot;latacunga&quot; (portal municipal de latacunga) o &quot;iadb&quot; (portal del bid, no exclusivo de ecuador) preview_rows filas de datos a previsualizar del recurso elegido (default: 10, máx.: 50) format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">investigate_dataset</code>
 <span class="atlas-tool-desc">Atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de "encuéntrame datos sobre X y muéstrame qué hay dentro"</span>
@@ -2296,7 +2382,7 @@
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Palabras clave de búsqueda (ej. "empleo", "SRI recaudación")</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default) o "cuenca" (portal municipal de Cuenca)</td></tr>
+<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default), "cuenca" (portal municipal de Cuenca), "latacunga" (portal municipal de Latacunga) o "iadb" (portal del BID, no exclusivo de Ecuador)</td></tr>
 
 <tr><td><code>preview_rows</code></td><td><code>int</code></td><td><code>10</code></td><td>Filas de datos a previsualizar del recurso elegido (default: 10, máx.: 50)</td></tr>
 
@@ -2745,7 +2831,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">Fuentes sectoriales adicionales<span class="tag">7</span></span>
+<span class="atlas-category-title">Fuentes sectoriales adicionales<span class="tag">11</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
@@ -2916,6 +3002,152 @@
 </div>
 </details>
 
+<details class="atlas-tool" id="tool-search_senescyt_estadisticas" data-search="search_senescyt_estadisticas reportes del siau de senescyt: estadísticas de educación superior y cti. lista los reportes del portal siau de senescyt: fichas metodológicas, reportes de indicadores (2021/2022/2024), el índice de competitividad del ecuador, el inventario de indicadores de cti y saberes ancestrales, la caracterización de la demanda laboral, y el estudio de impacto del covid-19 en educación superior. distinto de la cobertura ckan de senescyt ya existente (matrícula, docentes, becarios), del registro de títulos (bloqueado por captcha, no automatizable) y de la matrícula básica de minedec (search_minedec_matricula). query texto libre contra la sección, título, tipo (&quot;wpdm&quot;/&quot;directo&quot;) o url del archivo (ignora tildes). vacío devuelve todos los archivos. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_senescyt_estadisticas</code>
+<span class="atlas-tool-desc">Reportes del SIAU de SENESCYT: estadísticas de educación superior y CTI.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Lista los reportes del portal SIAU de SENESCYT: fichas metodológicas, reportes de indicadores (2021/2022/2024), el índice de competitividad del Ecuador, el inventario de indicadores de CTI y saberes ancestrales, la caracterización de la demanda laboral, y el estudio de impacto del COVID-19 en educación superior. Distinto de la cobertura CKAN de SENESCYT ya existente (matrícula, docentes, becarios), del registro de títulos (bloqueado por captcha, no automatizable) y de la matrícula básica de MINEDEC (search_minedec_matricula).</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra la sección, título, tipo ("wpdm"/"directo") o URL del archivo (ignora tildes). Vacío devuelve todos los archivos.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_senescyt_biblioteca_categorias" data-search="list_senescyt_biblioteca_categorias categorías de la biblioteca de educación superior (minedec/senescyt). lista las categorías de la biblioteca documental del viceministerio de educación superior (educacion.gob.ec/edusuperior/biblioteca/) — pac por año, normativa loes/snna, acuerdos institucionales desde 2015, exámenes especiales/auditoría, indicadores acti y más; ~1.259 documentos en 17 categorías de primer nivel. distinto de search_senescyt_estadisticas (un archivo curado de 12 entradas en siau.senescyt.gob.ec) y de search_minedec_matricula (matrícula básica, mismo dominio pero una página simple, no esta biblioteca). format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_senescyt_biblioteca_categorias</code>
+<span class="atlas-tool-desc">Categorías de la Biblioteca de Educación Superior (MINEDEC/SENESCYT).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Lista las categorías de la Biblioteca documental del Viceministerio de Educación Superior (educacion.gob.ec/edusuperior/biblioteca/) — PAC por año, normativa LOES/SNNA, acuerdos institucionales desde 2015, exámenes especiales/auditoría, indicadores ACTI y más; ~1.259 documentos en 17 categorías de primer nivel. Distinto de search_senescyt_estadisticas (un archivo curado de 12 entradas en siau.senescyt.gob.ec) y de search_minedec_matricula (matrícula básica, mismo dominio pero una página simple, no esta biblioteca).</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_senescyt_biblioteca_categoria_archivos" data-search="get_senescyt_biblioteca_categoria_archivos documentos de una categoría de la biblioteca de educación superior. lista los documentos de una categoría de primer nivel de la biblioteca. algunas categorías anidan sub-categorías varios niveles de profundidad — el campo &quot;subgrupo&quot; de cada documento solo muestra el encabezado anidado más cercano, no una ruta completa. el formato se reporta como &quot;desconocido&quot;: el link de descarga no lleva extensión de archivo. categoria un &quot;id&quot; o &quot;nombre&quot; de categoría de list_senescyt_biblioteca_categorias (el nombre se compara ignorando tildes/mayúsculas). format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_senescyt_biblioteca_categoria_archivos</code>
+<span class="atlas-tool-desc">Documentos de una categoría de la Biblioteca de Educación Superior.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Lista los documentos de una categoría de primer nivel de la Biblioteca. Algunas categorías anidan sub-categorías varios niveles de profundidad — el campo "subgrupo" de cada documento solo muestra el encabezado anidado más cercano, no una ruta completa. El formato se reporta como "DESCONOCIDO": el link de descarga no lleva extensión de archivo.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>categoria</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Un "id" o "nombre" de categoría de list_senescyt_biblioteca_categorias (el nombre se compara ignorando tildes/mayúsculas).</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_gacetas_inmunoprevenibles" data-search="search_gacetas_inmunoprevenibles gacetas epidemiológicas semanales de enfermedades prevenibles por vacunación (msp). lista los boletines semanales del msp (&quot;gaceta de inmunoprevenibles&quot;, por semana epidemiológica) sobre vigilancia de enfermedades prevenibles por vacunación, 2019 al presente — 362 pdfs confirmados en vivo. el descubrimiento de páginas es dinámico (vía la api rest de wordpress del msp), así que los años futuros aparecen solos. desde 2024 algunas semanas incluyen un reporte complementario por enfermedad específica (tosferina). una de varias series paralelas de gacetas del msp (vectoriales, enfermedades de la piel/reemergentes, indicadores existen también pero no están cubiertas por este tool todavía). query texto libre contra el título, año, semana o tipo (&quot;general&quot;/&quot;tosferina&quot;) del archivo (ignora tildes). vacío devuelve todos los archivos. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_gacetas_inmunoprevenibles</code>
+<span class="atlas-tool-desc">Gacetas epidemiológicas semanales de enfermedades prevenibles por vacunación (MSP).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Lista los boletines semanales del MSP ("Gaceta de Inmunoprevenibles", por Semana Epidemiológica) sobre vigilancia de enfermedades prevenibles por vacunación, 2019 al presente — 362 PDFs confirmados en vivo. El descubrimiento de páginas es dinámico (vía la API REST de WordPress del MSP), así que los años futuros aparecen solos. Desde 2024 algunas semanas incluyen un reporte complementario por enfermedad específica (tosferina). Una de varias series paralelas de gacetas del MSP (vectoriales, enfermedades de la piel/reemergentes, indicadores existen también pero no están cubiertas por este tool todavía).</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el título, año, semana o tipo ("general"/"tosferina") del archivo (ignora tildes). Vacío devuelve todos los archivos.</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+</div>
+</details>
+
+<details class="atlas-category">
+<summary class="atlas-category-summary">
+<span class="atlas-category-title">Fuentes internacionales<span class="tag">2</span></span>
+<span class="atlas-category-action">Mostrar</span>
+</summary>
+<div class="atlas-category-tools">
+
+<details class="atlas-tool" id="tool-search_cepalstat_indicadores" data-search="search_cepalstat_indicadores busca un indicador en el catálogo regional de cepalstat (cepal). busca en el catálogo completo de indicadores de cepalstat (la api pública de estadísticas de cepal, api-cepalstat.cepal.org) por nombre — 2.059 indicadores en demográficos y sociales, económicos, ambientales y temas transversales (incluye los ods). no es una fuente exclusiva de ecuador: cepalstat es el catálogo regional de cepal para toda américa latina y el caribe. úsalo para encontrar el indicator_id, y luego get_cepalstat_indicador para obtener las observaciones de ecuador específicamente. query texto libre contra el nombre del indicador o su ruta temática (ignora tildes), ej. &quot;poblacion&quot;, &quot;pobreza&quot;, &quot;comercio exterior&quot;. vacío devuelve el catálogo completo (grande — mejor usar un query). lang &quot;es&quot; (default) o &quot;en&quot; format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_cepalstat_indicadores</code>
+<span class="atlas-tool-desc">Busca un indicador en el catálogo regional de CEPALSTAT (CEPAL).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Busca en el catálogo completo de indicadores de CEPALSTAT (la API pública de estadísticas de CEPAL, api-cepalstat.cepal.org) por nombre — 2.059 indicadores en Demográficos y sociales, Económicos, Ambientales y Temas transversales (incluye los ODS). NO es una fuente exclusiva de Ecuador: CEPALSTAT es el catálogo regional de CEPAL para toda América Latina y el Caribe. Úsalo para encontrar el indicator_id, y luego get_cepalstat_indicador para obtener las observaciones de Ecuador específicamente.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el nombre del indicador o su ruta temática (ignora tildes), ej. "poblacion", "pobreza", "comercio exterior". Vacío devuelve el catálogo completo (grande — mejor usar un query).</td></tr>
+
+<tr><td><code>lang</code></td><td><code>str</code></td><td><code>es</code></td><td>"es" (default) o "en"</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_cepalstat_indicador" data-search="get_cepalstat_indicador observaciones de un indicador de cepalstat, filtradas a un país (ecuador por defecto). obtiene las observaciones de un indicador de cepalstat, filtradas a un país (ecuador por defecto) para mantener la respuesta chica — la api cruda de cepal devuelve todos los países de la región (y a menudo del mundo) por indicador si no se filtra, confirmado en vivo en ~2.5 mb sin filtro vs. ~85 kb filtrado a un país. consigue el indicator_id con search_cepalstat_indicadores. cada registro devuelto decodifica los ids de dimensión crudos de cepalstat a etiquetas legibles (ej. &quot;sexo&quot;: &quot;mujeres&quot;, &quot;años&quot;: &quot;1975&quot;) usando el propio catálogo de dimensiones de ese indicador — no todos los indicadores tienen las mismas dimensiones (algunos son solo país × año, otros agregan sexo, grupo de edad, etc.). indicator_id un &quot;indicator_id&quot; de search_cepalstat_indicadores. pais país al que filtrar (ignora tildes, ej. &quot;ecuador&quot;, &quot;peru&quot;). string vacío devuelve todos los países del indicador — puede ser de varios mb para un indicador rico. lang &quot;es&quot; (default) o &quot;en&quot; format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_cepalstat_indicador</code>
+<span class="atlas-tool-desc">Observaciones de un indicador de CEPALSTAT, filtradas a un país (Ecuador por defecto).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Obtiene las observaciones de un indicador de CEPALSTAT, filtradas a un país (Ecuador por defecto) para mantener la respuesta chica — la API cruda de CEPAL devuelve todos los países de la región (y a menudo del mundo) por indicador si no se filtra, confirmado en vivo en ~2.5 MB sin filtro vs. ~85 KB filtrado a un país. Consigue el indicator_id con search_cepalstat_indicadores. Cada registro devuelto decodifica los ids de dimensión crudos de CEPALSTAT a etiquetas legibles (ej. "Sexo": "Mujeres", "Años": "1975") usando el propio catálogo de dimensiones de ese indicador — no todos los indicadores tienen las mismas dimensiones (algunos son solo país × año, otros agregan sexo, grupo de edad, etc.).</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>indicator_id</code></td><td><code>int</code></td><td><code>requerido</code></td><td>Un "indicator_id" de search_cepalstat_indicadores.</td></tr>
+
+<tr><td><code>pais</code></td><td><code>str</code></td><td><code>Ecuador</code></td><td>País al que filtrar (ignora tildes, ej. "Ecuador", "Peru"). String vacío devuelve todos los países del indicador — puede ser de varios MB para un indicador rico.</td></tr>
+
+<tr><td><code>lang</code></td><td><code>str</code></td><td><code>es</code></td><td>"es" (default) o "en"</td></tr>
+
+<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
 </div>
 </details>
 
@@ -2970,7 +3202,7 @@ window.SITE_SEARCH_EMPTY_LABEL = "Sin resultados.";
     var count = visibleTools().length;
     resultCount.textContent = query
       ? count + " tool" + (count === 1 ? "" : "s") + " coincide" + (count === 1 ? "" : "n") + "."
-      : "106 tools · abre un grupo para ver sus detalles.";
+      : "115 tools · abre un grupo para ver sus detalles.";
   }
 
   function applyFilter(query) {
