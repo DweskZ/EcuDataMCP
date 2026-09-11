@@ -23,8 +23,10 @@ def register_get_category_info_tool(mcp: MCPServer) -> None:
         Args:
             category: Category slug/name from list_categories
             include_datasets: Include sample datasets in the category (default True)
-            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
-                    "latacunga" (Latacunga municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal),
+                    "latacunga" (Latacunga municipal portal), or "iadb" (IADB's
+                    open-data portal, data.iadb.org — NOT Ecuador-only, a
+                    regional/global catalog)
             format: text | json
         """
         try:

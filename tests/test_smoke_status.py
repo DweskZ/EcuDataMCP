@@ -26,6 +26,19 @@ def test_classifies_cenace_certificate_problem_as_degraded():
     assert assess_response(text, ["PRODUCCIÓN"]).status == "degraded"
 
 
+def test_classifies_sercop_regional_block_as_degraded():
+    text = (
+        '{"error": "No se pudo conectar al portal de Datos Abiertos de '
+        'Compras Públicas (compraspublicas.gob.ec). Esto suele pasar '
+        'cuando el servidor se conecta desde fuera de Latinoamérica."}'
+    )
+
+    assessment = assess_response(text, ["ocid", "results", "rate_limited", "error"])
+
+    assert assessment.status == "degraded"
+    assert assessment.source == "sercop_compras_publicas"
+
+
 def test_keeps_unknown_errors_as_failures():
     assessment = assess_response("Error: unexpected source response", [])
 

@@ -107,8 +107,10 @@ def register_list_dataset_resources_tool(mcp: MCPServer) -> None:
 
         Args:
             dataset_id: The dataset ID or slug
-            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
-                    "latacunga" (Latacunga municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal),
+                    "latacunga" (Latacunga municipal portal), or "iadb" (IADB's
+                    open-data portal, data.iadb.org — NOT Ecuador-only, a
+                    regional/global catalog)
             format: text | json
         """
         try:

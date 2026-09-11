@@ -32,9 +32,14 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
                       Use list_categories to see all available categories.
             source: "nacional" (www.datosabiertos.gob.ec, default), "cuenca"
                     (cuencaendatos.cuenca.gob.ec, the Cuenca municipal open-data
-                    portal), or "latacunga" (datosabiertos.latacunga.gob.ec,
+                    portal), "latacunga" (datosabiertos.latacunga.gob.ec,
                     the Latacunga municipal open-data portal) — separate,
-                    smaller CKAN catalogs
+                    smaller CKAN catalogs — or "iadb" (data.iadb.org, the
+                    Inter-American Development Bank's open-data portal — NOT
+                    Ecuador-only, a regional/global catalog: Latin Macro Watch
+                    macro/financial indicators for 26 LAC countries, the
+                    World Bank/IADB Database of Political Institutions for
+                    ~180 countries)
             format: text | json
         """
         page_size = min(max(page_size, 1), 100)

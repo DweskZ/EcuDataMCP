@@ -89,7 +89,25 @@ async def _get_json(
                     await asyncio.sleep(1.0 * (attempt + 1))
                     continue
                 logger.error("SERCOP request failed for %s: %s", url, exc)
-                raise
+                if isinstance(exc, httpx.HTTPStatusError):
+                    raise
+                # A bare ConnectError/ConnectTimeout stringifies to
+                # something like "All connection attempts failed", naming
+                # no host. compraspublicas.gob.ec has been observed
+                # dropping the TCP handshake entirely (no RST, no HTTP
+                # response) for connections from outside Ecuador/Latin
+                # America -- the same regional restriction
+                # datosabiertos.gob.ec enforces at the HTTP layer with a
+                # 403 (see ckan_client._fetch_json). Name that likely
+                # cause instead of a bare connection error.
+                raise RuntimeError(
+                    "No se pudo conectar al portal de Datos Abiertos de "
+                    "Compras Públicas (compraspublicas.gob.ec). Esto suele "
+                    "pasar cuando el servidor se conecta desde fuera de "
+                    "Latinoamérica. Si el problema persiste, prueba "
+                    "conectando desde una VPN con salida en algún país de "
+                    "la región."
+                ) from exc
         _trip_cooldown(45.0)
         if (
             isinstance(last_exc, httpx.HTTPStatusError)

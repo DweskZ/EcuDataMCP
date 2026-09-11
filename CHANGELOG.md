@@ -2,6 +2,134 @@
 
 ## Unreleased
 
+### Fixed
+
+- **`search_bce_iem(hash_archivos=true)` / `scripts/audit_bce_iem.py --hash-xlsx`
+  no longer re-downloads the same legacy ZIP dozens of times per bulletin.**
+  Every member of a 2006-2016 bulletin's bulk ZIP shares that ZIP's URL;
+  `hash_catalog_tables` hashed per table entry instead of per unique URL, so
+  one bulletin's ~60-90 members triggered ~60-90 redundant downloads of the
+  identical file. Now deduplicates by URL first — `max_hash_archivos` bounds
+  actual downloads, not table-entry count.
+
+### Added
+
+- **MSP Gacetas de Inmunoprevenibles** (`search_gacetas_inmunoprevenibles`) —
+  weekly vaccine-preventable-disease epidemiological bulletins (Semana
+  Epidemiológica), 2019-present, 362 PDFs across 9 archive pages whose
+  filename convention changed 5 times over the archive's history. Page
+  discovery goes through MSP's WordPress REST API rather than a hardcoded
+  year list, so future years surface automatically.
+- **`get_organization_info` gained a `query` parameter** and no longer
+  truncates `format=json` to 25 datasets — needed to make large CKAN
+  organizations with no dedicated tool (SRI genérico 127 packages, MEF
+  genérico 97, IEPS 106, COSEDE 88, IPAIP 70) actually browsable instead of
+  requiring an exact slug guess and hitting a silent truncation.
+- **CEPALSTAT** (`search_cepalstat_indicadores`, `get_cepalstat_indicador`) —
+  CEPAL/ECLAC's regional statistics API, 2,059 indicators across
+  Demográficos y sociales, Económicos, Ambientales, and Temas
+  transversales (ODS). Not Ecuador-only — a regional/global catalog —
+  but every data pull defaults to filtering to Ecuador, dropping the
+  payload from ~2.5 MB (every country) to ~85 KB. Raw dimension ids are
+  decoded into readable labels using the indicator's own dimension
+  catalog.
+- **IADB Latin Macro Watch + World Bank/IADB DPI** (`source="iadb"` on
+  every existing generic CKAN tool) — `data.iadb.org`, a standard CKAN
+  portal: 665 CSV resources (unemployment, CPI, FX, fiscal balance, 26
+  countries since 1990) plus a ~180-country political-institutions
+  dataset (1975-2023). Also not Ecuador-only. Along the way, found and
+  fixed a real compatibility gap: this portal returns package-level
+  title/notes/description as a multilingual dict instead of a plain
+  string, which every existing tool's text rendering expected — now
+  normalized (prefers Spanish) transparently for every CKAN source.
+- **Three CKAN sources documented as already reachable, zero new code**:
+  Homicidios Intencionales (Ministerio del Interior, 4 XLSX files),
+  Autoridad Portuaria de Puerto Bolívar (246 packages — the highest
+  package count of any organization on the national portal), and
+  Cancillería (13 packages: apostillas, visas, movilidad humana).
+- **SENESCYT SIAU — Estadísticas de Educación Superior, CTI**
+  (`search_senescyt_estadisticas`) — 12 reports (fichas metodológicas,
+  indicator reports 2021/2022/2024, national competitiveness index,
+  CTI/ancestral-knowledge indicator inventory, labor-demand
+  characterization, COVID-19 impact study) from a WPBakery accordion
+  mixing WordPress Download Manager gateway links and direct/Nextcloud
+  share links.
+- **Biblioteca de Educación Superior** (`list_senescyt_biblioteca_categorias`,
+  `get_senescyt_biblioteca_categoria_archivos`) — the larger sibling
+  archive (`educacion.gob.ec/edusuperior/biblioteca/`): 1,259 documents
+  across 17 top-level categories (PAC por año, Normativa, LOES, SNNA,
+  Acuerdos, Indicadores ACTI, exámenes especiales), same download-monitor
+  pattern as SGR/ARCSA, nesting up to 3 levels deep.
+- **BCE Cuentas Nacionales** (`search_bce_cuentas_nacionales`,
+  `get_bce_cuentas_nacionales_archivo`) — the national-accounts publication
+  packages this project previously only touched indirectly via BCEData/IEM
+  aggregates: annual and quarterly national accounts, regional/provincial
+  accounts, the historical PIB retropolation back to 1965, Tabla de Oferta
+  y Utilización (TOU), Cuadro Económico Integrado (CEI), Matriz de Empleo e
+  Ingresos (MEI), input-output and social-accounting matrices, the
+  bioeconomy thematic satellite account, fixed-base (2007=100) series, and
+  IMAEC monthly results — 18 pages, 244 files verified live. Each page
+  renders its own bespoke widget markup with no shared CSS convention, so
+  discovery is a hardcoded page list (same pattern as
+  `helpers/bce_precios_comex_client.py`) with a generic
+  extension-and-path-based file-link parser rather than one shared widget
+  parser. See RESEARCH.md for the investigation. Tool count rises from 106
+  to 108.
+- **`search_bce_indices` — 4 more publication pages** (Mercado Interbancario,
+  Entorno Macroeconómico, Cifras Económicas del Ecuador, Información
+  Histórica de Tasas Máximas y Referenciales), found via a full sitewide
+  sweep for the índice widget's own CSS class instead of trusting the
+  `-indice(s)` slug pattern. Two sibling pages found in the same sweep
+  (`reporte-monetario-semanal`, `iem-publicaciones`) were confirmed
+  duplicates of already-covered content and excluded. Catalog: 30 → 34
+  pages.
+- **BCE publication calendar** (`search_bce_calendario`) — BCE's own
+  forward-looking release schedule for the full calendar year (523
+  entries, 162 of them genuinely future-dated as of this pass), sourced
+  from a plain CSV behind the "Calendario Estadístico" page's iframe
+  widget. Filters by query, category, periodicity, date range, and
+  `solo_proximas` (upcoming only). Deliberately drops the responsible
+  staff member's name/email from the source file — direct personal
+  identifiers with no bearing on "when does X get published". Tool count
+  rises from 108 to 109.
+
+### Removed (scoped out)
+
+- **BCEData ↔ IEM — reviewing the remaining ~75 candidate equivalences.**
+  Only 2 of 77 label-similarity candidates from `compare_bce_sources` were
+  ever confirmed as real equivalences with live data; 3 of the first 5
+  reviewed turned out to be false positives, so the remaining review would
+  need value/methodology comparison per candidate with no shortcut and no
+  guarantee most resolve to anything. Daniel decided against continuing
+  the manual review — the candidate queue stays exposed as-is via
+  `compare_bce_sources`.
+- **IEM — mass-hashing the full 367-bulletin historical archive.** The
+  underlying capability is fixed and ready (see the ZIP-dedup fix above),
+  but a full run means several thousand downloads and hours of sustained
+  load against BCE's server for a manifest nothing in the project
+  currently depends on. Daniel decided not to run it.
+- **BCEData — revision-change detection.** The endpoint exposes no
+  version/ETag marker; the only alternative (content-diff) is already
+  covered on-demand by `audit_bce_catalog`. Daniel decided against
+  building anything further on top of it.
+
+### Clarified (no new tools)
+
+- **Mercado laboral (BCE)** — already fully reachable via the generic
+  `search_indicadores_bce`/`get_indicador_bce` tools (id_grupo 64/65/68/102,
+  "4.2 Precios, Salarios y Mercado Laboral"), including quarterly
+  national/urban/rural/city-level employment, underemployment, and wage
+  series back to 2020. ROADMAP.md's earlier "sin página índice encontrada"
+  note was about BCE's `.bce-gi` índice-archive system specifically, not
+  about BCEData coverage — no gap, no new code needed.
+- **Pobreza y desigualdad** — confirmed BCE publishes nothing on this
+  (0 results from `search_indicadores_bce`); it is INEC's domain and is
+  already reachable via `search_inec_publicaciones` ("Pobreza y
+  desigualdad" landing page plus annual "Pobreza por Ingresos" bulletins
+  back to 2019) — the static `search_inec_estadisticas` topic page for
+  "Pobreza" is stale (0 files), same known staleness pattern already
+  documented for other INEC topic pages.
+
 ## 0.8.7 — 2026-09-07
 
 ### Removed
@@ -11,7 +139,7 @@
   unreachable in live verification from three independent environments
   (deployed MCP server, local `curl`, real browser navigation): the TLS
   connection closes abruptly every time, not the deployed-server-only
-  connectivity gap previously suspected. Tool count drops from 103 to 100.
+  connectivity gap previously suspected. Tool count drops from 105 to 102.
 
 ### Added
 
@@ -22,7 +150,8 @@
   magnetic variation, operating hours, operator contacts, and the rest of
   the numbered ICAO Annex 15 subsections. No login, no JS, no WAF —
   server-rendered HTML from a MediaWiki-style exporter. GEN/ENR sections
-  and the AMDT/SUP/AIC tabs are out of scope for now (see ROADMAP.md).
+  and the AMDT/SUP/AIC tabs are out of scope for now (see ROADMAP.md). Tool
+  count rises from 104 to 106.
 - **ARCSA Base de Registros Emitidos** (`list_arcsa_categorias`,
   `get_arcsa_categoria_archivos`) — the live sanitary registry
   (`controlsanitario.gob.ec/base-de-datos/`) by category: alimentos,
@@ -33,8 +162,8 @@
   it responds normally to this project's own `USER_AGENT` header. Reuses
   `helpers/sgr_publicaciones_client.py`'s Biblioteca parsing logic
   verbatim (confirmed byte-for-byte the same WordPress download-monitor
-  markup), just retargeted at a new domain. Tool count rises from 100 to
-  102.
+  markup), just retargeted at a new domain. Tool count rises from 102 to
+  104.
 - **INEC topic coverage: Laboratorio de Dinámica Laboral y Empresarial
   (LDLE)** — added to `helpers/inec_client.py`'s `_EXTRA_TOPICS`, so
   `search_inec_estadisticas`/`get_inec_estadistica_files` now surface it.

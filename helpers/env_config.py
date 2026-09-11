@@ -13,6 +13,8 @@ _API_URLS = {
     "cuenca_site": "https://cuencaendatos.cuenca.gob.ec/",
     "latacunga": "https://datosabiertos.latacunga.gob.ec/api/3/action/",
     "latacunga_site": "https://datosabiertos.latacunga.gob.ec/",
+    "iadb": "https://data.iadb.org/api/3/action/",
+    "iadb_site": "https://data.iadb.org/",
 }
 
 _ENV_OVERRIDES = {
@@ -28,6 +30,8 @@ _ENV_OVERRIDES = {
     "cuenca_site": "CUENCA_SITE_URL",
     "latacunga": "LATACUNGA_API_URL",
     "latacunga_site": "LATACUNGA_SITE_URL",
+    "iadb": "IADB_API_URL",
+    "iadb_site": "IADB_SITE_URL",
 }
 
 

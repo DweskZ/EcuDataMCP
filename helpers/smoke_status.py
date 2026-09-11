@@ -25,6 +25,11 @@ _DEGRADED_SOURCES = (
         "cenace.gob.ec",
         "certificate_verify_failed",
     ),
+    (
+        "sercop_compras_publicas",
+        "compraspublicas.gob.ec",
+        "fuera de latinoamérica",
+    ),
 )
 
 

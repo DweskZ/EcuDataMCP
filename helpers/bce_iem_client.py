@@ -1113,27 +1113,54 @@ async def _hash_url(url: str, session: httpx.AsyncClient) -> dict[str, Any]:
 async def hash_catalog_tables(
     tables: list[dict[str, Any]], max_files: int = _MAX_HASH_FILES
 ) -> dict[str, Any]:
-    """Hash a bounded set of IEM XLSX links for reproducible archive audits."""
+    """Hash a bounded set of IEM file links for reproducible archive audits.
+
+    Several table entries can share one URL -- every member of a pre-Oct-2016
+    bulk ZIP carries that same ZIP's URL (see _fetch_legacy_zip_tables, which
+    sets "url" to the ZIP itself for each of its ~60-90 members), so hashing
+    per table entry would re-download and re-hash the identical file dozens
+    of times per bulletin. Each unique URL is downloaded and hashed exactly
+    once; the result is applied to every table entry that shares it.
+    max_files therefore bounds actual downloads (unique URLs), not the
+    (possibly much larger) count of table entries.
+    """
     max_files = min(max(max_files, 1), _MAX_HASH_FILES)
-    selected = tables[:max_files]
-    omitted = max(0, len(tables) - len(selected))
+    unique_urls: list[str] = []
+    seen_urls: set[str] = set()
+    for table in tables:
+        url = table["url"]
+        if url not in seen_urls:
+            seen_urls.add(url)
+            unique_urls.append(url)
+    selected_urls = unique_urls[:max_files]
+    selected_url_set = set(selected_urls)
+    omitted = max(0, len(unique_urls) - len(selected_urls))
     semaphore = asyncio.Semaphore(_HASH_CONCURRENCY)
 
-    async def hash_one(table: dict[str, Any], session: httpx.AsyncClient) -> dict[str, Any]:
+    async def hash_one(url: str, session: httpx.AsyncClient) -> tuple[str, dict[str, Any]]:
         async with semaphore:
             try:
-                result = await _hash_url(table["url"], session)
-                return {**table, **result, "ok": True}
+                result = await _hash_url(url, session)
+                return url, {**result, "ok": True}
             except Exception as exc:
-                return {**table, "ok": False, "error": str(exc)}
+                return url, {"ok": False, "error": str(exc)}
 
     async with httpx.AsyncClient(
         headers={"User-Agent": USER_AGENT}, timeout=120.0
     ) as session:
-        results = await asyncio.gather(*(hash_one(table, session) for table in selected))
+        hashed_by_url = dict(
+            await asyncio.gather(*(hash_one(url, session) for url in selected_urls))
+        )
+
+    results = [
+        {**table, **hashed_by_url[table["url"]]}
+        for table in tables
+        if table["url"] in selected_url_set
+    ]
     return {
         "total_archivos": len(tables),
-        "archivos_consultados": len(selected),
+        "urls_unicas": len(unique_urls),
+        "archivos_consultados": len(results),
         "archivos_omitidos_por_limite": omitted,
         "archivos_exitosos": sum(1 for result in results if result["ok"]),
         "archivos_con_error": sum(1 for result in results if not result["ok"]),

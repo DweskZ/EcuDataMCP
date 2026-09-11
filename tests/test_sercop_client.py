@@ -1,3 +1,4 @@
+import httpx
 import pytest
 
 from helpers import sercop_client
@@ -59,6 +60,23 @@ async def test_search_contracts_rate_limit(httpx_mock, monkeypatch):
     httpx_mock.add_response(url=url, status_code=429)
 
     with pytest.raises(sercop_client.SercopRateLimitError):
+        await sercop_client.search_contracts(search="agua", year=2024, page=1)
+
+
+@pytest.mark.asyncio
+async def test_search_contracts_names_regional_block_on_connect_error(
+    httpx_mock, monkeypatch
+):
+    monkeypatch.setattr(sercop_client, "_MAX_RETRIES", 1)
+
+    async def _no_sleep(_: float) -> None:
+        return None
+
+    monkeypatch.setattr(sercop_client.asyncio, "sleep", _no_sleep)
+
+    httpx_mock.add_exception(httpx.ConnectError("All connection attempts failed"))
+
+    with pytest.raises(RuntimeError, match="compraspublicas.gob.ec"):
         await sercop_client.search_contracts(search="agua", year=2024, page=1)
 
 

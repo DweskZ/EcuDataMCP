@@ -20,8 +20,10 @@ def register_list_recent_datasets_tool(mcp: MCPServer) -> None:
         Args:
             page: Page number (1-based, default 1)
             page_size: Results per page (default 15, max 50)
-            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
-                    "latacunga" (Latacunga municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal),
+                    "latacunga" (Latacunga municipal portal), or "iadb" (IADB's
+                    open-data portal, data.iadb.org — NOT Ecuador-only, a
+                    regional/global catalog)
             format: text | json
         """
         page = max(page, 1)

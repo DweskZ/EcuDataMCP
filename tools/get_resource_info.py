@@ -32,8 +32,10 @@ def register_get_resource_info_tool(mcp: MCPServer) -> None:
 
         Args:
             resource_id: The resource UUID
-            source: "nacional" (default), "cuenca" (Cuenca municipal portal), or
-                    "latacunga" (Latacunga municipal portal)
+            source: "nacional" (default), "cuenca" (Cuenca municipal portal),
+                    "latacunga" (Latacunga municipal portal), or "iadb" (IADB's
+                    open-data portal, data.iadb.org — NOT Ecuador-only, a
+                    regional/global catalog)
             format: text | json
         """
         try:
