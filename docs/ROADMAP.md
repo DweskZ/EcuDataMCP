@@ -316,7 +316,7 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 | Fuente | Estado | Qué falta |
 |---|---|---|
 | Búsqueda semántica | No iniciado | `search_datasets` sigue siendo keyword puro de CKAN, sin comprensión semántica sobre el catálogo completo |
-| Simplificar y armonizar la arquitectura MCP | No iniciado | Reducir duplicaciones en la superficie pública, separar tools de mantenimiento, migrar a schemas/resultados/errores estructurados — diagnóstico y diseño en [MCP_ARCHITECTURE.md](MCP_ARCHITECTURE.md) |
+| Simplificar y armonizar la arquitectura MCP | No iniciado, plan de ejecución en 4 fases listo | Reducir duplicaciones en la superficie pública, separar tools de mantenimiento, migrar a schemas/resultados/errores estructurados. Auditoría directa 2026-09-11 confirmó solo 2 duplicados reales en las 115 tools (no una bolsa grande de redundancia) más 2 candidatos de fusión de bajo impacto (aviación METAR/NOTAM/SIGMET, ARCOTEL) — diagnóstico, evidencia y plan de ejecución fase por fase en [MCP_ARCHITECTURE.md](MCP_ARCHITECTURE.md) |
 | `outputSchema` en los tools MCP | No iniciado | — |
 | Manejo geoespacial | No iniciado | WKT/GeoJSON más allá del stripping actual |
 | Type-checking en CI | No iniciado | ruff cubre estilo/imports pero no errores de tipo; riesgo de destapar errores preexistentes en 40+ archivos — evaluar alcance antes de activar el gate |

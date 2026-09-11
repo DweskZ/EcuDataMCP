@@ -1,110 +1,117 @@
 # Revisión de arquitectura MCP
 
-Revisión realizada el 2026-08-31 para decidir si EcuDataMCP debe simplificar,
-armonizar o reducir su número de tools. Este documento es una guía de diseño;
-no implica que todos los cambios deban hacerse de una sola vez.
+Revisión iniciada el 2026-08-31 para decidir si EcuDataMCP debe simplificar,
+armonizar o reducir su número de tools. Es una guía de diseño, no implica que
+todos los cambios deban hacerse de una sola vez — ver "Plan de ejecución" al
+final para el orden real.
 
-> **Recalculado 2026-09-04.** La revisión original (2026-08-31) contaba 74
-> tools; hoy son 103 — se volvió a correr toda la evidencia de esta página
-> contra el repositorio actual, no solo se ajustó el número. Conclusión: el
-> diagnóstico y el diseño propuesto (perfil público vs. perfil de
-> mantenimiento) siguen siendo válidos sin cambios — no apareció duplicación
-> nueva entre las 29 tools agregadas desde entonces, y el bug de versión fija
-> en `list_capabilities` que esta página señalaba ya se corrigió
-> (`helpers/version.py` es ahora la única fuente de verdad del string de
-> versión). Solo cambió la escala: la superficie pública objetivo pasa de
-> ~69 a ~99, con el mismo puñado de reducciones de siempre.
+## Historial de conteos
 
-> **Actualizado 2026-09-05.** Se removieron las 3 tools de SRI Saiku
-> (`list_sri_saiku_cubes`, `describe_sri_saiku_cube`,
-> `query_sri_saiku_aggregate`) tras confirmar en vivo, desde tres entornos
-> distintos (servidor MCP desplegado, `curl` local, navegador real), que
-> `srienlinea.sri.gob.ec` cierra la conexión TLS abruptamente sin excepción
-> — no es un problema de conectividad puntual del entorno de desarrollo, el
-> dominio completo está inalcanzable. El total baja de 103 a 100; los
-> números de esta página que preceden a esta nota reflejan el conteo exacto
-> a la fecha de cada revisión y no se reescriben retroactivamente.
+El número de tools registradas creció durante toda la vida de esta revisión.
+Cada fila refleja el conteo exacto verificado en esa fecha — no se
+reescriben retroactivamente cuando el total sube después.
 
-> **Actualizado 2026-09-05 (mismo día).** Se agregaron 2 tools de ARCSA
-> (`list_arcsa_categorias`, `get_arcsa_categoria_archivos`) — el total sube
-> de 100 a 102.
+| Fecha | Total | Qué cambió |
+|---|---|---|
+| 2026-08-31 | 74 | Revisión original. |
+| 2026-09-04 | 103 | Recalculado contra el repo actual; diagnóstico y diseño siguen válidos, sin duplicación nueva entre las 29 tools agregadas. Bug de versión fija en `list_capabilities` corregido (`helpers/version.py` es ahora la única fuente de verdad). |
+| 2026-09-05 | 100 | Se removieron 3 tools de SRI Saiku (`srienlinea.sri.gob.ec` confirmado inalcanzable desde tres entornos distintos). |
+| 2026-09-05 | 102 | Se agregaron 2 tools de ARCSA (`list_arcsa_categorias`, `get_arcsa_categoria_archivos`). |
+| 2026-09-10 | 115 | +13: BCE Cuentas Nacionales (2), calendario de publicaciones BCE (1), SENESCYT SIAU + Biblioteca (3), CEPALSTAT (2), Gacetas de Inmunoprevenibles del MSP (1). Ver auditoría 2026-09-11 abajo para la verificación directa contra el código, no solo un barrido nombre por nombre. |
 
-> **Actualizado 2026-09-10.** Se agregaron 13 tools más desde la última
-> revisión: BCE Cuentas Nacionales (`search_bce_cuentas_nacionales`,
-> `get_bce_cuentas_nacionales_archivo`), calendario de publicaciones del BCE
-> (`search_bce_calendario`), SENESCYT SIAU y Biblioteca (`search_senescyt_estadisticas`,
-> `list_senescyt_biblioteca_categorias`, `get_senescyt_biblioteca_categoria_archivos`),
-> CEPALSTAT (`search_cepalstat_indicadores`, `get_cepalstat_indicador`), y
-> Gacetas de Inmunoprevenibles del MSP (`search_gacetas_inmunoprevenibles`) —
-> el total sube de 102 a 115. Sin duplicación nueva (revisado nombre por
-> nombre contra el criterio de esta página): los pares `search_X`/`get_X_archivo`
-> (BCE Cuentas Nacionales, SENESCYT Biblioteca) son flujos de dos pasos, la
-> misma forma que la regla 4 ya protege — no candidatos a fusión. La
-> ampliación de `source=` a `"iadb"` en los tools CKAN genéricos existentes
-> (en vez de tools nuevas por-fuente) y el nuevo parámetro `query` en
-> `get_organization_info` (en vez de tools nuevos por-organización para
-> SRI/MEF genéricos) son ejemplos directos de la recomendación de esta
-> página de preferir una tool parametrizada sobre duplicar la superficie
-> pública — ver docs/RESEARCH.md § Vigésimo sexta pasada.
+**Patrón ya en uso para no agregar tools por fuente nueva:** la ampliación
+de `source=` a `"iadb"` en los tools CKAN genéricos existentes, y el nuevo
+parámetro `query` en `get_organization_info` (en vez de tools nuevos
+por-organización para SRI/MEF genéricos) — ver docs/RESEARCH.md § Vigésimo
+sexta pasada. Es exactamente la recomendación de "preferir una tool
+parametrizada sobre duplicar la superficie pública" ya aplicada dos veces.
 
 ## Conclusión corta
 
-El servidor tiene 103 tools registradas. Ese número no es, por sí solo, un
-problema de MCP: `tools/list` admite paginación y la especificación no fija un
-máximo pequeño. El problema actual es la forma de describir y devolver esas
-tools.
+El número bruto no es, por sí solo, un problema de MCP: `tools/list` admite
+paginación y la especificación no fija un máximo pequeño. El problema real es
+la forma de describir y devolver esas tools — todas aceptan `format: str` y
+devuelven `str`, sin `title`, sin anotaciones, sin schema de entrada
+tipado, y sin distinguir una tool de solo-lectura de una que escribe
+artefactos locales.
 
-La recomendación es mantener las capacidades específicas de cada fuente, pero
-reducir la superficie pública solo donde existe una duplicación clara. El
-objetivo inicial razonable es aproximadamente 99 tools visibles para usuarios,
-con 2 o 3 tools de mantenimiento en un perfil separado.
+**Sobre si 115 es demasiado (pregunta directa de Daniel, 2026-09-11):**
+auditoría dirigida contra el código (no solo un barrido nombre-por-nombre)
+encontró **exactamente 2 duplicados reales**, sin cambios respecto a la
+revisión original. 115 tools cubriendo 115 endpoints genuinamente distintos
+de un panorama de datos gubernamentales fragmentado es, hasta donde se pudo
+verificar, un conteo honesto — no hay una bolsa grande de redundancia
+escondida. La recomendación sigue siendo la misma: mantener las capacidades
+específicas de cada fuente, reducir solo donde hay duplicación clara, y
+resolver la fatiga de navegación con perfiles + mejores descripciones, no
+con una purga arbitraria.
 
-## Evidencia del repositorio
+## Auditoría de redundancia real (2026-09-11)
 
-- Hay 103 módulos en `tools/` y 103 decoradores `@mcp.tool()` registrados
-  (confirmado por tres vías independientes que coinciden: conteo de
-  archivos, conteo de decoradores, y llamadas `register_*_tool(mcp)` dentro
-  de `tools/__init__.py:register_tools`).
-- Las 103 tools aceptan `format: str`, normalmente con los valores `text` o
-  `json` — sin excepción, confirmado sobre las 103.
-- Las 103 declaran retorno `str` — también sin excepción. Con el SDK MCP
-  1.29.0 usado por el entorno (versión resuelta confirmada en `uv.lock`),
-  `tools/list` las presenta con un output schema equivalente a un resultado
-  textual (`result: string`), aunque muchas internamente construyen objetos
-  JSON dentro de una cadena.
-- Ninguna tool define actualmente `title` ni anotaciones MCP (0/103).
-- No hay `Annotated`, `Field`, `Literal[...]`, `BaseModel` ni `TypedDict` en
-  las firmas públicas de las tools (0/103) — la migración de esquemas de
-  entrada propuesta más abajo sigue sin empezar.
-- **Corregido desde la revisión original:** `list_capabilities` ya no tiene
-  una versión fija hardcodeada — usa `helpers.version.get_version()`, cuyo
-  propio docstring documenta que existe justamente para eliminar el bug que
-  esta página señalaba (versión de `list_capabilities` y del servidor
-  divergiendo por ser dos literales independientes). El resto del punto
-  original sigue en pie: `list_capabilities` sigue repitiendo información
-  ya disponible en el recurso `ecuador://fuentes`, así que la recomendación
-  de retirarlo de la superficie pública se mantiene por esa razón sola.
-- `search_datasets` y `list_recent_datasets` siguen consultando el mismo
-  catálogo y entidad; la segunda cambia principalmente el criterio de
-  orden — la única duplicación real identificada, sin cambios desde la
-  revisión original.
-- **Sin duplicación nueva entre las 29 tools agregadas desde el 2026-08-31**
-  (revisado nombre por nombre): los pares que a primera vista parecen
-  candidatos — `search_arcotel_boletines`/`search_arcotel_reportes_mensuales`,
-  `search_infomies_bases_mensuales`/`search_infomies_boletines_zonales` —
-  cubren series de datos genuinamente distintas de la misma institución
-  (confirmado contra RESEARCH.md), no el mismo catálogo con dos nombres.
-  Los pares `search_X`/`get_X_info` y `list_X`/`get_X_archivos` nuevos
-  (SRI RUC, SIPA geoportal, SEPS, SGR, Superbancos, INEVAL, IG-EPN informes)
-  son flujos de dos pasos, la misma forma que la regla 4 de abajo ya
-  protege — no candidatos a fusión.
-- Las únicas tools de "mantenimiento" (`audit_bce_catalog`,
-  `compare_bce_sources`) siguen siendo exactamente las mismas dos; no se
-  agregó ninguna tool nueva de ese tipo (`audit_*`/`compare_*`) desde la
-  revisión original.
+Daniel pidió verificar directamente, no confiar en el resumen de la
+revisión anterior. Se re-auditó el cluster más grande (BCE, 14 tools) leyendo
+el código y RESEARCH.md directamente, más un barrido de nombres sobre las
+115 tools completas.
 
-Esto indica que el mayor problema no es la cantidad bruta, sino que el cliente
-debe escoger entre muchos nombres y luego interpretar respuestas textuales.
+**Los 2 duplicados reales ya identificados siguen siendo los únicos:**
+1. `search_datasets` / `list_recent_datasets` — mismo catálogo, la segunda
+   solo cambia el criterio de orden.
+2. `list_capabilities` — repite información ya disponible en el recurso
+   `ecuador://fuentes`.
+
+**Cluster BCE (14 tools) — la superposición aparente está resuelta con
+evidencia dura, no es descuido:**
+
+- `search_bce_indices` cubre remesas, precios de comercio exterior y
+  boletines monetarios semanales *por nombre* entre sus ~35 páginas
+  "índice" — a primera vista se solapa con `search_bce_remesas`,
+  `search_bce_precios_comex` y `search_bce_publicaciones`. Investigado a
+  fondo en cada caso:
+  - Remesas: la página índice es un *boletín analítico* (comentario,
+    distinto artefacto), no la serie cruda que `search_bce_remesas` ya
+    expone. Mantenidos separados a propósito.
+  - Precios de comercio exterior: `search_bce_precios_comex` fue
+    construido tras confirmar en vivo que sus dos páginas fuente no
+    aparecen en el descubrimiento de `search_bce_indices` (sus slugs no
+    terminan en "-indice(s)") y exponen desagregación por producto que no
+    existe en ningún otro lado del proyecto. Una tercera página candidata
+    (serie histórica IPX/IPM/ITI) fue investigada y **descartada
+    explícitamente** tras cruzar valores exactos en vivo con BCEData
+    (ITI, IPX idénticos salvo ruido de precisión de punto flotante) —
+    hubiera sido un duplicado puro.
+  - Boletines monetarios semanales: `bce_indices_client.py` ya excluyó
+    activamente una página duplicada (`reporte-monetario-semanal`,
+    mismo conteo de archivos y rango de años que
+    `reporte-monetario-semanal-indices`). El solape restante entre
+    `search_bce_indices` (archivo histórico completo de una serie) y
+    `search_bce_publicaciones` (ventana rodante de ~30 publicaciones
+    recientes de tipos mixtos) es un solape de *contenido*, no de
+    *tool* — ambas herramientas sirven propósitos distintos (archivo
+    completo de una serie vs. panorama de qué se publicó últimamente) y
+    la misma publicación puede aparecer en ambas legítimamente. No hay
+    nada que fusionar aquí sin perder una de las dos funciones.
+- Ningún otro tool de BCE se superpone: BCEData, IEM, indicadores
+  diarios/mensuales y Cuentas Nacionales están explícitamente delimitados en
+  sus propios docstrings contra los otros tres.
+
+**Dos candidatos de fusión nuevos, encontrados en esta pasada — no son
+duplicados, son hermanos con la misma forma de parámetros:**
+
+| Candidato | Forma actual | Fusión posible |
+|---|---|---|
+| `get_metar(designador)`, `get_notam(designador)`, `get_sigmet()` | 3 tools DGAC, firma casi idéntica | `get_reporte_aeronautico(tipo, designador=None)` |
+| `search_arcotel_boletines(query)`, `search_arcotel_reportes_mensuales(query)` | 2 tools ARCOTEL, firma idéntica | `search_arcotel(tipo, query="")` |
+
+Ejecutar estas dos fusiones bajaría el conteo en hasta 3 (115 → 112), sumado
+a las 2 reducciones ya planeadas (→ 110). Es un ahorro real pero modesto —
+no cambia la conclusión de que la cantidad bruta no es el problema central.
+
+**Un tercer candidato investigado y descartado, por completitud:**
+`search_infomies_bases_mensuales` (`serie`, `anio`) vs.
+`search_infomies_boletines_zonales` (`modo`, `zona`, `anio`) — parámetros
+genuinamente distintos. Fusionarlos produciría exactamente el patrón que la
+regla 4 más abajo ya prohíbe: argumentos opcionales según el caso y
+respuestas de forma variable. Se mantienen separados.
 
 ## Arquitectura propuesta
 
@@ -173,6 +180,16 @@ Fusionarlos normalmente produce una tool con argumentos opcionales, respuestas
 de varios tipos y reglas difíciles de explicar. Se mantienen separados, en
 particular para SIPA, Superbancos, Contraloría y BCEData/IEM.
 
+### 5. (Opcional, bajo impacto) Fusionar hermanos de forma idéntica
+
+Ver la tabla de la auditoría 2026-09-11 arriba: aviación (METAR/NOTAM/SIGMET)
+y ARCOTEL (boletines/reportes mensuales) son candidatos porque comparten
+firma exacta, no porque haya evidencia de fusión previa. A diferencia de la
+regla 4, esto no es un flujo de dos pasos — es la misma pregunta
+("dame el reporte de tipo X") repetida tres o dos veces. Evaluar caso por
+caso si el nombre específico (ej. `get_metar`, término estándar de aviación
+que un modelo reconoce sin ayuda) vale más que el ahorro de una tool.
+
 ## Armonización de nombres
 
 Los nombres existentes deben conservarse para no romper clientes. Para tools
@@ -200,7 +217,8 @@ que indique qué hace, cuándo usarla, qué no devuelve y cuáles son sus límit
 Las firmas deben ayudar al cliente a construir una llamada válida, no aceptar
 cualquier texto y corregirlo solo después. La migración debería usar:
 
-- `Literal["nacional", "cuenca"]` para fuentes cerradas.
+- `Literal["nacional", "cuenca", "latacunga", "iadb"]` para fuentes cerradas
+  (el conjunto real ya creció a 4 valores — ver Historial de conteos).
 - `Literal["text", "json"]` mientras exista compatibilidad con `format`.
 - `Annotated` y `Field` para describir y limitar `limit`, `rows`, `page_size` y
   otros parámetros numéricos.
@@ -235,23 +253,84 @@ seguridad.
 
 Los errores de API, validación y límites deben llegar como errores de ejecución
 MCP (`isError: true`), no como una cadena que parece una respuesta exitosa. Así
-el modelo puede distinguir “no hubo resultados” de “la consulta falló” y
+el modelo puede distinguir "no hubo resultados" de "la consulta falló" y
 corregir sus argumentos.
 
-## Orden de implementación
+## Plan de ejecución
 
-1. **Primero:** títulos, descripciones, límites de entrada, anotaciones y
-   pruebas de `tools/list`.
-2. **Después:** quitar `list_capabilities` del perfil público e integrar
-   `list_recent_datasets` en `search_datasets` con compatibilidad temporal.
-3. **Luego:** crear el perfil público y el perfil de mantenimiento en el mismo
-   repositorio.
-4. **Finalmente:** migrar resultados a modelos estructurados y retirar
-   gradualmente `format`.
+Cuatro fases, cada una entregable de forma independiente — no es necesario
+completar una fase entera antes de que el proyecto obtenga valor de ella.
+Cada fase lista qué cambia, en qué archivos, y cómo se verifica.
 
-Antes de retirar más tools conviene medir llamadas reales, errores de selección
-y herramientas que nunca se usan. No se debe reducir la superficie únicamente
-para alcanzar un número arbitrario.
+### Fase 0 — Reducciones de bajo riesgo (1-2 sesiones)
+
+La única fase que borra o fusiona tools. Todo lo demás es aditivo (schemas,
+anotaciones) y no rompe nada existente.
+
+1. Retirar `list_capabilities` del perfil público (regla 1). Mantener como
+   alias una versión, luego retirar. Archivos: `tools/list_capabilities.py`,
+   `tools/__init__.py`.
+2. Fusionar `list_recent_datasets` en `search_datasets(sort="recent")`
+   (regla 2). Archivos: `helpers/ckan_client.py`, `tools/search_datasets.py`;
+   retirar `tools/list_recent_datasets.py` tras el período de alias.
+3. (Opcional, decisión de Daniel) Fusionar el trío de aviación y el par
+   ARCOTEL (regla 5) si el ahorro de 3 tools justifica perder los nombres
+   específicos.
+4. Verificación: `uv run pytest`, conteo de tools antes/después en
+   `docs/MCP_ARCHITECTURE.md` (nueva fila en Historial de conteos), smoke
+   test manual de los tools fusionados.
+
+Resultado esperado: 115 → 113 (o 110 si se ejecuta el paso 3 opcional).
+
+### Fase 1 — Perfiles público / mantenimiento (1 sesión)
+
+1. Mover `audit_bce_catalog` y `compare_bce_sources` a un segundo
+   `register_tools`-equivalente que solo se registra en una instancia
+   `FastMCP` de mantenimiento (regla 3). No se toca `helpers/` ni la lógica.
+2. Decidir el mecanismo de exposición: segundo proceso (`mcp-maintenance`)
+   vs. flag de arranque en el mismo proceso — impacto en `main.py` y
+   `docker-compose.yml`/`Dockerfile` si se elige proceso separado.
+3. Verificación: `tools/list` del perfil público ya no incluye las 2 tools
+   de mantenimiento; siguen funcionando vía el perfil de mantenimiento.
+
+### Fase 2 — Metadatos de tool (2-3 sesiones, incremental por fuente)
+
+No requiere tocar lógica de negocio — solo las firmas y docstrings de
+`tools/*.py`. Puede hacerse fuente por fuente sin bloquear el resto.
+
+1. Agregar `title` legible en español a cada tool.
+2. Migrar `source: str` a `Literal["nacional", "cuenca", "latacunga", "iadb"]`
+   (y equivalentes para cualquier otro parámetro con un conjunto cerrado de
+   valores) sin cambiar el comportamiento en runtime.
+3. Agregar anotaciones MCP (solo-lectura vs. escribe artefactos) — todas
+   las tools públicas son solo-lectura salvo que se documente lo contrario.
+4. Verificación: `tools/list` expone `title` y anotaciones para el 100% de
+   las tools públicas; test de regresión que falla si una tool nueva no
+   declara `title`.
+
+### Fase 3 — Contrato de respuesta estructurado (varias sesiones, la más grande)
+
+La migración de mayor alcance — tocar cada `tools/*.py` para devolver
+`structuredContent` además de texto. Diseñada para hacerse en paralelo con
+trabajo de fuentes nuevas, no como un bloque dedicado.
+
+1. Definir el modelo base de resultado (fuente, URL, fecha de consulta,
+   fecha de corte, límites) como un `TypedDict`/dataclass compartido en
+   `helpers/format_out.py` o un módulo nuevo.
+2. Migrar una fuente piloto completa (sugerido: BCE, ya tiene el contrato
+   `metadatos` más maduro) a `outputSchema` + `structuredContent`,
+   manteniendo `format="text"` como salida legada.
+3. Reemplazar errores de aplicación devueltos como string por errores de
+   ejecución MCP (`isError: true`) — empezar por la misma fuente piloto.
+4. Repetir por fuente, sin fecha límite fija — cada fuente migrada es una
+   mejora entregada, no depende de que las demás también migren.
+5. Retirar `format` (o dejarlo como alias de solo-texto) solo después de
+   que los clientes reales del proyecto confirmen que consumen el resultado
+   estructurado.
+
+Antes de retirar más tools en cualquier fase conviene medir llamadas reales,
+errores de selección y herramientas que nunca se usan. No se debe reducir la
+superficie únicamente para alcanzar un número arbitrario.
 
 ## Fuentes oficiales consultadas
 
