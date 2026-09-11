@@ -120,6 +120,9 @@ from tools.search_contratos import register_search_contratos_tool
 from tools.search_datasets import register_search_datasets_tool
 from tools.search_ecuador import register_search_ecuador_tool
 from tools.search_eventos_riesgo import register_search_eventos_riesgo_tool
+from tools.search_gacetas_inmunoprevenibles import (
+    register_search_gacetas_inmunoprevenibles_tool,
+)
 from tools.search_inamhi_capas import register_search_inamhi_capas_tool
 from tools.search_indicadores_bce import register_search_indicadores_bce_tool
 from tools.search_inec_estadisticas import register_search_inec_estadisticas_tool
@@ -288,3 +291,5 @@ def register_tools(mcp: MCPServer) -> None:
 
     register_search_cepalstat_indicadores_tool(mcp)
     register_get_cepalstat_indicador_tool(mcp)
+
+    register_search_gacetas_inmunoprevenibles_tool(mcp)

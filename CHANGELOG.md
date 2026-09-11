@@ -14,6 +14,17 @@
 
 ### Added
 
+- **MSP Gacetas de Inmunoprevenibles** (`search_gacetas_inmunoprevenibles`) —
+  weekly vaccine-preventable-disease epidemiological bulletins (Semana
+  Epidemiológica), 2019-present, 362 PDFs across 9 archive pages whose
+  filename convention changed 5 times over the archive's history. Page
+  discovery goes through MSP's WordPress REST API rather than a hardcoded
+  year list, so future years surface automatically.
+- **`get_organization_info` gained a `query` parameter** and no longer
+  truncates `format=json` to 25 datasets — needed to make large CKAN
+  organizations with no dedicated tool (SRI genérico 127 packages, MEF
+  genérico 97, IEPS 106, COSEDE 88, IPAIP 70) actually browsable instead of
+  requiring an exact slug guess and hitting a silent truncation.
 - **CEPALSTAT** (`search_cepalstat_indicadores`, `get_cepalstat_indicador`) —
   CEPAL/ECLAC's regional statistics API, 2,059 indicators across
   Demográficos y sociales, Económicos, Ambientales, and Temas
