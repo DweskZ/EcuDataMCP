@@ -1,5 +1,10 @@
 [
   {
+    "version": "0.8.8",
+    "date": "2026-09-10",
+    "summary": "BCE National Accounts and publication calendar, SENESCYT's SIAU/CTI statistics and Higher Education Library, CEPALSTAT (CEPAL's regional indicator API, filtered to Ecuador by default), IADB's open-data portal as a new source=\"iadb\" on the generic CKAN tools, and MSP's weekly vaccine-preventable-disease gazette archive. get_organization_info gained a text filter and no longer truncates large organizations at 25 datasets. Fixes redundant ZIP re-hashing in the IEM pipeline."
+  },
+  {
     "version": "0.8.7",
     "date": "2026-09-07",
     "summary": "AIP data sheets for Ecuadorian aerodromes and helipads (DGAC) and ARCSA's live sanitary registry by category, .xlsb preview support, and a download cap raised to 20 MB for XLSX/XLSB/ODS. Removes the SRI Saiku tools (endpoint confirmed unreachable in live verification)."
