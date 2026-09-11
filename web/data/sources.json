@@ -215,6 +215,24 @@
             "coverage": "contenido.bce.fin.ec",
             "url": "https://contenido.bce.fin.ec",
             "status": "live"
+          },
+          {
+            "id": "bce-cuentas-nacionales",
+            "name": "Cuentas Nacionales",
+            "tag": "BCE",
+            "description": "Cuentas anuales, trimestrales y regionales, retropolación del PIB desde 1965, matrices insumo-producto, TOU, CEI, MEI e IMAEC mensual",
+            "coverage": "contenido.bce.fin.ec",
+            "url": "https://contenido.bce.fin.ec",
+            "status": "live"
+          },
+          {
+            "id": "bce-calendario",
+            "name": "Calendario de publicaciones",
+            "tag": "BCE",
+            "description": "Fechas programadas de publicación para el año completo, por categoría y periodicidad",
+            "coverage": "contenido.bce.fin.ec",
+            "url": "https://contenido.bce.fin.ec",
+            "status": "live"
           }
         ]
       },
@@ -413,6 +431,29 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "SENESCYT",
+        "sources": [
+          {
+            "id": "senescyt-siau",
+            "name": "SIAU: estadísticas de educación superior y CTI",
+            "tag": "SENESCYT",
+            "description": "Fichas metodológicas, reportes de indicadores, índice de competitividad, inventario de indicadores CTI",
+            "coverage": "siau.senescyt.gob.ec",
+            "url": "https://siau.senescyt.gob.ec/estadisticas-de-educacion-superior-ciencia-tecnologia-e-innovacion/",
+            "status": "live"
+          },
+          {
+            "id": "senescyt-biblioteca",
+            "name": "Biblioteca de Educación Superior",
+            "tag": "SENESCYT",
+            "description": "~1.259 documentos (PAC, normativa LOES/SNNA, acuerdos, indicadores ACTI) en 17 categorías",
+            "coverage": "educacion.gob.ec/edusuperior",
+            "url": "https://educacion.gob.ec/edusuperior/biblioteca/",
+            "status": "live"
+          }
+        ]
       }
     ]
   },
@@ -588,7 +629,7 @@
   {
     "id": "salud",
     "theme": "Salud",
-    "lede": "El registro sanitario vigente de alimentos, medicamentos y dispositivos médicos.",
+    "lede": "El registro sanitario vigente de alimentos, medicamentos y dispositivos médicos, más la vigilancia epidemiológica semanal del MSP.",
     "institutions": [
       {
         "name": "ARCSA",
@@ -600,6 +641,20 @@
             "description": "Base de Registros Emitidos: alimentos, medicamentos, cosméticos, dispositivos médicos y más (27 categorías)",
             "coverage": "controlsanitario.gob.ec",
             "url": "https://www.controlsanitario.gob.ec/base-de-datos/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Ministerio de Salud Pública (MSP)",
+        "sources": [
+          {
+            "id": "msp-gacetas-inmunoprevenibles",
+            "name": "Gacetas de Inmunoprevenibles",
+            "tag": "MSP",
+            "description": "Boletines semanales de vigilancia de enfermedades prevenibles por vacunación, 2019-presente",
+            "coverage": "salud.gob.ec",
+            "url": "https://www.salud.gob.ec/gacetas-inmunoprevenibles/",
             "status": "live"
           }
         ]
@@ -621,6 +676,41 @@
             "description": "Reportes estadísticos mensuales (2017-2026) y boletines anuales/temáticos (2015-2024)",
             "coverage": "arcotel.gob.ec",
             "url": "https://www.arcotel.gob.ec",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fuentes-internacionales",
+    "theme": "Fuentes internacionales con foco Ecuador",
+    "lede": "Catálogos regionales/globales donde Ecuador es una entrada consultable, no una fuente exclusiva — úsalos para comparar a Ecuador con la región.",
+    "institutions": [
+      {
+        "name": "CEPAL",
+        "sources": [
+          {
+            "id": "cepalstat",
+            "name": "CEPALSTAT",
+            "tag": "CEPAL",
+            "description": "2.059 indicadores regionales de CEPAL; cada consulta filtra a Ecuador por defecto",
+            "coverage": "api-cepalstat.cepal.org",
+            "url": "https://statistics.cepal.org/portal/cepalstat/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "BID (IADB)",
+        "sources": [
+          {
+            "id": "iadb-ckan",
+            "name": "Datos Abiertos del BID",
+            "tag": "BID",
+            "description": "Latin Macro Watch (665 recursos, 26 países) y la Database of Political Institutions del Banco Mundial/BID — portal CKAN estándar, accesible con source=\"iadb\" en los tools CKAN genéricos",
+            "coverage": "data.iadb.org",
+            "url": "https://data.iadb.org",
             "status": "live"
           }
         ]

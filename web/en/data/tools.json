@@ -120,7 +120,7 @@
             "name": "source",
             "type": "str",
             "default": "'nacional'",
-            "description": "\"nacional\" (default, www.datosabiertos.gob.ec) or \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal)"
+            "description": "\"nacional\" (default, www.datosabiertos.gob.ec), \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal), \"latacunga\" (datosabiertos.latacunga.gob.ec, independent municipal portal), or \"iadb\" (data.iadb.org, IADB's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch and World Bank/IADB indicators)"
           },
           {
             "name": "format",
@@ -151,7 +151,7 @@
             "name": "source",
             "type": "str",
             "default": "'nacional'",
-            "description": "\"nacional\" (default, www.datosabiertos.gob.ec) or \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal)"
+            "description": "\"nacional\" (default, www.datosabiertos.gob.ec), \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal), \"latacunga\" (datosabiertos.latacunga.gob.ec, independent municipal portal), or \"iadb\" (data.iadb.org, IADB's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch and World Bank/IADB indicators)"
           },
           {
             "name": "format",
@@ -176,7 +176,7 @@
             "name": "source",
             "type": "str",
             "default": "'nacional'",
-            "description": "\"nacional\" (default, www.datosabiertos.gob.ec) or \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal)"
+            "description": "\"nacional\" (default, www.datosabiertos.gob.ec), \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal), \"latacunga\" (datosabiertos.latacunga.gob.ec, independent municipal portal), or \"iadb\" (data.iadb.org, IADB's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch and World Bank/IADB indicators)"
           },
           {
             "name": "format",
@@ -201,7 +201,7 @@
             "name": "source",
             "type": "str",
             "default": "'nacional'",
-            "description": "\"nacional\" (default, www.datosabiertos.gob.ec) or \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal)"
+            "description": "\"nacional\" (default, www.datosabiertos.gob.ec), \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal), \"latacunga\" (datosabiertos.latacunga.gob.ec, independent municipal portal), or \"iadb\" (data.iadb.org, IADB's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch and World Bank/IADB indicators)"
           },
           {
             "name": "format",
@@ -226,7 +226,7 @@
             "name": "source",
             "type": "str",
             "default": "'nacional'",
-            "description": "\"nacional\" (default, www.datosabiertos.gob.ec) or \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal)"
+            "description": "\"nacional\" (default, www.datosabiertos.gob.ec), \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal), \"latacunga\" (datosabiertos.latacunga.gob.ec, independent municipal portal), or \"iadb\" (data.iadb.org, IADB's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch and World Bank/IADB indicators)"
           },
           {
             "name": "format",
@@ -257,7 +257,7 @@
             "name": "source",
             "type": "str",
             "default": "'nacional'",
-            "description": "\"nacional\" (default, www.datosabiertos.gob.ec) or \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal)"
+            "description": "\"nacional\" (default, www.datosabiertos.gob.ec), \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal), \"latacunga\" (datosabiertos.latacunga.gob.ec, independent municipal portal), or \"iadb\" (data.iadb.org, IADB's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch and World Bank/IADB indicators)"
           },
           {
             "name": "format",
@@ -282,7 +282,7 @@
             "name": "source",
             "type": "str",
             "default": "'nacional'",
-            "description": "\"nacional\" (default, www.datosabiertos.gob.ec) or \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal)"
+            "description": "\"nacional\" (default, www.datosabiertos.gob.ec), \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal), \"latacunga\" (datosabiertos.latacunga.gob.ec, independent municipal portal), or \"iadb\" (data.iadb.org, IADB's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch and World Bank/IADB indicators)"
           },
           {
             "name": "format",
@@ -337,7 +337,7 @@
             "name": "source",
             "type": "str",
             "default": "'nacional'",
-            "description": "\"nacional\" (default, www.datosabiertos.gob.ec) or \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal)"
+            "description": "\"nacional\" (default, www.datosabiertos.gob.ec), \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal), \"latacunga\" (datosabiertos.latacunga.gob.ec, independent municipal portal), or \"iadb\" (data.iadb.org, IADB's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch and World Bank/IADB indicators)"
           },
           {
             "name": "format",
@@ -374,7 +374,7 @@
             "name": "source",
             "type": "str",
             "default": "'nacional'",
-            "description": "\"nacional\" (default, www.datosabiertos.gob.ec) or \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal)"
+            "description": "\"nacional\" (default, www.datosabiertos.gob.ec), \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal), \"latacunga\" (datosabiertos.latacunga.gob.ec, independent municipal portal), or \"iadb\" (data.iadb.org, IADB's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch and World Bank/IADB indicators)"
           },
           {
             "name": "format",
@@ -1244,7 +1244,7 @@
             "name": "source",
             "type": "str",
             "default": "'nacional'",
-            "description": "\"nacional\" (default, www.datosabiertos.gob.ec) or \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal)"
+            "description": "\"nacional\" (default, www.datosabiertos.gob.ec), \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal), \"latacunga\" (datosabiertos.latacunga.gob.ec, independent municipal portal), or \"iadb\" (data.iadb.org, IADB's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch and World Bank/IADB indicators)"
           },
           {
             "name": "format",
@@ -1257,13 +1257,19 @@
       },
       {
         "name": "get_organization_info",
-        "description": "Info about an organization, with a list of its datasets.",
+        "description": "Info about an organization, with datasets filterable by text.",
         "params": [
           {
             "name": "organization_id",
             "type": "str",
             "default": null,
             "description": "The organization slug (e.g. \"sri-servicio-de-rentas-internas\")"
+          },
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Free text matched (accent-insensitive) against each dataset's title. Empty returns all datasets."
           },
           {
             "name": "source",
@@ -1278,7 +1284,7 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Get detailed information about a public institution and its published datasets. Returns the institution name, description, dataset count, and a list of its datasets."
+        "long_description": "Get detailed information about a public institution and its published datasets — the main way to browse a CKAN organization's full package list, including large ones with no dedicated tool of their own (e.g. \"sri-servicio-de-rentas-internas\" —127 packages—, \"ministerio-de-economia-y-finanzas\" —97—, \"ieps\" —106—, \"cosede\" —88—, \"ipaip\" —70—, \"mag\" —69—; get the exact slug from search_organizations first if unsure). format=json always returns every dataset; format=text caps display and tells you how many more exist — use query to narrow a large organization down instead of scrolling past the cap."
       },
       {
         "name": "list_categories",
@@ -1288,7 +1294,7 @@
             "name": "source",
             "type": "str",
             "default": "'nacional'",
-            "description": "\"nacional\" (default, www.datosabiertos.gob.ec) or \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal)"
+            "description": "\"nacional\" (default, www.datosabiertos.gob.ec), \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal), \"latacunga\" (datosabiertos.latacunga.gob.ec, independent municipal portal), or \"iadb\" (data.iadb.org, IADB's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch and World Bank/IADB indicators)"
           },
           {
             "name": "format",
@@ -1319,7 +1325,7 @@
             "name": "source",
             "type": "str",
             "default": "'nacional'",
-            "description": "\"nacional\" (default, www.datosabiertos.gob.ec) or \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal)"
+            "description": "\"nacional\" (default, www.datosabiertos.gob.ec), \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal), \"latacunga\" (datosabiertos.latacunga.gob.ec, independent municipal portal), or \"iadb\" (data.iadb.org, IADB's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch and World Bank/IADB indicators)"
           },
           {
             "name": "format",
@@ -1681,6 +1687,111 @@
           }
         ],
         "long_description": "Lists BCE's disaggregated foreign-trade price-index file links — import prices by economic-use category and export prices by individual product (crude oil, shrimp, banana, cacao, copper, gold, roses), each with separate price/value/volume sheets and variation sheets. Distinct from search_indicadores_bce's BCEData catalog (only three aggregate series) and from search_bce_indices (doesn't cover trade prices). Returns direct URLs, not file contents."
+      },
+      {
+        "name": "search_bce_calendario",
+        "description": "BCE's scheduled statistical-publication calendar.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Free text matched against the publication name or its observations note (accent-insensitive). Empty matches all."
+          },
+          {
+            "name": "categoria",
+            "type": "str",
+            "default": "''",
+            "description": "Exact category filter (accent-insensitive), e.g. \"cuentas nacionales\", \"balanza de pagos y comercio exterior\"."
+          },
+          {
+            "name": "periodicidad",
+            "type": "str",
+            "default": "''",
+            "description": "Exact periodicity filter, e.g. \"Mensual\", \"Anual\", \"Trimestral\", \"Semanal\"."
+          },
+          {
+            "name": "desde",
+            "type": "str",
+            "default": "''",
+            "description": "Restrict to release date >= this date (YYYY-MM-DD)."
+          },
+          {
+            "name": "hasta",
+            "type": "str",
+            "default": "''",
+            "description": "Restrict to release date <= this date (YYYY-MM-DD)."
+          },
+          {
+            "name": "solo_proximas",
+            "type": "bool",
+            "default": "False",
+            "description": "If true, only releases scheduled today or later."
+          },
+          {
+            "name": "limit",
+            "type": "int",
+            "default": "50",
+            "description": "Max results (1-200, default 50)."
+          },
+          {
+            "name": "offset",
+            "type": "int",
+            "default": "0",
+            "description": "Pagination offset over the matched set."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Search BCE's own statistical publication calendar — scheduled release dates for IEM, Cuentas Nacionales, IMAEC, balance of payments, and more, each with category, periodicity, reference period, and a direct link to the publication's page. Distinct from search_bce_publicaciones (a rolling window of ~30 already-published items, no future dates): this is BCE's own forward-looking release schedule for the full calendar year."
+      },
+      {
+        "name": "search_bce_cuentas_nacionales",
+        "description": "BCE's National Accounts publication pages.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Free text matched (accent-insensitive) against the page's title, category, or id, e.g. \"trimestral\", \"mip\", \"regional\". Empty returns all pages."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lists BCE Cuentas Nacionales page families — annual, quarterly, and regional national accounts packages, the historical retropolation series (PIB back to 1965), input-output and social-accounting matrices, fixed-base (2007=100) series, the bioeconomy thematic satellite account, and IMAEC monthly results. Distinct from search_indicadores_bce (BCEData's own PIB aggregates) and get_bce_iem_table (IEM's monthly bulletin tables): this covers the actual national-accounts publication packages — Tabla de Oferta y Utilización (TOU), Cuadro Económico Integrado (CEI), Matriz de Empleo e Ingresos (MEI), Matriz Insumo-Producto, and their methodology documents. Returns summaries only — pass pagina_id to get_bce_cuentas_nacionales_archivo to read one page's file list."
+      },
+      {
+        "name": "get_bce_cuentas_nacionales_archivo",
+        "description": "File list for one BCE National Accounts page.",
+        "params": [
+          {
+            "name": "pagina_id",
+            "type": "str",
+            "default": null,
+            "description": "The page's id, from search_bce_cuentas_nacionales' pagina_id field (e.g. \"boletin-de-cuentas-nacionales-trimestrales\")."
+          },
+          {
+            "name": "max_archivos",
+            "type": "int",
+            "default": "50",
+            "description": "Cap on returned files, 1-200."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Reads the file list for one BCE Cuentas Nacionales page (from search_bce_cuentas_nacionales). Each item is one published file (report, data package, or methodology document) with a label, direct URL, and format. Returns direct URLs, not file contents — download them yourself or via download_resource."
       }
     ]
   },
@@ -2297,7 +2408,7 @@
             "name": "source",
             "type": "str",
             "default": "'nacional'",
-            "description": "\"nacional\" (default) or \"cuenca\" (Cuenca municipal portal)"
+            "description": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), \"latacunga\" (Latacunga municipal portal), or \"iadb\" (IADB's portal, not Ecuador-only)"
           },
           {
             "name": "preview_rows",
@@ -2834,6 +2945,137 @@
           }
         ],
         "long_description": "Lists Ecuador's sectoral minimum wage table documents — wage floors per branch of economic activity, set by the Consejo Nacional de Trabajo y Salarios, distinct from the single national Salario Básico Unificado. Scraped from the Ministry of Labor's document library, which actually responds and lists stable per-document download links unlike the ministry's dynamic pages. Confirmed coverage: one entry per year for 2020-2025. No 2026 table has been published — the 2025 table remains in force by default."
+      },
+      {
+        "name": "search_senescyt_estadisticas",
+        "description": "SENESCYT's SIAU reports: higher-education and science/tech/innovation statistics.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Free text matched (accent-insensitive) against the file's seccion, titulo, tipo (\"wpdm\"/\"directo\"), or URL. Empty returns all files."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lists SENESCYT's SIAU higher-education/science-technology-innovation (CTI) statistics reports: methodology sheets, annual indicator reports (2021/2022/2024), the national competitiveness index, the CTI/ancestral-knowledge indicator inventory, labor-demand characterization, and the COVID-19 impact study on higher education. Separate from this project's existing SENESCYT CKAN coverage (matrícula, docentes, becarios), the captcha-gated título registry (not automatable), and MINEDEC's basic-education matrícula (search_minedec_matricula)."
+      },
+      {
+        "name": "list_senescyt_biblioteca_categorias",
+        "description": "Categories in the Higher Education Library (MINEDEC/SENESCYT).",
+        "params": [
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lists the Viceministerio de Educación Superior's Biblioteca document-library categories (educacion.gob.ec/edusuperior/biblioteca/) — PAC por año, LOES/SNNA regulations, institutional agreements back to 2015, special exams/audits, ACTI indicators, and more; ~1,259 documents across 17 top-level categories. A different source from search_senescyt_estadisticas (a small, 12-entry curated archive on siau.senescyt.gob.ec) and search_minedec_matricula (basic-education enrollment, same domain but a plain page, not this library)."
+      },
+      {
+        "name": "get_senescyt_biblioteca_categoria_archivos",
+        "description": "Documents in one Higher Education Library category.",
+        "params": [
+          {
+            "name": "categoria",
+            "type": "str",
+            "default": null,
+            "description": "A category \"id\" or \"nombre\" from list_senescyt_biblioteca_categorias (nombre match is accent/case-insensitive)."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lists one top-level category's documents. Some categories nest sub-categories several levels deep — each document's \"subgrupo\" field is only the nearest nested header, not a full breadcrumb. Format is reported as \"DESCONOCIDO\": the download link carries no file extension."
+      },
+      {
+        "name": "search_gacetas_inmunoprevenibles",
+        "description": "Weekly vaccine-preventable-disease epidemiological gazettes (MSP).",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Free text matched (accent-insensitive) against the file's titulo, anio, semana, or tipo (\"general\"/\"tosferina\"). Empty returns all files."
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lists MSP's weekly vaccine-preventable-disease epidemiological gazettes (\"Gaceta de Inmunoprevenibles\", Semana Epidemiológica bulletins) — 2019 through the current week, 362 PDFs confirmed live. Page discovery is dynamic (via MSP's WordPress REST API), so new weeks/years surface automatically. Since 2024 some weeks ship a disease-specific companion report (tosferina/whooping cough) alongside the general bulletin. One of several parallel MSP weekly gazette series (vectoriales, enfermedades de la piel/reemergentes, indicadores exist too but aren't covered by this tool yet)."
+      }
+    ]
+  },
+  {
+    "category": "International sources",
+    "tools": [
+      {
+        "name": "search_cepalstat_indicadores",
+        "description": "Search CEPAL/ECLAC's CEPALSTAT regional indicator catalog.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Free text matched (accent-insensitive) against the indicator's name or its thematic-area breadcrumb, e.g. \"poblacion\", \"pobreza\", \"comercio exterior\". Empty returns the full catalog (large — prefer a query)."
+          },
+          {
+            "name": "lang",
+            "type": "str",
+            "default": "'es'",
+            "description": "\"es\" (default) or \"en\""
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Search CEPALSTAT (CEPAL/ECLAC's public statistics API) for an indicator by name — 2,059 indicators across Demográficos y sociales, Económicos, Ambientales, and Temas transversales (incluye los ODS). NOT an Ecuador-only source: CEPALSTAT is CEPAL's regional catalog for all of Latin America and the Caribbean. Use this to find the indicator_id, then get_cepalstat_indicador to fetch Ecuador's observations specifically."
+      },
+      {
+        "name": "get_cepalstat_indicador",
+        "description": "One CEPALSTAT indicator's observations, filtered to a country (Ecuador by default).",
+        "params": [
+          {
+            "name": "indicator_id",
+            "type": "int",
+            "default": null,
+            "description": "An \"indicator_id\" from search_cepalstat_indicadores."
+          },
+          {
+            "name": "pais",
+            "type": "str",
+            "default": "'Ecuador'",
+            "description": "Country to filter to (accent-insensitive, e.g. \"Ecuador\", \"Peru\"). Empty string fetches every country the indicator covers — can be a few MB for a rich indicator."
+          },
+          {
+            "name": "lang",
+            "type": "str",
+            "default": "'es'",
+            "description": "\"es\" (default) or \"en\""
+          },
+          {
+            "name": "format",
+            "type": "str",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Fetch one CEPALSTAT indicator's observations, filtered to one country (Ecuador by default) so the response stays small — CEPAL's raw API returns every country in the region (and often the world) per indicator otherwise, confirmed live at ~2.5 MB unfiltered vs. ~85 KB filtered to one country. Each returned record decodes CEPALSTAT's raw dimension ids into readable labels (e.g. \"Sexo\": \"Mujeres\", \"Años\": \"1975\") using that same indicator's own dimension catalog — not every indicator has the same dimensions."
       }
     ]
   }
