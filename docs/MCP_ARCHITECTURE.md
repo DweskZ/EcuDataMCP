@@ -29,6 +29,24 @@ no implica que todos los cambios deban hacerse de una sola vez.
 > (`list_arcsa_categorias`, `get_arcsa_categoria_archivos`) — el total sube
 > de 100 a 102.
 
+> **Actualizado 2026-09-10.** Se agregaron 13 tools más desde la última
+> revisión: BCE Cuentas Nacionales (`search_bce_cuentas_nacionales`,
+> `get_bce_cuentas_nacionales_archivo`), calendario de publicaciones del BCE
+> (`search_bce_calendario`), SENESCYT SIAU y Biblioteca (`search_senescyt_estadisticas`,
+> `list_senescyt_biblioteca_categorias`, `get_senescyt_biblioteca_categoria_archivos`),
+> CEPALSTAT (`search_cepalstat_indicadores`, `get_cepalstat_indicador`), y
+> Gacetas de Inmunoprevenibles del MSP (`search_gacetas_inmunoprevenibles`) —
+> el total sube de 102 a 115. Sin duplicación nueva (revisado nombre por
+> nombre contra el criterio de esta página): los pares `search_X`/`get_X_archivo`
+> (BCE Cuentas Nacionales, SENESCYT Biblioteca) son flujos de dos pasos, la
+> misma forma que la regla 4 ya protege — no candidatos a fusión. La
+> ampliación de `source=` a `"iadb"` en los tools CKAN genéricos existentes
+> (en vez de tools nuevas por-fuente) y el nuevo parámetro `query` en
+> `get_organization_info` (en vez de tools nuevos por-organización para
+> SRI/MEF genéricos) son ejemplos directos de la recomendación de esta
+> página de preferir una tool parametrizada sobre duplicar la superficie
+> pública — ver docs/RESEARCH.md § Vigésimo sexta pasada.
+
 ## Conclusión corta
 
 El servidor tiene 103 tools registradas. Ese número no es, por sí solo, un
