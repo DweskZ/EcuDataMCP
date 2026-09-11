@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.8 — 2026-09-10
+
 ### Fixed
 
 - **`search_bce_iem(hash_archivos=true)` / `scripts/audit_bce_iem.py --hash-xlsx`
