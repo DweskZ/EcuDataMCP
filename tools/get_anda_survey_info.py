@@ -1,8 +1,12 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import anda_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 _MAX_TEXT_CHARS = 800
 
@@ -15,9 +19,11 @@ def _trim(text: str, n: int = _MAX_TEXT_CHARS) -> str | None:
 
 
 def register_get_anda_survey_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver metadata de una encuesta ANDA", annotations=READ_ONLY)
     @log_tool
-    async def get_anda_survey_info(idno: str, format: str = "text") -> str:
+    async def get_anda_survey_info(
+        idno: str, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Get full metadata for one ANDA (INEC) survey/census by its idno.
 
@@ -35,11 +41,7 @@ def register_get_anda_survey_info_tool(mcp: MCPServer) -> None:
         try:
             dataset = await anda_client.get_survey(idno)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "idno": idno},
-                format,
-                text_builder=lambda d: f"Error al obtener la encuesta: {d['error']}",
-            )
+            raise ToolError(f"Error al obtener la encuesta: {e}") from e
 
         metadata = dataset.get("metadata") or {}
         study_desc = metadata.get("study_desc") or {}
@@ -110,4 +112,4 @@ def register_get_anda_survey_info_tool(mcp: MCPServer) -> None:
                 parts.append(f"URL: {data['url']}")
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

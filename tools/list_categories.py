@@ -1,14 +1,21 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import ckan_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_list_categories_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Listar categorías temáticas", annotations=READ_ONLY)
     @log_tool
-    async def list_categories(source: str = "nacional", format: str = "text") -> str:
+    async def list_categories(
+        source: ckan_client.CkanSource = "nacional",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         List all thematic categories of Ecuador's open data portal.
 
@@ -29,11 +36,7 @@ def register_list_categories_tool(mcp: MCPServer) -> None:
         try:
             groups = await ckan_client.list_groups(source=source)
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(f"Error: {e}") from e
 
         groups_sorted = sorted(
             groups, key=lambda g: g.get("package_count", 0), reverse=True
@@ -52,7 +55,8 @@ def register_list_categories_tool(mcp: MCPServer) -> None:
         }
 
         if not groups_sorted:
-            return render_output(
+            # Legitimate empty result (zero categories found), not a failure.
+            return render_structured(
                 payload,
                 format,
                 text_builder=lambda _: "No se encontraron categorías.",
@@ -73,4 +77,4 @@ def register_list_categories_tool(mcp: MCPServer) -> None:
             )
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

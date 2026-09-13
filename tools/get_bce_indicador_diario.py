@@ -1,12 +1,16 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import bce_indicadores_diarios_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_bce_indicador_diario_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver serie de un indicador diario del BCE", annotations=READ_ONLY)
     @log_tool
     async def get_bce_indicador_diario(
         archivo: str,
@@ -14,8 +18,8 @@ def register_get_bce_indicador_diario_tool(mcp: MCPServer) -> None:
         ultimos_n: int = 30,
         desde: str = "",
         hasta: str = "",
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Fetch one BCE daily/monthly indicator's time series (e.g. Riesgo
         País), bounded to a window — never the full series (some run
@@ -47,11 +51,7 @@ def register_get_bce_indicador_diario_tool(mcp: MCPServer) -> None:
                 archivo, codigo, ultimos_n=ultimos_n, desde=desde or None, hasta=hasta or None
             )
         except ValueError as e:
-            return render_output(
-                {"error": str(e), "archivo": archivo, "codigo": codigo},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(f"Error: {e}") from e
 
         def to_text(data: dict) -> str:
             rc = data["rango_completo"]
@@ -74,4 +74,4 @@ def register_get_bce_indicador_diario_tool(mcp: MCPServer) -> None:
                     parts.append(f"  {d['fecha']}: {valores}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

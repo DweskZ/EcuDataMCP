@@ -1,7 +1,8 @@
-import json
 import socket
 
+import pytest
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from tools.read_pdf import register_read_pdf_tool
 
@@ -38,7 +39,7 @@ async def test_read_pdf_returns_page_text_as_json(httpx_mock, monkeypatch):
 
     tool = _make_tool()
     result = await tool(url=url, format="json")
-    payload = json.loads(result)
+    payload = result.structured_content
 
     assert payload["total_pages"] == 2
     assert payload["pages"][0]["text"] == "Reglamento articulo 1"
@@ -53,9 +54,10 @@ async def test_read_pdf_text_format_includes_page_markers(httpx_mock, monkeypatc
 
     tool = _make_tool()
     result = await tool(url=url, format="text")
+    text = result.content[0].text
 
-    assert "Página 1" in result
-    assert "Contenido de prueba" in result
+    assert "Página 1" in text
+    assert "Contenido de prueba" in text
 
 
 async def test_read_pdf_invalid_page_range_returns_actionable_error(httpx_mock, monkeypatch):
@@ -65,10 +67,8 @@ async def test_read_pdf_invalid_page_range_returns_actionable_error(httpx_mock, 
     httpx_mock.add_response(url=url, content=raw)
 
     tool = _make_tool()
-    result = await tool(url=url, pages="abc", format="json")
-    payload = json.loads(result)
-
-    assert "Rango de páginas inválido" in payload["error"]
+    with pytest.raises(ToolError, match="Rango de páginas inválido"):
+        await tool(url=url, pages="abc", format="json")
 
 
 async def test_read_pdf_corrupt_file_returns_actionable_error(httpx_mock, monkeypatch):
@@ -77,10 +77,8 @@ async def test_read_pdf_corrupt_file_returns_actionable_error(httpx_mock, monkey
     httpx_mock.add_response(url=url, content=b"esto no es un pdf")
 
     tool = _make_tool()
-    result = await tool(url=url, format="json")
-    payload = json.loads(result)
-
-    assert "no se pudo leer como PDF" in payload["error"]
+    with pytest.raises(ToolError, match="no se pudo leer como PDF"):
+        await tool(url=url, format="json")
 
 
 async def test_read_pdf_no_extractable_text_gives_ocr_hint(httpx_mock, monkeypatch):
@@ -98,6 +96,6 @@ async def test_read_pdf_no_extractable_text_gives_ocr_hint(httpx_mock, monkeypat
 
     tool = _make_tool()
     result = await tool(url=url, format="json")
-    payload = json.loads(result)
+    payload = result.structured_content
 
     assert payload["error"] == "sin_texto_extraible"

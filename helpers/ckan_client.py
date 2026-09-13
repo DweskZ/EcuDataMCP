@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any
+from typing import Any, Literal
 
 import httpx
 
@@ -14,6 +14,11 @@ from helpers.user_agent import USER_AGENT
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 _TIMEOUT = 20.0
+
+# Closed set of CKAN catalogs this client can talk to -- shared by every
+# tools/*.py CKAN tool's `source` parameter so a client sees the valid
+# values in the schema itself, not only in a docstring.
+CkanSource = Literal["nacional", "cuenca", "latacunga", "iadb"]
 
 
 async def _fetch_json(

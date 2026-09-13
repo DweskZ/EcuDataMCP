@@ -1,16 +1,22 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import cepalstat_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_cepalstat_indicadores_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar indicadores en CEPALSTAT", annotations=READ_ONLY)
     @log_tool
     async def search_cepalstat_indicadores(
-        query: str = "", lang: str = "es", format: str = "text"
-    ) -> str:
+        query: str = "",
+        lang: Literal["es", "en"] = "es",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Search CEPALSTAT (CEPAL/ECLAC's public statistics API,
         api-cepalstat.cepal.org) for an indicator by name — 2,059
@@ -35,11 +41,7 @@ def register_search_cepalstat_indicadores_tool(mcp: MCPServer) -> None:
         try:
             result = await cepalstat_client.search_indicadores(query=query, lang=lang)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "query": query or None},
-                format,
-                text_builder=lambda d: f"Error al buscar indicadores en CEPALSTAT: {d['error']}",
-            )
+            raise ToolError(f"Error al buscar indicadores en CEPALSTAT: {e}") from e
 
         def to_text(data: dict) -> str:
             indicadores = data.get("indicadores") or []
@@ -60,4 +62,4 @@ def register_search_cepalstat_indicadores_tool(mcp: MCPServer) -> None:
                 parts.append(f"... y {len(indicadores) - 50} más (usa format=json para verlos todos)")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

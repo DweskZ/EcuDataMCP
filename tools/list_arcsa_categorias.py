@@ -1,14 +1,19 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
 
 from helpers import arcsa_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_list_arcsa_categorias_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Listar categorías del registro sanitario ARCSA", annotations=READ_ONLY)
     @log_tool
-    async def list_arcsa_categorias(format: str = "text") -> str:
+    async def list_arcsa_categorias(
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         List ARCSA's "Base de Registros Emitidos" categories
         (controlsanitario.gob.ec/base-de-datos/) — the sanitary registry
@@ -46,4 +51,4 @@ def register_list_arcsa_categorias_tool(mcp: MCPServer) -> None:
             parts.append(f"Fuente: {data.get('url_fuente')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

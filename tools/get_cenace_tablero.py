@@ -1,14 +1,27 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import cenace_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_cenace_tablero_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver un tablero en vivo de CENACE", annotations=READ_ONLY)
     @log_tool
-    async def get_cenace_tablero(tablero: str, format: str = "text") -> str:
+    async def get_cenace_tablero(
+        tablero: Literal[
+            "produccion_tiempo_real",
+            "demanda_tiempo_real",
+            "operativa_diaria",
+            "acumulada_mensual",
+            "acumulada_anual",
+        ],
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Fetch one tablero (tab) of CENACE's live grid-operations snapshot
         (Ecuador's national electricity operator) — generation mix and
@@ -34,11 +47,7 @@ def register_get_cenace_tablero_tool(mcp: MCPServer) -> None:
         try:
             result = await cenace_client.get_tablero(tablero)
         except ValueError as e:
-            return render_output(
-                {"error": str(e), "tablero": tablero},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(str(e)) from e
 
         def to_text(data: dict) -> str:
             parts = [f"{data['titulo']} — {data['periodo']}", ""]
@@ -52,4 +61,4 @@ def register_get_cenace_tablero_tool(mcp: MCPServer) -> None:
                     parts.append(f"  {name}: {mw:,}".replace(",", " "))
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

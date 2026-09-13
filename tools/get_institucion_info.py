@@ -1,17 +1,21 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import gobec_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_institucion_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver detalle de una institución pública", annotations=READ_ONLY)
     @log_tool
     async def get_institucion_info(
-        institucion_id: str, format: str = "text"
-    ) -> str:
+        institucion_id: str, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Get detailed information about a public institution registered on gob.ec.
 
@@ -27,20 +31,10 @@ def register_get_institucion_info_tool(mcp: MCPServer) -> None:
         try:
             inst = await gobec_client.get_institucion(institucion_id)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "institucion_id": institucion_id},
-                format,
-                text_builder=lambda d: f"Error al obtener institución: {d['error']}",
-            )
+            raise ToolError(f"Error al obtener institución: {e}") from e
 
         if not inst:
-            return render_output(
-                {"error": "not_found", "institucion_id": institucion_id},
-                format,
-                text_builder=lambda d: (
-                    f"No se encontró la institución con ID '{d['institucion_id']}'."
-                ),
-            )
+            raise ToolError(f"No se encontró la institución con ID '{institucion_id}'.")
 
         nombre = inst.get("institucion") or inst.get("nombre") or "Desconocida"
         siglas = inst.get("siglas", "")
@@ -87,4 +81,4 @@ def register_get_institucion_info_tool(mcp: MCPServer) -> None:
             )
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

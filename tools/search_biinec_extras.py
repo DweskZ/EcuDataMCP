@@ -1,14 +1,19 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
 
 from helpers.biinec_extras import BIINEC_URL, search_extras
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_biinec_extras_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar registros exclusivos de BIINEC", annotations=READ_ONLY)
     @log_tool
-    async def search_biinec_extras(query: str = "", format: str = "text") -> str:
+    async def search_biinec_extras(
+        query: str = "", format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Check INEC's BIINEC ("Banco de Datos Abiertos") for data not found in
         search_anda or search_inec_estadisticas.
@@ -65,4 +70,4 @@ def register_search_biinec_extras_tool(mcp: MCPServer) -> None:
             )
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

@@ -1,20 +1,24 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import ckan_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_organizations_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar organizaciones publicadoras", annotations=READ_ONLY)
     @log_tool
     async def search_organizations(
         query: str = "",
         page: int = 1,
         page_size: int = 20,
-        source: str = "nacional",
-        format: str = "text",
-    ) -> str:
+        source: ckan_client.CkanSource = "nacional",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Search for public institutions that publish data on Ecuador's open data portal.
 
@@ -37,11 +41,7 @@ def register_search_organizations_tool(mcp: MCPServer) -> None:
                 query=query, limit=page_size, offset=offset, source=source
             )
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(f"Error: {e}") from e
 
         payload = {
             "query": query or None,
@@ -65,7 +65,8 @@ def register_search_organizations_tool(mcp: MCPServer) -> None:
         }
 
         if not orgs:
-            return render_output(
+            # Legitimate empty result (search matched zero organizations).
+            return render_structured(
                 payload,
                 format,
                 text_builder=lambda d: (
@@ -89,4 +90,4 @@ def register_search_organizations_tool(mcp: MCPServer) -> None:
                 parts.append("")
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

@@ -1,14 +1,20 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import sgr_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_list_sat_tsunami_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Listar estaciones del SAT de tsunami", annotations=READ_ONLY)
     @log_tool
-    async def list_sat_tsunami(limit: int = 30, format: str = "text") -> str:
+    async def list_sat_tsunami(
+        limit: int = 30, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         List tsunami early-warning SAT stations published by SGR (Gestión de Riesgos).
 
@@ -21,11 +27,7 @@ def register_list_sat_tsunami_tool(mcp: MCPServer) -> None:
         try:
             result = await sgr_client.list_sat_stations(limit=limit)
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: f"Error al listar estaciones SAT: {d['error']}",
-            )
+            raise ToolError(f"Error al listar estaciones SAT: {e}") from e
 
         def to_text(data: dict) -> str:
             stations = data.get("stations") or []
@@ -43,4 +45,4 @@ def register_list_sat_tsunami_tool(mcp: MCPServer) -> None:
                 )
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

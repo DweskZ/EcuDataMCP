@@ -1,6 +1,9 @@
-from mcp.server.mcpserver import MCPServer
+from typing import Any, Literal
 
-from helpers.format_out import render_output
+from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
+
+from helpers.format_out import render_structured
 from helpers.geo_data import (
     find_cantones,
     find_parroquias,
@@ -9,19 +12,20 @@ from helpers.geo_data import (
     list_provincias,
 )
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_lookup_ubicacion_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar división político-administrativa del Ecuador", annotations=READ_ONLY)
     @log_tool
     async def lookup_ubicacion(
         query: str = "",
         region: str = "",
         provincia: str = "",
         canton: str = "",
-        nivel: str = "auto",
-        format: str = "text",
-    ) -> str:
+        nivel: Literal["auto", "provincia", "canton", "parroquia"] = "auto",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Look up Ecuador DPA geography: provinces, cantons and parroquias (INEC codes).
 
@@ -71,17 +75,9 @@ def register_lookup_ubicacion_tool(mcp: MCPServer) -> None:
             if nivel_norm == "parroquia" and not (
                 query.strip() or canton.strip() or provincia.strip()
             ):
-                empty = {
-                    "error": "filtro_requerido",
-                    "hint": "Usa query, canton o provincia para listar parroquias",
-                }
-                return render_output(
-                    empty,
-                    format,
-                    text_builder=lambda d: (
-                        "Para parroquias indica query, canton= o provincia=. "
-                        "Ej: query='Tumbaco', canton='Quito', provincia='Pichincha'."
-                    ),
+                raise ToolError(
+                    "Para parroquias indica query, canton= o provincia=. "
+                    "Ej: query='Tumbaco', canton='Quito', provincia='Pichincha'."
                 )
             parrs = find_parroquias(
                 query=query.strip(),
@@ -118,7 +114,7 @@ def register_lookup_ubicacion_tool(mcp: MCPServer) -> None:
                 "canton": canton,
                 "nivel": nivel_norm,
             }
-            return render_output(
+            return render_structured(
                 empty,
                 format,
                 text_builder=lambda _: (
@@ -185,4 +181,4 @@ def register_lookup_ubicacion_tool(mcp: MCPServer) -> None:
             )
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

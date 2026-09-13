@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+### Changed
+
+- **MCP architecture cleanup, all 4 phases of `docs/MCP_ARCHITECTURE.md`.**
+  - Removed the 2 confirmed duplicate tools (`list_recent_datasets` folded
+    into `search_datasets(sort="recent")`; `list_capabilities` kept only as
+    a deprecated compatibility alias) and merged the ARCOTEL pair into
+    `search_arcotel(tipo=...)` — 115 → 113 tools.
+  - Added an `MCP_PROFILE` env var (`public`/`maintenance`/`all`, default
+    `all`) so `audit_bce_catalog`/`compare_bce_sources` (the 2 tools that
+    write local snapshot/report artifacts) can be split onto a separate
+    operator-only instance without touching the 111 read-only tools —
+    opt-in via `docker-compose.yml`'s `mcp-maintenance` service.
+  - Every tool now declares a Spanish `title` and MCP `annotations`
+    (read-only vs. writes-artifacts), and every genuinely closed-set
+    string parameter (`source`, `format`, and 13 others) is a typed
+    `Literal[...]` instead of a bare `str`. Regression test:
+    `tests/test_tool_metadata.py`.
+  - Every tool now returns native `structuredContent` alongside its
+    existing text (`format="text"`/`"json"` unchanged) via
+    `helpers/format_out.py::render_structured`. Genuine failures (API
+    errors, invalid input, size limits) now surface as MCP `isError: true`
+    (`mcp.server.mcpserver.exceptions.ToolError`) instead of a
+    fake-success string; legitimate empty results ("no se encontraron...")
+    stay normal successful responses. See `docs/RESPONSE_CONTRACT.md`.
+
 ## 0.8.8 — 2026-09-10
 
 ### Fixed

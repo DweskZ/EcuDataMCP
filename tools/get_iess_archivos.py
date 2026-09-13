@@ -1,23 +1,25 @@
-from typing import Literal
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import iess_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 _COLECCIONES = ("boletines", "estudios_actuariales", "informes_auditoria")
 
 
 def register_get_iess_archivos_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver documentos de una colección del IESS", annotations=READ_ONLY)
     @log_tool
     async def get_iess_archivos(
         coleccion: Literal["boletines", "estudios_actuariales", "informes_auditoria"],
         anio: int | None = None,
         query: str = "",
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         List one IESS (Instituto Ecuatoriano de Seguridad Social) document
         collection's actual documents, each resolved to a direct download
@@ -40,12 +42,8 @@ def register_get_iess_archivos_tool(mcp: MCPServer) -> None:
             format: text | json
         """
         if coleccion not in _COLECCIONES:
-            return render_output(
-                {
-                    "error": f"coleccion '{coleccion}' no reconocida. Válidas: {_COLECCIONES}"
-                },
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
+            raise ToolError(
+                f"Error: coleccion '{coleccion}' no reconocida. Válidas: {_COLECCIONES}"
             )
 
         try:
@@ -59,27 +57,17 @@ def register_get_iess_archivos_tool(mcp: MCPServer) -> None:
                 items_key = "documentos"
             else:
                 if anio is None:
-                    return render_output(
-                        {
-                            "error": (
-                                "coleccion='informes_auditoria' requiere anio. "
-                                "Use list_iess_colecciones para ver los años disponibles "
-                                "(2007-2026 confirmado) y su conteo de documentos."
-                            )
-                        },
-                        format,
-                        text_builder=lambda d: f"Error: {d['error']}",
+                    raise ToolError(
+                        "Error: coleccion='informes_auditoria' requiere anio. "
+                        "Use list_iess_colecciones para ver los años disponibles "
+                        "(2007-2026 confirmado) y su conteo de documentos."
                     )
                 result = await iess_client.get_auditoria_documentos(
                     anio=anio, query=query
                 )
                 items_key = "documentos"
         except ValueError as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(f"Error: {e}") from e
 
         def to_text(data: dict) -> str:
             items = data.get(items_key) or []
@@ -107,4 +95,4 @@ def register_get_iess_archivos_tool(mcp: MCPServer) -> None:
             parts.append(f"Fuente: {data.get('url_fuente')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

@@ -1,25 +1,28 @@
 import logging
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import bce_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import MAIN_LOGGER_NAME, log_tool
+from helpers.tool_meta import READ_ONLY
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 
 def register_get_indicador_bce_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver serie de un indicador BCEData", annotations=READ_ONLY)
     @log_tool
     async def get_indicador_bce(
         id_grupo: int,
         desde: str = "",
         hasta: str = "",
-        frecuencia: str = "",
+        frecuencia: Literal["", "Semanal", "Mensual", "Trimestral", "Anual"] = "",
         unidad: str = "",
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Time series data for one Banco Central del Ecuador (BCE) indicator group.
 
@@ -52,16 +55,12 @@ def register_get_indicador_bce_tool(mcp: MCPServer) -> None:
             )
         except Exception as e:
             logger.exception("get_indicador_bce failed (id_grupo=%r)", id_grupo)
-            return render_output(
-                {"error": str(e), "id_grupo": id_grupo},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar el indicador del BCE: {d['error']}"
-                ),
-            )
+            raise ToolError(f"Error al consultar el indicador del BCE: {e}") from e
 
         if result.get("error"):
-            return render_output(
+            # Legitimate low-confidence/no-match result (caller can retry with
+            # a different id_grupo/frecuencia), not an execution failure.
+            return render_structured(
                 result,
                 format,
                 text_builder=lambda d: (
@@ -98,4 +97,4 @@ def register_get_indicador_bce_tool(mcp: MCPServer) -> None:
                 parts.append("")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

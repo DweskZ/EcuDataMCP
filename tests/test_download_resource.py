@@ -1,8 +1,9 @@
 import base64
-import json
 
 import httpx
+import pytest
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 import tools.download_resource as download_resource_module
 from helpers import ckan_client
@@ -36,7 +37,7 @@ async def test_json_format_returns_base64_roundtrip(monkeypatch):
 
     tool = _make_tool()
     result = await tool(resource_id="abc123", format="json")
-    payload = json.loads(result)
+    payload = result.structured_content
 
     assert base64.b64decode(payload["content_base64"]) == raw
     assert payload["size_bytes"] == len(raw)
@@ -53,11 +54,12 @@ async def test_text_format_does_not_leak_base64_and_points_to_json(monkeypatch):
 
     tool = _make_tool()
     result = await tool(resource_id="abc123", format="text")
+    text = result.content[0].text
 
     # The actual encoded payload must not leak in text mode, only a
     # pointer to format="json" for retrieving it.
-    assert base64.b64encode(raw).decode("ascii") not in result
-    assert 'format="json"' in result
+    assert base64.b64encode(raw).decode("ascii") not in text
+    assert 'format="json"' in text
 
 
 async def test_resource_not_found(monkeypatch):
@@ -69,9 +71,8 @@ async def test_resource_not_found(monkeypatch):
     monkeypatch.setattr(ckan_client, "get_resource", fake_get_resource)
 
     tool = _make_tool()
-    result = await tool(resource_id="missing", format="json")
-    payload = json.loads(result)
-    assert payload["error"] == "not_found"
+    with pytest.raises(ToolError, match="no encontrado"):
+        await tool(resource_id="missing", format="json")
 
 
 async def test_resource_without_url(monkeypatch):
@@ -81,9 +82,8 @@ async def test_resource_without_url(monkeypatch):
     monkeypatch.setattr(ckan_client, "get_resource", fake_get_resource)
 
     tool = _make_tool()
-    result = await tool(resource_id="abc123", format="json")
-    payload = json.loads(result)
-    assert payload["error"] == "sin_url"
+    with pytest.raises(ToolError, match="no tiene URL de descarga"):
+        await tool(resource_id="abc123", format="json")
 
 
 async def test_download_http_error(monkeypatch):
@@ -94,9 +94,8 @@ async def test_download_http_error(monkeypatch):
     monkeypatch.setattr(download_resource_module, "download_bytes", fake_download_bytes)
 
     tool = _make_tool()
-    result = await tool(resource_id="abc123", format="json")
-    payload = json.loads(result)
-    assert "download_failed" in payload["error"]
+    with pytest.raises(ToolError, match="download_failed"):
+        await tool(resource_id="abc123", format="json")
 
 
 async def test_oversized_file_has_no_content_base64_and_keeps_direct_url(monkeypatch):
@@ -107,10 +106,10 @@ async def test_oversized_file_has_no_content_base64_and_keeps_direct_url(monkeyp
     monkeypatch.setattr(download_resource_module, "download_bytes", fake_download_bytes)
 
     tool = _make_tool()
-    result = await tool(resource_id="abc123", format="json")
-    payload = json.loads(result)
+    with pytest.raises(ToolError) as excinfo:
+        await tool(resource_id="abc123", format="json")
 
-    assert payload["error"] == "demasiado_grande"
-    assert "content_base64" not in payload
-    assert payload["url"] == "https://x/enorme.zip"
-    assert payload["max_bytes"] == MAX_DOWNLOAD_BYTES
+    message = str(excinfo.value)
+    assert "supera el límite" in message
+    assert "https://x/enorme.zip" in message
+    assert str(MAX_DOWNLOAD_BYTES // (1024 * 1024)) in message

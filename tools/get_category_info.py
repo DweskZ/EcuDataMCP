@@ -1,19 +1,23 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import ckan_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_category_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver una categoría temática", annotations=READ_ONLY)
     @log_tool
     async def get_category_info(
         category: str,
         include_datasets: bool = True,
-        source: str = "nacional",
-        format: str = "text",
-    ) -> str:
+        source: ckan_client.CkanSource = "nacional",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Get details for a thematic category (CKAN group) on Ecuador's open data portal.
 
@@ -34,13 +38,7 @@ def register_get_category_info_tool(mcp: MCPServer) -> None:
                 category, include_datasets=include_datasets, source=source
             )
         except Exception as e:
-            return render_output(
-                {"error": str(e), "category": category},
-                format,
-                text_builder=lambda d: (
-                    f"Error al obtener categoría '{d['category']}': {d['error']}"
-                ),
-            )
+            raise ToolError(f"Error al obtener categoría '{category}': {e}") from e
 
         title = group.get("title") or group.get("display_name") or category
         name = group.get("name", category)
@@ -84,4 +82,4 @@ def register_get_category_info_tool(mcp: MCPServer) -> None:
             )
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

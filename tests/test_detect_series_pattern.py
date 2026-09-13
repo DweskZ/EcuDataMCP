@@ -1,7 +1,6 @@
-import json
-
 import pytest
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 import tools.detect_series_pattern as detect_series_pattern_module
 from helpers import ckan_client
@@ -198,7 +197,7 @@ async def test_classifies_acumulado_when_newer_file_covers_older_periods(monkeyp
         resource_id_old="pagos_mayo.csv",
         format="json",
     )
-    payload = json.loads(result)
+    payload = result.structured_content
 
     assert payload["classification"] == "acumulado"
     assert payload["overlap_count"] == 2
@@ -236,7 +235,7 @@ async def test_classifies_incremental_when_periods_dont_overlap(monkeypatch):
         resource_id_old="semana_25.csv",
         format="json",
     )
-    payload = json.loads(result)
+    payload = result.structured_content
 
     assert payload["classification"] == "incremental"
     assert payload["overlap_count"] == 0
@@ -263,7 +262,7 @@ async def test_classifies_indeterminado_without_period_column(monkeypatch):
     result = await tool(
         dataset_id="d1", resource_id_new="a.csv", resource_id_old="b.csv", format="json"
     )
-    payload = json.loads(result)
+    payload = result.structured_content
 
     assert payload["classification"] == "indeterminado"
     assert payload["reason"] == "sin_columna_periodo_detectada"
@@ -311,7 +310,7 @@ async def test_flags_schema_mismatch_instead_of_misreading_as_incremental(monkey
         resource_id_old="pagos_mayo.csv",
         format="json",
     )
-    payload = json.loads(result)
+    payload = result.structured_content
 
     assert payload["classification"] == "indeterminado"
     assert payload["reason"] == "esquema_distinto_entre_archivos"
@@ -320,9 +319,8 @@ async def test_flags_schema_mismatch_instead_of_misreading_as_incremental(monkey
 
 async def test_requires_both_ids_or_neither():
     tool = _make_tool()
-    result = await tool(dataset_id="d1", resource_id_new="only-one", format="json")
-    payload = json.loads(result)
-    assert payload["error"] == "faltan_ids"
+    with pytest.raises(ToolError, match="pasa resource_id_new y resource_id_old juntos"):
+        await tool(dataset_id="d1", resource_id_new="only-one", format="json")
 
 
 async def test_autodetects_pair_from_dataset_when_no_ids_given(monkeypatch):
@@ -365,7 +363,7 @@ async def test_autodetects_pair_from_dataset_when_no_ids_given(monkeypatch):
 
     tool = _make_tool()
     result = await tool(dataset_id="d1", format="json")
-    payload = json.loads(result)
+    payload = result.structured_content
 
     assert payload["resource_new"]["id"] == "r26"
     assert payload["resource_old"]["id"] == "r25"
@@ -379,7 +377,7 @@ async def test_no_series_detected_without_ids(monkeypatch):
 
     tool = _make_tool()
     result = await tool(dataset_id="d1", format="json")
-    payload = json.loads(result)
+    payload = result.structured_content
 
     assert payload["error"] == "sin_serie_detectada"
 

@@ -1,5 +1,3 @@
-import json
-
 from mcp.server.mcpserver import MCPServer
 
 import tools.investigate_dataset as investigate_dataset_module
@@ -64,8 +62,8 @@ async def test_investigate_dataset_previews_first_csv_resource(monkeypatch):
     )
 
     fn = _make_tool()
-    text = await fn(query="cacao", format="json")
-    data = json.loads(text)
+    result = await fn(query="cacao", format="json")
+    data = result.structured_content
 
     assert data["dataset"]["title"] == "Precios de cacao"
     assert data["resource"]["id"] == "res1"
@@ -82,8 +80,8 @@ async def test_investigate_dataset_no_search_results(monkeypatch):
     monkeypatch.setattr(ckan_client, "search_datasets", fake_search_datasets)
 
     fn = _make_tool()
-    text = await fn(query="zzz", format="json")
-    data = json.loads(text)
+    result = await fn(query="zzz", format="json")
+    data = result.structured_content
 
     assert data["error"] == "sin_resultados"
 
@@ -111,8 +109,8 @@ async def test_investigate_dataset_skips_unpreviewable_resource(monkeypatch):
     monkeypatch.setattr(ckan_client, "get_dataset", fake_get_dataset)
 
     fn = _make_tool()
-    text = await fn(query="archivo", format="json")
-    data = json.loads(text)
+    result = await fn(query="archivo", format="json")
+    data = result.structured_content
 
     assert data["error"] == "sin_recurso_previsualizable"
     assert data["recursos"][0]["id"] == "res1"

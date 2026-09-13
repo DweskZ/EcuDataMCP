@@ -1,16 +1,23 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import infomies_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_infomies_bases_mensuales_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar bases mensuales de infoMIES", annotations=READ_ONLY)
     @log_tool
     async def search_infomies_bases_mensuales(
-        serie: str, anio: int | None = None, query: str = "", format: str = "text"
-    ) -> str:
+        serie: Literal["anc", "is"],
+        anio: int | None = None,
+        query: str = "",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         List infoMIES's (info.desarrollohumano.gob.ec, the statistics portal
         of what used to be MIES) monthly BDD (base de datos) files for one
@@ -44,17 +51,9 @@ def register_search_infomies_bases_mensuales_tool(mcp: MCPServer) -> None:
                 serie=serie, anio=anio, query=query
             )
         except ValueError as e:
-            return render_output(
-                {"error": str(e), "serie": serie, "anio": anio},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(str(e)) from e
         except Exception as e:
-            return render_output(
-                {"error": str(e), "serie": serie, "anio": anio},
-                format,
-                text_builder=lambda d: f"Error al consultar infoMIES: {d['error']}",
-            )
+            raise ToolError(f"Error al consultar infoMIES: {e}") from e
 
         def to_text(data: dict) -> str:
             archivos = data.get("archivos") or []
@@ -73,4 +72,4 @@ def register_search_infomies_bases_mensuales_tool(mcp: MCPServer) -> None:
                 parts.append(f"   {f.get('url')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

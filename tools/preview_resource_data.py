@@ -1,5 +1,8 @@
+from typing import Any, Literal
+
 import httpx
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import ckan_client
 from helpers.csv_reader import (
@@ -14,8 +17,9 @@ from helpers.csv_reader import (
     preview_zip,
     sniff_content_type,
 )
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 _CSV_FORMATS = {"CSV", "TSV", "TXT", ""}
 _JSON_FORMATS = {"JSON", "GEOJSON"}
@@ -100,14 +104,14 @@ def classify_from_content_type(content_type: str | None) -> str:
 
 
 def register_preview_resource_data_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Previsualizar los datos de un recurso", annotations=READ_ONLY)
     @log_tool
     async def preview_resource_data(
         resource_id: str,
         rows: int = 20,
-        source: str = "nacional",
-        format: str = "text",
-    ) -> str:
+        source: ckan_client.CkanSource = "nacional",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Download and preview a resource from Ecuador's open data portal.
 
@@ -135,32 +139,14 @@ def register_preview_resource_data_tool(mcp: MCPServer) -> None:
             res = await ckan_client.get_resource(resource_id, source=source)
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
-                return render_output(
-                    {"error": "not_found", "resource_id": resource_id},
-                    format,
-                    text_builder=lambda d: (
-                        f"Error: Recurso con ID '{d['resource_id']}' no encontrado."
-                    ),
-                )
-            return render_output(
-                {"error": f"HTTP {e.response.status_code}", "detail": str(e)},
-                format,
-                text_builder=lambda d: f"Error: {d['error']} - {d['detail']}",
-            )
+                raise ToolError(f"Error: Recurso con ID '{resource_id}' no encontrado.") from e
+            raise ToolError(f"Error: HTTP {e.response.status_code} - {e}") from e
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: f"Error al obtener metadata del recurso: {d['error']}",
-            )
+            raise ToolError(f"Error al obtener metadata del recurso: {e}") from e
 
         url = res.get("url")
         if not url:
-            return render_output(
-                {"error": "sin_url", "resource_id": resource_id},
-                format,
-                text_builder=lambda _: "Error: Este recurso no tiene URL de descarga.",
-            )
+            raise ToolError("Error: Este recurso no tiene URL de descarga.")
 
         fmt = (res.get("format") or "").upper()
         name = res.get("name") or res.get("description") or "Sin título"
@@ -175,7 +161,9 @@ def register_preview_resource_data_tool(mcp: MCPServer) -> None:
 
         try:
             if kind == "RAR":
-                return render_output(
+                # Legitimate result: the tool correctly identified the
+                # resource and explains why it can't preview it as a table.
+                return render_structured(
                     {
                         "error": "rar_no_soportado",
                         "url": url,
@@ -207,7 +195,8 @@ def register_preview_resource_data_tool(mcp: MCPServer) -> None:
             elif kind == "CSV":
                 result = await preview_csv(url, max_rows=rows)
             else:
-                return render_output(
+                # Legitimate result, same reasoning as the RAR branch above.
+                return render_structured(
                     {
                         "error": "formato_no_soportado",
                         "format_detectado": fmt or None,
@@ -224,23 +213,19 @@ def register_preview_resource_data_tool(mcp: MCPServer) -> None:
                     ),
                 )
         except httpx.HTTPError as e:
-            return render_output(
-                {"error": f"download_failed: {e}", "url": url},
-                format,
-                text_builder=lambda d: f"Error al descargar el archivo: {d['error']}",
-            )
+            raise ToolError(f"Error al descargar el archivo: download_failed: {e}") from e
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: f"Error al procesar el archivo: {d['error']}",
-            )
+            raise ToolError(f"Error al procesar el archivo: {e}") from e
 
         headers = result["headers"]
         data_rows = result["rows"]
 
         if not headers:
-            return render_output(
+            # Ambiguous (Phase 3 migration): could be a genuinely empty
+            # source file or an unparseable one -- same precedent as
+            # get_contraloria_informe.py, left as a normal result rather
+            # than ToolError.
+            return render_structured(
                 {"error": "vacio", "name": name, "resource_id": resource_id},
                 format,
                 text_builder=lambda d: (
@@ -306,4 +291,4 @@ def register_preview_resource_data_tool(mcp: MCPServer) -> None:
                 )
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

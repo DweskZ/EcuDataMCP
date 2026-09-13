@@ -1,14 +1,22 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import sipa_resumen_indicadores_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_sipa_resumen_indicadores_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(
+        title="Ver el Resumen de Indicadores anual de SIPA", annotations=READ_ONLY
+    )
     @log_tool
-    async def get_sipa_resumen_indicadores(anio: int, format: str = "text") -> str:
+    async def get_sipa_resumen_indicadores(
+        anio: int, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         List the direct monthly PDF links for one year of SIPA's (Ministerio
         de Agricultura) "Resumen de Indicadores" report — reached from the
@@ -34,19 +42,11 @@ def register_get_sipa_resumen_indicadores_tool(mcp: MCPServer) -> None:
         try:
             result = await sipa_resumen_indicadores_client.get_resumen_indicadores(anio)
         except ValueError as e:
-            return render_output(
-                {"error": str(e), "anio": anio},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(f"Error: {e}") from e
         except Exception as e:
-            return render_output(
-                {"error": str(e), "anio": anio},
-                format,
-                text_builder=lambda d: (
-                    f"Error al obtener el Resumen de Indicadores de SIPA: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al obtener el Resumen de Indicadores de SIPA: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             meses = data.get("meses") or []
@@ -71,4 +71,4 @@ def register_get_sipa_resumen_indicadores_tool(mcp: MCPServer) -> None:
                 )
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

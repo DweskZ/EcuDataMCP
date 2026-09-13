@@ -1,22 +1,26 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import ckan_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_datasets_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar datasets en el portal de datos abiertos", annotations=READ_ONLY)
     @log_tool
     async def search_datasets(
         query: str = "",
         page: int = 1,
         page_size: int = 20,
         category: str = "",
-        sort: str = "relevance",
-        source: str = "nacional",
-        format: str = "text",
-    ) -> str:
+        sort: Literal["relevance", "recent"] = "relevance",
+        source: ckan_client.CkanSource = "nacional",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Search for datasets on Ecuador's open data portal (www.datosabiertos.gob.ec).
 
@@ -63,11 +67,7 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
                 source=source,
             )
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: f"Error al buscar datasets: {d['error']}",
-            )
+            raise ToolError(f"Error al buscar datasets: {e}") from e
 
         datasets = result.get("results", [])
         total = result.get("count", 0)
@@ -118,4 +118,4 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
                 parts.append("")
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

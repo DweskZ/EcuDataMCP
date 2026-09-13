@@ -1,14 +1,20 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import sgr_publicaciones_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_sgr_biblioteca_categoria_archivos_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver archivos de una categoría de la Biblioteca SGR", annotations=READ_ONLY)
     @log_tool
-    async def get_sgr_biblioteca_categoria_archivos(categoria: str, format: str = "text") -> str:
+    async def get_sgr_biblioteca_categoria_archivos(
+        categoria: str, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         List one SGR Biblioteca top-level category's documents.
 
@@ -33,19 +39,11 @@ def register_get_sgr_biblioteca_categoria_archivos_tool(mcp: MCPServer) -> None:
         try:
             result = await sgr_publicaciones_client.get_biblioteca_categoria_archivos(categoria)
         except ValueError as e:
-            return render_output(
-                {"error": str(e), "categoria": categoria},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(str(e)) from e
         except Exception as e:
-            return render_output(
-                {"error": str(e), "categoria": categoria},
-                format,
-                text_builder=lambda d: (
-                    f"Error al obtener la categoría de Biblioteca SGR: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al obtener la categoría de Biblioteca SGR: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             archivos = data.get("archivos") or []
@@ -60,4 +58,4 @@ def register_get_sgr_biblioteca_categoria_archivos_tool(mcp: MCPServer) -> None:
                 parts.append(f"   {a.get('url')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

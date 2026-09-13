@@ -1,9 +1,13 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import sercop_client
 from helpers.env_config import get_base_url
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def _money(amount: object, currency: str = "") -> str:
@@ -16,9 +20,11 @@ def _money(amount: object, currency: str = "") -> str:
 
 
 def register_get_contrato_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver el expediente OCDS de un contrato SERCOP", annotations=READ_ONLY)
     @log_tool
-    async def get_contrato_info(ocid: str, format: str = "text") -> str:
+    async def get_contrato_info(
+        ocid: str, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Get the full OCDS record for a public procurement procedure (SERCOP).
 
@@ -31,33 +37,19 @@ def register_get_contrato_info_tool(mcp: MCPServer) -> None:
         """
         ocid = (ocid or "").strip()
         if not ocid:
-            return render_output(
-                {"error": "ocid_requerido"},
-                format,
-                text_builder=lambda _: "Error: ocid es obligatorio.",
-            )
+            raise ToolError("Error: ocid es obligatorio.")
 
         try:
             package = await sercop_client.get_contract_record(ocid)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "ocid": ocid},
-                format,
-                text_builder=lambda d: (
-                    f"Error al obtener contrato '{d['ocid']}': {d['error']}. "
-                    "Si es 429, reintenta en unos segundos."
-                ),
-            )
+            raise ToolError(
+                f"Error al obtener contrato '{ocid}': {e}. "
+                "Si es 429, reintenta en unos segundos."
+            ) from e
 
         records = package.get("records") or []
         if not records:
-            return render_output(
-                {"error": "not_found", "ocid": ocid},
-                format,
-                text_builder=lambda d: (
-                    f"No se encontró el proceso con OCID '{d['ocid']}'."
-                ),
-            )
+            raise ToolError(f"No se encontró el proceso con OCID '{ocid}'.")
 
         record = records[0]
         releases = record.get("releases") or []
@@ -182,4 +174,4 @@ def register_get_contrato_info_tool(mcp: MCPServer) -> None:
                 parts.append(f"Fecha release: {data['date']}")
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

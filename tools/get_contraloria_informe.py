@@ -1,17 +1,21 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import contraloria_client
 from helpers.csv_reader import format_table
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_contraloria_informe_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver un informe de datos abiertos de Contraloría", annotations=READ_ONLY)
     @log_tool
     async def get_contraloria_informe(
-        informe_id: str, rows: int = 50, format: str = "text"
-    ) -> str:
+        informe_id: str, rows: int = 50, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Download and preview one Contraloría document (Datos Abiertos or
         Plan Anual de Control).
@@ -32,20 +36,12 @@ def register_get_contraloria_informe_tool(mcp: MCPServer) -> None:
         try:
             result = await contraloria_client.get_informe(informe_id, max_rows=rows)
         except ValueError as e:
-            return render_output(
-                {"error": str(e), "informe_id": informe_id},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(f"Error: {e}") from e
         except Exception as e:
-            return render_output(
-                {"error": str(e), "informe_id": informe_id},
-                format,
-                text_builder=lambda d: f"Error al descargar el documento: {d['error']}",
-            )
+            raise ToolError(f"Error al descargar el documento: {e}") from e
 
         if result.get("is_pdf"):
-            return render_output(
+            return render_structured(
                 result,
                 format,
                 text_builder=lambda d: (
@@ -58,7 +54,11 @@ def register_get_contraloria_informe_tool(mcp: MCPServer) -> None:
 
         headers = result["headers"]
         if not headers:
-            return render_output(
+            # Ambiguous case (Phase 3 migration): the document was fetched
+            # successfully, but came back empty or unparseable -- left as a
+            # normal response rather than ToolError since this may reflect
+            # the source file's own content, not an execution failure.
+            return render_structured(
                 {"error": "vacio", "informe_id": informe_id, "label": result.get("label")},
                 format,
                 text_builder=lambda d: (
@@ -79,4 +79,4 @@ def register_get_contraloria_informe_tool(mcp: MCPServer) -> None:
             parts.append(format_table(data["headers"], data["rows"]))
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

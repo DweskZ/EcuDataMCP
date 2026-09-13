@@ -1,14 +1,17 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
 
 from helpers import sut_powerbi_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_list_sut_indicadores_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Listar tableros de indicadores del SUT", annotations=READ_ONLY)
     @log_tool
-    async def list_sut_indicadores(format: str = "text") -> str:
+    async def list_sut_indicadores(format: Literal["text", "json"] = "text") -> dict[str, Any]:
         """
         List the Ministerio del Trabajo/SUT's public Power BI "Indicadores"
         dashboards (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml).
@@ -31,11 +34,13 @@ def register_list_sut_indicadores_tool(mcp: MCPServer) -> None:
             format: text | json
         """
         indicadores = sut_powerbi_client.list_indicadores()
+        payload = {"total": len(indicadores), "indicadores": indicadores}
 
-        def to_text(data: list[dict]) -> str:
-            parts = [f"Indicadores SUT (Power BI) — {len(data)} dashboard(s):", ""]
-            for i in data:
+        def to_text(data: dict) -> str:
+            rows = data["indicadores"]
+            parts = [f"Indicadores SUT (Power BI) — {len(rows)} dashboard(s):", ""]
+            for i in rows:
                 parts.append(f"- {i['indicador']}: {i['nombre']}")
             return "\n".join(parts)
 
-        return render_output(indicadores, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

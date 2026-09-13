@@ -1,10 +1,13 @@
 import re
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import ckan_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 _DIGIT_RE = re.compile(r"\d+")
 
@@ -85,11 +88,13 @@ def _format_size(size: int | None) -> str:
 
 
 def register_list_dataset_resources_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Listar los recursos de un dataset", annotations=READ_ONLY)
     @log_tool
     async def list_dataset_resources(
-        dataset_id: str, source: str = "nacional", format: str = "text"
-    ) -> str:
+        dataset_id: str,
+        source: ckan_client.CkanSource = "nacional",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         List all resources (files) in a dataset with their metadata.
 
@@ -116,11 +121,7 @@ def register_list_dataset_resources_tool(mcp: MCPServer) -> None:
         try:
             dataset = await ckan_client.get_dataset(dataset_id, source=source)
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(f"Error: {e}") from e
 
         resources = dataset.get("resources", [])
         resource_rows = [
@@ -185,4 +186,4 @@ def register_list_dataset_resources_tool(mcp: MCPServer) -> None:
                 )
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

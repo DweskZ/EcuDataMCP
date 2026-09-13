@@ -1,16 +1,23 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import bce_indices_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_bce_indice_archivo_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver archivos de un índice de publicaciones del BCE", annotations=READ_ONLY)
     @log_tool
     async def get_bce_indice_archivo(
-        pagina_id: str, anio: int = 0, max_archivos: int = 30, format: str = "text"
-    ) -> str:
+        pagina_id: str,
+        anio: int = 0,
+        max_archivos: int = 30,
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Read the file archive for one BCE "índice" page (from search_bce_indices).
 
@@ -31,13 +38,9 @@ def register_get_bce_indice_archivo_tool(mcp: MCPServer) -> None:
                 pagina_id=pagina_id, anio=anio, max_archivos=max_archivos
             )
         except Exception as e:
-            return render_output(
-                {"error": str(e), "pagina_id": pagina_id},
-                format,
-                text_builder=lambda d: (
-                    f"Error al leer el índice '{d['pagina_id']}' del BCE: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al leer el índice '{pagina_id}' del BCE: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             pagina = data.get("pagina") or {}
@@ -61,4 +64,4 @@ def register_get_bce_indice_archivo_tool(mcp: MCPServer) -> None:
             parts.append(f"Fuente: {pagina.get('url')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

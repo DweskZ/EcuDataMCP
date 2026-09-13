@@ -1,25 +1,30 @@
 import logging
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import bce_client, bce_equivalence, bce_equivalence_store, bce_iem_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import MAIN_LOGGER_NAME, log_tool
 from helpers.response_contract import with_response_metadata
+from helpers.tool_meta import WRITES_LOCAL_ARTIFACTS
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 
 def register_compare_bce_sources_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(
+        title="Comparar BCEData contra IEM (operador)", annotations=WRITES_LOCAL_ARTIFACTS
+    )
     @log_tool
     async def compare_bce_sources(
         query: str = "",
         limit: int = 100,
         historico: bool = False,
         guardar_revision: bool = False,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """Build a cautious BCEData ↔ IEM candidate-equivalence map.
 
         Matching uses normalized group/series/table labels. It reports
@@ -55,7 +60,7 @@ def register_compare_bce_sources_tool(mcp: MCPServer) -> None:
                 consulted_at=bce_snapshot.get("consultado_en"),
                 published_at=iem_catalog.get("catalogado_en"),
             )
-            return render_output(
+            return render_structured(
                 result,
                 format,
                 text_builder=lambda data: (
@@ -68,8 +73,4 @@ def register_compare_bce_sources_tool(mcp: MCPServer) -> None:
             )
         except Exception as exc:
             logger.exception("compare_bce_sources failed (query=%r)", query)
-            return render_output(
-                {"error": str(exc)},
-                format,
-                text_builder=lambda data: f"Error: {data['error']}",
-            )
+            raise ToolError(f"Error al comparar BCEData con IEM: {exc}") from exc

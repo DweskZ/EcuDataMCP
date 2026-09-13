@@ -1,10 +1,13 @@
 import logging
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import supercias_financials
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import MAIN_LOGGER_NAME, log_tool
+from helpers.tool_meta import READ_ONLY
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
@@ -23,11 +26,13 @@ _DISPLAY_FIELDS = (
 
 
 def register_get_financials_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver historial financiero de una compañía", annotations=READ_ONLY)
     @log_tool
     async def get_financials(
-        expediente_or_ruc: str, anio: int | None = None, format: str = "text"
-    ) -> str:
+        expediente_or_ruc: str,
+        anio: int | None = None,
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Get a company's financial history from Supercías balance-sheet filings.
 
@@ -48,31 +53,19 @@ def register_get_financials_tool(mcp: MCPServer) -> None:
                 expediente_or_ruc, anio
             )
         except supercias_financials.FinancialsDbUnavailable as e:
-            return render_output(
-                {"error": str(e), "expediente_or_ruc": expediente_or_ruc},
-                format,
-                text_builder=lambda d: d["error"],
-            )
+            raise ToolError(str(e)) from e
         except Exception as e:
             logger.exception(
                 "get_financials failed (expediente_or_ruc=%r)", expediente_or_ruc
             )
-            return render_output(
-                {"error": str(e), "expediente_or_ruc": expediente_or_ruc},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar los financieros de Supercías: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al consultar los financieros de Supercías: {e}"
+            ) from e
 
         if result.get("error") == "not_found":
-            return render_output(
-                result,
-                format,
-                text_builder=lambda d: (
-                    f"Error: no se encontró ninguna compañía con "
-                    f"'{d['expediente_or_ruc']}'. Prueba search_companias primero."
-                ),
+            raise ToolError(
+                f"Error: no se encontró ninguna compañía con "
+                f"'{expediente_or_ruc}'. Prueba search_companias primero."
             )
 
         def to_text(data: dict) -> str:
@@ -98,4 +91,4 @@ def register_get_financials_tool(mcp: MCPServer) -> None:
                 parts.append("")
             return "\n".join(parts).rstrip()
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

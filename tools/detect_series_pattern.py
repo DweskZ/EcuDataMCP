@@ -1,7 +1,9 @@
 from functools import partial
+from typing import Any, Literal
 
 import httpx
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import ckan_client
 from helpers.csv_reader import (
@@ -14,9 +16,10 @@ from helpers.csv_reader import (
     preview_zip,
     sniff_content_type,
 )
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.text_utils import strip_accents
+from helpers.tool_meta import READ_ONLY
 from tools.list_dataset_resources import detect_periodic_series, period_sort_key
 from tools.preview_resource_data import (
     classify_from_content_type,
@@ -196,15 +199,17 @@ def _pick_pair(resources: list[dict]) -> tuple[dict, dict] | None:
 
 
 def register_detect_series_pattern_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(
+        title="Detectar patrón de series periódicas en un dataset", annotations=READ_ONLY
+    )
     @log_tool
     async def detect_series_pattern(
         dataset_id: str,
         resource_id_new: str | None = None,
         resource_id_old: str | None = None,
-        source: str = "nacional",
-        format: str = "text",
-    ) -> str:
+        source: ckan_client.CkanSource = "nacional",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Tell whether a dataset's periodic files (one per week/month/etc) replace
         each other (cumulative -- only the newest file matters) or complement
@@ -235,13 +240,9 @@ def register_detect_series_pattern_tool(mcp: MCPServer) -> None:
             format: text | json
         """
         if bool(resource_id_new) != bool(resource_id_old):
-            return render_output(
-                {"error": "faltan_ids"},
-                format,
-                text_builder=lambda _: (
-                    "Error: pasa resource_id_new y resource_id_old juntos, o "
-                    "ninguno de los dos (para autodetectar el par)."
-                ),
+            raise ToolError(
+                "Error: pasa resource_id_new y resource_id_old juntos, o "
+                "ninguno de los dos (para autodetectar el par)."
             )
 
         session = httpx.AsyncClient()
@@ -255,25 +256,20 @@ def register_detect_series_pattern_tool(mcp: MCPServer) -> None:
                         resource_id_old, source=source, session=session
                     )
                 except Exception as e:
-                    return render_output(
-                        {"error": str(e)},
-                        format,
-                        text_builder=lambda d: f"Error al obtener los recursos: {d['error']}",
-                    )
+                    raise ToolError(f"Error al obtener los recursos: {e}") from e
             else:
                 try:
                     dataset = await ckan_client.get_dataset(
                         dataset_id, source=source, session=session
                     )
                 except Exception as e:
-                    return render_output(
-                        {"error": str(e)},
-                        format,
-                        text_builder=lambda d: f"Error al obtener el dataset: {d['error']}",
-                    )
+                    raise ToolError(f"Error al obtener el dataset: {e}") from e
                 pair = _pick_pair(dataset.get("resources", []))
                 if pair is None:
-                    return render_output(
+                    # Legitimate result: the dataset genuinely has no
+                    # detectable periodic-name group, not an execution
+                    # failure.
+                    return render_structured(
                         {"error": "sin_serie_detectada", "dataset_id": dataset_id},
                         format,
                         text_builder=lambda d: (
@@ -288,19 +284,11 @@ def register_detect_series_pattern_tool(mcp: MCPServer) -> None:
             try:
                 table_new = await _fetch_table(res_new, session)
             except (ValueError, httpx.HTTPError) as e:
-                return render_output(
-                    {"error": f"recurso_nuevo_no_legible: {e}"},
-                    format,
-                    text_builder=lambda d: f"Error: recurso más reciente {d['error']}",
-                )
+                raise ToolError(f"Error: recurso más reciente recurso_nuevo_no_legible: {e}") from e
             try:
                 table_old = await _fetch_table(res_old, session)
             except (ValueError, httpx.HTTPError) as e:
-                return render_output(
-                    {"error": f"recurso_viejo_no_legible: {e}"},
-                    format,
-                    text_builder=lambda d: f"Error: recurso más antiguo {d['error']}",
-                )
+                raise ToolError(f"Error: recurso más antiguo recurso_viejo_no_legible: {e}") from e
         finally:
             await session.aclose()
 
@@ -414,4 +402,4 @@ def register_detect_series_pattern_tool(mcp: MCPServer) -> None:
                 )
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

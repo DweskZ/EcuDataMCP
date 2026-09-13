@@ -1,19 +1,25 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import sri_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_sri_estadisticas_recaudacion_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(
+        title="Buscar estadísticas de recaudación del SRI", annotations=READ_ONLY
+    )
     @log_tool
     async def search_sri_estadisticas_recaudacion(
         query: str = "",
         limit: int = 30,
         offset: int = 0,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Search the SRI's "Estadísticas de Recaudación" page for direct file links.
 
@@ -40,13 +46,9 @@ def register_search_sri_estadisticas_recaudacion_tool(mcp: MCPServer) -> None:
                 query=query, limit=limit, offset=offset
             )
         except Exception as e:
-            return render_output(
-                {"error": str(e), "query": query or None},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar las Estadísticas de Recaudación del SRI: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al consultar las Estadísticas de Recaudación del SRI: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             archivos = data.get("archivos") or []
@@ -68,4 +70,4 @@ def register_search_sri_estadisticas_recaudacion_tool(mcp: MCPServer) -> None:
             parts.append(f"Fuente: {data.get('url_fuente')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

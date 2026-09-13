@@ -1,16 +1,22 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import bce_publicaciones_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_bce_publicaciones_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar últimas publicaciones del BCE", annotations=READ_ONLY)
     @log_tool
     async def search_bce_publicaciones(
-        query: str = "", formato: str = "", format: str = "text"
-    ) -> str:
+        query: str = "",
+        formato: Literal["", "PDF", "XLSX", "XLS", "CSV", "ZIP", "HTML"] = "",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         List recent BCE publications from "Últimas Publicaciones" — named
         bulletins and reports (weekly/monthly monetary bulletins, interest-rate
@@ -38,13 +44,9 @@ def register_search_bce_publicaciones_tool(mcp: MCPServer) -> None:
                 query=query, formato=formato
             )
         except Exception as e:
-            return render_output(
-                {"error": str(e), "query": query or None, "formato": formato or None},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar Últimas Publicaciones del BCE: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al consultar Últimas Publicaciones del BCE: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             publicaciones = data.get("publicaciones") or []
@@ -66,4 +68,4 @@ def register_search_bce_publicaciones_tool(mcp: MCPServer) -> None:
             parts.append(f"Fuente: {data.get('url_fuente')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

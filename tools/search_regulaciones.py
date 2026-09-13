@@ -1,17 +1,21 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import gobec_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_regulaciones_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar regulaciones publicadas en gob.ec", annotations=READ_ONLY)
     @log_tool
     async def search_regulaciones(
-        query: str = "", page: int = 1, format: str = "text"
-    ) -> str:
+        query: str = "", page: int = 1, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Search or list regulations published on Ecuador's gob.ec portal.
 
@@ -31,11 +35,7 @@ def register_search_regulaciones_tool(mcp: MCPServer) -> None:
                 api_page = max(page - 1, 0)
                 regs = await gobec_client.list_regulaciones(page=api_page)
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: f"Error al buscar regulaciones: {d['error']}",
-            )
+            raise ToolError(f"Error al buscar regulaciones: {e}") from e
 
         payload = {
             "query": query,
@@ -95,4 +95,4 @@ def register_search_regulaciones_tool(mcp: MCPServer) -> None:
             )
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

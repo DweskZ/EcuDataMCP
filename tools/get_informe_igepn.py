@@ -1,23 +1,27 @@
+from typing import Any, Literal
+
 import httpx
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import igepn_informes_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.pdf_reader import MAX_PAGES_PER_CALL, extract_text_from_bytes
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_informe_igepn_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Descargar y leer un informe del IG-EPN", annotations=READ_ONLY)
     @log_tool
     async def get_informe_igepn(
         nombre: str,
         volcan: str = "",
-        grupo: str = "",
+        grupo: Literal["sismico", "volcanico", ""] = "",
         anio: int = 0,
         pages: str = "",
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Download and extract text from one IG-EPN report found via
         search_informes_igepn. IG-EPN has no stable per-report URL (each
@@ -39,29 +43,17 @@ def register_get_informe_igepn_tool(mcp: MCPServer) -> None:
                 nombre, volcan=volcan, grupo=grupo, anio=anio
             )
         except ValueError as e:
-            return render_output(
-                {"error": str(e), "nombre": nombre},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(str(e)) from e
         except httpx.HTTPError as e:
-            return render_output(
-                {"error": f"download_failed: {e}", "nombre": nombre},
-                format,
-                text_builder=lambda d: f"Error al descargar el informe: {d['error']}",
-            )
+            raise ToolError(f"Error al descargar el informe: {e}") from e
 
         try:
             result = extract_text_from_bytes(raw, pages=pages)
         except ValueError as e:
-            return render_output(
-                {"error": str(e), "nombre": nombre},
-                format,
-                text_builder=lambda d: f"Error al leer el PDF: {d['error']}",
-            )
+            raise ToolError(f"Error al leer el PDF: {e}") from e
 
         if result["total_pages"] == 0 or not any(p["text"] for p in result["pages"]):
-            return render_output(
+            return render_structured(
                 {
                     "error": "sin_texto_extraible",
                     "nombre": matched_nombre,
@@ -103,4 +95,4 @@ def register_get_informe_igepn_tool(mcp: MCPServer) -> None:
                 parts.append("")
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

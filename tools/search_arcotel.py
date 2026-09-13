@@ -1,14 +1,22 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import arcotel_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_arcotel_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar boletines y reportes estadísticos de ARCOTEL", annotations=READ_ONLY)
     @log_tool
-    async def search_arcotel(tipo: str, query: str = "", format: str = "text") -> str:
+    async def search_arcotel(
+        tipo: Literal["boletines", "reportes_mensuales"],
+        query: str = "",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         List ARCOTEL's (Agencia de Regulación y Control de las
         Telecomunicaciones) statistical PDF series, published on the
@@ -39,20 +47,14 @@ def register_search_arcotel_tool(mcp: MCPServer) -> None:
         elif tipo == "boletines":
             fetch = arcotel_client.search_boletines_estadisticos
         else:
-            return render_output(
-                {"error": f"tipo inválido: {tipo!r} (usa 'boletines' o 'reportes_mensuales')"},
-                format,
-                text_builder=lambda d: d["error"],
+            raise ToolError(
+                f"tipo inválido: {tipo!r} (usa 'boletines' o 'reportes_mensuales')"
             )
 
         try:
             result = await fetch(query=query)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "query": query or None},
-                format,
-                text_builder=lambda d: f"Error al consultar ARCOTEL ({tipo}): {d['error']}",
-            )
+            raise ToolError(f"Error al consultar ARCOTEL ({tipo}): {e}") from e
 
         def to_text(data: dict) -> str:
             archivos = data.get("archivos") or []
@@ -75,4 +77,4 @@ def register_search_arcotel_tool(mcp: MCPServer) -> None:
             parts.append(f"Fuente: {data.get('url_fuente')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

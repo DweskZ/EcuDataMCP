@@ -1,16 +1,22 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import sri_ruc_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_sri_ruc_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar contribuyentes por razón social", annotations=READ_ONLY)
     @log_tool
     async def search_sri_ruc(
-        razon_social: str, max_resultados: int = 25, format: str = "text"
-    ) -> str:
+        razon_social: str,
+        max_resultados: int = 25,
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Buscar contribuyentes en el RUC del SRI por razón social o nombre
         comercial (texto parcial), sin necesitar el RUC exacto de antemano.
@@ -37,11 +43,7 @@ def register_search_sri_ruc_tool(mcp: MCPServer) -> None:
                 razon_social, max_resultados=max_resultados
             )
         except ValueError as e:
-            return render_output(
-                {"error": str(e), "razon_social": razon_social},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(f"Error: {e}") from e
 
         def to_text(data: dict) -> str:
             parts = [
@@ -61,4 +63,4 @@ def register_search_sri_ruc_tool(mcp: MCPServer) -> None:
                 parts.append(f"- {r['ruc']}: {r['razon_social']} ({r['estado']}, {r['tipo_contribuyente']})")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

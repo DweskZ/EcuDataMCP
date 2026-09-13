@@ -1,16 +1,22 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import sri_ruc_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_sri_ruc_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Consultar información pública de un RUC", annotations=READ_ONLY)
     @log_tool
     async def get_sri_ruc_info(
-        ruc: str, include_establecimientos: bool = True, format: str = "text"
-    ) -> str:
+        ruc: str,
+        include_establecimientos: bool = True,
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Consultar la información pública de un contribuyente por RUC en el SRI.
 
@@ -28,22 +34,13 @@ def register_get_sri_ruc_info_tool(mcp: MCPServer) -> None:
                 ruc, include_establecimientos=include_establecimientos
             )
         except Exception as exc:
-            return render_output(
-                {"error": str(exc), "ruc": ruc},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar la ficha pública del RUC en el SRI: "
-                    f"{d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al consultar la ficha pública del RUC en el SRI: {exc}"
+            ) from exc
 
         if data is None:
-            return render_output(
-                {"error": "not_found", "ruc": ruc},
-                format,
-                text_builder=lambda d: (
-                    f"No se encontró información pública para el RUC '{d['ruc']}'."
-                ),
+            raise ToolError(
+                f"No se encontró información pública para el RUC '{ruc}'."
             )
 
         def to_text(result: dict) -> str:
@@ -93,4 +90,4 @@ def register_get_sri_ruc_info_tool(mcp: MCPServer) -> None:
             )
             return "\n".join(parts)
 
-        return render_output(data, format, text_builder=to_text)
+        return render_structured(data, format, text_builder=to_text)

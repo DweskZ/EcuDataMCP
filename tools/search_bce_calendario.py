@@ -1,12 +1,16 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import bce_calendario_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_bce_calendario_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar el calendario de publicaciones del BCE", annotations=READ_ONLY)
     @log_tool
     async def search_bce_calendario(
         query: str = "",
@@ -17,8 +21,8 @@ def register_search_bce_calendario_tool(mcp: MCPServer) -> None:
         solo_proximas: bool = False,
         limit: int = 50,
         offset: int = 0,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Search BCE's own statistical publication calendar — scheduled
         release dates for IEM, Cuentas Nacionales, IMAEc, balance of
@@ -55,13 +59,9 @@ def register_search_bce_calendario_tool(mcp: MCPServer) -> None:
                 offset=offset,
             )
         except Exception as e:
-            return render_output(
-                {"error": str(e), "query": query or None},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar el calendario de publicaciones del BCE: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al consultar el calendario de publicaciones del BCE: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             publicaciones = data.get("publicaciones") or []
@@ -86,4 +86,4 @@ def register_search_bce_calendario_tool(mcp: MCPServer) -> None:
                 parts.append("")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

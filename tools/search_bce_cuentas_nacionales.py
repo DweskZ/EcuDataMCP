@@ -1,16 +1,20 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import bce_cuentas_nacionales_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_bce_cuentas_nacionales_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar páginas de Cuentas Nacionales del BCE", annotations=READ_ONLY)
     @log_tool
     async def search_bce_cuentas_nacionales(
-        query: str = "", format: str = "text"
-    ) -> str:
+        query: str = "", format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         List BCE Cuentas Nacionales page families — annual, quarterly, and
         regional national accounts packages, the historical retropolation
@@ -38,13 +42,9 @@ def register_search_bce_cuentas_nacionales_tool(mcp: MCPServer) -> None:
                 query=query
             )
         except Exception as e:
-            return render_output(
-                {"error": str(e), "query": query or None},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar Cuentas Nacionales del BCE: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al consultar Cuentas Nacionales del BCE: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             paginas = data.get("paginas") or []
@@ -67,4 +67,4 @@ def register_search_bce_cuentas_nacionales_tool(mcp: MCPServer) -> None:
                 parts.append(f"   {p.get('url')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)
