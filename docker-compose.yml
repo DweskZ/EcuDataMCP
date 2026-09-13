@@ -4,6 +4,12 @@ services:
     ports:
       - "${MCP_PORT:-8000}:${MCP_PORT:-8000}"
     environment:
+      # "all" (default) keeps every tool on this one instance, matching
+      # behavior before public/maintenance profiles existed. Set to
+      # "public" here (and run `mcp-maintenance` below via
+      # `docker compose --profile maintenance up`) to keep
+      # audit_bce_catalog/compare_bce_sources off this exposed instance.
+      - MCP_PROFILE=${MCP_PROFILE:-all}
       - MCP_HOST=0.0.0.0
       - MCP_PORT=${MCP_PORT:-8000}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
@@ -27,6 +33,34 @@ services:
       # recreates -- without this, every redeploy loses it and
       # search_ranking/get_financials go back to "run the build script"
       # until someone re-runs scripts/build_supercias_financials_db.py.
+      - supercias_data:/app/data
+
+  # Operator-only instance: audit_bce_catalog/compare_bce_sources, the two
+  # tools that write local artifacts instead of answering a read-only
+  # lookup (docs/MCP_ARCHITECTURE.md's public/maintenance split). Not
+  # started by `docker compose up` -- only via
+  # `docker compose --profile maintenance up mcp-maintenance`, and normally
+  # left off the public port/behind its own auth token.
+  mcp-maintenance:
+    build: .
+    profiles: ["maintenance"]
+    ports:
+      - "${MCP_MAINTENANCE_PORT:-8001}:${MCP_MAINTENANCE_PORT:-8001}"
+    environment:
+      - MCP_PROFILE=maintenance
+      - MCP_HOST=0.0.0.0
+      - MCP_PORT=${MCP_MAINTENANCE_PORT:-8001}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - MCP_AUTH_TOKEN=${MCP_MAINTENANCE_AUTH_TOKEN:-}
+      - MCP_REQUIRE_AUTH=${MCP_REQUIRE_AUTH:-1}
+      - MCP_SSL_CERTFILE=${MCP_SSL_CERTFILE:-}
+      - MCP_SSL_KEYFILE=${MCP_SSL_KEYFILE:-}
+      - BCE_CATALOG_SNAPSHOT_DIR=${BCE_CATALOG_SNAPSHOT_DIR:-/app/data/bce_catalog_snapshots}
+      - IEM_CATALOG_DIR=${IEM_CATALOG_DIR:-/app/data/iem_catalog_snapshots}
+    restart: unless-stopped
+    volumes:
+      # Same volume as `mcp` -- audit_bce_catalog's snapshots and
+      # compare_bce_sources' reports live under the same /app/data tree.
       - supercias_data:/app/data
 
 volumes:

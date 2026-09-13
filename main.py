@@ -13,6 +13,7 @@ from helpers.env_config import (
     get_mcp_host,
     get_mcp_max_concurrent_requests,
     get_mcp_port,
+    get_mcp_profile,
     get_mcp_rate_limit_requests,
     get_mcp_rate_limit_window_seconds,
     get_mcp_require_auth,
@@ -25,7 +26,7 @@ from helpers.logging import MAIN_LOGGER_NAME, UVICORN_LOGGING_CONFIG, setup_logg
 from helpers.version import get_version
 from prompts import register_prompts
 from resources import register_resources
-from tools import register_tools
+from tools import register_maintenance_tools, register_tools
 
 setup_logging()
 
@@ -49,7 +50,17 @@ Casi todos los tools aceptan `format="json"` además de `format="text"`
 """.strip()
 
 mcp = MCPServer("Ecuador Datos Abiertos MCP", instructions=SERVER_INSTRUCTIONS)
-register_tools(mcp)
+
+# MCP_PROFILE (default "all") splits the public read-only tools from the two
+# that write local operator artifacts (audit_bce_catalog, compare_bce_sources)
+# -- see docs/MCP_ARCHITECTURE.md's public/maintenance profile split. "all"
+# reproduces the single-instance behavior this server had before profiles
+# existed, so an unset MCP_PROFILE changes nothing for an existing deployment.
+MCP_PROFILE = get_mcp_profile()
+if MCP_PROFILE in ("public", "all"):
+    register_tools(mcp)
+if MCP_PROFILE in ("maintenance", "all"):
+    register_maintenance_tools(mcp)
 register_prompts(mcp)
 register_resources(mcp)
 
@@ -115,7 +126,9 @@ def main(argv: list[str] | None = None) -> None:
     transport = args.transport or get_transport()
 
     if transport == "stdio":
-        logger.info("Starting Ecuador MCP server v%s (stdio)", VERSION)
+        logger.info(
+            "Starting Ecuador MCP server v%s (stdio, profile=%s)", VERSION, MCP_PROFILE
+        )
         mcp.run(transport="stdio")
         return
 
@@ -138,8 +151,8 @@ def main(argv: list[str] | None = None) -> None:
         )
 
     logger.info(
-        "Starting Ecuador MCP server v%s on %s:%d",
-        VERSION, host, port,
+        "Starting Ecuador MCP server v%s on %s:%d (profile=%s)",
+        VERSION, host, port, MCP_PROFILE,
     )
     if auth_token:
         logger.info("MCP HTTP authentication: Bearer token enabled")

@@ -17,6 +17,14 @@ El `docker-compose.yml` deja `MCP_REQUIRE_AUTH=1` por defecto. Si falta el
 token, el proceso se detiene con un error claro en vez de dejar un MCP remoto
 sin autenticación.
 
+Para un despliegue remoto, considerar `MCP_PROFILE=public` en el servicio
+`mcp` expuesto — deja fuera `audit_bce_catalog` y `compare_bce_sources`
+(escriben snapshots/reportes locales, no son una consulta de solo lectura)
+— y levantar el servicio `mcp-maintenance` (mismo `docker-compose.yml`, bajo
+`docker compose --profile maintenance up`) solo cuando el operador
+necesite correrlos, en su propio puerto y `MCP_MAINTENANCE_AUTH_TOKEN`. Ver
+docs/MCP_ARCHITECTURE.md § Fase 1.
+
 Ejemplo mínimo detrás de un proxy HTTPS:
 
 ```text

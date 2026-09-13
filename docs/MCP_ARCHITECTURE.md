@@ -293,16 +293,29 @@ anotaciones) y no rompe nada existente.
 Resultado: 115 → 113. El ahorro de 3 (a 110) vía aviación no se tomó — ver
 justificación en el punto 3.
 
-### Fase 1 — Perfiles público / mantenimiento (1 sesión)
+### Fase 1 — Perfiles público / mantenimiento (1 sesión) — ejecutada 2026-09-12
 
-1. Mover `audit_bce_catalog` y `compare_bce_sources` a un segundo
-   `register_tools`-equivalente que solo se registra en una instancia
-   `FastMCP` de mantenimiento (regla 3). No se toca `helpers/` ni la lógica.
-2. Decidir el mecanismo de exposición: segundo proceso (`mcp-maintenance`)
-   vs. flag de arranque en el mismo proceso — impacto en `main.py` y
-   `docker-compose.yml`/`Dockerfile` si se elige proceso separado.
-3. Verificación: `tools/list` del perfil público ya no incluye las 2 tools
-   de mantenimiento; siguen funcionando vía el perfil de mantenimiento.
+1. `audit_bce_catalog` y `compare_bce_sources` movidos a
+   `register_maintenance_tools(mcp)`, separado de `register_tools(mcp)`
+   (regla 3). `helpers/` y la lógica de ambos tools no se tocaron.
+   Archivo: `tools/__init__.py`.
+2. Mecanismo elegido: **flag de arranque en el mismo proceso**, no proceso
+   separado por defecto — env var `MCP_PROFILE` (`public` | `maintenance` |
+   `all`, default `all`) leída en `main.py` vía
+   `helpers/env_config.get_mcp_profile()`. `all` reproduce exactamente el
+   comportamiento anterior a esta fase, así que un despliegue existente que
+   no fije `MCP_PROFILE` no cambia. `docker-compose.yml` gana un segundo
+   servicio `mcp-maintenance` bajo el `profiles: ["maintenance"]` propio de
+   Compose (no arranca con `docker compose up`, solo con
+   `docker compose --profile maintenance up mcp-maintenance`), en su propio
+   puerto (`MCP_MAINTENANCE_PORT`, default 8001) y con su propio
+   `MCP_MAINTENANCE_AUTH_TOKEN`, compartiendo el volumen `supercias_data`
+   con `mcp` porque ahí viven los snapshots/reportes que ambos tools
+   escriben. `Dockerfile` no cambió — misma imagen para ambos servicios.
+3. Verificación: con `MCP_PROFILE=public`, `tools/list` devuelve 111 tools
+   sin `audit_bce_catalog`/`compare_bce_sources`; con `MCP_PROFILE=maintenance`
+   devuelve exactamente esos 2; sin la variable (o `all`), devuelve los 113
+   de siempre. `uv run pytest` (661 tests) sin cambios.
 
 ### Fase 2 — Metadatos de tool (2-3 sesiones, incremental por fuente)
 

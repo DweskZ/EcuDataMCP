@@ -77,6 +77,18 @@ def get_transport() -> str:
     return "stdio" if raw == "stdio" else "http"
 
 
+def get_mcp_profile() -> str:
+    """
+    Return 'public', 'maintenance', or 'all'. Env MCP_PROFILE overrides the
+    default 'all' (both sets of tools registered on one instance, matching
+    behavior before profiles existed). 'public' excludes tools that write
+    local operator artifacts (audit_bce_catalog, compare_bce_sources);
+    'maintenance' registers only those.
+    """
+    raw = os.getenv("MCP_PROFILE", "all").strip().lower()
+    return raw if raw in {"public", "maintenance"} else "all"
+
+
 def get_mcp_auth_token() -> str | None:
     token = os.getenv("MCP_AUTH_TOKEN", "").strip()
     return token or None

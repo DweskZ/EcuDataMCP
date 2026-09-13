@@ -257,8 +257,6 @@ def register_tools(mcp: MCPServer) -> None:
 
     register_search_indicadores_bce_tool(mcp)
     register_get_indicador_bce_tool(mcp)
-    register_audit_bce_catalog_tool(mcp)
-    register_compare_bce_sources_tool(mcp)
     register_search_bce_iem_tool(mcp)
     register_get_bce_iem_table_tool(mcp)
     register_search_bce_publicaciones_tool(mcp)
@@ -287,3 +285,16 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_cepalstat_indicador_tool(mcp)
 
     register_search_gacetas_inmunoprevenibles_tool(mcp)
+
+
+def register_maintenance_tools(mcp: MCPServer) -> None:
+    """
+    Register operator-only tools with the provided MCPServer instance.
+
+    Kept separate from register_tools() (docs/MCP_ARCHITECTURE.md's public/
+    maintenance profile split) because both write local artifacts (BCE
+    catalog snapshots, comparison reports) rather than answering a read-only
+    lookup — an end user searching for a dataset shouldn't see them.
+    """
+    register_audit_bce_catalog_tool(mcp)
+    register_compare_bce_sources_tool(mcp)
