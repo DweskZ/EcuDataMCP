@@ -76,7 +76,6 @@ from tools.list_dataset_resources import register_list_dataset_resources_tool
 from tools.list_iess_colecciones import register_list_iess_colecciones_tool
 from tools.list_ineval_familias import register_list_ineval_familias_tool
 from tools.list_instituciones import register_list_instituciones_tool
-from tools.list_recent_datasets import register_list_recent_datasets_tool
 from tools.list_sat_tsunami import register_list_sat_tsunami_tool
 from tools.list_senescyt_biblioteca_categorias import (
     register_list_senescyt_biblioteca_categorias_tool,
@@ -95,10 +94,7 @@ from tools.query_resource_data import register_query_resource_data_tool
 from tools.query_sut_indicador import register_query_sut_indicador_tool
 from tools.read_pdf import register_read_pdf_tool
 from tools.search_anda import register_search_anda_tool
-from tools.search_arcotel_boletines import register_search_arcotel_boletines_tool
-from tools.search_arcotel_reportes_mensuales import (
-    register_search_arcotel_reportes_mensuales_tool,
-)
+from tools.search_arcotel import register_search_arcotel_tool
 from tools.search_auditores import register_search_auditores_tool
 from tools.search_bce_calendario import register_search_bce_calendario_tool
 from tools.search_bce_cuentas_nacionales import (
@@ -183,7 +179,6 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_ineval_familia_archivos_tool(mcp)
 
     register_search_datasets_tool(mcp)
-    register_list_recent_datasets_tool(mcp)
     register_get_dataset_info_tool(mcp)
     register_list_dataset_resources_tool(mcp)
     register_get_resource_info_tool(mcp)
@@ -213,8 +208,7 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_anda_survey_info_tool(mcp)
     register_download_anda_microdata_tool(mcp)
 
-    register_search_arcotel_reportes_mensuales_tool(mcp)
-    register_search_arcotel_boletines_tool(mcp)
+    register_search_arcotel_tool(mcp)
 
     register_search_inec_estadisticas_tool(mcp)
     register_get_inec_estadistica_files_tool(mcp)

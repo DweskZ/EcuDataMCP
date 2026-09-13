@@ -34,7 +34,21 @@ VERSION = get_version()
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
-mcp = MCPServer("Ecuador Datos Abiertos MCP")
+SERVER_INSTRUCTIONS = """
+Servidor MCP de datos abiertos del gobierno ecuatoriano (CKAN nacional y
+municipal, gob.ec, SRI, BCE, Supercías, IESS/SENESCYT, SIPA, IG-EPN, SERCOP,
+SGR, y más — ver el recurso `ecuador://fuentes` para el catálogo completo y
+actualizado de fuentes y sus tools).
+
+Entrada recomendada cuando no se sabe qué tool usar: `search_ecuador`, o los
+prompts `explorar_datos` / `consultar_tramite` / `investigar_contrato` /
+`buscar_regulacion` / `buscar_inec` / `monitorear_riesgos`.
+
+Casi todos los tools aceptan `format="json"` además de `format="text"`
+(default).
+""".strip()
+
+mcp = MCPServer("Ecuador Datos Abiertos MCP", instructions=SERVER_INSTRUCTIONS)
 register_tools(mcp)
 register_prompts(mcp)
 register_resources(mcp)

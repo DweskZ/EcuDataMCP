@@ -185,7 +185,11 @@ async def main() -> int:
                 {"query": "Tumbaco", "nivel": "parroquia", "format": "json"},
                 ["170150", "Tumbaco", "parroquias"],
             ),
-            ("list_recent_datasets", {"page_size": 3, "format": "json"}, ['"results"']),
+            (
+                "search_datasets",
+                {"sort": "recent", "page_size": 3, "format": "json"},
+                ['"results"'],
+            ),
             ("list_categories", {"format": "json"}, ['"categories"', "salud"]),
             ("list_instituciones", {"query": "SRI", "format": "json"}, ['"institucion_id"', "SRI"]),
             ("search_datasets", {"query": "salud", "page_size": 2}, ["dataset"]),

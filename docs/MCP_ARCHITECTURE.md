@@ -18,6 +18,7 @@ reescriben retroactivamente cuando el total sube después.
 | 2026-09-05 | 100 | Se removieron 3 tools de SRI Saiku (`srienlinea.sri.gob.ec` confirmado inalcanzable desde tres entornos distintos). |
 | 2026-09-05 | 102 | Se agregaron 2 tools de ARCSA (`list_arcsa_categorias`, `get_arcsa_categoria_archivos`). |
 | 2026-09-10 | 115 | +13: BCE Cuentas Nacionales (2), calendario de publicaciones BCE (1), SENESCYT SIAU + Biblioteca (3), CEPALSTAT (2), Gacetas de Inmunoprevenibles del MSP (1). Ver auditoría 2026-09-11 abajo para la verificación directa contra el código, no solo un barrido nombre por nombre. |
+| 2026-09-12 | 113 | Fase 0 ejecutada: `list_recent_datasets` fusionado en `search_datasets(sort="recent")`; `search_arcotel_boletines`/`search_arcotel_reportes_mensuales` fusionados en `search_arcotel(tipo=...)`. `list_capabilities` se mantiene como alias (regla 1, período de transición) — sus instrucciones generales ya viven en `MCPServer(instructions=...)`. El trío de aviación (METAR/NOTAM/SIGMET) se evaluó y **no** se fusionó: sus formas de respuesta difieren de verdad (SIGMET no tiene `designador`, y los campos `reportes`/`notams`/`sigmets` no son intercambiables) — fusionarlos habría producido exactamente el antipatrón de argumentos opcionales y respuesta de forma variable que la regla 4 ya prohíbe para otros casos. |
 
 **Patrón ya en uso para no agregar tools por fuente nueva:** la ampliación
 de `source=` a `"iadb"` en los tools CKAN genéricos existentes, y el nuevo
@@ -262,25 +263,35 @@ Cuatro fases, cada una entregable de forma independiente — no es necesario
 completar una fase entera antes de que el proyecto obtenga valor de ella.
 Cada fase lista qué cambia, en qué archivos, y cómo se verifica.
 
-### Fase 0 — Reducciones de bajo riesgo (1-2 sesiones)
+### Fase 0 — Reducciones de bajo riesgo (1-2 sesiones) — ejecutada 2026-09-12
 
 La única fase que borra o fusiona tools. Todo lo demás es aditivo (schemas,
 anotaciones) y no rompe nada existente.
 
-1. Retirar `list_capabilities` del perfil público (regla 1). Mantener como
-   alias una versión, luego retirar. Archivos: `tools/list_capabilities.py`,
-   `tools/__init__.py`.
-2. Fusionar `list_recent_datasets` en `search_datasets(sort="recent")`
-   (regla 2). Archivos: `helpers/ckan_client.py`, `tools/search_datasets.py`;
-   retirar `tools/list_recent_datasets.py` tras el período de alias.
-3. (Opcional, decisión de Daniel) Fusionar el trío de aviación y el par
-   ARCOTEL (regla 5) si el ahorro de 3 tools justifica perder los nombres
-   específicos.
-4. Verificación: `uv run pytest`, conteo de tools antes/después en
-   `docs/MCP_ARCHITECTURE.md` (nueva fila en Historial de conteos), smoke
-   test manual de los tools fusionados.
+1. ~~Retirar `list_capabilities` del perfil público (regla 1).~~ Sin perfiles
+   todavía (Fase 1 no ejecutada), se dejó como alias de compatibilidad y se
+   movieron las instrucciones generales a `MCPServer(instructions=...)` en
+   `main.py`. Retirar el tool en sí queda pendiente de la Fase 1.
+2. Fusionado `list_recent_datasets` en `search_datasets(sort="recent")`
+   (regla 2). Archivos: `tools/search_datasets.py` (ahora acepta `sort` y
+   `query` opcional); `tools/list_recent_datasets.py` eliminado;
+   `tools/__init__.py` y `resources/catalog.py` actualizados.
+3. Fusionado el par ARCOTEL (regla 5) en `search_arcotel(tipo, query)` —
+   firma y forma de respuesta eran idénticas entre las dos, sin
+   antipatrón. Archivos: `tools/search_arcotel.py` (nuevo),
+   `tools/search_arcotel_boletines.py` y
+   `tools/search_arcotel_reportes_mensuales.py` eliminados.
+   **No** se fusionó el trío de aviación (METAR/NOTAM/SIGMET): a diferencia
+   de ARCOTEL, sus respuestas tienen formas genuinamente distintas
+   (`designador` ausente en SIGMET; campos `reportes`/`notams`/`sigmets` no
+   intercambiables) — fusionarlos habría violado la regla 4 en vez de
+   aplicar la regla 5.
+4. Verificación: `uv run pytest`, conteo de tools actualizado en el
+   Historial de conteos (115 → 113), `scripts/smoke_e2e.py` actualizado
+   para el tool renombrado.
 
-Resultado esperado: 115 → 113 (o 110 si se ejecuta el paso 3 opcional).
+Resultado: 115 → 113. El ahorro de 3 (a 110) vía aviación no se tomó — ver
+justificación en el punto 3.
 
 ### Fase 1 — Perfiles público / mantenimiento (1 sesión)
 

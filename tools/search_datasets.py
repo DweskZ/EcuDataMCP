@@ -9,10 +9,11 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
     @mcp.tool()
     @log_tool
     async def search_datasets(
-        query: str,
+        query: str = "",
         page: int = 1,
         page_size: int = 20,
         category: str = "",
+        sort: str = "relevance",
         source: str = "nacional",
         format: str = "text",
     ) -> str:
@@ -25,11 +26,16 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
         Typical workflow: search_datasets → list_dataset_resources → preview_resource_data
 
         Args:
-            query: Search keywords (e.g. "empleo", "salud", "presupuesto", "SRI recaudación")
+            query: Search keywords (e.g. "empleo", "salud", "presupuesto", "SRI recaudación").
+                   Optional when sort="recent" — omit it to browse newly
+                   published/updated datasets without a keyword.
             page: Page number (1-based, default: 1)
             page_size: Results per page (default: 20, max: 100)
             category: Optional category filter (e.g. "sal" for Salud, "edu" for Educación).
                       Use list_categories to see all available categories.
+            sort: "relevance" (default, CKAN's own ranking) or "recent"
+                  (sort by metadata_modified descending, to discover newly
+                  added or freshly refreshed datasets)
             source: "nacional" (www.datosabiertos.gob.ec, default), "cuenca"
                     (cuencaendatos.cuenca.gob.ec, the Cuenca municipal open-data
                     portal), "latacunga" (datosabiertos.latacunga.gob.ec,
@@ -44,9 +50,17 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
         """
         page_size = min(max(page_size, 1), 100)
         start = (max(page, 1) - 1) * page_size
+        recent = sort == "recent"
+        effective_query = query or ("*:*" if recent else "")
+        sort_param = "metadata_modified desc" if recent else ""
         try:
             result = await ckan_client.search_datasets(
-                query=query, rows=page_size, start=start, category=category, source=source
+                query=effective_query,
+                rows=page_size,
+                start=start,
+                category=category,
+                sort=sort_param,
+                source=source,
             )
         except Exception as e:
             return render_output(
@@ -60,6 +74,7 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
         site = ckan_client.site_url(source).rstrip("/")
         payload = {
             "query": query,
+            "recent": recent,
             "total": total,
             "page": page,
             "results": datasets,
@@ -69,9 +84,16 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
         def to_text(data: dict) -> str:
             rows = data.get("results") or []
             if not rows:
+                if data["recent"] and not data["query"]:
+                    return "No se encontraron datasets recientes."
                 return f"No se encontraron datasets para: '{data['query']}'"
+            header = (
+                "Datasets actualizados recientemente (CKAN)"
+                if data["recent"] and not data["query"]
+                else f"Se encontraron {data['total']} dataset(s) para: '{data['query']}'"
+            )
             parts = [
-                f"Se encontraron {data['total']} dataset(s) para: '{data['query']}'",
+                header,
                 f"Página {data['page']} (mostrando {len(rows)} resultados):\n",
             ]
             for i, ds in enumerate(rows, 1):

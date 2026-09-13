@@ -1,6 +1,6 @@
 # Herramientas disponibles
 
-Referencia detallada de las 115 herramientas MCP de EcuDataMCP. Casi todas
+Referencia detallada de las 113 herramientas MCP de EcuDataMCP. Casi todas
 aceptan `format="json"` además de texto.
 
 ## Entrada unificada
@@ -15,8 +15,7 @@ aceptan `format="json"` además de texto.
 
 | Tool | Descripción |
 |------|-------------|
-| `search_datasets` | Buscar datasets por palabras clave. Soporta filtro por categoría. |
-| `list_recent_datasets` | Datasets más recientemente actualizados en el portal. |
+| `search_datasets` | Buscar datasets por palabras clave, o listar los más recientemente actualizados con `sort="recent"`. Soporta filtro por categoría. |
 | `get_dataset_info` | Metadata detallada de un dataset: título, descripción, organización, tags, licencia, fechas. |
 | `list_dataset_resources` | Listar todos los archivos (recursos) de un dataset con formato, tamaño, URL y fechas de creación/modificación. |
 | `get_resource_info` | Información detallada de un archivo específico. |
@@ -202,8 +201,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 
 | Tool | Descripción |
 |------|-------------|
-| `search_arcotel_reportes_mensuales` | Reportes estadísticos mensuales de ARCOTEL sobre telecomunicaciones. |
-| `search_arcotel_boletines` | Boletines estadísticos anuales/temáticos de ARCOTEL sobre telecomunicaciones. |
+| `search_arcotel` | Reportes estadísticos mensuales (`tipo="reportes_mensuales"`) o boletines anuales/temáticos (`tipo="boletines"`) de ARCOTEL sobre telecomunicaciones. |
 
 ## ARCSA: registro sanitario
 
