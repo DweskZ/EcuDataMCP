@@ -197,9 +197,11 @@ _CAPABILITIES = {
             "montos tributarios individuales"
         ),
         (
-            "search_ranking/get_financials: requieren que el operador del "
-            "servidor haya corrido scripts/build_supercias_financials_db.py "
-            "de antemano (no se construye solo); cubren solo los últimos "
+            "search_ranking/get_financials: la base local se construye/"
+            "refresca sola en segundo plano (al iniciar el servidor y ante "
+            "cualquier consulta si falta o está vieja); la primera vez tarda "
+            "5-10 min (descarga ~356 MB) y esas consultas fallan mientras "
+            "tanto -- reintenta en unos minutos. Cubren solo los últimos "
             "años cacheados, no el histórico completo desde 2008"
         ),
         (

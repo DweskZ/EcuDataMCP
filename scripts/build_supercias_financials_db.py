@@ -8,11 +8,18 @@ local SQLite database, then prunes `ranking`/`indicadores_sector` down to the
 last 5 fiscal years present in the data (not a hardcoded year, so this
 self-adjusts every year without a code change).
 
-Not run automatically by the MCP server: this takes several minutes (the
-356 MB download dominates), too slow for a single request/response cycle.
-Run it manually before deploying, or on a periodic schedule (the underlying
-filings change far less often than the daily company directory) --
-helpers/supercias_financials.py refuses to serve data older than 7 days.
+Launched automatically as a background subprocess by
+helpers/supercias_financials.py (`_trigger_background_build`), both at
+server startup and whenever a query hits a missing/stale DB -- an operator
+never needs to run this by hand. That module's `_build_lock`/
+`_build_process` only dedupes triggers from within the same running server
+process, though; still runnable directly for a manual/CI refresh, but avoid
+doing so while the server you're pointing at is already mid-build (check
+its logs for "Construyendo/refrescando..."), since two builds racing to
+`os.replace()` the same DB_PATH is unguarded across processes. Takes
+several minutes (the 356 MB download dominates) --
+helpers/supercias_financials.py refuses to serve data older than 7 days,
+which is what triggers the periodic refresh.
 
 bi_compania.csv (expediente, ruc, nombre, tipo, pro_codigo, provincia) IS
 downloaded, as the `companias` table -- an earlier version of this script

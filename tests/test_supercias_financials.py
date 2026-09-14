@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import sys
 import time
 
 import pytest
@@ -63,13 +64,25 @@ def test_resolve_expediente_distinguishes_ruc_from_expediente():
     assert supercias_financials._resolve_expediente("abc") is None
 
 
-def test_check_db_fresh_missing_file(tmp_path):
+@pytest.fixture
+def no_real_build(monkeypatch):
+    """Stub the background build launcher so these tests never spawn the
+    real script (network download) just for hitting a missing/stale DB."""
+    calls: list[None] = []
+    monkeypatch.setattr(
+        supercias_financials, "_trigger_background_build", lambda: calls.append(None)
+    )
+    return calls
+
+
+def test_check_db_fresh_missing_file(tmp_path, no_real_build):
     missing = tmp_path / "does_not_exist.sqlite3"
     with pytest.raises(supercias_financials.FinancialsDbUnavailable, match="no existe"):
         supercias_financials._check_db_fresh(missing)
+    assert no_real_build == [None]
 
 
-def test_check_db_fresh_stale_file(tmp_path):
+def test_check_db_fresh_stale_file(tmp_path, no_real_build):
     path = tmp_path / "old.sqlite3"
     path.write_bytes(b"")
     old_time = time.time() - 8 * 24 * 3600
@@ -78,6 +91,71 @@ def test_check_db_fresh_stale_file(tmp_path):
         supercias_financials.FinancialsDbUnavailable, match="desactualizada"
     ):
         supercias_financials._check_db_fresh(path)
+    assert no_real_build == [None]
+
+
+def test_trigger_background_build_spawns_once_while_running(monkeypatch):
+    popen_calls: list[list[str]] = []
+
+    class _FakeProcess:
+        def __init__(self):
+            self.pid = 4242
+
+        def poll(self):
+            return None  # still running
+
+    def fake_popen(args, **kwargs):
+        popen_calls.append(args)
+        return _FakeProcess()
+
+    monkeypatch.setattr(supercias_financials, "_build_process", None)
+    monkeypatch.setattr(supercias_financials.subprocess, "Popen", fake_popen)
+
+    supercias_financials._trigger_background_build()
+    supercias_financials._trigger_background_build()
+
+    assert len(popen_calls) == 1
+    assert popen_calls[0][0] == sys.executable
+    assert popen_calls[0][1].endswith("build_supercias_financials_db.py")
+
+
+def test_trigger_background_build_spawns_again_once_previous_finished(monkeypatch):
+    popen_calls: list[list[str]] = []
+
+    class _FakeProcess:
+        def __init__(self, exit_code):
+            self.pid = 4242
+            self._exit_code = exit_code
+
+        def poll(self):
+            return self._exit_code
+
+    processes = [_FakeProcess(None), _FakeProcess(0)]
+
+    def fake_popen(args, **kwargs):
+        popen_calls.append(args)
+        return processes[len(popen_calls) - 1]
+
+    monkeypatch.setattr(supercias_financials, "_build_process", None)
+    monkeypatch.setattr(supercias_financials.subprocess, "Popen", fake_popen)
+
+    supercias_financials._trigger_background_build()
+    processes[0]._exit_code = 0  # first build finished
+    supercias_financials._trigger_background_build()
+
+    assert len(popen_calls) == 2
+
+
+def test_ensure_financials_db_fresh_swallows_missing_db(tmp_path, monkeypatch):
+    monkeypatch.setattr(supercias_financials, "DB_PATH", tmp_path / "missing.sqlite3")
+    triggered: list[None] = []
+    monkeypatch.setattr(
+        supercias_financials, "_trigger_background_build", lambda: triggered.append(None)
+    )
+
+    supercias_financials.ensure_financials_db_fresh()  # must not raise
+
+    assert triggered == [None]
 
 
 async def test_get_financials_by_expediente(db_path):

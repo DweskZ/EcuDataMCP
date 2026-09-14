@@ -23,6 +23,7 @@ from helpers.env_config import (
 )
 from helpers.http_security import with_http_security
 from helpers.logging import MAIN_LOGGER_NAME, UVICORN_LOGGING_CONFIG, setup_logging
+from helpers.supercias_financials import ensure_financials_db_fresh
 from helpers.version import get_version
 from prompts import register_prompts
 from resources import register_resources
@@ -124,6 +125,12 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> None:
     args = _parse_args(argv)
     transport = args.transport or get_transport()
+
+    # Self-heals the Supercías financials DB (search_ranking/get_financials)
+    # instead of requiring the operator to run
+    # scripts/build_supercias_financials_db.py by hand before first use --
+    # non-blocking, so a missing/stale DB never delays server startup.
+    ensure_financials_db_fresh()
 
     if transport == "stdio":
         logger.info(

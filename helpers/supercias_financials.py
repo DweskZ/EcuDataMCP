@@ -11,12 +11,16 @@ too large to hold in memory the way supercias_client.py holds the (also
 large, but 10x smaller) company directory. Instead this module only ever
 *queries* a local SQLite database that `scripts/build_supercias_financials_db.py`
 builds ahead of time, pruned to the last 5 fiscal years during that build.
-That script is meant to be run by the server operator before deploying, or
-on a periodic schedule (the underlying data refreshes far less often than
-the daily-updated company directory) — not lazily inside a request the way
-supercias_client.py's TtlCache does, because a from-scratch build downloads
-the full 356 MB file and takes minutes, not the ~30-40s that's tolerable
-for a single MCP tool call.
+
+Building takes minutes (the 356 MB download dominates), too slow to run
+inline inside a single MCP tool call. Instead, `_check_db_fresh` launches
+that script as a background subprocess -- via `_trigger_background_build`
+-- the moment it notices the DB is missing or older than
+`_MAX_DB_AGE_SECONDS`, both from `ensure_financials_db_fresh()` at server
+startup (see main.py) and from every query that hits a missing/stale DB.
+The triggering call still raises `FinancialsDbUnavailable` (the build isn't
+done yet), but no operator step is required: the DB self-heals within a
+few minutes without anyone running the script by hand.
 
 Company names/RUCs are resolved from this same SQLite DB's own `companias`
 table (loaded from bi_compania.csv by the build script), not by calling into
@@ -33,15 +37,31 @@ helpers.supercias_client.
 from __future__ import annotations
 
 import asyncio
+import logging
 import sqlite3
+import subprocess
+import sys
+import threading
 import time
 from pathlib import Path
 from typing import Any
 
+logger = logging.getLogger(__name__)
+
 DB_PATH = Path(__file__).resolve().parents[1] / "data" / "supercias_financials.sqlite3"
+_BUILD_SCRIPT_PATH = (
+    Path(__file__).resolve().parents[1] / "scripts" / "build_supercias_financials_db.py"
+)
 # The dataset refreshes far less often than the daily company directory;
 # treat a build older than this as stale rather than silently serving it.
 _MAX_DB_AGE_SECONDS = 7 * 24 * 3600
+
+# Guards scripts/build_supercias_financials_db.py so a missing/stale DB
+# triggers at most one background build at a time, whether that check comes
+# from the server startup hook (ensure_financials_db_fresh) or a tool call
+# hitting the same missing/stale DB concurrently.
+_build_lock = threading.Lock()
+_build_process: subprocess.Popen | None = None
 
 _RANKING_COLUMNS = (
     "anio", "expediente", "posicion_general", "cia_imvalores",
@@ -71,6 +91,34 @@ class FinancialsDbUnavailable(Exception):
     """Raised when the SQLite build is missing or older than _MAX_DB_AGE_SECONDS."""
 
 
+def _build_in_progress() -> bool:
+    return _build_process is not None and _build_process.poll() is None
+
+
+def _trigger_background_build() -> None:
+    """Start scripts/build_supercias_financials_db.py in the background.
+
+    A no-op if a build is already running -- every missing/stale check calls
+    this, so it must be safe to call repeatedly without piling up duplicate
+    builds. Runs as a separate process (not a thread) because the build is
+    CPU-bound CSV parsing plus ~9M SQLite inserts; a thread would contend for
+    the GIL with the server's own request handling for several minutes.
+    """
+    global _build_process
+    with _build_lock:
+        if _build_in_progress():
+            return
+        _build_process = subprocess.Popen(
+            [sys.executable, str(_BUILD_SCRIPT_PATH)],
+            cwd=_BUILD_SCRIPT_PATH.parents[1],
+        )
+        logger.info(
+            "Construyendo/refrescando la base financiera de Supercías en "
+            "segundo plano (PID %d): %s",
+            _build_process.pid, _BUILD_SCRIPT_PATH,
+        )
+
+
 def _check_db_fresh(path: Path | None = None) -> None:
     # Read the module attribute at call time, not as a bound default -- a
     # default evaluated at def-time would freeze the original DB_PATH value,
@@ -78,19 +126,38 @@ def _check_db_fresh(path: Path | None = None) -> None:
     if path is None:
         path = DB_PATH
     if not path.exists():
+        _trigger_background_build()
         raise FinancialsDbUnavailable(
-            "La base de datos financiera de Supercías no existe todavía. "
-            "Corre `python scripts/build_supercias_financials_db.py` en el "
-            "servidor y vuelve a intentar (tarda varios minutos la primera vez)."
+            "La base de datos financiera de Supercías no existe todavía. Se "
+            "está construyendo automáticamente en segundo plano (descarga "
+            "~356 MB, tarda 5-10 minutos la primera vez) -- vuelve a "
+            "intentar en unos minutos."
         )
     age = time.time() - path.stat().st_mtime
     if age > _MAX_DB_AGE_SECONDS:
+        _trigger_background_build()
         days = int(age // 86400)
         raise FinancialsDbUnavailable(
             f"La base de datos financiera de Supercías tiene {days} días de "
-            "antigüedad y se considera desactualizada. Corre "
-            "`python scripts/build_supercias_financials_db.py` para refrescarla."
+            "antigüedad y se considera desactualizada. Se está refrescando "
+            "automáticamente en segundo plano -- vuelve a intentar en unos "
+            "minutos."
         )
+
+
+def ensure_financials_db_fresh() -> None:
+    """Kick off a background build/refresh at server startup if needed.
+
+    Called once from main() so an operator never has to run
+    scripts/build_supercias_financials_db.py by hand before first use --
+    reuses the same missing/stale check _connect() runs per query, and
+    swallows FinancialsDbUnavailable since at startup there's no request to
+    fail; _trigger_background_build already logged that the build started.
+    """
+    try:
+        _check_db_fresh()
+    except FinancialsDbUnavailable:
+        pass
 
 
 def _connect(path: Path | None = None) -> sqlite3.Connection:

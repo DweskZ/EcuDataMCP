@@ -27,6 +27,19 @@
     fake-success string; legitimate empty results ("no se encontraron...")
     stay normal successful responses. See `docs/RESPONSE_CONTRACT.md`.
 
+### Fixed
+
+- **`search_ranking`/`get_financials` no longer require an operator to run
+  `scripts/build_supercias_financials_db.py` by hand before first use.**
+  `helpers/supercias_financials.py` now launches that script as a
+  background subprocess (deduplicated so a missing/stale DB never queues
+  more than one build) the moment it notices the local SQLite DB is
+  missing or older than 7 days — both at server startup
+  (`ensure_financials_db_fresh()` in `main.py`) and from any tool call that
+  hits the same condition. Calls made while the build is in flight still
+  return an error telling the caller to retry in a few minutes, but no
+  manual step is needed for the DB to build/refresh itself.
+
 ## 0.8.8 — 2026-09-10
 
 ### Fixed
