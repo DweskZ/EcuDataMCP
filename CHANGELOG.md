@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.9 — 2026-09-14
+
 ### Changed
 
 - **MCP architecture cleanup, all 4 phases of `docs/MCP_ARCHITECTURE.md`.**
