@@ -256,6 +256,7 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 | Contrato de respuesta para agentes | Parcial — falta extender a otras fuentes | BCEData/IEM ya tienen bloque `metadatos` estable; falta migrar el resto de resultados de texto dual (`format=text\|json`) a schemas estructurados, y paginar/enlazar archivos grandes en vez de enviarlos completos |
 | Operación 24/7 | Parcial — falta alertas de esquema | Smoke test diario (`scripts/smoke_e2e.py`, ~39/68 tools) corre en GitHub Actions, separado de CI; falta alertar sobre cambios de esquema específicos → RESEARCH.md § Infraestructura operativa |
 | Rate limiting por usuario/IP y proxy HTTPS | Parcial — falta el proxy real | Cuotas por cliente/IP + límite global + Bearer opcional + TLS directo vía Uvicorn ya existen; falta proxy HTTPS/DNS/política operativa del endpoint remoto |
+| Publicar en PyPI | No iniciado | Empaquetar y publicar el servidor como paquete instalable (`pip install`/`uvx`) en vez de requerir clonar el repo; definir nombre de paquete, metadata de `pyproject.toml` para distribución, y versión/proceso de release |
 
 ### BCE — cobertura completa de BCEData e IEM
 
