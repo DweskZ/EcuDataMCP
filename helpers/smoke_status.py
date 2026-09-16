@@ -30,6 +30,16 @@ _DEGRADED_SOURCES = (
         "compraspublicas.gob.ec",
         "fuera de latinoamérica",
     ),
+    (
+        "censo_ecuador_geoblock",
+        "censoecuador.gob.ec",
+        "bloqueo geográfico",
+    ),
+    (
+        "supercias_financials_cold_start",
+        "base de datos financiera de supercías",
+        "automáticamente en segundo plano",
+    ),
 )
 
 

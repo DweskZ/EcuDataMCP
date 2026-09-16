@@ -297,7 +297,7 @@ async def chain_sut(client: httpx.AsyncClient) -> None:
     listing = json.loads(
         chain_step(await call_tool(client, "list_sut_indicadores", {"format": "json"}))
     )
-    indicador = listing[0]["indicador"]
+    indicador = listing["indicadores"][0]["indicador"]
     chain_step(
         await call_tool(
             client,
@@ -313,7 +313,7 @@ async def chain_superbancos(client: httpx.AsyncClient) -> None:
             await call_tool(client, "list_superbancos_secciones", {"format": "json"})
         )
     )
-    seccion = listing[0]["seccion"]
+    seccion = listing["secciones"][0]["seccion"]
     chain_step(
         await call_tool(
             client,
