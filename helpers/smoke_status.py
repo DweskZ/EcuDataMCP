@@ -52,16 +52,31 @@ def degraded_source(text: str) -> str | None:
     return None
 
 
-def assess_response(text: str, required: list[str]) -> SmokeAssessment:
+def assess_response(
+    text: str, required: list[str], is_error: bool = False
+) -> SmokeAssessment:
     """Classify one MCP tool response for the live smoke workflow.
 
     A known upstream restriction is ``degraded``. Everything else that does
     not meet the assertion is a real smoke failure, so the workflow remains a
     guard against regressions in this server and unexpected source changes.
+
+    ``is_error`` should carry the MCP result's own ``isError`` flag when the
+    caller has it. Tool failures raise ``ToolError`` with a per-tool message
+    ("Error al buscar datasets: ...", "Error: ...", a bare RuntimeError
+    string, ...) that does not reliably start with "Error:" or contain a
+    literal ``"error"`` JSON key, so guessing failure from the text alone
+    (the pre-``isError`` fallback below, kept for callers that only have
+    text) can misclassify a real failure as ``ok`` -- which then crashes a
+    caller that expects the text to be parseable JSON.
     """
     source = degraded_source(text)
     if "traceback" in text[:300].casefold():
         return SmokeAssessment("failed", "traceback in response")
+    if is_error:
+        if source:
+            return SmokeAssessment("degraded", text[:240], source)
+        return SmokeAssessment("failed", text[:240])
     if required and not any(token.casefold() in text.casefold() for token in required):
         if source:
             return SmokeAssessment("degraded", "required fields unavailable", source)
