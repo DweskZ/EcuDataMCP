@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 
@@ -42,6 +43,19 @@ _DEGRADED_SOURCES = (
     ),
 )
 
+# httpx's own raise_for_status() message format (confirmed against
+# httpx._models.Response.raise_for_status): "Server error '503 Service
+# Unavailable' for url '<url>'". A 5xx is by definition the live source
+# itself misbehaving (down, overloaded, restarting) -- never something our
+# request shape caused -- so this is a generic, host-agnostic degradation
+# check rather than one more hardcoded tuple per source. Confirmed live:
+# anda.inec.gob.ec 503'd on 2026-09-18's scheduled run and was unreachable/
+# inconsistent (timeout, then 403) minutes later -- a flaky host, not a
+# regression in this repo.
+_HTTPX_SERVER_ERROR_RE = re.compile(
+    r"Server error '5\d\d[^']*' for url 'https?://([^/']+)"
+)
+
 
 def degraded_source(text: str) -> str | None:
     """Return a known external degradation label, never a generic error."""
@@ -49,6 +63,9 @@ def degraded_source(text: str) -> str | None:
     for name, *markers in _DEGRADED_SOURCES:
         if all(marker.casefold() in normalized for marker in markers):
             return name
+    match = _HTTPX_SERVER_ERROR_RE.search(text)
+    if match:
+        return f"upstream_5xx:{match.group(1)}"
     return None
 
 

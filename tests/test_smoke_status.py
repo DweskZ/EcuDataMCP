@@ -45,6 +45,32 @@ def test_keeps_unknown_errors_as_failures():
     assert assessment.status == "failed"
 
 
+def test_classifies_any_upstream_5xx_as_degraded():
+    # Confirmed live 2026-09-18: anda.inec.gob.ec 503'd on the scheduled
+    # run. A 5xx is the live source's own server failing, generically, not
+    # something specific to ANDA -- so this must not need a hardcoded
+    # per-host tuple the way the 403/geoblock cases do.
+    text = (
+        "Error al buscar en ANDA: Server error '503 Service Unavailable' "
+        "for url 'https://anda.inec.gob.ec/anda5/index.php/api/catalog"
+        "?ps=50&sk=empleo'"
+    )
+
+    assessment = assess_response(text, [], is_error=True)
+
+    assert assessment.status == "degraded"
+    assert assessment.source == "upstream_5xx:anda.inec.gob.ec"
+
+
+def test_upstream_5xx_regex_ignores_client_errors():
+    # A 4xx is not automatically a live-source outage -- it can reflect a
+    # real bug in this repo's request (bad params, a changed endpoint), so
+    # only 5xx gets the generic pass.
+    text = "Client error '404 Not Found' for url 'https://example.gob.ec/x'"
+
+    assert degraded_source(text) is None
+
+
 def test_accepts_matching_normal_response():
     assert assess_response('{"results": []}', ['"results"']).status == "ok"
 
