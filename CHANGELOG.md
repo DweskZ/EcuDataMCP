@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Fixed
+
+- **The outgoing `User-Agent` reported version 0.5.0 to every official
+  source** while the project shipped 0.8.9. `helpers/user_agent.py` now
+  derives it from `helpers/version.py` (the single source of truth), which
+  is the same drift its docstring already warned about for `main.py`'s
+  `VERSION` and `list_capabilities`.
+
+### Changed
+
+- **Measured the surface that phases 0-3 produced and planned the next
+  phases in `docs/MCP_ARCHITECTURE.md`.** `tools/list` costs 188.352
+  characters (≈47k tokens) per conversation; `outputSchema` is generic in
+  113/113 tools because the return annotation is `dict[str, Any]`; the
+  `metadatos` contract covers 4/113; the daily smoke calls 43/113 tools.
+  Phases 4-8 cover the context budget, real `outputSchema`, response
+  size/pagination, a shared HTTP layer with a persistent cache, and
+  per-tool usage telemetry. `docs/ROADMAP.md`'s quality rows now match
+  what shipped in 0.8.9 instead of still listing it as not started.
+
 ## 0.8.9 — 2026-09-14
 
 ### Changed

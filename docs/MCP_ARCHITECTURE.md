@@ -356,6 +356,104 @@ Antes de retirar más tools en cualquier fase conviene medir llamadas reales,
 errores de selección y herramientas que nunca se usan. No se debe reducir la
 superficie únicamente para alcanzar un número arbitrario.
 
+## Medición de la superficie ya migrada (2026-09-18)
+
+Las fases 0-3 se publicaron en 0.8.9. Esta sección mide el resultado real
+contra el servidor, no contra el plan — todas las cifras salen de levantar
+`main.py` con `MCP_PROFILE=all` (113 tools) y leer `tools/list`.
+
+| Métrica | Valor medido | Cómo se midió |
+|---|---|---|
+| Tamaño de `tools/list` | 188.352 caracteres de JSON (≈47.000 tokens con la aproximación de 4 caracteres/token) | Suma de `model_dump()` de las 113 tools |
+| Tamaño por tool | mediana 1.616 caracteres; las mayores entre 2.363 y 3.189 (`search_sipa_geoportal_capas`, `search_mef_fiscal`, `search_datasets`) | Mismo dump, por tool |
+| `title` y anotaciones | 113/113 | Fase 2, ya completa |
+| `outputSchema` útil | 0/113 — las 113 publican `{"type": "object", "additionalProperties": true}` | Fase 3 entregó `structuredContent`, pero la anotación de retorno es `dict[str, Any]`, así que el SDK no puede derivar forma |
+| Contrato `metadatos` | 4/113 (`search_bce_iem`, `get_bce_iem_table`, `audit_bce_catalog`, `compare_bce_sources`) | `rg -l with_response_metadata` |
+| Cobertura del smoke en vivo | 43/113 tools (38%), 70 sin ninguna llamada real | Nombres de tool citados en `scripts/smoke_e2e.py` cruzados con `tools/list` |
+
+Dos conclusiones nuevas, ninguna visible antes de medir:
+
+1. **El costo de contexto pasó a ser el problema real, no el conteo.** La
+   conclusión de 2026-09-11 ("115 tools no es el problema, la forma de
+   describirlas sí") sigue siendo correcta, pero las descripciones que
+   resolvieron la fatiga de selección ahora cuestan ~47k tokens en cada
+   conversación, antes de la primera pregunta del usuario. En un cliente de
+   200k de contexto eso es ~24% gastado en el menú.
+2. **`structuredContent` sin `outputSchema` real es la mitad del contrato.**
+   Un agente recibe el objeto pero no puede saber su forma antes de llamar,
+   que era justamente el objetivo de la fase 3. El SDK ya deriva el schema
+   del tipo de retorno (`mcp/server/mcpserver/utilities/func_metadata.py`),
+   así que el arreglo es tipar el retorno, no escribir schemas a mano.
+
+### Fase 4 — Presupuesto de contexto de `tools/list`
+
+Objetivo medible: bajar de ~188k caracteres a <60k sin perder capacidades.
+
+1. Descripción en dos niveles: docstring corto (qué hace, cuándo usarla, qué
+   no devuelve) en el tool, y el detalle largo (tabla de parámetros,
+   ejemplos, límites de la fuente) movido a `docs/TOOLS.md` y al recurso
+   `ecuador://fuentes`, que ya existe y no se cobra por conversación.
+2. Perfiles por dominio sobre el mecanismo que la fase 1 ya construyó:
+   extender `MCP_PROFILE` de `public|maintenance|all` a toolsets
+   (`ckan`, `bce`, `salud`, `geo`, `empresas`...), de modo que un cliente que
+   solo necesita datos económicos no pague las 113. `MCPServer.remove_tool`
+   existe en el SDK, así que también permite activación dinámica.
+3. Verificación: test de regresión que falle si `tools/list` supera el
+   presupuesto de caracteres acordado — la misma forma de gate que
+   `tests/test_tool_metadata.py` usa para `title`.
+
+### Fase 5 — `outputSchema` real
+
+1. Definir modelos de resultado por *familia*, no por tool: búsqueda
+   paginada, listado de opciones, listado de archivos, serie temporal,
+   preview tabular, documento. Son 6 formas que cubren las 113 tools.
+2. Tipar el retorno de cada tool con el `TypedDict` de su familia en vez de
+   `dict[str, Any]`; el SDK publica el schema derivado sin tocar la lógica.
+3. Extender el envoltorio `metadatos` de `helpers/response_contract.py` a
+   esas familias (hoy 4/113), que es el paso que la fila "Contrato de
+   respuesta para agentes" del ROADMAP dejó pendiente.
+
+### Fase 6 — Tamaño de respuesta, paginación y enlaces
+
+`search_datasets` reenvía los objetos CKAN completos a `structuredContent`
+sin recortar campos ni límite de bytes: una búsqueda de 20 filas puede
+devolver cientos de KB donde el texto equivalente recorta las notas a 200
+caracteres. Es el mismo patrón en los tools de catálogo de otras fuentes.
+
+1. Lista blanca de campos por familia y un parámetro `campos`
+   (`minimo`/`completo`) para pedir el objeto crudo explícitamente.
+2. Tope de bytes por respuesta con truncamiento declarado en `metadatos`
+   (cuántas filas se omitieron y cómo pedir el resto), en vez de depender de
+   que el cliente aguante.
+3. Cursor de paginación uniforme entre tools, y `resource_link` para
+   archivos grandes en vez de inline.
+
+### Fase 7 — Capa HTTP compartida y caché persistente
+
+32 de los 69 módulos de `helpers/` usan `httpx` directamente, con timeouts
+dispersos (25s, 30s, 120s) y sin política común de reintento: la escalera de
+reintentos TLS (`helpers/tls.py`) está compartida, pero el manejo de 429 con
+`Retry-After` y cooldown solo existe en `helpers/sercop_client.py`, y
+`AsyncHTTPTransport(retries=2)` solo en `helpers/gobec_client.py`.
+
+1. Promover el patrón de SERCOP a un cliente compartido (factory con
+   timeout por perfil de fuente, backoff ante 429/5xx, pooling reutilizado,
+   cooldown por host) y migrar fuente por fuente, sin big bang.
+2. Caché con persistencia: `helpers/cache.py` es TTL en memoria, así que
+   cada reinicio vuelve a raspar catálogos caros (índices del BCE, ~1.660
+   documentos de la Biblioteca de SGR, 312 archivos de Superbancos). Un
+   caché en disco por URL con revalidación `ETag`/`Last-Modified` es
+   prerequisito real de la fila "Operación 24/7" del ROADMAP.
+
+### Fase 8 — Telemetría de uso
+
+Esta revisión repite desde su primera versión que no se deben retirar tools
+sin medir llamadas reales, y el servidor todavía no registra ninguna. Un
+contador por tool (llamadas, latencia p50/p95, tasa de error, fuente
+degradada) expuesto en un endpoint local estilo Prometheus convierte esa
+recomendación en algo accionable, y es también lo que diría qué tools entran
+en cada perfil de la fase 4.
+
 ## Fuentes oficiales consultadas
 
 - [MCP Tools, especificación 2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25/server/tools)
