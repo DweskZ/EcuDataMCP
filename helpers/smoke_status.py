@@ -41,6 +41,16 @@ _DEGRADED_SOURCES = (
         "base de datos financiera de supercías",
         "automáticamente en segundo plano",
     ),
+    (
+        # Confirmed live 2026-09-18: search_anda 503'd on one run, then
+        # 403'd on the next from a different network -- the same
+        # GitHub-Actions-runner geo/bot block already seen on INEC's other
+        # censoecuador.gob.ec property, not a transient blip (the generic
+        # 5xx check below wouldn't have caught this consistent 403).
+        "anda_inec_geoblock",
+        "anda.inec.gob.ec",
+        "403 forbidden",
+    ),
 )
 
 # httpx's own raise_for_status() message format (confirmed against

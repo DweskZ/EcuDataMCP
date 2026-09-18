@@ -71,6 +71,22 @@ def test_upstream_5xx_regex_ignores_client_errors():
     assert degraded_source(text) is None
 
 
+def test_classifies_anda_inec_regional_block_as_degraded():
+    # Confirmed live 2026-09-18: anda.inec.gob.ec 403'd from a second
+    # network right after its first 503 -- a consistent geo/bot block, the
+    # same INEC-property pattern as censoecuador.gob.ec, not a one-off.
+    text = (
+        "Error al buscar en ANDA: Client error '403 Forbidden' for url "
+        "'https://anda.inec.gob.ec/anda5/index.php/api/catalog"
+        "?ps=50&sk=empleo'"
+    )
+
+    assessment = assess_response(text, [], is_error=True)
+
+    assert assessment.status == "degraded"
+    assert assessment.source == "anda_inec_geoblock"
+
+
 def test_accepts_matching_normal_response():
     assert assess_response('{"results": []}', ['"results"']).status == "ok"
 
