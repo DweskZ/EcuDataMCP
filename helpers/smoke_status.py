@@ -51,6 +51,28 @@ _DEGRADED_SOURCES = (
         "anda.inec.gob.ec",
         "403 forbidden",
     ),
+    (
+        # Confirmed live 2026-09-19: list_instituciones/search_tramites/
+        # search_regulaciones/get_regulacion_info all failed the same way in
+        # one run -- gob.ec answered a (likely geo/bot-blocked) request with
+        # HTTP 200 and an empty/non-JSON body rather than a 4xx, so
+        # resp.json() raised instead of raise_for_status(). See
+        # gobec_client._fetch_json, which now wraps that into this message.
+        "gobec_geoblock",
+        "el portal gob.ec devolvió una respuesta vacía o no válida",
+    ),
+    (
+        # Confirmed live 2026-09-19: www.censoecuador.gob.ec's TLS
+        # certificate (notAfter 2026-09-18 23:59:59 GMT, per `openssl
+        # s_client`) expired the day before this run -- a genuine upstream
+        # outage, not the missing-intermediate case helpers/tls.py's
+        # _OS_TRUST_HOST_SUFFIXES retry already handles (that retry still
+        # fully verifies the chain, so it fails the same way once the leaf
+        # itself is expired).
+        "censo_ecuador_tls_expired",
+        "censo ecuador",
+        "certificate has expired",
+    ),
 )
 
 # httpx's own raise_for_status() message format (confirmed against

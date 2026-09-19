@@ -1,3 +1,4 @@
+import json
 import logging
 import re
 from html import unescape
@@ -61,7 +62,24 @@ async def _fetch_json(
         logger.debug("GobEC GET %s params=%s", url, params)
         resp = await session.get(url, params=params, timeout=_TIMEOUT)
         resp.raise_for_status()
-        return resp.json()
+        try:
+            return resp.json()
+        except json.JSONDecodeError as exc:
+            # Confirmed live 2026-09-19: gob.ec's API sometimes answers a
+            # blocked/bot-suspected request with HTTP 200 and an empty or
+            # non-JSON body instead of a 4xx (unlike datosabiertos.gob.ec's
+            # CKAN endpoint, which rejects the same kind of request with a
+            # plain 403 -- see ckan_client._fetch_json). Give callers a
+            # message that names the likely cause instead of the bare
+            # json.JSONDecodeError text.
+            logger.warning("GobEC response for %s was not valid JSON", url)
+            raise RuntimeError(
+                "El portal gob.ec devolvió una respuesta vacía o no válida. "
+                "Esto suele pasar cuando el servidor se conecta desde fuera "
+                "de Latinoamérica. Si el problema persiste, prueba "
+                "conectando desde una VPN con salida en algún país de la "
+                "región."
+            ) from exc
     except httpx.HTTPError as exc:
         logger.error("GobEC request failed for %s: %s", url, exc)
         raise

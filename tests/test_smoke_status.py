@@ -87,6 +87,38 @@ def test_classifies_anda_inec_regional_block_as_degraded():
     assert assessment.source == "anda_inec_geoblock"
 
 
+def test_classifies_gobec_empty_body_as_degraded():
+    # Confirmed live 2026-09-19: gob.ec answered a blocked request with
+    # HTTP 200 and an empty body rather than a 4xx, so resp.json() raised a
+    # bare JSONDecodeError instead of raise_for_status() firing.
+    text = (
+        "Error al listar instituciones: El portal gob.ec devolvió una "
+        "respuesta vacía o no válida. Esto suele pasar cuando el servidor "
+        "se conecta desde fuera de Latinoamérica."
+    )
+
+    assessment = assess_response(text, [], is_error=True)
+
+    assert assessment.status == "degraded"
+    assert assessment.source == "gobec_geoblock"
+
+
+def test_classifies_censo_ecuador_expired_certificate_as_degraded():
+    # Confirmed live 2026-09-19: www.censoecuador.gob.ec's TLS cert expired
+    # 2026-09-18 -- a genuine upstream outage, distinct from the missing-
+    # intermediate case helpers/tls.py already retries around.
+    text = (
+        "Error al buscar recursos del Censo Ecuador: "
+        "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: "
+        "certificate has expired (_ssl.c:1000)"
+    )
+
+    assessment = assess_response(text, [], is_error=True)
+
+    assert assessment.status == "degraded"
+    assert assessment.source == "censo_ecuador_tls_expired"
+
+
 def test_accepts_matching_normal_response():
     assert assess_response('{"results": []}', ['"results"']).status == "ok"
 
