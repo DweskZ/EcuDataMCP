@@ -24,6 +24,9 @@ from tools.get_compania_info import register_get_compania_info_tool
 from tools.get_contraloria_informe import register_get_contraloria_informe_tool
 from tools.get_contrato_info import register_get_contrato_info_tool
 from tools.get_dataset_info import register_get_dataset_info_tool
+from tools.get_energia_ecuador_snapshot import (
+    register_get_energia_ecuador_snapshot_tool,
+)
 from tools.get_financials import register_get_financials_tool
 from tools.get_iess_archivos import register_get_iess_archivos_tool
 from tools.get_inamhi_capa_datos import register_get_inamhi_capa_datos_tool
@@ -107,6 +110,7 @@ from tools.search_bce_publicaciones import register_search_bce_publicaciones_too
 from tools.search_bce_remesas import register_search_bce_remesas_tool
 from tools.search_biinec_extras import register_search_biinec_extras_tool
 from tools.search_censo_recursos import register_search_censo_recursos_tool
+from tools.search_centrosur_cortes import register_search_centrosur_cortes_tool
 from tools.search_cepalstat_indicadores import (
     register_search_cepalstat_indicadores_tool,
 )
@@ -270,6 +274,8 @@ def register_tools(mcp: MCPServer) -> None:
     register_list_bce_indicadores_diarios_tool(mcp)
     register_get_bce_indicador_diario_tool(mcp)
     register_get_cenace_tablero_tool(mcp)
+    register_search_centrosur_cortes_tool(mcp)
+    register_get_energia_ecuador_snapshot_tool(mcp)
 
     register_search_companias_tool(mcp)
     register_get_compania_info_tool(mcp)

@@ -4899,6 +4899,314 @@ Todas confirmadas con el mismo patrón de tabla Gutenberg que `helpers/msp_gacet
 
 ---
 
+## Vigésimo séptima pasada — archivo histórico de cortes de luz (crisis 2024), segunda vuelta a fondo (2026-09-20)
+
+**Pedido explícito de Daniel:** re-investigar a fondo el archivo histórico
+de los cortes de luz programados de la crisis eléctrica de 2024 (ya tocado
+de forma más superficial en la Octava pasada, § "Archivo histórico de
+cortes de luz programados") y documentar. Todo lo de abajo se verificó en
+vivo el 2026-09-20 con `curl`, el navegador del proyecto y búsquedas web —
+no es una relectura de la Octava pasada, cambia la conclusión sobre CNEL y
+agrega dos distribuidoras nuevas (Centrosur, EEASA) más un mecanismo de
+enumeración real que la Octava pasada no había encontrado.
+
+### EEQ (Quito) — confirmado vivo de nuevo, y el CMS identificado como Liferay
+
+El PDF de referencia de la Octava pasada
+(`eeq.com.ec/documents/d/empresa-electrica-quito/04-al-06-oct`) sigue
+respondiendo `200`/`Content-Type: application/pdf` hoy. Inspeccionando las
+cabeceras (`JSESSIONID`, redirect de `/documents/` a `/c/portal/login`) y
+la home (`Server: nginx`, tema `classic-theme`, imports de
+`frontend-js-react-web`) se confirma que el CMS es **Liferay DXP 7.x**, el
+mismo motor ya identificado para SRI (`search_sri_datasets`) e IESS
+(`document_library_display`) — un patrón que se repite un tercera vez en
+el proyecto. **Nuevo intento de enumeración programática, sin éxito:**
+
+- `/api/jsonws/*` (el módulo JSON Web Services clásico de Liferay 6/7) devuelve
+  `500`/`{}` o redirige a la home — deshabilitado o no expuesto en esta
+  instancia (normal en Liferay DXP moderno, que empuja hacia Headless APIs).
+- `/o/headless-delivery/v1.0/sites` devuelve `404` — el módulo Headless
+  Delivery no está desplegado públicamente en este sitio.
+- `sitemap.xml` sí es real y público (`groupId=8361921`, varios `p_l_id`
+  por layout), pero solo indexa **páginas** (Web Content, ej.
+  `/w/hablemos-de-phishing`), no entradas de la Document Library — los PDFs
+  de cortes no aparecen ahí.
+
+**Enumeración real: motores de búsqueda, no la API del CMS.** Con
+`site:eeq.com.ec/documents` (vía búsqueda web) aparecen decenas de slugs
+adicionales a los ya conocidos de la Octava pasada — confirma que Google
+indexó estas páginas cuando eran nuevas y ese índice es, hoy, la única vía
+de enumeración viable (el listado real del CMS exige login). Slugs nuevos
+confirmados en esta pasada: `21-06-2024`, `25-04-2024`, `30_04_2024`,
+`26-04-2024`, `29_04_2024`, `nov-05-10`, `viernes-10-a-jueves-16`,
+`lunes-20-martes-21`, `18-21-nov`, `09-a-13-2024`, `18-y-19-09-2024`,
+`20-abril`, `17-04-2024`, `23-04-2024`, `24-27-28-30`, `6h-25-28` — sin
+contar los ya conocidos (`04-al-06-oct`, `23-al-29-09-24`, `26-04-2024`,
+`mf-09-10-nov`). El naming sigue sin patrón predecible (mezcla
+`DD-MM-YYYY`, `DD_MM_YYYY`, rangos en prosa, abreviaturas de mes) —
+confirma que construir esto exige indexar por búsqueda repetida
+(variaciones de query por mes/quincena) en vez de adivinar URLs o listar
+via API.
+
+### Centrosur (Azuay/Cuenca) — hallazgo nuevo no visto en la Octava pasada, con enumeración real vía WordPress REST
+
+La Octava pasada solo conocía 2 PDFs sueltos de Centrosur
+(`Estadistica-2023.pdf`, `Informacion_pagina_web_2025_3T.pdf`). Esta pasada
+encontró que Centrosur corre **WordPress** para su sitio institucional
+(`www.centrosur.gob.ec`) y publicó ahí mismo el archivo real de la crisis:
+
+- **Carpeta dedicada `wp-content/uploads/documentospdf/CortesEstiaje/`**
+  ("estiaje" = temporada seca/de bajo caudal, el término técnico correcto
+  que usa el sector para la causa hidrológica de la crisis) — confirmado
+  en vivo que un archivo real ahí (`Cortes_19_20_ABRIL_2024_consolidado.pdf`)
+  responde `200`. El listado de directorio da `403` (bloqueado, como es de
+  esperar en cualquier Apache/nginx bien configurado), y estos archivos
+  **no** están en el `wp_posts`/media library de WordPress — fueron
+  subidos directo al filesystem, así que no aparecen en la API REST. Solo
+  enumerables vía búsqueda web dirigida a esa carpeta.
+- **PDFs sí registrados en la media library, enumerables por API real:**
+  `www.centrosur.gob.ec/wp-json/wp/v2/media?search=<término>` funciona sin
+  autenticación y devuelve `source_url` + fecha de subida. Confirmado en
+  vivo: `search=Cortes` → 12 resultados (`X-WP-Total: 12`, incluye
+  `Cortes_18_19_ABRIL_2024.pdf`, `Cortes-23-al-29-septiembre-2024.pdf`,
+  más los PDFs "trabajos programados" de 2023 que no son de la crisis);
+  `search=desconexion` → confirma además el patrón `DESCONEXION-*.pdf` como
+  sinónimo real que hay que buscar aparte de "Cortes". **Esta es la primera
+  distribuidora del proyecto con un mecanismo de enumeración
+  verdaderamente programático (paginado, sin login, sin adivinar slugs)
+  para al menos una parte de su archivo** — mejor que EEQ (Google-only) y
+  mejor que CNEL (nada).
+- **`nest.centrosur.gob.ec/cortes`** es una aplicación Angular
+  ("Programación de cortes", bundles `main.*.js`/`runtime.*.js` con
+  `xlsx.js`/`jszip.js`/`html2pdf.bundle.min.js` para exportar) — es la
+  **herramienta de consulta vigente hoy**, no un archivo histórico; el
+  link específico de sep-2024 encontrado por búsqueda web
+  (`nest.centrosur.gob.ec/programacion-cortes/assets/pdfs/Cortes-23-al-29-septiembre-2024.pdf`)
+  ya no existe como archivo estático — redirige (`301`) de vuelta a
+  `/cortes`, la SPA reemplazó esa ruta. El dato real de sep-2024 sigue
+  vivo, pero solo bajo el dominio principal (`www.centrosur.gob.ec/wp-content/...`),
+  no bajo `nest.*`.
+
+### EEASA (Ambato/Tungurahua) — dominio nuevo confirmado, pero hoy inalcanzable
+
+Búsqueda web confirma PDFs reales de la crisis bajo
+`eeasa.com.ec/content/uploads/2024/{mes}/...` (ej.
+`Cortes-30-de-abril-Tungurahua.pdf`,
+`Desconexiones-del-30-de-septiembre-al-06-de-octubre-Tungurahua-Actualizada.pdf`),
+mismo patrón de carpeta por año/mes que EEQ/Centrosur/CNEL. **Pero
+`www.eeasa.com.ec` no conecta en absoluto hoy** (`curl` con timeout de 25s:
+"Failed to connect... Could not connect to server") — no es un bloqueo
+TLS ni un 403, es que el host no acepta la conexión TCP en este momento.
+Dato real y con URLs conocidas, pendiente de reintentar cuando el sitio
+vuelva a responder.
+
+### EERSSA (Loja) — 403 confirmado con tres métodos distintos, bloqueo real
+
+La Octava pasada ya sospechaba un filtro de User-Agent sin confirmar. Esta
+pasada lo descarta: `curl` simple, `curl` con User-Agent de Chrome real +
+`Referer`, y el navegador del proyecto (IP y stack TLS distintos en cada
+caso) dan los tres el mismo `403 Forbidden` de Apache sobre
+`eerssa.gob.ec/eerssa/cortes/cortes_eerssa_2024.pdf` — un PDF real,
+indexado y con URL conocida (`www.eerssa.gob.ec/eerssa/cortes/cortes_eerssa_2024.pdf`),
+pero bloqueado a nivel de servidor para tráfico fuera de Ecuador (o alguna
+otra regla de Apache) de forma consistente, no una casualidad de una sola
+petición. Igual que `sisdatbi.arconel.gob.ec`, este es un bloqueo
+confirmado, no falta de esfuerzo.
+
+### CNEL (costa/Guayaquil) — la Octava pasada decía "página sobrescrita"; esta pasada confirma que el contenido no existe en absoluto, con la API REST propia de CNEL como evidencia
+
+Corrección de dominio primero: `cnel.gob.ec` (sin más) falla TLS
+(`SEC_E_WRONG_PRINCIPAL`, mismo patrón de certificado compartido de
+`.gob.ec` ya documentado para `recursosyenergia.gob.ec` y
+`habitatyvivienda.gob.ec`) — el dominio real y correcto es
+**`cnelep.gob.ec`**. Con el dominio correcto:
+
+- `www.cnelep.gob.ec/tag/corte-de-energia/` sí carga (`200`, aunque de
+  forma intermitente — un segundo intento con User-Agent distinto dio
+  timeout, y un tercer intento sin cambios volvió a dar `200`; hosting
+  inestable, no un bloqueo). Confirma lo de la Octava pasada: solo
+  muestra noticias de 2026, nada de 2024, sin paginación hacia atrás.
+- **CNEL corre WordPress y su API REST está viva** — a diferencia de EEQ
+  (Liferay, sin API pública) esto permitió una verificación mucho más
+  fuerte que en la Octava pasada. El tag "CORTE DE ENERGÍA" existe como
+  `tag_id=337`, pero `wp-json/wp/v2/posts?tags=337&after=2024-01-01&before=2024-12-31`
+  devuelve **0 resultados** — ningún post de 2024 tiene ese tag hoy.
+  Ampliando a **todos** los posts publicados entre 2024-09-15 y
+  2024-12-25 (la ventana completa de la crisis), sin filtrar por tag:
+  `X-WP-Total: 59`, y **ninguno de los 59 títulos** menciona corte,
+  apagón, racionamiento, suspensión o programación. Búsquedas de texto
+  completo (`?search=racionamiento`, `?search=cortes+de+energía`) sobre
+  todo el histórico del sitio tampoco encuentran los anuncios de la
+  crisis. **Conclusión más fuerte que la Octava pasada:** no es que la
+  página de tag se sobrescribiera visualmente — los posts de los anuncios
+  de la crisis 2024 no existen en la base de datos de WordPress de CNEL
+  hoy, ni con tag, ni sin tag, ni por búsqueda. Consistente con el hallazgo
+  ya documentado de que CNEL comunicó los cronogramas por "Unidad de
+  Negocio" (provincia) vía links cortos de X (Twitter), no vía su propio
+  CMS — y esos posts, si existieron, fueron borrados o nunca se crearon
+  como entradas indexables.
+- Único hallazgo real de archivo: `cnelep.gob.ec/wp-content/uploads/2024/04/Anexo-Corte-Marzo-24-signed-signed-1.pdf`
+  es un anexo de un **proceso de contratación** (servicio técnico de
+  cortes/reconexiones), no un cronograma de cortes programados — dato
+  administrativo, no operativo, descartar para este propósito.
+
+### Ministerio de Energía y Minas / Ambiente y Energía — aparece un sitio de agregación nacional, ya desaparecido, y el WAF bloquea su propia API
+
+Búsqueda web reveló que el ministerio lanzó durante la crisis un **sitio
+dedicado de consulta nacional de horarios de cortes**,
+`energia-ecuador.com` ("Nuevo sitio web para revisar los horarios de
+cortes de energía", anuncio archivado en `ambienteyenergia.gob.ec`) — esto
+habría sido, de seguir vivo, la fuente agregada ideal (todas las
+distribuidoras en un solo lugar). **Confirmado muerto:** el dominio ya no
+resuelve en DNS (`Could not resolve host`) — infraestructura de crisis
+desmontada después, como era de esperar. El propio dominio del ministerio
+(`www.ambienteyenergia.gob.ec`) sí tiene varios posts de prensa sobre
+anuncios de cortes (ej. "Condiciones hidrológicas permiten suspender
+cortes de energía el 18 y 19 de diciembre"), pero **su `/wp-json/` está
+bloqueado a nivel de conexión** (`Recv failure: Connection was reset`, de
+forma consistente en 3 intentos distintos, incluyendo una prueba mínima a
+la raíz `/wp-json/`) — un WAF bloqueando el path completo, no solo
+queries específicas. Los posts individuales sí son alcanzables por URL
+directa (ya indexados por búsqueda web), solo no hay forma de enumerar el
+catálogo completo vía su propia API.
+
+### CENACE — el informe de rendición de cuentas 2024 está protegido y no es legible
+
+`cenace.gob.ec/wp-content/uploads/downloads/2025/06/Informe-de-rendicion-de-cuentas-2024_CENACE_preliminar.pdf`
+se descargó completo (1.8 MB) pero **es un PDF con protección de
+permisos** — tanto `WebFetch` como el extractor de texto del proyecto
+(`Read` sobre PDF) fallan con "PDF is password-protected". Si este informe
+contiene una tabla de cumplimiento diario del plan de cortes por empresa
+(mencionado como posible en resultados de búsqueda), queda bloqueado por
+esta protección — no confirmado ni descartado, pendiente de una
+herramienta que remueva la protección de permisos (`qpdf --decrypt` o
+similar) antes de poder leerlo.
+
+### Wayback Machine — disponibilidad intermitente confirmada hoy, ya no es "caído sin más"
+
+La Octava pasada lo encontró con "Temporarily Offline" y no insistió. Hoy
+se confirmó **inestabilidad real, no una caída fija**: una consulta al CDX
+API dio `429 Too Many Requests` (el servicio respondiendo, solo
+limitando), y ocho segundos después otra consulta dio `503` con la misma
+página "Internet Archive services are temporarily offline" de la Octava
+pasada. Es decir, Internet Archive sigue teniendo cortes de servicio
+recurrentes en 2026 (consistente con problemas de infraestructura
+públicamente reportados) — no es un bloqueo hacia este proyecto ni hacia
+Ecuador. Reintentar con backoff/reintentos espaciados en vez de un solo
+intento sería la única forma de aprovecharlo, especialmente para CNEL
+(único caso donde de verdad hace falta, dado que EEQ/Centrosur ya tienen
+archivo en vivo).
+
+### Ranking actualizado de fuentes para este ítem
+
+1. **Centrosur** — la mejor fuente después de esta pasada: parte de su
+   archivo (`Cortes`, `desconexion`) es enumerable por API REST sin login,
+   sin adivinar URLs; el resto (`CortesEstiaje/`) exige búsqueda dirigida
+   pero está confirmado vivo.
+2. **EEQ** — archivo completo confirmado vivo, pero sin API real; requiere
+   iterar `site:eeq.com.ec/documents` con variaciones de query por
+   mes/quincena para maximizar cobertura, aceptando que el índice de
+   Google es el techo real de lo enumerable.
+3. **EEASA** — URLs reales conocidas, dominio caído hoy; reintentar más
+   adelante.
+4. **CNEL** — confirmado sin archivo propio recuperable (ni WordPress ni
+   tag ni búsqueda de texto encuentran los posts de la crisis); la única
+   vía que queda es Wayback Machine con reintentos, tratado como
+   experimento de baja probabilidad, no una fuente confiable.
+5. **EERSSA** — bloqueado a nivel de servidor, confirmado con tres métodos
+   distintos; sin ruta de acceso conocida desde fuera de Ecuador.
+6. **CENACE/ARCONEL/Ministerio** — sin cronogramas granulares (ya sabido);
+   el informe de rendición de cuentas de CENACE queda como pendiente
+   aparte por estar protegido, no por falta de contenido confirmado.
+
+**Conclusión:** el panorama es mejor de lo que documentó la Octava pasada
+— además de EEQ, hay al menos dos distribuidoras más (Centrosur, EEASA)
+con archivo real, y Centrosur aporta el primer mecanismo de enumeración
+programática del proyecto para este ítem. CNEL, en cambio, queda más
+categóricamente descartado que antes: no es una página sobrescrita, es
+contenido que no existe en su base de datos actual.
+
+**Construido 2026-09-21:** `search_centrosur_cortes`
+(`helpers/centrosur_cortes_client.py`), cubriendo la parte de este hallazgo
+con enumeración real (Centrosur, vía `wp-json/wp/v2/media?search=...`) —
+verificado en vivo contra la fuente real (8 PDFs en el archivo completo, 4
+de la ventana sep-dic 2024). EEQ (sin API, requiere búsqueda web dirigida),
+EEASA (dominio caído al momento de esta pasada) y CNEL (sin archivo
+recuperable) quedan fuera de esta primera entrega — ver ROADMAP.md para el
+resto pendiente.
+
+---
+
+## Vigésimo octava pasada — recuperado `energia-ecuador.com` (portal agregador nacional del Ministerio) vía Wayback Machine (2026-09-21)
+
+**Pedido explícito de Daniel:** el agregador nacional del Ministerio de
+Energía y Minas (`energia-ecuador.com`) mencionado en la Vigésimo séptima
+pasada como "ya desaparecido" — "quiero ese agregador, buscalo de alguna
+manera, es importante". Se insistió con Wayback Machine (que en la pasada
+anterior estaba intermitente, 429/503) hasta obtener resultados reales.
+
+**Encontrado y parcialmente recuperado.** El dominio en sí sigue muerto
+(no resuelve en DNS), pero **sí existe un snapshot real y completo del
+sitio en Wayback Machine**, del día de su lanzamiento:
+
+- Título real: *"Ecuador Energia – Portal para actualización de
+  racionamiento energético"* — confirma que era, efectivamente, el
+  agregador nacional que el Ministerio anunció.
+- Sitio WordPress + Elementor + **TablePress** (el plugin que renderiza
+  tablas de datos directamente en el HTML servido, no vía API separada —
+  a diferencia de la mayoría de fricciones JS de este proyecto, aquí el
+  dato real está en la página misma, solo hay que parsear la tabla).
+- El propio `wp-sitemap-posts-page-1.xml` archivado confirma **9 páginas,
+  una por distribuidora**, todas con `lastmod` agrupado en 2024-04-23: EEQ,
+  Centrosur, CNEL, Emelnorte, EEASA (bajo el slug
+  `empresa-electrica-ambato-regional-centro-norte`), Empresa Eléctrica
+  Azogues, Empresa Eléctrica Provincial Cotopaxi, Empresa Eléctrica
+  Riobamba, y EERSSA (bajo el slug `empresa-electrica-regional-del-sur`) —
+  la lista completa y exacta de qué cubría el portal, algo que no se sabía
+  antes de esta pasada.
+
+**Por qué solo una distribuidora es recuperable.** El rastreador de
+Wayback Machine solo tuvo una ventana de ~48 horas (2024-04-23 22:57 a
+2024-04-26) antes de que el sitio quedara detrás de un bloqueo Cloudflare
+(`cdn-cgi/challenge-platform`) — confirmado con una consulta CDX a todo el
+dominio filtrada a `statuscode:200`: de las 9 páginas de distribuidora,
+**únicamente `empresa-electrica-quito/` fue capturada completa** (200,
+2024-04-24). Las otras 8 no tienen ninguna captura 200 en ningún momento
+(verificado con la API `wayback/available`, que solo devuelve capturas
+exitosas: `archived_snapshots: {}` para las 9 páginas restantes probadas,
+o solo `403` en la CDX cruda para las que sí tienen alguna captura). No
+hay una versión posterior tampoco: la única captura posterior encontrada
+(2025-04-30) es una página parking de 114 bytes que redirige a `/lander` —
+el dominio expiró y fue absorbido por un parking service, confirmando que
+el Ministerio desmontó la infraestructura después de la crisis en vez de
+solo re-habilitar el rastreo.
+
+**El dato recuperado (EEQ, 40 filas, Pichincha)** tiene el mismo nivel de
+detalle pedido originalmente por Daniel — provincia, cantón, sectores, y
+franja horaria (`PROGRAMACIÓN INICIO/FIN`, `REPROGRAMACIÓN INICIO/FIN`) —
+pero es un **snapshot congelado de un solo día** (2024-04-24), no una
+serie continua; no hay "página siguiente" que descubrir, a diferencia de
+cualquier otro cliente de este proyecto.
+
+**Falsa alarma de encoding, descartada.** Una inspección inicial en
+terminal mostró texto corrupto ("RUMI�AHUI"). Verificado contra los bytes
+crudos del archivo: la secuencia real es `RUMI` + `\xc3\x91` (UTF-8 válido
+para "Ñ") + `AHUI` — el archivo está correctamente codificado en UTF-8 de
+principio a fin; el corte era un artefacto de la consola de esta sesión al
+imprimir, no un defecto de la fuente ni del parseo.
+
+**Construido el mismo día:** `get_energia_ecuador_snapshot`
+(`helpers/energia_ecuador_snapshot_client.py`) — resuelve el snapshot vía
+`archive.org/wayback/available` (no una URL con timestamp fijo hardcodeado,
+para no romperse si Wayback reconsolida capturas cercanas bajo otro
+timestamp exacto) y parsea la tabla TablePress. Verificado en vivo contra
+la Wayback Machine real: 40 filas recuperadas. Las otras 8 páginas quedan
+documentadas arriba como confirmadas-pero-no-recuperables — no hay ruta de
+recuperación conocida para ellas desde ninguna fuente encontrada hasta
+ahora.
+
+---
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un
