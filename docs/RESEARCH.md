@@ -5207,6 +5207,155 @@ ahora.
 
 ---
 
+## Vigésimo novena pasada — bug real en `search_sri_ruc`, y certificado patronal del IESS descubierto mientras se investigaba si existe un número público de empleados por empresa (2026-09-21)
+
+**Contexto:** Daniel reportó, citando un chat externo, que `search_sri_ruc`
+fallaba con `Expecting value: line 1 column 1` al buscar "ACQUADOR" (la
+empresa real detrás de Agua Splendor, según La Hora, es
+`ACQUAD'OR C.A.`, RUC 0992216735001, La Maná/Cotopaxi). Después preguntó
+si el MCP podía dar el número de empleados de esa empresa vía Supercías/
+IESS.
+
+### Bug confirmado y corregido: `numerosRucPorRazonSocialToken` devuelve `204` con cuerpo vacío en cero coincidencias
+
+Reproducido en vivo: buscar `"ACQUADOR"` (sin apóstrofe) o `"ACQUAD OR"`
+(con espacio) da cero coincidencias reales — la razón social real lleva
+apóstrofe, `ACQUAD'OR`. El endpoint `cantidadObtenidaPorRazonSocial`
+maneja bien el caso de cero resultados (responde `200` con cuerpo `"0"`),
+pero **`numerosRucPorRazonSocialToken` responde `204 No Content` con
+cuerpo completamente vacío** en el mismo caso, en vez de `"[]"`. El código
+existente llamaba `response.json()` sin comprobar el cuerpo antes,
+así que `json.loads("")` lanzaba exactamente el error reportado. No es un
+problema de disponibilidad temporal del SRI, como sugería el mensaje del
+otro chat — es un caso de esquina real y reproducible del propio backend.
+Corregido en `helpers/sri_ruc_client.py::_fetch_catastro_json`: si el
+cuerpo de la respuesta está vacío, devuelve `[]` en vez de intentar
+parsearlo como JSON. Verificado en vivo tras el fix: las mismas tres
+consultas (`ACQUADOR`, `ACQUAD OR`, `ACQUADOR C.A.`) ahora devuelven
+`total_reportado=0` limpio; `"ACQUAD'OR"` (con apóstrofe) sigue
+encontrando la empresa real.
+
+### Empleados por empresa: confirmado que no hay ninguna fuente pública, ni en Supercías ni en IESS
+
+Verificado en vivo contra el RUC real de ACQUAD'OR
+(`obtenerPorNumerosRuc`): el JSON completo del catastro del SRI no tiene
+ningún campo de número de empleados — solo régimen, obligación de llevar
+contabilidad, representantes legales, fechas y estado. Supercías (ya
+cubierto por `get_compania_info`/`search_companias`) tampoco publica
+plantilla/número de trabajadores en su registro. El único ángulo que
+faltaba explorar era el IESS, dado que es la entidad que administra la
+nómina de aportantes por empleador.
+
+**Encontrado: un servicio público real del IESS, pero no da la cifra
+pedida.** `iess.gob.ec/empleador-web/pages/morapatronal/
+certificadoCumplimientoPublico.jsf` — "Certificado Cumplimiento
+Obligaciones Patronales", la propia página dice "Este certificado no
+requiere validación del IESS" (sin login). Es una app **JSF legado**
+(Mojarra/RichFaces, no REST) — el mismo patrón de estado que
+`reportes.arconel.gob.ec` (Vigésima pasada): hay que hacer un GET para
+sembrar un `javax.faces.ViewState` fresco atado a la sesión/nodo del
+cluster, y un POST inmediato en la misma sesión reenviando ese
+`ViewState` exacto junto al campo del formulario (`frmCertificadoCumplimiento:j_id9`)
+y el botón (`frmCertificadoCumplimiento:j_id11=CONSULTAR`). La página
+tiene **dos formularios JSF**, cada uno con su propio
+`javax.faces.ViewState` — el del certificado es el último en el
+documento, no el primero (confirmado con la reproducción exacta vía
+`curl`/`httpx`, replicando el POST real que el navegador dispara).
+
+La respuesta es un **PDF generado al vuelo** (`Content-Type:
+application/pdf`), con una sola oración de contenido real: *"el señor(a)
+X, representante legal de la empresa Y con RUC Nro. Z y dirección W, NO
+registra obligaciones patronales en mora"* — confirmado en vivo contra
+el RUC real de ACQUAD'OR (representante legal: BASANTES FREIRE FERNANDO
+ALEXANDER, vía LEXORA DPO SERVICES S.A.S. como apoderado; **NO** registra
+mora). **Esto es un estado de mora sí/no, no una cifra de empleados** —
+la pregunta original de Daniel sigue sin respuesta pública en ninguna
+fuente encontrada, y así se documenta en la nota de alcance del tool, no
+como una limitación silenciosa.
+
+**Dos formas de "no encontrado", ninguna con error HTTP limpio, ambas
+confirmadas en vivo:**
+
+1. Una identificación con formato inválido (probado con un RUC que falla
+   el checksum) devuelve `200` pero con una **página de reto anti-bot de
+   F5 BIG-IP** (`f5_cspm`, JS ofuscado) en vez de un PDF — no es "no
+   encontrado", es que el backend probablemente lanza una excepción con
+   ese dato malformado y F5 intercepta la respuesta de error.
+2. Una identificación bien formada pero inexistente (probado con una
+   cédula sintética) devuelve `200 application/pdf` con un **PDF real
+   pero sin texto extraíble** (página en blanco) — `pypdf` lo procesa sin
+   error, simplemente no hay nada escrito en la página.
+
+`helpers/iess_certificado_patronal_client.py` distingue ambos casos
+(`encontrado=False` con un `motivo` distinto cada uno) en vez de dejar
+que cualquiera de los dos se propague como excepción de Python — ninguno
+de los dos es un bug de este cliente, son dos formas distintas que la
+propia fuente usa para decir "nada que mostrar".
+
+**Construido el mismo día:** `get_certificado_cumplimiento_patronal`,
+reutilizando `helpers/pdf_reader.extract_text_from_bytes` (ya existente
+en el proyecto) para el paso PDF→texto en vez de duplicar el manejo de
+`pypdf`. Verificado en vivo de punta a punta contra el RUC real de
+ACQUAD'OR.
+
+---
+
+## Trigésima pasada — corrección: `n_empleados` SÍ existía en el dataset de Ranking de Supercías, bug de conversión lo dejaba en NULL para el 100% de las filas (2026-09-21)
+
+**Daniel corrigió la conclusión de la Vigésimo novena pasada:** "i'm sure
+we have employee count on the bi dataset" — tenía razón. La Vigésimo
+novena pasada solo revisó el registro básico de Supercías
+(`get_compania_info`) y el catastro del SRI, sin revisar el dataset de
+Ranking financiero (`search_ranking`/`get_financials`,
+`scripts/build_supercias_financials_db.py`), que sí declara una columna
+`n_empleados` desde el inicio (confirmado en el propio código,
+`_RANKING_COLUMNS`).
+
+**Verificado en vivo contra la base local:** consultando
+`data/supercias_financials.sqlite3` directamente, `n_empleados` es
+`NULL` para las 660.482 filas de las 5 cosechas de años que retiene la
+base (2021-2025) — el 100 % sin excepción, para cualquier empresa
+probada (ACQUAD'OR, Corporación Favorita). Antes de asumir que la fuente
+simplemente no publica el dato (que hubiera sido la conclusión honesta
+pero incorrecta), se verificó contra el **CSV real y en vivo**
+(`bi_ranking.csv`, streaming directo del portal, sin pasar por el build
+local): confirmado que la fuente **sí tiene el dato, poblado y con
+historia reciente** — Corporación Favorita (expediente 384), año 2024:
+`"11547.00"`; ACQUAD'OR (expediente 105787), año 2024: `"2.00"`.
+
+**Causa raíz confirmada:** `scripts/build_supercias_financials_db.py`
+declara `n_empleados` en `_RANKING_INT_COLUMNS` (tipo `INTEGER` en la
+base), pero la fuente lo formatea como cadena decimal
+(`"2.00"`, `"11547.00"`) — igual que las columnas `REAL` vecinas, no como
+las demás columnas realmente enteras (`anio`, `expediente`, que sí vienen
+sin decimales). `_convert()` intentaba `int("2.00")` directamente, lo cual
+lanza `ValueError` en Python (a diferencia de `int(2.00)` sobre un float
+real, que sí funcionaría) — el `except ValueError: return None` existente
+silenciaba el error convirtiendo cada valor real en `NULL`, sin ningún
+aviso ni fila afectada de forma parcial: el bug era determinístico y
+afectaba el 100 % de las filas porque el formato de la fuente es
+consistente.
+
+**Corregido:** `_convert()` ahora intenta `int(value)` primero y, si falla
+por tener parte decimal, reintenta con `int(float(value))` antes de
+rendirse a `None` — mismo patrón que ya usa `_convert_eu_decimal` para el
+separador decimal europeo, aplicado aquí al caso "entero conceptual,
+formateado como decimal por la fuente". Verificado con `_convert("2.00",
+"INTEGER") == 2` y `_convert("11547.00", "INTEGER") == 11547`. Rebuild
+completo de la base local lanzado en background para confirmar el fix de
+punta a punta contra los ~9M de filas reales.
+
+**Alcance correcto tras este fix:** `n_empleados` es número de empleados
+**reportado por la propia empresa a Supercías** en su balance anual —
+mismo nivel de confiabilidad que cualquier otro campo del Ranking
+(auto-reportado, no auditado por Supercías más allá de la validación de
+formato). El certificado del IESS de la Vigésimo novena pasada sigue
+siendo la única fuente de *cumplimiento* patronal (mora sí/no); este
+campo del Ranking es la fuente correcta para la *cifra* de empleados que
+Daniel pedía originalmente.
+
+---
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

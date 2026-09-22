@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Added
+
+- **`search_centrosur_cortes`** — archive of Centrosur's (Azuay/Cañar/
+  Morona Santiago) scheduled power-cut PDFs, 2023-present, including the
+  2024 estiaje blackout crisis. Enumerated via WordPress's public Media
+  Library REST API (`wp-json/wp/v2/media?search=...`), no login.
+- **`get_energia_ecuador_snapshot`** — recovers, via the Wayback Machine,
+  the Ministry of Energy's now-dead national blackout-schedule aggregator
+  (`energia-ecuador.com`, 2024 crisis). Only one of its nine distributor
+  pages (Empresa Eléctrica Quito) survived Wayback's crawl before the site
+  went behind a Cloudflare block, so this ships as a frozen 2024-04-24
+  snapshot rather than a live series.
+- **`get_certificado_cumplimiento_patronal`** — checks whether an employer
+  (RUC) or individual (cédula) is current on IESS Seguro Social
+  contributions, via IESS's public "Certificado de Cumplimiento de
+  Obligaciones Patronales" (no login; a stateful JSF form-postback, same
+  shape as `reportes.arconel.gob.ec`'s ASP.NET ReportViewer). This is a
+  mora/no-mora compliance check, not an employee headcount — the IESS
+  does not publish per-employer affiliate counts publicly anywhere found.
+
 ### Fixed
 
 - **The outgoing `User-Agent` reported version 0.5.0 to every official
@@ -9,6 +29,15 @@
   derives it from `helpers/version.py` (the single source of truth), which
   is the same drift its docstring already warned about for `main.py`'s
   `VERSION` and `list_capabilities`.
+- **`search_sri_ruc`/`get_sri_ruc_info`'s razón-social search crashed
+  with `json.JSONDecodeError: Expecting value: line 1 column 1` on any
+  query with zero matches** (e.g. searching for a company name typed
+  without an apostrophe it actually has, like "ACQUADOR" for the real
+  "ACQUAD'OR C.A."). Confirmed live: the SRI's
+  `numerosRucPorRazonSocialToken` endpoint returns `204 No Content` with
+  an empty body, not `[]`, when nothing matches — `helpers/sri_ruc_client.py`
+  now treats an empty response body as an empty result instead of calling
+  `.json()` on it.
 
 ### Changed
 

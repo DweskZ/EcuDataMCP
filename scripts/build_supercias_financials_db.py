@@ -118,10 +118,23 @@ def _convert(value: str, sql_type: str) -> object:
         return value
     if _EU_DECIMAL_RE.match(value):
         value = _convert_eu_decimal(value)
+    if sql_type != "INTEGER":
+        try:
+            return float(value)
+        except ValueError:
+            return None
     try:
-        return int(value) if sql_type == "INTEGER" else float(value)
+        return int(value)
     except ValueError:
-        return None
+        # bi_ranking.csv ships n_empleados (an INTEGER column here) as a
+        # decimal string ("2.00", "11547.00") like its REAL-typed
+        # neighbors -- confirmed live 2026-09-21, this silently nulled out
+        # every single n_empleados value (100% of 660k rows) before this
+        # fallback existed, since int("2.00") raises ValueError directly.
+        try:
+            return int(float(value))
+        except ValueError:
+            return None
 
 
 def _load_csv_table(

@@ -20,6 +20,9 @@ from tools.get_bce_indice_archivo import register_get_bce_indice_archivo_tool
 from tools.get_category_info import register_get_category_info_tool
 from tools.get_cenace_tablero import register_get_cenace_tablero_tool
 from tools.get_cepalstat_indicador import register_get_cepalstat_indicador_tool
+from tools.get_certificado_cumplimiento_patronal import (
+    register_get_certificado_cumplimiento_patronal_tool,
+)
 from tools.get_compania_info import register_get_compania_info_tool
 from tools.get_contraloria_informe import register_get_contraloria_informe_tool
 from tools.get_contrato_info import register_get_contrato_info_tool
@@ -255,6 +258,7 @@ def register_tools(mcp: MCPServer) -> None:
 
     register_list_iess_colecciones_tool(mcp)
     register_get_iess_archivos_tool(mcp)
+    register_get_certificado_cumplimiento_patronal_tool(mcp)
 
     register_search_contratos_tool(mcp)
     register_get_contrato_info_tool(mcp)

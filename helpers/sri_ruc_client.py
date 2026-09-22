@@ -233,6 +233,12 @@ async def _fetch_catastro_json(path: str, params: list[tuple[str, str]], verify:
     ) as session:
         response = await session.get(url, params=params)
         response.raise_for_status()
+        # numerosRucPorRazonSocialToken returns 204 with an empty body (not
+        # "[]") when razonSocial has zero matches -- confirmed live against
+        # a real zero-match query -- response.json() would otherwise raise
+        # json.JSONDecodeError on the empty body.
+        if not response.text.strip():
+            return []
         return response.json()
 
 

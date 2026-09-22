@@ -212,3 +212,25 @@ async def test_search_by_razon_social_notes_the_100_cap(httpx_mock):
     assert result["total_reportado"] == 100
     assert len(result["resultados"]) == 3
     assert "100 coincidencias" in result["nota"]
+
+
+@pytest.mark.asyncio
+async def test_search_by_razon_social_handles_204_empty_body_on_zero_matches(httpx_mock):
+    # Confirmed live: numerosRucPorRazonSocialToken returns 204 with an
+    # empty body (not "[]") when razonSocial has zero matches -- this used
+    # to raise json.JSONDecodeError("Expecting value: line 1 column 1").
+    base = sri_ruc_client.SRI_CATASTRO_BASE
+    httpx_mock.add_response(
+        url=f"{base}/cantidadObtenidaPorRazonSocial?razonSocial=ACQUADOR",
+        text="0",
+    )
+    httpx_mock.add_response(
+        url=f"{base}/numerosRucPorRazonSocialToken?razonSocial=ACQUADOR",
+        status_code=204,
+        content=b"",
+    )
+
+    result = await sri_ruc_client.search_by_razon_social("ACQUADOR")
+
+    assert result["total_reportado"] == 0
+    assert result["resultados"] == []

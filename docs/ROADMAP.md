@@ -50,7 +50,7 @@ de cobertura que falta en cada una.
 | Fuente | Herramientas | Qué cubre |
 |---|---|---|
 | Directorio de compañías | `search_companias`, `get_compania_info` | 226k+ compañías, actualizado a diario desde el export Excel estático del portal → RESEARCH.md § Superintendencia de Compañías (Supercías) |
-| Ranking financiero | `search_ranking`, `get_financials` | ~38 ratios financieros por compañía/año fiscal, sobre SQLite local (`scripts/build_supercias_financials_db.py`) — ver Pendiente para portabilidad/actualización |
+| Ranking financiero | `search_ranking`, `get_financials` | ~38 ratios financieros por compañía/año fiscal, incluido `n_empleados` (número de empleados — el único campo de plantilla laboral por empresa en todo el proyecto, corregido 2026-09-21: estaba en `NULL` para el 100% de las filas por un bug de conversión, no por falta de dato en la fuente), sobre SQLite local (`scripts/build_supercias_financials_db.py`) — ver Pendiente para portabilidad/actualización → RESEARCH.md § Trigésima pasada |
 | Auditores externos | `search_auditores`, `get_auditor_info` | Registro de auditores externos |
 
 ### SIPA (Ministerio de Agricultura)
@@ -191,6 +191,7 @@ de cobertura que falta en cada una.
 | Fuente | Herramientas | Qué cubre |
 |---|---|---|
 | Boletines Estadísticos + Estudios Actuariales + Informes de Auditoría | `list_iess_colecciones`, `get_iess_archivos` | 3 archivos Liferay (`document_library_display`) resueltos a URL directa: 26 boletines anuales 1978-2024, 47 estudios actuariales en 4 años publicados (2010/2013/2018/2020), 325 informes de auditoría en 20 carpetas por año 2007-2026; detección de formato por el ícono de la página de detalle, no por la extensión de la URL (varios enlaces reales no tienen `.pdf`) → RESEARCH.md § IESS |
+| Certificado de Cumplimiento de Obligaciones Patronales | `get_certificado_cumplimiento_patronal` | Consulta pública sin login de mora patronal por cédula/RUC — formulario JSF con postback de `ViewState` (mismo patrón de estado que `reportes.arconel.gob.ec`), respuesta es un PDF generado al vuelo que este cliente parsea. Solo indica mora sí/no, no número de empleados/afiliados — esa cifra no está pública por empresa en ninguna fuente encontrada (ni SRI ni IESS) → RESEARCH.md § Vigésimo novena pasada |
 
 ### Fuentes internacionales con foco Ecuador
 
