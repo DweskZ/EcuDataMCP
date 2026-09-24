@@ -112,14 +112,24 @@ def _trigger_background_build() -> None:
     with _build_lock:
         if _build_in_progress():
             return
-        _build_process = subprocess.Popen(
-            [sys.executable, str(_BUILD_SCRIPT_PATH)],
-            cwd=_BUILD_SCRIPT_PATH.parents[1],
-        )
+        # Under the stdio transport the server's stdout IS the JSON-RPC
+        # stream: an inherited stdout would let the build's print() progress
+        # lines corrupt it and make the client drop the connection. Same for
+        # stdin, which carries the client's requests.
+        log_path = DB_PATH.parent / "supercias_build.log"
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(log_path, "ab") as log_file:
+            _build_process = subprocess.Popen(
+                [sys.executable, str(_BUILD_SCRIPT_PATH)],
+                cwd=_BUILD_SCRIPT_PATH.parents[1],
+                stdin=subprocess.DEVNULL,
+                stdout=log_file,
+                stderr=subprocess.STDOUT,
+            )
         logger.info(
             "Construyendo/refrescando la base financiera de Supercías en "
-            "segundo plano (PID %d): %s",
-            _build_process.pid, _BUILD_SCRIPT_PATH,
+            "segundo plano (PID %d): %s -- log en %s",
+            _build_process.pid, _BUILD_SCRIPT_PATH, log_path,
         )
 
 

@@ -254,3 +254,31 @@ def test_check_db_fresh_rebuilds_outdated_schema_version(tmp_path, no_real_build
     with pytest.raises(supercias_financials.FinancialsDbUnavailable, match="esquema"):
         supercias_financials._check_db_fresh(path)
     assert no_real_build == [None]
+
+
+def test_trigger_background_build_never_inherits_stdio(monkeypatch, tmp_path):
+    # Under the stdio transport, stdout is the JSON-RPC stream: the build's
+    # print() output must not reach it or the client drops the connection.
+    popen_kwargs: list[dict] = []
+
+    class _FakeProcess:
+        pid = 4242
+
+        def poll(self):
+            return None
+
+    def fake_popen(args, **kwargs):
+        popen_kwargs.append(kwargs)
+        return _FakeProcess()
+
+    monkeypatch.setattr(supercias_financials, "DB_PATH", tmp_path / "db.sqlite3")
+    monkeypatch.setattr(supercias_financials, "_build_process", None)
+    monkeypatch.setattr(supercias_financials.subprocess, "Popen", fake_popen)
+
+    supercias_financials._trigger_background_build()
+
+    kwargs = popen_kwargs[0]
+    assert kwargs["stdin"] is supercias_financials.subprocess.DEVNULL
+    assert kwargs["stdout"] not in (None, sys.stdout)
+    assert kwargs["stderr"] is supercias_financials.subprocess.STDOUT
+    assert (tmp_path / "supercias_build.log").exists()
