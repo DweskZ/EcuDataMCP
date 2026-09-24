@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.10 — 2026-09-24
+
 ### Added
 
 - **`search_centrosur_cortes`** — archive of Centrosur's (Azuay/Cañar/
@@ -39,6 +41,32 @@
   now treats an empty response body as an empty result instead of calling
   `.json()` on it.
 
+- **The IESS certificate tool could report an employer that owes
+  contributions as compliant.** An unparseable certificate now reports
+  the status as "NO DETERMINADO" instead of "NO registra obligaciones en
+  mora"; status matching tolerates the PDF's line breaks and accepts
+  "SÍ"; form fields, action and ViewState are read from the certificate
+  form itself rather than hardcoded; unexpected non-PDF replies raise
+  instead of being reported as "not found"; a certificate for a
+  different RUC is rejected; PDF parsing runs off the event loop.
+- **`search_sri_ruc` crashed with `TypeError` when the SRI's count
+  endpoint returned an empty body.** Empty replies now map to 0 for the
+  count and `[]` for result lists.
+- **Supercías `n_empleados` fix hardened.** An `inf` cell no longer
+  aborts the whole build and fractional values are no longer silently
+  truncated; the build fails if `n_empleados` comes out entirely null;
+  the DB is stamped with a schema version so databases built before the
+  fix are rebuilt on first use instead of serving null employee counts
+  for up to 7 days.
+- **stdio clients (Claude Desktop) randomly disconnected.** The
+  background Supercías DB build inherited the server's stdout, which
+  under the stdio transport is the JSON-RPC stream, so its progress
+  output corrupted the protocol. It now logs to
+  `data/supercias_build.log`. Startup is also faster (~4.7 s → ~2.9 s):
+  `openpyxl` and `uvicorn` are imported only when needed, which keeps
+  cold launches under client initialize timeouts.
+- Dependency bumps: pypdf 6.18.1, uvicorn 0.53.0, ruff 0.16.7.
+
 ### Changed
 
 - **Measured the surface that phases 0-3 produced and planned the next
@@ -50,6 +78,8 @@
   size/pagination, a shared HTTP layer with a persistent cache, and
   per-tool usage telemetry. `docs/ROADMAP.md`'s quality rows now match
   what shipped in 0.8.9 instead of still listing it as not started.
+
+Tool count: 116.
 
 ## 0.8.9 — 2026-09-14
 
