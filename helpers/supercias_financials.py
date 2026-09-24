@@ -55,6 +55,10 @@ _BUILD_SCRIPT_PATH = (
 # The dataset refreshes far less often than the daily company directory;
 # treat a build older than this as stale rather than silently serving it.
 _MAX_DB_AGE_SECONDS = 7 * 24 * 3600
+# Stamped into the built DB as PRAGMA user_version. Bump it whenever a build
+# script fix changes the data, so existing DBs are rebuilt on first use
+# instead of serving the old data until they age out. 2 = n_empleados fix.
+SCHEMA_VERSION = 2
 
 # Guards scripts/build_supercias_financials_db.py so a missing/stale DB
 # triggers at most one background build at a time, whether that check comes
@@ -119,6 +123,17 @@ def _trigger_background_build() -> None:
         )
 
 
+def _db_schema_version(path: Path) -> int | None:
+    try:
+        conn = sqlite3.connect(f"file:{path.as_posix()}?mode=ro", uri=True)
+        try:
+            return conn.execute("PRAGMA user_version").fetchone()[0]
+        finally:
+            conn.close()
+    except sqlite3.DatabaseError:
+        return None
+
+
 def _check_db_fresh(path: Path | None = None) -> None:
     # Read the module attribute at call time, not as a bound default -- a
     # default evaluated at def-time would freeze the original DB_PATH value,
@@ -142,6 +157,15 @@ def _check_db_fresh(path: Path | None = None) -> None:
             "antigüedad y se considera desactualizada. Se está refrescando "
             "automáticamente en segundo plano -- vuelve a intentar en unos "
             "minutos."
+        )
+    version = _db_schema_version(path)
+    if version != SCHEMA_VERSION:
+        _trigger_background_build()
+        raise FinancialsDbUnavailable(
+            f"La base de datos financiera de Supercías fue construida con una "
+            f"versión anterior del esquema ({version}, se requiere "
+            f"{SCHEMA_VERSION}). Se está reconstruyendo automáticamente en "
+            "segundo plano (5-10 minutos) -- vuelve a intentar en unos minutos."
         )
 
 

@@ -51,7 +51,16 @@ def register_get_certificado_cumplimiento_patronal_tool(mcp: MCPServer) -> None:
                     f"IESS — Certificado de Cumplimiento Patronal: sin resultado para "
                     f"{data.get('identificacion_consultada')}.\n{data.get('motivo')}"
                 )
-            estado = "SÍ registra obligaciones en mora" if data.get("moroso") else "NO registra obligaciones en mora"
+            moroso = data.get("moroso")
+            if moroso is None:
+                estado = (
+                    "NO DETERMINADO — no se pudo interpretar el texto del certificado; "
+                    "revisa texto_completo (format=json)"
+                )
+            elif moroso:
+                estado = "SÍ registra obligaciones en mora"
+            else:
+                estado = "NO registra obligaciones en mora"
             parts = [
                 f"IESS — Certificado de Cumplimiento Patronal — {data.get('identificacion_consultada')}",
                 "",

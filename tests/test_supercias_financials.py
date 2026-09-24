@@ -45,6 +45,7 @@ def _build_db(path) -> None:
     conn.execute(
         "INSERT INTO indicadores_sector VALUES (2025, 'C', 'Manufactura', 0.08)"
     )
+    conn.execute(f"PRAGMA user_version = {supercias_financials.SCHEMA_VERSION}")
     conn.commit()
     conn.close()
 
@@ -241,3 +242,15 @@ async def test_get_sector_benchmark(db_path):
 
     missing = await supercias_financials.get_sector_benchmark(2025, "z")
     assert missing is None
+
+
+def test_check_db_fresh_rebuilds_outdated_schema_version(tmp_path, no_real_build):
+    path = tmp_path / "old_schema.sqlite3"
+    _build_db(path)
+    conn = sqlite3.connect(path)
+    conn.execute("PRAGMA user_version = 1")
+    conn.commit()
+    conn.close()
+    with pytest.raises(supercias_financials.FinancialsDbUnavailable, match="esquema"):
+        supercias_financials._check_db_fresh(path)
+    assert no_real_build == [None]

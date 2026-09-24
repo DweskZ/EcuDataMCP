@@ -58,9 +58,11 @@ source itself uses.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
 from typing import Any
+from urllib.parse import urljoin
 
 import httpx
 
@@ -77,20 +79,33 @@ CERTIFICADO_URL = (
 )
 _TIMEOUT = 30.0
 
-_ACTION_RE = re.compile(
-    r'<form[^>]*id="frmCertificadoCumplimiento"[^>]*action="([^"]+)"'
+_FORM_ID = "frmCertificadoCumplimiento"
+_FORM_RE = re.compile(
+    r'(?P<tag><form\b(?=[^>]*\bid="' + _FORM_ID + r'")[^>]*>)(?P<body>.*?)</form>',
+    re.IGNORECASE | re.DOTALL,
 )
-_VIEWSTATE_RE = re.compile(r'name="javax\.faces\.ViewState"[^>]*value="([^"]+)"')
+_ACTION_RE = re.compile(r'\baction="([^"]+)"', re.IGNORECASE)
+_INPUT_RE = re.compile(r"<input\b[^>]*>", re.IGNORECASE)
+_ATTR_RE = re.compile(r'\b(name|type|value)="([^"]*)"', re.IGNORECASE)
+
+# Markers of the F5 BIG-IP anti-bot challenge page. Only `f5_cspm` has
+# been seen live on the IESS site; the other two are common on F5 ASM
+# challenge pages generally.
+_F5_MARKERS = ("f5_cspm", "TSPD", "bobcmn")
 
 _CERT_TEXT_RE = re.compile(
     r"el señor\(a\)\s+(?P<persona>.+?),\s*"
     r"(?:representante legal de la empresa\s+(?P<empresa>.+?)\s+con RUC Nro\.|"
     r"con (?:RUC|C\.?I\.?)\s*Nro\.)\s*"
     r"(?P<identificacion>\d{10,13})\s+y dirección\s+(?P<direccion>.+?),\s*"
-    r"(?P<estado_texto>NO registra|SI registra|registra)\s+obligaciones patronales en mora",
+    r"(?P<estado_texto>NO\s+registra|S[IÍ]\s+registra|registra)\s+"
+    r"obligaciones\s+patronales\s+en\s+mora",
     re.IGNORECASE | re.DOTALL,
 )
-_EMITIDO_RE = re.compile(r"Emitido el\s+([^\n]+)", re.IGNORECASE)
+# Stop before "Validez del Certificado" in case both land on one line.
+_EMITIDO_RE = re.compile(
+    r"Emitido el\s+(.+?)(?=\s*Validez del Certificado|\n|$)", re.IGNORECASE
+)
 _VALIDEZ_RE = re.compile(r"Validez del Certificado\s+(\d+)\s+días", re.IGNORECASE)
 
 
@@ -103,37 +118,58 @@ def _validate_identificacion(value: str) -> str:
     return digits
 
 
-async def _get_form(session: httpx.AsyncClient) -> tuple[str, str]:
-    """GET a fresh copy of the form -- returns (post_url, view_state), both
-    bound to this session's cookies/ViewState. See module docstring for
-    why this can't be cached or reused across calls."""
+async def _get_form(session: httpx.AsyncClient) -> tuple[str, str, dict[str, str]]:
+    """GET a fresh copy of the form -- returns (post_url, id_field, fields),
+    all read from the certificate form itself and bound to this session's
+    cookies/ViewState. Field names (`j_id9`, ...) are JSF-generated and
+    change on redeploy, so they're discovered here rather than hardcoded.
+    See module docstring for why this can't be cached across calls."""
     resp = await session.get(CERTIFICADO_URL)
     resp.raise_for_status()
     html = resp.text
 
-    action_m = _ACTION_RE.search(html)
-    if not action_m:
+    form_m = _FORM_RE.search(html)
+    if not form_m:
         raise ValueError("No se encontró el formulario del certificado del IESS en la página.")
-    action = action_m.group(1).replace("&amp;", "&")
-    post_url = f"https://www.iess.gob.ec{action}"
+    action_m = _ACTION_RE.search(form_m.group("tag"))
+    if not action_m:
+        raise ValueError("El formulario del certificado del IESS no tiene 'action'.")
+    post_url = urljoin(str(resp.url), action_m.group(1).replace("&amp;", "&"))
 
-    view_states = _VIEWSTATE_RE.findall(html)
-    if not view_states:
+    fields: dict[str, str] = {_FORM_ID: _FORM_ID}
+    id_field = submit_field = None
+    for tag in _INPUT_RE.findall(form_m.group("body")):
+        attrs = {k.lower(): v for k, v in _ATTR_RE.findall(tag)}
+        name = attrs.get("name")
+        if not name:
+            continue
+        kind = attrs.get("type", "text").lower()
+        if kind == "hidden":
+            fields[name] = attrs.get("value", "")
+        elif kind == "text" and id_field is None:
+            id_field = name
+        elif kind == "submit" and submit_field is None:
+            submit_field = name
+            fields[name] = attrs.get("value", "CONSULTAR")
+
+    if "javax.faces.ViewState" not in fields:
         raise ValueError("No se encontró el ViewState del formulario del IESS.")
-    # The page has two JSF forms; the certificate form's own ViewState is
-    # the last one in document order (see module docstring).
-    return post_url, view_states[-1]
+    if id_field is None or submit_field is None:
+        raise ValueError(
+            "El formulario del certificado del IESS cambió: no se encontraron los "
+            "campos de identificación y consulta."
+        )
+    return post_url, id_field, fields
 
 
 async def _submit_certificado(
-    session: httpx.AsyncClient, post_url: str, view_state: str, identificacion: str
+    session: httpx.AsyncClient,
+    post_url: str,
+    id_field: str,
+    fields: dict[str, str],
+    identificacion: str,
 ) -> httpx.Response:
-    data = {
-        "frmCertificadoCumplimiento": "frmCertificadoCumplimiento",
-        "frmCertificadoCumplimiento:j_id9": identificacion,
-        "frmCertificadoCumplimiento:j_id11": "CONSULTAR",
-        "javax.faces.ViewState": view_state,
-    }
+    data = {**fields, id_field: identificacion}
     resp = await session.post(post_url, data=data)
     resp.raise_for_status()
     return resp
@@ -164,7 +200,13 @@ def _parse_certificado_text(text: str, identificacion: str) -> dict[str, Any]:
         result["persona"] = _clean(match.group("persona"))
         result["empresa"] = _clean(match.group("empresa"))
         result["direccion"] = _clean(match.group("direccion"))
-        result["moroso"] = match.group("estado_texto").strip().upper() != "NO REGISTRA"
+        encontrada = match.group("identificacion")
+        if encontrada != identificacion:
+            raise ValueError(
+                f"El IESS devolvió un certificado para {encontrada}, no para la "
+                f"identificación consultada {identificacion}."
+            )
+        result["moroso"] = _clean(match.group("estado_texto")).upper() != "NO REGISTRA"
     else:
         # Real text, but not in the exact phrasing this regex expects (e.g.
         # a wording variant this client hasn't seen yet) -- surface the raw
@@ -183,8 +225,8 @@ async def _run(identificacion: str, verify: bool = True) -> httpx.Response:
         timeout=_TIMEOUT,
         verify=verify,
     ) as session:
-        post_url, view_state = await _get_form(session)
-        return await _submit_certificado(session, post_url, view_state, identificacion)
+        post_url, id_field, fields = await _get_form(session)
+        return await _submit_certificado(session, post_url, id_field, fields, identificacion)
 
 
 async def get_certificado_cumplimiento_patronal(identificacion: str) -> dict[str, Any]:
@@ -207,17 +249,27 @@ async def get_certificado_cumplimiento_patronal(identificacion: str) -> dict[str
 
     content_type = resp.headers.get("content-type", "")
     if "pdf" not in content_type.lower():
-        return {
-            "encontrado": False,
-            "identificacion_consultada": identificacion,
-            "motivo": (
-                "El IESS no devolvió un certificado (posible identificación con formato "
-                "inválido o un bloqueo temporal del servidor) en lugar de un 'no encontrado' "
-                "normal."
-            ),
-        }
+        body = resp.text
+        if any(marker in body for marker in _F5_MARKERS):
+            return {
+                "encontrado": False,
+                "identificacion_consultada": identificacion,
+                "motivo": (
+                    "El firewall del IESS devolvió una página anti-bot en lugar del "
+                    "certificado (visto con identificaciones de formato inválido). Esto "
+                    "NO prueba que la identificación no esté registrada."
+                ),
+            }
+        # Anything else (expired session, JSF validation error, changed form)
+        # is a failure, not a "not found" -- don't mask it as one.
+        logger.warning("IESS certificado: respuesta inesperada %s", content_type)
+        raise ValueError(
+            f"El IESS devolvió una respuesta inesperada ({content_type or 'sin tipo'}) "
+            "en lugar del certificado en PDF."
+        )
 
-    extracted = extract_text_from_bytes(resp.content, pages="1")
+    # pypdf is CPU-bound; keep it off the event loop.
+    extracted = await asyncio.to_thread(extract_text_from_bytes, resp.content, pages="1")
     pages = extracted.get("pages") or []
     text = pages[0]["text"] if pages else ""
     if not text.strip():
