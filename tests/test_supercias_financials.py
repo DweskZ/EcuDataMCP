@@ -45,6 +45,7 @@ def _build_db(path) -> None:
     conn.execute(
         "INSERT INTO indicadores_sector VALUES (2025, 'C', 'Manufactura', 0.08)"
     )
+    conn.execute(f"PRAGMA user_version = {supercias_financials.SCHEMA_VERSION}")
     conn.commit()
     conn.close()
 
@@ -241,3 +242,43 @@ async def test_get_sector_benchmark(db_path):
 
     missing = await supercias_financials.get_sector_benchmark(2025, "z")
     assert missing is None
+
+
+def test_check_db_fresh_rebuilds_outdated_schema_version(tmp_path, no_real_build):
+    path = tmp_path / "old_schema.sqlite3"
+    _build_db(path)
+    conn = sqlite3.connect(path)
+    conn.execute("PRAGMA user_version = 1")
+    conn.commit()
+    conn.close()
+    with pytest.raises(supercias_financials.FinancialsDbUnavailable, match="esquema"):
+        supercias_financials._check_db_fresh(path)
+    assert no_real_build == [None]
+
+
+def test_trigger_background_build_never_inherits_stdio(monkeypatch, tmp_path):
+    # Under the stdio transport, stdout is the JSON-RPC stream: the build's
+    # print() output must not reach it or the client drops the connection.
+    popen_kwargs: list[dict] = []
+
+    class _FakeProcess:
+        pid = 4242
+
+        def poll(self):
+            return None
+
+    def fake_popen(args, **kwargs):
+        popen_kwargs.append(kwargs)
+        return _FakeProcess()
+
+    monkeypatch.setattr(supercias_financials, "DB_PATH", tmp_path / "db.sqlite3")
+    monkeypatch.setattr(supercias_financials, "_build_process", None)
+    monkeypatch.setattr(supercias_financials.subprocess, "Popen", fake_popen)
+
+    supercias_financials._trigger_background_build()
+
+    kwargs = popen_kwargs[0]
+    assert kwargs["stdin"] is supercias_financials.subprocess.DEVNULL
+    assert kwargs["stdout"] not in (None, sys.stdout)
+    assert kwargs["stderr"] is supercias_financials.subprocess.STDOUT
+    assert (tmp_path / "supercias_build.log").exists()

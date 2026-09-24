@@ -234,3 +234,26 @@ async def test_search_by_razon_social_handles_204_empty_body_on_zero_matches(htt
 
     assert result["total_reportado"] == 0
     assert result["resultados"] == []
+
+
+@pytest.mark.asyncio
+async def test_search_by_razon_social_handles_empty_count_body(httpx_mock):
+    # An empty body on the count endpoint must become 0, not [] -- `[] >= 100`
+    # raises TypeError.
+    base = sri_ruc_client.SRI_CATASTRO_BASE
+    httpx_mock.add_response(
+        url=f"{base}/cantidadObtenidaPorRazonSocial?razonSocial=ACQUADOR",
+        status_code=204,
+        content=b"",
+    )
+    httpx_mock.add_response(
+        url=f"{base}/numerosRucPorRazonSocialToken?razonSocial=ACQUADOR",
+        status_code=204,
+        content=b"",
+    )
+
+    result = await sri_ruc_client.search_by_razon_social("ACQUADOR")
+
+    assert result["total_reportado"] == 0
+    assert result["resultados"] == []
+    assert result["nota"] is None

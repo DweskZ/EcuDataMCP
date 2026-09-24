@@ -49,6 +49,7 @@ import httpx
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from helpers.csv_reader import _EU_DECIMAL_RE, _convert_eu_decimal
+from helpers.supercias_financials import SCHEMA_VERSION
 from helpers.tls import legacy_cipher_context
 from helpers.user_agent import USER_AGENT
 
@@ -131,10 +132,15 @@ def _convert(value: str, sql_type: str) -> object:
         # neighbors -- confirmed live 2026-09-21, this silently nulled out
         # every single n_empleados value (100% of 660k rows) before this
         # fallback existed, since int("2.00") raises ValueError directly.
+        # Only whole numbers are accepted: "inf" would raise OverflowError
+        # (aborting the whole load) and "2.5" would silently truncate.
         try:
-            return int(float(value))
+            number = float(value)
         except ValueError:
             return None
+        if not number.is_integer():
+            return None
+        return int(number)
 
 
 def _load_csv_table(
@@ -191,7 +197,7 @@ def _verify_build(db_path: Path) -> None:
             raise RuntimeError(f"PRAGMA integrity_check falló: {ok}")
 
         for table, required_cols in (
-            ("ranking", {"anio", "expediente", "posicion_general"}),
+            ("ranking", {"anio", "expediente", "posicion_general", "n_empleados"}),
             ("companias", {"expediente", "ruc", "nombre"}),
             ("segmentos", {"id_segmento", "segmento"}),
             ("ciiu", {"ciiu", "descripcion"}),
@@ -216,6 +222,16 @@ def _verify_build(db_path: Path) -> None:
             raise RuntimeError(
                 "La tabla 'ranking' quedó vacía tras el build -- "
                 "probablemente el CSV fuente vino roto/truncado esta vez"
+            )
+        # Guards against the int-conversion bug that once nulled out 100% of
+        # n_empleados silently coming back.
+        n_empleados_rows = conn.execute(
+            "SELECT COUNT(n_empleados) FROM ranking"
+        ).fetchone()[0]
+        if n_empleados_rows == 0:
+            raise RuntimeError(
+                "La columna 'n_empleados' de 'ranking' quedó completamente vacía "
+                "tras el build -- probablemente falló la conversión a entero"
             )
         min_anio, max_anio = conn.execute(
             "SELECT MIN(anio), MAX(anio) FROM ranking"
@@ -302,6 +318,7 @@ def main() -> None:
         )
         conn.execute("CREATE INDEX idx_companias_expediente ON companias(expediente)")
         conn.execute("CREATE INDEX idx_companias_ruc ON companias(ruc)")
+        conn.execute(f"PRAGMA user_version = {int(SCHEMA_VERSION)}")
         conn.commit()
 
         print("VACUUM...", flush=True)

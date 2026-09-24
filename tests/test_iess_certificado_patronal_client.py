@@ -145,3 +145,84 @@ async def test_get_certificado_treats_non_pdf_response_as_not_found(httpx_mock):
 async def test_rejects_wrong_length_identificacion():
     with pytest.raises(ValueError, match=re.escape("10 dígitos")):
         await client.get_certificado_cumplimiento_patronal("12345")
+
+
+def _cert_text(estado: str, ruc: str = "0992216735001") -> str:
+    return _REAL_CERT_TEXT.replace("0992216735001", ruc).replace(
+        "NO registra obligaciones\npatronales en mora".replace("\n", " "), estado
+    )
+
+
+async def _run_with_pdf(httpx_mock, text: str, ruc: str = "0992216735001") -> dict:
+    httpx_mock.add_response(url=client.CERTIFICADO_URL, html=_FORM_HTML)
+    httpx_mock.add_response(
+        url=_post_url(),
+        method="POST",
+        content=_build_minimal_pdf(text),
+        headers={"Content-Type": "application/pdf"},
+    )
+    return await client.get_certificado_cumplimiento_patronal(ruc)
+
+
+@pytest.mark.asyncio
+async def test_posts_certificate_form_viewstate_and_discovered_fields(httpx_mock):
+    await _run_with_pdf(httpx_mock, _REAL_CERT_TEXT)
+    post = httpx_mock.get_requests(method="POST")[0]
+    body = post.content.decode()
+    assert _VIEW_STATE_2 in body
+    assert _VIEW_STATE_1 not in body
+    assert "frmCertificadoCumplimiento%3Aj_id9=0992216735001" in body
+
+
+@pytest.mark.asyncio
+async def test_si_registra_with_accent_and_line_breaks_is_moroso(httpx_mock):
+    text = _cert_text("SÍ\nregistra obligaciones patronales\nen mora")
+    result = await _run_with_pdf(httpx_mock, text)
+    assert result["moroso"] is True
+
+
+@pytest.mark.asyncio
+async def test_no_registra_split_across_lines_is_not_moroso(httpx_mock):
+    text = _cert_text("NO\nregistra obligaciones patronales en mora")
+    result = await _run_with_pdf(httpx_mock, text)
+    assert result["moroso"] is False
+
+
+@pytest.mark.asyncio
+async def test_unparseable_certificate_leaves_moroso_unknown(httpx_mock):
+    result = await _run_with_pdf(httpx_mock, "CERTIFICADO\nTexto con otra redacción")
+    assert result["encontrado"] is True
+    assert result["moroso"] is None
+
+
+@pytest.mark.asyncio
+async def test_certificate_for_another_ruc_raises(httpx_mock):
+    text = _REAL_CERT_TEXT.replace("0992216735001", "1790013731001")
+    with pytest.raises(ValueError, match="1790013731001"):
+        await _run_with_pdf(httpx_mock, text)
+
+
+@pytest.mark.asyncio
+async def test_non_f5_html_response_raises_instead_of_not_found(httpx_mock):
+    httpx_mock.add_response(url=client.CERTIFICADO_URL, html=_FORM_HTML)
+    httpx_mock.add_response(
+        url=_post_url(), method="POST", html="<html>ViewExpiredException</html>"
+    )
+    with pytest.raises(ValueError, match="respuesta inesperada"):
+        await client.get_certificado_cumplimiento_patronal("0992216735001")
+
+
+def test_emitido_stops_before_validez_on_same_line():
+    text = _REAL_CERT_TEXT.replace("2026\nValidez", "2026 Validez")
+    result = client._parse_certificado_text(text, "0992216735001")
+    assert result["fecha_emision"] == "21 de septiembre de 2026"
+    assert result["validez_dias"] == 30
+
+
+def test_absolute_form_action_is_not_double_prefixed():
+    html = _FORM_HTML.replace(_ACTION, "https://www.iess.gob.ec" + _ACTION)
+    m = client._FORM_RE.search(html)
+    action = client._ACTION_RE.search(m.group("tag")).group(1)
+    from urllib.parse import urljoin
+
+    assert urljoin(client.CERTIFICADO_URL, action) == _post_url()

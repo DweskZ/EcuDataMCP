@@ -26,7 +26,6 @@ from typing import Any
 from urllib.parse import urljoin
 
 import httpx
-from openpyxl import load_workbook
 
 from helpers.cache import TtlCache
 from helpers.csv_reader import download_bytes
@@ -36,6 +35,15 @@ from helpers.text_utils import strip_accents as _strip
 from helpers.user_agent import USER_AGENT
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
+
+
+def load_workbook(*args: Any, **kwargs: Any) -> Any:
+    # openpyxl costs ~0.4 s to import; deferring it keeps it off the server's
+    # startup path, where slow launches made stdio clients time out.
+    from openpyxl import load_workbook as _load_workbook
+
+    return _load_workbook(*args, **kwargs)
+
 
 IEM_INDEX_URL = (
     "https://contenido.bce.fin.ec/documentos/informacioneconomica/"
