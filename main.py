@@ -5,7 +5,6 @@ import sys
 from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime
 
-import uvicorn
 from mcp.server.mcpserver import MCPServer
 
 from helpers.env_config import (
@@ -177,6 +176,10 @@ def main(argv: list[str] | None = None) -> None:
     scheme = "https" if certfile else "http"
     logger.info("MCP endpoint: %s://%s:%d/mcp", scheme, host, port)
     logger.info("Health check: %s://%s:%d/health", scheme, host, port)
+
+    # Imported here, not at module top: stdio launches never need it, and it
+    # adds ~0.3 s to startup.
+    import uvicorn
 
     uvicorn.run(
         asgi_app,
