@@ -10,6 +10,33 @@
 - **`server.json`** for the official MCP registry
   (`io.github.dweskz/ecudatamcp`), plus the `mcp-name` marker in the README.
 - **`SECURITY.md`** — private vulnerability reporting policy.
+- **Supercías financials status** — `get_financials`/`search_ranking` now
+  carry `metadatos` (`daily_bulk`) with a `base_local` block (build date,
+  year range, staleness, build in progress, last error); `/health` reports
+  the same under `supercias_financials`.
+
+### Changed
+
+- **Stale Supercías DB is served, not refused.** Past 7 days the existing
+  build keeps answering (flagged) while a refresh runs; previously a
+  Supercías outage made both tools fail until a rebuild succeeded.
+- **`search_ranking` defaults to the latest fiscal year** instead of
+  interleaving one ranking per year.
+- **`get_financials` with a RUC shared by several companies** (~156 RUCs in
+  the source) now lists the candidate expedientes instead of silently
+  picking one.
+
+### Fixed
+
+- **Repeated 356 MB downloads while Supercías is down** — failed builds are
+  recorded in `data/supercias_build.state.json` and retried after 1h/6h/24h.
+- **Concurrent builds** — a cross-process lock file stops a second server,
+  the maintenance container or a manual run from building at the same time
+  (seen in a real interleaved build log); hung builds are killed after 45 min
+  and the download has an overall deadline.
+- **Silent data loss in builds** — malformed CSV rows are counted and the
+  build fails above 0.1%; a build with 20%+ fewer ranking rows than the live
+  DB is rejected.
 
 ## 0.8.10 — 2026-09-24
 

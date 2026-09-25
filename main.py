@@ -22,7 +22,7 @@ from helpers.env_config import (
 )
 from helpers.http_security import with_http_security
 from helpers.logging import MAIN_LOGGER_NAME, UVICORN_LOGGING_CONFIG, setup_logging
-from helpers.supercias_financials import ensure_financials_db_fresh
+from helpers.supercias_financials import ensure_financials_db_fresh, financials_status
 from helpers.version import get_version
 from prompts import register_prompts
 from resources import register_resources
@@ -80,6 +80,7 @@ def with_health_endpoint(
                         "status": "ok",
                         "uptime_since": SERVER_START_TIME.isoformat(),
                         "version": VERSION,
+                        "supercias_financials": financials_status(),
                     }
                 ).encode("utf-8")
                 headers = [

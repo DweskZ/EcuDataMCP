@@ -33,12 +33,15 @@ def register_search_ranking_tool(mcp: MCPServer) -> None:
         e.g. "C" for manufacturing), sorted by any indicator column (defaults
         to the dataset's own precomputed posicion_general). Each result
         includes the company's nombre/ruc alongside its financials. Covers
-        only the last few cached fiscal years, not the full history. Use
-        get_financials for one company's full detail, or get_compania_info
-        for legal/registry data (address, legal representative, etc.).
+        only the last five fiscal years in the local build, not the full
+        history; `metadatos.base_local` gives the build date and year range.
+        Use get_financials for one company's full detail, or
+        get_compania_info for legal/registry data (address, legal
+        representative, etc.).
 
         Args:
-            anio: Optional fiscal year filter.
+            anio: Fiscal year filter; defaults to the latest available year
+                (the latest year may still be incomplete while filings arrive).
             ciiu_n1: Optional CIIU level-1 filter, e.g. "C", "G", "I".
             order_by: Column to sort by (e.g. "posicion_general", "activos",
                 "roe"). Raises an error listing valid columns if unknown.
@@ -72,13 +75,17 @@ def register_search_ranking_tool(mcp: MCPServer) -> None:
             )
             raise ToolError(f"Error al consultar el ranking de Supercías: {e}") from e
 
+        result = supercias_financials.with_financials_metadata(result)
+
         def to_text(data: dict) -> str:
             companias = data.get("companias") or []
             parts = [
                 (
-                    f"Ranking Supercías — {data['total']} resultado(s) "
-                    f"(mostrando {len(companias)}, offset={data['offset']})"
+                    f"Ranking Supercías {data.get('anio')} — {data['total']} "
+                    f"resultado(s) (mostrando {len(companias)}, "
+                    f"offset={data['offset']})"
                 ),
+                *supercias_financials.stale_warning_lines(data),
                 "",
             ]
             if not companias:

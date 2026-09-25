@@ -161,6 +161,75 @@ def test_verify_build_rejects_missing_table(tmp_path):
         build_script._verify_build(path)
 
 
+def test_load_csv_table_rejects_many_malformed_rows(tmp_path):
+    csv_path = tmp_path / "truncated.csv"
+    csv_path.write_text("anio,valor\n2025,1\n2025\n", encoding="utf-8")
+    conn = sqlite3.connect(tmp_path / "out.sqlite3")
+    with pytest.raises(RuntimeError, match="truncado"):
+        build_script._load_csv_table(conn, csv_path, "t", {"anio"}, set())
+
+
+def test_check_not_shrunk_rejects_sharp_drop(tmp_path):
+    previous = tmp_path / "prev.sqlite3"
+    new = tmp_path / "new.sqlite3"
+    for path, rows in ((previous, 10), (new, 5)):
+        conn = sqlite3.connect(path)
+        conn.execute("CREATE TABLE ranking (anio INTEGER)")
+        conn.executemany("INSERT INTO ranking VALUES (?)", [(2025,)] * rows)
+        conn.commit()
+        conn.close()
+
+    with pytest.raises(RuntimeError, match="bajó de 10 a 5"):
+        build_script._check_not_shrunk(new, previous)
+    build_script._check_not_shrunk(previous, new)  # growth is fine
+    build_script._check_not_shrunk(new, tmp_path / "none.sqlite3")  # no previous
+
+
+@pytest.fixture
+def isolated_state(tmp_path, monkeypatch):
+    from helpers import supercias_financials
+
+    monkeypatch.setattr(
+        supercias_financials, "DB_PATH", tmp_path / "data" / "financials.sqlite3"
+    )
+    return supercias_financials
+
+
+def test_main_skips_when_lock_held(isolated_state, monkeypatch):
+    built: list[bool] = []
+    monkeypatch.setattr(build_script, "_build", lambda: built.append(True))
+    lock = isolated_state.lock_path()
+    lock.parent.mkdir(parents=True)
+    lock.write_text("1")
+
+    build_script.main()
+
+    assert built == []
+    assert lock.exists()  # another build's lock is left alone
+
+
+def test_main_records_failure_and_releases_lock(isolated_state, monkeypatch):
+    def boom():
+        raise ConnectionError("Supercías caído")
+
+    monkeypatch.setattr(build_script, "_build", boom)
+    with pytest.raises(ConnectionError):
+        build_script.main()
+    with pytest.raises(ConnectionError):
+        build_script.main()
+
+    state = isolated_state.read_build_state()
+    assert state["fallos_consecutivos"] == 2
+    assert "Supercías caído" in state["ultimo_error"]
+    assert not isolated_state.lock_path().exists()
+
+    monkeypatch.setattr(build_script, "_build", lambda: None)
+    build_script.main()
+    state = isolated_state.read_build_state()
+    assert state["fallos_consecutivos"] == 0
+    assert state["ultimo_error"] is None
+
+
 def test_convert_integer_rejects_inf_and_fractions_without_raising():
     assert build_script._convert("inf", "INTEGER") is None
     assert build_script._convert("2.5", "INTEGER") is None

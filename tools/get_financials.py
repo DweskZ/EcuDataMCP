@@ -38,8 +38,10 @@ def register_get_financials_tool(mcp: MCPServer) -> None:
 
         Returns revenue, assets, equity, profit, employee count, and financial
         ratios (liquidity, leverage, profitability) per fiscal year. Covers
-        only the last few fiscal years (whatever scripts/build_supercias_financials_db.py
-        last cached), not the full history back to 2008. Complements
+        only the last five fiscal years in the local build, not the full
+        history back to 2008; `metadatos.base_local` gives the build date and
+        year range, and the latest year may still be incomplete. If a RUC
+        maps to several companies, the error lists their expedientes. Complements
         get_compania_info, which has legal/registry data but no financials.
 
         Args:
@@ -62,16 +64,28 @@ def register_get_financials_tool(mcp: MCPServer) -> None:
                 f"Error al consultar los financieros de Supercías: {e}"
             ) from e
 
+        if result.get("error") == "ambiguous":
+            candidatos = "; ".join(
+                f"expediente {c['expediente']} ({c.get('nombre') or 'sin nombre'})"
+                for c in result["candidatos"]
+            )
+            raise ToolError(
+                f"El RUC '{expediente_or_ruc}' corresponde a varias compañías en "
+                f"Supercías: {candidatos}. Vuelve a consultar con el expediente."
+            )
         if result.get("error") == "not_found":
             raise ToolError(
                 f"Error: no se encontró ninguna compañía con "
                 f"'{expediente_or_ruc}'. Prueba search_companias primero."
             )
 
+        result = supercias_financials.with_financials_metadata(result)
+
         def to_text(data: dict) -> str:
             years = data.get("years") or []
             header = data.get("nombre") or f"Expediente {data.get('expediente')}"
             parts = [f"Financieros: {header}"]
+            parts.extend(supercias_financials.stale_warning_lines(data))
             if data.get("ruc"):
                 parts.append(f"RUC: {data['ruc']}")
             parts.append(f"Expediente: {data.get('expediente')}")
