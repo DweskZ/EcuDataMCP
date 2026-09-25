@@ -1,0 +1,22 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.dweskz/ecudatamcp",
+  "title": "EcuDataMCP",
+  "description": "Open public-data infrastructure for Ecuador: CKAN, SRI, BCE, Supercias, INEC, SERCOP, IG-EPN and more.",
+  "repository": {
+    "url": "https://github.com/DweskZ/EcuDataMCP",
+    "source": "github"
+  },
+  "version": "0.8.10",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "ecuador-mcp",
+      "version": "0.8.10",
+      "transport": { "type": "stdio" },
+      "packageArguments": [
+        { "type": "named", "name": "--transport", "value": "stdio" }
+      ]
+    }
+  ]
+}

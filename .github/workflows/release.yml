@@ -1,0 +1,23 @@
+name: Release
+
+# Publishes to PyPI via trusted publishing when a version tag is pushed.
+# Requires a PyPI "pending publisher" for this repo/workflow/environment.
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  pypi:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - name: Check tag matches pyproject version
+        run: test "${GITHUB_REF_NAME#v}" = "$(uv version --short)"
+      - name: Build
+        run: uv build
+      - name: Publish
+        run: uv publish --trusted-publishing always
