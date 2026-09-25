@@ -1,8 +1,12 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers.csv_reader import list_zip_contents as _list_zip_contents
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def _human_size(n: int) -> str:
@@ -15,14 +19,14 @@ def _human_size(n: int) -> str:
 
 
 def register_list_zip_contents_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Listar el contenido de un archivo ZIP", annotations=READ_ONLY)
     @log_tool
     async def list_zip_contents(
         url: str,
         limit: int = 200,
         offset: int = 0,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         List a .zip archive's member files (name, size) from a direct URL,
         without downloading the archive.
@@ -49,17 +53,9 @@ def register_list_zip_contents_tool(mcp: MCPServer) -> None:
         try:
             result = await _list_zip_contents(url)
         except ValueError as e:
-            return render_output(
-                {"error": str(e), "url": url},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(str(e)) from e
         except Exception as e:
-            return render_output(
-                {"error": str(e), "url": url},
-                format,
-                text_builder=lambda d: f"Error al listar el .zip: {d['error']}",
-            )
+            raise ToolError(f"Error al listar el .zip: {e}") from e
 
         all_members = result["members"]
         page = all_members[offset : offset + limit]
@@ -92,4 +88,4 @@ def register_list_zip_contents_tool(mcp: MCPServer) -> None:
                 )
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

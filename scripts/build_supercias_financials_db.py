@@ -8,11 +8,18 @@ local SQLite database, then prunes `ranking`/`indicadores_sector` down to the
 last 5 fiscal years present in the data (not a hardcoded year, so this
 self-adjusts every year without a code change).
 
-Not run automatically by the MCP server: this takes several minutes (the
-356 MB download dominates), too slow for a single request/response cycle.
-Run it manually before deploying, or on a periodic schedule (the underlying
-filings change far less often than the daily company directory) --
-helpers/supercias_financials.py refuses to serve data older than 7 days.
+Launched automatically as a background subprocess by
+helpers/supercias_financials.py (`_trigger_background_build`), both at
+server startup and whenever a query hits a missing/stale DB -- an operator
+never needs to run this by hand. That module's `_build_lock`/
+`_build_process` only dedupes triggers from within the same running server
+process, though; still runnable directly for a manual/CI refresh, but avoid
+doing so while the server you're pointing at is already mid-build (check
+its logs for "Construyendo/refrescando..."), since two builds racing to
+`os.replace()` the same DB_PATH is unguarded across processes. Takes
+several minutes (the 356 MB download dominates) --
+helpers/supercias_financials.py refuses to serve data older than 7 days,
+which is what triggers the periodic refresh.
 
 bi_compania.csv (expediente, ruc, nombre, tipo, pro_codigo, provincia) IS
 downloaded, as the `companias` table -- an earlier version of this script
@@ -42,6 +49,7 @@ import httpx
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from helpers.csv_reader import _EU_DECIMAL_RE, _convert_eu_decimal
+from helpers.supercias_financials import SCHEMA_VERSION
 from helpers.tls import legacy_cipher_context
 from helpers.user_agent import USER_AGENT
 
@@ -111,10 +119,28 @@ def _convert(value: str, sql_type: str) -> object:
         return value
     if _EU_DECIMAL_RE.match(value):
         value = _convert_eu_decimal(value)
+    if sql_type != "INTEGER":
+        try:
+            return float(value)
+        except ValueError:
+            return None
     try:
-        return int(value) if sql_type == "INTEGER" else float(value)
+        return int(value)
     except ValueError:
-        return None
+        # bi_ranking.csv ships n_empleados (an INTEGER column here) as a
+        # decimal string ("2.00", "11547.00") like its REAL-typed
+        # neighbors -- confirmed live 2026-09-21, this silently nulled out
+        # every single n_empleados value (100% of 660k rows) before this
+        # fallback existed, since int("2.00") raises ValueError directly.
+        # Only whole numbers are accepted: "inf" would raise OverflowError
+        # (aborting the whole load) and "2.5" would silently truncate.
+        try:
+            number = float(value)
+        except ValueError:
+            return None
+        if not number.is_integer():
+            return None
+        return int(number)
 
 
 def _load_csv_table(
@@ -171,7 +197,7 @@ def _verify_build(db_path: Path) -> None:
             raise RuntimeError(f"PRAGMA integrity_check falló: {ok}")
 
         for table, required_cols in (
-            ("ranking", {"anio", "expediente", "posicion_general"}),
+            ("ranking", {"anio", "expediente", "posicion_general", "n_empleados"}),
             ("companias", {"expediente", "ruc", "nombre"}),
             ("segmentos", {"id_segmento", "segmento"}),
             ("ciiu", {"ciiu", "descripcion"}),
@@ -196,6 +222,16 @@ def _verify_build(db_path: Path) -> None:
             raise RuntimeError(
                 "La tabla 'ranking' quedó vacía tras el build -- "
                 "probablemente el CSV fuente vino roto/truncado esta vez"
+            )
+        # Guards against the int-conversion bug that once nulled out 100% of
+        # n_empleados silently coming back.
+        n_empleados_rows = conn.execute(
+            "SELECT COUNT(n_empleados) FROM ranking"
+        ).fetchone()[0]
+        if n_empleados_rows == 0:
+            raise RuntimeError(
+                "La columna 'n_empleados' de 'ranking' quedó completamente vacía "
+                "tras el build -- probablemente falló la conversión a entero"
             )
         min_anio, max_anio = conn.execute(
             "SELECT MIN(anio), MAX(anio) FROM ranking"
@@ -282,6 +318,7 @@ def main() -> None:
         )
         conn.execute("CREATE INDEX idx_companias_expediente ON companias(expediente)")
         conn.execute("CREATE INDEX idx_companias_ruc ON companias(ruc)")
+        conn.execute(f"PRAGMA user_version = {int(SCHEMA_VERSION)}")
         conn.commit()
 
         print("VACUUM...", flush=True)

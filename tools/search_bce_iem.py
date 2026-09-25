@@ -1,17 +1,20 @@
 import logging
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import bce_iem_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import MAIN_LOGGER_NAME, log_tool
 from helpers.response_contract import with_response_metadata
+from helpers.tool_meta import READ_ONLY
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 
 def register_search_bce_iem_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar tablas del boletín IEM del BCE", annotations=READ_ONLY)
     @log_tool
     async def search_bce_iem(
         query: str = "",
@@ -23,8 +26,8 @@ def register_search_bce_iem_tool(mcp: MCPServer) -> None:
         guardar_catalogo: bool = False,
         hash_archivos: bool = False,
         max_hash_archivos: int = 5000,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """Search individual Excel tables in the BCE's latest IEM bulletin.
 
         Use this for detailed BCE tables not conveniently available through
@@ -58,11 +61,7 @@ def register_search_bce_iem_tool(mcp: MCPServer) -> None:
             )
         except Exception as exc:
             logger.exception("search_bce_iem failed (query=%r)", query)
-            return render_output(
-                {"error": str(exc)},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(f"Error al buscar tablas del IEM del BCE: {exc}") from exc
 
         def to_text(data: dict) -> str:
             bulletin = data["boletin"]
@@ -142,4 +141,4 @@ def register_search_bce_iem_tool(mcp: MCPServer) -> None:
             published_at=f"{bulletin.get('anio')}-{bulletin.get('mes'):02d}"
             if bulletin.get("anio") and bulletin.get("mes") else None,
         )
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

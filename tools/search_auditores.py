@@ -1,20 +1,24 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import supercias_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_auditores_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar auditores externos autorizados", annotations=READ_ONLY)
     @log_tool
     async def search_auditores(
         query: str = "",
         provincia: str = "",
         limit: int = 20,
         offset: int = 0,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Search Ecuador's registry of authorized external auditors (Superintendencia de Compañías).
 
@@ -42,17 +46,9 @@ def register_search_auditores_tool(mcp: MCPServer) -> None:
                 offset=offset,
             )
         except Exception as e:
-            return render_output(
-                {
-                    "error": str(e),
-                    "query": query or None,
-                    "provincia": provincia or None,
-                },
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar el listado de auditores externos: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al consultar el listado de auditores externos: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             auditores = data.get("auditores") or []
@@ -85,4 +81,4 @@ def register_search_auditores_tool(mcp: MCPServer) -> None:
             parts.append(f"Fuente: {data.get('url_fuente')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

@@ -117,11 +117,17 @@ def normalize_eu_decimal_columns(
     return new_rows, [headers[i] for i in idxs]
 
 
+def _should_raise(resp: httpx.Response, raise_for_status: bool | frozenset[int]) -> bool:
+    if isinstance(raise_for_status, bool):
+        return raise_for_status
+    return resp.status_code not in raise_for_status
+
+
 async def _download(
     session: httpx.AsyncClient,
     url: str,
     *,
-    raise_for_status: bool = True,
+    raise_for_status: bool | frozenset[int] = True,
     max_bytes: int = MAX_DOWNLOAD_BYTES,
 ) -> tuple[bytes, bool]:
     truncated = False
@@ -129,7 +135,7 @@ async def _download(
     # so every hop (including redirects) must be checked against the SSRF
     # guard rather than trusting httpx's own follow_redirects.
     async with safe_stream(session, url, timeout=_TIMEOUT) as resp:
-        if raise_for_status:
+        if _should_raise(resp, raise_for_status):
             resp.raise_for_status()
 
         content_length = resp.headers.get("content-length")
@@ -152,17 +158,19 @@ async def download_bytes(
     url: str,
     session: httpx.AsyncClient | None = None,
     *,
-    raise_for_status: bool = True,
+    raise_for_status: bool | frozenset[int] = True,
     max_bytes: int = MAX_DOWNLOAD_BYTES,
 ) -> tuple[bytes, bool]:
     """Download up to `max_bytes` (default MAX_DOWNLOAD_BYTES) with TLS
     fallback for portal hosts.
 
-    raise_for_status=False is a narrow escape hatch for a confirmed host
-    quirk (a WordPress/Elementor bug on censoecuador.gob.ec's
+    raise_for_status also accepts a frozenset of status codes to tolerate
+    while still raising on any other non-2xx -- a narrow escape hatch for a
+    confirmed host quirk (a WordPress/Elementor bug on censoecuador.gob.ec's
     /data-y-resultados/ page serves a real, substantial page under an HTTP
-    404) -- default stays True so every other caller keeps failing loudly
-    on a genuine error response.
+    404: callers pass frozenset({404})). Plain False tolerates every status;
+    default stays True so every other caller keeps failing loudly on a
+    genuine error response.
 
     max_bytes is an explicit override for callers whose format offers no
     partial-download benefit -- a ZIP-container spreadsheet (.xlsx/.xlsb/

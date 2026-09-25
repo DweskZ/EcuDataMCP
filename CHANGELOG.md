@@ -2,6 +2,125 @@
 
 ## Unreleased
 
+## 0.8.10 — 2026-09-24
+
+### Added
+
+- **`search_centrosur_cortes`** — archive of Centrosur's (Azuay/Cañar/
+  Morona Santiago) scheduled power-cut PDFs, 2023-present, including the
+  2024 estiaje blackout crisis. Enumerated via WordPress's public Media
+  Library REST API (`wp-json/wp/v2/media?search=...`), no login.
+- **`get_energia_ecuador_snapshot`** — recovers, via the Wayback Machine,
+  the Ministry of Energy's now-dead national blackout-schedule aggregator
+  (`energia-ecuador.com`, 2024 crisis). Only one of its nine distributor
+  pages (Empresa Eléctrica Quito) survived Wayback's crawl before the site
+  went behind a Cloudflare block, so this ships as a frozen 2024-04-24
+  snapshot rather than a live series.
+- **`get_certificado_cumplimiento_patronal`** — checks whether an employer
+  (RUC) or individual (cédula) is current on IESS Seguro Social
+  contributions, via IESS's public "Certificado de Cumplimiento de
+  Obligaciones Patronales" (no login; a stateful JSF form-postback, same
+  shape as `reportes.arconel.gob.ec`'s ASP.NET ReportViewer). This is a
+  mora/no-mora compliance check, not an employee headcount — the IESS
+  does not publish per-employer affiliate counts publicly anywhere found.
+
+### Fixed
+
+- **The outgoing `User-Agent` reported version 0.5.0 to every official
+  source** while the project shipped 0.8.9. `helpers/user_agent.py` now
+  derives it from `helpers/version.py` (the single source of truth), which
+  is the same drift its docstring already warned about for `main.py`'s
+  `VERSION` and `list_capabilities`.
+- **`search_sri_ruc`/`get_sri_ruc_info`'s razón-social search crashed
+  with `json.JSONDecodeError: Expecting value: line 1 column 1` on any
+  query with zero matches** (e.g. searching for a company name typed
+  without an apostrophe it actually has, like "ACQUADOR" for the real
+  "ACQUAD'OR C.A."). Confirmed live: the SRI's
+  `numerosRucPorRazonSocialToken` endpoint returns `204 No Content` with
+  an empty body, not `[]`, when nothing matches — `helpers/sri_ruc_client.py`
+  now treats an empty response body as an empty result instead of calling
+  `.json()` on it.
+
+- **The IESS certificate tool could report an employer that owes
+  contributions as compliant.** An unparseable certificate now reports
+  the status as "NO DETERMINADO" instead of "NO registra obligaciones en
+  mora"; status matching tolerates the PDF's line breaks and accepts
+  "SÍ"; form fields, action and ViewState are read from the certificate
+  form itself rather than hardcoded; unexpected non-PDF replies raise
+  instead of being reported as "not found"; a certificate for a
+  different RUC is rejected; PDF parsing runs off the event loop.
+- **`search_sri_ruc` crashed with `TypeError` when the SRI's count
+  endpoint returned an empty body.** Empty replies now map to 0 for the
+  count and `[]` for result lists.
+- **Supercías `n_empleados` fix hardened.** An `inf` cell no longer
+  aborts the whole build and fractional values are no longer silently
+  truncated; the build fails if `n_empleados` comes out entirely null;
+  the DB is stamped with a schema version so databases built before the
+  fix are rebuilt on first use instead of serving null employee counts
+  for up to 7 days.
+- **stdio clients (Claude Desktop) randomly disconnected.** The
+  background Supercías DB build inherited the server's stdout, which
+  under the stdio transport is the JSON-RPC stream, so its progress
+  output corrupted the protocol. It now logs to
+  `data/supercias_build.log`. Startup is also faster (~4.7 s → ~2.9 s):
+  `openpyxl` and `uvicorn` are imported only when needed, which keeps
+  cold launches under client initialize timeouts.
+- Dependency bumps: pypdf 6.18.1, uvicorn 0.53.0, ruff 0.16.7.
+
+### Changed
+
+- **Measured the surface that phases 0-3 produced and planned the next
+  phases in `docs/MCP_ARCHITECTURE.md`.** `tools/list` costs 188.352
+  characters (≈47k tokens) per conversation; `outputSchema` is generic in
+  113/113 tools because the return annotation is `dict[str, Any]`; the
+  `metadatos` contract covers 4/113; the daily smoke calls 43/113 tools.
+  Phases 4-8 cover the context budget, real `outputSchema`, response
+  size/pagination, a shared HTTP layer with a persistent cache, and
+  per-tool usage telemetry. `docs/ROADMAP.md`'s quality rows now match
+  what shipped in 0.8.9 instead of still listing it as not started.
+
+Tool count: 116.
+
+## 0.8.9 — 2026-09-14
+
+### Changed
+
+- **MCP architecture cleanup, all 4 phases of `docs/MCP_ARCHITECTURE.md`.**
+  - Removed the 2 confirmed duplicate tools (`list_recent_datasets` folded
+    into `search_datasets(sort="recent")`; `list_capabilities` kept only as
+    a deprecated compatibility alias) and merged the ARCOTEL pair into
+    `search_arcotel(tipo=...)` — 115 → 113 tools.
+  - Added an `MCP_PROFILE` env var (`public`/`maintenance`/`all`, default
+    `all`) so `audit_bce_catalog`/`compare_bce_sources` (the 2 tools that
+    write local snapshot/report artifacts) can be split onto a separate
+    operator-only instance without touching the 111 read-only tools —
+    opt-in via `docker-compose.yml`'s `mcp-maintenance` service.
+  - Every tool now declares a Spanish `title` and MCP `annotations`
+    (read-only vs. writes-artifacts), and every genuinely closed-set
+    string parameter (`source`, `format`, and 13 others) is a typed
+    `Literal[...]` instead of a bare `str`. Regression test:
+    `tests/test_tool_metadata.py`.
+  - Every tool now returns native `structuredContent` alongside its
+    existing text (`format="text"`/`"json"` unchanged) via
+    `helpers/format_out.py::render_structured`. Genuine failures (API
+    errors, invalid input, size limits) now surface as MCP `isError: true`
+    (`mcp.server.mcpserver.exceptions.ToolError`) instead of a
+    fake-success string; legitimate empty results ("no se encontraron...")
+    stay normal successful responses. See `docs/RESPONSE_CONTRACT.md`.
+
+### Fixed
+
+- **`search_ranking`/`get_financials` no longer require an operator to run
+  `scripts/build_supercias_financials_db.py` by hand before first use.**
+  `helpers/supercias_financials.py` now launches that script as a
+  background subprocess (deduplicated so a missing/stale DB never queues
+  more than one build) the moment it notices the local SQLite DB is
+  missing or older than 7 days — both at server startup
+  (`ensure_financials_db_fresh()` in `main.py`) and from any tool call that
+  hits the same condition. Calls made while the build is in flight still
+  return an error telling the caller to retry in a few minutes, but no
+  manual step is needed for the DB to build/refresh itself.
+
 ## 0.8.8 — 2026-09-10
 
 ### Fixed

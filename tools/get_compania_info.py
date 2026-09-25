@@ -1,14 +1,20 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import supercias_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_compania_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver información registral de una compañía", annotations=READ_ONLY)
     @log_tool
-    async def get_compania_info(ruc: str, format: str = "text") -> str:
+    async def get_compania_info(
+        ruc: str, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Get full registry details for a company by RUC (Superintendencia de Compañías).
 
@@ -24,22 +30,14 @@ def register_get_compania_info_tool(mcp: MCPServer) -> None:
         try:
             compania = await supercias_client.get_compania_by_ruc(ruc)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "ruc": ruc},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar el directorio de Supercías: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al consultar el directorio de Supercías: {e}"
+            ) from e
 
         if compania is None:
-            return render_output(
-                {"error": "not_found", "ruc": ruc},
-                format,
-                text_builder=lambda d: (
-                    f"Error: no se encontró ninguna compañía con RUC '{d['ruc']}'. "
-                    "Prueba search_companias para buscar por nombre."
-                ),
+            raise ToolError(
+                f"Error: no se encontró ninguna compañía con RUC '{ruc}'. "
+                "Prueba search_companias para buscar por nombre."
             )
 
         def to_text(c: dict) -> str:
@@ -77,4 +75,4 @@ def register_get_compania_info_tool(mcp: MCPServer) -> None:
                 parts.append(f"Último año de balance presentado: {c['ultimo_balance']}")
             return "\n".join(parts)
 
-        return render_output(compania, format, text_builder=to_text)
+        return render_structured(compania, format, text_builder=to_text)

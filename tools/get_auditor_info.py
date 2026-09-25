@@ -1,14 +1,20 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import supercias_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_auditor_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver información de un auditor externo", annotations=READ_ONLY)
     @log_tool
-    async def get_auditor_info(identificacion: str, format: str = "text") -> str:
+    async def get_auditor_info(
+        identificacion: str, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Get full registry details for an authorized external auditor by identificación (Superintendencia de Compañías).
 
@@ -23,23 +29,15 @@ def register_get_auditor_info_tool(mcp: MCPServer) -> None:
         try:
             auditor = await supercias_client.get_auditor_info(identificacion)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "identificacion": identificacion},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar el listado de auditores externos: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al consultar el listado de auditores externos: {e}"
+            ) from e
 
         if auditor is None:
-            return render_output(
-                {"error": "not_found", "identificacion": identificacion},
-                format,
-                text_builder=lambda d: (
-                    f"Error: no se encontró ningún auditor externo con "
-                    f"identificación '{d['identificacion']}'. Prueba "
-                    "search_auditores para buscar por nombre."
-                ),
+            raise ToolError(
+                f"Error: no se encontró ningún auditor externo con "
+                f"identificación '{identificacion}'. Prueba "
+                "search_auditores para buscar por nombre."
             )
 
         def to_text(a: dict) -> str:
@@ -65,4 +63,4 @@ def register_get_auditor_info_tool(mcp: MCPServer) -> None:
                 parts.append(f"Correo: {a['correo_electronico']}")
             return "\n".join(parts)
 
-        return render_output(auditor, format, text_builder=to_text)
+        return render_structured(auditor, format, text_builder=to_text)

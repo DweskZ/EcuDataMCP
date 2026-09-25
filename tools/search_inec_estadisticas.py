@@ -1,19 +1,23 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import inec_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_inec_estadisticas_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar temas estadísticos del INEC", annotations=READ_ONLY)
     @log_tool
     async def search_inec_estadisticas(
         query: str = "",
         limit: int = 30,
         offset: int = 0,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Search INEC's statistical topic pages (ecuadorencifras.gob.ec).
 
@@ -41,13 +45,7 @@ def register_search_inec_estadisticas_tool(mcp: MCPServer) -> None:
         try:
             result = await inec_client.search_topics(query=query, limit=limit, offset=offset)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "query": query or None},
-                format,
-                text_builder=lambda d: (
-                    f"Error al buscar temas de Ecuador en Cifras (INEC): {d['error']}"
-                ),
-            )
+            raise ToolError(f"Error al buscar temas de Ecuador en Cifras (INEC): {e}") from e
 
         def to_text(data: dict) -> str:
             temas = data.get("temas") or []
@@ -66,4 +64,4 @@ def register_search_inec_estadisticas_tool(mcp: MCPServer) -> None:
                 parts.append(f"   {t.get('url')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

@@ -14,7 +14,6 @@ _INSTITUCIONES_CLAVE = [
 
 _CKAN_TOOLS = [
     "search_datasets",
-    "list_recent_datasets",
     "get_dataset_info",
     "list_dataset_resources",
     "get_resource_info",
@@ -232,6 +231,15 @@ def _fuentes_payload() -> dict:
                     "get_sut_indicador_schema",
                     "query_sut_indicador",
                 ],
+            },
+            {
+                "id": "arcotel",
+                "nombre": (
+                    "ARCOTEL (estadísticas del sector de telecomunicaciones: "
+                    "reportes mensuales y boletines anuales/temáticos)"
+                ),
+                "base": "https://www.arcotel.gob.ec/",
+                "tools": ["search_arcotel"],
             },
         ]
     }

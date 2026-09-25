@@ -1,12 +1,15 @@
 from functools import partial
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import gobec_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
 from helpers.text_utils import strip_accents
+from helpers.tool_meta import READ_ONLY
 
 _strip_accents = partial(strip_accents, lower=False)
 
@@ -21,14 +24,14 @@ def _matches_query(tramite: dict, words: list[str]) -> bool:
 
 
 def register_search_tramites_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar trámites gubernamentales en gob.ec", annotations=READ_ONLY)
     @log_tool
     async def search_tramites(
         query: str = "",
         institution_id: str = "",
         page: int = 1,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Search for government procedures (trámites) on Ecuador's official portal gob.ec.
 
@@ -110,11 +113,7 @@ def register_search_tramites_tool(mcp: MCPServer) -> None:
                 )
                 total_scanned = len(tramites)
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: f"Error al buscar trámites: {d['error']}",
-            )
+            raise ToolError(f"Error al buscar trámites: {e}") from e
 
         payload = {
             "query": query,
@@ -185,4 +184,4 @@ def register_search_tramites_tool(mcp: MCPServer) -> None:
                 parts.append(f"... y {data['total'] - 20} más.")
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

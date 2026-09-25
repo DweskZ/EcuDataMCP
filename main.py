@@ -5,7 +5,6 @@ import sys
 from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime
 
-import uvicorn
 from mcp.server.mcpserver import MCPServer
 
 from helpers.env_config import (
@@ -13,6 +12,7 @@ from helpers.env_config import (
     get_mcp_host,
     get_mcp_max_concurrent_requests,
     get_mcp_port,
+    get_mcp_profile,
     get_mcp_rate_limit_requests,
     get_mcp_rate_limit_window_seconds,
     get_mcp_require_auth,
@@ -22,10 +22,11 @@ from helpers.env_config import (
 )
 from helpers.http_security import with_http_security
 from helpers.logging import MAIN_LOGGER_NAME, UVICORN_LOGGING_CONFIG, setup_logging
+from helpers.supercias_financials import ensure_financials_db_fresh
 from helpers.version import get_version
 from prompts import register_prompts
 from resources import register_resources
-from tools import register_tools
+from tools import register_maintenance_tools, register_tools
 
 setup_logging()
 
@@ -34,8 +35,32 @@ VERSION = get_version()
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
-mcp = MCPServer("Ecuador Datos Abiertos MCP")
-register_tools(mcp)
+SERVER_INSTRUCTIONS = """
+Servidor MCP de datos abiertos del gobierno ecuatoriano (CKAN nacional y
+municipal, gob.ec, SRI, BCE, Supercías, IESS/SENESCYT, SIPA, IG-EPN, SERCOP,
+SGR, y más — ver el recurso `ecuador://fuentes` para el catálogo completo y
+actualizado de fuentes y sus tools).
+
+Entrada recomendada cuando no se sabe qué tool usar: `search_ecuador`, o los
+prompts `explorar_datos` / `consultar_tramite` / `investigar_contrato` /
+`buscar_regulacion` / `buscar_inec` / `monitorear_riesgos`.
+
+Casi todos los tools aceptan `format="json"` además de `format="text"`
+(default).
+""".strip()
+
+mcp = MCPServer("Ecuador Datos Abiertos MCP", instructions=SERVER_INSTRUCTIONS)
+
+# MCP_PROFILE (default "all") splits the public read-only tools from the two
+# that write local operator artifacts (audit_bce_catalog, compare_bce_sources)
+# -- see docs/MCP_ARCHITECTURE.md's public/maintenance profile split. "all"
+# reproduces the single-instance behavior this server had before profiles
+# existed, so an unset MCP_PROFILE changes nothing for an existing deployment.
+MCP_PROFILE = get_mcp_profile()
+if MCP_PROFILE in ("public", "all"):
+    register_tools(mcp)
+if MCP_PROFILE in ("maintenance", "all"):
+    register_maintenance_tools(mcp)
 register_prompts(mcp)
 register_resources(mcp)
 
@@ -100,8 +125,16 @@ def main(argv: list[str] | None = None) -> None:
     args = _parse_args(argv)
     transport = args.transport or get_transport()
 
+    # Self-heals the Supercías financials DB (search_ranking/get_financials)
+    # instead of requiring the operator to run
+    # scripts/build_supercias_financials_db.py by hand before first use --
+    # non-blocking, so a missing/stale DB never delays server startup.
+    ensure_financials_db_fresh()
+
     if transport == "stdio":
-        logger.info("Starting Ecuador MCP server v%s (stdio)", VERSION)
+        logger.info(
+            "Starting Ecuador MCP server v%s (stdio, profile=%s)", VERSION, MCP_PROFILE
+        )
         mcp.run(transport="stdio")
         return
 
@@ -124,8 +157,8 @@ def main(argv: list[str] | None = None) -> None:
         )
 
     logger.info(
-        "Starting Ecuador MCP server v%s on %s:%d",
-        VERSION, host, port,
+        "Starting Ecuador MCP server v%s on %s:%d (profile=%s)",
+        VERSION, host, port, MCP_PROFILE,
     )
     if auth_token:
         logger.info("MCP HTTP authentication: Bearer token enabled")
@@ -143,6 +176,10 @@ def main(argv: list[str] | None = None) -> None:
     scheme = "https" if certfile else "http"
     logger.info("MCP endpoint: %s://%s:%d/mcp", scheme, host, port)
     logger.info("Health check: %s://%s:%d/health", scheme, host, port)
+
+    # Imported here, not at module top: stdio launches never need it, and it
+    # adds ~0.3 s to startup.
+    import uvicorn
 
     uvicorn.run(
         asgi_app,

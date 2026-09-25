@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 
@@ -30,6 +31,61 @@ _DEGRADED_SOURCES = (
         "compraspublicas.gob.ec",
         "fuera de latinoamérica",
     ),
+    (
+        "censo_ecuador_geoblock",
+        "censoecuador.gob.ec",
+        "bloqueo geográfico",
+    ),
+    (
+        "supercias_financials_cold_start",
+        "base de datos financiera de supercías",
+        "automáticamente en segundo plano",
+    ),
+    (
+        # Confirmed live 2026-09-18: search_anda 503'd on one run, then
+        # 403'd on the next from a different network -- the same
+        # GitHub-Actions-runner geo/bot block already seen on INEC's other
+        # censoecuador.gob.ec property, not a transient blip (the generic
+        # 5xx check below wouldn't have caught this consistent 403).
+        "anda_inec_geoblock",
+        "anda.inec.gob.ec",
+        "403 forbidden",
+    ),
+    (
+        # Confirmed live 2026-09-19: list_instituciones/search_tramites/
+        # search_regulaciones/get_regulacion_info all failed the same way in
+        # one run -- gob.ec answered a (likely geo/bot-blocked) request with
+        # HTTP 200 and an empty/non-JSON body rather than a 4xx, so
+        # resp.json() raised instead of raise_for_status(). See
+        # gobec_client._fetch_json, which now wraps that into this message.
+        "gobec_geoblock",
+        "el portal gob.ec devolvió una respuesta vacía o no válida",
+    ),
+    (
+        # Confirmed live 2026-09-19: www.censoecuador.gob.ec's TLS
+        # certificate (notAfter 2026-09-18 23:59:59 GMT, per `openssl
+        # s_client`) expired the day before this run -- a genuine upstream
+        # outage, not the missing-intermediate case helpers/tls.py's
+        # _OS_TRUST_HOST_SUFFIXES retry already handles (that retry still
+        # fully verifies the chain, so it fails the same way once the leaf
+        # itself is expired).
+        "censo_ecuador_tls_expired",
+        "censo ecuador",
+        "certificate has expired",
+    ),
+)
+
+# httpx's own raise_for_status() message format (confirmed against
+# httpx._models.Response.raise_for_status): "Server error '503 Service
+# Unavailable' for url '<url>'". A 5xx is by definition the live source
+# itself misbehaving (down, overloaded, restarting) -- never something our
+# request shape caused -- so this is a generic, host-agnostic degradation
+# check rather than one more hardcoded tuple per source. Confirmed live:
+# anda.inec.gob.ec 503'd on 2026-09-18's scheduled run and was unreachable/
+# inconsistent (timeout, then 403) minutes later -- a flaky host, not a
+# regression in this repo.
+_HTTPX_SERVER_ERROR_RE = re.compile(
+    r"Server error '5\d\d[^']*' for url 'https?://([^/']+)"
 )
 
 
@@ -39,19 +95,37 @@ def degraded_source(text: str) -> str | None:
     for name, *markers in _DEGRADED_SOURCES:
         if all(marker.casefold() in normalized for marker in markers):
             return name
+    match = _HTTPX_SERVER_ERROR_RE.search(text)
+    if match:
+        return f"upstream_5xx:{match.group(1)}"
     return None
 
 
-def assess_response(text: str, required: list[str]) -> SmokeAssessment:
+def assess_response(
+    text: str, required: list[str], is_error: bool = False
+) -> SmokeAssessment:
     """Classify one MCP tool response for the live smoke workflow.
 
     A known upstream restriction is ``degraded``. Everything else that does
     not meet the assertion is a real smoke failure, so the workflow remains a
     guard against regressions in this server and unexpected source changes.
+
+    ``is_error`` should carry the MCP result's own ``isError`` flag when the
+    caller has it. Tool failures raise ``ToolError`` with a per-tool message
+    ("Error al buscar datasets: ...", "Error: ...", a bare RuntimeError
+    string, ...) that does not reliably start with "Error:" or contain a
+    literal ``"error"`` JSON key, so guessing failure from the text alone
+    (the pre-``isError`` fallback below, kept for callers that only have
+    text) can misclassify a real failure as ``ok`` -- which then crashes a
+    caller that expects the text to be parseable JSON.
     """
     source = degraded_source(text)
     if "traceback" in text[:300].casefold():
         return SmokeAssessment("failed", "traceback in response")
+    if is_error:
+        if source:
+            return SmokeAssessment("degraded", text[:240], source)
+        return SmokeAssessment("failed", text[:240])
     if required and not any(token.casefold() in text.casefold() for token in required):
         if source:
             return SmokeAssessment("degraded", "required fields unavailable", source)

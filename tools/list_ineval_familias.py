@@ -1,14 +1,17 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
 
 from helpers import ineval_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_list_ineval_familias_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Listar familias de evaluación de INEVAL", annotations=READ_ONLY)
     @log_tool
-    async def list_ineval_familias(format: str = "text") -> str:
+    async def list_ineval_familias(format: Literal["text", "json"] = "text") -> dict[str, Any]:
         """
         List INEVAL (Instituto Nacional de Evaluación Educativa) evaluation
         families with a real "Bases de Datos" download page
@@ -32,12 +35,14 @@ def register_list_ineval_familias_tool(mcp: MCPServer) -> None:
             format: text | json
         """
         familias = ineval_client.list_familias()
+        payload = {"total": len(familias), "familias": familias}
 
-        def to_text(data: list[dict]) -> str:
-            parts = [f"Familias de evaluación Ineval — {len(data)} familia(s):", ""]
-            for f in data:
+        def to_text(data: dict) -> str:
+            rows = data["familias"]
+            parts = [f"Familias de evaluación Ineval — {len(rows)} familia(s):", ""]
+            for f in rows:
                 parts.append(f"- {f['familia']}: {f['nombre']}")
                 parts.append(f"  {f['url']}")
             return "\n".join(parts)
 
-        return render_output(familias, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

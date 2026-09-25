@@ -1,14 +1,20 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import sgr_publicaciones_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_sgr_sitreps_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar informes de situación (SITREP) del SGR", annotations=READ_ONLY)
     @log_tool
-    async def search_sgr_sitreps(query: str = "", format: str = "text") -> str:
+    async def search_sgr_sitreps(
+        query: str = "", format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         List SGR's SITREP ("Informes de Situación") archive of adverse-event
         dossiers (gestionderiesgos.gob.ec), 2016-2026.
@@ -31,13 +37,7 @@ def register_search_sgr_sitreps_tool(mcp: MCPServer) -> None:
         try:
             result = await sgr_publicaciones_client.list_eventos_sitrep(query=query)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "query": query or None},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar el archivo SITREP de SGR: {d['error']}"
-                ),
-            )
+            raise ToolError(f"Error al consultar el archivo SITREP de SGR: {e}") from e
 
         def to_text(data: dict) -> str:
             eventos = data.get("eventos") or []
@@ -61,4 +61,4 @@ def register_search_sgr_sitreps_tool(mcp: MCPServer) -> None:
             parts.append(f"Fuente: {data.get('url_fuente')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

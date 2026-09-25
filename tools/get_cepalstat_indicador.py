@@ -1,16 +1,23 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import cepalstat_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_cepalstat_indicador_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver observaciones de un indicador CEPALSTAT", annotations=READ_ONLY)
     @log_tool
     async def get_cepalstat_indicador(
-        indicator_id: int, pais: str = "Ecuador", lang: str = "es", format: str = "text"
-    ) -> str:
+        indicator_id: int,
+        pais: str = "Ecuador",
+        lang: Literal["es", "en"] = "es",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Fetch one CEPALSTAT indicator's observations, filtered to one
         country (Ecuador by default) so the response stays small — CEPAL's
@@ -36,14 +43,9 @@ def register_get_cepalstat_indicador_tool(mcp: MCPServer) -> None:
         try:
             result = await cepalstat_client.get_indicador(indicator_id, pais=pais, lang=lang)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "indicator_id": indicator_id, "pais": pais},
-                format,
-                text_builder=lambda d: (
-                    f"Error al obtener el indicador {d['indicator_id']} de CEPALSTAT: "
-                    f"{d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al obtener el indicador {indicator_id} de CEPALSTAT: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             meta = data.get("metadata") or {}
@@ -76,4 +78,4 @@ def register_get_cepalstat_indicador_tool(mcp: MCPServer) -> None:
                 parts.append("Fuente(s): " + "; ".join(f.get("description", "") for f in fuentes))
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

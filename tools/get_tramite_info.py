@@ -1,15 +1,21 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import gobec_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_tramite_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver detalle de un trámite gubernamental", annotations=READ_ONLY)
     @log_tool
-    async def get_tramite_info(tramite_id: str, format: str = "text") -> str:
+    async def get_tramite_info(
+        tramite_id: str, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Get detailed information about a specific government procedure (trámite).
 
@@ -23,20 +29,10 @@ def register_get_tramite_info_tool(mcp: MCPServer) -> None:
         try:
             t = await gobec_client.get_tramite(tramite_id)
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: f"Error al obtener trámite: {d['error']}",
-            )
+            raise ToolError(f"Error al obtener trámite: {e}") from e
 
         if not t:
-            return render_output(
-                {"error": "not_found", "tramite_id": tramite_id},
-                format,
-                text_builder=lambda d: (
-                    f"No se encontró el trámite con ID '{d['tramite_id']}'."
-                ),
-            )
+            raise ToolError(f"No se encontró el trámite con ID '{tramite_id}'.")
 
         try:
             regs = await gobec_client.get_tramite_regulaciones(tramite_id)
@@ -108,4 +104,4 @@ def register_get_tramite_info_tool(mcp: MCPServer) -> None:
                 )
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

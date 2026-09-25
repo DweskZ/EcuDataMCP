@@ -1,16 +1,20 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import inamhi_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_inamhi_capas_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar capas del geoportal INAMHI", annotations=READ_ONLY)
     @log_tool
     async def search_inamhi_capas(
-        query: str = "", solo_wfs: bool = False, format: str = "text"
-    ) -> str:
+        query: str = "", solo_wfs: bool = False, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Search INAMHI's geoportal (geoservicios.inamhi.gob.ec) layer catalog --
         a GeoNode-backed GeoServer exposing Ecuador's meteorology/hydrology
@@ -46,13 +50,7 @@ def register_search_inamhi_capas_tool(mcp: MCPServer) -> None:
         try:
             result = await inamhi_client.search_capas(query=query, solo_wfs=solo_wfs)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "query": query or None},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar el catálogo de capas de INAMHI: {d['error']}"
-                ),
-            )
+            raise ToolError(f"Error al consultar el catálogo de capas de INAMHI: {e}") from e
 
         def to_text(data: dict) -> str:
             capas = data.get("capas") or []
@@ -77,4 +75,4 @@ def register_search_inamhi_capas_tool(mcp: MCPServer) -> None:
             parts.append(f"Fuente: {data.get('url_wms_capabilities')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

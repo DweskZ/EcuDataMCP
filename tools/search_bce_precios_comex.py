@@ -1,14 +1,23 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import bce_precios_comex_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_bce_precios_comex_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(
+        title="Buscar índices de precios de comercio exterior del BCE",
+        annotations=READ_ONLY,
+    )
     @log_tool
-    async def search_bce_precios_comex(query: str = "", format: str = "text") -> str:
+    async def search_bce_precios_comex(
+        query: str = "", format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         List BCE's disaggregated foreign-trade price-index file links —
         import prices by economic-use category (fuels/lubricants, raw
@@ -33,13 +42,9 @@ def register_search_bce_precios_comex_tool(mcp: MCPServer) -> None:
         try:
             result = await bce_precios_comex_client.search_archivos(query=query)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "query": query or None},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar Índices de Precios de Comercio Exterior del BCE: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al consultar Índices de Precios de Comercio Exterior del BCE: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             archivos = data.get("archivos") or []
@@ -58,4 +63,4 @@ def register_search_bce_precios_comex_tool(mcp: MCPServer) -> None:
                 parts.append(f"   {f.get('url')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

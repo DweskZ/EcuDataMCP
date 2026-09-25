@@ -1,14 +1,20 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import inec_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_inec_estadistica_files_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver archivos de un tema estadístico del INEC", annotations=READ_ONLY)
     @log_tool
-    async def get_inec_estadistica_files(url: str, format: str = "text") -> str:
+    async def get_inec_estadistica_files(
+        url: str, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         List the direct file links published on one INEC statistical topic page.
 
@@ -25,17 +31,9 @@ def register_get_inec_estadistica_files_tool(mcp: MCPServer) -> None:
         try:
             result = await inec_client.get_topic_files(url)
         except ValueError as e:
-            return render_output(
-                {"error": str(e), "url": url},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(str(e)) from e
         except Exception as e:
-            return render_output(
-                {"error": str(e), "url": url},
-                format,
-                text_builder=lambda d: f"Error al obtener la página del tema: {d['error']}",
-            )
+            raise ToolError(f"Error al obtener la página del tema: {e}") from e
 
         def to_text(data: dict) -> str:
             archivos = data.get("archivos") or []
@@ -49,4 +47,4 @@ def register_get_inec_estadistica_files_tool(mcp: MCPServer) -> None:
                 parts.append(f"   {f.get('url')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

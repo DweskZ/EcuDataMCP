@@ -1,16 +1,19 @@
 import json
+from typing import Any, Literal
 
 import httpx
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import ckan_client
 from helpers.csv_reader import format_table
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_query_resource_data_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Consultar los datos de un recurso (DataStore)", annotations=READ_ONLY)
     @log_tool
     async def query_resource_data(
         resource_id: str,
@@ -19,9 +22,9 @@ def register_query_resource_data_tool(mcp: MCPServer) -> None:
         rows: int = 20,
         offset: int = 0,
         sort: str = "",
-        source: str = "nacional",
-        format: str = "text",
-    ) -> str:
+        source: ckan_client.CkanSource = "nacional",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Query a tabular resource via CKAN DataStore without downloading the full file.
 
@@ -51,20 +54,10 @@ def register_query_resource_data_tool(mcp: MCPServer) -> None:
             try:
                 parsed = json.loads(filters_json)
             except json.JSONDecodeError as e:
-                return render_output(
-                    {"error": "filters_json_invalido", "detail": str(e)},
-                    format,
-                    text_builder=lambda d: (
-                        f"Error: filters_json no es JSON válido: {d['detail']}"
-                    ),
-                )
+                raise ToolError(f"Error: filters_json no es JSON válido: {e}") from e
             if not isinstance(parsed, dict):
-                return render_output(
-                    {"error": "filters_json_debe_ser_objeto"},
-                    format,
-                    text_builder=lambda _: (
-                        "Error: filters_json debe ser un objeto JSON (diccionario)."
-                    ),
+                raise ToolError(
+                    "Error: filters_json debe ser un objeto JSON (diccionario)."
                 )
             filters = parsed
 
@@ -80,37 +73,18 @@ def register_query_resource_data_tool(mcp: MCPServer) -> None:
             )
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
-                return render_output(
-                    {
-                        "error": "not_found_or_no_datastore",
-                        "resource_id": resource_id,
-                    },
-                    format,
-                    text_builder=lambda d: (
-                        f"Error: recurso '{d['resource_id']}' no encontrado o sin DataStore. "
-                        "Prueba preview_resource_data para descargar el archivo."
-                    ),
-                )
-            return render_output(
-                {"error": f"HTTP {e.response.status_code}", "detail": str(e)},
-                format,
-                text_builder=lambda d: f"Error: {d['error']} - {d['detail']}",
-            )
+                raise ToolError(
+                    f"Error: recurso '{resource_id}' no encontrado o sin DataStore. "
+                    "Prueba preview_resource_data para descargar el archivo."
+                ) from e
+            raise ToolError(f"Error: HTTP {e.response.status_code} - {e}") from e
         except ValueError as e:
-            return render_output(
-                {"error": "datastore_error", "detail": str(e)},
-                format,
-                text_builder=lambda d: (
-                    f"Error de DataStore: {d['detail']}. "
-                    "Si el recurso no está indexado, usa preview_resource_data."
-                ),
-            )
+            raise ToolError(
+                f"Error de DataStore: {e}. "
+                "Si el recurso no está indexado, usa preview_resource_data."
+            ) from e
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: f"Error al consultar DataStore: {d['error']}",
-            )
+            raise ToolError(f"Error al consultar DataStore: {e}") from e
 
         records = result.get("records") or []
         fields = result.get("fields") or []
@@ -136,7 +110,8 @@ def register_query_resource_data_tool(mcp: MCPServer) -> None:
         }
 
         if not records:
-            return render_output(
+            # Legitimate empty result (query matched zero rows), not a failure.
+            return render_structured(
                 payload,
                 format,
                 text_builder=lambda d: (
@@ -171,4 +146,4 @@ def register_query_resource_data_tool(mcp: MCPServer) -> None:
             )
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

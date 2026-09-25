@@ -1,12 +1,16 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import supercias_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_companias_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar compañías en el registro de Supercías", annotations=READ_ONLY)
     @log_tool
     async def search_companias(
         query: str = "",
@@ -14,8 +18,8 @@ def register_search_companias_tool(mcp: MCPServer) -> None:
         situacion_legal: str = "",
         limit: int = 20,
         offset: int = 0,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Search Ecuador's company registry (Superintendencia de Compañías).
 
@@ -45,18 +49,9 @@ def register_search_companias_tool(mcp: MCPServer) -> None:
                 offset=offset,
             )
         except Exception as e:
-            return render_output(
-                {
-                    "error": str(e),
-                    "query": query or None,
-                    "provincia": provincia or None,
-                    "situacion_legal": situacion_legal or None,
-                },
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar el directorio de Supercías: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al consultar el directorio de Supercías: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             companias = data.get("companias") or []
@@ -91,4 +86,4 @@ def register_search_companias_tool(mcp: MCPServer) -> None:
             parts.append(f"Fuente: {data.get('url_fuente')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

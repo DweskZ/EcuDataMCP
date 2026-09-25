@@ -1,14 +1,20 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import aviacion_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_aip_aerodromo_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver la ficha AIP de un aeródromo", annotations=READ_ONLY)
     @log_tool
-    async def get_aip_aerodromo(designador: str, format: str = "text") -> str:
+    async def get_aip_aerodromo(
+        designador: str, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Fetch the published AIP AD 2.x data sheet for an Ecuadorian
         aerodrome or helipad, from DGAC's public eAIP
@@ -36,13 +42,7 @@ def register_get_aip_aerodromo_tool(mcp: MCPServer) -> None:
         try:
             result = await aviacion_client.get_aip_aerodromo(icao)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "designador": icao},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar AIP de {d['designador']}: {d['error']}"
-                ),
-            )
+            raise ToolError(f"Error al consultar AIP de {icao}: {e}") from e
 
         def to_text(data: dict) -> str:
             nombre = f" — {data['nombre']}" if data.get("nombre") else ""
@@ -56,4 +56,4 @@ def register_get_aip_aerodromo_tool(mcp: MCPServer) -> None:
             parts.append(f"Fuente: {data.get('url_fuente')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

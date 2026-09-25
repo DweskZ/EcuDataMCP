@@ -1,20 +1,24 @@
+from typing import Any, Literal
+
 import httpx
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.pdf_reader import MAX_PAGES_PER_CALL
 from helpers.pdf_reader import read_pdf as extract_pdf_text
+from helpers.tool_meta import READ_ONLY
 
 
 def register_read_pdf_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Extraer texto de un PDF", annotations=READ_ONLY)
     @log_tool
     async def read_pdf(
         url: str,
         pages: str = "",
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Extract text from a PDF document at a direct URL.
 
@@ -35,26 +39,17 @@ def register_read_pdf_tool(mcp: MCPServer) -> None:
         try:
             result = await extract_pdf_text(url, pages=pages)
         except ValueError as e:
-            return render_output(
-                {"error": str(e), "url": url},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(f"Error: {e}") from e
         except httpx.HTTPError as e:
-            return render_output(
-                {"error": f"download_failed: {e}", "url": url},
-                format,
-                text_builder=lambda d: f"Error al descargar el archivo: {d['error']}",
-            )
+            raise ToolError(f"Error al descargar el archivo: download_failed: {e}") from e
         except Exception as e:
-            return render_output(
-                {"error": str(e), "url": url},
-                format,
-                text_builder=lambda d: f"Error al procesar el PDF: {d['error']}",
-            )
+            raise ToolError(f"Error al procesar el PDF: {e}") from e
 
         if result["total_pages"] == 0 or not any(p["text"] for p in result["pages"]):
-            return render_output(
+            # Legitimate result (the PDF has no extractable text, likely a
+            # scanned image) rather than an execution failure -- same
+            # precedent as get_informe_igepn.py's sin_texto_extraible case.
+            return render_structured(
                 {
                     "error": "sin_texto_extraible",
                     "url": url,
@@ -96,4 +91,4 @@ def register_read_pdf_tool(mcp: MCPServer) -> None:
                 parts.append("")
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

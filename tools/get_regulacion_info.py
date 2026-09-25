@@ -1,15 +1,21 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import gobec_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_regulacion_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver detalle de una regulación de gob.ec", annotations=READ_ONLY)
     @log_tool
-    async def get_regulacion_info(regulacion_id: str, format: str = "text") -> str:
+    async def get_regulacion_info(
+        regulacion_id: str, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Get detailed information about a regulation published on gob.ec.
 
@@ -23,20 +29,10 @@ def register_get_regulacion_info_tool(mcp: MCPServer) -> None:
         try:
             reg = await gobec_client.get_regulacion(regulacion_id)
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: f"Error al obtener regulación: {d['error']}",
-            )
+            raise ToolError(f"Error al obtener regulación: {e}") from e
 
         if not reg:
-            return render_output(
-                {"error": "not_found", "regulacion_id": regulacion_id},
-                format,
-                text_builder=lambda d: (
-                    f"No se encontró la regulación con ID '{d['regulacion_id']}'."
-                ),
-            )
+            raise ToolError(f"No se encontró la regulación con ID '{regulacion_id}'.")
 
         payload = {
             "regulacion_id": reg.get("regulacion_id", regulacion_id),
@@ -72,4 +68,4 @@ def register_get_regulacion_info_tool(mcp: MCPServer) -> None:
                 parts.append(f"Descripción:\n{data['descripcion']}")
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

@@ -1,15 +1,20 @@
 from datetime import UTC, datetime
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import sercop_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.sercop_client import SercopRateLimitError
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_contratos_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(
+        title="Buscar procesos de contratación pública (SERCOP)", annotations=READ_ONLY
+    )
     @log_tool
     async def search_contratos(
         query: str,
@@ -17,8 +22,8 @@ def register_search_contratos_tool(mcp: MCPServer) -> None:
         page: int = 1,
         buyer: str = "",
         supplier: str = "",
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Search Ecuador public procurement procedures (SERCOP / OCDS open data).
 
@@ -37,13 +42,9 @@ def register_search_contratos_tool(mcp: MCPServer) -> None:
         """
         query = (query or "").strip()
         if len(query) < 3:
-            return render_output(
-                {"error": "query_corto", "min_chars": 3},
-                format,
-                text_builder=lambda _: (
-                    "Error: query debe tener al menos 3 caracteres "
-                    "(requisito de la API SERCOP)."
-                ),
+            raise ToolError(
+                "Error: query debe tener al menos 3 caracteres "
+                "(requisito de la API SERCOP)."
             )
 
         page = max(page, 1)
@@ -61,19 +62,9 @@ def register_search_contratos_tool(mcp: MCPServer) -> None:
                 fallback_years=fallback,
             )
         except SercopRateLimitError as e:
-            return render_output(
-                {"error": "rate_limited", "message": str(e)},
-                format,
-                text_builder=lambda d: f"SERCOP ocupado: {d['message']}",
-            )
+            raise ToolError(f"SERCOP ocupado: {e}") from e
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: (
-                    f"Error al buscar contratos en SERCOP: {d['error']}."
-                ),
-            )
+            raise ToolError(f"Error al buscar contratos en SERCOP: {e}.") from e
 
         data = result.get("data") or []
         resolved_year = result.get("_resolved_year", year_arg)
@@ -120,4 +111,4 @@ def register_search_contratos_tool(mcp: MCPServer) -> None:
             )
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

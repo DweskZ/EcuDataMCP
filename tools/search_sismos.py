@@ -1,8 +1,12 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import igepn_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 _ESTADOS = {
     "confirmed": "revisado por analista",
@@ -12,15 +16,15 @@ _ESTADOS = {
 
 
 def register_search_sismos_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar sismos recientes en Ecuador", annotations=READ_ONLY)
     @log_tool
     async def search_sismos(
         query: str = "",
         magnitud_minima: float = 0.0,
         dias: int = 0,
         limit: int = 15,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Search recent earthquakes in Ecuador from the Instituto Geofísico (IG-EPN).
 
@@ -43,12 +47,7 @@ def register_search_sismos_tool(mcp: MCPServer) -> None:
                 limit=limit,
             )
         except Exception as e:
-            err = {"error": str(e), "source": "IG-EPN"}
-            return render_output(
-                err,
-                format,
-                text_builder=lambda d: f"Error al consultar sismos IG-EPN: {d['error']}",
-            )
+            raise ToolError(f"Error al consultar sismos IG-EPN: {e}") from e
 
         def to_text(data: dict) -> str:
             events = data.get("events") or []
@@ -87,4 +86,4 @@ def register_search_sismos_tool(mcp: MCPServer) -> None:
             )
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

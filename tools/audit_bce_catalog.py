@@ -1,25 +1,30 @@
 import logging
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import bce_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import MAIN_LOGGER_NAME, log_tool
 from helpers.response_contract import with_response_metadata
+from helpers.tool_meta import WRITES_LOCAL_ARTIFACTS
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 
 def register_audit_bce_catalog_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(
+        title="Auditar el catálogo BCEData (operador)", annotations=WRITES_LOCAL_ARTIFACTS
+    )
     @log_tool
     async def audit_bce_catalog(
         incluir_grupos: bool = False,
         guardar_snapshot: bool = False,
         comparar_anterior: bool = False,
         auditar_grid: bool = False,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """Audit the live BCEData catalogue and report its coverage.
 
         Fetches the catalogue tree and every indicator group's metadata. The
@@ -48,13 +53,7 @@ def register_audit_bce_catalog_tool(mcp: MCPServer) -> None:
             )
         except Exception as exc:
             logger.exception("audit_bce_catalog failed")
-            return render_output(
-                {"error": str(exc)},
-                format,
-                text_builder=lambda data: (
-                    f"Error al auditar el catálogo BCEData: {data['error']}"
-                ),
-            )
+            raise ToolError(f"Error al auditar el catálogo BCEData: {exc}") from exc
 
         def to_text(data: dict) -> str:
             parts = [
@@ -149,4 +148,4 @@ def register_audit_bce_catalog_tool(mcp: MCPServer) -> None:
             ],
             consulted_at=result["consultado_en"],
         )
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

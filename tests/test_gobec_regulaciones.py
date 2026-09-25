@@ -79,3 +79,18 @@ async def test_get_tramite_estadisticas_missing_returns_empty_list(httpx_mock):
     )
     rows = await gobec_client.get_tramite_estadisticas("999999")
     assert rows == []
+
+
+@pytest.mark.asyncio
+async def test_list_regulaciones_raises_on_empty_body(httpx_mock):
+    # Confirmed live 2026-09-19: gob.ec answers a blocked/bot-suspected
+    # request with HTTP 200 and an empty body instead of a 4xx, so
+    # resp.json() raises json.JSONDecodeError. _fetch_json must turn that
+    # into a message naming the likely cause, not let the bare
+    # JSONDecodeError text reach the caller.
+    httpx_mock.add_response(
+        url="https://www.gob.ec/api/v1/regulaciones?page=0",
+        text="",
+    )
+    with pytest.raises(RuntimeError, match="respuesta vacía o no válida"):
+        await gobec_client.list_regulaciones(page=0)

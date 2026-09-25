@@ -1,23 +1,26 @@
 import logging
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import bce_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import MAIN_LOGGER_NAME, log_tool
+from helpers.tool_meta import READ_ONLY
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 
 def register_search_indicadores_bce_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar el catálogo estadístico del BCE", annotations=READ_ONLY)
     @log_tool
     async def search_indicadores_bce(
         query: str = "",
         limit: int = 20,
         offset: int = 0,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Search the Banco Central del Ecuador (BCE) statistical catalog.
 
@@ -54,13 +57,7 @@ def register_search_indicadores_bce_tool(mcp: MCPServer) -> None:
             )
         except Exception as e:
             logger.exception("search_indicadores_bce failed (query=%r)", query)
-            return render_output(
-                {"error": str(e), "query": query or None},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar el catálogo del BCE: {d['error']}"
-                ),
-            )
+            raise ToolError(f"Error al consultar el catálogo del BCE: {e}") from e
 
         def to_text(data: dict) -> str:
             indicadores = data.get("indicadores") or []
@@ -95,4 +92,4 @@ def register_search_indicadores_bce_tool(mcp: MCPServer) -> None:
             )
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

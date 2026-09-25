@@ -1,20 +1,24 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import infomies_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_infomies_boletines_zonales_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar boletines zonales de infoMIES", annotations=READ_ONLY)
     @log_tool
     async def search_infomies_boletines_zonales(
-        modo: str = "zonal",
+        modo: Literal["zonal", "consolidado"] = "zonal",
         zona: str = "",
         anio: int | None = None,
         query: str = "",
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         List infoMIES's (info.desarrollohumano.gob.ec) zonal bulletin files.
         Two distinct series live under this name, confirmed live 2026-09-03
@@ -51,11 +55,7 @@ def register_search_infomies_boletines_zonales_tool(mcp: MCPServer) -> None:
             format: text | json
         """
         if modo not in ("zonal", "consolidado"):
-            return render_output(
-                {"error": "modo debe ser 'zonal' o 'consolidado'", "modo": modo},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(f"modo debe ser 'zonal' o 'consolidado', recibido: {modo!r}")
 
         if modo == "consolidado":
             try:
@@ -63,19 +63,11 @@ def register_search_infomies_boletines_zonales_tool(mcp: MCPServer) -> None:
                     anio=anio, query=query
                 )
             except ValueError as e:
-                return render_output(
-                    {"error": str(e), "anio": anio},
-                    format,
-                    text_builder=lambda d: f"Error: {d['error']}",
-                )
+                raise ToolError(str(e)) from e
             except Exception as e:
-                return render_output(
-                    {"error": str(e), "anio": anio},
-                    format,
-                    text_builder=lambda d: (
-                        f"Error al consultar los Reportes Boletines Zonales de infoMIES: {d['error']}"
-                    ),
-                )
+                raise ToolError(
+                    f"Error al consultar los Reportes Boletines Zonales de infoMIES: {e}"
+                ) from e
 
             def to_text_consolidado(data: dict) -> str:
                 archivos = data.get("archivos") or []
@@ -94,12 +86,12 @@ def register_search_infomies_boletines_zonales_tool(mcp: MCPServer) -> None:
                     parts.append(f"   {f.get('url')}")
                 return "\n".join(parts)
 
-            return render_output(result, format, text_builder=to_text_consolidado)
+            return render_structured(result, format, text_builder=to_text_consolidado)
 
         # modo == "zonal"
         if not zona:
             zonas = infomies_client.list_zonas()
-            return render_output(
+            return render_structured(
                 {"zonas": zonas},
                 format,
                 text_builder=lambda d: (
@@ -112,19 +104,9 @@ def register_search_infomies_boletines_zonales_tool(mcp: MCPServer) -> None:
                 zona=zona, anio=anio, query=query
             )
         except ValueError as e:
-            return render_output(
-                {"error": str(e), "zona": zona, "anio": anio},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(str(e)) from e
         except Exception as e:
-            return render_output(
-                {"error": str(e), "zona": zona, "anio": anio},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar los Boletines Zonales de infoMIES: {d['error']}"
-                ),
-            )
+            raise ToolError(f"Error al consultar los Boletines Zonales de infoMIES: {e}") from e
 
         def to_text_zonal(data: dict) -> str:
             archivos = data.get("archivos") or []
@@ -143,4 +125,4 @@ def register_search_infomies_boletines_zonales_tool(mcp: MCPServer) -> None:
                 parts.append(f"   {f.get('url')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text_zonal)
+        return render_structured(result, format, text_builder=to_text_zonal)

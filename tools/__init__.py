@@ -20,10 +20,16 @@ from tools.get_bce_indice_archivo import register_get_bce_indice_archivo_tool
 from tools.get_category_info import register_get_category_info_tool
 from tools.get_cenace_tablero import register_get_cenace_tablero_tool
 from tools.get_cepalstat_indicador import register_get_cepalstat_indicador_tool
+from tools.get_certificado_cumplimiento_patronal import (
+    register_get_certificado_cumplimiento_patronal_tool,
+)
 from tools.get_compania_info import register_get_compania_info_tool
 from tools.get_contraloria_informe import register_get_contraloria_informe_tool
 from tools.get_contrato_info import register_get_contrato_info_tool
 from tools.get_dataset_info import register_get_dataset_info_tool
+from tools.get_energia_ecuador_snapshot import (
+    register_get_energia_ecuador_snapshot_tool,
+)
 from tools.get_financials import register_get_financials_tool
 from tools.get_iess_archivos import register_get_iess_archivos_tool
 from tools.get_inamhi_capa_datos import register_get_inamhi_capa_datos_tool
@@ -76,7 +82,6 @@ from tools.list_dataset_resources import register_list_dataset_resources_tool
 from tools.list_iess_colecciones import register_list_iess_colecciones_tool
 from tools.list_ineval_familias import register_list_ineval_familias_tool
 from tools.list_instituciones import register_list_instituciones_tool
-from tools.list_recent_datasets import register_list_recent_datasets_tool
 from tools.list_sat_tsunami import register_list_sat_tsunami_tool
 from tools.list_senescyt_biblioteca_categorias import (
     register_list_senescyt_biblioteca_categorias_tool,
@@ -95,10 +100,7 @@ from tools.query_resource_data import register_query_resource_data_tool
 from tools.query_sut_indicador import register_query_sut_indicador_tool
 from tools.read_pdf import register_read_pdf_tool
 from tools.search_anda import register_search_anda_tool
-from tools.search_arcotel_boletines import register_search_arcotel_boletines_tool
-from tools.search_arcotel_reportes_mensuales import (
-    register_search_arcotel_reportes_mensuales_tool,
-)
+from tools.search_arcotel import register_search_arcotel_tool
 from tools.search_auditores import register_search_auditores_tool
 from tools.search_bce_calendario import register_search_bce_calendario_tool
 from tools.search_bce_cuentas_nacionales import (
@@ -111,6 +113,7 @@ from tools.search_bce_publicaciones import register_search_bce_publicaciones_too
 from tools.search_bce_remesas import register_search_bce_remesas_tool
 from tools.search_biinec_extras import register_search_biinec_extras_tool
 from tools.search_censo_recursos import register_search_censo_recursos_tool
+from tools.search_centrosur_cortes import register_search_centrosur_cortes_tool
 from tools.search_cepalstat_indicadores import (
     register_search_cepalstat_indicadores_tool,
 )
@@ -183,7 +186,6 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_ineval_familia_archivos_tool(mcp)
 
     register_search_datasets_tool(mcp)
-    register_list_recent_datasets_tool(mcp)
     register_get_dataset_info_tool(mcp)
     register_list_dataset_resources_tool(mcp)
     register_get_resource_info_tool(mcp)
@@ -213,8 +215,7 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_anda_survey_info_tool(mcp)
     register_download_anda_microdata_tool(mcp)
 
-    register_search_arcotel_reportes_mensuales_tool(mcp)
-    register_search_arcotel_boletines_tool(mcp)
+    register_search_arcotel_tool(mcp)
 
     register_search_inec_estadisticas_tool(mcp)
     register_get_inec_estadistica_files_tool(mcp)
@@ -257,14 +258,13 @@ def register_tools(mcp: MCPServer) -> None:
 
     register_list_iess_colecciones_tool(mcp)
     register_get_iess_archivos_tool(mcp)
+    register_get_certificado_cumplimiento_patronal_tool(mcp)
 
     register_search_contratos_tool(mcp)
     register_get_contrato_info_tool(mcp)
 
     register_search_indicadores_bce_tool(mcp)
     register_get_indicador_bce_tool(mcp)
-    register_audit_bce_catalog_tool(mcp)
-    register_compare_bce_sources_tool(mcp)
     register_search_bce_iem_tool(mcp)
     register_get_bce_iem_table_tool(mcp)
     register_search_bce_publicaciones_tool(mcp)
@@ -278,6 +278,8 @@ def register_tools(mcp: MCPServer) -> None:
     register_list_bce_indicadores_diarios_tool(mcp)
     register_get_bce_indicador_diario_tool(mcp)
     register_get_cenace_tablero_tool(mcp)
+    register_search_centrosur_cortes_tool(mcp)
+    register_get_energia_ecuador_snapshot_tool(mcp)
 
     register_search_companias_tool(mcp)
     register_get_compania_info_tool(mcp)
@@ -293,3 +295,16 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_cepalstat_indicador_tool(mcp)
 
     register_search_gacetas_inmunoprevenibles_tool(mcp)
+
+
+def register_maintenance_tools(mcp: MCPServer) -> None:
+    """
+    Register operator-only tools with the provided MCPServer instance.
+
+    Kept separate from register_tools() (docs/MCP_ARCHITECTURE.md's public/
+    maintenance profile split) because both write local artifacts (BCE
+    catalog snapshots, comparison reports) rather than answering a read-only
+    lookup — an end user searching for a dataset shouldn't see them.
+    """
+    register_audit_bce_catalog_tool(mcp)
+    register_compare_bce_sources_tool(mcp)

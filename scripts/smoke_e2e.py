@@ -86,7 +86,13 @@ async def initialize(client: httpx.AsyncClient) -> None:
     )
 
 
-async def call_tool(client: httpx.AsyncClient, name: str, args: dict) -> str:
+async def call_tool(client: httpx.AsyncClient, name: str, args: dict) -> tuple[str, bool]:
+    """Return (text, is_error) -- the tool result's own MCP ``isError`` flag.
+
+    A tool failure still comes back as a normal (non-protocol-error) MCP
+    result with ``isError: true``, so it must be threaded through explicitly
+    rather than guessed from the text: see assess_response's docstring.
+    """
     data = await mcp_post(
         client,
         {
@@ -98,8 +104,10 @@ async def call_tool(client: httpx.AsyncClient, name: str, args: dict) -> str:
     )
     if "error" in data:
         raise RuntimeError(str(data["error"]))
-    content = data.get("result", {}).get("content", [])
-    return "\n".join(c.get("text", "") for c in content if c.get("type") == "text")
+    result = data.get("result", {})
+    content = result.get("content", [])
+    text = "\n".join(c.get("text", "") for c in content if c.get("type") == "text")
+    return text, bool(result.get("isError"))
 
 
 async def check_tool(
@@ -108,8 +116,8 @@ async def check_tool(
     """Run a check twice when a known live source is temporarily degraded."""
     assessment = None
     for attempt in range(2):
-        text = await call_tool(client, name, args)
-        assessment = assess_response(text, required)
+        text, is_error = await call_tool(client, name, args)
+        assessment = assess_response(text, required, is_error=is_error)
         if assessment.status != "degraded" or attempt:
             break
         await asyncio.sleep(1)
@@ -131,7 +139,9 @@ class DegradedChain(Exception):
         self.source = source
 
 
-def chain_step(text: str, required: list[str] | None = None) -> str:
+def chain_step(
+    text: str, required: list[str] | None = None, is_error: bool = False
+) -> str:
     """Assert one chain step through the same classifier the flat checks use.
 
     Each chain used to hand-roll a Traceback/`Error:` check, so a known
@@ -140,12 +150,20 @@ def chain_step(text: str, required: list[str] | None = None) -> str:
     as degraded. Routing both paths through `assess_response` keeps a real
     source change failing while a known outage only degrades.
     """
-    assessment = assess_response(text, required or [])
+    assessment = assess_response(text, required or [], is_error=is_error)
     if assessment.status == "degraded":
         raise DegradedChain(assessment.source or "unknown", assessment.detail)
     if assessment.status == "failed":
         raise AssertionError(assessment.detail)
     return text
+
+
+async def call_chain_step(
+    client: httpx.AsyncClient, name: str, args: dict, required: list[str] | None = None
+) -> str:
+    """call_tool + chain_step, threading the real isError flag between them."""
+    text, is_error = await call_tool(client, name, args)
+    return chain_step(text, required, is_error=is_error)
 
 
 def write_summary(total: int, failed: int, degraded: set[str]) -> None:
@@ -185,7 +203,11 @@ async def main() -> int:
                 {"query": "Tumbaco", "nivel": "parroquia", "format": "json"},
                 ["170150", "Tumbaco", "parroquias"],
             ),
-            ("list_recent_datasets", {"page_size": 3, "format": "json"}, ['"results"']),
+            (
+                "search_datasets",
+                {"sort": "recent", "page_size": 3, "format": "json"},
+                ['"results"'],
+            ),
             ("list_categories", {"format": "json"}, ['"categories"', "salud"]),
             ("list_instituciones", {"query": "SRI", "format": "json"}, ['"institucion_id"', "SRI"]),
             ("search_datasets", {"query": "salud", "page_size": 2}, ["dataset"]),
@@ -291,72 +313,58 @@ async def main() -> int:
 
 async def chain_sut(client: httpx.AsyncClient) -> None:
     listing = json.loads(
-        chain_step(await call_tool(client, "list_sut_indicadores", {"format": "json"}))
+        await call_chain_step(client, "list_sut_indicadores", {"format": "json"})
     )
-    indicador = listing[0]["indicador"]
-    chain_step(
-        await call_tool(
-            client,
-            "get_sut_indicador_schema",
-            {"indicador": indicador, "format": "json"},
-        )
+    indicador = listing["indicadores"][0]["indicador"]
+    await call_chain_step(
+        client, "get_sut_indicador_schema", {"indicador": indicador, "format": "json"}
     )
 
 
 async def chain_superbancos(client: httpx.AsyncClient) -> None:
     listing = json.loads(
-        chain_step(
-            await call_tool(client, "list_superbancos_secciones", {"format": "json"})
-        )
+        await call_chain_step(client, "list_superbancos_secciones", {"format": "json"})
     )
-    seccion = listing[0]["seccion"]
-    chain_step(
-        await call_tool(
-            client,
-            "get_superbancos_seccion_archivos",
-            {"seccion": seccion, "format": "json"},
-        )
+    seccion = listing["secciones"][0]["seccion"]
+    await call_chain_step(
+        client,
+        "get_superbancos_seccion_archivos",
+        {"seccion": seccion, "format": "json"},
     )
 
 
 async def chain_igepn(client: httpx.AsyncClient) -> None:
     resultado = json.loads(
-        chain_step(
-            await call_tool(
-                client,
-                "search_informes_igepn",
-                {"anio": 2022, "grupo": "volcanico", "limit": 1, "format": "json"},
-            )
+        await call_chain_step(
+            client,
+            "search_informes_igepn",
+            {"anio": 2022, "grupo": "volcanico", "limit": 1, "format": "json"},
         )
     )
     informes = resultado.get("informes") or []
     if not informes:
         raise AssertionError("search_informes_igepn returned no reports for 2022/volcanico")
     informe = informes[0]
-    chain_step(
-        await call_tool(
-            client,
-            "get_informe_igepn",
-            {
-                "nombre": informe["nombre"],
-                "volcan": informe.get("volcan") or "",
-                "grupo": "volcanico",
-                "anio": 2022,
-                "pages": "1",
-                "format": "json",
-            },
-        )
+    await call_chain_step(
+        client,
+        "get_informe_igepn",
+        {
+            "nombre": informe["nombre"],
+            "volcan": informe.get("volcan") or "",
+            "grupo": "volcanico",
+            "anio": 2022,
+            "pages": "1",
+            "format": "json",
+        },
     )
 
 
 async def chain_ckan_preview(client: httpx.AsyncClient) -> None:
     search = json.loads(
-        chain_step(
-            await call_tool(
-                client,
-                "search_datasets",
-                {"query": "SRI recaudacion", "page_size": 5, "format": "json"},
-            )
+        await call_chain_step(
+            client,
+            "search_datasets",
+            {"query": "SRI recaudacion", "page_size": 5, "format": "json"},
         )
     )
     datasets = search.get("results") or []
@@ -369,12 +377,10 @@ async def chain_ckan_preview(client: httpx.AsyncClient) -> None:
         if not dataset_id:
             continue
         listing = json.loads(
-            chain_step(
-                await call_tool(
-                    client,
-                    "list_dataset_resources",
-                    {"dataset_id": dataset_id, "format": "json"},
-                )
+            await call_chain_step(
+                client,
+                "list_dataset_resources",
+                {"dataset_id": dataset_id, "format": "json"},
             )
         )
         resources = listing.get("resources") or []
@@ -385,12 +391,10 @@ async def chain_ckan_preview(client: httpx.AsyncClient) -> None:
         if resource is None:
             continue
 
-        chain_step(
-            await call_tool(
-                client,
-                "preview_resource_data",
-                {"resource_id": resource["id"], "rows": 3, "format": "json"},
-            )
+        await call_chain_step(
+            client,
+            "preview_resource_data",
+            {"resource_id": resource["id"], "rows": 3, "format": "json"},
         )
         return
 

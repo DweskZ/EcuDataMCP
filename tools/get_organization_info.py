@@ -1,22 +1,26 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import ckan_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.text_utils import strip_accents as _strip
+from helpers.tool_meta import READ_ONLY
 
 _TEXT_DISPLAY_LIMIT = 60
 
 
 def register_get_organization_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver una organización y sus datasets", annotations=READ_ONLY)
     @log_tool
     async def get_organization_info(
         organization_id: str,
         query: str = "",
-        source: str = "nacional",
-        format: str = "text",
-    ) -> str:
+        source: ckan_client.CkanSource = "nacional",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Get detailed information about a public institution and its published
         datasets — the main way to browse a CKAN organization's full package
@@ -44,11 +48,7 @@ def register_get_organization_info_tool(mcp: MCPServer) -> None:
         try:
             org = await ckan_client.get_organization(organization_id, source=source)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "organization_id": organization_id},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(f"Error: {e}") from e
 
         site = ckan_client.site_url(source).rstrip("/")
         datasets = org.get("packages") or []
@@ -107,4 +107,4 @@ def register_get_organization_info_tool(mcp: MCPServer) -> None:
                     )
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

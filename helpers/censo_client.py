@@ -16,8 +16,13 @@ helpers/csv_reader.download_bytes / helpers/tls.py, not duplicated here:
   broken cert) -- handled by helpers.tls's OS-trust-store retry tier.
 - HTTP status: /data-y-resultados/ returns HTTP 404 (a WordPress/Elementor
   bug) while still serving its full, real page content -- this module
-  calls download_bytes(..., raise_for_status=False) to tolerate that
-  specifically, not to hide genuine errors elsewhere.
+  calls download_bytes(..., raise_for_status=frozenset({404})) to tolerate
+  that one status code specifically, not to hide genuine errors elsewhere.
+  A non-404 error status (confirmed live: some networks -- GitHub Actions'
+  US-based runners among them -- get a 403 from this host, likely a
+  geo/bot block) is raised as a distinct error instead of falling through
+  to the generic "no files found" message, so a real block is not mistaken
+  for the page's structure having changed.
 """
 
 from __future__ import annotations
@@ -26,6 +31,8 @@ import logging
 import re
 from html import unescape
 from typing import Any
+
+import httpx
 
 from helpers.cache import TtlCache
 from helpers.csv_reader import download_bytes
@@ -58,7 +65,19 @@ async def _fetch_resources() -> list[dict[str, str]]:
     if cached is not None:
         return cached
 
-    content, truncated = await download_bytes(RESULTADOS_URL, raise_for_status=False)
+    try:
+        content, truncated = await download_bytes(
+            RESULTADOS_URL, raise_for_status=frozenset({404})
+        )
+    except httpx.HTTPStatusError as exc:
+        status = exc.response.status_code
+        raise ValueError(
+            f"censoecuador.gob.ec respondió HTTP {status} en lugar de la "
+            "página de resultados -- probablemente un bloqueo "
+            "geográfico/anti-bot del portal, no un cambio de estructura. "
+            "Prueba conectando desde una VPN con salida en algún país de "
+            "la región si el problema persiste."
+        ) from exc
     if truncated:
         raise ValueError("La página de resultados del censo superó el límite de descarga")
     html = content.decode("utf-8", errors="replace")

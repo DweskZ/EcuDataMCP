@@ -1,19 +1,23 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import censo_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_censo_recursos_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar recursos del Censo Ecuador 2022", annotations=READ_ONLY)
     @log_tool
     async def search_censo_recursos(
         query: str = "",
         limit: int = 30,
         offset: int = 0,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Search INEC's dedicated Census 2022 microsite (censoecuador.gob.ec)
         for direct microdata/methodology file links.
@@ -44,13 +48,7 @@ def register_search_censo_recursos_tool(mcp: MCPServer) -> None:
                 query=query, limit=limit, offset=offset
             )
         except Exception as e:
-            return render_output(
-                {"error": str(e), "query": query or None},
-                format,
-                text_builder=lambda d: (
-                    f"Error al buscar recursos del Censo Ecuador: {d['error']}"
-                ),
-            )
+            raise ToolError(f"Error al buscar recursos del Censo Ecuador: {e}") from e
 
         def to_text(data: dict) -> str:
             recursos = data.get("recursos") or []
@@ -70,4 +68,4 @@ def register_search_censo_recursos_tool(mcp: MCPServer) -> None:
                 parts.append(f"   {r.get('url')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

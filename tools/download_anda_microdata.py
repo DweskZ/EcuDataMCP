@@ -1,14 +1,20 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import anda_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_download_anda_microdata_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Descargar microdatos de una encuesta ANDA", annotations=READ_ONLY)
     @log_tool
-    async def download_anda_microdata(idno: str, format: str = "text") -> str:
+    async def download_anda_microdata(
+        idno: str, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Get direct download links for an ANDA survey's microdata files.
 
@@ -33,7 +39,7 @@ def register_download_anda_microdata_tool(mcp: MCPServer) -> None:
                 raise ValueError(f"No se encontró ninguna encuesta con idno '{idno}' en ANDA.")
 
             if not anda_client.has_microdata(dataset):
-                return render_output(
+                return render_structured(
                     {"idno": idno, "titulo": dataset.get("title"), "archivos": []},
                     format,
                     text_builder=lambda d: (
@@ -44,11 +50,7 @@ def register_download_anda_microdata_tool(mcp: MCPServer) -> None:
 
             files = await anda_client.list_microdata_files(survey_id)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "idno": idno},
-                format,
-                text_builder=lambda d: f"Error al obtener los archivos: {d['error']}",
-            )
+            raise ToolError(f"Error al obtener los archivos: {e}") from e
 
         payload = {
             "idno": idno,
@@ -76,4 +78,4 @@ def register_download_anda_microdata_tool(mcp: MCPServer) -> None:
                 parts.append(f"  {f['url']}")
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

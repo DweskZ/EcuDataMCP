@@ -1,17 +1,20 @@
 import logging
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import bce_iem_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import MAIN_LOGGER_NAME, log_tool
 from helpers.response_contract import with_response_metadata
+from helpers.tool_meta import READ_ONLY
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 
 def register_get_bce_iem_table_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver una tabla del boletín IEM del BCE", annotations=READ_ONLY)
     @log_tool
     async def get_bce_iem_table(
         table_id: str,
@@ -19,8 +22,8 @@ def register_get_bce_iem_table_tool(mcp: MCPServer) -> None:
         hasta: str = "",
         boletin_numero: int = 0,
         rows: int = 20,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """Inspect one official XLSX table from the latest BCE IEM bulletin.
 
         Get table_id from search_bce_iem. Tables with the common BCE layout
@@ -37,11 +40,7 @@ def register_get_bce_iem_table_tool(mcp: MCPServer) -> None:
             )
         except Exception as exc:
             logger.exception("get_bce_iem_table failed (table_id=%r)", table_id)
-            return render_output(
-                {"error": str(exc), "table_id": table_id},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(f"Error al leer la tabla {table_id!r} del IEM del BCE: {exc}") from exc
 
         def to_text(data: dict) -> str:
             table = data["tabla"]
@@ -108,4 +107,4 @@ def register_get_bce_iem_table_tool(mcp: MCPServer) -> None:
                 ", ".join(result.get("periodos") or []) or None
             ),
         )
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

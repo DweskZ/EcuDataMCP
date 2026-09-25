@@ -1,11 +1,14 @@
 from functools import partial
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import anda_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.text_utils import strip_accents
+from helpers.tool_meta import READ_ONLY
 
 # ANDA's own full-text search (`sk`) is loose — it ranks by relevance across
 # a broad blob of fields rather than requiring every query word to match, so
@@ -25,9 +28,11 @@ def _matches_query(row: dict, words: list[str]) -> bool:
 
 
 def register_search_anda_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar encuestas y censos en ANDA", annotations=READ_ONLY)
     @log_tool
-    async def search_anda(query: str = "", limit: int = 10, format: str = "text") -> str:
+    async def search_anda(
+        query: str = "", limit: int = 10, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Search INEC's ANDA catalog (anda.inec.gob.ec) of surveys and censuses.
 
@@ -60,11 +65,7 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
                 matched = result.get("rows", [])
                 total_scanned = len(matched)
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: f"Error al buscar en ANDA: {d['error']}",
-            )
+            raise ToolError(f"Error al buscar en ANDA: {e}") from e
 
         total = len(matched)
         payload = {
@@ -103,4 +104,4 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
                 parts.append("")
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

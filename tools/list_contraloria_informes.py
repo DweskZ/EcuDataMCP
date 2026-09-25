@@ -1,14 +1,22 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import contraloria_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_list_contraloria_informes_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(
+        title="Listar informes de datos abiertos de Contraloría", annotations=READ_ONLY
+    )
     @log_tool
-    async def list_contraloria_informes(format: str = "text") -> str:
+    async def list_contraloria_informes(
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         List Contraloría General del Estado's "Datos Abiertos" and
         "Plan Anual de Control" documents.
@@ -30,22 +38,21 @@ def register_list_contraloria_informes_tool(mcp: MCPServer) -> None:
         try:
             informes = await contraloria_client.list_informes()
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: (
-                    f"Error al listar documentos de Datos Abiertos de la Contraloría: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al listar documentos de Datos Abiertos de la Contraloría: {e}"
+            ) from e
 
-        def to_text(data: list[dict]) -> str:
-            parts = [f"Documentos de Datos Abiertos de la Contraloría — {len(data)}:", ""]
-            if not data:
+        payload = {"total": len(informes), "informes": informes}
+
+        def to_text(data: dict) -> str:
+            rows = data["informes"]
+            parts = [f"Documentos de Datos Abiertos de la Contraloría — {len(rows)}:", ""]
+            if not rows:
                 parts.append("No se encontraron documentos.")
                 return "\n".join(parts)
-            for i in data:
+            for i in rows:
                 parts.append(f"- id={i['id']}: {i['label']}")
                 parts.append(f"  {i['url']}")
             return "\n".join(parts)
 
-        return render_output(informes, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

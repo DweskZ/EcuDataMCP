@@ -1,10 +1,13 @@
 import re
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import gobec_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 _TIME_TAG_RE = re.compile(r"<[^>]+>")
 
@@ -24,9 +27,11 @@ def _periodo(anio, mes) -> str:
 
 
 def register_get_tramite_estadisticas_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver estadísticas de uso de un trámite", annotations=READ_ONLY)
     @log_tool
-    async def get_tramite_estadisticas(tramite_id: str, format: str = "text") -> str:
+    async def get_tramite_estadisticas(
+        tramite_id: str, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Monthly usage/complaint stats (atenciones/quejas) for one trámite.
 
@@ -44,14 +49,10 @@ def register_get_tramite_estadisticas_tool(mcp: MCPServer) -> None:
         try:
             rows = await gobec_client.get_tramite_estadisticas(tramite_id)
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: f"Error al obtener estadísticas del trámite: {d['error']}",
-            )
+            raise ToolError(f"Error al obtener estadísticas del trámite: {e}") from e
 
         if not rows:
-            return render_output(
+            return render_structured(
                 {"tramite_id": tramite_id, "meses": []},
                 format,
                 text_builder=lambda d: (
@@ -104,4 +105,4 @@ def register_get_tramite_estadisticas_tool(mcp: MCPServer) -> None:
                 )
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

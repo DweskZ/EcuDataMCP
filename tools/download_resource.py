@@ -1,20 +1,25 @@
 import base64
+from typing import Any, Literal
 
 import httpx
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import ckan_client
 from helpers.csv_reader import MAX_DOWNLOAD_BYTES, download_bytes
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_download_resource_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Descargar el archivo crudo de un recurso", annotations=READ_ONLY)
     @log_tool
     async def download_resource(
-        resource_id: str, source: str = "nacional", format: str = "text"
-    ) -> str:
+        resource_id: str,
+        source: ckan_client.CkanSource = "nacional",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Download a resource's raw bytes from Ecuador's open data portal, base64-encoded.
 
@@ -42,32 +47,14 @@ def register_download_resource_tool(mcp: MCPServer) -> None:
             res = await ckan_client.get_resource(resource_id, source=source)
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
-                return render_output(
-                    {"error": "not_found", "resource_id": resource_id},
-                    format,
-                    text_builder=lambda d: (
-                        f"Error: Recurso con ID '{d['resource_id']}' no encontrado."
-                    ),
-                )
-            return render_output(
-                {"error": f"HTTP {e.response.status_code}", "detail": str(e)},
-                format,
-                text_builder=lambda d: f"Error: {d['error']} - {d['detail']}",
-            )
+                raise ToolError(f"Error: Recurso con ID '{resource_id}' no encontrado.") from e
+            raise ToolError(f"Error: HTTP {e.response.status_code} - {e}") from e
         except Exception as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: f"Error al obtener metadata del recurso: {d['error']}",
-            )
+            raise ToolError(f"Error al obtener metadata del recurso: {e}") from e
 
         url = res.get("url")
         if not url:
-            return render_output(
-                {"error": "sin_url", "resource_id": resource_id},
-                format,
-                text_builder=lambda _: "Error: Este recurso no tiene URL de descarga.",
-            )
+            raise ToolError("Error: Este recurso no tiene URL de descarga.")
 
         name = res.get("name") or res.get("description") or "Sin título"
         fmt = (res.get("format") or "").upper() or None
@@ -75,27 +62,13 @@ def register_download_resource_tool(mcp: MCPServer) -> None:
         try:
             content, truncated = await download_bytes(url)
         except httpx.HTTPError as e:
-            return render_output(
-                {"error": f"download_failed: {e}", "url": url},
-                format,
-                text_builder=lambda d: f"Error al descargar el archivo: {d['error']}",
-            )
+            raise ToolError(f"Error al descargar el archivo: download_failed: {e}") from e
 
         if truncated:
             max_mb = MAX_DOWNLOAD_BYTES // (1024 * 1024)
-            return render_output(
-                {
-                    "error": "demasiado_grande",
-                    "resource_id": resource_id,
-                    "name": name,
-                    "url": url,
-                    "max_bytes": MAX_DOWNLOAD_BYTES,
-                },
-                format,
-                text_builder=lambda d: (
-                    f"'{d['name']}' supera el límite de {max_mb} MB para descarga "
-                    f"vía MCP. Bájalo directamente desde: {d['url']}"
-                ),
+            raise ToolError(
+                f"'{name}' supera el límite de {max_mb} MB para descarga vía MCP. "
+                f"Bájalo directamente desde: {url}"
             )
 
         payload = {
@@ -115,4 +88,4 @@ def register_download_resource_tool(mcp: MCPServer) -> None:
                 "(decodifícalo en base64 para reconstruir el archivo original)."
             )
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

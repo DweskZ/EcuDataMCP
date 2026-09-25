@@ -1,22 +1,26 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import sut_powerbi_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 _TEXT_ROW_CAP = 200
 
 
 def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Consultar datos de un indicador del SUT", annotations=READ_ONLY)
     @log_tool
     async def query_sut_indicador(
         indicador: str,
         campos: list[str],
         filtros: dict[str, str] | None = None,
         limite: int = 500,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Run a live query against one SUT Power BI dashboard's underlying
         data model — any combination of its fields, e.g. month AND
@@ -51,11 +55,7 @@ def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
                 indicador, campos, filtros=filtros, limite=limite
             )
         except ValueError as e:
-            return render_output(
-                {"error": str(e), "indicador": indicador},
-                format,
-                text_builder=lambda d: f"Error: {d['error']}",
-            )
+            raise ToolError(str(e)) from e
 
         def to_text(data: dict) -> str:
             filas = data.get("filas") or []
@@ -73,4 +73,4 @@ def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
                 )
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

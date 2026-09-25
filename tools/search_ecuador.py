@@ -1,22 +1,27 @@
 import asyncio
 from datetime import UTC, datetime
 from functools import partial
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import ckan_client, gobec_client, sercop_client, sgr_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
 from helpers.text_utils import strip_accents
+from helpers.tool_meta import READ_ONLY
 
 _strip_accents = partial(strip_accents, lower=False)
 
 
 def register_search_ecuador_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar en todas las fuentes de Ecuador", annotations=READ_ONLY)
     @log_tool
-    async def search_ecuador(query: str, limit: int = 5, format: str = "text") -> str:
+    async def search_ecuador(
+        query: str, limit: int = 5, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Unified search across Ecuador open data, trámites, regulations, contracts
         and risk events.
@@ -32,13 +37,7 @@ def register_search_ecuador_tool(mcp: MCPServer) -> None:
         """
         query = (query or "").strip()
         if not query:
-            return render_output(
-                {"error": "query_vacio"},
-                format,
-                text_builder=lambda _: (
-                    "Error: proporciona un query (ej. 'salud', 'pasaporte', 'INEC')."
-                ),
-            )
+            raise ToolError("Error: proporciona un query (ej. 'salud', 'pasaporte', 'INEC').")
 
         limit = min(max(limit, 1), 10)
 
@@ -288,4 +287,4 @@ def register_search_ecuador_tool(mcp: MCPServer) -> None:
             )
             return "\n".join(parts)
 
-        return render_output(payload, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

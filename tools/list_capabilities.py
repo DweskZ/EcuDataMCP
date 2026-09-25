@@ -1,7 +1,10 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
 
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 from helpers.version import get_version
 
 _CAPABILITIES = {
@@ -54,6 +57,11 @@ _CAPABILITIES = {
             "Ministerio del Trabajo (SUT): tableros Power BI en vivo — "
             "contratos mensuales por industria/provincia/género desde 2015, "
             "brechas de empleo, cumplimiento de políticas de género"
+        ),
+        (
+            "ARCOTEL: estadísticas del sector de telecomunicaciones — "
+            "reportes mensuales (2017-2026) y boletines anuales/temáticos "
+            "(2015-2024), ambos en PDF"
         ),
     ],
     "entrada": [
@@ -137,6 +145,7 @@ _CAPABILITIES = {
             "query_sut_indicador",
         ],
         "utilidades": ["investigate_dataset", "list_zip_contents"],
+        "telecomunicaciones": ["search_arcotel"],
     },
     "resources": [
         "ecuador://fuentes",
@@ -188,9 +197,11 @@ _CAPABILITIES = {
             "montos tributarios individuales"
         ),
         (
-            "search_ranking/get_financials: requieren que el operador del "
-            "servidor haya corrido scripts/build_supercias_financials_db.py "
-            "de antemano (no se construye solo); cubren solo los últimos "
+            "search_ranking/get_financials: la base local se construye/"
+            "refresca sola en segundo plano (al iniciar el servidor y ante "
+            "cualquier consulta si falta o está vieja); la primera vez tarda "
+            "5-10 min (descarga ~356 MB) y esas consultas fallan mientras "
+            "tanto -- reintenta en unos minutos. Cubren solo los últimos "
             "años cacheados, no el histórico completo desde 2008"
         ),
         (
@@ -210,13 +221,19 @@ _CAPABILITIES = {
 
 
 def register_list_capabilities_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(
+        title="Describir las capacidades del servidor (alias)", annotations=READ_ONLY
+    )
     @log_tool
-    async def list_capabilities(format: str = "text") -> str:
+    async def list_capabilities(format: Literal["text", "json"] = "text") -> dict[str, Any]:
         """
         Describe what this Ecuador MCP can do: sources, key tools, prompts and limits.
 
-        Call this first when you are unsure which tool to use.
+        Deprecated: the server's own `instructions` now cover the general
+        orientation (sources, recommended entry points, prompts, format),
+        and `ecuador://fuentes` is the structured, always-current source
+        catalog. Kept as a compatibility alias for the per-tool "limites"
+        notes not yet folded into `ecuador://fuentes`.
 
         Args:
             format: text | json
@@ -250,4 +267,4 @@ def register_list_capabilities_tool(mcp: MCPServer) -> None:
             )
             return "\n".join(lines)
 
-        return render_output(_CAPABILITIES, format, text_builder=to_text)
+        return render_structured(_CAPABILITIES, format, text_builder=to_text)

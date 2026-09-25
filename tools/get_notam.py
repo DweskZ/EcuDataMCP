@@ -1,14 +1,20 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import aviacion_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_notam_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Consultar NOTAM activos de un aeródromo", annotations=READ_ONLY)
     @log_tool
-    async def get_notam(designador: str, format: str = "text") -> str:
+    async def get_notam(
+        designador: str, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Fetch active NOTAMs (Notices to Airmen) for an Ecuadorian aerodrome
         or helipad, from DGAC's IFIS site (ais.aviacioncivil.gob.ec) —
@@ -33,13 +39,7 @@ def register_get_notam_tool(mcp: MCPServer) -> None:
         try:
             result = await aviacion_client.get_notam(icao)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "designador": icao},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar NOTAM de {d['designador']}: {d['error']}"
-                ),
-            )
+            raise ToolError(f"Error al consultar NOTAM de {icao}: {e}") from e
 
         def to_text(data: dict) -> str:
             notams = data.get("notams") or []
@@ -61,4 +61,4 @@ def register_get_notam_tool(mcp: MCPServer) -> None:
             parts.append(f"Fuente: {data.get('url_fuente')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

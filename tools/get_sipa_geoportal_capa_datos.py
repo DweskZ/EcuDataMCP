@@ -1,16 +1,20 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import sipa_geoportal_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_sipa_geoportal_capa_datos_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Ver muestra de datos de una capa del geoportal MAG", annotations=READ_ONLY)
     @log_tool
     async def get_sipa_geoportal_capa_datos(
-        layer_id: str, count: int = 5, format: str = "text"
-    ) -> str:
+        layer_id: str, count: int = 5, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         Fetch a small, bounded sample of a WFS-enabled Ministry of Agriculture
         geoportal layer's real feature attributes (via WFS GetFeature, JSON
@@ -37,13 +41,9 @@ def register_get_sipa_geoportal_capa_datos_tool(mcp: MCPServer) -> None:
         try:
             result = await sipa_geoportal_client.get_layer_features(layer_id, count=count)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "capa": layer_id},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar la capa '{d['capa']}' del geoportal MAG: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al consultar la capa '{layer_id}' del geoportal MAG: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             features = data.get("features") or []
@@ -65,4 +65,4 @@ def register_get_sipa_geoportal_capa_datos_tool(mcp: MCPServer) -> None:
             parts.append(f"Consulta: {data.get('url_consulta')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

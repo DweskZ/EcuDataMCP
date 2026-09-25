@@ -1,18 +1,24 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import mef_fiscal_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 _FUENTES = {"mef", "senae"}
 
 
 def register_search_mef_fiscal_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar reportes fiscales del MEF o SENAE", annotations=READ_ONLY)
     @log_tool
     async def search_mef_fiscal(
-        fuente: str = "mef", query: str = "", format: str = "text"
-    ) -> str:
+        fuente: Literal["mef", "senae"] = "mef",
+        query: str = "",
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         List Ecuador's fiscal-operations workbook links from either of two
         sources — MEF/MDEP (primary, current) or SENAE (secondary, stale).
@@ -58,11 +64,7 @@ def register_search_mef_fiscal_tool(mcp: MCPServer) -> None:
         """
         fuente_norm = (fuente or "mef").strip().lower()
         if fuente_norm not in _FUENTES:
-            return render_output(
-                {"error": f"fuente '{fuente}' no reconocida. Válidas: mef, senae"},
-                format,
-                text_builder=lambda d: d["error"],
-            )
+            raise ToolError(f"fuente '{fuente}' no reconocida. Válidas: mef, senae")
 
         try:
             if fuente_norm == "senae":
@@ -70,13 +72,7 @@ def register_search_mef_fiscal_tool(mcp: MCPServer) -> None:
             else:
                 result = await mef_fiscal_client.search_operaciones_spnf(query=query)
         except Exception as e:
-            return render_output(
-                {"error": str(e), "fuente": fuente_norm, "query": query or None},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar la fuente fiscal '{d['fuente']}': {d['error']}"
-                ),
-            )
+            raise ToolError(f"Error al consultar la fuente fiscal '{fuente_norm}': {e}") from e
 
         def to_text(data: dict) -> str:
             archivos = data.get("archivos") or []
@@ -103,4 +99,4 @@ def register_search_mef_fiscal_tool(mcp: MCPServer) -> None:
             parts.append(f"Fuente: {data.get('url_fuente')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

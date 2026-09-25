@@ -18,9 +18,9 @@ def _valid_db(path: Path) -> None:
     conn = sqlite3.connect(path)
     conn.execute(
         "CREATE TABLE ranking (anio INTEGER, expediente INTEGER, "
-        "posicion_general INTEGER)"
+        "posicion_general INTEGER, n_empleados INTEGER)"
     )
-    conn.execute("INSERT INTO ranking VALUES (2025, 1, 10)")
+    conn.execute("INSERT INTO ranking VALUES (2025, 1, 10, 5)")
     conn.execute(
         "CREATE TABLE companias (expediente INTEGER, ruc TEXT, nombre TEXT)"
     )
@@ -58,6 +58,20 @@ def test_convert_parses_european_decimal_notation():
     assert build_script._convert("1500", "REAL") == 1500.0
 
 
+def test_convert_handles_decimal_formatted_integer_column():
+    # bi_ranking.csv's n_empleados is declared INTEGER here but the source
+    # ships it as a decimal string ("2.00", "11547.00") like its REAL-typed
+    # neighbors -- confirmed live 2026-09-21 against the real CSV
+    # (Corporación Favorita, expediente 384, año 2024: "11547.00"). A bare
+    # int("2.00") raises ValueError, which used to silently null out every
+    # single n_empleados value in the built database.
+    assert build_script._convert("2.00", "INTEGER") == 2
+    assert build_script._convert("11547.00", "INTEGER") == 11547
+    # Genuinely non-numeric INTEGER-column values still fall back to None
+    # rather than raising.
+    assert build_script._convert("n/a", "INTEGER") is None
+
+
 def test_verify_build_accepts_well_formed_db(tmp_path):
     path = tmp_path / "ok.sqlite3"
     _valid_db(path)
@@ -69,7 +83,7 @@ def test_verify_build_rejects_empty_ranking_table(tmp_path):
     conn = sqlite3.connect(path)
     conn.execute(
         "CREATE TABLE ranking (anio INTEGER, expediente INTEGER, "
-        "posicion_general INTEGER)"
+        "posicion_general INTEGER, n_empleados INTEGER)"
     )
     conn.execute(
         "CREATE TABLE companias (expediente INTEGER, ruc TEXT, nombre TEXT)"
@@ -90,9 +104,9 @@ def test_verify_build_rejects_empty_companias_table(tmp_path):
     conn = sqlite3.connect(path)
     conn.execute(
         "CREATE TABLE ranking (anio INTEGER, expediente INTEGER, "
-        "posicion_general INTEGER)"
+        "posicion_general INTEGER, n_empleados INTEGER)"
     )
-    conn.execute("INSERT INTO ranking VALUES (2025, 1, 10)")
+    conn.execute("INSERT INTO ranking VALUES (2025, 1, 10, 5)")
     conn.execute(
         "CREATE TABLE companias (expediente INTEGER, ruc TEXT, nombre TEXT)"
     )
@@ -131,9 +145,9 @@ def test_verify_build_rejects_missing_table(tmp_path):
     conn = sqlite3.connect(path)
     conn.execute(
         "CREATE TABLE ranking (anio INTEGER, expediente INTEGER, "
-        "posicion_general INTEGER)"
+        "posicion_general INTEGER, n_empleados INTEGER)"
     )
-    conn.execute("INSERT INTO ranking VALUES (2025, 1, 10)")
+    conn.execute("INSERT INTO ranking VALUES (2025, 1, 10, 5)")
     # 'companias', 'segmentos', 'ciiu', 'indicadores_sector' never created.
     # PRAGMA table_info on a missing table returns no rows rather than
     # erroring, so this surfaces as "missing all required columns", not a
@@ -144,4 +158,20 @@ def test_verify_build_rejects_missing_table(tmp_path):
     conn.close()
 
     with pytest.raises(RuntimeError, match="companias"):
+        build_script._verify_build(path)
+
+
+def test_convert_integer_rejects_inf_and_fractions_without_raising():
+    assert build_script._convert("inf", "INTEGER") is None
+    assert build_script._convert("2.5", "INTEGER") is None
+
+
+def test_verify_build_rejects_all_null_n_empleados(tmp_path):
+    path = tmp_path / "null_empleados.sqlite3"
+    _valid_db(path)
+    conn = sqlite3.connect(path)
+    conn.execute("UPDATE ranking SET n_empleados = NULL")
+    conn.commit()
+    conn.close()
+    with pytest.raises(RuntimeError, match="n_empleados"):
         build_script._verify_build(path)

@@ -1,16 +1,24 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import bce_cuentas_nacionales_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_get_bce_cuentas_nacionales_archivo_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(
+        title="Ver archivos de una página de Cuentas Nacionales", annotations=READ_ONLY
+    )
     @log_tool
     async def get_bce_cuentas_nacionales_archivo(
-        pagina_id: str, max_archivos: int = 50, format: str = "text"
-    ) -> str:
+        pagina_id: str,
+        max_archivos: int = 50,
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Read the file list for one BCE Cuentas Nacionales page (from
         search_bce_cuentas_nacionales).
@@ -31,13 +39,9 @@ def register_get_bce_cuentas_nacionales_archivo_tool(mcp: MCPServer) -> None:
                 pagina_id=pagina_id, max_archivos=max_archivos
             )
         except Exception as e:
-            return render_output(
-                {"error": str(e), "pagina_id": pagina_id},
-                format,
-                text_builder=lambda d: (
-                    f"Error al leer la página de Cuentas Nacionales '{d['pagina_id']}' del BCE: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al leer la página de Cuentas Nacionales '{pagina_id}' del BCE: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             pagina = data.get("pagina") or {}
@@ -60,4 +64,4 @@ def register_get_bce_cuentas_nacionales_archivo_tool(mcp: MCPServer) -> None:
             parts.append(f"Fuente: {pagina.get('url')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

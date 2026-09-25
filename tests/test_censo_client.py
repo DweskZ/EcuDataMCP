@@ -85,3 +85,20 @@ async def test_search_censo_recursos_raises_when_page_has_no_files(
 
     with pytest.raises(ValueError, match="No se encontraron archivos"):
         await censo_client.search_censo_recursos()
+
+
+async def test_search_censo_recursos_raises_distinct_error_on_403(
+    httpx_mock, monkeypatch
+):
+    # A 403 (confirmed live from some networks, e.g. GitHub Actions'
+    # US-based runners) is a geo/bot block, not the documented 404 quirk --
+    # it must not be swallowed into the generic "no files found" message.
+    _fake_dns(monkeypatch)
+    httpx_mock.add_response(
+        url=censo_client.RESULTADOS_URL,
+        status_code=403,
+        html="<html><body>Forbidden</body></html>",
+    )
+
+    with pytest.raises(ValueError, match="bloqueo geográfico"):
+        await censo_client.search_censo_recursos()

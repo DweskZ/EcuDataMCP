@@ -1,14 +1,19 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
 
 from helpers import bce_indicadores_diarios_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_list_bce_indicadores_diarios_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Listar indicadores diarios y mensuales del BCE", annotations=READ_ONLY)
     @log_tool
-    async def list_bce_indicadores_diarios(format: str = "text") -> str:
+    async def list_bce_indicadores_diarios(
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         List BCE's family of daily/monthly "indicador" widgets published
         outside both BCEData and IEM (contenido.bce.fin.ec's Highcharts
@@ -39,10 +44,12 @@ def register_list_bce_indicadores_diarios_tool(mcp: MCPServer) -> None:
             format: text | json
         """
         catalog = await bce_indicadores_diarios_client.list_indicadores()
+        payload = {"total": len(catalog), "catalogo": catalog}
 
-        def to_text(data: list[dict]) -> str:
-            parts = [f"Indicadores BCE (diarios/mensuales) — {len(data)} serie(s):", ""]
-            for c in data:
+        def to_text(data: dict) -> str:
+            rows = data["catalogo"]
+            parts = [f"Indicadores BCE (diarios/mensuales) — {len(rows)} serie(s):", ""]
+            for c in rows:
                 parts.append(
                     f"- [{c['archivo']} / {c['codigo']}] {c['indicador']} "
                     f"({c['periodicidad']}, {c['unidad']}): {c['fecha_desde']} → {c['fecha_hasta']} "
@@ -50,4 +57,4 @@ def register_list_bce_indicadores_diarios_tool(mcp: MCPServer) -> None:
                 )
             return "\n".join(parts)
 
-        return render_output(catalog, format, text_builder=to_text)
+        return render_structured(payload, format, text_builder=to_text)

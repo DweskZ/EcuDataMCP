@@ -1,7 +1,7 @@
-import json
-
 import httpx
+import pytest
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 import tools.preview_resource_data as preview_resource_data_module
 from helpers import ckan_client
@@ -149,7 +149,7 @@ async def test_sri_tar_gz_declared_csv_is_routed_to_targz_parser(monkeypatch):
 
     tool = _make_tool()
     result = await tool(resource_id="abc123", format="json")
-    payload = json.loads(result)
+    payload = result.structured_content
     assert payload["headers"] == ["ruc", "total"]
     assert payload["member_name"] == "sri_activos_2025.csv"
     assert calls == ["https://sri.example/sri_activos_2025.tar.gz"]
@@ -184,7 +184,7 @@ async def test_zip_declared_csv_is_routed_to_zip_parser(monkeypatch):
 
     tool = _make_tool()
     result = await tool(resource_id="abc123", format="json")
-    payload = json.loads(result)
+    payload = result.structured_content
     assert payload["headers"] == ["producto", "precio"]
     assert payload["member_name"] == "precios_cacao.csv"
     assert calls == ["https://x/precios_cacao.zip"]
@@ -217,7 +217,7 @@ async def test_mpceip_xlsx_declared_csv_is_routed_to_xlsx_parser(monkeypatch):
 
     tool = _make_tool()
     result = await tool(resource_id="abc123", format="json")
-    payload = json.loads(result)
+    payload = result.structured_content
     assert payload["headers"] == ["producto", "precio"]
     assert calls == ["https://mpceip.example/precios_cacao.xlsx"]
 
@@ -230,8 +230,9 @@ async def test_rar_message_does_not_overclaim_unrar_requirement(monkeypatch):
 
     tool = _make_tool()
     result = await tool(resource_id="abc123", format="text")
-    assert "unrar" not in result
-    assert "download_resource('abc123', format=\"json\")" in result
+    text = result.content[0].text
+    assert "unrar" not in text
+    assert "download_resource('abc123', format=\"json\")" in text
 
 
 async def test_xls_is_routed_to_xls_parser(monkeypatch):
@@ -258,7 +259,7 @@ async def test_xls_is_routed_to_xls_parser(monkeypatch):
 
     tool = _make_tool()
     result = await tool(resource_id="abc123", format="json")
-    payload = json.loads(result)
+    payload = result.structured_content
     assert payload["headers"] == ["producto", "precio"]
     assert calls == ["https://x/reporte.xls"]
 
@@ -291,7 +292,7 @@ async def test_xlsb_is_routed_to_xlsb_parser(monkeypatch):
 
     tool = _make_tool()
     result = await tool(resource_id="abc123", format="json")
-    payload = json.loads(result)
+    payload = result.structured_content
     assert payload["headers"] == ["provincia", "canton"]
     assert calls == ["https://x/defunciones.xlsb"]
 
@@ -320,7 +321,7 @@ async def test_ods_is_routed_to_ods_parser(monkeypatch):
 
     tool = _make_tool()
     result = await tool(resource_id="abc123", format="json")
-    payload = json.loads(result)
+    payload = result.structured_content
     assert payload["headers"] == ["producto", "precio"]
     assert calls == ["https://x/reporte.ods"]
 
@@ -334,9 +335,8 @@ async def test_resource_not_found_returns_error(monkeypatch):
     monkeypatch.setattr(ckan_client, "get_resource", fake_get_resource)
 
     tool = _make_tool()
-    result = await tool(resource_id="missing", format="json")
-    payload = json.loads(result)
-    assert payload["error"] == "not_found"
+    with pytest.raises(ToolError, match="no encontrado"):
+        await tool(resource_id="missing", format="json")
 
 
 async def test_resource_without_url_returns_error(monkeypatch):
@@ -346,9 +346,8 @@ async def test_resource_without_url_returns_error(monkeypatch):
     monkeypatch.setattr(ckan_client, "get_resource", fake_get_resource)
 
     tool = _make_tool()
-    result = await tool(resource_id="abc123", format="json")
-    payload = json.loads(result)
-    assert payload["error"] == "sin_url"
+    with pytest.raises(ToolError, match="no tiene URL de descarga"):
+        await tool(resource_id="abc123", format="json")
 
 
 # -- extensionless resource: content-type sniffing fallback ------------------
@@ -384,7 +383,7 @@ async def test_extensionless_resource_is_routed_via_sniffed_content_type(monkeyp
 
     tool = _make_tool()
     result = await tool(resource_id="abc123", format="json")
-    payload = json.loads(result)
+    payload = result.structured_content
     assert payload["headers"] == ["a", "b"]
     assert payload["sniffed_content_type"] is True
     assert calls == ["https://x/download?id=123"]
@@ -408,5 +407,5 @@ async def test_extensionless_resource_falls_back_when_sniff_is_inconclusive(monk
 
     tool = _make_tool()
     result = await tool(resource_id="abc123", format="json")
-    payload = json.loads(result)
+    payload = result.structured_content
     assert payload["error"] == "formato_no_soportado"

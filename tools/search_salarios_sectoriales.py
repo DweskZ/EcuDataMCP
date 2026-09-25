@@ -1,16 +1,20 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import salarios_sectoriales_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_salarios_sectoriales_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar tablas de salarios mínimos sectoriales", annotations=READ_ONLY)
     @log_tool
     async def search_salarios_sectoriales(
-        anio: int | None = None, format: str = "text"
-    ) -> str:
+        anio: int | None = None, format: Literal["text", "json"] = "text"
+    ) -> dict[str, Any]:
         """
         List Ecuador's sectoral minimum wage table documents (salarios
         mínimos sectoriales — wage floors per branch of economic activity,
@@ -43,14 +47,9 @@ def register_search_salarios_sectoriales_tool(mcp: MCPServer) -> None:
                 anio=anio
             )
         except Exception as e:
-            return render_output(
-                {"error": str(e), "anio": anio},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar salarios sectoriales del Ministerio "
-                    f"del Trabajo: {d['error']}"
-                ),
-            )
+            raise ToolError(
+                f"Error al consultar salarios sectoriales del Ministerio del Trabajo: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             tablas = data.get("tablas") or []
@@ -73,4 +72,4 @@ def register_search_salarios_sectoriales_tool(mcp: MCPServer) -> None:
             parts.append(f"Fuente: {data.get('url_fuente')}")
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

@@ -233,6 +233,14 @@ async def _fetch_catastro_json(path: str, params: list[tuple[str, str]], verify:
     ) as session:
         response = await session.get(url, params=params)
         response.raise_for_status()
+        # numerosRucPorRazonSocialToken returns 204 with an empty body (not
+        # "[]") when razonSocial has zero matches -- confirmed live against
+        # a real zero-match query -- response.json() would otherwise raise
+        # json.JSONDecodeError on the empty body. Return None rather than a
+        # shape-specific default: callers of count endpoints need 0, list
+        # endpoints need [].
+        if not response.text.strip():
+            return None
         return response.json()
 
 
@@ -295,13 +303,14 @@ async def search_by_razon_social(
     n = max(1, min(max_resultados, 100))
 
     total = await _fetch_catastro_public("cantidadObtenidaPorRazonSocial", [("razonSocial", texto)])
+    total = int(total or 0)
     rucs = await _fetch_catastro_public("numerosRucPorRazonSocialToken", [("razonSocial", texto)])
-    rucs = rucs[:n]
+    rucs = (rucs or [])[:n]
 
     resultados: list[dict[str, Any]] = []
     if rucs:
         raw = await _fetch_catastro_public("obtenerPorNumerosRuc", [("ruc", r) for r in rucs])
-        resultados = [_map_contribuyente(r) for r in raw]
+        resultados = [_map_contribuyente(r) for r in raw or []]
 
     return {
         "razon_social_buscada": texto,

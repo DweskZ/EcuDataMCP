@@ -1,12 +1,16 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import sgr_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_eventos_riesgo_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar eventos de riesgo del SGR", annotations=READ_ONLY)
     @log_tool
     async def search_eventos_riesgo(
         query: str = "",
@@ -15,8 +19,8 @@ def register_search_eventos_riesgo_tool(mcp: MCPServer) -> None:
         evento: str = "",
         estado: str = "",
         limit: int = 15,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Search emergency/risk events from Ecuador's SGR COE (Gestión de Riesgos).
 
@@ -43,12 +47,7 @@ def register_search_eventos_riesgo_tool(mcp: MCPServer) -> None:
                 limit=limit,
             )
         except Exception as e:
-            err = {"error": str(e), "source": "SGR COE2"}
-            return render_output(
-                err,
-                format,
-                text_builder=lambda d: f"Error al consultar eventos SGR: {d['error']}",
-            )
+            raise ToolError(f"Error al consultar eventos SGR: {e}") from e
 
         def to_text(data: dict) -> str:
             events = data.get("events") or []
@@ -107,4 +106,4 @@ def register_search_eventos_riesgo_tool(mcp: MCPServer) -> None:
             )
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

@@ -18,6 +18,7 @@ reescriben retroactivamente cuando el total sube después.
 | 2026-09-05 | 100 | Se removieron 3 tools de SRI Saiku (`srienlinea.sri.gob.ec` confirmado inalcanzable desde tres entornos distintos). |
 | 2026-09-05 | 102 | Se agregaron 2 tools de ARCSA (`list_arcsa_categorias`, `get_arcsa_categoria_archivos`). |
 | 2026-09-10 | 115 | +13: BCE Cuentas Nacionales (2), calendario de publicaciones BCE (1), SENESCYT SIAU + Biblioteca (3), CEPALSTAT (2), Gacetas de Inmunoprevenibles del MSP (1). Ver auditoría 2026-09-11 abajo para la verificación directa contra el código, no solo un barrido nombre por nombre. |
+| 2026-09-12 | 113 | Fase 0 ejecutada: `list_recent_datasets` fusionado en `search_datasets(sort="recent")`; `search_arcotel_boletines`/`search_arcotel_reportes_mensuales` fusionados en `search_arcotel(tipo=...)`. `list_capabilities` se mantiene como alias (regla 1, período de transición) — sus instrucciones generales ya viven en `MCPServer(instructions=...)`. El trío de aviación (METAR/NOTAM/SIGMET) se evaluó y **no** se fusionó: sus formas de respuesta difieren de verdad (SIGMET no tiene `designador`, y los campos `reportes`/`notams`/`sigmets` no son intercambiables) — fusionarlos habría producido exactamente el antipatrón de argumentos opcionales y respuesta de forma variable que la regla 4 ya prohíbe para otros casos. |
 
 **Patrón ya en uso para no agregar tools por fuente nueva:** la ampliación
 de `source=` a `"iadb"` en los tools CKAN genéricos existentes, y el nuevo
@@ -262,36 +263,59 @@ Cuatro fases, cada una entregable de forma independiente — no es necesario
 completar una fase entera antes de que el proyecto obtenga valor de ella.
 Cada fase lista qué cambia, en qué archivos, y cómo se verifica.
 
-### Fase 0 — Reducciones de bajo riesgo (1-2 sesiones)
+### Fase 0 — Reducciones de bajo riesgo (1-2 sesiones) — ejecutada 2026-09-12
 
 La única fase que borra o fusiona tools. Todo lo demás es aditivo (schemas,
 anotaciones) y no rompe nada existente.
 
-1. Retirar `list_capabilities` del perfil público (regla 1). Mantener como
-   alias una versión, luego retirar. Archivos: `tools/list_capabilities.py`,
-   `tools/__init__.py`.
-2. Fusionar `list_recent_datasets` en `search_datasets(sort="recent")`
-   (regla 2). Archivos: `helpers/ckan_client.py`, `tools/search_datasets.py`;
-   retirar `tools/list_recent_datasets.py` tras el período de alias.
-3. (Opcional, decisión de Daniel) Fusionar el trío de aviación y el par
-   ARCOTEL (regla 5) si el ahorro de 3 tools justifica perder los nombres
-   específicos.
-4. Verificación: `uv run pytest`, conteo de tools antes/después en
-   `docs/MCP_ARCHITECTURE.md` (nueva fila en Historial de conteos), smoke
-   test manual de los tools fusionados.
+1. ~~Retirar `list_capabilities` del perfil público (regla 1).~~ Sin perfiles
+   todavía (Fase 1 no ejecutada), se dejó como alias de compatibilidad y se
+   movieron las instrucciones generales a `MCPServer(instructions=...)` en
+   `main.py`. Retirar el tool en sí queda pendiente de la Fase 1.
+2. Fusionado `list_recent_datasets` en `search_datasets(sort="recent")`
+   (regla 2). Archivos: `tools/search_datasets.py` (ahora acepta `sort` y
+   `query` opcional); `tools/list_recent_datasets.py` eliminado;
+   `tools/__init__.py` y `resources/catalog.py` actualizados.
+3. Fusionado el par ARCOTEL (regla 5) en `search_arcotel(tipo, query)` —
+   firma y forma de respuesta eran idénticas entre las dos, sin
+   antipatrón. Archivos: `tools/search_arcotel.py` (nuevo),
+   `tools/search_arcotel_boletines.py` y
+   `tools/search_arcotel_reportes_mensuales.py` eliminados.
+   **No** se fusionó el trío de aviación (METAR/NOTAM/SIGMET): a diferencia
+   de ARCOTEL, sus respuestas tienen formas genuinamente distintas
+   (`designador` ausente en SIGMET; campos `reportes`/`notams`/`sigmets` no
+   intercambiables) — fusionarlos habría violado la regla 4 en vez de
+   aplicar la regla 5.
+4. Verificación: `uv run pytest`, conteo de tools actualizado en el
+   Historial de conteos (115 → 113), `scripts/smoke_e2e.py` actualizado
+   para el tool renombrado.
 
-Resultado esperado: 115 → 113 (o 110 si se ejecuta el paso 3 opcional).
+Resultado: 115 → 113. El ahorro de 3 (a 110) vía aviación no se tomó — ver
+justificación en el punto 3.
 
-### Fase 1 — Perfiles público / mantenimiento (1 sesión)
+### Fase 1 — Perfiles público / mantenimiento (1 sesión) — ejecutada 2026-09-12
 
-1. Mover `audit_bce_catalog` y `compare_bce_sources` a un segundo
-   `register_tools`-equivalente que solo se registra en una instancia
-   `FastMCP` de mantenimiento (regla 3). No se toca `helpers/` ni la lógica.
-2. Decidir el mecanismo de exposición: segundo proceso (`mcp-maintenance`)
-   vs. flag de arranque en el mismo proceso — impacto en `main.py` y
-   `docker-compose.yml`/`Dockerfile` si se elige proceso separado.
-3. Verificación: `tools/list` del perfil público ya no incluye las 2 tools
-   de mantenimiento; siguen funcionando vía el perfil de mantenimiento.
+1. `audit_bce_catalog` y `compare_bce_sources` movidos a
+   `register_maintenance_tools(mcp)`, separado de `register_tools(mcp)`
+   (regla 3). `helpers/` y la lógica de ambos tools no se tocaron.
+   Archivo: `tools/__init__.py`.
+2. Mecanismo elegido: **flag de arranque en el mismo proceso**, no proceso
+   separado por defecto — env var `MCP_PROFILE` (`public` | `maintenance` |
+   `all`, default `all`) leída en `main.py` vía
+   `helpers/env_config.get_mcp_profile()`. `all` reproduce exactamente el
+   comportamiento anterior a esta fase, así que un despliegue existente que
+   no fije `MCP_PROFILE` no cambia. `docker-compose.yml` gana un segundo
+   servicio `mcp-maintenance` bajo el `profiles: ["maintenance"]` propio de
+   Compose (no arranca con `docker compose up`, solo con
+   `docker compose --profile maintenance up mcp-maintenance`), en su propio
+   puerto (`MCP_MAINTENANCE_PORT`, default 8001) y con su propio
+   `MCP_MAINTENANCE_AUTH_TOKEN`, compartiendo el volumen `supercias_data`
+   con `mcp` porque ahí viven los snapshots/reportes que ambos tools
+   escriben. `Dockerfile` no cambió — misma imagen para ambos servicios.
+3. Verificación: con `MCP_PROFILE=public`, `tools/list` devuelve 111 tools
+   sin `audit_bce_catalog`/`compare_bce_sources`; con `MCP_PROFILE=maintenance`
+   devuelve exactamente esos 2; sin la variable (o `all`), devuelve los 113
+   de siempre. `uv run pytest` (661 tests) sin cambios.
 
 ### Fase 2 — Metadatos de tool (2-3 sesiones, incremental por fuente)
 
@@ -331,6 +355,104 @@ trabajo de fuentes nuevas, no como un bloque dedicado.
 Antes de retirar más tools en cualquier fase conviene medir llamadas reales,
 errores de selección y herramientas que nunca se usan. No se debe reducir la
 superficie únicamente para alcanzar un número arbitrario.
+
+## Medición de la superficie ya migrada (2026-09-18)
+
+Las fases 0-3 se publicaron en 0.8.9. Esta sección mide el resultado real
+contra el servidor, no contra el plan — todas las cifras salen de levantar
+`main.py` con `MCP_PROFILE=all` (113 tools) y leer `tools/list`.
+
+| Métrica | Valor medido | Cómo se midió |
+|---|---|---|
+| Tamaño de `tools/list` | 188.352 caracteres de JSON (≈47.000 tokens con la aproximación de 4 caracteres/token) | Suma de `model_dump()` de las 113 tools |
+| Tamaño por tool | mediana 1.616 caracteres; las mayores entre 2.363 y 3.189 (`search_sipa_geoportal_capas`, `search_mef_fiscal`, `search_datasets`) | Mismo dump, por tool |
+| `title` y anotaciones | 113/113 | Fase 2, ya completa |
+| `outputSchema` útil | 0/113 — las 113 publican `{"type": "object", "additionalProperties": true}` | Fase 3 entregó `structuredContent`, pero la anotación de retorno es `dict[str, Any]`, así que el SDK no puede derivar forma |
+| Contrato `metadatos` | 4/113 (`search_bce_iem`, `get_bce_iem_table`, `audit_bce_catalog`, `compare_bce_sources`) | `rg -l with_response_metadata` |
+| Cobertura del smoke en vivo | 43/113 tools (38%), 70 sin ninguna llamada real | Nombres de tool citados en `scripts/smoke_e2e.py` cruzados con `tools/list` |
+
+Dos conclusiones nuevas, ninguna visible antes de medir:
+
+1. **El costo de contexto pasó a ser el problema real, no el conteo.** La
+   conclusión de 2026-09-11 ("115 tools no es el problema, la forma de
+   describirlas sí") sigue siendo correcta, pero las descripciones que
+   resolvieron la fatiga de selección ahora cuestan ~47k tokens en cada
+   conversación, antes de la primera pregunta del usuario. En un cliente de
+   200k de contexto eso es ~24% gastado en el menú.
+2. **`structuredContent` sin `outputSchema` real es la mitad del contrato.**
+   Un agente recibe el objeto pero no puede saber su forma antes de llamar,
+   que era justamente el objetivo de la fase 3. El SDK ya deriva el schema
+   del tipo de retorno (`mcp/server/mcpserver/utilities/func_metadata.py`),
+   así que el arreglo es tipar el retorno, no escribir schemas a mano.
+
+### Fase 4 — Presupuesto de contexto de `tools/list`
+
+Objetivo medible: bajar de ~188k caracteres a <60k sin perder capacidades.
+
+1. Descripción en dos niveles: docstring corto (qué hace, cuándo usarla, qué
+   no devuelve) en el tool, y el detalle largo (tabla de parámetros,
+   ejemplos, límites de la fuente) movido a `docs/TOOLS.md` y al recurso
+   `ecuador://fuentes`, que ya existe y no se cobra por conversación.
+2. Perfiles por dominio sobre el mecanismo que la fase 1 ya construyó:
+   extender `MCP_PROFILE` de `public|maintenance|all` a toolsets
+   (`ckan`, `bce`, `salud`, `geo`, `empresas`...), de modo que un cliente que
+   solo necesita datos económicos no pague las 113. `MCPServer.remove_tool`
+   existe en el SDK, así que también permite activación dinámica.
+3. Verificación: test de regresión que falle si `tools/list` supera el
+   presupuesto de caracteres acordado — la misma forma de gate que
+   `tests/test_tool_metadata.py` usa para `title`.
+
+### Fase 5 — `outputSchema` real
+
+1. Definir modelos de resultado por *familia*, no por tool: búsqueda
+   paginada, listado de opciones, listado de archivos, serie temporal,
+   preview tabular, documento. Son 6 formas que cubren las 113 tools.
+2. Tipar el retorno de cada tool con el `TypedDict` de su familia en vez de
+   `dict[str, Any]`; el SDK publica el schema derivado sin tocar la lógica.
+3. Extender el envoltorio `metadatos` de `helpers/response_contract.py` a
+   esas familias (hoy 4/113), que es el paso que la fila "Contrato de
+   respuesta para agentes" del ROADMAP dejó pendiente.
+
+### Fase 6 — Tamaño de respuesta, paginación y enlaces
+
+`search_datasets` reenvía los objetos CKAN completos a `structuredContent`
+sin recortar campos ni límite de bytes: una búsqueda de 20 filas puede
+devolver cientos de KB donde el texto equivalente recorta las notas a 200
+caracteres. Es el mismo patrón en los tools de catálogo de otras fuentes.
+
+1. Lista blanca de campos por familia y un parámetro `campos`
+   (`minimo`/`completo`) para pedir el objeto crudo explícitamente.
+2. Tope de bytes por respuesta con truncamiento declarado en `metadatos`
+   (cuántas filas se omitieron y cómo pedir el resto), en vez de depender de
+   que el cliente aguante.
+3. Cursor de paginación uniforme entre tools, y `resource_link` para
+   archivos grandes en vez de inline.
+
+### Fase 7 — Capa HTTP compartida y caché persistente
+
+32 de los 69 módulos de `helpers/` usan `httpx` directamente, con timeouts
+dispersos (25s, 30s, 120s) y sin política común de reintento: la escalera de
+reintentos TLS (`helpers/tls.py`) está compartida, pero el manejo de 429 con
+`Retry-After` y cooldown solo existe en `helpers/sercop_client.py`, y
+`AsyncHTTPTransport(retries=2)` solo en `helpers/gobec_client.py`.
+
+1. Promover el patrón de SERCOP a un cliente compartido (factory con
+   timeout por perfil de fuente, backoff ante 429/5xx, pooling reutilizado,
+   cooldown por host) y migrar fuente por fuente, sin big bang.
+2. Caché con persistencia: `helpers/cache.py` es TTL en memoria, así que
+   cada reinicio vuelve a raspar catálogos caros (índices del BCE, ~1.660
+   documentos de la Biblioteca de SGR, 312 archivos de Superbancos). Un
+   caché en disco por URL con revalidación `ETag`/`Last-Modified` es
+   prerequisito real de la fila "Operación 24/7" del ROADMAP.
+
+### Fase 8 — Telemetría de uso
+
+Esta revisión repite desde su primera versión que no se deben retirar tools
+sin medir llamadas reales, y el servidor todavía no registra ninguna. Un
+contador por tool (llamadas, latencia p50/p95, tasa de error, fuente
+degradada) expuesto en un endpoint local estilo Prometheus convierte esa
+recomendación en algo accionable, y es también lo que diría qué tools entran
+en cada perfil de la fase 4.
 
 ## Fuentes oficiales consultadas
 

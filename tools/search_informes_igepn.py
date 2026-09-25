@@ -1,20 +1,24 @@
+from typing import Any, Literal
+
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import igepn_informes_client
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.tool_meta import READ_ONLY
 
 
 def register_search_informes_igepn_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(title="Buscar informes sísmicos y volcánicos del IG-EPN", annotations=READ_ONLY)
     @log_tool
     async def search_informes_igepn(
         query: str = "",
-        grupo: str = "",
+        grupo: Literal["sismico", "volcanico", ""] = "",
         anio: int = 0,
         limit: int = 15,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Search the IG-EPN PDF report archive (Instituto Geofísico):
         daily/weekly/monthly/special seismic bulletins, volcanic "IG Al
@@ -35,12 +39,7 @@ def register_search_informes_igepn_tool(mcp: MCPServer) -> None:
                 query=query, grupo=grupo, anio=anio, limit=limit
             )
         except Exception as e:
-            err = {"error": str(e), "source": "IG-EPN Búsqueda de Informes"}
-            return render_output(
-                err,
-                format,
-                text_builder=lambda d: f"Error al buscar informes IG-EPN: {d['error']}",
-            )
+            raise ToolError(f"Error al buscar informes IG-EPN: {e}") from e
 
         def to_text(data: dict) -> str:
             informes = data.get("informes") or []
@@ -60,4 +59,4 @@ def register_search_informes_igepn_tool(mcp: MCPServer) -> None:
             parts.append(data["nota"])
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)

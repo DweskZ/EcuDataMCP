@@ -1,16 +1,21 @@
 import logging
+from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import supercias_financials
-from helpers.format_out import render_output
+from helpers.format_out import render_structured
 from helpers.logging import MAIN_LOGGER_NAME, log_tool
+from helpers.tool_meta import READ_ONLY
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 
 def register_search_ranking_tool(mcp: MCPServer) -> None:
-    @mcp.tool()
+    @mcp.tool(
+        title="Rankear compañías por indicadores financieros", annotations=READ_ONLY
+    )
     @log_tool
     async def search_ranking(
         anio: int | None = None,
@@ -19,8 +24,8 @@ def register_search_ranking_tool(mcp: MCPServer) -> None:
         descending: bool = False,
         limit: int = 20,
         offset: int = 0,
-        format: str = "text",
-    ) -> str:
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Rank/filter Supercías companies by financial indicators for a fiscal year.
 
@@ -58,28 +63,14 @@ def register_search_ranking_tool(mcp: MCPServer) -> None:
                 offset=offset,
             )
         except supercias_financials.FinancialsDbUnavailable as e:
-            return render_output(
-                {"error": str(e), "anio": anio, "ciiu_n1": ciiu_n1 or None},
-                format,
-                text_builder=lambda d: d["error"],
-            )
+            raise ToolError(str(e)) from e
         except ValueError as e:
-            return render_output(
-                {"error": str(e)},
-                format,
-                text_builder=lambda d: d["error"],
-            )
+            raise ToolError(str(e)) from e
         except Exception as e:
             logger.exception(
                 "search_ranking failed (anio=%r, ciiu_n1=%r)", anio, ciiu_n1
             )
-            return render_output(
-                {"error": str(e), "anio": anio, "ciiu_n1": ciiu_n1 or None},
-                format,
-                text_builder=lambda d: (
-                    f"Error al consultar el ranking de Supercías: {d['error']}"
-                ),
-            )
+            raise ToolError(f"Error al consultar el ranking de Supercías: {e}") from e
 
         def to_text(data: dict) -> str:
             companias = data.get("companias") or []
@@ -117,4 +108,4 @@ def register_search_ranking_tool(mcp: MCPServer) -> None:
             )
             return "\n".join(parts)
 
-        return render_output(result, format, text_builder=to_text)
+        return render_structured(result, format, text_builder=to_text)
