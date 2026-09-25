@@ -50,6 +50,17 @@ def _build_db(path) -> None:
     conn.close()
 
 
+@pytest.fixture(autouse=True)
+def isolated_data_dir(tmp_path, monkeypatch):
+    # The lock and state files live next to DB_PATH; keep every test away
+    # from the real data/ directory (a real failed build there would put
+    # these tests in backoff).
+    monkeypatch.setattr(
+        supercias_financials, "DB_PATH", tmp_path / "data" / "financials.sqlite3"
+    )
+    monkeypatch.setattr(supercias_financials, "_build_started_at", None)
+
+
 @pytest.fixture
 def db_path(tmp_path, monkeypatch):
     path = tmp_path / "financials.sqlite3"
@@ -83,16 +94,120 @@ def test_check_db_fresh_missing_file(tmp_path, no_real_build):
     assert no_real_build == [None]
 
 
-def test_check_db_fresh_stale_file(tmp_path, no_real_build):
+def test_check_db_fresh_serves_stale_file_and_refreshes(tmp_path, no_real_build):
+    # A stale DB is still the latest valid build: serve it (flagged) while a
+    # refresh runs, instead of turning a Supercías outage into a tool outage.
     path = tmp_path / "old.sqlite3"
-    path.write_bytes(b"")
+    _build_db(path)
     old_time = time.time() - 8 * 24 * 3600
     os.utime(path, (old_time, old_time))
-    with pytest.raises(
-        supercias_financials.FinancialsDbUnavailable, match="desactualizada"
-    ):
-        supercias_financials._check_db_fresh(path)
+
+    assert supercias_financials._check_db_fresh(path) is True
     assert no_real_build == [None]
+    status = supercias_financials.financials_status(path)
+    assert status["disponible"] is True
+    assert status["desactualizada"] is True
+    assert status["anios"] == [2024, 2025]
+
+
+class _RunningProcess:
+    pid = 4242
+
+    def poll(self):
+        return None
+
+
+def test_trigger_background_build_backs_off_after_failure(monkeypatch):
+    popen_calls: list[list[str]] = []
+    monkeypatch.setattr(supercias_financials, "_build_process", None)
+    monkeypatch.setattr(
+        supercias_financials.subprocess,
+        "Popen",
+        lambda args, **kw: popen_calls.append(args) or _RunningProcess(),
+    )
+    supercias_financials.write_build_state(
+        {
+            "fallos_consecutivos": 1,
+            "ultimo_intento_ts": time.time() - 60,
+            "ultimo_error": "ConnectError: boom",
+        }
+    )
+
+    supercias_financials._trigger_background_build()
+    assert popen_calls == []
+
+    # Once the 1-hour backoff for a single failure has elapsed, retry.
+    supercias_financials.write_build_state(
+        {"fallos_consecutivos": 1, "ultimo_intento_ts": time.time() - 3700}
+    )
+    supercias_financials._trigger_background_build()
+    assert len(popen_calls) == 1
+
+
+def test_trigger_background_build_skips_while_lock_held(monkeypatch):
+    popen_calls: list[list[str]] = []
+    monkeypatch.setattr(supercias_financials, "_build_process", None)
+    monkeypatch.setattr(
+        supercias_financials.subprocess,
+        "Popen",
+        lambda args, **kw: popen_calls.append(args) or _RunningProcess(),
+    )
+    lock = supercias_financials.lock_path()
+    lock.parent.mkdir(parents=True, exist_ok=True)
+    lock.write_text("123")
+
+    supercias_financials._trigger_background_build()
+    assert popen_calls == []
+
+    # An abandoned lock (older than the build timeout) no longer blocks.
+    old = time.time() - supercias_financials.BUILD_TIMEOUT_SECONDS - 60
+    os.utime(lock, (old, old))
+    supercias_financials._trigger_background_build()
+    assert len(popen_calls) == 1
+
+
+def test_build_in_progress_kills_hung_build(monkeypatch):
+    killed: list[bool] = []
+
+    class _HungProcess:
+        pid = 4242
+
+        def poll(self):
+            return None
+
+        def kill(self):
+            killed.append(True)
+
+    monkeypatch.setattr(supercias_financials, "_build_process", _HungProcess())
+    monkeypatch.setattr(
+        supercias_financials,
+        "_build_started_at",
+        time.time() - supercias_financials.BUILD_TIMEOUT_SECONDS - 1,
+    )
+
+    assert supercias_financials._build_in_progress() is False
+    assert killed == [True]
+
+
+def test_missing_db_message_reports_last_failure(tmp_path, no_real_build):
+    supercias_financials.write_build_state(
+        {
+            "fallos_consecutivos": 2,
+            "ultimo_intento_ts": time.time(),
+            "ultimo_intento": "2026-09-25T00:00:00+00:00",
+            "ultimo_error": "ConnectError: Supercías caído",
+        }
+    )
+    with pytest.raises(
+        supercias_financials.FinancialsDbUnavailable, match="Supercías caído"
+    ):
+        supercias_financials._check_db_fresh(tmp_path / "missing.sqlite3")
+
+
+def test_financials_status_missing_db(tmp_path):
+    status = supercias_financials.financials_status(tmp_path / "missing.sqlite3")
+    assert status["disponible"] is False
+    assert status["anios"] is None
 
 
 def test_trigger_background_build_spawns_once_while_running(monkeypatch):
@@ -186,6 +301,24 @@ async def test_get_financials_by_ruc(db_path):
     assert result["expediente"] == 2
     assert result["nombre"] == "OTRA S.A."
     assert len(result["years"]) == 1
+
+
+async def test_get_financials_ambiguous_ruc_returns_candidates(db_path):
+    conn = sqlite3.connect(db_path)
+    conn.execute("INSERT INTO companias VALUES (4, '1790004724001', 'OTRA DUP')")
+    conn.commit()
+    conn.close()
+
+    result = await supercias_financials.get_financials("1790004724001")
+
+    assert result["error"] == "ambiguous"
+    assert [c["expediente"] for c in result["candidatos"]] == [2, 4]
+
+
+async def test_search_ranking_defaults_to_latest_year(db_path):
+    result = await supercias_financials.search_ranking()
+    assert result["anio"] == 2025
+    assert {c["anio"] for c in result["companias"]} == {2025}
 
 
 async def test_get_financials_ruc_not_found(db_path):

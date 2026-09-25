@@ -274,7 +274,7 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 | Fuente | Estado | Qué falta |
 |---|---|---|
 | Fuente masiva actualizable | No iniciado | Usar el Ranking de Compañías oficial (`bi_ranking.csv` + tablas auxiliares, actualización cada 24h) en vez del proceso manual actual |
-| Refresh idempotente y automatización diaria | No iniciado | Comando que valide esquema/tamaño/filas/duplicados/nulos, construya índices y reemplace atómicamente solo tras pasar validación; ejecutarlo por cron/Actions, conservando la última base válida si falla |
+| Refresh idempotente y automatización diaria | Parcial | Ya existe: reemplazo atómico tras validar, base vieja servida mientras refresca, backoff 1h/6h/24h tras fallos, lock entre procesos, rechazo por filas malformadas (>0,1%) o caída de filas (>20%), estado en `/health`. Falta: construir por cron/Actions y publicar la base como asset versionado (Release) que el servidor solo descarga; mover el build al paquete y el directorio de datos a `ECUADOR_MCP_DATA_DIR` (bloquea PyPI) |
 | Conservar toda la historia disponible | No iniciado | Dejar de eliminar años anteriores al último bloque de cinco (la fuente documenta datos desde 2008); retención configurable (`all` o N años) |
 | Consultas históricas sin respuestas gigantes | No iniciado | Filtros `desde`/`hasta`/`anio`, consultas resumidas por año/compañía/CIIU/métrica, paginación de rankings |
 | Almacenamiento histórico por capas | No iniciado | SQLite indexado para búsquedas puntuales/rankings chicos, archivos fuente comprimidos por año como respaldo, Parquet/DuckDB solo para agregaciones grandes |

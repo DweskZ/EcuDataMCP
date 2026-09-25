@@ -1,6 +1,6 @@
 """Build/refresh data/supercias_financials.sqlite3 from the Supercías ranking export.
 
-Downloads bi_ranking.csv (~356 MB, ~9M rows, 2008-present) plus the small
+Downloads bi_ranking.csv (~356 MB, ~1.7M rows, 2008-present) plus the small
 lookup tables (bi_compania.csv, bi_segmento.csv, bi_ciiu.csv,
 indicadores_sector.csv) from
 https://appscvsmovil.supercias.gob.ec/ranking/reporte.html, loads them into a
@@ -11,15 +11,15 @@ self-adjusts every year without a code change).
 Launched automatically as a background subprocess by
 helpers/supercias_financials.py (`_trigger_background_build`), both at
 server startup and whenever a query hits a missing/stale DB -- an operator
-never needs to run this by hand. That module's `_build_lock`/
-`_build_process` only dedupes triggers from within the same running server
-process, though; still runnable directly for a manual/CI refresh, but avoid
-doing so while the server you're pointing at is already mid-build (check
-its logs for "Construyendo/refrescando..."), since two builds racing to
-`os.replace()` the same DB_PATH is unguarded across processes. Takes
-several minutes (the 356 MB download dominates) --
-helpers/supercias_financials.py refuses to serve data older than 7 days,
-which is what triggers the periodic refresh.
+never needs to run this by hand, though it is safe to run directly for a
+manual/CI refresh. A lock file next to the DB (`supercias_build.lock`)
+makes a second concurrent build -- from another server, the maintenance
+container or a manual run -- exit immediately instead of racing this one;
+a lock older than BUILD_TIMEOUT_SECONDS is treated as abandoned. Every run
+records its outcome in `supercias_build.state.json`, which the server uses
+to back off after failures and to report status. Takes ~15-20 minutes (the
+356 MB download dominates); the server starts a refresh once the DB is
+older than 7 days but keeps serving the old one meanwhile.
 
 bi_compania.csv (expediente, ruc, nombre, tipo, pro_codigo, provincia) IS
 downloaded, as the `companias` table -- an earlier version of this script
@@ -42,23 +42,32 @@ import os
 import sqlite3
 import sys
 import time
+from datetime import UTC, datetime
 from pathlib import Path
 
 import httpx
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from helpers import supercias_financials
 from helpers.csv_reader import _EU_DECIMAL_RE, _convert_eu_decimal
-from helpers.supercias_financials import SCHEMA_VERSION
+from helpers.supercias_financials import BUILD_TIMEOUT_SECONDS, SCHEMA_VERSION
 from helpers.tls import legacy_cipher_context
 from helpers.user_agent import USER_AGENT
 
-ROOT = Path(__file__).resolve().parents[1]
-DB_PATH = ROOT / "data" / "supercias_financials.sqlite3"
+DB_PATH = supercias_financials.DB_PATH
 _RESOURCES_BASE = "https://appscvsmovil.supercias.gob.ec/ranking/recursos/"
 _TIMEOUT = 300.0
 _YEARS_TO_KEEP = 5
 _BATCH_SIZE = 5000
+# A few malformed lines are tolerable; more means a truncated/corrupt file.
+_MAX_SKIPPED_SHARE = 0.001
+# A new build with far fewer ranking rows than the live one is more likely a
+# partial source file than a real drop in filings.
+_MIN_ROWS_VS_PREVIOUS = 0.8
+# Whole-download deadline: httpx's timeout is per read, so a trickling
+# connection could otherwise keep the build (and its lock) alive for hours.
+_DOWNLOAD_DEADLINE_SECONDS = BUILD_TIMEOUT_SECONDS - 10 * 60
 
 _RANKING_INT_COLUMNS = {
     "anio", "expediente", "posicion_general", "cia_imvalores",
@@ -82,7 +91,9 @@ def _client() -> httpx.Client:
     )
 
 
-def _download_to(client: httpx.Client, name: str, dest: Path) -> None:
+def _download_to(
+    client: httpx.Client, name: str, dest: Path, deadline: float
+) -> None:
     url = _RESOURCES_BASE + name
     print(f"Descargando {name}...", flush=True)
     t0 = time.time()
@@ -91,6 +102,11 @@ def _download_to(client: httpx.Client, name: str, dest: Path) -> None:
         resp.raise_for_status()
         with open(dest, "wb") as f:
             for chunk in resp.iter_bytes(chunk_size=1024 * 1024):
+                if time.time() > deadline:
+                    raise TimeoutError(
+                        f"Descarga de {name} excedió el plazo total "
+                        f"({_DOWNLOAD_DEADLINE_SECONDS // 60} min)"
+                    )
                 f.write(chunk)
                 total += len(chunk)
                 if total % (20 * 1024 * 1024) < len(chunk):
@@ -166,8 +182,10 @@ def _load_csv_table(
 
         batch: list[tuple] = []
         n = 0
+        skipped = 0
         for row in reader:
             if len(row) != len(header):
+                skipped += 1
                 continue
             batch.append(tuple(_convert(v, t) for v, t in zip(row, types, strict=True)))
             if len(batch) >= _BATCH_SIZE:
@@ -178,8 +196,69 @@ def _load_csv_table(
             conn.executemany(insert_sql, batch)
             n += len(batch)
         conn.commit()
-        print(f"  {table}: {n} filas cargadas", flush=True)
+        print(f"  {table}: {n} filas cargadas, {skipped} omitidas", flush=True)
+        if skipped > (n + skipped) * _MAX_SKIPPED_SHARE:
+            raise RuntimeError(
+                f"{csv_path.name}: {skipped} de {n + skipped} filas con número "
+                "de columnas distinto al encabezado -- archivo probablemente "
+                "truncado o corrupto"
+            )
     return header
+
+
+def _check_not_shrunk(new_path: Path, previous_path: Path) -> None:
+    """Reject a build whose ranking table shrank sharply vs. the live DB."""
+    if not previous_path.exists():
+        return
+    try:
+        conn = sqlite3.connect(f"file:{previous_path.as_posix()}?mode=ro", uri=True)
+        try:
+            previous_rows = conn.execute("SELECT COUNT(*) FROM ranking").fetchone()[0]
+        finally:
+            conn.close()
+    except sqlite3.DatabaseError:
+        return  # unreadable previous DB -- nothing meaningful to compare against
+    conn = sqlite3.connect(f"file:{new_path.as_posix()}?mode=ro", uri=True)
+    try:
+        new_rows = conn.execute("SELECT COUNT(*) FROM ranking").fetchone()[0]
+    finally:
+        conn.close()
+    if new_rows < previous_rows * _MIN_ROWS_VS_PREVIOUS:
+        raise RuntimeError(
+            f"'ranking' bajó de {previous_rows} a {new_rows} filas frente a la "
+            "base anterior -- probablemente la fuente vino incompleta"
+        )
+
+
+def _acquire_lock() -> bool:
+    """Create the cross-process build lock; False if another build holds it."""
+    path = supercias_financials.lock_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        if time.time() - path.stat().st_mtime > BUILD_TIMEOUT_SECONDS:
+            path.unlink(missing_ok=True)  # abandoned by a crashed/killed build
+    except OSError:
+        pass
+    try:
+        fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        return False
+    with os.fdopen(fd, "w") as f:
+        f.write(str(os.getpid()))
+    return True
+
+
+def _record_outcome(started: float, error: BaseException | None) -> None:
+    state = supercias_financials.read_build_state()
+    now = datetime.now(UTC).isoformat()
+    state["ultimo_intento"] = now
+    state["ultimo_intento_ts"] = started
+    if error is None:
+        state.update(ultimo_exito=now, ultimo_error=None, fallos_consecutivos=0)
+    else:
+        state["ultimo_error"] = f"{type(error).__name__}: {error}"[:500]
+        state["fallos_consecutivos"] = int(state.get("fallos_consecutivos") or 0) + 1
+    supercias_financials.write_build_state(state)
 
 
 def _verify_build(db_path: Path) -> None:
@@ -245,7 +324,7 @@ def _verify_build(db_path: Path) -> None:
         conn.close()
 
 
-def main() -> None:
+def _build() -> None:
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     tmp_dir = DB_PATH.parent / "tmp_supercias_financials"
     tmp_dir.mkdir(parents=True, exist_ok=True)
@@ -254,6 +333,7 @@ def main() -> None:
     # cross-filesystem copy that could itself fail partway through.
     build_path = DB_PATH.parent / f"{DB_PATH.name}.building"
 
+    deadline = time.time() + _DOWNLOAD_DEADLINE_SECONDS
     with _client() as client:
         ranking_csv = tmp_dir / "bi_ranking.csv"
         compania_csv = tmp_dir / "bi_compania.csv"
@@ -267,7 +347,7 @@ def main() -> None:
             ("bi_ciiu.csv", ciiu_csv),
             ("indicadores_sector.csv", sector_csv),
         ):
-            _download_to(client, name, dest)
+            _download_to(client, name, dest, deadline)
 
     build_path.unlink(missing_ok=True)
     conn = sqlite3.connect(build_path)
@@ -333,6 +413,7 @@ def main() -> None:
     print("Verificando la base construida antes de reemplazar la anterior...", flush=True)
     try:
         _verify_build(build_path)
+        _check_not_shrunk(build_path, DB_PATH)
     except Exception:
         build_path.unlink(missing_ok=True)
         raise
@@ -350,6 +431,22 @@ def main() -> None:
     tmp_dir.rmdir()
 
     print(f"Listo: {DB_PATH} ({DB_PATH.stat().st_size / (1024 * 1024):.1f} MB)")
+
+
+def main() -> None:
+    if not _acquire_lock():
+        print("Otro build de Supercías está en curso (lock activo); se omite.", flush=True)
+        return
+    started = time.time()
+    try:
+        _build()
+    except BaseException as e:
+        _record_outcome(started, e)
+        raise
+    else:
+        _record_outcome(started, None)
+    finally:
+        supercias_financials.lock_path().unlink(missing_ok=True)
 
 
 if __name__ == "__main__":
