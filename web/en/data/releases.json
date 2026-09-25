@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.8.10",
+    "date": "2026-09-24",
+    "summary": "IESS employer compliance check (arrears or not, by RUC or cédula), Centrosur's archive of scheduled power cuts since 2023, and energia-ecuador.com's 2024 blackout schedules recovered from the Wayback Machine. Fixes random disconnects in stdio clients like Claude Desktop, speeds up startup (~4.7 s to ~2.9 s), stops the IESS certificate from reporting an employer in arrears as compliant when its text can't be parsed, fixes a search_sri_ruc crash on empty responses, and hardens Supercías' n_empleados field."
+  },
+  {
+    "version": "0.8.9",
+    "date": "2026-09-14",
+    "summary": "MCP architecture cleanup: duplicate tools removed (list_recent_datasets folded into search_datasets(sort=\"recent\")) and the ARCOTEL pair merged into search_arcotel(tipo=...); a new MCP_PROFILE separates maintenance tools; every tool now declares a Spanish title, MCP annotations, and native structuredContent. The Supercías financials DB (search_ranking/get_financials) now builds and refreshes itself in the background."
+  },
+  {
     "version": "0.8.8",
     "date": "2026-09-10",
     "summary": "BCE National Accounts and publication calendar, SENESCYT's SIAU/CTI statistics and Higher Education Library, CEPALSTAT (CEPAL's regional indicator API, filtered to Ecuador by default), IADB's open-data portal as a new source=\"iadb\" on the generic CKAN tools, and MSP's weekly vaccine-preventable-disease gazette archive. get_organization_info gained a text filter and no longer truncates large organizations at 25 datasets. Fixes redundant ZIP re-hashing in the IEM pipeline."

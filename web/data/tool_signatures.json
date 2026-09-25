@@ -24,7 +24,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -59,7 +59,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -86,12 +86,12 @@
       },
       {
         "name": "source",
-        "type": "str",
+        "type": "ckan_client.CkanSource",
         "default": "'nacional'"
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -114,7 +114,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -134,12 +134,12 @@
       },
       {
         "name": "source",
-        "type": "str",
+        "type": "ckan_client.CkanSource",
         "default": "'nacional'"
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -160,7 +160,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -180,7 +180,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -200,7 +200,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -220,7 +220,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -245,7 +245,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -286,7 +286,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -323,7 +323,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -357,7 +357,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -384,12 +384,12 @@
       },
       {
         "name": "source",
-        "type": "str",
+        "type": "ckan_client.CkanSource",
         "default": "'nacional'"
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -406,12 +406,12 @@
     "params": [
       {
         "name": "tablero",
-        "type": "str",
+        "type": "Literal['produccion_tiempo_real', 'demanda_tiempo_real', 'operativa_diaria', 'acumulada_mensual', 'acumulada_anual']",
         "default": null
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -436,12 +436,12 @@
       },
       {
         "name": "lang",
-        "type": "str",
+        "type": "Literal['es', 'en']",
         "default": "'es'"
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -450,6 +450,26 @@
       "indicator_id": "An \"indicator_id\" from search_cepalstat_indicadores.",
       "pais": "Country to filter to (accent-insensitive, e.g. \"Ecuador\", \"Peru\"). Empty string fetches every country the indicator covers — can be a few MB for a rich indicator.",
       "lang": "\"es\" (default) or \"en\"",
+      "format": "text | json"
+    }
+  },
+  "get_certificado_cumplimiento_patronal": {
+    "file": "get_certificado_cumplimiento_patronal.py",
+    "params": [
+      {
+        "name": "identificacion",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "Literal['text', 'json']",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Check whether an employer (13-digit RUC) or individual (10-digit cédula) is current on Seguro Social (IESS) contributions, via the IESS's public \"Certificado de Cumplimiento de Obligaciones Patronales\" — no login required. Scope: this is a mora/no-mora compliance check, NOT an employee or affiliate headcount — the IESS itself does not publish that figure anywhere publicly (confirmed 2026-09-21). For the actual employee count, use get_financials/search_ranking's `n_empleados` field instead (self-reported to Supercías' Ranking, not this tool) — get_compania_info's basic registry doesn't carry it, but the Ranking dataset does.",
+    "args_doc": {
+      "identificacion": "A 10-digit cédula or 13-digit RUC.",
       "format": "text | json"
     }
   },
@@ -463,7 +483,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -488,7 +508,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -509,7 +529,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -529,12 +549,12 @@
       },
       {
         "name": "source",
-        "type": "str",
+        "type": "ckan_client.CkanSource",
         "default": "'nacional'"
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -542,6 +562,26 @@
     "args_doc": {
       "dataset_id": "The dataset ID or slug (e.g. \"registro-estadistico-de-recursos-y-actividades-de-salud-2019\")",
       "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), \"latacunga\" (Latacunga municipal portal), or \"iadb\" (IADB's open-data portal, data.iadb.org — NOT Ecuador-only, a regional/global catalog)",
+      "format": "text | json"
+    }
+  },
+  "get_energia_ecuador_snapshot": {
+    "file": "get_energia_ecuador_snapshot.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "Literal['text', 'json']",
+        "default": "'text'"
+      }
+    ],
+    "summary": "Recover, via the Wayback Machine, the national blackout-schedule aggregator the Ministry of Energy and Mines briefly ran during the 2024 crisis at energia-ecuador.com (\"Portal para actualización de racionamiento energético\"). The domain itself is dead (parked since 2025) and the site went behind a Cloudflare bot-block within days of launch, so only one of its nine distributor pages was fully archived: Empresa Eléctrica Quito, a single frozen snapshot from 2024-04-24 (province/canton/sector-level rotation for Pichincha, 40 rows). Centrosur, CNEL, Emelnorte, EEASA, and four other distributors' pages are confirmed to have existed (via the site's own archived sitemap) but were never successfully archived — not recoverable from this or any other source found so far. This is a one-time historical snapshot, not an ongoing series — there is no newer page to discover.",
+    "args_doc": {
+      "query": "Free text matched (accent-insensitive) against canton or sectores. Empty returns all rows.",
       "format": "text | json"
     }
   },
@@ -560,7 +600,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -591,7 +631,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -618,7 +658,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -649,7 +689,7 @@
       },
       {
         "name": "frecuencia",
-        "type": "str",
+        "type": "Literal['', 'Semanal', 'Mensual', 'Trimestral', 'Anual']",
         "default": "''"
       },
       {
@@ -659,7 +699,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -683,7 +723,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -703,7 +743,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -723,7 +763,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -748,7 +788,7 @@
       },
       {
         "name": "grupo",
-        "type": "str",
+        "type": "Literal['sismico', 'volcanico', '']",
         "default": "''"
       },
       {
@@ -763,7 +803,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -787,7 +827,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -807,7 +847,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -827,7 +867,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -852,12 +892,12 @@
       },
       {
         "name": "source",
-        "type": "str",
+        "type": "ckan_client.CkanSource",
         "default": "'nacional'"
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -879,7 +919,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -899,12 +939,12 @@
       },
       {
         "name": "source",
-        "type": "str",
+        "type": "ckan_client.CkanSource",
         "default": "'nacional'"
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -925,7 +965,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -945,7 +985,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -965,7 +1005,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -985,7 +1025,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1000,7 +1040,7 @@
     "params": [
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1024,7 +1064,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1045,7 +1085,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1065,7 +1105,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1090,7 +1130,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1111,7 +1151,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1131,7 +1171,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1151,7 +1191,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1171,7 +1211,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1191,7 +1231,7 @@
       },
       {
         "name": "source",
-        "type": "str",
+        "type": "ckan_client.CkanSource",
         "default": "'nacional'"
       },
       {
@@ -1201,7 +1241,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1218,7 +1258,7 @@
     "params": [
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1232,7 +1272,7 @@
     "params": [
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1246,7 +1286,7 @@
     "params": [
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1260,11 +1300,11 @@
     "params": [
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
-    "summary": "Describe what this Ecuador MCP can do: sources, key tools, prompts and limits. Call this first when you are unsure which tool to use.",
+    "summary": "Describe what this Ecuador MCP can do: sources, key tools, prompts and limits. Deprecated: the server's own `instructions` now cover the general orientation (sources, recommended entry points, prompts, format), and `ecuador://fuentes` is the structured, always-current source catalog. Kept as a compatibility alias for the per-tool \"limites\" notes not yet folded into `ecuador://fuentes`.",
     "args_doc": {
       "format": "text | json"
     }
@@ -1274,12 +1314,12 @@
     "params": [
       {
         "name": "source",
-        "type": "str",
+        "type": "ckan_client.CkanSource",
         "default": "'nacional'"
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1294,7 +1334,7 @@
     "params": [
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1313,12 +1353,12 @@
       },
       {
         "name": "source",
-        "type": "str",
+        "type": "ckan_client.CkanSource",
         "default": "'nacional'"
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1334,7 +1374,7 @@
     "params": [
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1348,7 +1388,7 @@
     "params": [
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1372,7 +1412,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1380,38 +1420,6 @@
     "args_doc": {
       "query": "Optional search term (e.g. \"SRI\", \"salud\", \"rentas\")",
       "page": "Page number (1-based, default: 1, only used without query)",
-      "format": "text | json"
-    }
-  },
-  "list_recent_datasets": {
-    "file": "list_recent_datasets.py",
-    "params": [
-      {
-        "name": "page",
-        "type": "int",
-        "default": "1"
-      },
-      {
-        "name": "page_size",
-        "type": "int",
-        "default": "15"
-      },
-      {
-        "name": "source",
-        "type": "str",
-        "default": "'nacional'"
-      },
-      {
-        "name": "format",
-        "type": "str",
-        "default": "'text'"
-      }
-    ],
-    "summary": "List the most recently updated datasets on Ecuador's open data portal. Useful to discover new or freshly refreshed government data without a specific keyword. Sorted by metadata_modified descending.",
-    "args_doc": {
-      "page": "Page number (1-based, default 1)",
-      "page_size": "Results per page (default 15, max 50)",
-      "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), \"latacunga\" (Latacunga municipal portal), or \"iadb\" (IADB's open-data portal, data.iadb.org — NOT Ecuador-only, a regional/global catalog)",
       "format": "text | json"
     }
   },
@@ -1425,7 +1433,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1440,7 +1448,7 @@
     "params": [
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1454,7 +1462,7 @@
     "params": [
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1468,7 +1476,7 @@
     "params": [
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1482,7 +1490,7 @@
     "params": [
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1496,7 +1504,7 @@
     "params": [
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1510,7 +1518,7 @@
     "params": [
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1539,7 +1547,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1576,12 +1584,12 @@
       },
       {
         "name": "nivel",
-        "type": "str",
+        "type": "Literal['auto', 'provincia', 'canton', 'parroquia']",
         "default": "'auto'"
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1610,12 +1618,12 @@
       },
       {
         "name": "source",
-        "type": "str",
+        "type": "ckan_client.CkanSource",
         "default": "'nacional'"
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1662,12 +1670,12 @@
       },
       {
         "name": "source",
-        "type": "str",
+        "type": "ckan_client.CkanSource",
         "default": "'nacional'"
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1708,7 +1716,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1736,7 +1744,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1762,7 +1770,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1773,9 +1781,14 @@
       "format": "text | json"
     }
   },
-  "search_arcotel_boletines": {
-    "file": "search_arcotel_boletines.py",
+  "search_arcotel": {
+    "file": "search_arcotel.py",
     "params": [
+      {
+        "name": "tipo",
+        "type": "Literal['boletines', 'reportes_mensuales']",
+        "default": null
+      },
       {
         "name": "query",
         "type": "str",
@@ -1783,33 +1796,14 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
-    "summary": "List ARCOTEL's (Agencia de Regulación y Control de las Telecomunicaciones) \"Boletín Estadístico del Sector de las Telecomunicaciones\" PDFs — annual/topical statistical bulletins published on the institutional site (www.arcotel.gob.ec), outside CKAN. Confirmed live range: 2015 through 2024 (no 2025/2026 bulletin published yet as of this check). Lower-frequency and more topic-driven than search_arcotel_reportes_mensuales (one-per-month series, 2017-2026) -- entries here are things like \"Servicio Portador — Agosto\" or \"Roaming-Nacional Automático\", not a uniform monthly cadence. Also separate from ARCOTEL's frozen-since-2021/2022 CKAN organization. PDF only — no CSV/XLSX/API. Returns direct URLs, not parsed table data — download them yourself, via download_resource, or via read_pdf.",
+    "summary": "List ARCOTEL's (Agencia de Regulación y Control de las Telecomunicaciones) statistical PDF series, published on the institutional site (www.arcotel.gob.ec), outside CKAN. Both series are separate from ARCOTEL's frozen-since-2021/2022 CKAN organization. PDF only — no CSV/XLSX/API. Returns direct URLs, not parsed table data — download them yourself, via download_resource, or via read_pdf.",
     "args_doc": {
-      "query": "Free text matched against the entry's label, year, or URL (accent-insensitive), e.g. \"roaming\", \"2020\", \"portabilidad\". Empty returns all entries.",
-      "format": "text | json"
-    }
-  },
-  "search_arcotel_reportes_mensuales": {
-    "file": "search_arcotel_reportes_mensuales.py",
-    "params": [
-      {
-        "name": "query",
-        "type": "str",
-        "default": "''"
-      },
-      {
-        "name": "format",
-        "type": "str",
-        "default": "'text'"
-      }
-    ],
-    "summary": "List ARCOTEL's (Agencia de Regulación y Control de las Telecomunicaciones) \"Reportes Estadísticos Mensuales\" PDFs — the regulator's monthly telecom-sector statistics series, published on the institutional site (www.arcotel.gob.ec), outside CKAN. Confirmed live range: January 2017 through June 2026 (most recent upload lags today by roughly 2 months). 2023-2026 is one PDF per month; 2017-2022 mixes months with ad hoc topical infographics. This is a separate, higher-frequency series from search_arcotel_boletines (annual/topical bulletins, 2015-2024) and from ARCOTEL's frozen-since-2021/2022 CKAN organization. PDF only — no CSV/XLSX/API. Returns direct URLs, not parsed table data — download them yourself, via download_resource, or via read_pdf.",
-    "args_doc": {
-      "query": "Free text matched against the entry's label, year, or URL (accent-insensitive), e.g. \"junio 2026\", \"2025\", \"internet\". Empty returns all entries.",
+      "tipo": "\"boletines\" for the \"Boletín Estadístico del Sector de las Telecomunicaciones\" (annual/topical, confirmed live 2015-2024, entries like \"Servicio Portador — Agosto\" or \"Roaming-Nacional Automático\", not a uniform monthly cadence), or \"reportes_mensuales\" for the \"Reportes Estadísticos Mensuales\" (higher-frequency, confirmed live January 2017 through June 2026, one PDF per month since 2023, mixed with ad hoc topical infographics 2017-2022).",
+      "query": "Free text matched against the entry's label, year, or URL (accent-insensitive), e.g. \"roaming\", \"2020\", \"portabilidad\" for boletines, or \"junio 2026\", \"2025\", \"internet\" for reportes_mensuales. Empty returns all entries.",
       "format": "text | json"
     }
   },
@@ -1838,7 +1832,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1896,7 +1890,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1923,7 +1917,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -1983,7 +1977,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2000,7 +1994,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2020,7 +2014,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2040,12 +2034,12 @@
       },
       {
         "name": "formato",
-        "type": "str",
+        "type": "Literal['', 'PDF', 'XLSX', 'XLS', 'CSV', 'ZIP', 'HTML']",
         "default": "''"
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2066,7 +2060,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2086,7 +2080,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2116,7 +2110,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2125,6 +2119,26 @@
       "query": "Free text matched (accent-insensitive) against the file label, e.g. \"manlo\" (city-block level), \"sector\", \"2010\", \"spss\", \"diccionario\", \"metodologia\". Empty returns every file found.",
       "limit": "Max results (default 30, max 100).",
       "offset": "Pagination offset over the matched set.",
+      "format": "text | json"
+    }
+  },
+  "search_centrosur_cortes": {
+    "file": "search_centrosur_cortes.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "Literal['text', 'json']",
+        "default": "'text'"
+      }
+    ],
+    "summary": "List Centrosur's (Empresa Eléctrica Regional Centro Sur — Azuay, Cañar, Morona Santiago) archive of scheduled power-cut PDFs (\"Programación de cortes del servicio de energía eléctrica\"), including the 2024 national hydrological-crisis blackouts (estiaje, Sep-Dec 2024) as well as ordinary maintenance cuts. Regional, not national — only Centrosur's concession area. This is the only distributor in the project with a confirmed, unauthenticated enumeration mechanism (WordPress's own Media Library REST API); EEQ's equivalent archive is only discoverable via search-engine indexing (no public API), and CNEL has no recoverable archive at all. A separate Centrosur folder (`CortesEstiaje/`) holds additional 2024 PDFs uploaded outside the media library — not covered here, no known way to enumerate it programmatically.",
+    "args_doc": {
+      "query": "Free text matched (accent-insensitive) against the file's titulo, anio, mes, or URL. Empty returns all files.",
       "format": "text | json"
     }
   },
@@ -2138,12 +2152,12 @@
       },
       {
         "name": "lang",
-        "type": "str",
+        "type": "Literal['es', 'en']",
         "default": "'es'"
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2164,7 +2178,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2204,7 +2218,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2248,7 +2262,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2268,7 +2282,7 @@
       {
         "name": "query",
         "type": "str",
-        "default": null
+        "default": "''"
       },
       {
         "name": "page",
@@ -2286,22 +2300,28 @@
         "default": "''"
       },
       {
+        "name": "sort",
+        "type": "Literal['relevance', 'recent']",
+        "default": "'relevance'"
+      },
+      {
         "name": "source",
-        "type": "str",
+        "type": "ckan_client.CkanSource",
         "default": "'nacional'"
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
     "summary": "Search for datasets on Ecuador's open data portal (www.datosabiertos.gob.ec). This is the starting point for exploring government data from 98+ public institutions. Use short, specific queries in Spanish for best results. Typical workflow: search_datasets → list_dataset_resources → preview_resource_data",
     "args_doc": {
-      "query": "Search keywords (e.g. \"empleo\", \"salud\", \"presupuesto\", \"SRI recaudación\")",
+      "query": "Search keywords (e.g. \"empleo\", \"salud\", \"presupuesto\", \"SRI recaudación\"). Optional when sort=\"recent\" — omit it to browse newly published/updated datasets without a keyword.",
       "page": "Page number (1-based, default: 1)",
       "page_size": "Results per page (default: 20, max: 100)",
       "category": "Optional category filter (e.g. \"sal\" for Salud, \"edu\" for Educación). Use list_categories to see all available categories.",
+      "sort": "\"relevance\" (default, CKAN's own ranking) or \"recent\" (sort by metadata_modified descending, to discover newly added or freshly refreshed datasets)",
       "source": "\"nacional\" (www.datosabiertos.gob.ec, default), \"cuenca\" (cuencaendatos.cuenca.gob.ec, the Cuenca municipal open-data portal), \"latacunga\" (datosabiertos.latacunga.gob.ec, the Latacunga municipal open-data portal) — separate, smaller CKAN catalogs — or \"iadb\" (data.iadb.org, the Inter-American Development Bank's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch macro/financial indicators for 26 LAC countries, the World Bank/IADB Database of Political Institutions for ~180 countries)",
       "format": "text | json"
     }
@@ -2321,7 +2341,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2367,7 +2387,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2392,7 +2412,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2417,7 +2437,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2448,7 +2468,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2480,7 +2500,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2512,7 +2532,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2529,7 +2549,7 @@
     "params": [
       {
         "name": "serie",
-        "type": "str",
+        "type": "Literal['anc', 'is']",
         "default": null
       },
       {
@@ -2544,7 +2564,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2561,7 +2581,7 @@
     "params": [
       {
         "name": "modo",
-        "type": "str",
+        "type": "Literal['zonal', 'consolidado']",
         "default": "'zonal'"
       },
       {
@@ -2581,7 +2601,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2604,7 +2624,7 @@
       },
       {
         "name": "grupo",
-        "type": "str",
+        "type": "Literal['sismico', 'volcanico', '']",
         "default": "''"
       },
       {
@@ -2619,7 +2639,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2637,7 +2657,7 @@
     "params": [
       {
         "name": "fuente",
-        "type": "str",
+        "type": "Literal['mef', 'senae']",
         "default": "'mef'"
       },
       {
@@ -2647,7 +2667,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2668,7 +2688,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2698,12 +2718,12 @@
       },
       {
         "name": "source",
-        "type": "str",
+        "type": "ckan_client.CkanSource",
         "default": "'nacional'"
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2751,7 +2771,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2781,7 +2801,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2802,7 +2822,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2822,7 +2842,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2842,7 +2862,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2872,7 +2892,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2909,7 +2929,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2942,7 +2962,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -2974,7 +2994,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -3001,7 +3021,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -3022,7 +3042,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
@@ -3052,7 +3072,7 @@
       },
       {
         "name": "format",
-        "type": "str",
+        "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],

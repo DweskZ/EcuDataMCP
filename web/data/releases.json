@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.8.10",
+    "date": "2026-09-24",
+    "summary": "Verificación de cumplimiento patronal del IESS (mora/no mora por RUC o cédula), el archivo de cortes de luz programados de Centrosur desde 2023 y los horarios de racionamiento de 2024 de energia-ecuador.com recuperados del Wayback Machine. Corrige desconexiones aleatorias en clientes stdio como Claude Desktop, acelera el arranque (~4,7 s a ~2,9 s), evita que el certificado del IESS reporte como al día a un empleador en mora cuando no puede leer el texto, corrige un fallo de search_sri_ruc con respuestas vacías y blinda el campo n_empleados de Supercías."
+  },
+  {
+    "version": "0.8.9",
+    "date": "2026-09-14",
+    "summary": "Limpieza de la arquitectura MCP: se eliminan tools duplicadas (list_recent_datasets pasa a search_datasets(sort=\"recent\")) y el par de ARCOTEL se unifica en search_arcotel(tipo=...); nuevo MCP_PROFILE para separar las tools de mantenimiento; todas las tools declaran título en español, anotaciones MCP y structuredContent nativo. La base financiera de Supercías (search_ranking/get_financials) ahora se construye y refresca sola en segundo plano."
+  },
+  {
     "version": "0.8.8",
     "date": "2026-09-10",
     "summary": "Cuentas Nacionales y calendario de publicaciones del BCE, el SIAU/CTI y la Biblioteca de Educación Superior de SENESCYT, CEPALSTAT (la API regional de indicadores de CEPAL, filtrada a Ecuador por defecto), el portal de datos abiertos del BID como nuevo source=\"iadb\" en los tools CKAN genéricos, y las Gacetas de Inmunoprevenibles semanales del MSP. get_organization_info gana un filtro de texto y ya no trunca organizaciones grandes a 25 datasets. Corrige el re-hasheo redundante de ZIPs en el pipeline de IEM."

@@ -132,37 +132,6 @@
         "long_description": "Search for datasets on Ecuador's open data portal (www.datosabiertos.gob.ec). This is the starting point for exploring government data from 98+ public institutions. Use short, specific queries in Spanish for best results. Typical workflow: search_datasets → list_dataset_resources → preview_resource_data"
       },
       {
-        "name": "list_recent_datasets",
-        "description": "The most recently updated datasets on the portal.",
-        "params": [
-          {
-            "name": "page",
-            "type": "int",
-            "default": "1",
-            "description": "Page number (1-based, default 1)"
-          },
-          {
-            "name": "page_size",
-            "type": "int",
-            "default": "15",
-            "description": "Results per page (default 15, max 50)"
-          },
-          {
-            "name": "source",
-            "type": "str",
-            "default": "'nacional'",
-            "description": "\"nacional\" (default, www.datosabiertos.gob.ec), \"cuenca\" (cuencaendatos.cuenca.gob.ec, independent municipal portal), \"latacunga\" (datosabiertos.latacunga.gob.ec, independent municipal portal), or \"iadb\" (data.iadb.org, IADB's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch and World Bank/IADB indicators)"
-          },
-          {
-            "name": "format",
-            "type": "str",
-            "default": "'text'",
-            "description": "Output format: `text` (default) or `json`."
-          }
-        ],
-        "long_description": "List the most recently updated datasets on Ecuador's open data portal. Useful to discover new or freshly refreshed government data without a specific keyword. Sorted by metadata_modified descending."
-      },
-      {
         "name": "get_dataset_info",
         "description": "Detailed dataset metadata: title, description, organization, tags, license, dates.",
         "params": [
@@ -2219,7 +2188,7 @@
     ]
   },
   {
-    "category": "CENACE, SUT, and IG-EPN",
+    "category": "CENACE, SUT, IG-EPN, and power cuts",
     "tools": [
       {
         "name": "get_cenace_tablero",
@@ -2388,6 +2357,44 @@
           }
         ],
         "long_description": "Search the IG-EPN PDF report archive (Instituto Geofísico): daily/weekly/monthly/special seismic bulletins, volcanic \"IG Al Instante\" alerts, field/annual reports, etc. Different from search_sismos, which reads the raw earthquake catalog feed -- this searches the narrative/PDF report archive instead. Use get_informe_igepn afterwards to download and read one report's text."
+      },
+      {
+        "name": "search_centrosur_cortes",
+        "description": "Archive of Centrosur's scheduled power-cut PDFs, 2023 onward.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Free text matched against title, year, month, or URL, accent-insensitive. Empty returns everything."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "Output format: `text` (default) or `json`."
+          }
+        ],
+        "long_description": "Lists Centrosur's scheduled power-cut notices (Azuay, Cañar, and Morona Santiago), including the 2024 drought-crisis blackouts and ordinary maintenance cuts. Regional, not national. Enumerated via the site's public WordPress media API, no login."
+      },
+      {
+        "name": "get_energia_ecuador_snapshot",
+        "description": "2024 blackout schedules from energia-ecuador.com, recovered from the Wayback Machine.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Free text matched against canton or sectors, accent-insensitive. Empty returns all rows."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "Output format: `text` (default) or `json`."
+          }
+        ],
+        "long_description": "Recovers, via the Wayback Machine, the national blackout-schedule aggregator the Ministry of Energy ran during the 2024 crisis (the domain is now dead). Only the Empresa Eléctrica Quito page was archived: a frozen 2024-04-24 snapshot of Pichincha's rotation by province, canton, and sector. Not a live series."
       }
     ]
   },
@@ -2521,7 +2528,7 @@
     ]
   },
   {
-    "category": "IESS: institutional documents",
+    "category": "IESS: documents and employer compliance",
     "tools": [
       {
         "name": "list_iess_colecciones",
@@ -2566,6 +2573,25 @@
           }
         ],
         "long_description": "Lists one IESS document collection's actual documents, each resolved to a direct download URL, título, and formato. Call list_iess_colecciones first to see what years/counts each collection has."
+      },
+      {
+        "name": "get_certificado_cumplimiento_patronal",
+        "description": "Checks whether an employer is current on IESS contributions.",
+        "params": [
+          {
+            "name": "identificacion",
+            "type": "str",
+            "default": null,
+            "description": "A 10-digit cédula or 13-digit RUC."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "Output format: `text` (default) or `json`."
+          }
+        ],
+        "long_description": "Queries the IESS's public Employer Obligations Compliance Certificate (no login) and reports whether the employer has contributions in arrears. If the certificate text can't be parsed, the status is reported as NO DETERMINADO (undetermined). It does not return employee counts: the IESS doesn't publish that per company; use the n_empleados field from get_financials/search_ranking (self-reported to Supercías)."
       }
     ]
   },
@@ -2698,42 +2724,29 @@
     "category": "ARCOTEL: telecommunications",
     "tools": [
       {
-        "name": "search_arcotel_reportes_mensuales",
-        "description": "ARCOTEL's monthly telecom statistical reports.",
+        "name": "search_arcotel",
+        "description": "ARCOTEL's statistical PDF series: bulletins or monthly reports.",
         "params": [
+          {
+            "name": "tipo",
+            "type": "Literal['boletines', 'reportes_mensuales']",
+            "default": null,
+            "description": "\"boletines\" (Telecommunications Sector Statistical Bulletin, 2015-2024) or \"reportes_mensuales\" (Monthly Statistical Reports, January 2017 to June 2026)."
+          },
           {
             "name": "query",
             "type": "str",
             "default": "''",
-            "description": "Free text matched against the entry's label, year, or URL (accent-insensitive), e.g. \"june 2026\", \"2025\", \"internet\". Empty returns all entries."
+            "description": "Free text matched against label, year, or URL, accent-insensitive (e.g. \"roaming\", \"2025\", \"portabilidad\"). Empty returns everything."
           },
           {
             "name": "format",
-            "type": "str",
+            "type": "Literal['text', 'json']",
             "default": "'text'",
-            "description": "text | json"
+            "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Lists ARCOTEL's (telecom regulator) \"Reportes Estadísticos Mensuales\" PDFs, published on the institutional site outside CKAN. Confirmed live range: January 2017 through June 2026, typically lagging today by about two months. A separate, higher-frequency series from search_arcotel_boletines and from ARCOTEL's CKAN organization (frozen since 2021/2022). PDF only — returns direct URLs, not parsed table data."
-      },
-      {
-        "name": "search_arcotel_boletines",
-        "description": "ARCOTEL's annual/topical telecom statistical bulletins.",
-        "params": [
-          {
-            "name": "query",
-            "type": "str",
-            "default": "''",
-            "description": "Free text matched against the entry's label, year, or URL (accent-insensitive), e.g. \"roaming\", \"2020\", \"portabilidad\". Empty returns all entries."
-          },
-          {
-            "name": "format",
-            "type": "str",
-            "default": "'text'",
-            "description": "text | json"
-          }
-        ],
-        "long_description": "Lists ARCOTEL's \"Boletín Estadístico del Sector de las Telecomunicaciones\" PDFs, published on the institutional site outside CKAN. Confirmed live range: 2015 through 2024 (no 2025/2026 bulletin yet). Lower-frequency and more topic-driven than search_arcotel_reportes_mensuales. PDF only — returns direct URLs, not parsed table data."
+        "long_description": "Lists the two statistical PDF series ARCOTEL publishes on its institutional site, outside its CKAN organization (frozen since 2021/2022). Returns direct URLs, not tables: download them with download_resource or read them with read_pdf. Replaces search_arcotel_boletines and search_arcotel_reportes_mensuales."
       }
     ]
   },

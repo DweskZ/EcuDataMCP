@@ -505,6 +505,29 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Distribuidoras eléctricas",
+        "sources": [
+          {
+            "id": "centrosur-cortes",
+            "name": "Cortes Centrosur",
+            "tag": "Energía",
+            "description": "Programación de cortes de luz de Centrosur (Azuay, Cañar, Morona Santiago), 2023 en adelante, incluida la crisis de 2024",
+            "coverage": "centrosur.gob.ec",
+            "url": "https://www.centrosur.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "energia-ecuador",
+            "name": "energia-ecuador.com (archivo)",
+            "tag": "Energía",
+            "description": "Horarios de racionamiento de 2024 de la EEQ, recuperados del Wayback Machine (foto fija)",
+            "coverage": "web.archive.org",
+            "url": "https://web.archive.org/web/2024/https://energia-ecuador.com/",
+            "status": "live"
+          }
+        ]
       }
     ]
   },
@@ -555,6 +578,15 @@
             "description": "Boletines estadísticos, estudios actuariales e informes de auditoría",
             "coverage": "iess.gob.ec",
             "url": "https://www.iess.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "iess-certificado-patronal",
+            "name": "Certificado patronal IESS",
+            "tag": "IESS",
+            "description": "Certificado público de cumplimiento de obligaciones patronales (mora/no mora)",
+            "coverage": "iess.gob.ec/empleador-web",
+            "url": "https://www.iess.gob.ec/empleador-web/pages/morapatronal/certificadoCumplimientoPublico.jsf",
             "status": "live"
           }
         ]

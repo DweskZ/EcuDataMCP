@@ -505,6 +505,29 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Electricity distributors",
+        "sources": [
+          {
+            "id": "centrosur-cortes",
+            "name": "Centrosur power cuts",
+            "tag": "Energy",
+            "description": "Centrosur's scheduled power cuts (Azuay, Cañar, Morona Santiago), 2023 onward, including the 2024 crisis",
+            "coverage": "centrosur.gob.ec",
+            "url": "https://www.centrosur.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "energia-ecuador",
+            "name": "energia-ecuador.com (archive)",
+            "tag": "Energy",
+            "description": "EEQ's 2024 blackout schedules, recovered from the Wayback Machine (frozen snapshot)",
+            "coverage": "web.archive.org",
+            "url": "https://web.archive.org/web/2024/https://energia-ecuador.com/",
+            "status": "live"
+          }
+        ]
       }
     ]
   },
@@ -555,6 +578,15 @@
             "description": "Statistical bulletins, actuarial studies, and audit reports",
             "coverage": "iess.gob.ec",
             "url": "https://www.iess.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "iess-certificado-patronal",
+            "name": "IESS employer certificate",
+            "tag": "IESS",
+            "description": "Public employer-obligations compliance certificate (arrears or not)",
+            "coverage": "iess.gob.ec/empleador-web",
+            "url": "https://www.iess.gob.ec/empleador-web/pages/morapatronal/certificadoCumplimientoPublico.jsf",
             "status": "live"
           }
         ]

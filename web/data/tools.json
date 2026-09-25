@@ -132,37 +132,6 @@
         "long_description": "Busca datasets en el portal de datos abiertos de Ecuador (www.datosabiertos.gob.ec). Es el punto de partida para explorar datos de 98+ instituciones públicas. Usa queries cortos y específicos en español para mejores resultados. Flujo típico: search_datasets → list_dataset_resources → preview_resource_data."
       },
       {
-        "name": "list_recent_datasets",
-        "description": "Datasets más recientemente actualizados en el portal.",
-        "params": [
-          {
-            "name": "page",
-            "type": "int",
-            "default": "1",
-            "description": "Número de página (base 1, default 1)"
-          },
-          {
-            "name": "page_size",
-            "type": "int",
-            "default": "15",
-            "description": "Resultados por página (default 15, máx. 50)"
-          },
-          {
-            "name": "source",
-            "type": "str",
-            "default": "'nacional'",
-            "description": "\"nacional\" (default, www.datosabiertos.gob.ec), \"cuenca\" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), \"latacunga\" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o \"iadb\" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)"
-          },
-          {
-            "name": "format",
-            "type": "str",
-            "default": "'text'",
-            "description": "Formato de salida: `text` (default) o `json`."
-          }
-        ],
-        "long_description": "Lista los datasets más recientemente actualizados en el portal de datos abiertos de Ecuador. Útil para descubrir datos gubernamentales nuevos o recién actualizados sin un keyword específico. Ordenado por metadata_modified descendente."
-      },
-      {
         "name": "get_dataset_info",
         "description": "Metadata detallada de un dataset: título, descripción, organización, tags, licencia, fechas.",
         "params": [
@@ -2225,7 +2194,7 @@
     ]
   },
   {
-    "category": "CENACE, SUT e IG-EPN",
+    "category": "CENACE, SUT, IG-EPN y cortes de luz",
     "tools": [
       {
         "name": "get_cenace_tablero",
@@ -2394,6 +2363,44 @@
           }
         ],
         "long_description": "Busca en el archivo de informes PDF del IG-EPN (Instituto Geofísico): boletines sísmicos diarios/semanales/mensuales/especiales, alertas volcánicas \"IG Al Instante\", informes de campo/anuales, etc. A diferencia de search_sismos, que lee el feed crudo del catálogo sísmico, este busca en el archivo narrativo de informes PDF. Usa get_informe_igepn después para descargar y leer el texto de un informe."
+      },
+      {
+        "name": "search_centrosur_cortes",
+        "description": "Archivo de PDFs de cortes de luz programados de Centrosur, 2023 en adelante.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra título, año, mes o URL, sin tildes. Vacío devuelve todo."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "Formato de salida: `text` (default) o `json`."
+          }
+        ],
+        "long_description": "Lista la programación de cortes de energía de Centrosur (Azuay, Cañar y Morona Santiago), incluidos los apagones de la crisis de estiaje de 2024 y los cortes ordinarios por mantenimiento. Es regional, no nacional. Se enumera mediante la API pública de medios de WordPress del sitio, sin login."
+      },
+      {
+        "name": "get_energia_ecuador_snapshot",
+        "description": "Horarios de racionamiento de 2024 de energia-ecuador.com, recuperados del Wayback Machine.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Texto libre contra cantón o sectores, sin tildes. Vacío devuelve todas las filas."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "Formato de salida: `text` (default) o `json`."
+          }
+        ],
+        "long_description": "Recupera, vía Wayback Machine, el agregador nacional de horarios de racionamiento que el Ministerio de Energía publicó durante la crisis de 2024 (dominio hoy muerto). Solo la página de la Empresa Eléctrica Quito quedó archivada: una foto fija del 24 de abril de 2024 con la rotación por provincia, cantón y sector de Pichincha. No es una serie viva."
       }
     ]
   },
@@ -2527,7 +2534,7 @@
     ]
   },
   {
-    "category": "IESS: documentos institucionales",
+    "category": "IESS: documentos y cumplimiento patronal",
     "tools": [
       {
         "name": "list_iess_colecciones",
@@ -2572,6 +2579,25 @@
           }
         ],
         "long_description": "Lista los documentos reales de una colección del IESS, cada uno resuelto a su URL de descarga directa, título y formato. Llama primero a list_iess_colecciones para ver qué años y cantidades tiene disponible cada colección."
+      },
+      {
+        "name": "get_certificado_cumplimiento_patronal",
+        "description": "Verifica si un empleador está al día con el IESS (mora patronal).",
+        "params": [
+          {
+            "name": "identificacion",
+            "type": "str",
+            "default": null,
+            "description": "Cédula (10 dígitos) o RUC (13 dígitos)."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "Formato de salida: `text` (default) o `json`."
+          }
+        ],
+        "long_description": "Consulta el Certificado de Cumplimiento de Obligaciones Patronales público del IESS (sin login) e indica si el empleador registra obligaciones en mora. Si el texto del certificado no se puede interpretar, el estado se reporta como NO DETERMINADO. No devuelve número de empleados: el IESS no publica esa cifra por empresa; usa el campo n_empleados de get_financials/search_ranking (autorreportado a Supercías)."
       }
     ]
   },
@@ -2704,42 +2730,29 @@
     "category": "ARCOTEL: telecomunicaciones",
     "tools": [
       {
-        "name": "search_arcotel_reportes_mensuales",
-        "description": "Reportes estadísticos mensuales de ARCOTEL sobre telecomunicaciones.",
+        "name": "search_arcotel",
+        "description": "Series estadísticas en PDF de ARCOTEL: boletines o reportes mensuales.",
         "params": [
+          {
+            "name": "tipo",
+            "type": "Literal['boletines', 'reportes_mensuales']",
+            "default": null,
+            "description": "\"boletines\" (Boletín Estadístico del Sector de Telecomunicaciones, 2015-2024) o \"reportes_mensuales\" (Reportes Estadísticos Mensuales, enero 2017 a junio 2026)."
+          },
           {
             "name": "query",
             "type": "str",
             "default": "''",
-            "description": "Texto libre contra la etiqueta, el año o la URL de cada entrada (ignora tildes), ej. \"junio 2026\", \"2025\", \"internet\". Vacío devuelve todas."
+            "description": "Texto libre contra etiqueta, año o URL, sin tildes (ej. \"roaming\", \"2025\", \"portabilidad\"). Vacío devuelve todo."
           },
           {
             "name": "format",
-            "type": "str",
+            "type": "Literal['text', 'json']",
             "default": "'text'",
-            "description": "text | json"
+            "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Lista los PDF de \"Reportes Estadísticos Mensuales\" de ARCOTEL (Agencia de Regulación y Control de las Telecomunicaciones), publicados en el sitio institucional (www.arcotel.gob.ec) fuera de CKAN. Rango confirmado en vivo: enero de 2017 a junio de 2026, con un rezago típico de unos dos meses. Es una serie distinta y de mayor frecuencia que search_arcotel_boletines y del organismo CKAN de ARCOTEL (congelado desde 2021/2022). Solo PDF, sin CSV/XLSX/API — devuelve URLs directas, no datos de tabla ya extraídos."
-      },
-      {
-        "name": "search_arcotel_boletines",
-        "description": "Boletines estadísticos anuales/temáticos de ARCOTEL sobre telecomunicaciones.",
-        "params": [
-          {
-            "name": "query",
-            "type": "str",
-            "default": "''",
-            "description": "Texto libre contra la etiqueta, el año o la URL de cada entrada (ignora tildes), ej. \"roaming\", \"2020\", \"portabilidad\". Vacío devuelve todas."
-          },
-          {
-            "name": "format",
-            "type": "str",
-            "default": "'text'",
-            "description": "text | json"
-          }
-        ],
-        "long_description": "Lista los PDF del \"Boletín Estadístico del Sector de las Telecomunicaciones\" de ARCOTEL, publicados en el sitio institucional fuera de CKAN. Rango confirmado en vivo: 2015 a 2024 (sin boletín 2025/2026 todavía). Tiene una frecuencia más baja y más temática que search_arcotel_reportes_mensuales (serie mensual 2017-2026). Solo PDF — devuelve URLs directas, no datos de tabla ya extraídos."
+        "long_description": "Lista las dos series estadísticas en PDF que ARCOTEL publica en su sitio institucional, fuera de su organización CKAN congelada desde 2021/2022. Devuelve URLs directas, no tablas: descárgalas con download_resource o léelas con read_pdf. Reemplaza a search_arcotel_boletines y search_arcotel_reportes_mensuales."
       }
     ]
   },
