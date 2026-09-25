@@ -4,6 +4,8 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![MCP](https://img.shields.io/badge/MCP-compatible-green.svg)](https://modelcontextprotocol.io)
 
+<!-- mcp-name: io.github.dweskz/ecudatamcp -->
+
 **Infraestructura abierta de datos públicos para Ecuador.** EcuDataMCP conecta asistentes de IA, investigadores, periodistas y software con datos oficiales ecuatorianos mediante una interfaz común.
 
 Utiliza el Model Context Protocol (MCP) para que clientes compatibles como Claude, ChatGPT, Gemini y Cursor puedan buscar, explorar y analizar esos datos mediante conversación o software.
@@ -197,6 +199,15 @@ Agrega a `~/.codeium/windsurf/mcp_config.json`:
 ---
 
 ## Ejecutar localmente
+
+### Con `uvx` (tras la publicación en PyPI)
+
+```bash
+uvx ecuador-mcp --transport stdio
+```
+
+`search_ranking`/`get_financials` necesitan la base SQLite local de Supercías,
+que hoy solo se construye desde un clon del repositorio (ver abajo).
 
 ### Con Docker (recomendado)
 

@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Added
+
+- **PyPI packaging** — `ecuador-mcp` console entry point, project URLs,
+  classifiers and keywords; `uvx ecuador-mcp --transport stdio` works from
+  a built wheel.
+- **`server.json`** for the official MCP registry
+  (`io.github.dweskz/ecudatamcp`), plus the `mcp-name` marker in the README.
+- **`SECURITY.md`** — private vulnerability reporting policy.
+
 ## 0.8.10 — 2026-09-24
 
 ### Added

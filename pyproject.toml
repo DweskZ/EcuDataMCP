@@ -2,7 +2,18 @@
 name = "ecuador-mcp"
 version = "0.8.10"
 description = "Open public-data infrastructure for Ecuador, connecting official sources to AI assistants and software through MCP."
-authors = [{ name = "Ecuador MCP Contributors" }]
+authors = [{ name = "EcuDataMCP contributors" }]
+keywords = ["mcp", "model-context-protocol", "ecuador", "open-data", "datos-abiertos", "ckan"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
@@ -18,9 +29,21 @@ dependencies = [
     "xlrd>=2.0.2",
 ]
 
+[project.urls]
+Homepage = "https://github.com/DweskZ/EcuDataMCP"
+Repository = "https://github.com/DweskZ/EcuDataMCP"
+Changelog = "https://github.com/DweskZ/EcuDataMCP/blob/main/CHANGELOG.md"
+Issues = "https://github.com/DweskZ/EcuDataMCP/issues"
+
+[project.scripts]
+ecuador-mcp = "main:main"
+
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["main"]
 
 [tool.setuptools.packages.find]
 include = ["helpers*", "tools*", "prompts*", "resources*"]
