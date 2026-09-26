@@ -5537,6 +5537,65 @@ de días lo complican; hoy se entrega el texto publicado y la `fecha` de
 publicación viene de `search_eeq_cortes`); aplicar lo mismo a los PDFs de
 Centrosur (otro diseño, no revisado).
 
+## Trigésimo cuarta pasada — PDFs de cortes de Centrosur convertidos a filas (2026-09-25)
+
+Segundo paso de A6, tras EEQ. `helpers/centrosur_cortes_pdf.py` +
+`get_centrosur_cortes_horarios`.
+
+**El archivo real es chico y heterogéneo** (los 8 PDFs que lista
+`search_centrosur_cortes`):
+- `Cortes_18_19_ABRIL_2024.pdf` subido 3 veces (`-1`, `-2`, byte a byte
+  iguales): una sola página altísima (1080 × 8096 pt) con varias secciones
+  horarias apiladas ("00:00 a 05:00", "02:00 a 06:00", ...), cada una con
+  su tabla CANTÓN / ZONA DE CORTE / SECTORES. Texto centrado en cada celda;
+  las filas apenas se separan (salto de 20 pt contra interlineado de
+  15-16), así que entre dos etiquetas de zona se corta por el salto más
+  ancho, no por el punto medio. 125 filas.
+- Tres tablas del 27 de octubre de 2023 (PROVINCIA / CANTÓN / ÁREA o ZONA
+  DE CORTE / SECTORES), un bloque horario por archivo en la cabecera, con
+  guion U+2010 ("08:00 ‐ 12:00"; `parse_horario` lo acepta ahora). Dos son
+  páginas apaisadas guardadas en vertical con `/Rotate 90`: la matriz de
+  texto es `[0, s, -s, 0, e, f]` y hay que leer X = f, Y = −e. Dos emiten
+  una palabra por fragmento, así que se rearman las líneas (ancho estimado
+  0,55 em por carácter; pypdf no da anchos de glifo en el visitor).
+  Provincia y cantón a veces son celdas combinadas que abarcan varias
+  filas y se imprimen una sola vez, centradas. 82 filas.
+- `Cortes-23-al-29-septiembre-2024.pdf` (22 MB, 21 páginas): **solo
+  imágenes, sin capa de texto** — requeriría OCR, que este proyecto no
+  hace. Se devuelve con una nota y sin filas (tope de descarga subido a
+  25 MB para poder decirlo en vez de fallar por truncado).
+- `DESCONEXION-30-31-01-1.pdf`: **es un PDF de EEQ** (subestaciones de
+  Quito, 30 oct - 1 nov 2023) subido por error a la biblioteca de
+  Centrosur. Se detecta por el encabezado "Subestaciones" y se procesa con
+  el parser de EEQ (36 filas), marcado en `nota`.
+
+**Columnas:** el borde izquierdo de SECTORES es donde arranca la mayoría
+de las líneas largas con comas (moda en cubetas de 20 pt), no la más a la
+izquierda — una etiqueta de zona también puede tener comas. Provincia y
+cantón salen de las etiquetas contra la lista nacional de cantones
+(`helpers/data/cantones.json`), más los nombres de cabecera que usan los
+PDFs (Méndez → Santiago, Limón → Limón Indanza, Macas → Morona); la
+provincia se deriva del cantón. Solo se separa provincia/cantón en la
+columna de etiquetas más a la izquierda: en la de zona, un nombre de
+cantón al inicio es parte de la zona ("GUALACEO CENTRO").
+
+**Celdas combinadas:** como van centradas sobre las filas que abarcan y
+los tramos son contiguos, cada límite sale del anterior (centro = (arriba
++ abajo) / 2), por columna. Funciona dentro de una página pero falla
+cuando la celda continúa en la página siguiente (p. 2 de
+`CORTES-27-DE-OCT-DE-12-A-15.pdf`: zonas de Cuenca quedan como El Tambo).
+Por eso el cantón tomado de una celda combinada se marca
+`canton_inferido: true`; el leído de la etiqueta propia de la fila no.
+Hacerlo exacto requeriría leer los bordes dibujados de la tabla (operadores
+de trazado del content stream), no implementado.
+
+**Límites conocidos:** algunos fragmentos de texto del PDF cruzan de la
+columna de zona a la de sectores (texto justificado con espaciado interno
+que la estimación de anchos no ve), así que la primera palabra de los
+sectores puede quedar al final de la zona ("SANTA ANA SAN" / "PEDRO,
+..."). Resultado en los 5 PDFs con texto propio de Centrosur: 207 filas, 0
+sin horario, 2 sin cantón, 5 sin zona.
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

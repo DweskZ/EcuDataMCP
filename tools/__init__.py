@@ -23,6 +23,9 @@ from tools.get_bce_indicador_diario import register_get_bce_indicador_diario_too
 from tools.get_bce_indice_archivo import register_get_bce_indice_archivo_tool
 from tools.get_category_info import register_get_category_info_tool
 from tools.get_cenace_tablero import register_get_cenace_tablero_tool
+from tools.get_centrosur_cortes_horarios import (
+    register_get_centrosur_cortes_horarios_tool,
+)
 from tools.get_cepalstat_indicador import register_get_cepalstat_indicador_tool
 from tools.get_certificado_cumplimiento_patronal import (
     register_get_certificado_cumplimiento_patronal_tool,
@@ -287,6 +290,7 @@ def register_tools(mcp: MCPServer) -> None:
     register_list_arconel_reportes_tool(mcp)
     register_get_arconel_reporte_tool(mcp)
     register_search_centrosur_cortes_tool(mcp)
+    register_get_centrosur_cortes_horarios_tool(mcp)
     register_search_eeq_cortes_tool(mcp)
     register_get_eeq_cortes_horarios_tool(mcp)
     register_get_energia_ecuador_snapshot_tool(mcp)

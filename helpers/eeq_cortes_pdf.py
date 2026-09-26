@@ -32,7 +32,7 @@ from typing import Any
 from pypdf import PdfReader
 
 _TIME_RE = re.compile(
-    r"(\d{1,2})\s*[:h]\s*(\d{2})\s*(?:-|a)\s*(\d{1,2})\s*[:h]\s*(\d{2})"
+    r"(\d{1,2})\s*[:h]\s*(\d{2})\s*(?:[-\u2010\u2013\u2014]|a)\s*(\d{1,2})\s*[:h]\s*(\d{2})"
 )
 _TIME_TOKEN_RE = re.compile(r"^(\d{1,2}\s*[:h]\s*\d{2}|a|-)$")
 _HEADER_SKIP = (

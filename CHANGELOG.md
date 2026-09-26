@@ -4,6 +4,13 @@
 
 ### Added
 
+- **`get_centrosur_cortes_horarios`** — parses a Centrosur schedule PDF
+  into rows of time block × province × canton × zone × sectors: the Oct
+  2023 tables (including landscape pages stored rotated) and the Apr 2024
+  multi-section schedule. The Sep 2024 file is a scan with no text layer
+  and is reported as such; one file in Centrosur's library is an EEQ
+  schedule and is parsed with the EEQ parser. Cantons read from merged
+  table cells are flagged `canton_inferido`.
 - **`get_eeq_cortes_horarios`** — parses an EEQ schedule PDF into rows of
   date × time blocks × substation × sectors, filterable by neighbourhood.
   The PDFs are slides, so rows are rebuilt from text positions; handles

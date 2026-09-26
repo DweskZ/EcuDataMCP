@@ -54,6 +54,8 @@ from urllib.parse import unquote
 import httpx
 
 from helpers.cache import TtlCache
+from helpers.centrosur_cortes_pdf import parse_pdf
+from helpers.csv_reader import download_bytes
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.text_utils import strip_accents as _strip
 from helpers.user_agent import USER_AGENT
@@ -75,6 +77,15 @@ _archivos_cache = TtlCache(ttl_seconds=21600.0, max_entries=1)
 _fetch_lock = asyncio.Lock()
 
 _UPLOAD_PATH_RE = re.compile(r"/wp-content/uploads/(\d{4})/(\d{2})/")
+_PDF_URL_RE = re.compile(
+    r"^https://www\.centrosur\.gob\.ec/wp-content/uploads/\d{4}/\d{2}/[^/?#]+\.pdf$",
+    re.IGNORECASE,
+)
+
+# The Sep 2024 file is a 22 MB scan; a bigger cap than the project's 5 MB
+# default lets the parser report "no text layer" instead of a truncation.
+_MAX_PDF_BYTES = 25 * 1024 * 1024
+_horarios_cache = TtlCache(ttl_seconds=86400.0, max_entries=16)
 
 
 def _parse_item(item: dict[str, Any]) -> dict[str, Any]:
@@ -121,7 +132,9 @@ async def _fetch_archivos() -> list[dict[str, Any]]:
         seen: set[int] = set()
         async with httpx.AsyncClient(headers={"User-Agent": USER_AGENT}) as session:
             for term in _SEARCH_TERMS:
-                logger.info("Descargando archivo de cortes de Centrosur (búsqueda: %s)", term)
+                logger.info(
+                    "Descargando archivo de cortes de Centrosur (búsqueda: %s)", term
+                )
                 for item in await _fetch_term(term, session):
                     if item.get("mime_type") != "application/pdf":
                         continue
@@ -166,4 +179,54 @@ async def search_centrosur_cortes(query: str = "") -> dict[str, Any]:
         ),
         "url_fuente": _WP_MEDIA_URL,
         "archivos": matched,
+    }
+
+
+async def get_centrosur_cortes_horarios(url: str, query: str = "") -> dict[str, Any]:
+    """
+    Parse one Centrosur schedule PDF into rows of time block × province ×
+    canton × zone × sectors (see helpers/centrosur_cortes_pdf.py).
+
+    Args:
+        url: The file's URL as returned by search_centrosur_cortes.
+        query: Free text matched (accent-insensitive) against canton, zone
+            and sectors. Empty returns every row.
+    """
+    url = url.strip()
+    if not _PDF_URL_RE.match(url):
+        raise ValueError(
+            "url debe ser un PDF de www.centrosur.gob.ec/wp-content/uploads/ "
+            "(usa search_centrosur_cortes para obtenerla)"
+        )
+
+    parsed = _horarios_cache.get(url)
+    if parsed is None:
+        logger.info("Descargando y procesando horario de cortes de Centrosur: %s", url)
+        raw, truncated = await download_bytes(url, max_bytes=_MAX_PDF_BYTES)
+        if truncated:
+            raise ValueError(f"el PDF supera {_MAX_PDF_BYTES // 2**20} MB")
+        if not raw.startswith(b"%PDF"):
+            raise ValueError(f"{url} no devolvió un PDF")
+        parsed = parse_pdf(raw)
+        _horarios_cache.set(url, parsed)
+
+    q = _strip(query)
+    fields = ("canton", "zona", "subestacion", "sectores")
+    filas = [
+        f
+        for f in parsed["filas"]
+        if not q or any(q in _strip(f.get(k)) for k in fields)
+    ]
+    return {
+        "url": url,
+        "formato": parsed["formato"],
+        "nota": parsed["nota"],
+        "paginas": parsed["paginas"],
+        "total": len(filas),
+        "total_en_archivo": len(parsed["filas"]),
+        "filas_sin_horario": parsed["filas_sin_horario"],
+        "filas_canton_inferido": sum(
+            1 for f in parsed["filas"] if f.get("canton_inferido")
+        ),
+        "filas": filas,
     }
