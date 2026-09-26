@@ -75,7 +75,7 @@ async def test_fetch_archivos_merges_live_results_with_seeds(httpx_mock):
     archivos = await client._fetch_archivos()
 
     by_slug = {a["slug"]: a for a in archivos}
-    assert len(archivos) == len(client._SEED_ARCHIVOS) + 2
+    assert len(archivos) == len(client._SEED_ARCHIVOS) + 1
     assert by_slug["vsd"]["url"] == (
         "https://www.eeq.com.ec/documents/d/empresa-electrica-quito/vsd"
     )
@@ -109,4 +109,4 @@ async def test_seed_only_result_is_not_cached(httpx_mock):
     assert len(first) == len(client._SEED_ARCHIVOS)
 
     second = await client._fetch_archivos()
-    assert len(second) == len(client._SEED_ARCHIVOS) + 2
+    assert len(second) == len(client._SEED_ARCHIVOS) + 1

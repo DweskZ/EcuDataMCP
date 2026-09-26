@@ -40,6 +40,8 @@ from typing import Any
 import httpx
 
 from helpers.cache import TtlCache
+from helpers.csv_reader import download_bytes
+from helpers.eeq_cortes_pdf import parse_pdf
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.text_utils import strip_accents as _strip
 from helpers.tls import os_trust_context
@@ -62,6 +64,14 @@ _MAX_PAGES = 3
 # Crisis archive, not a live feed — same long TTL as the Centrosur client.
 _archivos_cache = TtlCache(ttl_seconds=21600.0, max_entries=1)
 _fetch_lock = asyncio.Lock()
+
+# Parsed schedules never change once published; one entry per PDF.
+_horarios_cache = TtlCache(ttl_seconds=86400.0, max_entries=64)
+
+# Largest PDF in the archive is ~3.7 MB (`25-27`); the project default cap
+# (5 MB) would leave little headroom, and a truncated PDF can't be parsed.
+_MAX_PDF_BYTES = 15 * 1024 * 1024
+_SLUG_OK_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
 
 # Not reachable through the site search (see module docstring). Periods
 # are copied from each PDF's first page, not inferred from the slug.
@@ -121,6 +131,13 @@ _SEED_ARCHIVOS: tuple[dict[str, str], ...] = (
         "slug": "04-al-06-oct",
         "periodo": "Viernes 4 a domingo 6 de octubre de 2024",
         "fecha": "2024-10-04",
+    },
+    # The one "Horarios"-era file whose article isn't tagged/titled
+    # "Horarios": the site search only returns it for "programación".
+    {
+        "slug": "14-al-20-10-2024",
+        "periodo": "Lunes 14 a domingo 20 de octubre de 2024",
+        "fecha": "2024-10-14",
     },
     {
         "slug": "25-27",
@@ -248,4 +265,49 @@ async def search_eeq_cortes(query: str = "") -> dict[str, Any]:
         ),
         "url_fuente": f"{_SEARCH_URL}?q={_SEARCH_TERM}",
         "archivos": matched,
+    }
+
+
+async def get_eeq_cortes_horarios(slug: str, query: str = "") -> dict[str, Any]:
+    """
+    Parse one EEQ schedule PDF into rows of time block × substation ×
+    sectors (see helpers/eeq_cortes_pdf.py).
+
+    Args:
+        slug: The file's slug as returned by search_eeq_cortes (e.g.
+            "vsd", "29_04_2024"), or its full URL.
+        query: Free text matched (accent-insensitive) against substation
+            and sectors, e.g. a neighbourhood. Empty returns every row.
+    """
+    slug = slug.strip().rstrip("/").rsplit("/", 1)[-1]
+    if not _SLUG_OK_RE.match(slug):
+        raise ValueError(f"slug inválido: {slug!r}")
+    url = f"{_DOC_BASE}/{slug}"
+
+    parsed = _horarios_cache.get(slug)
+    if parsed is None:
+        logger.info("Descargando y procesando horario de cortes de EEQ: %s", slug)
+        raw, truncated = await download_bytes(url, max_bytes=_MAX_PDF_BYTES)
+        if truncated:
+            raise ValueError(f"el PDF {slug!r} supera {_MAX_PDF_BYTES // 2**20} MB")
+        if not raw.startswith(b"%PDF"):
+            raise ValueError(f"{url} no devolvió un PDF")
+        parsed = parse_pdf(raw)
+        _horarios_cache.set(slug, parsed)
+
+    q = _strip(query)
+    filas = [
+        f
+        for f in parsed["filas"]
+        if not q or q in _strip(f["subestacion"]) or q in _strip(f["sectores"])
+    ]
+    return {
+        "slug": slug,
+        "url": url,
+        "paginas": parsed["paginas"],
+        "total": len(filas),
+        "total_en_archivo": len(parsed["filas"]),
+        "filas_sin_subestacion": parsed["filas_sin_subestacion"],
+        "filas_sin_horario": parsed["filas_sin_horario"],
+        "filas": filas,
     }

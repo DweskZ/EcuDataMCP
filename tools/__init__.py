@@ -31,6 +31,7 @@ from tools.get_compania_info import register_get_compania_info_tool
 from tools.get_contraloria_informe import register_get_contraloria_informe_tool
 from tools.get_contrato_info import register_get_contrato_info_tool
 from tools.get_dataset_info import register_get_dataset_info_tool
+from tools.get_eeq_cortes_horarios import register_get_eeq_cortes_horarios_tool
 from tools.get_energia_ecuador_snapshot import (
     register_get_energia_ecuador_snapshot_tool,
 )
@@ -287,6 +288,7 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_arconel_reporte_tool(mcp)
     register_search_centrosur_cortes_tool(mcp)
     register_search_eeq_cortes_tool(mcp)
+    register_get_eeq_cortes_horarios_tool(mcp)
     register_get_energia_ecuador_snapshot_tool(mcp)
 
     register_search_companias_tool(mcp)

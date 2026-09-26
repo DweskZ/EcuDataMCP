@@ -5399,7 +5399,9 @@ huecos (p. ej. 1-22 de septiembre y 7-13 de octubre de 2024).
 caso que CENACE; agregado a `_OS_TRUST_HOST_SUFFIXES` (verificación
 completa se mantiene).
 
-**Construido:** `search_eeq_cortes` (25 archivos al 2026-09-25). Los PDFs
+**Construido:** `search_eeq_cortes` (26 archivos al 2026-09-25, contando
+`14-al-20-10-2024`, agregado a la semilla en la Trigésimo tercera pasada:
+su artículo no aparece buscando "horarios", solo "programación"). Los PDFs
 son legibles con `read_pdf`; parsearlos a filas (subestación × sector ×
 bloque horario) queda pendiente.
 
@@ -5487,6 +5489,53 @@ construirlo:
   ya avanzó el estado de la sesión.
 - El año y el filtro de mes se validan contra lo que el servidor acaba
   de renderizar tras `dpTipo`, no contra una lista fija.
+
+## Trigésimo tercera pasada — PDFs de cortes de EEQ convertidos a filas (2026-09-25)
+
+Ítem A6 del alcance "módulos de luz": pasar de "lista de PDFs" a "¿cuándo
+estuvo sin luz tal barrio?". Construido `helpers/eeq_cortes_pdf.py` +
+`get_eeq_cortes_horarios`.
+
+**Por qué no alcanza el texto plano:** los PDFs son láminas diseñadas, no
+tablas. `pypdf.extract_text()` emite primero toda la columna de
+subestaciones y después todos los sectores (o al revés), así que se pierde
+qué subestación va con qué sectores. Se trabaja con los fragmentos de
+texto posicionados (`visitor_text`: x, y, tamaño de fuente).
+
+**Diseño medido en los 26 PDFs (página de 2000 pt de ancho):**
+- cabecera en fuente ≥ 30 pt: fecha tal como se publicó (casi siempre un
+  rango: "Viernes 04 al domingo 06 de octubre de 2024") y, desde abril de
+  2024, el bloque horario de la página ("07:30 - 10:30", "10h30 - 14h00",
+  "De 18:00 a 19:00", varios unidos por "/"). **Una página = un bloque
+  horario**; los PDFs de varios días repiten las subestaciones bajo la
+  fecha de cada día;
+- columna de sectores: arranca en la x del encabezado "Sectores" (≈ 440;
+  ≈ 330 en noviembre de 2023, por eso se lee por página), fuente < 20 pt;
+- subestaciones: columna izquierda, **centradas verticalmente en su
+  fila** — 23 pt en 2024, 17 pt (igual que los sectores) en 2023; a veces
+  partidas en dos líneas ("SANTA" / "ROSA") o en minúsculas
+  ("Barrionuevo");
+- diseño de oct-nov de 2023: el horario va en una tercera columna a la
+  izquierda, apilado ("08:00" / "a" / "10:00", 27-30 pt, justo en el
+  corte de tamaño de cabecera según la página) y abarca varias filas;
+- las filas se separan con una línea en blanco (el doble del
+  interlineado); algunas páginas son una grilla compacta sin líneas en
+  blanco, y ahí se corta entre dos etiquetas de subestación por el punto
+  medio de sus centros;
+- ruido a descartar: "IMPORTANTE", "NOTA IMPORTANTE", la marca del
+  Ministerio, el encabezado "Hora", y en las páginas de clientes
+  industriales el rótulo "SECTOR INDUSTRIAL" / "AV1" más la fecha repetida
+  (queda como `sector_industrial: true`).
+
+**Resultado:** los 26 PDFs del archivo → 2.150 filas, 0 sin subestación,
+0 sin horario. Errores de origen que se conservan tal cual: "de junio d e
+2024" (21-06-2024). Los tests usan PDFs sintéticos generados con `fpdf2`
+con las mismas posiciones y tamaños medidos, no PDFs reales.
+
+**Pendiente:** normalizar `fecha_texto` a fechas ISO (los rangos y listas
+de días lo complican; hoy se entrega el texto publicado y la `fecha` de
+publicación viene de `search_eeq_cortes`); aplicar lo mismo a los PDFs de
+Centrosur (otro diseño, no revisado).
 
 ## Notas históricas
 

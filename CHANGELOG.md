@@ -4,6 +4,12 @@
 
 ### Added
 
+- **`get_eeq_cortes_horarios`** — parses an EEQ schedule PDF into rows of
+  date × time blocks × substation × sectors, filterable by neighbourhood.
+  The PDFs are slides, so rows are rebuilt from text positions; handles
+  both the 2023 layout (time column) and the 2024 one (time in the page
+  header). All 26 archived PDFs parse to 2,150 rows with none left
+  without a substation or time block.
 - **`list_arconel_reportes` / `get_arconel_reporte`** — ARCONEL's public
   statistics report builder (`reportes.arconel.gob.ec`): 28 report types
   (energy balance per distributor, bought/sold/produced energy, losses,
@@ -14,7 +20,7 @@
   Needs a browser-style User-Agent (the project's own one gets a bare 500)
   and a bundled GoGetSSL intermediate (full TLS verification kept).
 - **`search_eeq_cortes`** — Empresa Eléctrica Quito's scheduled power-cut
-  PDFs from the 2023 and 2024 blackout crises (25 files). Mid-October to
+  PDFs from the 2023 and 2024 blackout crises (26 files). Mid-October to
   December 2024 is enumerated live from EEQ's own site search (the
   "Horarios" web-content articles carry each PDF's slug); earlier files
   are a fixed seed list recovered via search-engine indexing, since
