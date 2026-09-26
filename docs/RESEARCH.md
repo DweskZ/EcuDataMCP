@@ -5449,6 +5449,19 @@ esa respuesta trae el bloque `ReportArea` completo (~221 KB) con la página
 `ReportViewer1$ReportViewer`, `ReportViewer1$DocMap` y
 `ReportViewer1$ctl09$ReportArea` (de `PageRequestManager._initialize`).
 
+**Reproducido desde `httpx` sin browser (mismo día), y con una señal
+mejor para el cliente:** las respuestas de "Siguiente" solo refrescan
+`ReportArea` (no el toolbar, así que la etiqueta HTML de `TotalPages` no
+viene), pero el `scriptStartupBlock` de cada respuesta trae
+`"ToolBarUpdate":{'CurrentPage':6,'TotalPages':6,'IsEstimatePageCount':false,'TotalPagesString':'6',...}`
+(comillas simples, no JSON estricto). **Condición de corte para el
+cliente: `IsEstimatePageCount == false` y `CurrentPage == TotalPages`.**
+Pedir una página más allá de la última devuelve `ReportArea` con
+`VisibilityState=Error` (`NewContentType=...ReportAreaContent.Error`) —
+segunda red de seguridad, nunca datos repetidos. Tamaños reales de
+`ReportArea` por página (Balance Energía 2023/Todos): 221, 230, 229, 222,
+203 KB y 1,9 KB la sexta.
+
 **Latencia:** cada página tarda varios segundos, a veces más de 20; un
 `ConnectTimeout` ocurrió durante la prueba. Un reporte de 6 páginas ronda
 el minuto — el cliente necesita timeouts generosos y caché larga.
