@@ -1,5 +1,9 @@
 from mcp.server.mcpserver import MCPServer
 
+from tools.arconel_reportes import (
+    register_get_arconel_reporte_tool,
+    register_list_arconel_reportes_tool,
+)
 from tools.audit_bce_catalog import register_audit_bce_catalog_tool
 from tools.compare_bce_sources import register_compare_bce_sources_tool
 from tools.detect_series_pattern import register_detect_series_pattern_tool
@@ -279,6 +283,8 @@ def register_tools(mcp: MCPServer) -> None:
     register_list_bce_indicadores_diarios_tool(mcp)
     register_get_bce_indicador_diario_tool(mcp)
     register_get_cenace_tablero_tool(mcp)
+    register_list_arconel_reportes_tool(mcp)
+    register_get_arconel_reporte_tool(mcp)
     register_search_centrosur_cortes_tool(mcp)
     register_search_eeq_cortes_tool(mcp)
     register_get_energia_ecuador_snapshot_tool(mcp)

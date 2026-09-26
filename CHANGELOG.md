@@ -4,6 +4,15 @@
 
 ### Added
 
+- **`list_arconel_reportes` / `get_arconel_reporte`** — ARCONEL's public
+  statistics report builder (`reportes.arconel.gob.ec`): 28 report types
+  (energy balance per distributor, bought/sold/produced energy, losses,
+  billing, infrastructure, service-quality indicators, per-parish data),
+  1998-present. Drives the ASP.NET/SSRS ReportViewer postback flow and
+  follows its pagination until the page count stops being an estimate,
+  capped by `max_paginas` (the result says whether it is `completo`).
+  Needs a browser-style User-Agent (the project's own one gets a bare 500)
+  and a bundled GoGetSSL intermediate (full TLS verification kept).
 - **`search_eeq_cortes`** — Empresa Eléctrica Quito's scheduled power-cut
   PDFs from the 2023 and 2024 blackout crises (25 files). Mid-October to
   December 2024 is enumerated live from EEQ's own site search (the

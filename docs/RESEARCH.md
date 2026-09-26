@@ -5466,8 +5466,27 @@ segunda red de seguridad, nunca datos repetidos. Tamaños reales de
 `ConnectTimeout` ocurrió durante la prueba. Un reporte de 6 páginas ronda
 el minuto — el cliente necesita timeouts generosos y caché larga.
 
-**Estado:** mecánica completa verificada; listo para escribir
-`helpers/arconel_reportes_client.py`.
+**Construido (mismo día):** `helpers/arconel_reportes_client.py` +
+`list_arconel_reportes` / `get_arconel_reporte`. Probado en vivo:
+"Balance Energía" 2023/Todos → 240 filas (20 distribuidoras × 12 meses),
+6 páginas, `completo`, ~11 s; "Medidores Catastro" 2024/enero con
+`max_paginas=2` → 97 filas, `3 ?`, `completo=False`. Tres hallazgos al
+construirlo:
+- **User-Agent:** con el UA del proyecto (`ecuador-mcp/...`) todo
+  postback async responde `0|error|500||`; con cualquier token `Mozilla`
+  funciona. La detección de navegador de ASP.NET trata un UA desconocido
+  como "downlevel". El cliente usa un UA propio que empieza con
+  `Mozilla/5.0 (compatible; ecuador-mcp; ...)`.
+- **TLS:** el servidor no envía su intermedio (`GoGetSSL RSA DV CA`, raíz
+  USERTrust RSA). Descargado desde la URL AIA del certificado hoja,
+  empaquetado en `helpers/certs/gogetssl_rsa_dv_ca.pem` (vence
+  2028-09-05); `arconel.gob.ec` agregado a `_OS_TRUST_HOST_SUFFIXES`.
+- **Conexiones intermitentes:** varios `ConnectError`/`ConnectTimeout`
+  entre pedidos exitosos; el cliente reintenta solo fallos de conexión (3
+  intentos, backoff 2/4 s) — nunca un POST que llegó al servidor, porque
+  ya avanzó el estado de la sesión.
+- El año y el filtro de mes se validan contra lo que el servidor acaba
+  de renderizar tras `dpTipo`, no contra una lista fija.
 
 ## Notas históricas
 

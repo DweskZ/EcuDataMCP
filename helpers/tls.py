@@ -87,17 +87,22 @@ def should_retry_insecure(exc: BaseException, url: str) -> bool:
 # CKAN_INSECURE_TLS and is kept in its own list rather than merged with
 # either existing one. censoecuador.gob.ec and superbancos.gob.ec use the DV
 # and OV R36 intermediates respectively; cenace.gob.ec and eeq.com.ec use
-# DV R36 too.
+# DV R36 too. reportes.arconel.gob.ec is the same misconfiguration under a
+# different CA: its leaf is issued by "GoGetSSL RSA DV CA" (chains to
+# USERTrust RSA, in certifi), bundled separately in gogetssl_rsa_dv_ca.pem
+# (fetched from the leaf's AIA URL 2026-09-25, valid to 2028-09-05).
 _OS_TRUST_HOST_SUFFIXES = (
     "censoecuador.gob.ec",
     "superbancos.gob.ec",
     "cenace.gob.ec",
     "eeq.com.ec",
+    "arconel.gob.ec",
 )
 
 _INTERMEDIATE_BUNDLE_PATH = (
     Path(__file__).parent / "certs" / "sectigo_public_server_auth_intermediates.pem"
 )
+_GOGETSSL_INTERMEDIATE_PATH = Path(__file__).parent / "certs" / "gogetssl_rsa_dv_ca.pem"
 
 
 def host_needs_os_trust_store(url: str) -> bool:
@@ -130,6 +135,7 @@ def os_trust_context() -> ssl.SSLContext:
     """
     ctx = ssl.create_default_context(cafile=certifi.where())
     ctx.load_verify_locations(cafile=str(_INTERMEDIATE_BUNDLE_PATH))
+    ctx.load_verify_locations(cafile=str(_GOGETSSL_INTERMEDIATE_PATH))
     return ctx
 
 
