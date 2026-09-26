@@ -122,6 +122,7 @@ from tools.search_companias import register_search_companias_tool
 from tools.search_contratos import register_search_contratos_tool
 from tools.search_datasets import register_search_datasets_tool
 from tools.search_ecuador import register_search_ecuador_tool
+from tools.search_eeq_cortes import register_search_eeq_cortes_tool
 from tools.search_eventos_riesgo import register_search_eventos_riesgo_tool
 from tools.search_gacetas_inmunoprevenibles import (
     register_search_gacetas_inmunoprevenibles_tool,
@@ -279,6 +280,7 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_bce_indicador_diario_tool(mcp)
     register_get_cenace_tablero_tool(mcp)
     register_search_centrosur_cortes_tool(mcp)
+    register_search_eeq_cortes_tool(mcp)
     register_get_energia_ecuador_snapshot_tool(mcp)
 
     register_search_companias_tool(mcp)

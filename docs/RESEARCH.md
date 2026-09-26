@@ -5356,6 +5356,53 @@ Daniel pedía originalmente.
 
 ---
 
+## Trigésimo primera pasada — archivo de cortes de EEQ (Quito): APIs cerradas, pero la búsqueda del sitio enumera los "Horarios" (2026-09-25)
+
+Primer ítem del alcance "módulos de luz" acordado con Daniel: EEQ, el caso
+fuerte de la octava pasada (archivo en vivo, slugs manuales sin patrón).
+
+**APIs de Liferay — cerradas a invitados, confirmado:**
+`/o/headless-delivery/v1.0/sites/{id}/documents` responde `403
+<Forbidden/>` tanto con el nombre del sitio como con el groupId real
+(`8361921`, sacado de los `<loc>` del `sitemap.xml`). JSONWS
+(`/api/jsonws`) sirve el explorador HTML, pero toda llamada de lectura
+(`dlapp/get-folders`, `dlapp/get-file-entries-count`,
+`dlfileentry/get-group-file-entries-count`) responde `{}` con el groupId
+real — exige sesión sin decirlo. El sitemap solo lista páginas, no
+documentos.
+
+**La búsqueda del sitio sí sirve (`/search?q=horarios&delta=60`):**
+desde mediados de octubre de 2024 EEQ publicó cada horario como artículo
+de contenido web (estructura "Horarios", etiqueta `horarios`). La tarjeta
+de resultado trae título ("Horarios del 15 al 17 de noviembre"), fecha
+de publicación (`2024-11-14`) y el slug del PDF en la descripción
+(`.../d/empresa-electrica-quito/vsd`). 57-61 resultados totales, 11-12
+con documento; el resto son noticias que mencionan "horarios". `delta`
+máximo 60, paginación con `start` = número de página.
+Consultas probadas sin aportar más PDFs: `cortes` (36), `programación`
+(5, solo `14-al-20-10-2024`), `racionamiento`, `septiembre`, `octubre`,
+`noviembre`, `diciembre`, `abril`, `sector`, `subestacion`. El filtro
+`type=...DLFileEntry` en la URL se ignora.
+
+**Lo anterior a mediados de octubre no está indexado por el sitio.**
+Recuperado vía buscador (`site:eeq.com.ec` + "Programación cortes del
+servicio"), 14 slugs, todos confirmados en vivo (`200 application/pdf`) y
+fechados desde la primera página de cada PDF: `desconexion-30-31-01-1-`,
+`viernes-10-a-jueves-16`, `24-27-28-30` (oct-nov **2023** — la crisis
+anterior, no 2024 como sugerían los slugs); `22-abril`, `23-04-2024`,
+`25-04-2024`, `26-04-2024`, `29_04_2024`, `30_04_2024`, `21-06-2024`,
+`23-al-29-09-24`, `04-al-06-oct`, `25-27`, `mf-09-10-nov`. Quedan como
+lista semilla fija en `helpers/eeq_cortes_client.py`; probablemente hay
+huecos (p. ej. 1-22 de septiembre y 7-13 de octubre de 2024).
+
+**TLS:** `www.eeq.com.ec` no envía el intermedio Sectigo DV R36 — mismo
+caso que CENACE; agregado a `_OS_TRUST_HOST_SUFFIXES` (verificación
+completa se mantiene).
+
+**Construido:** `search_eeq_cortes` (25 archivos al 2026-09-25). Los PDFs
+son legibles con `read_pdf`; parsearlos a filas (subestación × sector ×
+bloque horario) queda pendiente.
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

@@ -4,6 +4,13 @@
 
 ### Added
 
+- **`search_eeq_cortes`** — Empresa Eléctrica Quito's scheduled power-cut
+  PDFs from the 2023 and 2024 blackout crises (25 files). Mid-October to
+  December 2024 is enumerated live from EEQ's own site search (the
+  "Horarios" web-content articles carry each PDF's slug); earlier files
+  are a fixed seed list recovered via search-engine indexing, since
+  Liferay's APIs are closed to guests. `eeq.com.ec` joins the hosts that
+  get the bundled Sectigo intermediate (full verification kept).
 - **PyPI packaging** — `ecuador-mcp` console entry point, project URLs,
   classifiers and keywords; `uvx ecuador-mcp --transport stdio` works from
   a built wheel.

@@ -86,8 +86,14 @@ def should_retry_insecure(exc: BaseException, url: str) -> bool:
 # verification on -- not a security downgrade, so it isn't gated behind
 # CKAN_INSECURE_TLS and is kept in its own list rather than merged with
 # either existing one. censoecuador.gob.ec and superbancos.gob.ec use the DV
-# and OV R36 intermediates respectively; cenace.gob.ec uses DV R36 too.
-_OS_TRUST_HOST_SUFFIXES = ("censoecuador.gob.ec", "superbancos.gob.ec", "cenace.gob.ec")
+# and OV R36 intermediates respectively; cenace.gob.ec and eeq.com.ec use
+# DV R36 too.
+_OS_TRUST_HOST_SUFFIXES = (
+    "censoecuador.gob.ec",
+    "superbancos.gob.ec",
+    "cenace.gob.ec",
+    "eeq.com.ec",
+)
 
 _INTERMEDIATE_BUNDLE_PATH = (
     Path(__file__).parent / "certs" / "sectigo_public_server_auth_intermediates.pem"
