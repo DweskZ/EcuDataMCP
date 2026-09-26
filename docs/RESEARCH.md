@@ -5403,6 +5403,59 @@ completa se mantiene).
 son legibles con `read_pdf`; parsearlos a filas (subestación × sector ×
 bloque horario) queda pendiente.
 
+## Trigésimo segunda pasada — `reportes.arconel.gob.ec`: criterio de fin de paginación confirmado (2026-09-25)
+
+Cierra el único bloqueo que dejó la Vigésima pasada. Confirmado en vivo con
+"Balance Energía" 2023 / Todos (`dpGrupoEmpresa=1`), capturando con un
+browser real el body exacto de cada postback.
+
+**El total nunca se conoce por adelantado.** SSRS solo cuenta una página
+más allá de la actual: la etiqueta `..._ctl05_ctl00_TotalPages` va
+`2 ?` → `3 ?` → `4 ?` → `5 ?` → `6 ?` → `6` al pasar de la página 1 a la
+6. El `?` desaparece solo en la última página. No sirve para decidir
+cuántas páginas pedir de antemano.
+
+**Criterio de última página (tres señales que coinciden):**
+1. la etiqueta `TotalPages` ya no termina en `?`;
+2. `CurrentPage` (input `...$ctl05$ctl00$CurrentPage`) es igual a ese total;
+3. el div envoltorio `ctl00_contenidoCentro_ReportViewer1_ctl05_ctl00_Next_ctl00`
+   (botón habilitado) pasa a `display:none` y su gemelo `..._Next_ctl01`
+   (botón deshabilitado) a `block`.
+Un cliente debe usar (1)+(2) como condición de corte y (3) como
+verificación cruzada, más un tope duro de páginas como red de seguridad.
+
+**Postback de "Siguiente", capturado byte a byte — corrige lo supuesto en
+la Vigésima pasada:** no es un image-submit con `.x/.y`. Es
+`__doPostBack` sobre el **div envoltorio**, no sobre el `<input>`:
+`__EVENTTARGET=ctl00$contenidoCentro$ReportViewer1$ctl05$ctl00$Next$ctl00`,
+`ctl00$ScriptManager1=ctl00$ScriptManager1|<mismo target>` (prefijo
+`ScriptManager1`, no un UpdatePanel), y en el body además
+`...$ctl05$ctl00$CurrentPage=<página actual>`,
+`...$ctl05$ctl03$ctl00=`, `...$ctl10=ltr` y
+`...$ctl09$VisibilityState$ctl00=ReportPage` (no `None` una vez que hay
+reporte). Un intento previo desde `httpx` con el target
+`Next$ctl01`/`Next$ctl00$ctl00` + `.x/.y`, prefijo de UpdatePanel y
+`VisibilityState=None` devolvía siempre la página 1 sin error — falla
+silenciosa, de ahí la importancia de verificar `CurrentPage` tras cada
+paso.
+
+**Carga del reporte en dos tiempos (tampoco documentado antes):** el POST
+de "Generar Reporte" devuelve solo el esqueleto del visor (`TotalPages`
+0, `ReportArea` casi vacío). La tabla llega en un segundo postback que el
+JS del visor dispara solo: `__EVENTTARGET=ctl00$contenidoCentro$ReportViewer1$ctl09$Reserved_AsyncLoadTarget`,
+`ScriptManager1=ctl00$contenidoCentro$ReportViewer1$ctl09$ReportArea|<target>`;
+esa respuesta trae el bloque `ReportArea` completo (~221 KB) con la página
+1. Los UpdatePanels registrados son `UpdatePanel1`,
+`ReportViewer1$ReportViewer`, `ReportViewer1$DocMap` y
+`ReportViewer1$ctl09$ReportArea` (de `PageRequestManager._initialize`).
+
+**Latencia:** cada página tarda varios segundos, a veces más de 20; un
+`ConnectTimeout` ocurrió durante la prueba. Un reporte de 6 páginas ronda
+el minuto — el cliente necesita timeouts generosos y caché larga.
+
+**Estado:** mecánica completa verificada; listo para escribir
+`helpers/arconel_reportes_client.py`.
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un
