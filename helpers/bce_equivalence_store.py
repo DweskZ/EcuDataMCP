@@ -9,8 +9,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-_ROOT = Path(__file__).resolve().parents[1]
-_DEFAULT_DIR = _ROOT / "data" / "bce_equivalence_reviews"
+from helpers.paths import data_dir
+
+_DEFAULT_DIR = data_dir() / "bce_equivalence_reviews"
 
 
 def review_dir() -> Path:

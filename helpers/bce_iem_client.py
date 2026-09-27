@@ -30,6 +30,7 @@ import httpx
 from helpers.cache import TtlCache
 from helpers.csv_reader import download_bytes
 from helpers.logging import MAIN_LOGGER_NAME
+from helpers.paths import data_dir
 from helpers.safe_download import safe_stream
 from helpers.text_utils import strip_accents as _strip
 from helpers.user_agent import USER_AGENT
@@ -52,8 +53,7 @@ IEM_INDEX_URL = (
 IEM_LATEST_PUBLICATIONS_URL = "https://contenido.bce.fin.ec/ultimas-publicaciones/"
 IEM_ARCHIVE_URL = "https://contenido.bce.fin.ec/iem-publicaciones/"
 _SOURCE_NAME = "Banco Central del Ecuador — Información Estadística Mensual"
-_ROOT = Path(__file__).resolve().parents[1]
-_DEFAULT_CATALOG_DIR = _ROOT / "data" / "iem_catalog_snapshots"
+_DEFAULT_CATALOG_DIR = data_dir() / "iem_catalog_snapshots"
 
 _catalog_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
 _bulletins_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)

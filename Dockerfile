@@ -36,7 +36,7 @@ COPY main.py README.md ./
 RUN uv sync --locked --no-dev
 
 # /app/data doesn't exist yet -- it's only created at runtime by
-# scripts/build_supercias_financials_db.py, and docker-compose.yml mounts a
+# helpers/supercias_financials_build.py, and docker-compose.yml mounts a
 # named volume there. Docker copies a fresh named volume's initial
 # ownership from whatever's already at that path in the image, so this has
 # to exist (owned by appuser) before that mount happens, or the volume
@@ -44,6 +44,13 @@ RUN uv sync --locked --no-dev
 RUN mkdir -p /app/data && chown -R appuser:appuser /app
 USER appuser
 
+# stdio by default, like any MCP server image: clients (and Glama's build
+# checks) start it with `docker run -i --rm <image>` and speak JSON-RPC over
+# stdin/stdout. docker-compose.yml sets MCP_TRANSPORT=http for the hosted
+# deployment, which is what EXPOSE refers to.
+ENV MCP_TRANSPORT=stdio
 EXPOSE ${MCP_PORT:-8000}
 
-CMD ["uv", "run", "python", "main.py"]
+# The venv's python directly rather than `uv run`, which would re-check the
+# lockfile (and could try to sync) on every start.
+CMD ["/app/.venv/bin/python", "main.py"]

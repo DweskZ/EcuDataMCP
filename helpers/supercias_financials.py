@@ -51,14 +51,16 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from helpers.paths import data_dir
 from helpers.response_contract import with_response_metadata
 
 logger = logging.getLogger(__name__)
 
-DB_PATH = Path(__file__).resolve().parents[1] / "data" / "supercias_financials.sqlite3"
-_BUILD_SCRIPT_PATH = (
-    Path(__file__).resolve().parents[1] / "scripts" / "build_supercias_financials_db.py"
-)
+DB_PATH = data_dir() / "supercias_financials.sqlite3"
+# Run as a module, not a scripts/ path: PyPI and MCPB installs ship the
+# helpers package but not scripts/.
+_BUILD_MODULE = "helpers.supercias_financials_build"
+_PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 # The dataset refreshes far less often than the daily company directory.
 # Past this age a refresh is started, but the existing DB keeps being served
 # (flagged as stale) -- refusing it would turn a Supercías outage into an
@@ -171,7 +173,7 @@ def _build_in_progress() -> bool:
 
 
 def _trigger_background_build() -> None:
-    """Start scripts/build_supercias_financials_db.py in the background.
+    """Start helpers/supercias_financials_build.py in the background.
 
     A no-op while a build is running (in this process, or in any process
     holding the lock file) and while backing off after failed builds -- every
@@ -194,8 +196,8 @@ def _trigger_background_build() -> None:
         log_path.parent.mkdir(parents=True, exist_ok=True)
         with open(log_path, "ab") as log_file:
             _build_process = subprocess.Popen(
-                [sys.executable, str(_BUILD_SCRIPT_PATH)],
-                cwd=_BUILD_SCRIPT_PATH.parents[1],
+                [sys.executable, "-m", _BUILD_MODULE],
+                cwd=_PACKAGE_ROOT,
                 stdin=subprocess.DEVNULL,
                 stdout=log_file,
                 stderr=subprocess.STDOUT,
@@ -204,7 +206,7 @@ def _trigger_background_build() -> None:
         logger.info(
             "Construyendo/refrescando la base financiera de Supercías en "
             "segundo plano (PID %d): %s -- log en %s",
-            _build_process.pid, _BUILD_SCRIPT_PATH, log_path,
+            _build_process.pid, _BUILD_MODULE, log_path,
         )
 
 

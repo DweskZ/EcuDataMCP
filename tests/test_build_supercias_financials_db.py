@@ -1,17 +1,9 @@
-import importlib.util
 import sqlite3
 from pathlib import Path
 
 import pytest
 
-_SCRIPT_PATH = (
-    Path(__file__).resolve().parents[1] / "scripts" / "build_supercias_financials_db.py"
-)
-_spec = importlib.util.spec_from_file_location(
-    "build_supercias_financials_db", _SCRIPT_PATH
-)
-build_script = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(build_script)
+from helpers import supercias_financials_build as build_script
 
 
 def _valid_db(path: Path) -> None:

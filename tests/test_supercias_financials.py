@@ -232,7 +232,7 @@ def test_trigger_background_build_spawns_once_while_running(monkeypatch):
 
     assert len(popen_calls) == 1
     assert popen_calls[0][0] == sys.executable
-    assert popen_calls[0][1].endswith("build_supercias_financials_db.py")
+    assert popen_calls[0][1:] == ["-m", "helpers.supercias_financials_build"]
 
 
 def test_trigger_background_build_spawns_again_once_previous_finished(monkeypatch):
@@ -415,3 +415,19 @@ def test_trigger_background_build_never_inherits_stdio(monkeypatch, tmp_path):
     assert kwargs["stdout"] not in (None, sys.stdout)
     assert kwargs["stderr"] is supercias_financials.subprocess.STDOUT
     assert (tmp_path / "supercias_build.log").exists()
+
+
+def test_data_dir_env_override(monkeypatch, tmp_path):
+    from helpers.paths import data_dir
+
+    monkeypatch.setenv("ECUADOR_MCP_DATA_DIR", str(tmp_path))
+    assert data_dir() == tmp_path
+
+
+def test_data_dir_outside_checkout_is_per_user(monkeypatch, tmp_path):
+    from helpers import paths
+
+    monkeypatch.delenv("ECUADOR_MCP_DATA_DIR", raising=False)
+    monkeypatch.setattr(paths, "_ROOT", tmp_path / "site-packages")
+    assert paths.data_dir().name == "ecuador-mcp"
+    assert "site-packages" not in paths.data_dir().parts

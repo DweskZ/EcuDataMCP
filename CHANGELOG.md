@@ -10,6 +10,27 @@
   forbid), so the script rewrites the manifest with the tool list read from
   the released code and publishes it. `--dry-run` builds without publishing.
 
+### Changed
+
+- **The Docker image starts over stdio by default** (`docker run -i --rm`),
+  as MCP clients and Glama's checks expect; `docker-compose.yml` sets
+  `MCP_TRANSPORT=http` for the hosted deployment. CI now builds the image
+  and checks that it answers `tools/list` over stdio, and tests on Python
+  3.14 (what the image ships).
+
+### Fixed
+
+- **`search_ranking`/`get_financials` never worked outside a source
+  checkout.** The background build ran `scripts/build_supercias_financials_db.py`,
+  which the PyPI wheel and MCPB bundles don't include, and the DB path
+  pointed into `site-packages`. The build now lives in
+  `helpers/supercias_financials_build.py` (run with `python -m`), and
+  runtime data goes to a per-user directory when installed from PyPI
+  (`ECUADOR_MCP_DATA_DIR` overrides). The BCE snapshot and review stores
+  use the same directory.
+- **README install instructions** still described the PyPI package as
+  unpublished; Claude Desktop now points at `uvx ecuador-mcp` first.
+
 ## 0.8.12 — 2026-09-27
 
 ### Added

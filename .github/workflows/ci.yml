@@ -12,8 +12,8 @@ jobs:
       fail-fast: false
       matrix:
         # Matches pyproject.toml's requires-python (>=3.11); also covers the
-        # 3.13 the Dockerfile actually ships.
-        python-version: ["3.11", "3.12", "3.13"]
+        # 3.14 the Dockerfile actually ships.
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v7
@@ -25,3 +25,23 @@ jobs:
         run: uv run ruff check .
       - name: Test
         run: uv run pytest -q
+
+  # Runs the image the way MCP clients and Glama's checks do (`docker run -i`,
+  # JSON-RPC over stdio) and fails unless it answers tools/list.
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build image
+        run: docker build -t ecuador-mcp .
+      - name: stdio handshake
+        run: |
+          {
+            echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"ci","version":"1"}}}'
+            echo '{"jsonrpc":"2.0","method":"notifications/initialized"}'
+            echo '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
+            sleep 15
+          } | timeout 60 docker run -i --rm ecuador-mcp > out.jsonl || true
+          count=$(jq -s '[.[] | select(.id == 2)][0].result.tools | length' out.jsonl)
+          echo "tools: $count"
+          test "$count" -ge 100

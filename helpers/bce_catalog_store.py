@@ -17,8 +17,9 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-_ROOT = Path(__file__).resolve().parents[1]
-_DEFAULT_DIR = _ROOT / "data" / "bce_catalog_snapshots"
+from helpers.paths import data_dir
+
+_DEFAULT_DIR = data_dir() / "bce_catalog_snapshots"
 _LATEST_VALID = "latest-valid.json"
 _LATEST_ATTEMPT = "latest-attempt.json"
 _LATEST_GRID_AUDIT = "latest-grid-audit.json"

@@ -10,6 +10,9 @@ services:
       # `docker compose --profile maintenance up`) to keep
       # audit_bce_catalog/compare_bce_sources off this exposed instance.
       - MCP_PROFILE=${MCP_PROFILE:-all}
+      # The image defaults to stdio (for `docker run -i` clients); this
+      # service is the HTTP deployment.
+      - MCP_TRANSPORT=http
       - MCP_HOST=0.0.0.0
       - MCP_PORT=${MCP_PORT:-8000}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
@@ -32,7 +35,7 @@ services:
       # Persists data/supercias_financials.sqlite3 across container
       # recreates -- without this, every redeploy loses it and
       # search_ranking/get_financials go back to "run the build script"
-      # until someone re-runs scripts/build_supercias_financials_db.py.
+      # until the background rebuild (helpers/supercias_financials_build.py) finishes.
       - supercias_data:/app/data
 
   # Operator-only instance: audit_bce_catalog/compare_bce_sources, the two
@@ -48,6 +51,7 @@ services:
       - "${MCP_MAINTENANCE_PORT:-8001}:${MCP_MAINTENANCE_PORT:-8001}"
     environment:
       - MCP_PROFILE=maintenance
+      - MCP_TRANSPORT=http
       - MCP_HOST=0.0.0.0
       - MCP_PORT=${MCP_MAINTENANCE_PORT:-8001}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}

@@ -94,21 +94,27 @@ Este MCP unifica fuentes gubernamentales en un solo servidor:
 
 ### Claude Desktop
 
-Agrega lo siguiente a tu archivo de configuración de Claude Desktop (`~/Library/Application Support/Claude/claude_desktop_config.json` en macOS, `%APPDATA%\Claude\claude_desktop_config.json` en Windows):
+La forma más simple no necesita levantar ningún servidor: Claude Desktop
+ejecuta el paquete de PyPI con [uv](https://docs.astral.sh/uv/). Agrega lo
+siguiente a tu archivo de configuración (`~/Library/Application Support/Claude/claude_desktop_config.json`
+en macOS, `%APPDATA%\Claude\claude_desktop_config.json` en Windows):
 
 ```json
 {
   "mcpServers": {
     "ecuador-datos": {
-      "command": "npx",
-      "args": [
-        "mcp-remote",
-        "http://localhost:8000/mcp"
-      ]
+      "command": "uvx",
+      "args": ["ecuador-mcp", "--transport", "stdio"]
     }
   }
 }
 ```
+
+También puedes instalar el archivo `.mcpb` adjunto a cada
+[release](https://github.com/DweskZ/EcuDataMCP/releases) como extensión de
+Claude Desktop. Si ya tienes el servidor HTTP corriendo (ver
+[Ejecutar localmente](#ejecutar-localmente)), usa `"command": "npx"` con
+`"args": ["mcp-remote", "http://localhost:8000/mcp"]`.
 
 ### Cursor
 
@@ -201,16 +207,29 @@ Agrega a `~/.codeium/windsurf/mcp_config.json`:
 
 ## Ejecutar localmente
 
-### Con `uvx` (tras la publicación en PyPI)
+### Con `uvx` (desde PyPI)
 
 ```bash
 uvx ecuador-mcp --transport stdio
 ```
 
-`search_ranking`/`get_financials` necesitan la base SQLite local de Supercías,
-que hoy solo se construye desde un clon del repositorio (ver abajo).
+`search_ranking`/`get_financials` usan una base SQLite local de Supercías que
+se construye sola en segundo plano la primera vez (descarga ~356 MB, 5-10
+min). Instalado desde PyPI se guarda en el directorio de datos del usuario
+(`%LOCALAPPDATA%\ecuador-mcp` en Windows, `~/Library/Application Support/ecuador-mcp`
+en macOS, `~/.local/share/ecuador-mcp` en Linux); `ECUADOR_MCP_DATA_DIR`
+cambia la ubicación.
 
 ### Con Docker (recomendado)
+
+La imagen arranca por stdio, como cualquier servidor MCP en Docker:
+
+```bash
+docker build -t ecuador-mcp https://github.com/DweskZ/EcuDataMCP.git
+docker run -i --rm ecuador-mcp
+```
+
+Para el servidor HTTP, `docker compose` fija `MCP_TRANSPORT=http`:
 
 ```bash
 git clone https://github.com/DweskZ/EcuDataMCP.git
@@ -256,6 +275,7 @@ uv run main.py
 | `MCP_REQUIRE_AUTH` | Rechaza el arranque remoto sin token | `0` |
 | `MCP_RATE_LIMIT_REQUESTS` / `MCP_RATE_LIMIT_WINDOW_SECONDS` | Cuota por cliente/IP | `120` / `60` |
 | `MCP_SSL_CERTFILE` / `MCP_SSL_KEYFILE` | Certificado y clave para TLS directo | vacío |
+| `ECUADOR_MCP_DATA_DIR` | Dónde guardar la base de Supercías y los snapshots del BCE | `data/` en un clon; directorio de datos del usuario si se instaló desde PyPI |
 
 Para ejecutar el transporte stdio localmente:
 
