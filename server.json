@@ -7,12 +7,12 @@
     "url": "https://github.com/DweskZ/EcuDataMCP",
     "source": "github"
   },
-  "version": "0.9.0",
+  "version": "0.9.1",
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "ecuador-mcp",
-      "version": "0.9.0",
+      "version": "0.9.1",
       "transport": { "type": "stdio" },
       "packageArguments": [
         { "type": "named", "name": "--transport", "value": "stdio" }

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.9.1 — 2026-09-27
+
+### Fixed
+
+- **Superbancos returned only its static tables.** The OneDrive widget's
+  nonce is hex, but the parser accepted digits only, so the widget looked
+  absent whenever the nonce contained a letter: `boletines_financieros`
+  came back with 13 files instead of 225, and `servicios_financieros`
+  lost its three widget trees (now 271 files). A widget that is present
+  but can't be parsed is now logged instead of silently shrinking the
+  result.
+
 ## 0.9.0 — 2026-09-27
 
 ### Added

@@ -249,6 +249,22 @@ def test_extract_wpcp_params_from_widget_markup():
     }
 
 
+def test_extract_wpcp_params_accepts_a_hex_nonce():
+    # WordPress nonces are hex; the regex once accepted digits only, so the
+    # live widget (nonce "4c1c060a34", 2026-09-27) looked absent.
+    html = _WPCP_WIDGET_HTML.replace('"refresh_nonce":"9924993739"', '"refresh_nonce":"4c1c060a34"')
+
+    assert sb._extract_wpcp_params(html)["nonce"] == "4c1c060a34"
+    assert sb._extract_all_wpcp_widgets(html)[0]["nonce"] == "4c1c060a34"
+
+
+def test_unparseable_widget_is_logged_not_silent(caplog):
+    html = _WPCP_WIDGET_HTML.replace('"refresh_nonce":"9924993739"', '"refresh_nonce":""')
+
+    assert sb._extract_wpcp_params(html) is None
+    assert "widget de OneDrive" in caplog.text
+
+
 def test_extract_wpcp_params_returns_none_when_widget_absent():
     assert sb._extract_wpcp_params("<html><body>no widget here</body></html>") is None
 

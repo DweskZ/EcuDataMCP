@@ -158,7 +158,11 @@ _CALENDARIO_RE = re.compile(
 _WPCP_TOKEN_RE = re.compile(r"data-token='([0-9a-f]{32})'")
 _WPCP_ACCOUNT_RE = re.compile(r"data-account-id='([0-9a-f-]{36})'")
 _WPCP_DRIVE_RE = re.compile(r"data-drive-id='([^']+)'")
-_WPCP_NONCE_RE = re.compile(r'"refresh_nonce":"(\d+)"')
+# WordPress nonces are 10 hex characters. This was \d+ until 2026-09-27,
+# which only matched while the page's nonce happened to be all digits: the
+# widget then looked absent and both sections silently fell back to their
+# static tables (boletines_financieros: 13 files instead of ~224).
+_WPCP_NONCE_RE = re.compile(r'"refresh_nonce":"([0-9a-f]+)"')
 _WPCP_YEAR_FOLDER_RE = re.compile(r"^Año \d{4}$")
 _WPCP_HEADING_RE = re.compile(r'<h3 class="elementor-heading-title[^"]*">(?P<heading>[^<]*)</h3>')
 
@@ -221,6 +225,18 @@ def _formato_from_name(name: str) -> str:
     return ext if ext in _KNOWN_FORMATS else "DESCONOCIDO"
 
 
+def _warn_if_widget_unparsed(html: str) -> None:
+    """A page with no widget is normal; a widget we can't parse is a markup
+    change that would otherwise just shrink the results to the static
+    tables, so say so in the log."""
+    if "ShareoneDrive" in html:
+        logger.warning(
+            "Superbancos: la página tiene el widget de OneDrive pero no se "
+            "pudieron leer sus parámetros (¿cambió el HTML?); se devuelven "
+            "solo las tablas estáticas."
+        )
+
+
 def _extract_wpcp_params(html: str) -> dict[str, str] | None:
     """Pull the OneDrive widget's identifying params out of a section
     page's static HTML. Returns None if the page has no such widget (or,
@@ -231,6 +247,7 @@ def _extract_wpcp_params(html: str) -> dict[str, str] | None:
     drive_m = _WPCP_DRIVE_RE.search(html)
     nonce_m = _WPCP_NONCE_RE.search(html)
     if not (token_m and account_m and drive_m and nonce_m):
+        _warn_if_widget_unparsed(html)
         return None
     return {
         "listtoken": token_m.group(1),
@@ -258,6 +275,7 @@ def _extract_all_wpcp_widgets(html: str) -> list[dict[str, Any]]:
     since page structure can change)."""
     nonce_m = _WPCP_NONCE_RE.search(html)
     if nonce_m is None:
+        _warn_if_widget_unparsed(html)
         return []
     nonce = nonce_m.group(1)
 
