@@ -275,6 +275,7 @@ uv run main.py
 | `MCP_REQUIRE_AUTH` | Rechaza el arranque remoto sin token | `0` |
 | `MCP_RATE_LIMIT_REQUESTS` / `MCP_RATE_LIMIT_WINDOW_SECONDS` | Cuota por cliente/IP | `120` / `60` |
 | `MCP_SSL_CERTFILE` / `MCP_SSL_KEYFILE` | Certificado y clave para TLS directo | vacío |
+| `ECUADOR_MCP_USAGE_LOG` | `1` guarda cada llamada (tool, resultado, duración; nunca argumentos) en `usage.jsonl` del directorio de datos; `scripts/usage_report.py` lo resume | vacío |
 | `ECUADOR_MCP_DATA_DIR` | Dónde guardar la base de Supercías y los snapshots del BCE | `data/` en un clon; directorio de datos del usuario si se instaló desde PyPI |
 
 Para ejecutar el transporte stdio localmente:
@@ -295,11 +296,12 @@ El contrato JSON para agentes de BCEData/IEM está en
 |----------|-------------|
 | `POST /mcp` | Mensajes JSON-RPC (cliente → servidor) |
 | `GET /health` | Health check: `{"status":"ok","uptime_since":"...","version":"..."}` |
+| `GET /usage` | Llamadas, errores y latencia p50/p95 por tool desde el arranque |
 
 Cuando `MCP_AUTH_TOKEN` está definido, `POST /mcp` requiere el encabezado
 `Authorization: Bearer <token>`. Para un despliegue remoto usa también
-`MCP_REQUIRE_AUTH=1`, HTTPS y un proxy con su propia cuota por IP. `/health`
-permanece sin autenticación para que Docker pueda comprobar el servicio.
+`MCP_REQUIRE_AUTH=1`, HTTPS y un proxy con su propia cuota por IP. `/health` y
+`/usage` permanecen sin autenticación (no exponen argumentos ni datos de usuarios).
 Consulta [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) para el despliegue remoto.
 
 ---

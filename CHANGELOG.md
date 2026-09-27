@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Added
+
+- **Per-tool usage counters.** Every tool call records its name, outcome
+  and duration (never its arguments). The HTTP server exposes them at
+  `/usage` (calls, errors, p50/p95 latency since start);
+  `ECUADOR_MCP_USAGE_LOG=1` also appends each call to `usage.jsonl` in the
+  data directory, which survives restarts and stdio sessions, and
+  `scripts/usage_report.py` summarizes it, including registered tools that
+  were never called.
+
 ### Changed
 
 - **Breaking: 14 institutional-archive tools merged into 2.**

@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 
 from mcp.server.mcpserver import MCPServer
 
+from helpers import usage
 from helpers.env_config import (
     get_mcp_auth_token,
     get_mcp_host,
@@ -93,6 +94,20 @@ def with_health_endpoint(
                         "supercias_financials": financials_status(),
                     }
                 ).encode("utf-8")
+                headers = [
+                    (b"content-type", b"application/json"),
+                    (b"content-length", str(len(body)).encode("utf-8")),
+                ]
+                await send(
+                    {"type": "http.response.start", "status": 200, "headers": headers}
+                )
+                await send({"type": "http.response.body", "body": body})
+                return
+
+            # Per-tool call/error/latency counters for this process (see
+            # helpers/usage.py); like /health, outside the /mcp auth.
+            if path == "/usage":
+                body = json.dumps(usage.snapshot()).encode("utf-8")
                 headers = [
                     (b"content-type", b"application/json"),
                     (b"content-length", str(len(body)).encode("utf-8")),

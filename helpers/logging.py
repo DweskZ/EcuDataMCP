@@ -1,8 +1,11 @@
 import logging
 import os
+import time
 from collections.abc import Callable
 from functools import wraps
 from typing import Any
+
+from helpers import usage
 
 MAIN_LOGGER_NAME = "ecuador_mcp"
 
@@ -44,19 +47,26 @@ UVICORN_LOGGING_CONFIG = {
 }
 
 
+def _elapsed_ms(started: float) -> float:
+    return (time.perf_counter() - started) * 1000
+
+
 def log_tool(func: Callable[..., Any]) -> Callable[..., Any]:
-    """Decorator to log MCP tool invocations."""
+    """Decorator to log MCP tool invocations and record their usage."""
 
     @wraps(func)
     async def wrapper(*args: Any, **kwargs: Any) -> Any:
         tool_name = func.__name__
         logger.info("Tool called: %s | params: %s", tool_name, kwargs or args)
+        started = time.perf_counter()
         try:
             result = await func(*args, **kwargs)
-            logger.debug("Tool %s completed successfully", tool_name)
-            return result
         except Exception:
+            usage.record(tool_name, ok=False, duration_ms=_elapsed_ms(started))
             logger.exception("Tool %s failed", tool_name)
             raise
+        usage.record(tool_name, ok=True, duration_ms=_elapsed_ms(started))
+        logger.debug("Tool %s completed successfully", tool_name)
+        return result
 
     return wrapper
