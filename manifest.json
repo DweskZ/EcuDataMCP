@@ -1,0 +1,35 @@
+{
+  "manifest_version": "0.4",
+  "name": "ecuador-mcp",
+  "display_name": "EcuDataMCP",
+  "version": "0.8.12",
+  "description": "Ecuador's open government data for AI assistants: CKAN, SRI, BCE, INEC, Supercias, SERCOP and more.",
+  "long_description": "Search and analyze Ecuador's official open data through MCP: the national and municipal CKAN portals, gob.ec procedures and regulations, SRI, BCE, INEC/ANDA, Supercías, Superbancos, SERCOP public procurement, IG-EPN earthquakes, SGR risk events, CENACE, ARCONEL and power-cut schedules, among other sources. Read-only; no credentials needed.",
+  "author": {
+    "name": "EcuDataMCP contributors",
+    "url": "https://github.com/DweskZ/EcuDataMCP"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DweskZ/EcuDataMCP"
+  },
+  "homepage": "https://github.com/DweskZ/EcuDataMCP",
+  "documentation": "https://github.com/DweskZ/EcuDataMCP#readme",
+  "support": "https://github.com/DweskZ/EcuDataMCP/issues",
+  "server": {
+    "type": "uv",
+    "entry_point": "main.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": ["run", "--directory", "${__dirname}", "main.py", "--transport", "stdio"]
+    }
+  },
+  "compatibility": {
+    "platforms": ["darwin", "linux", "win32"],
+    "runtimes": {
+      "python": ">=3.11"
+    }
+  },
+  "keywords": ["ecuador", "open-data", "datos-abiertos", "ckan", "government", "statistics"],
+  "license": "MIT"
+}

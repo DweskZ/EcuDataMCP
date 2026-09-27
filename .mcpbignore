@@ -1,0 +1,27 @@
+# Keep the MCPB bundle to what the server needs at runtime: main.py, the
+# packages, pyproject.toml and uv.lock. The uv runtime installs dependencies
+# itself, so no virtualenv or vendored lib goes in.
+.venv/
+.git/
+.github/
+.claude/
+.pytest_cache/
+.pytest-local/
+.ruff_cache/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+data/
+docs/
+scripts/
+tests/
+*.mcpb
+docker-compose.yml
+Dockerfile
+CHANGELOG.md
+CONTRIBUTING.md
+.uv-cache*/
+CLAUDE.md
+.dockerignore

@@ -49,7 +49,12 @@ Casi todos los tools aceptan `format="json"` además de `format="text"`
 (default).
 """.strip()
 
-mcp = MCPServer("Ecuador Datos Abiertos MCP", instructions=SERVER_INSTRUCTIONS)
+mcp = MCPServer(
+    "Ecuador Datos Abiertos MCP",
+    instructions=SERVER_INSTRUCTIONS,
+    version=VERSION,
+    website_url="https://github.com/DweskZ/EcuDataMCP",
+)
 
 # MCP_PROFILE (default "all") splits the public read-only tools from the two
 # that write local operator artifacts (audit_bce_catalog, compare_bce_sources)

@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.8.12 — 2026-09-27
+
+### Added
+
+- **MCPB bundle** (`manifest.json`, `.mcpbignore`) for installing the server
+  as a local stdio extension, e.g. from Smithery or Claude Desktop. It uses
+  the MCPB `uv` runtime, so dependencies come from `pyproject.toml` rather
+  than being vendored. The publish workflow builds it and attaches it to
+  each GitHub release.
+- **`glama.json`** listing the maintainers, so the Glama directory entry can
+  be claimed.
+
+### Fixed
+
+- **`serverInfo.version` was empty** in the MCP `initialize` response; the
+  server now reports its real version and repository URL.
+
 ## 0.8.11 — 2026-09-27
 
 ### Added
