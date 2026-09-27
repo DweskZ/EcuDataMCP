@@ -129,6 +129,56 @@ Verifica que el servidor responda antes de darlo por terminado.</code></pre>
 </section>
 
 <section class="landing">
+<div class="container-page" id="solucion-problemas">
+<p class="kicker">Solución de problemas</p>
+<h2 class="section-title">¿Algo no funciona?</h2>
+<p class="section-lede">Empieza por confirmar que el servidor está vivo. Si responde, el problema casi siempre está en la configuración del cliente o en el portal de origen, no en EcuDataMCP.</p>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>curl http://localhost:8000/health</code></pre></div>
+<p class="client-intro">Debe devolver <code>{"status":"ok", "version": ...}</code>. Si no responde, el servidor no está corriendo o escucha en otro puerto.</p>
+<details class="faq-item">
+<summary>Mi cliente no muestra ningún tool</summary>
+<p>Revisa, en orden: (1) que el servidor esté corriendo (<code>/health</code> responde); (2) que la URL termine en <code>/mcp</code>, no en <code>/</code> ni en <code>/health</code>; (3) que el JSON de configuración sea válido (una coma de más lo invalida en silencio); y (4) que hayas <strong>reiniciado el cliente por completo</strong> después de editar la configuración. Claude Desktop, Cursor y Windsurf solo leen el archivo al arrancar.</p>
+</details>
+<details class="faq-item">
+<summary>Claude Desktop o Windsurf: <code>npx</code> no se encuentra</summary>
+<p>Esas configuraciones usan <code>mcp-remote</code> como puente, que necesita Node.js 18+ instalado y en el <code>PATH</code>. Instálalo desde nodejs.org y reinicia el cliente. Alternativa sin Node: usa modo stdio con <code>"command": "uv"</code> y <code>"args": ["run", "--directory", "&lt;ruta-del-clon&gt;", "python", "main.py", "--transport", "stdio"]</code>.</p>
+</details>
+<details class="faq-item">
+<summary>El puerto 8000 ya está en uso</summary>
+<p>Arranca el servidor en otro puerto (<code>uv run main.py --port 8007</code>, o <code>MCP_PORT=8007 docker compose up -d</code>) y cambia la URL del cliente a <code>http://localhost:8007/mcp</code>.</p>
+</details>
+<details class="faq-item">
+<summary>En modo stdio el servidor se cierra al instante</summary>
+<p>Corre el mismo comando a mano en una terminal para ver el error real. Las causas típicas son una ruta incorrecta en <code>--directory</code>, no haber corrido <code>uv sync</code> en el clon, o que <code>uv</code> no esté en el <code>PATH</code> que ve el cliente (en ese caso, usa la ruta absoluta a <code>uv</code>).</p>
+</details>
+<details class="faq-item">
+<summary>ChatGPT o Le Chat no pueden conectarse a <code>localhost</code></summary>
+<p>Los clientes web corren en la nube y no ven tu máquina. Necesitas exponer el servidor con una URL pública HTTPS (un túnel o un despliegue propio) y, en ese caso, activar <code>MCP_REQUIRE_AUTH=1</code> con un <code>MCP_AUTH_TOKEN</code>. Nunca expongas el servidor sin token.</p>
+</details>
+<details class="faq-item">
+<summary>Error 401, 429 o 503 del servidor</summary>
+<p><strong>401</strong>: el servidor exige token (<code>MCP_AUTH_TOKEN</code>) y el cliente no lo envía como <code>Authorization: Bearer ...</code>. <strong>429</strong>: superaste el límite de solicitudes por ventana (<code>MCP_RATE_LIMIT_REQUESTS</code>, 120 por 60 s por defecto); espera o súbelo en uso local. <strong>503</strong>: demasiadas solicitudes simultáneas (<code>MCP_MAX_CONCURRENT_REQUESTS</code>, 8 por defecto).</p>
+</details>
+<details class="faq-item">
+<summary>Error 403 o timeout del portal de Datos Abiertos</summary>
+<p><code>www.datosabiertos.gob.ec</code> a veces rechaza conexiones que vienen de fuera de Latinoamérica (error 403). Si ves esto, corre el servidor desde una conexión con salida en Ecuador o la región (por ejemplo, una VPN). Los tools de trámites e instituciones usan otro portal y no tienen este problema. Los portales del Estado también tienen caídas propias: si un solo tool falla y los demás responden, reintenta más tarde.</p>
+</details>
+<details class="faq-item">
+<summary>Error de certificado TLS / SSL</summary>
+<p>Algunos portales oficiales han publicado certificados vencidos o con la cadena incompleta (el de Datos Abiertos venció en julio de 2026). Para ese portal existe un reintento opt-in: <code>CKAN_INSECURE_TLS=1</code> en tu <code>.env</code>. Úsalo solo mientras dure la falla del portal y quítalo después.</p>
+</details>
+<details class="faq-item">
+<summary>El preview sale cortado o dice que el archivo es muy grande</summary>
+<p>Es intencional: las descargas se limitan a 5 MB y la descompresión de ZIP/tar.gz a 20 MB. Para recursos grandes usa <code>query_resource_data</code> (filtra en el DataStore de CKAN sin bajar el archivo) o <code>list_zip_contents</code> para ver qué trae un ZIP antes de abrirlo.</p>
+</details>
+<details class="faq-item">
+<summary>Necesito más detalle para reportar un bug</summary>
+<p>Arranca con <code>LOG_LEVEL=DEBUG</code>, reproduce el error y abre un <a href="https://github.com/DweskZ/EcuDataMCP/issues" target="_blank" rel="noopener">issue en GitHub</a> con el tool, los parámetros, la salida de <code>/health</code> y el log. No incluyas tokens.</p>
+</details>
+</div>
+</section>
+
+<section class="landing">
 <div class="container-page">
 <p class="kicker">Sin fricción</p>
 <h2 class="section-title">Listo para usar, sin trámite propio.</h2>
@@ -174,8 +224,8 @@ Verifica que el servidor responda antes de darlo por terminado.</code></pre>
 <p>Preview en memoria de CSV, TSV, JSON, GeoJSON y XLSX; consulta tabular filtrada vía el DataStore de CKAN cuando el recurso lo soporta.</p>
 </details>
 <details class="faq-item">
-<summary>¿Por qué a veces falla la conexión al portal de Datos Abiertos?</summary>
-<p><code>www.datosabiertos.gob.ec</code> a veces rechaza conexiones que vienen de fuera de Latinoamérica (error 403). Si ves esto, corre el servidor desde una conexión con salida en Ecuador o la región (por ejemplo, una VPN). Los tools de trámites e instituciones usan otro portal y no tienen este problema.</p>
+<summary>Algo no funciona, ¿dónde busco?</summary>
+<p>Revisa la sección <a href="#solucion-problemas">Solución de problemas</a>: cubre clientes que no muestran tools, puertos ocupados, errores 401/403/429, certificados TLS y archivos demasiado grandes.</p>
 </details>
 <details class="faq-item">
 <summary>¿Puedo contribuir?</summary>

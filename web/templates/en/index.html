@@ -129,6 +129,56 @@ Verify the server responds before calling it done.</code></pre>
 </section>
 
 <section class="landing">
+<div class="container-page" id="troubleshooting">
+<p class="kicker">Troubleshooting</p>
+<h2 class="section-title">Something not working?</h2>
+<p class="section-lede">Start by confirming the server is alive. If it responds, the problem is almost always in the client configuration or the upstream portal, not in EcuDataMCP.</p>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>curl http://localhost:8000/health</code></pre></div>
+<p class="client-intro">It should return <code>{"status":"ok", "version": ...}</code>. If it doesn't respond, the server isn't running or is listening on a different port.</p>
+<details class="faq-item">
+<summary>My client shows no tools</summary>
+<p>Check, in order: (1) the server is running (<code>/health</code> responds); (2) the URL ends in <code>/mcp</code>, not <code>/</code> or <code>/health</code>; (3) the config JSON is valid (one stray comma silently breaks it); and (4) you <strong>fully restarted the client</strong> after editing the config. Claude Desktop, Cursor, and Windsurf only read the file at startup.</p>
+</details>
+<details class="faq-item">
+<summary>Claude Desktop or Windsurf: <code>npx</code> not found</summary>
+<p>Those configs use <code>mcp-remote</code> as a bridge, which needs Node.js 18+ installed and on the <code>PATH</code>. Install it from nodejs.org and restart the client. Node-free alternative: use stdio mode with <code>"command": "uv"</code> and <code>"args": ["run", "--directory", "&lt;clone-path&gt;", "python", "main.py", "--transport", "stdio"]</code>.</p>
+</details>
+<details class="faq-item">
+<summary>Port 8000 is already in use</summary>
+<p>Start the server on another port (<code>uv run main.py --port 8007</code>, or <code>MCP_PORT=8007 docker compose up -d</code>) and change the client URL to <code>http://localhost:8007/mcp</code>.</p>
+</details>
+<details class="faq-item">
+<summary>In stdio mode the server exits immediately</summary>
+<p>Run the same command by hand in a terminal to see the real error. Typical causes are a wrong <code>--directory</code> path, not having run <code>uv sync</code> in the clone, or <code>uv</code> not being on the <code>PATH</code> the client sees (in that case, use the absolute path to <code>uv</code>).</p>
+</details>
+<details class="faq-item">
+<summary>ChatGPT or Le Chat can't reach <code>localhost</code></summary>
+<p>Web clients run in the cloud and can't see your machine. You need to expose the server at a public HTTPS URL (a tunnel or your own deployment) and, in that case, enable <code>MCP_REQUIRE_AUTH=1</code> with an <code>MCP_AUTH_TOKEN</code>. Never expose the server without a token.</p>
+</details>
+<details class="faq-item">
+<summary>401, 429, or 503 error from the server</summary>
+<p><strong>401</strong>: the server requires a token (<code>MCP_AUTH_TOKEN</code>) and the client isn't sending it as <code>Authorization: Bearer ...</code>. <strong>429</strong>: you exceeded the per-window request limit (<code>MCP_RATE_LIMIT_REQUESTS</code>, 120 per 60 s by default); wait, or raise it for local use. <strong>503</strong>: too many concurrent requests (<code>MCP_MAX_CONCURRENT_REQUESTS</code>, 8 by default).</p>
+</details>
+<details class="faq-item">
+<summary>403 error or timeout from the Open Data portal</summary>
+<p><code>www.datosabiertos.gob.ec</code> sometimes rejects connections coming from outside Latin America (403 error). If you see this, run the server from a connection with an exit point in Ecuador or the region (a VPN, for example). The procedures and institutions tools use a different portal and don't have this issue. Government portals also have their own outages: if a single tool fails while the rest respond, try again later.</p>
+</details>
+<details class="faq-item">
+<summary>TLS / SSL certificate error</summary>
+<p>Some official portals have served expired certificates or incomplete chains (the Open Data portal's expired in July 2026). For that portal there's an opt-in retry: <code>CKAN_INSECURE_TLS=1</code> in your <code>.env</code>. Use it only while the portal is broken and remove it afterward.</p>
+</details>
+<details class="faq-item">
+<summary>The preview is cut off or says the file is too large</summary>
+<p>That's intentional: downloads are capped at 5 MB and ZIP/tar.gz decompression at 20 MB. For large resources use <code>query_resource_data</code> (filters in the CKAN DataStore without downloading the file) or <code>list_zip_contents</code> to see what a ZIP contains before opening it.</p>
+</details>
+<details class="faq-item">
+<summary>I need more detail to report a bug</summary>
+<p>Start with <code>LOG_LEVEL=DEBUG</code>, reproduce the error, and open a <a href="https://github.com/DweskZ/EcuDataMCP/issues" target="_blank" rel="noopener">GitHub issue</a> with the tool, its parameters, the <code>/health</code> output, and the log. Don't include tokens.</p>
+</details>
+</div>
+</section>
+
+<section class="landing">
 <div class="container-page">
 <p class="kicker">No friction</p>
 <h2 class="section-title">Ready to use, no setup of your own.</h2>
@@ -174,8 +224,8 @@ Verify the server responds before calling it done.</code></pre>
 <p>In-memory preview of CSV, TSV, JSON, GeoJSON, and XLSX; filtered tabular queries via the CKAN DataStore when the resource supports it.</p>
 </details>
 <details class="faq-item">
-<summary>Why does the connection to the Open Data portal sometimes fail?</summary>
-<p><code>www.datosabiertos.gob.ec</code> sometimes rejects connections coming from outside Latin America (403 error). If you see this, run the server from a connection with an exit point in Ecuador or the region (a VPN, for example). The procedures and institutions tools use a different portal and don't have this issue.</p>
+<summary>Something isn't working, where do I look?</summary>
+<p>See the <a href="#troubleshooting">Troubleshooting</a> section: it covers clients that show no tools, busy ports, 401/403/429 errors, TLS certificates, and oversized files.</p>
 </details>
 <details class="faq-item">
 <summary>Can I contribute?</summary>
