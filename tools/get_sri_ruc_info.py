@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_sri_ruc_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Consultar información pública de un RUC", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Consultar información pública de un RUC",
+        description=(
+            "Public SRI record for one 13-digit RUC: name, status, type, activity, "
+            "dates and registered establishments. No tax amounts."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_sri_ruc_info(
         ruc: str,

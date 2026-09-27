@@ -19,7 +19,14 @@ def _human_size(n: int) -> str:
 
 
 def register_list_zip_contents_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Listar el contenido de un archivo ZIP", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Listar el contenido de un archivo ZIP",
+        description=(
+            "List a remote ZIP's members (name, size) via HTTP Range requests, "
+            "without downloading it; works for archives far beyond 5 MB. No ZIP64."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def list_zip_contents(
         url: str,

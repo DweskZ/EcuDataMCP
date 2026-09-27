@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_aip_aerodromo_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver la ficha AIP de un aeródromo", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver la ficha AIP de un aeródromo",
+        description=(
+            "Full published AIP AD 2 data sheet for one aerodrome (ICAO code): "
+            "coordinates, runways, hours, services, frequencies, procedures."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_aip_aerodromo(
         designador: str, format: Literal["text", "json"] = "text"

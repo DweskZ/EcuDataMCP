@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_arcotel_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar boletines y reportes estadísticos de ARCOTEL", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar boletines y reportes estadísticos de ARCOTEL",
+        description=(
+            'ARCOTEL telecom statistics PDFs: tipo="boletines" (annual/topical '
+            '2015-2024) or "reportes_mensuales" (monthly 2017-2026). Returns links, '
+            "not contents."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_arcotel(
         tipo: Literal["boletines", "reportes_mensuales"],

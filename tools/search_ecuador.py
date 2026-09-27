@@ -17,7 +17,15 @@ _strip_accents = partial(strip_accents, lower=False)
 
 
 def register_search_ecuador_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar en todas las fuentes de Ecuador", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar en todas las fuentes de Ecuador",
+        description=(
+            "Unified first-step search across CKAN datasets, organizations, gob.ec "
+            "trámites and regulations, SERCOP contracts and SGR risk events. Drill "
+            "down afterwards with the source-specific get_* tools."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_ecuador(
         query: str, limit: int = 5, format: Literal["text", "json"] = "text"

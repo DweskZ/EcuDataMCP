@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_list_categories_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Listar categorías temáticas", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Listar categorías temáticas",
+        description=(
+            "Thematic categories of a CKAN portal with dataset counts; pass a name "
+            "as search_datasets' category."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def list_categories(
         source: ckan_client.CkanSource = "nacional",

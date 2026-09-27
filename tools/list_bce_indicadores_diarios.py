@@ -9,7 +9,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_list_bce_indicadores_diarios_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Listar indicadores diarios y mensuales del BCE", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Listar indicadores diarios y mensuales del BCE",
+        description=(
+            "BCE daily and monthly indicator widgets outside BCEData: riesgo país "
+            "(daily since 2004), gold, WTI, bonds, payments, reserves, fiscal and "
+            "external series. Next: get_bce_indicador_diario."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def list_bce_indicadores_diarios(
         format: Literal["text", "json"] = "text",

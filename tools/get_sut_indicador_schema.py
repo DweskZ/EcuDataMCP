@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_sut_indicador_schema_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver campos de un indicador del SUT", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver campos de un indicador del SUT",
+        description=(
+            "Queryable fields of one SUT dashboard: columns, measures ([medida]) "
+            "and date levels, for query_sut_indicador."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_sut_indicador_schema(
         indicador: str, format: Literal["text", "json"] = "text"

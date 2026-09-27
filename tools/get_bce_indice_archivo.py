@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_bce_indice_archivo_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver archivos de un índice de publicaciones del BCE", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver archivos de un índice de publicaciones del BCE",
+        description=(
+            "Files of one BCE index page (pagina_id from search_bce_indices), by "
+            "year and period, most recent first."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_bce_indice_archivo(
         pagina_id: str,

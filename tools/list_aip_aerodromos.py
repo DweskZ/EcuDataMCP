@@ -9,7 +9,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_list_aip_aerodromos_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Listar aeródromos con ficha AIP publicada", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Listar aeródromos con ficha AIP publicada",
+        description=(
+            "ICAO codes and names of aerodromes/helipads with a published AIP AD 2 "
+            "page (DGAC eAIP). Next: get_aip_aerodromo."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def list_aip_aerodromos(format: Literal["text", "json"] = "text") -> dict[str, Any]:
         """

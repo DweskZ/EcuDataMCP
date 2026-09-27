@@ -26,7 +26,15 @@ _DISPLAY_FIELDS = (
 
 
 def register_get_financials_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver historial financiero de una compañía", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver historial financiero de una compañía",
+        description=(
+            "One company's Supercías financial history (last five fiscal years): "
+            "revenue, assets, equity, profit, employees and ratios. Takes "
+            "expediente or RUC."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_financials(
         expediente_or_ruc: str,

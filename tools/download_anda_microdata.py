@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_download_anda_microdata_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Descargar microdatos de una encuesta ANDA", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Descargar microdatos de una encuesta ANDA",
+        description=(
+            "Direct links to an ANDA survey's microdata files (accepts ANDA's "
+            "research-use terms). Check get_anda_survey_info first; returns links "
+            "to multi-MB ZIPs."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def download_anda_microdata(
         idno: str, format: Literal["text", "json"] = "text"

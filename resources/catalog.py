@@ -3,6 +3,7 @@ import json
 from mcp.server.mcpserver import MCPServer
 
 from helpers.geo_data import list_cantones, list_parroquias, list_provincias
+from helpers.logging import TOOL_DOCS
 
 _INSTITUCIONES_CLAVE = [
     {"id": "8", "nombre": "SRI", "uso": "impuestos, RUC, facturación"},
@@ -420,6 +421,23 @@ def register_catalog_resources(mcp: MCPServer) -> None:
     )
     def fuentes() -> str:
         return json.dumps(_fuentes_payload(), ensure_ascii=False, indent=2)
+
+    @mcp.resource(
+        "ecuador://herramientas/{nombre}",
+        name="referencia_herramienta",
+        title="Referencia completa de una herramienta",
+        description=(
+            "Documentación completa de una tool (alcance, parámetros, límites de "
+            "la fuente); tools/list solo lleva un resumen."
+        ),
+        mime_type="text/plain",
+    )
+    def herramienta(nombre: str) -> str:
+        if nombre not in TOOL_DOCS:
+            raise ValueError(
+                f"Tool '{nombre}' no existe. Ver tools/list o ecuador://fuentes."
+            )
+        return TOOL_DOCS[nombre]
 
     @mcp.resource(
         "ecuador://provincias",

@@ -28,7 +28,15 @@ def _matches_query(row: dict, words: list[str]) -> bool:
 
 
 def register_search_anda_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar encuestas y censos en ANDA", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar encuestas y censos en ANDA",
+        description=(
+            "Search INEC's ANDA catalog of 437+ surveys and censuses; the broadest "
+            "INEC index. Entries without microdata point to "
+            "search_inec_estadisticas. Next: get_anda_survey_info."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_anda(
         query: str = "", limit: int = 10, format: Literal["text", "json"] = "text"

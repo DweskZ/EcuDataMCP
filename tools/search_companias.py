@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_companias_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar compañías en el registro de Supercías", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar compañías en el registro de Supercías",
+        description=(
+            "Search Supercías' registry of 226k+ companies by name or RUC: legal "
+            "status, incorporation, representative, capital, CIIU, address. First "
+            "call after 6h can take 30-40 s."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_companias(
         query: str = "",

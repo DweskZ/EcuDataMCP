@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_centrosur_cortes_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar cortes de luz programados (Centrosur)", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar cortes de luz programados (Centrosur)",
+        description=(
+            "Centrosur (Azuay, Cañar, Morona Santiago) scheduled power-cut PDFs "
+            "2023 onward, including the 2024 blackouts. Next: "
+            "get_centrosur_cortes_horarios."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_centrosur_cortes(
         query: str = "", format: Literal["text", "json"] = "text"

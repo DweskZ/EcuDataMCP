@@ -11,7 +11,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_regulaciones_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar regulaciones publicadas en gob.ec", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar regulaciones publicadas en gob.ec",
+        description=(
+            "Search or list regulations published on gob.ec, with Registro Oficial "
+            "references when available."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_regulaciones(
         query: str = "", page: int = 1, format: Literal["text", "json"] = "text"

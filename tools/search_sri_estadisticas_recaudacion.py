@@ -11,7 +11,13 @@ from helpers.tool_meta import READ_ONLY
 
 def register_search_sri_estadisticas_recaudacion_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Buscar estadísticas de recaudación del SRI", annotations=READ_ONLY
+        title="Buscar estadísticas de recaudación del SRI",
+        description=(
+            "Direct links to SRI's monthly tax-collection reports by tax, "
+            "province/canton and activity, plus historical indicators and "
+            "bulletins. Returns links, not contents."
+        ),
+        annotations=READ_ONLY,
     )
     @log_tool
     async def search_sri_estadisticas_recaudacion(

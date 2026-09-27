@@ -12,7 +12,14 @@ _TEXT_ROWS = 25
 
 
 def register_list_arconel_reportes_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Listar reportes estadísticos de ARCONEL", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Listar reportes estadísticos de ARCONEL",
+        description=(
+            "Report types, years (1998 on) and company groups in ARCONEL's "
+            "electricity statistics builder. Next: get_arconel_reporte."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def list_arconel_reportes(
         format: Literal["text", "json"] = "text",
@@ -54,7 +61,15 @@ def register_list_arconel_reportes_tool(mcp: MCPServer) -> None:
 
 
 def register_get_arconel_reporte_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Consultar reporte estadístico de ARCONEL", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Consultar reporte estadístico de ARCONEL",
+        description=(
+            'Run one ARCONEL report (e.g. "Balance Energía" for a year) and return '
+            "its rows. Slow, ~50 rows per page; max_paginas caps work and completo "
+            "says if everything was read."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_arconel_reporte(
         tipo: str,

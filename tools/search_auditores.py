@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_auditores_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar auditores externos autorizados", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar auditores externos autorizados",
+        description=(
+            "Search Supercías' registry of 1,447 authorized external auditors by "
+            "name or ID."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_auditores(
         query: str = "",

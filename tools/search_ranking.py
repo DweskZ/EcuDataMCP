@@ -14,7 +14,13 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 def register_search_ranking_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Rankear compañías por indicadores financieros", annotations=READ_ONLY
+        title="Rankear compañías por indicadores financieros",
+        description=(
+            "Rank Supercías companies by financial indicators for one fiscal year "
+            "(last five years), optionally by CIIU letter. descending=true for "
+            "top-N by a column."
+        ),
+        annotations=READ_ONLY,
     )
     @log_tool
     async def search_ranking(

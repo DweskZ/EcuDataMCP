@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_sri_datasets_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar datasets abiertos del SRI", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar datasets abiertos del SRI",
+        description=(
+            "Direct links to ~130 SRI files outside CKAN (sri.gob.ec/datasets): RUC "
+            "catastro, recaudación, ventas, vehículos, electronic receipts, "
+            "dictionaries. Returns links, not contents."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_sri_datasets(
         query: str = "",

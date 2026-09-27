@@ -292,7 +292,13 @@ _CAPABILITIES = {
 
 def register_list_capabilities_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Describir las capacidades del servidor (alias)", annotations=READ_ONLY
+        title="Describir las capacidades del servidor (alias)",
+        description=(
+            "Deprecated alias: summary of sources, key tools, prompts and "
+            "per-source limits. Prefer the server instructions and the "
+            "ecuador://fuentes resource."
+        ),
+        annotations=READ_ONLY,
     )
     @log_tool
     async def list_capabilities(

@@ -104,7 +104,15 @@ def classify_from_content_type(content_type: str | None) -> str:
 
 
 def register_preview_resource_data_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Previsualizar los datos de un recurso", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Previsualizar los datos de un recurso",
+        description=(
+            "First rows of a CKAN resource as a table: CSV/TSV, JSON/GeoJSON, "
+            "XLS/XLSX/XLSB, ODS, and ZIP/tar.gz wrapping a CSV. Max 5 MB; for "
+            "DataStore resources prefer query_resource_data."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def preview_resource_data(
         resource_id: str,

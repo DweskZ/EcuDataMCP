@@ -14,7 +14,12 @@ _TEXT_SECTORES = 220
 
 def register_get_centrosur_cortes_horarios_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Horarios de cortes de luz por sector (Centrosur)", annotations=READ_ONLY
+        title="Horarios de cortes de luz por sector (Centrosur)",
+        description=(
+            "Parse one Centrosur power-cut PDF into rows: date, time blocks, "
+            "canton, zone and sectors. query filters by place."
+        ),
+        annotations=READ_ONLY,
     )
     @log_tool
     async def get_centrosur_cortes_horarios(

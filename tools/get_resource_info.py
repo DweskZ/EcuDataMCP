@@ -23,7 +23,14 @@ def _format_size(size: int | None) -> str:
 
 
 def register_get_resource_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver metadata de un recurso (archivo)", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver metadata de un recurso (archivo)",
+        description=(
+            "Metadata for one CKAN resource (file): format, size, MIME type, "
+            "download URL and parent dataset."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_resource_info(
         resource_id: str,

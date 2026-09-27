@@ -16,7 +16,15 @@ _ESTADOS = {
 
 
 def register_search_sismos_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar sismos recientes en Ecuador", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar sismos recientes en Ecuador",
+        description=(
+            "Recent earthquakes from the IG-EPN catalog feed: magnitude, depth, "
+            "coordinates, time and place. Filter by text, minimum magnitude and "
+            "days."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_sismos(
         query: str = "",

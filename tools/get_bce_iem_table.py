@@ -14,7 +14,15 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 
 def register_get_bce_iem_table_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver una tabla del boletín IEM del BCE", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver una tabla del boletín IEM del BCE",
+        description=(
+            "One IEM XLSX table (table_id from search_bce_iem): date-filterable "
+            "series for the standard layout, a faithful preview otherwise. "
+            "boletin_numero selects a past bulletin."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_bce_iem_table(
         table_id: str,

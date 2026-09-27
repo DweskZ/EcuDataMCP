@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_inamhi_capa_datos_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver datos de una capa del geoportal INAMHI", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver datos de una capa del geoportal INAMHI",
+        description=(
+            "Sample up to 20 features' attributes from a WFS-enabled INAMHI layer "
+            "(from search_inamhi_capas). A preview, not a spatial query; geometry "
+            "is dropped."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_inamhi_capa_datos(
         layer_name: str, count: int = 5, format: Literal["text", "json"] = "text"

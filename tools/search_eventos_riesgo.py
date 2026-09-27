@@ -10,7 +10,16 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_eventos_riesgo_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar eventos de riesgo del SGR", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar eventos de riesgo del SGR",
+        description=(
+            "Current and recent SGR (Gestión de Riesgos) risk events from the live "
+            "COE feed: landslides, floods, structural damage, with location, status "
+            "and impacts. No history; for past event dossiers use "
+            "search_sgr_sitreps."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_eventos_riesgo(
         query: str = "",

@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_notam_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Consultar NOTAM activos de un aeródromo", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Consultar NOTAM activos de un aeródromo",
+        description=(
+            "Active NOTAMs for an Ecuadorian aerodrome (ICAO code, e.g. SEQM): raw "
+            "ICAO text plus DGAC's decoded fields."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_notam(
         designador: str, format: Literal["text", "json"] = "text"

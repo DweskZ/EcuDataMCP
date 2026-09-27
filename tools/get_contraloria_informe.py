@@ -11,7 +11,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_contraloria_informe_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver un informe de datos abiertos de Contraloría", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver un informe de datos abiertos de Contraloría",
+        description=(
+            "Rows of one Contraloría audit-reports CSV (one row per approved "
+            "report), or metadata and a read_pdf pointer for an annual plan."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_contraloria_informe(
         informe_id: str, rows: int = 50, format: Literal["text", "json"] = "text"

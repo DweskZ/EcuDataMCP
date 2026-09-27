@@ -11,7 +11,12 @@ from helpers.tool_meta import READ_ONLY
 
 def register_search_eeq_cortes_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Buscar cortes de luz programados (EEQ, Quito)", annotations=READ_ONLY
+        title="Buscar cortes de luz programados (EEQ, Quito)",
+        description=(
+            "Empresa Eléctrica Quito power-cut PDFs from the 2023 and 2024 blackout "
+            "crises. Next: get_eeq_cortes_horarios."
+        ),
+        annotations=READ_ONLY,
     )
     @log_tool
     async def search_eeq_cortes(

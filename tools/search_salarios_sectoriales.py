@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_salarios_sectoriales_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar tablas de salarios mínimos sectoriales", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar tablas de salarios mínimos sectoriales",
+        description=(
+            "Sectoral minimum-wage tables (salarios mínimos sectoriales) 2020-2025 "
+            "from the Ministerio del Trabajo library; no 2026 table exists. Returns "
+            "links."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_salarios_sectoriales(
         anio: int | None = None, format: Literal["text", "json"] = "text"

@@ -12,7 +12,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_informe_igepn_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Descargar y leer un informe del IG-EPN", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Descargar y leer un informe del IG-EPN",
+        description=(
+            "Download and extract the text of one IG-EPN report from "
+            "search_informes_igepn, re-located by exact nombre, grupo and anio "
+            "(plus volcan when names repeat). pages limits the range (max 20/call)."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_informe_igepn(
         nombre: str,

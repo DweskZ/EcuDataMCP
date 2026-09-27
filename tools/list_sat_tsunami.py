@@ -10,7 +10,11 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_list_sat_tsunami_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Listar estaciones del SAT de tsunami", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Listar estaciones del SAT de tsunami",
+        description="SGR tsunami early-warning (SAT) stations with codes and coordinates.",
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def list_sat_tsunami(
         limit: int = 30, format: Literal["text", "json"] = "text"

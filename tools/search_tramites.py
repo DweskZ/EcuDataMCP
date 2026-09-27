@@ -24,7 +24,15 @@ def _matches_query(tramite: dict, words: list[str]) -> bool:
 
 
 def register_search_tramites_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar trámites gubernamentales en gob.ec", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar trámites gubernamentales en gob.ec",
+        description=(
+            "Search gob.ec government procedures (trámites). Pass institution_id "
+            "(SRI=8, IESS=5, Registro Civil=23, ANT=62, Cancillería=16; others via "
+            "list_instituciones) for relevant results."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_tramites(
         query: str = "",

@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_sigmet_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Consultar SIGMET activos en Ecuador", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Consultar SIGMET activos en Ecuador",
+        description=(
+            "Active SIGMETs for Ecuador's single FIR (SEFG): volcanic ash, "
+            "turbulence, icing, storms. Empty means none active."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_sigmet(format: Literal["text", "json"] = "text") -> dict[str, Any]:
         """

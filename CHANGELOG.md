@@ -14,6 +14,13 @@
 
 ### Changed
 
+- **`tools/list` is a third of its former size** (199k → 66k characters,
+  ~50k → ~16.5k tokens per conversation). Each tool now advertises a short
+  description; the full docstring is served on demand by the new
+  `ecuador://herramientas/{nombre}` resource, and conventions shared by
+  most tools (`source`, `format`, link-only results) moved to the server
+  instructions. Auto-generated schema `title`s are no longer sent. A test
+  caps `tools/list` at 80k characters.
 - **Breaking: 14 institutional-archive tools merged into 2.**
   `list_archivo_secciones(fuente)` and `get_archivo_seccion(fuente, seccion)`
   replace the list/get pairs for ARCSA, Superbancos, SEPS, INEVAL, the SGR

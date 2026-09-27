@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_bce_cuentas_nacionales_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar páginas de Cuentas Nacionales del BCE", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar páginas de Cuentas Nacionales del BCE",
+        description=(
+            "BCE national-accounts publication pages: annual, quarterly, regional, "
+            "retropolation, input-output and satellite accounts, IMAEC. Next: "
+            "get_bce_cuentas_nacionales_archivo."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_bce_cuentas_nacionales(
         query: str = "", format: Literal["text", "json"] = "text"

@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_bce_calendario_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar el calendario de publicaciones del BCE", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar el calendario de publicaciones del BCE",
+        description=(
+            "BCE's forward-looking statistical release calendar: dates, category, "
+            "periodicity and reference period. solo_proximas=true keeps upcoming "
+            "releases."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_bce_calendario(
         query: str = "",

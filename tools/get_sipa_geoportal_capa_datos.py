@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_sipa_geoportal_capa_datos_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver muestra de datos de una capa del geoportal MAG", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver muestra de datos de una capa del geoportal MAG",
+        description=(
+            "Sample up to 20 features' attributes from a WFS-enabled MAG geoportal "
+            "layer (layer_id from search_sipa_geoportal_capas). A preview, not a "
+            "spatial query."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_sipa_geoportal_capa_datos(
         layer_id: str, count: int = 5, format: Literal["text", "json"] = "text"

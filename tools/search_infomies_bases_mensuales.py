@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_infomies_bases_mensuales_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar bases mensuales de infoMIES", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar bases mensuales de infoMIES",
+        description=(
+            'infoMIES monthly program databases, serie "anc" (economic inclusion) '
+            'or "is" (social inclusion). Closed years have one year-end file. .rar '
+            "files: links only."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_infomies_bases_mensuales(
         serie: Literal["anc", "is"],

@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_cepalstat_indicador_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver observaciones de un indicador CEPALSTAT", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver observaciones de un indicador CEPALSTAT",
+        description=(
+            "Observations of one CEPALSTAT indicator for one country (Ecuador by "
+            "default), with dimension ids decoded to labels."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_cepalstat_indicador(
         indicator_id: int,

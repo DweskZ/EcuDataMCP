@@ -11,7 +11,12 @@ from helpers.tool_meta import READ_ONLY
 
 def register_get_bce_cuentas_nacionales_archivo_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Ver archivos de una página de Cuentas Nacionales", annotations=READ_ONLY
+        title="Ver archivos de una página de Cuentas Nacionales",
+        description=(
+            "Files of one BCE national-accounts page (pagina_id from "
+            "search_bce_cuentas_nacionales)."
+        ),
+        annotations=READ_ONLY,
     )
     @log_tool
     async def get_bce_cuentas_nacionales_archivo(

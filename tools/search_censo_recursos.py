@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_censo_recursos_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar recursos del Censo Ecuador 2022", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar recursos del Censo Ecuador 2022",
+        description=(
+            "Census 2022 microsite files: full microdata by sector, cantón and city "
+            "block (CSV, SPSS, REDATAM), 2010/2001 recoded to 2022 geography, "
+            "dictionaries, methodology. Returns links."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_censo_recursos(
         query: str = "",

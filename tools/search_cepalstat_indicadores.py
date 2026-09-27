@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_cepalstat_indicadores_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar indicadores en CEPALSTAT", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar indicadores en CEPALSTAT",
+        description=(
+            "Search CEPALSTAT's 2,059 regional indicators (demographic, economic, "
+            "environmental, SDG). Next: get_cepalstat_indicador for Ecuador's "
+            "values."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_cepalstat_indicadores(
         query: str = "",

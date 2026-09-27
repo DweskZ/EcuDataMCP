@@ -1,3 +1,4 @@
+import inspect
 import logging
 import os
 import time
@@ -47,12 +48,20 @@ UVICORN_LOGGING_CONFIG = {
 }
 
 
+# Full docstring of every tool, by name. Tools advertise a short
+# `description=` in tools/list (it's paid for in every conversation's
+# context); the full reference is served on demand by the
+# ecuador://herramientas/{nombre} resource from this registry.
+TOOL_DOCS: dict[str, str] = {}
+
+
 def _elapsed_ms(started: float) -> float:
     return (time.perf_counter() - started) * 1000
 
 
 def log_tool(func: Callable[..., Any]) -> Callable[..., Any]:
     """Decorator to log MCP tool invocations and record their usage."""
+    TOOL_DOCS[func.__name__] = inspect.cleandoc(func.__doc__ or "")
 
     @wraps(func)
     async def wrapper(*args: Any, **kwargs: Any) -> Any:

@@ -13,7 +13,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_download_resource_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Descargar el archivo crudo de un recurso", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Descargar el archivo crudo de un recurso",
+        description=(
+            "Raw bytes of a CKAN resource, base64-encoded, for formats the preview "
+            "can't parse. Max 5 MB. Use format=\"json\"; text only confirms the "
+            "download."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def download_resource(
         resource_id: str,

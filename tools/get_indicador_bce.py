@@ -13,7 +13,15 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 
 def register_get_indicador_bce_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver serie de un indicador BCEData", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver serie de un indicador BCEData",
+        description=(
+            "Time series of one BCEData group (id_grupo from "
+            "search_indicadores_bce), with optional YYYY-MM range, frequency and "
+            "unit."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_indicador_bce(
         id_grupo: int,

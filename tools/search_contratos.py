@@ -13,7 +13,12 @@ from helpers.tool_meta import READ_ONLY
 
 def register_search_contratos_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Buscar procesos de contratación pública (SERCOP)", annotations=READ_ONLY
+        title="Buscar procesos de contratación pública (SERCOP)",
+        description=(
+            "Search SERCOP public procurement (OCDS) by keyword (min 3 characters), "
+            "year, buyer or supplier."
+        ),
+        annotations=READ_ONLY,
     )
     @log_tool
     async def search_contratos(

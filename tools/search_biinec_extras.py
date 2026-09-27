@@ -9,7 +9,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_biinec_extras_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar registros exclusivos de BIINEC", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar registros exclusivos de BIINEC",
+        description=(
+            "Small curated list of INEC BIINEC registries found nowhere else (e.g. "
+            "environmental modules). A last resort; not a live BIINEC search."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_biinec_extras(
         query: str = "", format: Literal["text", "json"] = "text"

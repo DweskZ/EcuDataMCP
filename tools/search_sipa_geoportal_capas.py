@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_sipa_geoportal_capas_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar capas del geoportal agropecuario MAG", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar capas del geoportal agropecuario MAG",
+        description=(
+            "Search MAG's agricultural geoportal layers (agro zoning, land cover, "
+            "censuses, cadastre, agroclimatic risk) by text and categoria. "
+            "solo_wfs=true keeps layers with attribute data."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_sipa_geoportal_capas(
         query: str = "",

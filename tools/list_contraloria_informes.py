@@ -11,7 +11,12 @@ from helpers.tool_meta import READ_ONLY
 
 def register_list_contraloria_informes_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Listar informes de datos abiertos de Contraloría", annotations=READ_ONLY
+        title="Listar informes de datos abiertos de Contraloría",
+        description=(
+            "Contraloría's quarterly CSVs of audit reports approved for any public "
+            "institution, plus annual control plans. Next: get_contraloria_informe."
+        ),
+        annotations=READ_ONLY,
     )
     @log_tool
     async def list_contraloria_informes(

@@ -54,7 +54,13 @@ async def _classify(res: dict, session: httpx.AsyncClient) -> str:
 
 def register_investigate_dataset_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Investigar un dataset en un solo paso", annotations=READ_ONLY
+        title="Investigar un dataset en un solo paso",
+        description=(
+            "One-step shortcut: search CKAN, pick the top dataset and preview its "
+            "first readable resource. Use the individual tools when the top hit "
+            "isn't the right one."
+        ),
+        annotations=READ_ONLY,
     )
     @log_tool
     async def investigate_dataset(

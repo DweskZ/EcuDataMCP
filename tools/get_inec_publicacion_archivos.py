@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_inec_publicacion_archivos_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver archivos de una publicación del INEC", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver archivos de una publicación del INEC",
+        description=(
+            "File links (PDF/XLSX/CSV/ZIP) in one INEC publication (id or URL from "
+            "search_inec_publicaciones)."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_inec_publicacion_archivos(
         post: str, format: Literal["text", "json"] = "text"

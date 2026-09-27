@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_sgr_sitreps_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar informes de situación (SITREP) del SGR", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar informes de situación (SITREP) del SGR",
+        description=(
+            "SGR's archive of ~54 adverse-event dossiers 2016-2026 (earthquakes, "
+            "rainy and fire seasons, volcanic activity) with status. Next: "
+            "get_sgr_sitrep_archivos(evento_url) for the SITREP PDFs."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_sgr_sitreps(
         query: str = "", format: Literal["text", "json"] = "text"

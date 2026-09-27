@@ -88,7 +88,15 @@ def _format_size(size: int | None) -> str:
 
 
 def register_list_dataset_resources_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Listar los recursos de un dataset", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Listar los recursos de un dataset",
+        description=(
+            "Files (resources) in a CKAN dataset with format, size, URL and dates, "
+            "flagging name groups that look like periodic series. Next: "
+            "preview_resource_data or query_resource_data."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def list_dataset_resources(
         dataset_id: str,

@@ -11,7 +11,12 @@ from helpers.tool_meta import READ_ONLY
 
 def register_get_sipa_resumen_indicadores_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Ver el Resumen de Indicadores anual de SIPA", annotations=READ_ONLY
+        title="Ver el Resumen de Indicadores anual de SIPA",
+        description=(
+            "Monthly PDF links of SIPA's (MAG) \"Resumen de Indicadores\" for one "
+            "year, 2018 onward."
+        ),
+        annotations=READ_ONLY,
     )
     @log_tool
     async def get_sipa_resumen_indicadores(

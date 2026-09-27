@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_cnig_femicidios_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar estadísticas de violencia de género (CNIG)", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar estadísticas de violencia de género (CNIG)",
+        description=(
+            "CNIG gender-violence statistics PDFs, including the femicide matrix "
+            "and 19 related tables (snapshot to April 2023). Returns links, not "
+            "contents."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_cnig_femicidios(
         query: str = "", format: Literal["text", "json"] = "text"

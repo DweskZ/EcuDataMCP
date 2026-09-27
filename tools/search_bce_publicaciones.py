@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_bce_publicaciones_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar últimas publicaciones del BCE", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar últimas publicaciones del BCE",
+        description=(
+            "BCE's ~30 most recent published reports and bulletins (editorial feed, "
+            "not data series), filterable by title and format. Returns links."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_bce_publicaciones(
         query: str = "",

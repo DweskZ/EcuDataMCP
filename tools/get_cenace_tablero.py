@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_cenace_tablero_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver un tablero en vivo de CENACE", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver un tablero en vivo de CENACE",
+        description=(
+            "CENACE live grid snapshot: generation mix and demand now, yesterday, "
+            "month or year to date. No historical queries."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_cenace_tablero(
         tablero: Literal[

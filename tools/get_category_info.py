@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_category_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver una categoría temática", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver una categoría temática",
+        description=(
+            "Details and sample datasets for one CKAN thematic category (name from "
+            "list_categories)."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_category_info(
         category: str,

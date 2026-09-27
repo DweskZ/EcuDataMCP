@@ -14,7 +14,15 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 
 def register_search_bce_iem_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar tablas del boletín IEM del BCE", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar tablas del boletín IEM del BCE",
+        description=(
+            "Search the Excel tables of BCE's monthly IEM bulletin (trade by "
+            "country, debt, fiscal, oil, GDP detail). historico=true searches past "
+            "bulletins. Next: get_bce_iem_table."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_bce_iem(
         query: str = "",

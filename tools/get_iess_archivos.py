@@ -12,7 +12,14 @@ _COLECCIONES = ("boletines", "estudios_actuariales", "informes_auditoria")
 
 
 def register_get_iess_archivos_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver documentos de una colección del IESS", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver documentos de una colección del IESS",
+        description=(
+            "Documents in one IESS collection with direct links. anio is required "
+            "for informes_auditoria."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_iess_archivos(
         coleccion: Literal["boletines", "estudios_actuariales", "informes_auditoria"],

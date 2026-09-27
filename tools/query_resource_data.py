@@ -13,7 +13,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_query_resource_data_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Consultar los datos de un recurso (DataStore)", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Consultar los datos de un recurso (DataStore)",
+        description=(
+            "Query a tabular CKAN resource through the DataStore without "
+            "downloading it: full-text query, exact filters (filters_json), sort "
+            "and pagination."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def query_resource_data(
         resource_id: str,

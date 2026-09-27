@@ -200,7 +200,13 @@ def _pick_pair(resources: list[dict]) -> tuple[dict, dict] | None:
 
 def register_detect_series_pattern_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Detectar patrón de series periódicas en un dataset", annotations=READ_ONLY
+        title="Detectar patrón de series periódicas en un dataset",
+        description=(
+            "Tell whether a dataset's periodic files are cumulative (newest file "
+            "suffices) or incremental (combine all) by comparing period values in "
+            "the two newest files. Heuristic over up to 500 rows each."
+        ),
+        annotations=READ_ONLY,
     )
     @log_tool
     async def detect_series_pattern(

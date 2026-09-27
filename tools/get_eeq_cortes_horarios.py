@@ -14,7 +14,12 @@ _TEXT_SECTORES = 220
 
 def register_get_eeq_cortes_horarios_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Horarios de cortes de luz por sector (EEQ, Quito)", annotations=READ_ONLY
+        title="Horarios de cortes de luz por sector (EEQ, Quito)",
+        description=(
+            "Parse one EEQ (Quito) power-cut PDF into rows: date, time blocks, "
+            "substation and neighbourhoods. query filters by place."
+        ),
+        annotations=READ_ONLY,
     )
     @log_tool
     async def get_eeq_cortes_horarios(

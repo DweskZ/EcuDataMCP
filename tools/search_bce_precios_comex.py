@@ -12,6 +12,11 @@ from helpers.tool_meta import READ_ONLY
 def register_search_bce_precios_comex_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Buscar índices de precios de comercio exterior del BCE",
+        description=(
+            "BCE foreign-trade price-index files by import use category and export "
+            "product (oil, shrimp, banana, cacao...). BCEData only has the "
+            "aggregates. Returns links."
+        ),
         annotations=READ_ONLY,
     )
     @log_tool

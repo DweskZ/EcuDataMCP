@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_compania_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver información registral de una compañía", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver información registral de una compañía",
+        description=(
+            "Supercías registry record for one company by RUC: status, "
+            "incorporation, representative, capital, CIIU, address. No financials."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_compania_info(
         ruc: str, format: Literal["text", "json"] = "text"

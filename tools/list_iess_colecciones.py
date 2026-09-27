@@ -9,7 +9,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_list_iess_colecciones_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Listar colecciones de documentos del IESS", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Listar colecciones de documentos del IESS",
+        description=(
+            "IESS document collections (statistical bulletins, actuarial studies, "
+            "audit reports) with years and counts. Next: get_iess_archivos."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def list_iess_colecciones(
         format: Literal["text", "json"] = "text",

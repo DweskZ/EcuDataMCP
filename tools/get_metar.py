@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_metar_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Consultar reportes METAR de un aeródromo", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Consultar reportes METAR de un aeródromo",
+        description=(
+            "Latest METAR/SPECI weather reports for an Ecuadorian aerodrome (ICAO "
+            "code, e.g. SEQM), raw ICAO text with UTC times, from DGAC/AIS."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_metar(
         designador: str, format: Literal["text", "json"] = "text"

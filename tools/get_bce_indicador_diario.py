@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_bce_indicador_diario_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver serie de un indicador diario del BCE", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver serie de un indicador diario del BCE",
+        description=(
+            "One BCE daily/monthly indicator (archivo and codigo from "
+            "list_bce_indicadores_diarios): the last ultimos_n points or a date "
+            "range, capped at 366 rows."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_bce_indicador_diario(
         archivo: str,

@@ -19,6 +19,7 @@ reescriben retroactivamente cuando el total sube después.
 | 2026-09-05 | 102 | Se agregaron 2 tools de ARCSA (`list_arcsa_categorias`, `get_arcsa_categoria_archivos`). |
 | 2026-09-10 | 115 | +13: BCE Cuentas Nacionales (2), calendario de publicaciones BCE (1), SENESCYT SIAU + Biblioteca (3), CEPALSTAT (2), Gacetas de Inmunoprevenibles del MSP (1). Ver auditoría 2026-09-11 abajo para la verificación directa contra el código, no solo un barrido nombre por nombre. |
 | 2026-09-12 | 113 | Fase 0 ejecutada: `list_recent_datasets` fusionado en `search_datasets(sort="recent")`; `search_arcotel_boletines`/`search_arcotel_reportes_mensuales` fusionados en `search_arcotel(tipo=...)`. `list_capabilities` se mantiene como alias (regla 1, período de transición) — sus instrucciones generales ya viven en `MCPServer(instructions=...)`. El trío de aviación (METAR/NOTAM/SIGMET) se evaluó y **no** se fusionó: sus formas de respuesta difieren de verdad (SIGMET no tiene `designador`, y los campos `reportes`/`notams`/`sigmets` no son intercambiables) — fusionarlos habría producido exactamente el antipatrón de argumentos opcionales y respuesta de forma variable que la regla 4 ya prohíbe para otros casos. |
+| 2026-09-27 | 109 | 121 → 109: 14 tools de archivos institucionales fusionadas en `list_archivo_secciones`/`get_archivo_seccion` (ver "Ejecución 2026-09-27"). Entre 09-12 y 09-27 el conteo había subido a 121 con fuentes nuevas (energía, aviación, IESS...). |
 
 **Patrón ya en uso para no agregar tools por fuente nueva:** la ampliación
 de `source=` a `"iadb"` en los tools CKAN genéricos existentes, y el nuevo
@@ -453,6 +454,48 @@ contador por tool (llamadas, latencia p50/p95, tasa de error, fuente
 degradada) expuesto en un endpoint local estilo Prometheus convierte esa
 recomendación en algo accionable, y es también lo que diría qué tools entran
 en cada perfil de la fase 4.
+
+## Ejecución 2026-09-27: fases 4 (primer paso) y 8, y fusión de archivos
+
+Motivo inmediato: el puntaje de Glama marcó "Tool Count 1/5" (121 tools),
+y la medición de 2026-09-18 ya había mostrado que el costo real era el
+tamaño de `tools/list`, no el número.
+
+| Métrica | Antes (121 tools) | Después (109 tools) |
+|---|---|---|
+| `tools/list` (JSON) | 199.151 caracteres (≈50k tokens) | 66.125 caracteres (≈16,5k tokens) |
+| Descripciones | 121.662 | 15.512 |
+| `inputSchema` | 39.453 | 26.337 |
+| `outputSchema` | 10.984 | 5.232 |
+
+1. **Fusión de archivos institucionales (nueva, no estaba en el plan).**
+   14 tools — los pares `list_*`/`get_*` de ARCSA, Superbancos, SEPS,
+   INEVAL, Biblioteca SGR, Biblioteca de Educación Superior y SIPA — pasan
+   a `list_archivo_secciones(fuente)` y `get_archivo_seccion(fuente,
+   seccion)`. No contradice la regla 4: no se fusionan los dos pasos de una
+   fuente, sino la misma pareja repetida entre fuentes con idéntica forma
+   de respuesta (verificado contra los clientes), igual que `source=` en
+   los tools CKAN. IESS queda fuera: su `get` lleva filtros propios
+   (`anio` obligatorio para auditorías, `query`), justo lo que la regla 4
+   prohíbe mezclar.
+2. **Fase 4, paso 1 (descripciones en dos niveles).** Cada tool declara un
+   `description=` corto (mediana 141 caracteres, máximo 350 por test); el
+   docstring completo sigue en el código y se sirve bajo demanda en el
+   recurso `ecuador://herramientas/{nombre}` (registrado por `log_tool`).
+   Lo que casi todos los docstrings repetían (valores de `source`,
+   `format`, "devuelve enlaces, tope de 5 MB") pasa una sola vez a las
+   instrucciones del servidor. `helpers/mcp_server.EcuadorMCPServer` quita
+   los `title` que pydantic genera en cada schema. Gate:
+   `tests/test_tools_list_budget.py` (80k caracteres).
+3. **Fase 8 (telemetría).** `log_tool` registra nombre, resultado y
+   duración de cada llamada (nunca argumentos): `/usage` en HTTP, y
+   `usage.jsonl` con `ECUADOR_MCP_USAGE_LOG=1`, resumido por
+   `scripts/usage_report.py` (incluye las tools nunca llamadas). Es la
+   evidencia que esta revisión exige antes de retirar más tools o de
+   definir perfiles por dominio (resto de la fase 4).
+
+Pendiente: perfiles por dominio (fase 4, paso 2) una vez haya datos de
+uso; fases 5-7 sin cambios.
 
 ## Fuentes oficiales consultadas
 

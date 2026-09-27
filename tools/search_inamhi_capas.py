@@ -10,7 +10,16 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_inamhi_capas_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar capas del geoportal INAMHI", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar capas del geoportal INAMHI",
+        description=(
+            "Search INAMHI's geoportal layers (precipitation normals, daily "
+            "rainfall anomalies, WRF forecast grids, watersheds). "
+            "Polygon-aggregated, not raw station series. solo_wfs=true keeps layers "
+            "with attribute data."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_inamhi_capas(
         query: str = "", solo_wfs: bool = False, format: Literal["text", "json"] = "text"

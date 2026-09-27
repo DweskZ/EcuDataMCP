@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_datasets_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar datasets en el portal de datos abiertos", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar datasets en el portal de datos abiertos",
+        description=(
+            "Search CKAN open-data datasets (national portal by default; see "
+            'source). Use sort="recent" without a query to browse new or updated '
+            "datasets. Next: list_dataset_resources."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_datasets(
         query: str = "",

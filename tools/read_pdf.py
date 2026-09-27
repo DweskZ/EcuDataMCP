@@ -12,7 +12,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_read_pdf_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Extraer texto de un PDF", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Extraer texto de un PDF",
+        description=(
+            "Extract text from a PDF at a direct URL (max 5 MB, 20 pages per call; "
+            "pages selects a range). No OCR: scanned PDFs come back empty."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def read_pdf(
         url: str,

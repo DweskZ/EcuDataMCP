@@ -11,7 +11,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_tramite_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver detalle de un trámite gubernamental", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver detalle de un trámite gubernamental",
+        description=(
+            "One gob.ec trámite's requirements, beneficiaries, cost and responsible "
+            "institution (tramite_id from search_tramites)."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_tramite_info(
         tramite_id: str, format: Literal["text", "json"] = "text"

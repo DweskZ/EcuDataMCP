@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_inec_estadistica_files_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver archivos de un tema estadístico del INEC", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver archivos de un tema estadístico del INEC",
+        description=(
+            "File links (bulletins, methodology, historical series) on one INEC "
+            "topic page from search_inec_estadisticas."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_inec_estadistica_files(
         url: str, format: Literal["text", "json"] = "text"

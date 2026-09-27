@@ -20,7 +20,14 @@ def _money(amount: object, currency: str = "") -> str:
 
 
 def register_get_contrato_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver el expediente OCDS de un contrato SERCOP", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver el expediente OCDS de un contrato SERCOP",
+        description=(
+            "Full OCDS record of one SERCOP procurement process (ocid from "
+            "search_contratos): buyer, tender, awards, contracts."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_contrato_info(
         ocid: str, format: Literal["text", "json"] = "text"

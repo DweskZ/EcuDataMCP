@@ -15,7 +15,13 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 def register_audit_bce_catalog_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Auditar el catálogo BCEData (operador)", annotations=WRITES_LOCAL_ARTIFACTS
+        title="Auditar el catálogo BCEData (operador)",
+        description=(
+            "Operator tool: audit BCEData catalog coverage (groups, series, "
+            "failures); optionally save a snapshot, compare with the last one or "
+            "probe values. Writes local files."
+        ),
+        annotations=WRITES_LOCAL_ARTIFACTS,
     )
     @log_tool
     async def audit_bce_catalog(

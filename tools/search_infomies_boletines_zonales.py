@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_infomies_boletines_zonales_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar boletines zonales de infoMIES", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar boletines zonales de infoMIES",
+        description=(
+            'infoMIES zonal bulletins: modo="zonal" (per-zone .rar, 2017-2021, '
+            'needs zona) or "consolidado" (yearly XLSX 2021-2026, still updated). '
+            "Returns links."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_infomies_boletines_zonales(
         modo: Literal["zonal", "consolidado"] = "zonal",

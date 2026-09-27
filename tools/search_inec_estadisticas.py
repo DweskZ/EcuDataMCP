@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_inec_estadisticas_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar temas estadísticos del INEC", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar temas estadísticos del INEC",
+        description=(
+            "INEC's ~75 statistical topic pages on ecuadorencifras.gob.ec (IPC, "
+            "ENEMDU, pobreza, cuentas nacionales...), where published aggregate "
+            "series live. Next: get_inec_estadistica_files."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_inec_estadisticas(
         query: str = "",

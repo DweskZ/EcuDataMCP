@@ -15,7 +15,13 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 def register_compare_bce_sources_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Comparar BCEData contra IEM (operador)", annotations=WRITES_LOCAL_ARTIFACTS
+        title="Comparar BCEData contra IEM (operador)",
+        description=(
+            "Operator tool: candidate equivalences between BCEData series and IEM "
+            "tables by label. Candidates only; confirm definitions before "
+            "combining. Can save a review file."
+        ),
+        annotations=WRITES_LOCAL_ARTIFACTS,
     )
     @log_tool
     async def compare_bce_sources(

@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_informes_igepn_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar informes sísmicos y volcánicos del IG-EPN", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar informes sísmicos y volcánicos del IG-EPN",
+        description=(
+            "Search IG-EPN's PDF report archive: seismic bulletins and volcanic "
+            "alerts/reports, by year and group. Next: get_informe_igepn to read "
+            "one. For raw earthquake data use search_sismos."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_informes_igepn(
         query: str = "",

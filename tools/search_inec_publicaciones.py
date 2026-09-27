@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_inec_publicaciones_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar publicaciones de Ecuador en Cifras", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar publicaciones de Ecuador en Cifras",
+        description=(
+            "Every INEC post on Ecuador en Cifras, newest first; use for the latest "
+            "release of an operation (topic pages can go stale). Next: "
+            "get_inec_publicacion_archivos."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_inec_publicaciones(
         query: str = "",

@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_organizations_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar organizaciones publicadoras", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar organizaciones publicadoras",
+        description=(
+            "Search the institutions publishing on a CKAN portal (98+ on the "
+            "national one: INEC, SRI, MSP, BCE...)."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_organizations(
         query: str = "",

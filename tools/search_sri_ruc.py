@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_sri_ruc_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar contribuyentes por razón social", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar contribuyentes por razón social",
+        description=(
+            "Find SRI taxpayers by partial razón social or trade name (min 4 "
+            "characters) when the RUC is unknown. SRI caps results at 100."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_sri_ruc(
         razon_social: str,

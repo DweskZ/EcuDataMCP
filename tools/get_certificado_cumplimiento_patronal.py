@@ -12,6 +12,11 @@ from helpers.tool_meta import READ_ONLY
 def register_get_certificado_cumplimiento_patronal_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Verificar cumplimiento de obligaciones patronales (IESS)",
+        description=(
+            "Whether an employer (RUC) or person (cédula) is current on IESS "
+            "contributions. A compliance check, not a headcount; for employees use "
+            "get_financials' n_empleados."
+        ),
         annotations=READ_ONLY,
     )
     @log_tool

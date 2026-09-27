@@ -12,7 +12,15 @@ _FUENTES = {"mef", "senae"}
 
 
 def register_search_mef_fiscal_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar reportes fiscales del MEF o SENAE", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar reportes fiscales del MEF o SENAE",
+        description=(
+            'Fiscal-operations XLSX links: fuente="mef" (current monthly SPNF '
+            'accounts) or "senae" (customs collection by tax, 2012-2021 only). '
+            "Returns links, not contents."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_mef_fiscal(
         fuente: Literal["mef", "senae"] = "mef",

@@ -11,7 +11,11 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_institucion_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver detalle de una institución pública", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver detalle de una institución pública",
+        description="One gob.ec institution's acronym, sector, description and websites.",
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_institucion_info(
         institucion_id: str, format: Literal["text", "json"] = "text"

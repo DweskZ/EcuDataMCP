@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_gacetas_inmunoprevenibles_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar gacetas epidemiológicas de inmunoprevenibles", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar gacetas epidemiológicas de inmunoprevenibles",
+        description=(
+            "MSP weekly vaccine-preventable disease gazette PDFs, 2019 to date, "
+            "some with a disease-specific companion (e.g. tosferina). Returns "
+            "links."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_gacetas_inmunoprevenibles(
         query: str = "", format: Literal["text", "json"] = "text"

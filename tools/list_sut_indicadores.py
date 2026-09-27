@@ -9,7 +9,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_list_sut_indicadores_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Listar tableros de indicadores del SUT", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Listar tableros de indicadores del SUT",
+        description=(
+            "Ministerio del Trabajo SUT Power BI dashboards (contracts since 2015 "
+            "by industry/province/gender, labor demand, gender policy). Next: "
+            "get_sut_indicador_schema, then query_sut_indicador."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def list_sut_indicadores(format: Literal["text", "json"] = "text") -> dict[str, Any]:
         """

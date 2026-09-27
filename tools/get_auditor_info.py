@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_auditor_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver información de un auditor externo", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver información de un auditor externo",
+        description=(
+            "One external auditor's authorization, nationality and contact details "
+            "by RUC or cédula."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_auditor_info(
         identificacion: str, format: Literal["text", "json"] = "text"

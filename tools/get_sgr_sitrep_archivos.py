@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_sgr_sitrep_archivos_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver reportes SITREP de un evento SGR", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver reportes SITREP de un evento SGR",
+        description=(
+            "SITREP PDF links (national, provincial, cantonal) for one SGR event "
+            "page from search_sgr_sitreps. Returns links, not contents."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_sgr_sitrep_archivos(
         evento_url: str, format: Literal["text", "json"] = "text"

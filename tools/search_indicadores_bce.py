@@ -13,7 +13,15 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 
 def register_search_indicadores_bce_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar el catálogo estadístico del BCE", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar el catálogo estadístico del BCE",
+        description=(
+            "Search BCEData indicator groups (monetary, fiscal, external, real "
+            "sector), matching series names too. Not CPI or poverty (INEC). First "
+            "call after 24h can take 10-15 s. Next: get_indicador_bce."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_indicadores_bce(
         query: str = "",

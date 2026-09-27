@@ -11,7 +11,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_get_dataset_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver metadata de un dataset", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver metadata de un dataset",
+        description=(
+            "Metadata for one CKAN dataset: description, organization, tags, dates, "
+            "license, update frequency and the publisher's source URL."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_dataset_info(
         dataset_id: str,

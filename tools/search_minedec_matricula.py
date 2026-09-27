@@ -10,7 +10,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_minedec_matricula_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar registros de matrícula escolar (MINEDEC)", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar registros de matrícula escolar (MINEDEC)",
+        description=(
+            "MINEDEC's basic-education enrollment registry 2009-present "
+            "(start/end-of-year XLSX, metadata, dictionary). Files are 30-140 MB; "
+            "returns links."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_minedec_matricula(
         query: str = "", format: Literal["text", "json"] = "text"

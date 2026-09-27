@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_senescyt_estadisticas_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar estadísticas de educación superior (SENESCYT)", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar estadísticas de educación superior (SENESCYT)",
+        description=(
+            "SENESCYT SIAU higher-education and science/technology reports: annual "
+            "indicators, competitiveness index, methodology. Returns links."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_senescyt_estadisticas(
         query: str = "", format: Literal["text", "json"] = "text"

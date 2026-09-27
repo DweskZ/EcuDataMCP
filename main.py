@@ -5,8 +5,6 @@ import sys
 from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime
 
-from mcp.server.mcpserver import MCPServer
-
 from helpers import usage
 from helpers.env_config import (
     get_mcp_auth_token,
@@ -23,6 +21,7 @@ from helpers.env_config import (
 )
 from helpers.http_security import with_http_security
 from helpers.logging import MAIN_LOGGER_NAME, UVICORN_LOGGING_CONFIG, setup_logging
+from helpers.mcp_server import EcuadorMCPServer
 from helpers.supercias_financials import ensure_financials_db_fresh, financials_status
 from helpers.version import get_version
 from prompts import register_prompts
@@ -46,11 +45,21 @@ Entrada recomendada cuando no se sabe qué tool usar: `search_ecuador`, o los
 prompts `explorar_datos` / `consultar_tramite` / `investigar_contrato` /
 `buscar_regulacion` / `buscar_inec` / `monitorear_riesgos`.
 
-Casi todos los tools aceptan `format="json"` además de `format="text"`
-(default).
+Convenciones comunes a los tools (no se repiten en cada descripción):
+- `format="json"` devuelve el resultado estructurado; `format="text"`
+  (default) un resumen legible.
+- `source` en los tools CKAN: `nacional` (datosabiertos.gob.ec, default),
+  `cuenca` y `latacunga` (portales municipales) o `iadb` (BID; regional,
+  no solo Ecuador).
+- Los tools que "devuelven enlaces" no traen el contenido: descarga la URL
+  directamente o usa `download_resource`/`read_pdf`/`preview_resource_data`
+  (tope de 5 MB).
+- La descripción de cada tool es un resumen; la referencia completa
+  (alcance, parámetros, límites de la fuente) está en el recurso
+  `ecuador://herramientas/{nombre}`.
 """.strip()
 
-mcp = MCPServer(
+mcp = EcuadorMCPServer(
     "Ecuador Datos Abiertos MCP",
     title="EcuDataMCP",
     description=(

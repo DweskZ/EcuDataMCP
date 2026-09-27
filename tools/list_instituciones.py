@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_list_instituciones_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Listar instituciones públicas de gob.ec", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Listar instituciones públicas de gob.ec",
+        description=(
+            "List or search public institutions registered on gob.ec, with their "
+            "IDs."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def list_instituciones(
         query: str = "", page: int = 1, format: Literal["text", "json"] = "text"

@@ -10,7 +10,14 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_search_trabajo_boletin_anual_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar boletines anuales del mercado laboral", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar boletines anuales del mercado laboral",
+        description=(
+            "Ministerio del Trabajo's annual labor-market bulletin PDFs; only "
+            "2020-2022 editions are known. Returns links."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def search_trabajo_boletin_anual(
         query: str = "", format: Literal["text", "json"] = "text"

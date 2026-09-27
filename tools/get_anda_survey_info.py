@@ -19,7 +19,14 @@ def _trim(text: str, n: int = _MAX_TEXT_CHARS) -> str | None:
 
 
 def register_get_anda_survey_info_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Ver metadata de una encuesta ANDA", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Ver metadata de una encuesta ANDA",
+        description=(
+            "Full metadata for one ANDA survey (string idno from search_anda): "
+            "scope, variables, microdata availability and access terms."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def get_anda_survey_info(
         idno: str, format: Literal["text", "json"] = "text"

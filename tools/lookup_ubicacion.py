@@ -16,7 +16,15 @@ from helpers.tool_meta import READ_ONLY
 
 
 def register_lookup_ubicacion_tool(mcp: MCPServer) -> None:
-    @mcp.tool(title="Buscar división político-administrativa del Ecuador", annotations=READ_ONLY)
+    @mcp.tool(
+        title="Buscar división político-administrativa del Ecuador",
+        description=(
+            "Look up Ecuador's provinces, cantons and parroquias with INEC codes, "
+            "region and population. For parroquias, filter by canton and/or "
+            "provincia."
+        ),
+        annotations=READ_ONLY,
+    )
     @log_tool
     async def lookup_ubicacion(
         query: str = "",
