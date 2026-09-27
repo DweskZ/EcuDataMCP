@@ -214,8 +214,8 @@ uvx ecuador-mcp --transport stdio
 ```
 
 `search_ranking`/`get_financials` usan una base SQLite local de Supercías que
-se construye sola en segundo plano la primera vez (descarga ~356 MB, 5-10
-min). Instalado desde PyPI se guarda en el directorio de datos del usuario
+se construye sola en segundo plano cuando la primera consulta la necesita
+(descarga ~356 MB, 5-10 min; esa consulta pide reintentar). Instalado desde PyPI se guarda en el directorio de datos del usuario
 (`%LOCALAPPDATA%\ecuador-mcp` en Windows, `~/Library/Application Support/ecuador-mcp`
 en macOS, `~/.local/share/ecuador-mcp` en Linux); `ECUADOR_MCP_DATA_DIR`
 cambia la ubicación.

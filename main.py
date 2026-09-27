@@ -160,18 +160,22 @@ def main(argv: list[str] | None = None) -> None:
     args = _parse_args(argv)
     transport = args.transport or get_transport()
 
-    # Self-heals the Supercías financials DB (search_ranking/get_financials)
-    # instead of requiring the operator to run
-    # scripts/build_supercias_financials_db.py by hand before first use --
-    # non-blocking, so a missing/stale DB never delays server startup.
-    ensure_financials_db_fresh()
-
     if transport == "stdio":
         logger.info(
             "Starting Ecuador MCP server v%s (stdio, profile=%s)", VERSION, MCP_PROFILE
         )
         mcp.run(transport="stdio")
         return
+
+    # Self-heals the Supercías financials DB (search_ranking/get_financials)
+    # without the operator running the build by hand -- non-blocking, so a
+    # missing/stale DB never delays startup. HTTP only: a stdio server lives
+    # for one client session (and directory checks, `uvx` trials and Docker
+    # `run -i` each start a fresh one), so starting a ~356 MB download there
+    # on every launch wasted it on sessions that never ask for financials.
+    # Over stdio the first financials query starts the build instead
+    # (supercias_financials._check_db_fresh).
+    ensure_financials_db_fresh()
 
     host = args.host if args.host is not None else get_mcp_host()
     port = args.port if args.port is not None else get_mcp_port()

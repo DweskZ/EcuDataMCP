@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.0 — 2026-09-27
 
 ### Added
 
@@ -21,6 +21,11 @@
   most tools (`source`, `format`, link-only results) moved to the server
   instructions. Auto-generated schema `title`s are no longer sent. A test
   caps `tools/list` at 80k characters.
+- **Over stdio, the Supercías financials build waits for the first
+  financials query** instead of starting a ~356 MB download on every
+  launch. Each stdio session (a client, `uvx`, `docker run -i`, directory
+  checks) is a fresh process, so most paid for a download they never used.
+  The HTTP server still starts it at boot.
 - **Breaking: 14 institutional-archive tools merged into 2.**
   `list_archivo_secciones(fuente)` and `get_archivo_seccion(fuente, seccion)`
   replace the list/get pairs for ARCSA, Superbancos, SEPS, INEVAL, the SGR

@@ -235,7 +235,7 @@ wheels = [
 
 [[package]]
 name = "ecuador-mcp"
-version = "0.8.13"
+version = "0.9.0"
 source = { editable = "." }
 dependencies = [
     { name = "certifi" },

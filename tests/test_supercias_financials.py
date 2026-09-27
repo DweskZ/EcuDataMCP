@@ -431,3 +431,25 @@ def test_data_dir_outside_checkout_is_per_user(monkeypatch, tmp_path):
     monkeypatch.setattr(paths, "_ROOT", tmp_path / "site-packages")
     assert paths.data_dir().name == "ecuador-mcp"
     assert "site-packages" not in paths.data_dir().parts
+
+
+def test_stdio_startup_leaves_the_financials_build_to_the_first_query(monkeypatch):
+    import main
+
+    calls = []
+    monkeypatch.setattr(main, "ensure_financials_db_fresh", lambda: calls.append("ensure"))
+    monkeypatch.setattr(main.mcp, "run", lambda transport: calls.append(transport))
+    main.main(["--transport", "stdio"])
+    assert calls == ["stdio"]
+
+
+def test_http_startup_still_starts_the_financials_build(monkeypatch):
+    import uvicorn
+
+    import main
+
+    calls = []
+    monkeypatch.setattr(main, "ensure_financials_db_fresh", lambda: calls.append("ensure"))
+    monkeypatch.setattr(uvicorn, "run", lambda *a, **k: calls.append("uvicorn"))
+    main.main(["--transport", "http", "--host", "127.0.0.1"])
+    assert calls == ["ensure", "uvicorn"]
