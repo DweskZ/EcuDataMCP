@@ -24,6 +24,8 @@ jobs:
         run: |
           version=$(grep -m1 '^version' pyproject.toml | cut -d '"' -f2)
           jq -e --arg v "$version" '.version == $v and .packages[0].version == $v' server.json
+          # The MCP Registry rejects descriptions over 100 characters.
+          jq -e '.description | length <= 100' server.json
           if [ "${{ github.event_name }}" = "release" ]; then
             test "${{ github.event.release.tag_name }}" = "v$version"
           fi
@@ -53,7 +55,11 @@ jobs:
           name: dist
           path: dist/
 
+      # A manual rerun after the registry step fails would otherwise stop
+      # here, because PyPI refuses to re-upload an existing version.
       - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
 
   mcp-registry:
     needs: pypi
