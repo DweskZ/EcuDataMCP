@@ -54,6 +54,10 @@
 - **`get_financials` with a RUC shared by several companies** (~156 RUCs in
   the source) now lists the candidate expedientes instead of silently
   picking one.
+- **Publishing:** releases now go to PyPI (trusted publishing) and the
+  official MCP Registry from `.github/workflows/publish.yml`. The registry
+  name is now `io.github.DweskZ/ecudatamcp`, because GitHub OIDC grants the
+  owner's exact casing and the registry compares namespaces case-sensitively.
 
 ### Fixed
 

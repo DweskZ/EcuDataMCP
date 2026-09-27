@@ -5,7 +5,7 @@
 [![MCP](https://img.shields.io/badge/MCP-compatible-green.svg)](https://modelcontextprotocol.io)
 [![M8ven Score](https://m8ven.ai/badge/mcp/dweskz/ecudatamcp)](https://m8ven.ai/mcp/dweskz/ecudatamcp)
 
-<!-- mcp-name: io.github.dweskz/ecudatamcp -->
+<!-- mcp-name: io.github.DweskZ/ecudatamcp -->
 
 **Infraestructura abierta de datos públicos para Ecuador.** EcuDataMCP conecta asistentes de IA, investigadores, periodistas y software con datos oficiales ecuatorianos mediante una interfaz común.
 

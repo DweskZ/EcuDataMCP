@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.dweskz/ecudatamcp",
+  "name": "io.github.DweskZ/ecudatamcp",
   "title": "EcuDataMCP",
   "description": "Open public-data infrastructure for Ecuador: CKAN, SRI, BCE, Supercias, INEC, SERCOP, IG-EPN and more.",
   "repository": {

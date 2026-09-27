@@ -1,0 +1,74 @@
+name: Publish
+
+# Runs when a GitHub release is published. Uploads the package to PyPI via
+# trusted publishing (OIDC, no stored token) and then registers server.json
+# in the official MCP Registry, which verifies the PyPI package through the
+# `mcp-name:` comment in README.md.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+
+      # The tag, pyproject.toml and server.json must agree, otherwise PyPI
+      # and the MCP Registry end up advertising different versions.
+      - name: Check version consistency
+        run: |
+          version=$(grep -m1 '^version' pyproject.toml | cut -d '"' -f2)
+          jq -e --arg v "$version" '.version == $v and .packages[0].version == $v' server.json
+          if [ "${{ github.event_name }}" = "release" ]; then
+            test "${{ github.event.release.tag_name }}" = "v$version"
+          fi
+
+      - name: Run tests
+        run: uv run pytest -q
+
+      - name: Build
+        run: uv build
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+  pypi:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/ecuador-mcp/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  mcp-registry:
+    needs: pypi
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install mcp-publisher
+        run: |
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" \
+            | tar xz mcp-publisher
+
+      - name: Publish to MCP Registry
+        run: |
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish
