@@ -115,8 +115,8 @@ _CAPABILITIES = {
             "get_informe_igepn",
             "search_sgr_sitreps",
             "get_sgr_sitrep_archivos",
-            "list_sgr_biblioteca_categorias",
-            "get_sgr_biblioteca_categoria_archivos",
+            "list_archivo_secciones",
+            "get_archivo_seccion",
             "search_inamhi_capas",
             "get_inamhi_capa_datos",
         ],
@@ -163,21 +163,19 @@ _CAPABILITIES = {
             "get_sri_ruc_info",
             "search_sri_ruc",
         ],
-        "arcsa": ["list_arcsa_categorias", "get_arcsa_categoria_archivos"],
+        "arcsa": ["list_archivo_secciones", "get_archivo_seccion"],
         "financieros": ["search_ranking", "get_financials"],
         "agropecuario": [
-            "list_sipa_modulos",
-            "get_sipa_modulo_archivos",
+            "list_archivo_secciones",
+            "get_archivo_seccion",
             "get_sipa_resumen_indicadores",
             "search_sipa_geoportal_capas",
             "get_sipa_geoportal_capa_datos",
         ],
         "auditoria": ["list_contraloria_informes", "get_contraloria_informe"],
         "superbancos": [
-            "list_superbancos_secciones",
-            "get_superbancos_seccion_archivos",
-            "list_seps_secciones",
-            "get_seps_seccion_archivos",
+            "list_archivo_secciones",
+            "get_archivo_seccion",
         ],
         "energia": [
             "get_cenace_tablero",
@@ -201,11 +199,9 @@ _CAPABILITIES = {
         ],
         "social": [
             "search_senescyt_estadisticas",
-            "list_senescyt_biblioteca_categorias",
-            "get_senescyt_biblioteca_categoria_archivos",
+            "list_archivo_secciones",
+            "get_archivo_seccion",
             "search_minedec_matricula",
-            "list_ineval_familias",
-            "get_ineval_familia_archivos",
             "search_infomies_bases_mensuales",
             "search_infomies_boletines_zonales",
             "search_gacetas_inmunoprevenibles",
@@ -285,7 +281,7 @@ _CAPABILITIES = {
         ),
         (
             "SIPA es Ministerio de Agricultura, Ganadería y Pesca — distinto de "
-            "MPCEIP (Producción/Comercio Exterior); get_sipa_modulo_archivos "
+            "MPCEIP (Producción/Comercio Exterior); get_archivo_seccion(fuente='sipa') "
             "solo devuelve metadata + URL directa, nunca el archivo (algunos "
             "superan 41 MB, muy por encima del tope de 5 MB de "
             "download_resource/preview_resource_data)"

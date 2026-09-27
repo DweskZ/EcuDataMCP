@@ -41,7 +41,7 @@ def test_fuentes_lists_every_integrated_source_family():
     assert "search_informes_igepn" in sources["igepn"]["tools"]
     assert "get_sri_ruc_info" in sources["sri"]["tools"]
     assert "list_bce_indicadores_diarios" in sources["bce"]["tools"]
-    assert "get_superbancos_seccion_archivos" in sources["superbancos"]["tools"]
+    assert "get_archivo_seccion" in sources["superbancos"]["tools"]
     assert "get_cenace_tablero" in sources["cenace"]["tools"]
     assert "query_sut_indicador" in sources["sut"]["tools"]
     assert json.loads(json.dumps(payload, ensure_ascii=False))["fuentes"]

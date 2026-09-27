@@ -81,8 +81,8 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `search_sismos` | Sismos recientes del catálogo del Instituto Geofísico (IG-EPN): magnitud, profundidad, ubicación y estado de revisión. |
 | `search_sgr_sitreps` | Archivo histórico de eventos adversos de la SGR (2016-2026). |
 | `get_sgr_sitrep_archivos` | Reportes SITREP en PDF de un evento adverso de la SGR. |
-| `list_sgr_biblioteca_categorias` | Categorías de la biblioteca documental de la SGR (~1660 documentos). |
-| `get_sgr_biblioteca_categoria_archivos` | Documentos de una categoría de la biblioteca de la SGR. |
+| `list_archivo_secciones` (`fuente="sgr"`) | Categorías de la biblioteca documental de la SGR (~1660 documentos). |
+| `get_archivo_seccion` (`fuente="sgr"`) | Documentos de una categoría de la biblioteca de la SGR. |
 | `search_inamhi_capas` | Catálogo de capas del geoportal de INAMHI (meteorología e hidrología). |
 | `get_inamhi_capa_datos` | Muestra de atributos reales de una capa del geoportal de INAMHI. |
 
@@ -138,11 +138,11 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | Tool | Descripción |
 |------|-------------|
 | `get_contraloria_informe` | Descarga y previsualiza un documento de la Contraloría (Datos Abiertos o Plan Anual de Control). |
-| `get_sipa_modulo_archivos` | Lista los enlaces de descarga directa publicados en un módulo de estadísticas de SIPA. |
-| `get_superbancos_seccion_archivos` | Lista los enlaces de descarga directa publicados en una sección de estadísticas de Superbancos. |
+| `get_archivo_seccion` (`fuente="sipa"`) | Lista los enlaces de descarga directa publicados en un módulo de estadísticas de SIPA. |
+| `get_archivo_seccion` (`fuente="superbancos"`) | Lista los enlaces de descarga directa publicados en una sección de estadísticas de Superbancos. |
 | `list_contraloria_informes` | Lista los documentos "Datos Abiertos" y "Plan Anual de Control" de la Contraloría General del Estado. |
-| `list_sipa_modulos` | Lista los módulos de descarga de estadísticas de SIPA (sipa.agricultura.gob.ec). |
-| `list_superbancos_secciones` | Lista las secciones de estadísticas de la Superintendencia de Bancos (superbancos.gob.ec/estadisticas/portalestudios/). |
+| `list_archivo_secciones` (`fuente="sipa"`) | Lista los módulos de descarga de estadísticas de SIPA (sipa.agricultura.gob.ec). |
+| `list_archivo_secciones` (`fuente="superbancos"`) | Lista las secciones de estadísticas de la Superintendencia de Bancos (superbancos.gob.ec/estadisticas/portalestudios/). |
 | `get_sipa_resumen_indicadores` | PDF mensuales del "Resumen de Indicadores" de SIPA (Ministerio de Agricultura), por año. |
 | `search_sipa_geoportal_capas` | Catálogo de capas del geoportal del Ministerio de Agricultura (SIPA). |
 | `get_sipa_geoportal_capa_datos` | Muestra de atributos reales de una capa del geoportal de SIPA. |
@@ -170,8 +170,8 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 
 | Tool | Descripción |
 |------|-------------|
-| `list_seps_secciones` | Secciones de estadísticas de la SEPS (sector financiero popular y solidario). |
-| `get_seps_seccion_archivos` | Documentos de una sección de estadísticas de la SEPS. |
+| `list_archivo_secciones` (`fuente="seps"`) | Secciones de estadísticas de la SEPS (sector financiero popular y solidario). |
+| `get_archivo_seccion` (`fuente="seps"`) | Documentos de una sección de estadísticas de la SEPS. |
 
 ## IESS: documentos institucionales
 
@@ -184,8 +184,8 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 
 | Tool | Descripción |
 |------|-------------|
-| `list_ineval_familias` | Familias de evaluación del INEVAL con página de bases de datos. |
-| `get_ineval_familia_archivos` | Enlaces de descarga de una familia de evaluación del INEVAL. |
+| `list_archivo_secciones` (`fuente="ineval"`) | Familias de evaluación del INEVAL con página de bases de datos. |
+| `get_archivo_seccion` (`fuente="ineval"`) | Enlaces de descarga de una familia de evaluación del INEVAL. |
 
 ## Aviación civil (DGAC)
 
@@ -207,8 +207,8 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 
 | Tool | Descripción |
 |------|-------------|
-| `list_arcsa_categorias` | Categorías del registro sanitario de ARCSA (Base de Registros Emitidos). |
-| `get_arcsa_categoria_archivos` | Documentos de una categoría del registro sanitario de ARCSA. |
+| `list_archivo_secciones` (`fuente="arcsa"`) | Categorías del registro sanitario de ARCSA (Base de Registros Emitidos). |
+| `get_archivo_seccion` (`fuente="arcsa"`) | Documentos de una categoría del registro sanitario de ARCSA. |
 
 ## Fuentes sectoriales adicionales
 
@@ -222,8 +222,8 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `search_trabajo_boletin_anual` | Boletín estadístico anual del mercado laboral ecuatoriano. |
 | `search_salarios_sectoriales` | Tablas de salarios mínimos sectoriales de Ecuador. |
 | `search_senescyt_estadisticas` | Reportes del SIAU de SENESCYT: estadísticas de educación superior y CTI. |
-| `list_senescyt_biblioteca_categorias` | Categorías de la Biblioteca de Educación Superior (MINEDEC/SENESCYT). |
-| `get_senescyt_biblioteca_categoria_archivos` | Documentos de una categoría de la Biblioteca de Educación Superior. |
+| `list_archivo_secciones` (`fuente="senescyt"`) | Categorías de la Biblioteca de Educación Superior (MINEDEC/SENESCYT). |
+| `get_archivo_seccion` (`fuente="senescyt"`) | Documentos de una categoría de la Biblioteca de Educación Superior. |
 | `search_gacetas_inmunoprevenibles` | Gacetas epidemiológicas semanales de enfermedades prevenibles por vacunación (MSP). |
 
 ## Fuentes internacionales

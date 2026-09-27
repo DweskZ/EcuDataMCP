@@ -42,7 +42,7 @@ de cobertura que falta en cada una.
 
 | Fuente | Herramientas | Qué cubre |
 |---|---|---|
-| Base de Registros Emitidos | `list_arcsa_categorias`, `get_arcsa_categoria_archivos` | Registro sanitario vigente por categoría (alimentos, medicamentos, cosméticos, dispositivos médicos, plaguicidas, etc.), 27 categorías / 77 archivos; reutiliza el mismo parser de la Biblioteca de SGR (mismo plugin WordPress download-monitor) → RESEARCH.md § Decimoctava pasada |
+| Base de Registros Emitidos | `list_archivo_secciones(fuente="arcsa")`, `get_archivo_seccion(fuente="arcsa", …)` | Registro sanitario vigente por categoría (alimentos, medicamentos, cosméticos, dispositivos médicos, plaguicidas, etc.), 27 categorías / 77 archivos; reutiliza el mismo parser de la Biblioteca de SGR (mismo plugin WordPress download-monitor) → RESEARCH.md § Decimoctava pasada |
 | Datasets CKAN (registros suspendidos/cancelados) | tools CKAN genéricos | 4 datasets ya alcanzables sin código nuevo, complementarios al registro vigente de arriba → RESEARCH.md § Décima pasada |
 
 ### Superintendencia de Compañías (Supercías)
@@ -57,7 +57,7 @@ de cobertura que falta en cada una.
 
 | Fuente | Herramientas | Qué cubre |
 |---|---|---|
-| Módulos económico/productivo/social/censos | `list_sipa_modulos`, `get_sipa_modulo_archivos` | 30 archivos Excel reales en 4 módulos → RESEARCH.md § Quinta pasada |
+| Módulos económico/productivo/social/censos | `list_archivo_secciones(fuente="sipa")`, `get_archivo_seccion(fuente="sipa", …)` | 30 archivos Excel reales en 4 módulos → RESEARCH.md § Quinta pasada |
 | Geoportal (GeoServer) | `search_sipa_geoportal_capas`, `get_sipa_geoportal_capa_datos` | 277 capas WMS, 257 con WFS real, en 24 endpoints por workspace → RESEARCH.md § Decimocuarta pasada |
 | Resumen de Indicadores Sectoriales | `get_sipa_resumen_indicadores` | PDFs mensuales 2018-2026 (el único de 7 ítems del tablero que no es Tableau/flipbook) → RESEARCH.md § Decimocuarta pasada |
 
@@ -101,19 +101,19 @@ de cobertura que falta en cada una.
 
 | Fuente | Herramientas | Qué cubre |
 |---|---|---|
-| SITREP + Biblioteca | `search_sgr_sitreps`, `get_sgr_sitrep_archivos`, `list_sgr_biblioteca_categorias`, `get_sgr_biblioteca_categoria_archivos` | 54 eventos adversos 2016-2026 con PDFs; Biblioteca con 19 categorías, ~1660 documentos (mapas de amenaza, rutas de evacuación) → RESEARCH.md § Decimocuarta pasada |
+| SITREP + Biblioteca | `search_sgr_sitreps`, `get_sgr_sitrep_archivos`, `list_archivo_secciones(fuente="sgr")`, `get_archivo_seccion(fuente="sgr", …)` | 54 eventos adversos 2016-2026 con PDFs; Biblioteca con 19 categorías, ~1660 documentos (mapas de amenaza, rutas de evacuación) → RESEARCH.md § Decimocuarta pasada |
 
 ### INEVAL
 
 | Fuente | Herramientas | Qué cubre |
 |---|---|---|
-| Familias de exámenes nacionales | `list_ineval_familias`, `get_ineval_familia_archivos` | 9 familias (Ser Bachiller, Ser Estudiante, Ser Maestro, Ser Profesional, Llece), 557 enlaces, sin login/CAPTCHA → RESEARCH.md § INEVAL |
+| Familias de exámenes nacionales | `list_archivo_secciones(fuente="ineval")`, `get_archivo_seccion(fuente="ineval", …)` | 9 familias (Ser Bachiller, Ser Estudiante, Ser Maestro, Ser Profesional, Llece), 557 enlaces, sin login/CAPTCHA → RESEARCH.md § INEVAL |
 
 ### Superbancos
 
 | Fuente | Herramientas | Qué cubre |
 |---|---|---|
-| Secciones estadísticas + widgets OneDrive | `list_superbancos_secciones`, `get_superbancos_seccion_archivos` | Boletines Financieros Mensuales (224 archivos, 1997-2026), Servicios Financieros (312 archivos vía 3 widgets OneDrive descifrados), Información Histórica, Calendario Estadístico → RESEARCH.md § Séptima, Décima y Duodécima pasada |
+| Secciones estadísticas + widgets OneDrive | `list_archivo_secciones(fuente="superbancos")`, `get_archivo_seccion(fuente="superbancos", …)` | Boletines Financieros Mensuales (224 archivos, 1997-2026), Servicios Financieros (312 archivos vía 3 widgets OneDrive descifrados), Información Histórica, Calendario Estadístico → RESEARCH.md § Séptima, Décima y Duodécima pasada |
 
 ### MEF/SENAE
 
@@ -132,13 +132,13 @@ de cobertura que falta en cada una.
 | Fuente | Herramientas | Qué cubre |
 |---|---|---|
 | SIAU — Estadísticas de Educación Superior, CTI | `search_senescyt_estadisticas` | 12 archivos reales (fichas metodológicas, reportes de indicadores 2021/2022/2024, índice de competitividad, inventario CTI/saberes ancestrales, demanda laboral, impacto COVID-19), acordeón WPBakery mezclando paquetes WordPress Download Manager y links directos/Nextcloud → RESEARCH.md § SENESCYT / Educación Superior / MINEDEC |
-| Biblioteca de Educación Superior | `list_senescyt_biblioteca_categorias`, `get_senescyt_biblioteca_categoria_archivos` | 1.259 documentos reales en 17 categorías de primer nivel (PAC por año, Normativa, LOES, SNNA, Acuerdos —694 por sí sola—, Indicadores ACTI, exámenes especiales), mismo patrón download-monitor que SGR/ARCSA; nesting hasta 3 niveles de profundidad (más que SGR/ARCSA) → RESEARCH.md § SENESCYT / Educación Superior / MINEDEC |
+| Biblioteca de Educación Superior | `list_archivo_secciones(fuente="senescyt")`, `get_archivo_seccion(fuente="senescyt", …)` | 1.259 documentos reales en 17 categorías de primer nivel (PAC por año, Normativa, LOES, SNNA, Acuerdos —694 por sí sola—, Indicadores ACTI, exámenes especiales), mismo patrón download-monitor que SGR/ARCSA; nesting hasta 3 niveles de profundidad (más que SGR/ARCSA) → RESEARCH.md § SENESCYT / Educación Superior / MINEDEC |
 
 ### SEPS (Economía Popular y Solidaria)
 
 | Fuente | Herramientas | Qué cubre |
 |---|---|---|
-| Secciones SFPS/EPS | `list_seps_secciones`, `get_seps_seccion_archivos` | 26 secciones reales, incluida calificación de riesgo (112 entidades, 2020-2025) → RESEARCH.md § Decimotercera pasada |
+| Secciones SFPS/EPS | `list_archivo_secciones(fuente="seps")`, `get_archivo_seccion(fuente="seps", …)` | 26 secciones reales, incluida calificación de riesgo (112 entidades, 2020-2025) → RESEARCH.md § Decimotercera pasada |
 
 ### CNIG (Igualdad de Género)
 

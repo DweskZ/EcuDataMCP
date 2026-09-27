@@ -1,5 +1,6 @@
 from mcp.server.mcpserver import MCPServer
 
+from tools.archivo_secciones import register_archivo_secciones_tools
 from tools.arconel_reportes import (
     register_get_arconel_reporte_tool,
     register_list_arconel_reportes_tool,
@@ -11,9 +12,6 @@ from tools.download_anda_microdata import register_download_anda_microdata_tool
 from tools.download_resource import register_download_resource_tool
 from tools.get_aip_aerodromo import register_get_aip_aerodromo_tool
 from tools.get_anda_survey_info import register_get_anda_survey_info_tool
-from tools.get_arcsa_categoria_archivos import (
-    register_get_arcsa_categoria_archivos_tool,
-)
 from tools.get_auditor_info import register_get_auditor_info_tool
 from tools.get_bce_cuentas_nacionales_archivo import (
     register_get_bce_cuentas_nacionales_archivo_tool,
@@ -46,7 +44,6 @@ from tools.get_inec_estadistica_files import register_get_inec_estadistica_files
 from tools.get_inec_publicacion_archivos import (
     register_get_inec_publicacion_archivos_tool,
 )
-from tools.get_ineval_familia_archivos import register_get_ineval_familia_archivos_tool
 from tools.get_informe_igepn import register_get_informe_igepn_tool
 from tools.get_institucion_info import register_get_institucion_info_tool
 from tools.get_metar import register_get_metar_tool
@@ -54,32 +51,20 @@ from tools.get_notam import register_get_notam_tool
 from tools.get_organization_info import register_get_organization_info_tool
 from tools.get_regulacion_info import register_get_regulacion_info_tool
 from tools.get_resource_info import register_get_resource_info_tool
-from tools.get_senescyt_biblioteca_categoria_archivos import (
-    register_get_senescyt_biblioteca_categoria_archivos_tool,
-)
-from tools.get_seps_seccion_archivos import register_get_seps_seccion_archivos_tool
-from tools.get_sgr_biblioteca_categoria_archivos import (
-    register_get_sgr_biblioteca_categoria_archivos_tool,
-)
 from tools.get_sgr_sitrep_archivos import register_get_sgr_sitrep_archivos_tool
 from tools.get_sigmet import register_get_sigmet_tool
 from tools.get_sipa_geoportal_capa_datos import (
     register_get_sipa_geoportal_capa_datos_tool,
 )
-from tools.get_sipa_modulo_archivos import register_get_sipa_modulo_archivos_tool
 from tools.get_sipa_resumen_indicadores import (
     register_get_sipa_resumen_indicadores_tool,
 )
 from tools.get_sri_ruc_info import register_get_sri_ruc_info_tool
-from tools.get_superbancos_seccion_archivos import (
-    register_get_superbancos_seccion_archivos_tool,
-)
 from tools.get_sut_indicador_schema import register_get_sut_indicador_schema_tool
 from tools.get_tramite_estadisticas import register_get_tramite_estadisticas_tool
 from tools.get_tramite_info import register_get_tramite_info_tool
 from tools.investigate_dataset import register_investigate_dataset_tool
 from tools.list_aip_aerodromos import register_list_aip_aerodromos_tool
-from tools.list_arcsa_categorias import register_list_arcsa_categorias_tool
 from tools.list_bce_indicadores_diarios import (
     register_list_bce_indicadores_diarios_tool,
 )
@@ -88,18 +73,8 @@ from tools.list_categories import register_list_categories_tool
 from tools.list_contraloria_informes import register_list_contraloria_informes_tool
 from tools.list_dataset_resources import register_list_dataset_resources_tool
 from tools.list_iess_colecciones import register_list_iess_colecciones_tool
-from tools.list_ineval_familias import register_list_ineval_familias_tool
 from tools.list_instituciones import register_list_instituciones_tool
 from tools.list_sat_tsunami import register_list_sat_tsunami_tool
-from tools.list_senescyt_biblioteca_categorias import (
-    register_list_senescyt_biblioteca_categorias_tool,
-)
-from tools.list_seps_secciones import register_list_seps_secciones_tool
-from tools.list_sgr_biblioteca_categorias import (
-    register_list_sgr_biblioteca_categorias_tool,
-)
-from tools.list_sipa_modulos import register_list_sipa_modulos_tool
-from tools.list_superbancos_secciones import register_list_superbancos_secciones_tool
 from tools.list_sut_indicadores import register_list_sut_indicadores_tool
 from tools.list_zip_contents import register_list_zip_contents_tool
 from tools.lookup_ubicacion import register_lookup_ubicacion_tool
@@ -177,8 +152,6 @@ def register_tools(mcp: MCPServer) -> None:
     register_search_eventos_riesgo_tool(mcp)
     register_search_sgr_sitreps_tool(mcp)
     register_get_sgr_sitrep_archivos_tool(mcp)
-    register_list_sgr_biblioteca_categorias_tool(mcp)
-    register_get_sgr_biblioteca_categoria_archivos_tool(mcp)
     register_search_inamhi_capas_tool(mcp)
     register_get_inamhi_capa_datos_tool(mcp)
     register_list_sat_tsunami_tool(mcp)
@@ -191,8 +164,6 @@ def register_tools(mcp: MCPServer) -> None:
     register_list_aip_aerodromos_tool(mcp)
     register_get_aip_aerodromo_tool(mcp)
 
-    register_list_ineval_familias_tool(mcp)
-    register_get_ineval_familia_archivos_tool(mcp)
 
     register_search_datasets_tool(mcp)
     register_get_dataset_info_tool(mcp)
@@ -235,8 +206,6 @@ def register_tools(mcp: MCPServer) -> None:
     register_search_cnig_femicidios_tool(mcp)
     register_search_minedec_matricula_tool(mcp)
     register_search_senescyt_estadisticas_tool(mcp)
-    register_list_senescyt_biblioteca_categorias_tool(mcp)
-    register_get_senescyt_biblioteca_categoria_archivos_tool(mcp)
     register_search_mef_fiscal_tool(mcp)
     register_search_infomies_bases_mensuales_tool(mcp)
     register_search_infomies_boletines_zonales_tool(mcp)
@@ -246,17 +215,11 @@ def register_tools(mcp: MCPServer) -> None:
     register_search_regulaciones_tool(mcp)
     register_get_regulacion_info_tool(mcp)
 
-    register_list_sipa_modulos_tool(mcp)
-    register_get_sipa_modulo_archivos_tool(mcp)
     register_get_sipa_resumen_indicadores_tool(mcp)
     register_search_sipa_geoportal_capas_tool(mcp)
     register_get_sipa_geoportal_capa_datos_tool(mcp)
 
-    register_list_superbancos_secciones_tool(mcp)
-    register_get_superbancos_seccion_archivos_tool(mcp)
 
-    register_list_seps_secciones_tool(mcp)
-    register_get_seps_seccion_archivos_tool(mcp)
 
     register_list_sut_indicadores_tool(mcp)
     register_get_sut_indicador_schema_tool(mcp)
@@ -294,6 +257,7 @@ def register_tools(mcp: MCPServer) -> None:
     register_search_eeq_cortes_tool(mcp)
     register_get_eeq_cortes_horarios_tool(mcp)
     register_get_energia_ecuador_snapshot_tool(mcp)
+    register_archivo_secciones_tools(mcp)
 
     register_search_companias_tool(mcp)
     register_get_compania_info_tool(mcp)
@@ -302,8 +266,6 @@ def register_tools(mcp: MCPServer) -> None:
     register_search_auditores_tool(mcp)
     register_get_auditor_info_tool(mcp)
 
-    register_list_arcsa_categorias_tool(mcp)
-    register_get_arcsa_categoria_archivos_tool(mcp)
 
     register_search_cepalstat_indicadores_tool(mcp)
     register_get_cepalstat_indicador_tool(mcp)

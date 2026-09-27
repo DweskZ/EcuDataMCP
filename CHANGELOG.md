@@ -2,7 +2,28 @@
 
 ## Unreleased
 
+### Changed
+
+- **Breaking: 14 institutional-archive tools merged into 2.**
+  `list_archivo_secciones(fuente)` and `get_archivo_seccion(fuente, seccion)`
+  replace the list/get pairs for ARCSA, Superbancos, SEPS, INEVAL, the SGR
+  and Educación Superior libraries, and SIPA (`list_arcsa_categorias`,
+  `get_arcsa_categoria_archivos`, `list_superbancos_secciones`,
+  `get_superbancos_seccion_archivos`, `list_seps_secciones`,
+  `get_seps_seccion_archivos`, `list_ineval_familias`,
+  `get_ineval_familia_archivos`, `list_sgr_biblioteca_categorias`,
+  `get_sgr_biblioteca_categoria_archivos`,
+  `list_senescyt_biblioteca_categorias`,
+  `get_senescyt_biblioteca_categoria_archivos`, `list_sipa_modulos`,
+  `get_sipa_modulo_archivos`). They were the same two-step flow with the
+  same file-listing shape; the responses are normalized to `id`/`nombre`
+  per section and a common file list. 121 → 109 tools.
+
 ### Fixed
+
+- **INEVAL downloads failed certificate verification.**
+  evaluaciones.evaluacion.gob.ec doesn't send its Sectigo intermediate;
+  it now uses the bundled intermediate like Superbancos and CENACE.
 
 - **The MCP `initialize` response had no title or description**, so
   directory tools that inspect the server (LobeHub's `lhm plugin init`)

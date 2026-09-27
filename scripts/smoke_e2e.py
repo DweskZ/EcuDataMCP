@@ -255,8 +255,8 @@ async def main() -> int:
             ("search_companias", {"query": "BANCO", "limit": 3}, []),
             ("search_auditores", {"query": "AUDIT", "limit": 3}, []),
             ("search_ranking", {"limit": 3}, []),
-            ("list_sipa_modulos", {}, ["SIPA", "económico"]),
-            ("list_superbancos_secciones", {}, ["seccion"]),
+            ("list_archivo_secciones", {"fuente": "sipa"}, ["SIPA", "economico"]),
+            ("list_archivo_secciones", {"fuente": "superbancos"}, ["boletines_financieros"]),
             ("list_sut_indicadores", {}, ["indicador"]),
             ("list_contraloria_informes", {}, ["Contraloría"]),
             ("search_anda", {"query": "empleo", "limit": 3}, []),
@@ -323,13 +323,15 @@ async def chain_sut(client: httpx.AsyncClient) -> None:
 
 async def chain_superbancos(client: httpx.AsyncClient) -> None:
     listing = json.loads(
-        await call_chain_step(client, "list_superbancos_secciones", {"format": "json"})
+        await call_chain_step(
+            client, "list_archivo_secciones", {"fuente": "superbancos", "format": "json"}
+        )
     )
-    seccion = listing["secciones"][0]["seccion"]
+    seccion = listing["secciones"][0]["id"]
     await call_chain_step(
         client,
-        "get_superbancos_seccion_archivos",
-        {"seccion": seccion, "format": "json"},
+        "get_archivo_seccion",
+        {"fuente": "superbancos", "seccion": seccion, "format": "json"},
     )
 
 

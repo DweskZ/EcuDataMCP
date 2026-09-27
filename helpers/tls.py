@@ -87,7 +87,8 @@ def should_retry_insecure(exc: BaseException, url: str) -> bool:
 # CKAN_INSECURE_TLS and is kept in its own list rather than merged with
 # either existing one. censoecuador.gob.ec and superbancos.gob.ec use the DV
 # and OV R36 intermediates respectively; cenace.gob.ec and eeq.com.ec use
-# DV R36 too. reportes.arconel.gob.ec is the same misconfiguration under a
+# DV R36 too; evaluaciones.evaluacion.gob.ec (INEVAL) the OV R36, confirmed
+# 2026-09-27. reportes.arconel.gob.ec is the same misconfiguration under a
 # different CA: its leaf is issued by "GoGetSSL RSA DV CA" (chains to
 # USERTrust RSA, in certifi), bundled separately in gogetssl_rsa_dv_ca.pem
 # (fetched from the leaf's AIA URL 2026-09-25, valid to 2028-09-05).
@@ -97,6 +98,7 @@ _OS_TRUST_HOST_SUFFIXES = (
     "cenace.gob.ec",
     "eeq.com.ec",
     "arconel.gob.ec",
+    "evaluacion.gob.ec",
 )
 
 _INTERMEDIATE_BUNDLE_PATH = (

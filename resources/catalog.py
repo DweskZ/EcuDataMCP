@@ -67,7 +67,7 @@ def _fuentes_payload() -> dict:
                 "id": "arcsa",
                 "nombre": "ARCSA Base de Registros Emitidos (registro sanitario vigente)",
                 "base": "https://www.controlsanitario.gob.ec/base-de-datos/",
-                "tools": ["list_arcsa_categorias", "get_arcsa_categoria_archivos"],
+                "tools": ["list_archivo_secciones", "get_archivo_seccion"],
             },
             {
                 "id": "gobec",
@@ -102,8 +102,8 @@ def _fuentes_payload() -> dict:
                 "tools": [
                     "search_sgr_sitreps",
                     "get_sgr_sitrep_archivos",
-                    "list_sgr_biblioteca_categorias",
-                    "get_sgr_biblioteca_categoria_archivos",
+                    "list_archivo_secciones",
+                    "get_archivo_seccion",
                 ],
             },
             {
@@ -204,8 +204,8 @@ def _fuentes_payload() -> dict:
                 "nombre": "SIPA / Ministerio de Agricultura (estadísticas agropecuarias)",
                 "base": "https://sipa.agricultura.gob.ec/",
                 "tools": [
-                    "list_sipa_modulos",
-                    "get_sipa_modulo_archivos",
+                    "list_archivo_secciones",
+                    "get_archivo_seccion",
                     "get_sipa_resumen_indicadores",
                     "search_sipa_geoportal_capas",
                     "get_sipa_geoportal_capa_datos",
@@ -248,8 +248,8 @@ def _fuentes_payload() -> dict:
                 ),
                 "base": "https://www.superbancos.gob.ec/estadisticas/portalestudios",
                 "tools": [
-                    "list_superbancos_secciones",
-                    "get_superbancos_seccion_archivos",
+                    "list_archivo_secciones",
+                    "get_archivo_seccion",
                 ],
             },
             {
@@ -339,7 +339,7 @@ def _fuentes_payload() -> dict:
                 "id": "seps",
                 "nombre": "SEPS (estadísticas de la economía popular y solidaria)",
                 "base": "https://estadisticas.seps.gob.ec/",
-                "tools": ["list_seps_secciones", "get_seps_seccion_archivos"],
+                "tools": ["list_archivo_secciones", "get_archivo_seccion"],
             },
             {
                 "id": "mef",
@@ -353,8 +353,8 @@ def _fuentes_payload() -> dict:
                 "base": "https://siau.senescyt.gob.ec/",
                 "tools": [
                     "search_senescyt_estadisticas",
-                    "list_senescyt_biblioteca_categorias",
-                    "get_senescyt_biblioteca_categoria_archivos",
+                    "list_archivo_secciones",
+                    "get_archivo_seccion",
                 ],
             },
             {
@@ -367,7 +367,7 @@ def _fuentes_payload() -> dict:
                 "id": "ineval",
                 "nombre": "INEVAL (resultados de evaluaciones educativas)",
                 "base": "https://evaluaciones.evaluacion.gob.ec/BI",
-                "tools": ["list_ineval_familias", "get_ineval_familia_archivos"],
+                "tools": ["list_archivo_secciones", "get_archivo_seccion"],
             },
             {
                 "id": "infomies",
