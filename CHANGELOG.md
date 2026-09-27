@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- **The MCP `initialize` response had no title or description**, so
+  directory tools that inspect the server (LobeHub's `lhm plugin init`)
+  couldn't describe it. The server now reports `title` and `description`.
+
 ## 0.8.13 — 2026-09-27
 
 ### Added

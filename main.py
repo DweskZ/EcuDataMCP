@@ -51,6 +51,11 @@ Casi todos los tools aceptan `format="json"` además de `format="text"`
 
 mcp = MCPServer(
     "Ecuador Datos Abiertos MCP",
+    title="EcuDataMCP",
+    description=(
+        "Ecuador's open government data for AI assistants: CKAN, SRI, BCE, "
+        "INEC, Supercias, SERCOP and more."
+    ),
     instructions=SERVER_INSTRUCTIONS,
     version=VERSION,
     website_url="https://github.com/DweskZ/EcuDataMCP",
