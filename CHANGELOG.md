@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.8.11 — 2026-09-27
 
 ### Added
 
@@ -70,6 +70,10 @@
 - **Silent data loss in builds** — malformed CSV rows are counted and the
   build fails above 0.1%; a build with 20%+ fewer ranking rows than the live
   DB is rejected.
+- **`ecuador://fuentes` and `list_capabilities` were missing about 50
+  tools** each, including every power-cut tool, ARCONEL, aviation, IESS,
+  SEPS, CEPALSTAT, INAMHI and the SGR archives. Both now list every
+  registered tool, and a test fails if a new tool is left out of either.
 
 ## 0.8.10 — 2026-09-24
 
