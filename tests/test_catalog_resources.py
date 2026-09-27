@@ -1,6 +1,11 @@
+import asyncio
 import json
 
+from mcp.server.mcpserver import MCPServer
+
 from resources.catalog import _fuentes_payload
+from tools import register_maintenance_tools, register_tools
+from tools.list_capabilities import _CAPABILITIES
 
 
 def test_fuentes_lists_every_integrated_source_family():
@@ -40,3 +45,26 @@ def test_fuentes_lists_every_integrated_source_family():
     assert "get_cenace_tablero" in sources["cenace"]["tools"]
     assert "query_sut_indicador" in sources["sut"]["tools"]
     assert json.loads(json.dumps(payload, ensure_ascii=False))["fuentes"]
+
+
+def _registered_tool_names() -> set[str]:
+    mcp = MCPServer("test")
+    register_tools(mcp)
+    register_maintenance_tools(mcp)
+    return {tool.name for tool in asyncio.run(mcp.list_tools())}
+
+
+def test_fuentes_covers_every_registered_tool():
+    listed = {
+        tool for source in _fuentes_payload()["fuentes"] for tool in source["tools"]
+    }
+    missing = sorted(_registered_tool_names() - listed)
+    assert not missing, f"tools missing from ecuador://fuentes: {missing}"
+
+
+def test_list_capabilities_covers_every_registered_tool():
+    listed = set(_CAPABILITIES["entrada"]) | {
+        tool for tools in _CAPABILITIES["tools_clave"].values() for tool in tools
+    }
+    missing = sorted(_registered_tool_names() - listed)
+    assert not missing, f"tools missing from list_capabilities: {missing}"

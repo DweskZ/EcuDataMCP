@@ -54,6 +54,19 @@ _CAPABILITIES = {
         ),
         "CENACE: snapshot en vivo de generación y demanda de la red eléctrica nacional",
         (
+            "Sector eléctrico: reportes estadísticos de ARCONEL, cronogramas de "
+            "cortes de EEQ y Centrosur (PDF parseados a filas) y horarios "
+            "históricos de energia-ecuador.com vía Wayback Machine"
+        ),
+        "DGAC/AIS: AIP de aeródromos, METAR, NOTAM y SIGMET",
+        "INAMHI y geoportal del MAG: capas geográficas WMS/WFS",
+        "SGR: informes de situación (SITREP) y Biblioteca de documentos",
+        (
+            "IESS (boletines, certificado de cumplimiento patronal), SEPS, "
+            "MEF/SENAE fiscal, SENESCYT, MINEDEC, INEVAL, infoMIES, MSP y CNIG"
+        ),
+        "CEPALSTAT: indicadores regionales de CEPAL filtrados a Ecuador",
+        (
             "Ministerio del Trabajo (SUT): tableros Power BI en vivo — "
             "contratos mensuales por industria/provincia/género desde 2015, "
             "brechas de empleo, cumplimiento de políticas de género"
@@ -77,6 +90,13 @@ _CAPABILITIES = {
             "detect_series_pattern",
             "list_categories",
             "read_pdf",
+            "get_dataset_info",
+            "list_dataset_resources",
+            "get_resource_info",
+            "download_resource",
+            "get_category_info",
+            "search_organizations",
+            "get_organization_info",
         ],
         "tramites": [
             "search_tramites",
@@ -93,6 +113,12 @@ _CAPABILITIES = {
             "search_sismos",
             "search_informes_igepn",
             "get_informe_igepn",
+            "search_sgr_sitreps",
+            "get_sgr_sitrep_archivos",
+            "list_sgr_biblioteca_categorias",
+            "get_sgr_biblioteca_categoria_archivos",
+            "search_inamhi_capas",
+            "get_inamhi_capa_datos",
         ],
         "geo": ["lookup_ubicacion"],
         "encuestas": ["search_anda", "get_anda_survey_info", "download_anda_microdata"],
@@ -117,6 +143,13 @@ _CAPABILITIES = {
             "list_bce_indicadores_diarios",
             "get_bce_indicador_diario",
             "search_bce_remesas",
+            "search_bce_cuentas_nacionales",
+            "get_bce_cuentas_nacionales_archivo",
+            "search_bce_precios_comex",
+            "search_bce_calendario",
+            "search_mef_fiscal",
+            "search_cepalstat_indicadores",
+            "get_cepalstat_indicador",
         ],
         "companias": [
             "search_companias",
@@ -132,17 +165,58 @@ _CAPABILITIES = {
         ],
         "arcsa": ["list_arcsa_categorias", "get_arcsa_categoria_archivos"],
         "financieros": ["search_ranking", "get_financials"],
-        "agropecuario": ["list_sipa_modulos", "get_sipa_modulo_archivos"],
+        "agropecuario": [
+            "list_sipa_modulos",
+            "get_sipa_modulo_archivos",
+            "get_sipa_resumen_indicadores",
+            "search_sipa_geoportal_capas",
+            "get_sipa_geoportal_capa_datos",
+        ],
         "auditoria": ["list_contraloria_informes", "get_contraloria_informe"],
         "superbancos": [
             "list_superbancos_secciones",
             "get_superbancos_seccion_archivos",
+            "list_seps_secciones",
+            "get_seps_seccion_archivos",
         ],
-        "energia": ["get_cenace_tablero"],
+        "energia": [
+            "get_cenace_tablero",
+            "list_arconel_reportes",
+            "get_arconel_reporte",
+            "search_eeq_cortes",
+            "get_eeq_cortes_horarios",
+            "search_centrosur_cortes",
+            "get_centrosur_cortes_horarios",
+            "get_energia_ecuador_snapshot",
+        ],
         "trabajo": [
             "list_sut_indicadores",
             "get_sut_indicador_schema",
             "query_sut_indicador",
+            "search_salarios_sectoriales",
+            "search_trabajo_boletin_anual",
+            "list_iess_colecciones",
+            "get_iess_archivos",
+            "get_certificado_cumplimiento_patronal",
+        ],
+        "social": [
+            "search_senescyt_estadisticas",
+            "list_senescyt_biblioteca_categorias",
+            "get_senescyt_biblioteca_categoria_archivos",
+            "search_minedec_matricula",
+            "list_ineval_familias",
+            "get_ineval_familia_archivos",
+            "search_infomies_bases_mensuales",
+            "search_infomies_boletines_zonales",
+            "search_gacetas_inmunoprevenibles",
+            "search_cnig_femicidios",
+        ],
+        "aviacion": [
+            "list_aip_aerodromos",
+            "get_aip_aerodromo",
+            "get_metar",
+            "get_notam",
+            "get_sigmet",
         ],
         "utilidades": ["investigate_dataset", "list_zip_contents"],
         "telecomunicaciones": ["search_arcotel"],
@@ -225,7 +299,9 @@ def register_list_capabilities_tool(mcp: MCPServer) -> None:
         title="Describir las capacidades del servidor (alias)", annotations=READ_ONLY
     )
     @log_tool
-    async def list_capabilities(format: Literal["text", "json"] = "text") -> dict[str, Any]:
+    async def list_capabilities(
+        format: Literal["text", "json"] = "text",
+    ) -> dict[str, Any]:
         """
         Describe what this Ecuador MCP can do: sources, key tools, prompts and limits.
 

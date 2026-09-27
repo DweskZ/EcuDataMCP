@@ -96,6 +96,35 @@ def _fuentes_payload() -> dict:
                 "tools": ["search_eventos_riesgo", "list_sat_tsunami"],
             },
             {
+                "id": "sgr-publicaciones",
+                "nombre": "SGR Gestión de Riesgos (SITREP de eventos adversos y Biblioteca)",
+                "base": "https://www.gestionderiesgos.gob.ec/",
+                "tools": [
+                    "search_sgr_sitreps",
+                    "get_sgr_sitrep_archivos",
+                    "list_sgr_biblioteca_categorias",
+                    "get_sgr_biblioteca_categoria_archivos",
+                ],
+            },
+            {
+                "id": "inamhi",
+                "nombre": "INAMHI (geoportal hidrometeorológico, capas WMS/WFS)",
+                "base": "https://geoservicios.inamhi.gob.ec/geoserver",
+                "tools": ["search_inamhi_capas", "get_inamhi_capa_datos"],
+            },
+            {
+                "id": "aviacion",
+                "nombre": "DGAC / AIS Ecuador (AIP de aeródromos, METAR, NOTAM, SIGMET)",
+                "base": "https://www.ais.aviacioncivil.gob.ec/",
+                "tools": [
+                    "list_aip_aerodromos",
+                    "get_aip_aerodromo",
+                    "get_metar",
+                    "get_notam",
+                    "get_sigmet",
+                ],
+            },
+            {
                 "id": "igepn",
                 "nombre": "Instituto Geofísico EPN (catálogo sísmico + informes sísmicos/volcánicos)",
                 "base": "https://www.igepn.edu.ec/portal/eventos/www/",
@@ -164,13 +193,23 @@ def _fuentes_payload() -> dict:
                     "list_bce_indicadores_diarios",
                     "get_bce_indicador_diario",
                     "search_bce_remesas",
+                    "search_bce_cuentas_nacionales",
+                    "get_bce_cuentas_nacionales_archivo",
+                    "search_bce_precios_comex",
+                    "search_bce_calendario",
                 ],
             },
             {
                 "id": "sipa",
                 "nombre": "SIPA / Ministerio de Agricultura (estadísticas agropecuarias)",
                 "base": "https://sipa.agricultura.gob.ec/",
-                "tools": ["list_sipa_modulos", "get_sipa_modulo_archivos"],
+                "tools": [
+                    "list_sipa_modulos",
+                    "get_sipa_modulo_archivos",
+                    "get_sipa_resumen_indicadores",
+                    "search_sipa_geoportal_capas",
+                    "get_sipa_geoportal_capa_datos",
+                ],
             },
             {
                 "id": "contraloria",
@@ -220,6 +259,36 @@ def _fuentes_payload() -> dict:
                 "tools": ["get_cenace_tablero"],
             },
             {
+                "id": "arconel",
+                "nombre": "ARCONEL (reportes estadísticos del sector eléctrico)",
+                "base": "https://reportes.arconel.gob.ec/",
+                "tools": ["list_arconel_reportes", "get_arconel_reporte"],
+            },
+            {
+                "id": "eeq",
+                "nombre": "Empresa Eléctrica Quito (cronogramas de cortes de luz en PDF)",
+                "base": "https://www.eeq.com.ec/",
+                "tools": ["search_eeq_cortes", "get_eeq_cortes_horarios"],
+            },
+            {
+                "id": "centrosur",
+                "nombre": (
+                    "Centrosur (cronogramas de cortes de luz en Azuay, Cañar "
+                    "y Morona Santiago)"
+                ),
+                "base": "https://www.centrosur.gob.ec/",
+                "tools": ["search_centrosur_cortes", "get_centrosur_cortes_horarios"],
+            },
+            {
+                "id": "energia-ecuador",
+                "nombre": (
+                    "energia-ecuador.com vía Wayback Machine (horarios históricos "
+                    "de apagones)"
+                ),
+                "base": "https://web.archive.org/",
+                "tools": ["get_energia_ecuador_snapshot"],
+            },
+            {
                 "id": "sut",
                 "nombre": (
                     "Ministerio del Trabajo / SUT (tableros Power BI en vivo: "
@@ -240,6 +309,102 @@ def _fuentes_payload() -> dict:
                 ),
                 "base": "https://www.arcotel.gob.ec/",
                 "tools": ["search_arcotel"],
+            },
+            {
+                "id": "trabajo",
+                "nombre": (
+                    "Ministerio del Trabajo (salarios sectoriales y boletín "
+                    "estadístico anual)"
+                ),
+                "base": "https://www.trabajo.gob.ec/",
+                "tools": [
+                    "search_salarios_sectoriales",
+                    "search_trabajo_boletin_anual",
+                ],
+            },
+            {
+                "id": "iess",
+                "nombre": (
+                    "IESS (boletines y documentos estadísticos, certificado de "
+                    "cumplimiento patronal)"
+                ),
+                "base": "https://www.iess.gob.ec/",
+                "tools": [
+                    "list_iess_colecciones",
+                    "get_iess_archivos",
+                    "get_certificado_cumplimiento_patronal",
+                ],
+            },
+            {
+                "id": "seps",
+                "nombre": "SEPS (estadísticas de la economía popular y solidaria)",
+                "base": "https://estadisticas.seps.gob.ec/",
+                "tools": ["list_seps_secciones", "get_seps_seccion_archivos"],
+            },
+            {
+                "id": "mef",
+                "nombre": "MEF / SENAE (operaciones fiscales y tributos recaudados)",
+                "base": "https://www.economicoproductivo.gob.ec/",
+                "tools": ["search_mef_fiscal"],
+            },
+            {
+                "id": "senescyt",
+                "nombre": "SENESCYT / Educación Superior (estadísticas SIAU y Biblioteca)",
+                "base": "https://siau.senescyt.gob.ec/",
+                "tools": [
+                    "search_senescyt_estadisticas",
+                    "list_senescyt_biblioteca_categorias",
+                    "get_senescyt_biblioteca_categoria_archivos",
+                ],
+            },
+            {
+                "id": "minedec",
+                "nombre": "MINEDEC (matrícula escolar histórica, datos abiertos)",
+                "base": "https://educacion.gob.ec/datos-abiertos-minedec/",
+                "tools": ["search_minedec_matricula"],
+            },
+            {
+                "id": "ineval",
+                "nombre": "INEVAL (resultados de evaluaciones educativas)",
+                "base": "https://evaluaciones.evaluacion.gob.ec/BI",
+                "tools": ["list_ineval_familias", "get_ineval_familia_archivos"],
+            },
+            {
+                "id": "infomies",
+                "nombre": "infoMIES (bases mensuales y boletines zonales del MIES)",
+                "base": "https://info.desarrollohumano.gob.ec/",
+                "tools": [
+                    "search_infomies_bases_mensuales",
+                    "search_infomies_boletines_zonales",
+                ],
+            },
+            {
+                "id": "msp",
+                "nombre": "MSP (gacetas semanales de enfermedades inmunoprevenibles)",
+                "base": "https://www.salud.gob.ec/",
+                "tools": ["search_gacetas_inmunoprevenibles"],
+            },
+            {
+                "id": "cnig",
+                "nombre": "CNIG (estadísticas de violencia de género y femicidios)",
+                "base": "https://www.igualdadgenero.gob.ec/violencia/",
+                "tools": ["search_cnig_femicidios"],
+            },
+            {
+                "id": "cepalstat",
+                "nombre": "CEPALSTAT (indicadores de CEPAL filtrados a Ecuador)",
+                "base": "https://api-cepalstat.cepal.org/cepalstat/api/v1",
+                "tools": ["search_cepalstat_indicadores", "get_cepalstat_indicador"],
+            },
+            {
+                "id": "utilidades",
+                "nombre": "Utilidades transversales (búsqueda global, archivos, orientación)",
+                "tools": [
+                    "search_ecuador",
+                    "investigate_dataset",
+                    "list_zip_contents",
+                    "list_capabilities",
+                ],
             },
         ]
     }

@@ -318,7 +318,7 @@ Cliente MCP (Claude, ChatGPT, Cursor, etc.)
     │
     ▼ POST /mcp
 ┌──────────────────────────────┐
-│   FastMCP Server (main.py)   │
+│   MCPServer (main.py)        │
 ├──────────────────────────────┤
 │  tools/                      │
 │   ├── search_ecuador         │  → CKAN + gob.ec (unificado)
