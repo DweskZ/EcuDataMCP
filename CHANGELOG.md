@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- **`scripts/publish_smithery.py`** — republishes a GitHub release's MCPB
+  bundle to Smithery. Smithery rejects the release bundle as-is (it doesn't
+  know the `uv` server type and requires tool schemas that MCPB manifests
+  forbid), so the script rewrites the manifest with the tool list read from
+  the released code and publishes it. `--dry-run` builds without publishing.
+
 ## 0.8.12 — 2026-09-27
 
 ### Added
