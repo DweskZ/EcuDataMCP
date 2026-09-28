@@ -57,11 +57,11 @@ def test_every_tool_has_a_full_reference():
 
 
 def test_reference_resource_serves_the_full_docstring():
-    contents = asyncio.run(main.mcp.read_resource("ecuador://herramientas/search_mef_fiscal"))
+    contents = asyncio.run(main.mcp.read_resource("ecuador://herramientas/search_archivos"))
     text = contents[0].content
-    assert text == TOOL_DOCS["search_mef_fiscal"]
+    assert text == TOOL_DOCS["search_archivos"]
     assert len(text) > len(
-        next(t for t in _tools() if t.name == "search_mef_fiscal").description
+        next(t for t in _tools() if t.name == "search_archivos").description
     )
 
 

@@ -68,7 +68,6 @@ from tools.list_aip_aerodromos import register_list_aip_aerodromos_tool
 from tools.list_bce_indicadores_diarios import (
     register_list_bce_indicadores_diarios_tool,
 )
-from tools.list_capabilities import register_list_capabilities_tool
 from tools.list_categories import register_list_categories_tool
 from tools.list_contraloria_informes import register_list_contraloria_informes_tool
 from tools.list_dataset_resources import register_list_dataset_resources_tool
@@ -83,7 +82,7 @@ from tools.query_resource_data import register_query_resource_data_tool
 from tools.query_sut_indicador import register_query_sut_indicador_tool
 from tools.read_pdf import register_read_pdf_tool
 from tools.search_anda import register_search_anda_tool
-from tools.search_arcotel import register_search_arcotel_tool
+from tools.search_archivos import register_search_archivos_tool
 from tools.search_auditores import register_search_auditores_tool
 from tools.search_bce_calendario import register_search_bce_calendario_tool
 from tools.search_bce_cuentas_nacionales import (
@@ -95,21 +94,16 @@ from tools.search_bce_precios_comex import register_search_bce_precios_comex_too
 from tools.search_bce_publicaciones import register_search_bce_publicaciones_tool
 from tools.search_bce_remesas import register_search_bce_remesas_tool
 from tools.search_biinec_extras import register_search_biinec_extras_tool
-from tools.search_censo_recursos import register_search_censo_recursos_tool
 from tools.search_centrosur_cortes import register_search_centrosur_cortes_tool
 from tools.search_cepalstat_indicadores import (
     register_search_cepalstat_indicadores_tool,
 )
-from tools.search_cnig_femicidios import register_search_cnig_femicidios_tool
 from tools.search_companias import register_search_companias_tool
 from tools.search_contratos import register_search_contratos_tool
 from tools.search_datasets import register_search_datasets_tool
 from tools.search_ecuador import register_search_ecuador_tool
 from tools.search_eeq_cortes import register_search_eeq_cortes_tool
 from tools.search_eventos_riesgo import register_search_eventos_riesgo_tool
-from tools.search_gacetas_inmunoprevenibles import (
-    register_search_gacetas_inmunoprevenibles_tool,
-)
 from tools.search_inamhi_capas import register_search_inamhi_capas_tool
 from tools.search_indicadores_bce import register_search_indicadores_bce_tool
 from tools.search_inec_estadisticas import register_search_inec_estadisticas_tool
@@ -121,32 +115,18 @@ from tools.search_infomies_boletines_zonales import (
     register_search_infomies_boletines_zonales_tool,
 )
 from tools.search_informes_igepn import register_search_informes_igepn_tool
-from tools.search_mef_fiscal import register_search_mef_fiscal_tool
-from tools.search_minedec_matricula import register_search_minedec_matricula_tool
 from tools.search_organizations import register_search_organizations_tool
 from tools.search_ranking import register_search_ranking_tool
 from tools.search_regulaciones import register_search_regulaciones_tool
-from tools.search_salarios_sectoriales import register_search_salarios_sectoriales_tool
-from tools.search_senescyt_estadisticas import (
-    register_search_senescyt_estadisticas_tool,
-)
 from tools.search_sgr_sitreps import register_search_sgr_sitreps_tool
 from tools.search_sipa_geoportal_capas import register_search_sipa_geoportal_capas_tool
 from tools.search_sismos import register_search_sismos_tool
-from tools.search_sri_datasets import register_search_sri_datasets_tool
-from tools.search_sri_estadisticas_recaudacion import (
-    register_search_sri_estadisticas_recaudacion_tool,
-)
 from tools.search_sri_ruc import register_search_sri_ruc_tool
-from tools.search_trabajo_boletin_anual import (
-    register_search_trabajo_boletin_anual_tool,
-)
 from tools.search_tramites import register_search_tramites_tool
 
 
 def register_tools(mcp: MCPServer) -> None:
     """Register all MCP tools with the provided MCPServer instance."""
-    register_list_capabilities_tool(mcp)
     register_search_ecuador_tool(mcp)
     register_lookup_ubicacion_tool(mcp)
     register_search_eventos_riesgo_tool(mcp)
@@ -177,8 +157,6 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_organization_info_tool(mcp)
     register_list_categories_tool(mcp)
     register_get_category_info_tool(mcp)
-    register_search_sri_datasets_tool(mcp)
-    register_search_sri_estadisticas_recaudacion_tool(mcp)
     register_get_sri_ruc_info_tool(mcp)
     register_search_sri_ruc_tool(mcp)
     register_read_pdf_tool(mcp)
@@ -195,22 +173,14 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_anda_survey_info_tool(mcp)
     register_download_anda_microdata_tool(mcp)
 
-    register_search_arcotel_tool(mcp)
 
     register_search_inec_estadisticas_tool(mcp)
     register_get_inec_estadistica_files_tool(mcp)
     register_search_inec_publicaciones_tool(mcp)
     register_get_inec_publicacion_archivos_tool(mcp)
     register_search_biinec_extras_tool(mcp)
-    register_search_censo_recursos_tool(mcp)
-    register_search_cnig_femicidios_tool(mcp)
-    register_search_minedec_matricula_tool(mcp)
-    register_search_senescyt_estadisticas_tool(mcp)
-    register_search_mef_fiscal_tool(mcp)
     register_search_infomies_bases_mensuales_tool(mcp)
     register_search_infomies_boletines_zonales_tool(mcp)
-    register_search_trabajo_boletin_anual_tool(mcp)
-    register_search_salarios_sectoriales_tool(mcp)
 
     register_search_regulaciones_tool(mcp)
     register_get_regulacion_info_tool(mcp)
@@ -258,6 +228,7 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_eeq_cortes_horarios_tool(mcp)
     register_get_energia_ecuador_snapshot_tool(mcp)
     register_archivo_secciones_tools(mcp)
+    register_search_archivos_tool(mcp)
 
     register_search_companias_tool(mcp)
     register_get_compania_info_tool(mcp)
@@ -270,7 +241,6 @@ def register_tools(mcp: MCPServer) -> None:
     register_search_cepalstat_indicadores_tool(mcp)
     register_get_cepalstat_indicador_tool(mcp)
 
-    register_search_gacetas_inmunoprevenibles_tool(mcp)
 
 
 def register_maintenance_tools(mcp: MCPServer) -> None:

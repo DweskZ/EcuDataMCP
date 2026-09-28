@@ -4,8 +4,8 @@ services:
     ports:
       - "${MCP_PORT:-8000}:${MCP_PORT:-8000}"
     environment:
-      # "all" (default) keeps every tool on this one instance, matching
-      # behavior before public/maintenance profiles existed. Set to
+      # "all" keeps every tool on this one instance (the server's own
+      # default is "public", without the two operator tools). Set to
       # "public" here (and run `mcp-maintenance` below via
       # `docker compose --profile maintenance up`) to keep
       # audit_bce_catalog/compare_bce_sources off this exposed instance.

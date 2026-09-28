@@ -58,10 +58,9 @@ def _fuentes_payload() -> dict:
                 ),
                 "base": "https://www.sri.gob.ec/datasets",
                 "tools": [
-                    "search_sri_datasets",
+                    "search_archivos",
                     "get_sri_ruc_info",
                     "search_sri_ruc",
-                    "search_sri_estadisticas_recaudacion",
                 ],
             },
             {
@@ -171,7 +170,7 @@ def _fuentes_payload() -> dict:
                 "id": "inec-censo",
                 "nombre": "Censo Ecuador 2022 / INEC (microdatos completos del censo)",
                 "base": "https://www.censoecuador.gob.ec/",
-                "tools": ["search_censo_recursos"],
+                "tools": ["search_archivos"],
             },
             {
                 "id": "bce",
@@ -309,7 +308,7 @@ def _fuentes_payload() -> dict:
                     "reportes mensuales y boletines anuales/temáticos)"
                 ),
                 "base": "https://www.arcotel.gob.ec/",
-                "tools": ["search_arcotel"],
+                "tools": ["search_archivos"],
             },
             {
                 "id": "trabajo",
@@ -319,8 +318,7 @@ def _fuentes_payload() -> dict:
                 ),
                 "base": "https://www.trabajo.gob.ec/",
                 "tools": [
-                    "search_salarios_sectoriales",
-                    "search_trabajo_boletin_anual",
+                    "search_archivos",
                 ],
             },
             {
@@ -346,14 +344,14 @@ def _fuentes_payload() -> dict:
                 "id": "mef",
                 "nombre": "MEF / SENAE (operaciones fiscales y tributos recaudados)",
                 "base": "https://www.economicoproductivo.gob.ec/",
-                "tools": ["search_mef_fiscal"],
+                "tools": ["search_archivos"],
             },
             {
                 "id": "senescyt",
                 "nombre": "SENESCYT / Educación Superior (estadísticas SIAU y Biblioteca)",
                 "base": "https://siau.senescyt.gob.ec/",
                 "tools": [
-                    "search_senescyt_estadisticas",
+                    "search_archivos",
                     "list_archivo_secciones",
                     "get_archivo_seccion",
                 ],
@@ -362,7 +360,7 @@ def _fuentes_payload() -> dict:
                 "id": "minedec",
                 "nombre": "MINEDEC (matrícula escolar histórica, datos abiertos)",
                 "base": "https://educacion.gob.ec/datos-abiertos-minedec/",
-                "tools": ["search_minedec_matricula"],
+                "tools": ["search_archivos"],
             },
             {
                 "id": "ineval",
@@ -383,13 +381,13 @@ def _fuentes_payload() -> dict:
                 "id": "msp",
                 "nombre": "MSP (gacetas semanales de enfermedades inmunoprevenibles)",
                 "base": "https://www.salud.gob.ec/",
-                "tools": ["search_gacetas_inmunoprevenibles"],
+                "tools": ["search_archivos"],
             },
             {
                 "id": "cnig",
                 "nombre": "CNIG (estadísticas de violencia de género y femicidios)",
                 "base": "https://www.igualdadgenero.gob.ec/violencia/",
-                "tools": ["search_cnig_femicidios"],
+                "tools": ["search_archivos"],
             },
             {
                 "id": "cepalstat",
@@ -404,7 +402,6 @@ def _fuentes_payload() -> dict:
                     "search_ecuador",
                     "investigate_dataset",
                     "list_zip_contents",
-                    "list_capabilities",
                 ],
             },
         ]

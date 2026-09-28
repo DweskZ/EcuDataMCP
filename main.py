@@ -71,11 +71,10 @@ mcp = EcuadorMCPServer(
     website_url="https://github.com/DweskZ/EcuDataMCP",
 )
 
-# MCP_PROFILE (default "all") splits the public read-only tools from the two
-# that write local operator artifacts (audit_bce_catalog, compare_bce_sources)
-# -- see docs/MCP_ARCHITECTURE.md's public/maintenance profile split. "all"
-# reproduces the single-instance behavior this server had before profiles
-# existed, so an unset MCP_PROFILE changes nothing for an existing deployment.
+# MCP_PROFILE (default "public") splits the public read-only tools from the
+# two that write local operator artifacts (audit_bce_catalog,
+# compare_bce_sources) -- see docs/MCP_ARCHITECTURE.md's public/maintenance
+# profile split. "all" registers both, as every deployment did before 0.10.
 MCP_PROFILE = get_mcp_profile()
 if MCP_PROFILE in ("public", "all"):
     register_tools(mcp)

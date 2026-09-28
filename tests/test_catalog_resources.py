@@ -5,7 +5,6 @@ from mcp.server.mcpserver import MCPServer
 
 from resources.catalog import _fuentes_payload
 from tools import register_maintenance_tools, register_tools
-from tools.list_capabilities import _CAPABILITIES
 
 
 def test_fuentes_lists_every_integrated_source_family():
@@ -61,10 +60,3 @@ def test_fuentes_covers_every_registered_tool():
     missing = sorted(_registered_tool_names() - listed)
     assert not missing, f"tools missing from ecuador://fuentes: {missing}"
 
-
-def test_list_capabilities_covers_every_registered_tool():
-    listed = set(_CAPABILITIES["entrada"]) | {
-        tool for tools in _CAPABILITIES["tools_clave"].values() for tool in tools
-    }
-    missing = sorted(_registered_tool_names() - listed)
-    assert not missing, f"tools missing from list_capabilities: {missing}"

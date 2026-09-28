@@ -195,7 +195,6 @@ async def main() -> int:
         print("  session", getattr(client, "_session_id", "")[:16], "...")
 
         checks = [
-            ("list_capabilities", {}, ["CKAN", "SERCOP"]),
             ("lookup_ubicacion", {"query": "Pichincha"}, ["17", "Pichincha"]),
             ("lookup_ubicacion", {"query": "Cuenca", "nivel": "canton"}, ["0101", "Cuenca"]),
             (
@@ -231,10 +230,14 @@ async def main() -> int:
             # errors/tracebacks are), so `must` stays empty unless the tool
             # returns a fixed, non-query-dependent shape.
             ("search_organizations", {"query": "sri", "page_size": 3}, []),
-            ("search_sri_datasets", {"query": "recaudacion", "limit": 3}, []),
             (
-                "search_sri_estadisticas_recaudacion",
-                {"query": "recaudacion", "limit": 3},
+                "search_archivos",
+                {"fuente": "sri_datasets", "query": "recaudacion", "limit": 3},
+                [],
+            ),
+            (
+                "search_archivos",
+                {"fuente": "sri_recaudacion", "query": "recaudacion", "limit": 3},
                 [],
             ),
             ("search_sri_ruc", {"razon_social": "BANCO", "max_resultados": 3}, []),
@@ -261,7 +264,7 @@ async def main() -> int:
             ("list_contraloria_informes", {}, ["Contraloría"]),
             ("search_anda", {"query": "empleo", "limit": 3}, []),
             ("search_biinec_extras", {"query": "ambiental"}, []),
-            ("search_censo_recursos", {"query": "poblacion", "limit": 3}, []),
+            ("search_archivos", {"fuente": "censo", "query": "poblacion", "limit": 3}, []),
             ("search_inec_estadisticas", {"query": "empleo", "limit": 3}, []),
             ("search_inec_publicaciones", {"query": "empleo", "limit": 3}, []),
         ]

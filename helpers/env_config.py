@@ -80,13 +80,14 @@ def get_transport() -> str:
 def get_mcp_profile() -> str:
     """
     Return 'public', 'maintenance', or 'all'. Env MCP_PROFILE overrides the
-    default 'all' (both sets of tools registered on one instance, matching
-    behavior before profiles existed). 'public' excludes tools that write
-    local operator artifacts (audit_bce_catalog, compare_bce_sources);
-    'maintenance' registers only those.
+    default 'public', which leaves out the tools that write local operator
+    artifacts (audit_bce_catalog, compare_bce_sources) -- every client
+    listing, `uvx` user and directory check paid for them in tools/list
+    without being their audience. 'maintenance' registers only those two;
+    'all' registers both sets (docker-compose.yml sets it explicitly).
     """
-    raw = os.getenv("MCP_PROFILE", "all").strip().lower()
-    return raw if raw in {"public", "maintenance"} else "all"
+    raw = os.getenv("MCP_PROFILE", "public").strip().lower()
+    return raw if raw in {"maintenance", "all"} else "public"
 
 
 def get_mcp_auth_token() -> str | None:
