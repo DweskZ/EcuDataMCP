@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EcuDataMCP – EcuDataMCP</title>
+<meta name="description" content="Servidor MCP de código abierto para explorar datos abiertos del gobierno de Ecuador desde tu asistente de IA.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="EcuDataMCP – EcuDataMCP">
+<meta property="og:description" content="Servidor MCP de código abierto para explorar datos abiertos del gobierno de Ecuador desde tu asistente de IA.">
+<meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/site.css">
+
+<style>html { scroll-behavior: smooth; }</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+  <div class="navbar-container container-fluid">
+    <div class="navbar-brand-container mx-auto">
+      <a class="navbar-brand" href="index.html">
+        <span class="navbar-title">EcuDataMCP</span>
+      </a>
+    </div>
+    <button class="site-search-toggle" type="button" title="Buscar" aria-label="Buscar">
+      <svg class="icon-search" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.75"/><line x1="10.2" y1="10.2" x2="14" y2="14"/></svg>
+    </button>
+    <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Navegación de palanca" data-nav-toggle="navbarCollapse">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav navbar-nav-scroll me-auto">
+        
+        <li class="nav-item">
+          <a class="nav-link active" href="index.html" aria-current="page">
+            <span class="menu-text">EcuDataMCP</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="index.html#como-funciona">
+            <span class="menu-text">Cómo funciona</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="fuentes.html">
+            <span class="menu-text">Fuentes</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="atlas.html">
+            <span class="menu-text">Referencia</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="examples.html">
+            <span class="menu-text">Ejemplos</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="releases.html">
+            <span class="menu-text">Releases</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">
+            <span class="menu-text">Acerca de</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="colaborar.html">
+            <span class="menu-text">Cómo colaborar</span>
+          </a>
+        </li>
+        
+      </ul>
+      <ul class="navbar-nav navbar-nav-scroll ms-auto">
+        <li class="nav-item lang-toggle" role="group" aria-label="Language / Idioma">
+          
+          <span class="lang-toggle-option active" aria-current="true">ES</span>
+          <a class="lang-toggle-option" href="en/index.html">EN</a>
+          
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP" target="_blank">
+            <span class="menu-text">GitHub</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="site-search-panel" id="siteSearchPanel" hidden>
+  <div class="site-search-panel-inner">
+    <input type="text" id="siteSearchInput" class="site-search-input" placeholder="Buscar en el sitio…" autocomplete="off">
+    <div id="siteSearchResults" class="site-search-results"></div>
+  </div>
+</div>
+
+<main>
+
+<section class="landing hero">
+<div class="container-page">
+<p class="kicker">Infraestructura abierta de datos públicos para Ecuador</p>
+<h1>Explora <span class="accent">datos abiertos.</span></h1>
+<p class="hero-sub">Conecta tu asistente de IA a datos públicos verificables de Ecuador: datasets, trámites, contratos, sismos, indicadores del BCE, tablas IEM, RUC y compañías. Encuentra la fuente correcta, consulta con límites claros y cita siempre el origen oficial.</p>
+<div class="hero-ctas">
+<a class="btn-cta primary" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">Empezar en GitHub</a>
+<a class="btn-cta secondary" href="#como-funciona">Ver cómo funciona &darr;</a>
+</div>
+<div class="hero-stats">
+<div class="hero-stat"><span class="num">1,581</span><span class="label">datasets</span></div>
+<div class="hero-stat"><span class="num">116</span><span class="label">tools MCP</span></div>
+<div class="hero-stat"><span class="num">56</span><span class="label">fuentes oficiales</span></div>
+<div class="hero-stat"><span class="num">0</span><span class="label">API keys</span></div>
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">El problema</p>
+<h2 class="section-title">Menos tiempo en portales. Más respuestas de tus datos.</h2>
+<p class="section-lede">Ecuador publica una enorme cantidad de datos públicos, pero encontrarlos significa navegar portales distintos, revisar catálogos separados y adivinar cuál archivo está vigente. EcuDataMCP le da a tu asistente de IA las herramientas para hacer ese trabajo por ti, y sigue citando la fuente oficial en cada respuesta.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="como-funciona">
+<p class="kicker">Cómo funciona</p>
+<h2 class="section-title">Un camino trazable.</h2>
+<p class="section-lede">Cuatro pasos, del lenguaje natural a la fuente oficial.</p>
+<div class="steps-grid">
+<div class="step-card">
+<div class="step-num">01</div>
+<h3>Buscar</h3>
+<p><code>search_ecuador</code> busca a la vez en datasets, trámites, regulaciones, contratos y riesgos por palabra clave.</p>
+</div>
+<div class="step-card">
+<div class="step-num">02</div>
+<h3>Inspeccionar</h3>
+<p><code>get_dataset_info</code> y <code>list_dataset_resources</code> revisan campos, formatos y fechas antes de traer datos.</p>
+</div>
+<div class="step-card">
+<div class="step-num">03</div>
+<h3>Consultar</h3>
+<p><code>query_resource_data</code> filtra en el DataStore de CKAN sin descargar el archivo completo, o <code>preview_resource_data</code> para CSV, JSON y XLSX.</p>
+</div>
+<div class="step-card">
+<div class="step-num">04</div>
+<h3>Citar</h3>
+<p>Cada resultado enlaza a la fuente oficial (el dataset, el trámite, el expediente SERCOP) para que puedas verificarlo.</p>
+</div>
+</div>
+<div class="notice-box" role="note"><strong>Aviso:</strong> Algunas definiciones, parámetros y descripciones de herramientas fueron generados o asistidos por IA. Pueden estar incompletos o desactualizados; una herramienta puede devolver resultados parciales, rechazar parámetros válidos o comportarse inesperadamente cuando cambia la fuente oficial. Verifica siempre la respuesta contra la fuente enlazada y revisa manualmente los resultados antes de usarlos para decisiones importantes.</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">¿Qué puedes preguntar?</p>
+<h2 class="section-title">Nunca antes había sido tan fácil navegar los datos sobre Ecuador.</h2>
+<p class="section-lede">56 fuentes oficiales, en una sola conversación.</p>
+<div class="questions-grid">
+
+<div class="question-card">&ldquo;¿Qué datos tiene el SRI sobre recaudación tributaria?&rdquo;</div>
+
+<div class="question-card">&ldquo;Muéstrame los datasets de salud del INEC&rdquo;</div>
+
+<div class="question-card">&ldquo;¿Cuáles son los requisitos para sacar el pasaporte?&rdquo;</div>
+
+<div class="question-card">&ldquo;¿Qué compañías del CIIU de comercio al por menor tienen mayor rentabilidad sobre el patrimonio (ROE) este año?&rdquo;</div>
+
+<div class="question-card">&ldquo;Investiga el expediente de esta licitación pública en SERCOP&rdquo;</div>
+
+<div class="question-card">&ldquo;¿Cómo ha cambiado la confianza del consumidor según el BCE en los últimos dos años?&rdquo;</div>
+
+<div class="question-card">&ldquo;Busca una tabla IEM del BCE sobre exportaciones y muéstrame sus valores recientes.&rdquo;</div>
+
+<div class="question-card">&ldquo;¿Qué cubos públicos del SRI están disponibles para consultas agregadas?&rdquo;</div>
+
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="fuentes">
+<p class="kicker">Fuentes</p>
+<h2 class="section-title">Datos oficiales, siempre citados.</h2>
+<p class="section-lede">EcuDataMCP no copia ni almacena estos catálogos: cada consulta va en vivo contra el portal de origen. 56 fuentes agrupadas por tema — Banco Central, SRI, INEC, Supercías, Superbancos y más — cada una con su institución de origen.</p>
+<div class="tools-summary">
+<span class="tool-chip">Catálogos de datos abiertos</span><span class="tool-chip">Trámites, regulaciones y contratación pública</span><span class="tool-chip">Riesgos y desastres naturales</span><span class="tool-chip">Economía y finanzas</span><span class="tool-chip">Estadísticas y demografía</span><span class="tool-chip">Agricultura</span><span class="tool-chip">Energía</span><span class="tool-chip">Trabajo y empleo</span><span class="tool-chip">Control y transparencia</span><span class="tool-chip">Transporte y aviación civil</span><span class="tool-chip">Salud</span><span class="tool-chip">Telecomunicaciones</span><span class="tool-chip">Fuentes internacionales con foco Ecuador</span>
+</div>
+<a class="btn-cta secondary" href="fuentes.html">Ver las 56 fuentes agrupadas &rarr;</a>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="tools">
+<p class="kicker">El backstage</p>
+<h2 class="section-title">Servidor MCP de código abierto.</h2>
+<p class="section-lede">EcuDataMCP corre como un servidor <a href="https://github.com/jlowin/fastmcp" target="_blank" rel="noopener">FastMCP</a> en Python, expuesto sobre HTTP Streamable o stdio. No hay base de datos propia: cada tool llama en vivo al portal oficial correspondiente (CKAN, gob.ec, SERCOP, BCE, Supercías, IG-EPN, SGR) y devuelve la respuesta formateada.</p>
+<div class="tools-summary">
+<span class="tool-chip">Entrada unificada</span><span class="tool-chip">Datos Abiertos</span><span class="tool-chip">Trámites Gubernamentales</span><span class="tool-chip">ANDA (INEC)</span><span class="tool-chip">Macroeconomía (BCE)</span><span class="tool-chip">Compañías (Supercías)</span><span class="tool-chip">Regulaciones y contratos</span><span class="tool-chip">Riesgos y sismos</span><span class="tool-chip">Exploración</span><span class="tool-chip">BCE y series especializadas</span><span class="tool-chip">INEC: estadísticas, BIINEC y censo</span><span class="tool-chip">SRI: RUC y recaudación</span><span class="tool-chip">SIPA, Contraloría y Superbancos</span><span class="tool-chip">CENACE, SUT, IG-EPN y cortes de luz</span><span class="tool-chip">Utilidades de investigación</span><span class="tool-chip">SEPS y economía popular</span><span class="tool-chip">IESS: documentos y cumplimiento patronal</span><span class="tool-chip">INEVAL: evaluación educativa</span><span class="tool-chip">Aviación civil (DGAC)</span><span class="tool-chip">ARCOTEL: telecomunicaciones</span><span class="tool-chip">ARCSA: registro sanitario</span><span class="tool-chip">Fuentes sectoriales adicionales</span><span class="tool-chip">Fuentes internacionales</span>
+</div>
+<a class="btn-cta secondary" href="atlas.html">Ver los 116 tools en la Referencia &rarr;</a>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Conecta tu asistente</p>
+<h2 class="section-title">Copia la configuración de tu cliente.</h2>
+<p class="section-lede">Corre el servidor localmente (Docker o <code>uv run</code>, ver el <a href="https://github.com/DweskZ/EcuDataMCP#ejecutar-localmente" target="_blank" rel="noopener">README</a>) y apunta tu cliente MCP a <code>http://localhost:8000/mcp</code>.</p>
+<div class="quick-connect">
+<p class="kicker">Opción rápida</p>
+<p class="client-intro">Si tu asistente tiene acceso a una terminal, pégale el link del repositorio y déjalo instalar todo por ti:</p>
+<div class="code-block">
+<button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+<pre><code>Clona https://github.com/DweskZ/EcuDataMCP, instala sus dependencias con uv sync,
+y regístralo como servidor MCP en mi cliente usando modo stdio con
+`uv run --directory &lt;ruta-del-clon&gt; python main.py --transport stdio`.
+Verifica que el servidor responda antes de darlo por terminado.</code></pre>
+</div>
+<p class="client-intro">Revisa siempre lo que tu asistente cambie (archivos de configuración, comandos ejecutados) antes de confirmar. Esta opción solo funciona con asistentes que pueden ejecutar comandos por su cuenta: hoy eso es <strong>Claude Code</strong>, <strong>Cursor</strong> y <strong>Windsurf</strong> en modo agente. Con ChatGPT, Claude.ai de solo-chat u otros clientes sin terminal, usa la configuración manual de abajo.</p>
+</div>
+<ul class="nav nav-tabs" id="client-tabs" role="tablist">
+
+<li class="nav-item" role="presentation"><button class="nav-link active" id="claude-desktop-tab" data-tab-target="claude-desktop-pane" type="button" role="tab">Claude Desktop</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="cursor-tab" data-tab-target="cursor-pane" type="button" role="tab">Cursor</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="vscode-tab" data-tab-target="vscode-pane" type="button" role="tab">VS Code</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="chatgpt-tab" data-tab-target="chatgpt-pane" type="button" role="tab">ChatGPT</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="claude-code-tab" data-tab-target="claude-code-pane" type="button" role="tab">Claude Code</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="gemini-cli-tab" data-tab-target="gemini-cli-pane" type="button" role="tab">Gemini CLI</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="le-chat-tab" data-tab-target="le-chat-pane" type="button" role="tab">Le Chat (Mistral)</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="windsurf-tab" data-tab-target="windsurf-pane" type="button" role="tab">Windsurf</button></li>
+
+<li class="nav-item" role="presentation"><button class="nav-link" id="huggingchat-tab" data-tab-target="huggingchat-pane" type="button" role="tab">HuggingChat</button></li>
+
+</ul>
+<div class="tab-content" id="client-tabs-content">
+
+<div class="tab-pane fade show active" id="claude-desktop-pane" role="tabpanel">
+<p class="client-intro">Agrega esto a tu archivo de configuración (<code>~/Library/Application Support/Claude/claude_desktop_config.json</code> en macOS, <code>%APPDATA%\Claude\claude_desktop_config.json</code> en Windows):</p>
+
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>{
+  "mcpServers": {
+    "ecuador-datos": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "http://localhost:8000/mcp"
+      ]
+    }
+  }
+}</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="cursor-pane" role="tabpanel">
+
+<ol class="client-steps"><li>Abre Cursor Settings</li><li>Busca "MCP"</li><li>Agrega un nuevo servidor MCP:</li></ol>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>{
+  "mcpServers": {
+    "ecuador-datos": {
+      "url": "http://localhost:8000/mcp",
+      "transport": "http"
+    }
+  }
+}</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="vscode-pane" role="tabpanel">
+<p class="client-intro">Agrega a tu archivo <code>mcp.json</code> (ejecuta <strong>MCP: Open User Configuration</strong> desde la paleta de comandos):</p>
+
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>{
+  "servers": {
+    "ecuador-datos": {
+      "url": "http://localhost:8000/mcp",
+      "type": "http"
+    }
+  }
+}</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="chatgpt-pane" role="tabpanel">
+<p class="client-intro">*Disponible para planes pagos (Plus, Pro, Team, Enterprise).*</p>
+<ol class="client-steps"><li>Ve a <code>Settings</code> > <code>Apps and connectors</code></li><li>Abre <code>Advanced settings</code> y habilita <strong>Developer mode</strong></li><li>En <code>Settings</code> > <code>Connectors</code> > <code>Browse connectors</code>, haz clic en <strong>Add a new connector</strong></li><li>Configura la URL: <code>http://localhost:8000/mcp</code></li></ol>
+
+</div>
+
+<div class="tab-pane fade" id="claude-code-pane" role="tabpanel">
+
+
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>claude mcp add --transport http ecuador-datos http://localhost:8000/mcp</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="gemini-cli-pane" role="tabpanel">
+<p class="client-intro">Agrega a <code>~/.gemini/settings.json</code>:</p>
+
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>{
+  "mcpServers": {
+    "ecuador-datos": {
+      "httpUrl": "http://localhost:8000/mcp"
+    }
+  }
+}</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="le-chat-pane" role="tabpanel">
+
+<ol class="client-steps"><li>Ve a <code>Intelligence</code> > <code>Connectors</code></li><li><code>Add connector</code> > <code>Custom MCP Connector</code></li><li>Nombre: "Ecuador Datos" / URL: <code>http://localhost:8000/mcp</code></li></ol>
+
+</div>
+
+<div class="tab-pane fade" id="windsurf-pane" role="tabpanel">
+<p class="client-intro">Agrega a <code>~/.codeium/windsurf/mcp_config.json</code>:</p>
+
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>{
+  "mcpServers": {
+    "ecuador-datos": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "http://localhost:8000/mcp"]
+    }
+  }
+}</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="huggingchat-pane" role="tabpanel">
+
+<ol class="client-steps"><li>En el chat, haz clic en el ícono <code>+</code> > <code>MCP Servers</code> > <code>Manage MCP Servers</code></li><li><code>Add Server</code> con nombre "Ecuador Datos" y URL <code>http://localhost:8000/mcp</code></li></ol>
+
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="solucion-problemas">
+<p class="kicker">Solución de problemas</p>
+<h2 class="section-title">¿Algo no funciona?</h2>
+<p class="section-lede">Empieza por confirmar que el servidor está vivo. Si responde, el problema casi siempre está en la configuración del cliente o en el portal de origen, no en EcuDataMCP.</p>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>curl http://localhost:8000/health</code></pre></div>
+<p class="client-intro">Debe devolver <code>{"status":"ok", "version": ...}</code>. Si no responde, el servidor no está corriendo o escucha en otro puerto.</p>
+<details class="faq-item">
+<summary>Mi cliente no muestra ningún tool</summary>
+<p>Revisa, en orden: (1) que el servidor esté corriendo (<code>/health</code> responde); (2) que la URL termine en <code>/mcp</code>, no en <code>/</code> ni en <code>/health</code>; (3) que el JSON de configuración sea válido (una coma de más lo invalida en silencio); y (4) que hayas <strong>reiniciado el cliente por completo</strong> después de editar la configuración. Claude Desktop, Cursor y Windsurf solo leen el archivo al arrancar.</p>
+</details>
+<details class="faq-item">
+<summary>Claude Desktop o Windsurf: <code>npx</code> no se encuentra</summary>
+<p>Esas configuraciones usan <code>mcp-remote</code> como puente, que necesita Node.js 18+ instalado y en el <code>PATH</code>. Instálalo desde nodejs.org y reinicia el cliente. Alternativa sin Node: usa modo stdio con <code>"command": "uv"</code> y <code>"args": ["run", "--directory", "&lt;ruta-del-clon&gt;", "python", "main.py", "--transport", "stdio"]</code>.</p>
+</details>
+<details class="faq-item">
+<summary>El puerto 8000 ya está en uso</summary>
+<p>Arranca el servidor en otro puerto (<code>uv run main.py --port 8007</code>, o <code>MCP_PORT=8007 docker compose up -d</code>) y cambia la URL del cliente a <code>http://localhost:8007/mcp</code>.</p>
+</details>
+<details class="faq-item">
+<summary>En modo stdio el servidor se cierra al instante</summary>
+<p>Corre el mismo comando a mano en una terminal para ver el error real. Las causas típicas son una ruta incorrecta en <code>--directory</code>, no haber corrido <code>uv sync</code> en el clon, o que <code>uv</code> no esté en el <code>PATH</code> que ve el cliente (en ese caso, usa la ruta absoluta a <code>uv</code>).</p>
+</details>
+<details class="faq-item">
+<summary>ChatGPT o Le Chat no pueden conectarse a <code>localhost</code></summary>
+<p>Los clientes web corren en la nube y no ven tu máquina. Necesitas exponer el servidor con una URL pública HTTPS (un túnel o un despliegue propio) y, en ese caso, activar <code>MCP_REQUIRE_AUTH=1</code> con un <code>MCP_AUTH_TOKEN</code>. Nunca expongas el servidor sin token.</p>
+</details>
+<details class="faq-item">
+<summary>Error 401, 429 o 503 del servidor</summary>
+<p><strong>401</strong>: el servidor exige token (<code>MCP_AUTH_TOKEN</code>) y el cliente no lo envía como <code>Authorization: Bearer ...</code>. <strong>429</strong>: superaste el límite de solicitudes por ventana (<code>MCP_RATE_LIMIT_REQUESTS</code>, 120 por 60 s por defecto); espera o súbelo en uso local. <strong>503</strong>: demasiadas solicitudes simultáneas (<code>MCP_MAX_CONCURRENT_REQUESTS</code>, 8 por defecto).</p>
+</details>
+<details class="faq-item">
+<summary>Error 403 o timeout del portal de Datos Abiertos</summary>
+<p><code>www.datosabiertos.gob.ec</code> a veces rechaza conexiones que vienen de fuera de Latinoamérica (error 403). Si ves esto, corre el servidor desde una conexión con salida en Ecuador o la región (por ejemplo, una VPN). Los tools de trámites e instituciones usan otro portal y no tienen este problema. Los portales del Estado también tienen caídas propias: si un solo tool falla y los demás responden, reintenta más tarde.</p>
+</details>
+<details class="faq-item">
+<summary>Error de certificado TLS / SSL</summary>
+<p>Algunos portales oficiales han publicado certificados vencidos o con la cadena incompleta (el de Datos Abiertos venció en julio de 2026). Para ese portal existe un reintento opt-in: <code>CKAN_INSECURE_TLS=1</code> en tu <code>.env</code>. Úsalo solo mientras dure la falla del portal y quítalo después.</p>
+</details>
+<details class="faq-item">
+<summary>El preview sale cortado o dice que el archivo es muy grande</summary>
+<p>Es intencional: las descargas se limitan a 5 MB y la descompresión de ZIP/tar.gz a 20 MB. Para recursos grandes usa <code>query_resource_data</code> (filtra en el DataStore de CKAN sin bajar el archivo) o <code>list_zip_contents</code> para ver qué trae un ZIP antes de abrirlo.</p>
+</details>
+<details class="faq-item">
+<summary>Necesito más detalle para reportar un bug</summary>
+<p>Arranca con <code>LOG_LEVEL=DEBUG</code>, reproduce el error y abre un <a href="https://github.com/DweskZ/EcuDataMCP/issues" target="_blank" rel="noopener">issue en GitHub</a> con el tool, los parámetros, la salida de <code>/health</code> y el log. No incluyas tokens.</p>
+</details>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">Sin fricción</p>
+<h2 class="section-title">Listo para usar, sin trámite propio.</h2>
+<ul class="friction-list">
+<li><strong>Sin API key</strong>Todas las fuentes son datos públicos, sin autenticación.</li>
+<li><strong>Sin cuenta</strong>No hay registro ni cuenta de usuario que crear.</li>
+<li><strong>100% datos públicos</strong>Bajo licencia abierta, tal como los publica el Estado ecuatoriano.</li>
+<li><strong>Sin telemetría</strong>El servidor corre en tu máquina y no registra ni envía ninguna de tus consultas.</li>
+</ul>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">FAQ</p>
+<h2 class="section-title">¿Tienes más preguntas?</h2>
+<details class="faq-item">
+<summary>¿Qué es EcuDataMCP?</summary>
+<p>Un servidor MCP (Model Context Protocol) de código abierto que ayuda a tu asistente de IA a descubrir y consultar datos abiertos del gobierno de Ecuador: datasets, trámites, regulaciones, contratos públicos, riesgos, sismos, indicadores del Banco Central y compañías.</p>
+</details>
+<details class="faq-item">
+<summary>¿Qué es MCP?</summary>
+<p>Model Context Protocol es un estándar abierto para conectar asistentes de IA con herramientas y fuentes de datos externas, manteniendo el control sobre qué puede hacer el modelo y qué datos puede leer.</p>
+</details>
+<details class="faq-item">
+<summary>¿Qué asistentes puedo usar?</summary>
+<p>Cualquier cliente compatible con MCP: Claude Desktop, Claude Code, ChatGPT (planes pagos), Cursor, VS Code, Gemini CLI, Le Chat, Windsurf, HuggingChat, y más.</p>
+</details>
+<details class="faq-item">
+<summary>¿Necesito una API key?</summary>
+<p>No. Todas las fuentes que usa el servidor son datos públicos sin autenticación.</p>
+</details>
+<details class="faq-item">
+<summary>¿Es esto un servicio oficial del gobierno ecuatoriano?</summary>
+<p>No. EcuDataMCP es un proyecto independiente de código abierto que consulta las mismas fuentes públicas que ya publica el Estado ecuatoriano. No está afiliado a ninguna institución.</p>
+</details>
+<details class="faq-item">
+<summary>¿El servidor guarda mis preguntas?</summary>
+<p>No hay telemetría. El servidor corre localmente en tu máquina y cada consulta va directo del cliente MCP al portal oficial correspondiente.</p>
+</details>
+<details class="faq-item">
+<summary>¿Qué formatos soporta?</summary>
+<p>Preview en memoria de CSV, TSV, JSON, GeoJSON y XLSX; consulta tabular filtrada vía el DataStore de CKAN cuando el recurso lo soporta.</p>
+</details>
+<details class="faq-item">
+<summary>Algo no funciona, ¿dónde busco?</summary>
+<p>Revisa la sección <a href="#solucion-problemas">Solución de problemas</a>: cubre clientes que no muestran tools, puertos ocupados, errores 401/403/429, certificados TLS y archivos demasiado grandes.</p>
+</details>
+<details class="faq-item">
+<summary>¿Puedo contribuir?</summary>
+<p>Sí, el proyecto es MIT y acepta pull requests. Ve la guía en <a href="colaborar.html">Cómo colaborar</a>.</p>
+</details>
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>Datos abiertos de Ecuador, con tu asistente de IA favorito.</p>
+<a class="btn-cta primary" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">Ver en GitHub</a>
+</div>
+</section>
+
+</main>
+
+<footer class="page-footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left"><p>MIT License · Proyecto independiente, no afiliado a ninguna institución del Estado ecuatoriano.</p></div>
+    <div class="nav-footer-center">&nbsp;</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+        <li class="nav-item"><a class="nav-link" href="https://github.com/DweskZ/EcuDataMCP">GitHub</a></li>
+        <li class="nav-item"><a class="nav-link" href="releases.html">Releases</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/fuse.min.js"></script>
+<script>
+window.SITE_SEARCH_INDEX_URL = "search.json";
+window.SITE_ROOT = "";
+window.COPY_LABEL_COPIED = "¡Copiado!";
+window.SITE_SEARCH_EMPTY_LABEL = "Sin resultados.";
+</script>
+<script src="assets/site.js"></script>
+
+</body>
+</html>
