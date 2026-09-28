@@ -614,7 +614,7 @@ a.btn-cta[href="https://github.com/DweskZ/EcuDataMCP"]::before {
   content: "";
   position: absolute;
   inset: auto 0 0 0;
-  height: 1px;
+  height: 2px;
   background: linear-gradient(
     90deg,
     transparent 0%,
@@ -623,8 +623,10 @@ a.btn-cta[href="https://github.com/DweskZ/EcuDataMCP"]::before {
     #ef3340 82%,
     transparent 100%
   );
-  opacity: 0.7;
+  background-size: 200% 100%;
+  opacity: 0.85;
   z-index: 1;
+  animation: flag-slide 9s linear infinite;
 }
 
 .landing.hero .container-page {
@@ -655,10 +657,12 @@ a.btn-cta[href="https://github.com/DweskZ/EcuDataMCP"]::before {
 }
 
 .landing.hero h1 .accent {
-  background: linear-gradient(120deg, #ffd100, #ffe566 55%, #fff1a8);
+  background: linear-gradient(110deg, #ffd100 0%, #fff6c2 35%, #ffd100 55%, #ffe566 100%);
+  background-size: 220% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  animation: accent-shift 6s ease-in-out infinite;
 }
 
 .btn-cta.primary {
@@ -748,6 +752,11 @@ a.btn-cta[href="https://github.com/DweskZ/EcuDataMCP"]::before {
 
 .question-card {
   border-left-color: #ffd100;
+  transition: transform 0.22s ease, border-color 0.22s ease;
+}
+
+.question-card:hover {
+  transform: translateY(-3px);
 }
 
 .question-card:nth-child(3n + 2) {
@@ -801,6 +810,61 @@ a.btn-cta[href="https://github.com/DweskZ/EcuDataMCP"]::before {
   max-width: 36rem;
 }
 
+.hero-copy > * {
+  animation: hero-rise 0.75s ease-out both;
+}
+
+.hero-copy > .brand-hero { animation-delay: 0.04s; }
+.hero-copy > .kicker { animation-delay: 0.12s; }
+.hero-copy > h1 { animation-delay: 0.2s; }
+.hero-copy > .hero-sub { animation-delay: 0.3s; }
+.hero-copy > .hero-ctas { animation-delay: 0.4s; }
+
+.hero-visual {
+  animation: chat-float 7.5s ease-in-out 1s infinite alternate;
+}
+
+.hero-orbs {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(2px);
+}
+
+.hero-orb-y {
+  width: 26rem;
+  height: 26rem;
+  left: -8rem;
+  top: -7rem;
+  background: radial-gradient(circle, var(--ecu-hero-glow-y), transparent 68%);
+  animation: orb-drift-a 18s ease-in-out infinite alternate;
+}
+
+.hero-orb-b {
+  width: 22rem;
+  height: 22rem;
+  right: -4rem;
+  top: -5rem;
+  background: radial-gradient(circle, var(--ecu-hero-glow-b), transparent 68%);
+  animation: orb-drift-b 22s ease-in-out infinite alternate;
+}
+
+.hero-orb-r {
+  width: 18rem;
+  height: 18rem;
+  right: 18%;
+  bottom: -6rem;
+  background: radial-gradient(circle, var(--ecu-hero-glow-r), transparent 70%);
+  animation: orb-drift-c 16s ease-in-out infinite alternate;
+}
+
 .chat-mock {
   background: var(--ecu-panel);
   border: 1px solid var(--ecu-line);
@@ -829,11 +893,12 @@ a.btn-cta[href="https://github.com/DweskZ/EcuDataMCP"]::before {
   height: 8px;
   border-radius: 50%;
   background: #5c6573;
+  animation: chat-dot-glow 2.6s ease-in-out infinite;
 }
 
 .chat-dot:nth-child(1) { background: #ef3340; }
-.chat-dot:nth-child(2) { background: #ffd100; }
-.chat-dot:nth-child(3) { background: #0033a0; }
+.chat-dot:nth-child(2) { background: #ffd100; animation-delay: 0.35s; }
+.chat-dot:nth-child(3) { background: #0033a0; animation-delay: 0.7s; }
 
 .chat-mock-title {
   margin-left: 0.5rem;
@@ -853,6 +918,19 @@ a.btn-cta[href="https://github.com/DweskZ/EcuDataMCP"]::before {
   min-height: 1em;
 }
 
+.chat-mock-status::before {
+  content: "";
+  display: inline-block;
+  width: 0.42rem;
+  height: 0.42rem;
+  margin-right: 0.4rem;
+  border-radius: 50%;
+  background: #00bc8c;
+  box-shadow: 0 0 0 0 rgba(0, 188, 140, 0.55);
+  vertical-align: -1px;
+  animation: live-ping 1.8s ease-out infinite;
+}
+
 .chat-mock-status:empty,
 .chat-mock-status[hidden] {
   display: none;
@@ -862,11 +940,38 @@ a.btn-cta[href="https://github.com/DweskZ/EcuDataMCP"]::before {
   min-height: 280px;
   overflow: visible;
   padding-bottom: 0.35rem;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.22s ease, transform 0.22s ease;
 }
 
-.chat-mock-body.is-resetting {
+.chat-mock-body.is-leaving {
   opacity: 0;
+  transform: translateY(8px);
+}
+
+.chat-progress {
+  height: 4px;
+  margin: 0.2rem 0.95rem 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ecu-text) 16%, transparent);
+  overflow: hidden;
+}
+
+.chat-progress > span {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ffd100, #0033a0 58%, #ef3340);
+  box-shadow: 0 0 10px rgba(255, 209, 0, 0.55);
+  transform-origin: left center;
+}
+
+.chat-mock.is-playing .chat-progress > span {
+  animation: chat-progress 8.4s linear forwards;
+}
+
+.chat-mock.is-paused .chat-progress > span {
+  animation-play-state: paused;
 }
 
 .chat-nav {
@@ -1067,6 +1172,7 @@ html[data-theme="light"] .chat-code {
   background:
     linear-gradient(180deg, rgba(255, 209, 0, 0.08), transparent),
     var(--ecu-panel);
+  animation: node-breathe 3.4s ease-in-out infinite;
 }
 
 .arch-label {
@@ -1089,6 +1195,7 @@ html[data-theme="light"] .chat-code {
   color: var(--ecu-accent-text);
   font-size: 1.25rem;
   font-weight: 700;
+  animation: arch-nudge 1.7s ease-in-out infinite;
 }
 
 @media (max-width: 700px) {
@@ -1115,7 +1222,18 @@ html[data-theme="light"] .chat-code {
   border: 1px solid var(--ecu-line);
   background: var(--ecu-panel);
   color: var(--ecu-text);
+  animation: pill-float 4.8s ease-in-out infinite;
 }
+
+.source-pill:nth-child(2) { animation-delay: 0.35s; }
+.source-pill:nth-child(3) { animation-delay: 0.7s; }
+.source-pill:nth-child(4) { animation-delay: 1.05s; }
+.source-pill:nth-child(5) { animation-delay: 1.4s; }
+.source-pill:nth-child(6) { animation-delay: 1.75s; }
+.source-pill:nth-child(7) { animation-delay: 2.1s; }
+.source-pill:nth-child(8) { animation-delay: 2.45s; }
+.source-pill:nth-child(9) { animation-delay: 2.8s; }
+.source-pill:nth-child(10) { animation-delay: 3.15s; }
 
 .source-pill:nth-child(5n + 1) { border-color: rgba(255, 209, 0, 0.45); }
 .source-pill:nth-child(5n + 2) { border-color: rgba(0, 51, 160, 0.4); }
@@ -1155,7 +1273,11 @@ html[data-theme="light"] .chat-code {
 
 @media (max-width: 700px) {
   .install-bar {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .install-code {
+    min-width: 0;
+    overflow-x: auto;
   }
 }
 
@@ -1205,4 +1327,104 @@ a:not(.btn-cta):not(.nav-link):not(.tool-chip):not(.lang-toggle-option) {
 
 code a:any-link {
   text-decoration-color: currentColor;
+}
+
+/* ---- Landing motion ---- */
+
+@keyframes flag-slide {
+  from { background-position: 0 0; }
+  to { background-position: 200% 0; }
+}
+
+@keyframes accent-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes chat-float {
+  from { transform: translateY(0); }
+  to { transform: translateY(-10px); }
+}
+
+@keyframes orb-drift-a {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(4rem, 2.5rem, 0) scale(1.08); }
+}
+
+@keyframes orb-drift-b {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(-3.5rem, 3rem, 0) scale(1.12); }
+}
+
+@keyframes orb-drift-c {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-2rem, -2.2rem, 0); }
+}
+
+@keyframes chat-dot-glow {
+  0%, 100% { transform: scale(1); opacity: 0.75; }
+  50% { transform: scale(1.25); opacity: 1; }
+}
+
+@keyframes live-ping {
+  0% { box-shadow: 0 0 0 0 rgba(0, 188, 140, 0.55); }
+  70%, 100% { box-shadow: 0 0 0 7px rgba(0, 188, 140, 0); }
+}
+
+@keyframes chat-progress {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes arch-nudge {
+  0%, 100% { transform: translateX(0); opacity: 0.55; }
+  50% { transform: translateX(5px); opacity: 1; }
+}
+
+@keyframes node-breathe {
+  0%, 100% { box-shadow: inset 0 0 0 1px rgba(255, 209, 0, 0.15); }
+  50% { box-shadow: inset 0 0 0 1px rgba(255, 209, 0, 0.5), 0 0 22px rgba(255, 209, 0, 0.14); }
+}
+
+@keyframes pill-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing.hero::before,
+  .landing.hero h1 .accent,
+  .hero-copy > *,
+  .hero-visual,
+  .hero-orb,
+  .chat-dot,
+  .chat-mock-status::before,
+  .chat-mock.is-playing .chat-progress > span,
+  .arch-arrow,
+  .arch-node.accent,
+  .source-pill {
+    animation: none;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .question-card:hover,
+  .step-card:hover {
+    transform: none;
+  }
 }

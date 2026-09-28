@@ -176,7 +176,7 @@ function copyCode(btn) {
   });
 })();
 
-// ---- hero chat examples (real MCP answers, prev / next) ----------------
+// ---- hero chat examples (real MCP answers, prev / next, autoplay) ------
 
 (function () {
   var root = document.querySelector("[data-chat-demo]");
@@ -198,11 +198,31 @@ function copyCode(btn) {
   }
   if (!examples.length) return;
 
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var DWELL = 8400;
   var index = 0;
+  var timer = 0;
+  var swapTimer = 0;
+  var paused = false;
+  var deadline = 0;
+  var remaining = DWELL;
+  var swapping = false;
+  var pending = 0;
 
-  function renderTurn(step) {
+  var progress = document.createElement("div");
+  progress.className = "chat-progress";
+  progress.setAttribute("aria-hidden", "true");
+  var progressBar = document.createElement("span");
+  progress.appendChild(progressBar);
+  if (!reduce) body.insertAdjacentElement("afterend", progress);
+
+  function renderTurn(step, i) {
     var bubble = document.createElement("div");
     bubble.className = "chat-bubble " + (step.role === "user" ? "user" : "assistant");
+    if (!reduce) {
+      bubble.classList.add("chat-enter");
+      bubble.style.animationDelay = (i * 80) + "ms";
+    }
     if (step.role === "user") {
       bubble.textContent = step.text || "";
       return bubble;
@@ -234,15 +254,164 @@ function copyCode(btn) {
     return bubble;
   }
 
-  function show(nextIndex) {
-    index = (nextIndex + examples.length) % examples.length;
-    var example = examples[index];
-    body.replaceChildren.apply(body, example.turns.map(renderTurn));
+  function restartBar() {
+    progressBar.style.animation = "none";
+    void progressBar.offsetWidth;
+    progressBar.style.animation = "";
+  }
+
+  function beginCycle() {
+    window.clearTimeout(timer);
+    remaining = DWELL;
+    if (reduce) return;
+    restartBar();
+    root.classList.add("is-playing");
+    if (paused || document.hidden) {
+      root.classList.add("is-paused");
+      return;
+    }
+    root.classList.remove("is-paused");
+    deadline = Date.now() + remaining;
+    timer = window.setTimeout(function () { show(index + 1); }, remaining);
+  }
+
+  function pause() {
+    if (paused || reduce) return;
+    paused = true;
+    root.classList.add("is-paused");
+    window.clearTimeout(timer);
+    if (deadline) remaining = Math.max(400, deadline - Date.now());
+  }
+
+  function resume() {
+    if (!paused) return;
+    paused = false;
+    if (reduce || document.hidden || swapping) return;
+    root.classList.remove("is-paused");
+    deadline = Date.now() + remaining;
+    timer = window.setTimeout(function () { show(index + 1); }, remaining);
+  }
+
+  function paint(example) {
+    var nodes = example.turns.map(renderTurn);
+    body.replaceChildren.apply(body, nodes);
     if (labelEl) labelEl.textContent = example.label + " · " + (index + 1) + " / " + examples.length;
     if (statusEl) statusEl.textContent = example.label;
   }
 
+  function show(nextIndex) {
+    pending = (nextIndex + examples.length) % examples.length;
+    function commit() {
+      index = pending;
+      swapping = false;
+      body.classList.remove("is-leaving");
+      paint(examples[index]);
+      beginCycle();
+    }
+    if (reduce) {
+      commit();
+      return;
+    }
+    swapping = true;
+    window.clearTimeout(timer);
+    window.clearTimeout(swapTimer);
+    body.classList.add("is-leaving");
+    swapTimer = window.setTimeout(commit, 200);
+  }
+
+  if (!reduce) {
+    Array.prototype.forEach.call(body.children, function (node, i) {
+      node.classList.add("chat-enter");
+      node.style.animationDelay = (i * 80) + "ms";
+    });
+  }
+  if (statusEl && examples[0].label) statusEl.textContent = examples[0].label;
+  beginCycle();
+
   prevBtn.addEventListener("click", function () { show(index - 1); });
   nextBtn.addEventListener("click", function () { show(index + 1); });
-  show(0);
+  root.addEventListener("pointerenter", pause);
+  root.addEventListener("pointerleave", resume);
+  root.addEventListener("focusin", pause);
+  root.addEventListener("focusout", function (event) {
+    if (!root.contains(event.relatedTarget)) resume();
+  });
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+      window.clearTimeout(timer);
+      if (deadline) remaining = Math.max(400, deadline - Date.now());
+      root.classList.add("is-paused");
+    } else if (!paused && !swapping) {
+      root.classList.remove("is-paused");
+      deadline = Date.now() + remaining;
+      timer = window.setTimeout(function () { show(index + 1); }, remaining);
+    }
+  });
+})();
+
+// ---- landing atmosphere + scroll reveal --------------------------------
+
+(function () {
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var hero = document.querySelector(".landing.hero");
+  if (hero && !reduce && !hero.querySelector(".hero-orbs")) {
+    var wrap = document.createElement("div");
+    wrap.className = "hero-orbs";
+    wrap.setAttribute("aria-hidden", "true");
+    ["y", "b", "r"].forEach(function (name) {
+      var orb = document.createElement("span");
+      orb.className = "hero-orb hero-orb-" + name;
+      wrap.appendChild(orb);
+    });
+    hero.prepend(wrap);
+  }
+
+  if (reduce || !("IntersectionObserver" in window)) return;
+
+  var nodes = document.querySelectorAll(".landing:not(.hero), .closing-cta");
+  if (!nodes.length) return;
+  var statsStarted = false;
+
+  function countUp(el) {
+    var finalText = el.textContent.trim();
+    var target = Number(finalText.replace(/[^\d.]/g, ""));
+    if (!isFinite(target)) return;
+    var start = performance.now();
+    var dur = 900;
+    function frame(now) {
+      var t = Math.min(1, (now - start) / dur);
+      var eased = 1 - Math.pow(1 - t, 3);
+      var value = Math.round(target * eased);
+      el.textContent = finalText.indexOf(",") >= 0 ? value.toLocaleString("en-US") : String(value);
+      if (t < 1) requestAnimationFrame(frame);
+      else el.textContent = finalText;
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function revealStats() {
+    if (statsStarted) return;
+    statsStarted = true;
+    document.querySelectorAll(".hero-stat .num").forEach(countUp);
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-in");
+      if (entry.target.classList.contains("strip-section")) revealStats();
+      io.unobserve(entry.target);
+    });
+  }, { threshold: 0, rootMargin: "0px 0px 12% 0px" });
+
+  nodes.forEach(function (el) {
+    var top = el.getBoundingClientRect().top;
+    if (top < window.innerHeight * 0.92) {
+      el.classList.add("is-in");
+      if (el.classList.contains("strip-section")) revealStats();
+      return;
+    }
+    el.classList.add("reveal");
+    io.observe(el);
+  });
 })();
