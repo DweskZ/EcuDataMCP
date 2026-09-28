@@ -611,23 +611,9 @@ a.btn-cta[href="https://github.com/DweskZ/EcuDataMCP"]::before {
     var(--ecu-hero-base);
 }
 
-.landing.hero::before {
-  content: "";
-  position: absolute;
-  inset: auto 0 0 0;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    #ffd100 18%,
-    #0033a0 50%,
-    #ef3340 82%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  opacity: 0.85;
-  z-index: 1;
-  animation: flag-slide 9s linear infinite;
+.landing.hero,
+.landing.strip-section {
+  border-bottom: none;
 }
 
 .landing.hero .container-page {
@@ -950,7 +936,7 @@ html[data-theme="light"] .closing-cta p {
 }
 
 .landing.hero {
-  padding: 4.5rem 0 3.5rem;
+  padding: 4.5rem 0 1.25rem;
 }
 
 .hero-copy .hero-sub {
@@ -1294,7 +1280,8 @@ html[data-theme="light"] .chat-code {
 }
 
 .strip-section {
-  padding: 2.25rem 0 2.75rem;
+  padding: 0.35rem 0 2.75rem;
+  background: transparent;
 }
 
 .arch-flow {
@@ -1478,11 +1465,6 @@ code a:any-link {
 
 /* ---- Landing motion ---- */
 
-@keyframes flag-slide {
-  from { background-position: 0 0; }
-  to { background-position: 200% 0; }
-}
-
 @keyframes accent-shift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -1550,7 +1532,6 @@ code a:any-link {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .landing.hero::before,
   .landing.hero h1 .accent,
   .hero-copy > *,
   .hero-visual,
