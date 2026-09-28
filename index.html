@@ -158,28 +158,28 @@
 <span class="chat-mock-status" data-chat-status>ejemplo real</span>
 </div>
 <div class="chat-mock-body" data-chat-body>
-<div class="chat-bubble user">¿A cómo cerró el oro según el BCE?</div>
+<div class="chat-bubble user">¿Cuánto cuesta el pasaporte y qué piden?</div>
 <div class="chat-bubble assistant">
-<span class="chat-tool">tool · get_bce_indicador_diario</span>
-<p>El 25 de septiembre de 2026 el oro spot cerró en <strong>4,284.81 dólares</strong> por onza troy.</p>
-<pre class="chat-code">2026-09-23  4,287.65
-2026-09-24  4,275.03
-2026-09-25  4,284.81</pre>
-<span class="chat-cite">fuente · contenido.bce.fin.ec</span>
+<span class="chat-tool">tool · get_tramite_info</span>
+<p>Para mayores de 18 años el pasaporte electrónico cuesta <strong>USD 90</strong>, sin IVA. La tercera edad paga la mitad. Con discapacidad del 30% o más, no se paga.</p>
+<pre class="chat-code">comprobante de pago
+cédula vigente
+pasaporte anterior, si sigue vigente</pre>
+<span class="chat-cite">fuente · gob.ec, Registro Civil</span>
 </div>
 </div>
 <div class="chat-nav">
 <button type="button" class="chat-nav-btn" data-chat-prev aria-label="Ejemplo anterior">‹</button>
-<span class="chat-nav-label" data-chat-label>Oro · 1 / 4</span>
+<span class="chat-nav-label" data-chat-label>Pasaporte · 1 / 4</span>
 <button type="button" class="chat-nav-btn" data-chat-next aria-label="Ejemplo siguiente">›</button>
 </div>
 <script type="application/json" data-chat-examples>
 [
   {
-    "label": "Oro",
+    "label": "Pasaporte",
     "turns": [
-      {"role": "user", "text": "¿A cómo cerró el oro según el BCE?"},
-      {"role": "assistant", "tool": "get_bce_indicador_diario", "text": "El 25 de septiembre de 2026 el oro spot cerró en 4,284.81 dólares por onza troy.", "html": "El 25 de septiembre de 2026 el oro spot cerró en <strong>4,284.81 dólares</strong> por onza troy.", "code": "2026-09-23  4,287.65\n2026-09-24  4,275.03\n2026-09-25  4,284.81", "cite": "fuente · contenido.bce.fin.ec"}
+      {"role": "user", "text": "¿Cuánto cuesta el pasaporte y qué piden?"},
+      {"role": "assistant", "tool": "get_tramite_info", "text": "Para mayores de 18 años el pasaporte electrónico cuesta USD 90, sin IVA. La tercera edad paga la mitad. Con discapacidad del 30% o más, no se paga.", "html": "Para mayores de 18 años el pasaporte electrónico cuesta <strong>USD 90</strong>, sin IVA. La tercera edad paga la mitad. Con discapacidad del 30% o más, no se paga.", "code": "comprobante de pago\ncédula vigente\npasaporte anterior, si sigue vigente", "cite": "fuente · gob.ec, Registro Civil"}
     ]
   },
   {
