@@ -814,6 +814,11 @@ a.lang-toggle-option:hover {
   max-height: 340px;
   overflow: hidden;
   padding-bottom: 0.4rem;
+  transition: opacity 0.25s ease;
+}
+
+.chat-mock-body.is-resetting {
+  opacity: 0;
 }
 
 .chat-bubble {

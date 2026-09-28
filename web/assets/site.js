@@ -252,6 +252,11 @@ function copyCode(btn) {
     statusEl.hidden = !text;
   }
 
+  // Take over immediately so the static fallback does not flash then wipe.
+  body.innerHTML = "";
+  setStatus("");
+  root.classList.add("is-animated");
+
   function typeText(el, text, cps) {
     cps = cps || 38;
     return new Promise(function (resolve) {
@@ -356,11 +361,13 @@ function copyCode(btn) {
   }
 
   async function runLoop() {
-    root.classList.add("is-animated");
     while (true) {
+      body.classList.add("is-resetting");
+      await sleep(280);
       body.innerHTML = "";
+      body.classList.remove("is-resetting");
       setStatus("");
-      await sleep(400);
+      await sleep(350);
       for (var i = 0; i < script.length; i += 1) {
         var step = script[i];
         if (step.role === "user") {
@@ -369,7 +376,7 @@ function copyCode(btn) {
           await playAssistant(step);
         }
       }
-      await sleep(2600);
+      await sleep(2800);
     }
   }
 
