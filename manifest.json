@@ -2,7 +2,7 @@
   "manifest_version": "0.4",
   "name": "ecuador-mcp",
   "display_name": "EcuDataMCP",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "Ecuador's open government data for AI assistants: CKAN, SRI, BCE, INEC, Supercias, SERCOP and more.",
   "long_description": "Search and analyze Ecuador's official open data through MCP: the national and municipal CKAN portals, gob.ec procedures and regulations, SRI, BCE, INEC/ANDA, Supercías, Superbancos, SERCOP public procurement, IG-EPN earthquakes, SGR risk events, CENACE, ARCONEL and power-cut schedules, among other sources. Read-only; no credentials needed.",
   "author": {
