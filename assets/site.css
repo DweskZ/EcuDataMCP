@@ -26,6 +26,8 @@ html[data-theme="dark"] {
   --ecu-hero-glow-r: rgba(239, 51, 64, 0.14);
   --ecu-nav-wash: rgba(0, 51, 160, 0.14);
   --ecu-code-bg: #0b0c0e;
+  --ecu-inline-code-bg: rgba(255, 255, 255, 0.1);
+  --ecu-inline-code-fg: #f4f6f8;
   --ecu-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   color-scheme: dark;
 }
@@ -54,6 +56,8 @@ html[data-theme="light"] {
   --ecu-hero-glow-r: rgba(239, 51, 64, 0.1);
   --ecu-nav-wash: rgba(0, 51, 160, 0.05);
   --ecu-code-bg: #eef2f8;
+  --ecu-inline-code-bg: #e4ebf6;
+  --ecu-inline-code-fg: #152033;
   --ecu-shadow: 0 18px 40px rgba(15, 20, 32, 0.12);
   color-scheme: light;
 }
@@ -1072,4 +1076,52 @@ html[data-theme="light"] .chat-code {
   .install-bar {
     grid-template-columns: 1fr;
   }
+}
+
+/* Inline code chips. styles.css paints these with a light #f8f9fa chip
+   and, inside paragraphs, a dark translucent bar. That puts gold tool
+   names on white in dark mode and dark text on a gray bar in light mode. */
+code {
+  color: var(--ecu-inline-code-fg);
+  background-color: var(--ecu-inline-code-bg);
+}
+
+p code:not(.sourceCode),
+li code:not(.sourceCode),
+td code:not(.sourceCode),
+summary code {
+  color: var(--ecu-inline-code-fg);
+  background-color: var(--ecu-inline-code-bg);
+}
+
+.atlas-tool-name,
+.atlas-params code,
+.release-version {
+  background-color: transparent;
+  padding: 0;
+}
+
+html[data-theme="dark"] .atlas-tool-name,
+html[data-theme="dark"] .atlas-params code,
+html:not([data-theme="light"]) .atlas-tool-name,
+html:not([data-theme="light"]) .atlas-params code {
+  color: #ffe08a;
+}
+
+pre code,
+.code-block code,
+.chat-code code {
+  color: inherit;
+  background-color: transparent;
+  padding: 0;
+}
+
+a:not(.btn-cta):not(.nav-link):not(.tool-chip):not(.lang-toggle-option) {
+  text-decoration-color: currentColor;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+code a:any-link {
+  text-decoration-color: currentColor;
 }
