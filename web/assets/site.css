@@ -785,6 +785,53 @@ a.btn-cta[href="https://github.com/DweskZ/EcuDataMCP"]::before {
     var(--ecu-ink);
 }
 
+/* Closing line. styles.css paints the sentence #e6e6e6, which disappears
+   on the light page. Give it its own band and a theme-aware heading color. */
+.closing-cta {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  text-align: center;
+  padding: 4.75rem 1.25rem 5rem;
+  background:
+    radial-gradient(ellipse 48% 90% at 50% 115%, var(--ecu-hero-glow-b), transparent 64%),
+    radial-gradient(ellipse 36% 80% at 0% 0%, var(--ecu-hero-glow-y), transparent 70%),
+    radial-gradient(ellipse 36% 80% at 100% 0%, var(--ecu-hero-glow-r), transparent 70%),
+    var(--ecu-panel);
+  border-top: 1px solid var(--ecu-line);
+}
+
+.closing-cta::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #ffd100 16%,
+    #0033a0 50%,
+    #ef3340 84%,
+    transparent 100%
+  );
+}
+
+.closing-cta p {
+  color: var(--ecu-heading);
+  font-size: clamp(1.7rem, 3.8vw, 2.45rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.22;
+  max-width: 16em;
+  margin: 0 auto 1.75rem;
+}
+
+html[data-theme="light"] .closing-cta p {
+  color: var(--ecu-heading);
+}
+
 /* ---- Richer hero (inspired by FastMCP / Smithery / MCP.io) ---- */
 
 .container-page.hero-layout,
