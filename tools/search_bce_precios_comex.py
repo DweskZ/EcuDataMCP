@@ -34,7 +34,7 @@ def register_search_bce_precios_comex_tool(mcp: MCPServer) -> None:
         Genuinely distinct from search_indicadores_bce's BCEData catalog
         (id_grupo 134 "Índices IPX - IPM - ITI" only has the three
         *aggregate* series — general export index, general import index,
-        ITI) and from search_bce_indices (a different, year-archived
+        ITI) and from search_bce_paginas(catalogo="indices") (a year-archived
         widget that doesn't cover trade prices). Returns direct URLs, not
         file contents — download them yourself or via download_resource.
 

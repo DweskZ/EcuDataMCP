@@ -1,5 +1,43 @@
 # Changelog
 
+## 0.10.0 — 2026-09-28
+
+Breaking: tool names changed. 109 → 90 tools in the default profile, every
+parameter documented, `tools/list` ~80k characters (~20k tokens).
+
+### Changed
+
+- **Every tool parameter has a description in its schema**, taken from the
+  first sentence of its docstring `Args` entry (shared wording for `format`
+  and the CKAN `source`). Shortening descriptions in 0.9.0 had left the
+  schema with no parameter documentation, and Glama's tool-definition score
+  fell from 4.5 to 3.5 on it. A test fails if a parameter goes undocumented.
+- **Breaking: tools merged behind a selector** (same call, same result
+  shape, clients unchanged):
+  - `search_archivos(fuente, query, limit, offset)` replaces
+    `search_sri_datasets`, `search_sri_estadisticas_recaudacion`,
+    `search_mef_fiscal`, `search_censo_recursos`, `search_minedec_matricula`,
+    `search_senescyt_estadisticas`, `search_gacetas_inmunoprevenibles`,
+    `search_cnig_femicidios`, `search_trabajo_boletin_anual`,
+    `search_salarios_sectoriales` and `search_arcotel`; files are
+    normalized to `titulo`/`url`/`formato`.
+  - `search_cortes(distribuidora)` / `get_cortes_horarios(distribuidora,
+    archivo)` replace the EEQ and Centrosur search/parse pairs.
+  - `search_capas_geo(fuente)` / `get_capa_geo_datos(fuente, capa)` replace
+    the INAMHI and MAG geoportal pairs.
+  - `search_bce_paginas(catalogo)` / `get_bce_pagina_archivos(catalogo,
+    pagina_id)` replace `search_bce_indices`, `get_bce_indice_archivo`,
+    `search_bce_cuentas_nacionales` and `get_bce_cuentas_nacionales_archivo`.
+- **Breaking: the default `MCP_PROFILE` is `public`**, leaving the two
+  operator tools (`audit_bce_catalog`, `compare_bce_sources`) out of every
+  client's tool list; `MCP_PROFILE=all` restores them and
+  `docker-compose.yml` sets it.
+
+### Removed
+
+- **`list_capabilities`**, deprecated since 0.8.9; the server instructions
+  and `ecuador://fuentes` cover it.
+
 ## 0.9.1 — 2026-09-27
 
 ### Fixed

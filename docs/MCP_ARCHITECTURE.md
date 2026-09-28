@@ -497,6 +497,39 @@ tamaño de `tools/list`, no el número.
 Pendiente: perfiles por dominio (fase 4, paso 2) una vez haya datos de
 uso; fases 5-7 sin cambios.
 
+## Ejecución 2026-09-28: descripciones de parámetros y fusiones rápidas (0.10.0)
+
+Resultado de 0.9.x en Glama: "Tool Count 1/5" sin cambios con 109 tools, y
+la calidad por tool bajó de A (4,5) a B (3,5). El motivo, según su propio
+diagnóstico: "schema description coverage 0%" — al acortar las
+descripciones desapareció la única documentación de parámetros.
+
+1. **Parámetros documentados en el schema.** `EcuadorMCPServer` añade a cada
+   propiedad la primera oración de su entrada en `Args` (363/363, con test).
+   Cuesta ~14k caracteres; vale la pena porque es justo lo que los clientes
+   muestran al elegir argumentos.
+2. **Fusiones rápidas** (mismo criterio que la de archivos institucionales:
+   misma llamada, misma forma de respuesta, clientes intactos):
+   `search_archivos` (11 buscadores de enlaces a archivos), `search_cortes`/
+   `get_cortes_horarios` (EEQ, Centrosur), `search_capas_geo`/
+   `get_capa_geo_datos` (INAMHI, MAG), `search_bce_paginas`/
+   `get_bce_pagina_archivos` (índices, Cuentas Nacionales). Se dejaron
+   fuera BIINEC (registros de catálogo, no archivos) y el snapshot de
+   energia-ecuador (otra forma de fila).
+3. **Perfil `public` por defecto** y retiro de `list_capabilities`.
+
+| Métrica | 0.8.13 | 0.10.0 |
+|---|---|---|
+| Tools (perfil por defecto) | 121 | 90 |
+| `tools/list` en el cable | ≈199k caracteres | ≈80k caracteres |
+| Parámetros con descripción | 0/363 | 100% |
+
+**Decisión:** no se hará el cambio estructural (núcleo pequeño por defecto
+con dominios opcionales, activación dinámica o servidores separados). El
+puntaje de "Tool Count" de Glama probablemente siga bajo con 90 tools; se
+acepta a cambio de que un cliente con la configuración por defecto vea
+todas las fuentes.
+
 ## Fuentes oficiales consultadas
 
 - [MCP Tools, especificación 2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25/server/tools)

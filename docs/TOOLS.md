@@ -7,7 +7,6 @@ aceptan `format="json"` además de texto.
 
 | Tool | Descripción |
 |------|-------------|
-| `list_capabilities` | Resume fuentes, tools, prompts y límites del servidor. |
 | `search_ecuador` | Busca a la vez en datasets, orgs, trámites, regulaciones, contratos y riesgos. |
 | `lookup_ubicacion` | Provincias, cantones y parroquias (código INEC, región, población). |
 
@@ -23,7 +22,7 @@ aceptan `format="json"` además de texto.
 | `download_resource` | Baja el archivo crudo de un recurso en base64 (máx. 5 MB), para formatos que no se pueden previsualizar como tabla (.rar, .tar.gz, etc.). |
 | `query_resource_data` | Consulta tabular vía CKAN DataStore (filtros, texto, paginación) sin descargar el archivo. |
 | `detect_series_pattern` | Para datasets con un archivo por período: determina si cada archivo nuevo reemplaza a los anteriores (acumulado) o los complementa (incremental). |
-| `search_sri_datasets` | Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN: catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables. |
+| `search_archivos` (`fuente="sri_datasets"`) | Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN: catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables. |
 
 Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca"` o `source="latacunga"` (portales municipales), o `source="iadb"` (data.iadb.org, el portal de datos abiertos del BID — NO exclusivo de Ecuador, un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID).
 
@@ -83,8 +82,8 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `get_sgr_sitrep_archivos` | Reportes SITREP en PDF de un evento adverso de la SGR. |
 | `list_archivo_secciones` (`fuente="sgr"`) | Categorías de la biblioteca documental de la SGR (~1660 documentos). |
 | `get_archivo_seccion` (`fuente="sgr"`) | Documentos de una categoría de la biblioteca de la SGR. |
-| `search_inamhi_capas` | Catálogo de capas del geoportal de INAMHI (meteorología e hidrología). |
-| `get_inamhi_capa_datos` | Muestra de atributos reales de una capa del geoportal de INAMHI. |
+| `search_capas_geo` (`fuente="inamhi"`) | Catálogo de capas del geoportal de INAMHI (meteorología e hidrología). |
+| `get_capa_geo_datos` (`fuente="inamhi"`) | Muestra de atributos reales de una capa del geoportal de INAMHI. |
 
 ## Exploración
 
@@ -107,12 +106,12 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `search_bce_iem` | Busca tablas individuales de Excel en el último boletín IEM del BCE. |
 | `search_bce_remesas` | Lista los enlaces directos a archivos de Remesas de Trabajadores del BCE. |
 | `search_bce_publicaciones` | Publicaciones recientes del BCE (boletines, reportes, avisos). |
-| `search_bce_indices` | Catálogo de páginas "índice" del BCE con archivo histórico por serie. |
-| `get_bce_indice_archivo` | Archivo de archivos de una página "índice" del BCE. |
+| `search_bce_paginas` (`catalogo="indices"`) | Catálogo de páginas "índice" del BCE con archivo histórico por serie. |
+| `get_bce_pagina_archivos` (`catalogo="indices"`) | Archivo de archivos de una página "índice" del BCE. |
 | `search_bce_precios_comex` | Índices de precios de comercio exterior del BCE, desagregados. |
 | `search_bce_calendario` | Calendario de publicaciones estadísticas programadas del BCE. |
-| `search_bce_cuentas_nacionales` | Páginas de publicación de Cuentas Nacionales del BCE. |
-| `get_bce_cuentas_nacionales_archivo` | Listado de archivos de una página de Cuentas Nacionales del BCE. |
+| `search_bce_paginas` (`catalogo="cuentas_nacionales"`) | Páginas de publicación de Cuentas Nacionales del BCE. |
+| `get_bce_pagina_archivos` (`catalogo="cuentas_nacionales"`) | Listado de archivos de una página de Cuentas Nacionales del BCE. |
 
 ## INEC: estadísticas, BIINEC y censo
 
@@ -121,7 +120,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `get_inec_estadistica_files` | Lista los enlaces directos a archivos publicados en una página de tema estadístico del INEC. |
 | `get_inec_publicacion_archivos` | Lista los enlaces directos a archivos (PDF/XLSX/CSV/ZIP) incrustados en una publicación del INEC encontrada vía search_inec_publicaciones. |
 | `search_biinec_extras` | Revisa el BIINEC ("Banco de Datos Abiertos") del INEC en busca de datos que no aparecen en search_anda ni en search_inec_estadisticas. |
-| `search_censo_recursos` | Busca en el micrositio dedicado del Censo 2022 del INEC (censoecuador.gob.ec) enlaces directos a archivos de microdatos/metodología. |
+| `search_archivos` (`fuente="censo"`) | Busca en el micrositio dedicado del Censo 2022 del INEC (censoecuador.gob.ec) enlaces directos a archivos de microdatos/metodología. |
 | `search_inec_estadisticas` | Busca en las páginas de temas estadísticos del INEC (ecuadorencifras.gob.ec). |
 | `search_inec_publicaciones` | Busca en todas las publicaciones del INEC en Ecuador en Cifras, vía su API REST pública de WordPress -- siempre actualizada, más recientes primero. |
 
@@ -130,7 +129,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | Tool | Descripción |
 |------|-------------|
 | `get_sri_ruc_info` | Consultar la información pública de un contribuyente por RUC en el SRI. |
-| `search_sri_estadisticas_recaudacion` | Busca en la página "Estadísticas de Recaudación" del SRI enlaces directos a archivos. |
+| `search_archivos` (`fuente="sri_recaudacion"`) | Busca en la página "Estadísticas de Recaudación" del SRI enlaces directos a archivos. |
 | `search_sri_ruc` | Buscar contribuyentes en el RUC del SRI por razón social o nombre comercial (texto parcial), sin necesitar el RUC exacto de antemano. |
 
 ## SIPA, Contraloría y Superbancos
@@ -144,14 +143,19 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `list_archivo_secciones` (`fuente="sipa"`) | Lista los módulos de descarga de estadísticas de SIPA (sipa.agricultura.gob.ec). |
 | `list_archivo_secciones` (`fuente="superbancos"`) | Lista las secciones de estadísticas de la Superintendencia de Bancos (superbancos.gob.ec/estadisticas/portalestudios/). |
 | `get_sipa_resumen_indicadores` | PDF mensuales del "Resumen de Indicadores" de SIPA (Ministerio de Agricultura), por año. |
-| `search_sipa_geoportal_capas` | Catálogo de capas del geoportal del Ministerio de Agricultura (SIPA). |
-| `get_sipa_geoportal_capa_datos` | Muestra de atributos reales de una capa del geoportal de SIPA. |
+| `search_capas_geo` (`fuente="mag"`) | Catálogo de capas del geoportal del Ministerio de Agricultura (SIPA). |
+| `get_capa_geo_datos` (`fuente="mag"`) | Muestra de atributos reales de una capa del geoportal de SIPA. |
 
 ## CENACE, SUT e IG-EPN
 
 | Tool | Descripción |
 |------|-------------|
 | `get_cenace_tablero` | Obtiene un tablero del snapshot en vivo de la operación de la red eléctrica de CENACE (el operador nacional de Ecuador) — mezcla de generación y demanda, siempre al instante. |
+| `list_arconel_reportes` | Tipos de reporte, años (1998 en adelante) y grupos de empresas del generador de reportes estadísticos de ARCONEL. |
+| `get_arconel_reporte` | Ejecuta un reporte de ARCONEL (p. ej. "Balance Energía" de un año) y devuelve sus filas. |
+| `search_cortes` (`distribuidora="eeq"`\|`"centrosur"`) | Archivo de PDFs de cortes de luz programados de EEQ (Quito, crisis 2023-2024) o Centrosur (Azuay, Cañar, Morona Santiago, 2023 en adelante). |
+| `get_cortes_horarios` | Convierte un PDF de cortes en filas: fecha, bloques horarios sin luz, ubicación (subestación o provincia/cantón/zona) y sectores. |
+| `get_energia_ecuador_snapshot` | Snapshot (2024-04-24, Wayback Machine) del portal nacional de horarios de apagones energia-ecuador.com; solo sobrevivió la rotación de EEQ. |
 | `get_informe_igepn` | Descarga y extrae el texto de un informe del IG-EPN encontrado vía search_informes_igepn. |
 | `get_sut_indicador_schema` | Lista las columnas/medidas/niveles de fecha consultables de un tablero Power BI del SUT, descubiertos desde la definición propia del reporte (la consulta subyacente de cada visual), no por adivinanza. |
 | `list_sut_indicadores` | Lista los tableros públicos de Power BI "Indicadores" del Ministerio del Trabajo/SUT (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml). |
@@ -201,7 +205,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 
 | Tool | Descripción |
 |------|-------------|
-| `search_arcotel` | Reportes estadísticos mensuales (`tipo="reportes_mensuales"`) o boletines anuales/temáticos (`tipo="boletines"`) de ARCOTEL sobre telecomunicaciones. |
+| `search_archivos` (`fuente="arcotel_boletines"|"arcotel_mensuales"`) | Reportes estadísticos mensuales (`tipo="reportes_mensuales"`) o boletines anuales/temáticos (`tipo="boletines"`) de ARCOTEL sobre telecomunicaciones. |
 
 ## ARCSA: registro sanitario
 
@@ -214,17 +218,17 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 
 | Tool | Descripción |
 |------|-------------|
-| `search_cnig_femicidios` | Estadísticas de violencia de género del CNIG, incluyendo femicidios. |
-| `search_minedec_matricula` | Registro histórico de matrícula de educación básica y bachillerato. |
-| `search_mef_fiscal` | Cifras fiscales de Ecuador (MEF/MDEP o SENAE), incluyendo ingresos arancelarios. |
+| `search_archivos` (`fuente="cnig"`) | Estadísticas de violencia de género del CNIG, incluyendo femicidios. |
+| `search_archivos` (`fuente="minedec"`) | Registro histórico de matrícula de educación básica y bachillerato. |
+| `search_archivos` (`fuente="mef"|"senae"`) | Cifras fiscales de Ecuador (MEF/MDEP o SENAE), incluyendo ingresos arancelarios. |
 | `search_infomies_bases_mensuales` | Bases de datos mensuales de infoMIES (inclusión económica y social). |
 | `search_infomies_boletines_zonales` | Boletines zonales de infoMIES, por zona o consolidados por año. |
-| `search_trabajo_boletin_anual` | Boletín estadístico anual del mercado laboral ecuatoriano. |
-| `search_salarios_sectoriales` | Tablas de salarios mínimos sectoriales de Ecuador. |
-| `search_senescyt_estadisticas` | Reportes del SIAU de SENESCYT: estadísticas de educación superior y CTI. |
+| `search_archivos` (`fuente="trabajo_boletin"`) | Boletín estadístico anual del mercado laboral ecuatoriano. |
+| `search_archivos` (`fuente="salarios"`) | Tablas de salarios mínimos sectoriales de Ecuador. |
+| `search_archivos` (`fuente="senescyt"`) | Reportes del SIAU de SENESCYT: estadísticas de educación superior y CTI. |
 | `list_archivo_secciones` (`fuente="senescyt"`) | Categorías de la Biblioteca de Educación Superior (MINEDEC/SENESCYT). |
 | `get_archivo_seccion` (`fuente="senescyt"`) | Documentos de una categoría de la Biblioteca de Educación Superior. |
-| `search_gacetas_inmunoprevenibles` | Gacetas epidemiológicas semanales de enfermedades prevenibles por vacunación (MSP). |
+| `search_archivos` (`fuente="msp"`) | Gacetas epidemiológicas semanales de enfermedades prevenibles por vacunación (MSP). |
 
 ## Fuentes internacionales
 

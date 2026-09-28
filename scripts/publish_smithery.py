@@ -41,14 +41,16 @@ DEFAULT_NAME = "dsanchezp998/ecudatamcp"
 
 # Runs inside the extracted bundle, so the tool list comes from the released
 # code rather than whatever is checked out here.
+# EcuadorMCPServer (0.9.0+) adds the per-parameter descriptions and drops
+# schema titles, as the real server does; only the public tools, matching
+# the default MCP_PROFILE.
 _DUMP_TOOLS = """
 import asyncio, json
-from mcp.server.mcpserver import MCPServer
-from tools import register_maintenance_tools, register_tools
+from helpers.mcp_server import EcuadorMCPServer
+from tools import register_tools
 
-mcp = MCPServer("dump")
+mcp = EcuadorMCPServer("dump")
 register_tools(mcp)
-register_maintenance_tools(mcp)
 tools = []
 for tool in asyncio.run(mcp.list_tools()):
     card = tool.model_dump(mode="json", by_alias=True, exclude_none=True)

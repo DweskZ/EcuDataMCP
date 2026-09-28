@@ -6,24 +6,20 @@ from tools.arconel_reportes import (
     register_list_arconel_reportes_tool,
 )
 from tools.audit_bce_catalog import register_audit_bce_catalog_tool
+from tools.bce_paginas import register_bce_paginas_tools
 from tools.compare_bce_sources import register_compare_bce_sources_tool
+from tools.cortes import register_cortes_tools
 from tools.detect_series_pattern import register_detect_series_pattern_tool
 from tools.download_anda_microdata import register_download_anda_microdata_tool
 from tools.download_resource import register_download_resource_tool
+from tools.geoportal import register_geoportal_tools
 from tools.get_aip_aerodromo import register_get_aip_aerodromo_tool
 from tools.get_anda_survey_info import register_get_anda_survey_info_tool
 from tools.get_auditor_info import register_get_auditor_info_tool
-from tools.get_bce_cuentas_nacionales_archivo import (
-    register_get_bce_cuentas_nacionales_archivo_tool,
-)
 from tools.get_bce_iem_table import register_get_bce_iem_table_tool
 from tools.get_bce_indicador_diario import register_get_bce_indicador_diario_tool
-from tools.get_bce_indice_archivo import register_get_bce_indice_archivo_tool
 from tools.get_category_info import register_get_category_info_tool
 from tools.get_cenace_tablero import register_get_cenace_tablero_tool
-from tools.get_centrosur_cortes_horarios import (
-    register_get_centrosur_cortes_horarios_tool,
-)
 from tools.get_cepalstat_indicador import register_get_cepalstat_indicador_tool
 from tools.get_certificado_cumplimiento_patronal import (
     register_get_certificado_cumplimiento_patronal_tool,
@@ -32,13 +28,11 @@ from tools.get_compania_info import register_get_compania_info_tool
 from tools.get_contraloria_informe import register_get_contraloria_informe_tool
 from tools.get_contrato_info import register_get_contrato_info_tool
 from tools.get_dataset_info import register_get_dataset_info_tool
-from tools.get_eeq_cortes_horarios import register_get_eeq_cortes_horarios_tool
 from tools.get_energia_ecuador_snapshot import (
     register_get_energia_ecuador_snapshot_tool,
 )
 from tools.get_financials import register_get_financials_tool
 from tools.get_iess_archivos import register_get_iess_archivos_tool
-from tools.get_inamhi_capa_datos import register_get_inamhi_capa_datos_tool
 from tools.get_indicador_bce import register_get_indicador_bce_tool
 from tools.get_inec_estadistica_files import register_get_inec_estadistica_files_tool
 from tools.get_inec_publicacion_archivos import (
@@ -53,9 +47,6 @@ from tools.get_regulacion_info import register_get_regulacion_info_tool
 from tools.get_resource_info import register_get_resource_info_tool
 from tools.get_sgr_sitrep_archivos import register_get_sgr_sitrep_archivos_tool
 from tools.get_sigmet import register_get_sigmet_tool
-from tools.get_sipa_geoportal_capa_datos import (
-    register_get_sipa_geoportal_capa_datos_tool,
-)
 from tools.get_sipa_resumen_indicadores import (
     register_get_sipa_resumen_indicadores_tool,
 )
@@ -85,16 +76,11 @@ from tools.search_anda import register_search_anda_tool
 from tools.search_archivos import register_search_archivos_tool
 from tools.search_auditores import register_search_auditores_tool
 from tools.search_bce_calendario import register_search_bce_calendario_tool
-from tools.search_bce_cuentas_nacionales import (
-    register_search_bce_cuentas_nacionales_tool,
-)
 from tools.search_bce_iem import register_search_bce_iem_tool
-from tools.search_bce_indices import register_search_bce_indices_tool
 from tools.search_bce_precios_comex import register_search_bce_precios_comex_tool
 from tools.search_bce_publicaciones import register_search_bce_publicaciones_tool
 from tools.search_bce_remesas import register_search_bce_remesas_tool
 from tools.search_biinec_extras import register_search_biinec_extras_tool
-from tools.search_centrosur_cortes import register_search_centrosur_cortes_tool
 from tools.search_cepalstat_indicadores import (
     register_search_cepalstat_indicadores_tool,
 )
@@ -102,9 +88,7 @@ from tools.search_companias import register_search_companias_tool
 from tools.search_contratos import register_search_contratos_tool
 from tools.search_datasets import register_search_datasets_tool
 from tools.search_ecuador import register_search_ecuador_tool
-from tools.search_eeq_cortes import register_search_eeq_cortes_tool
 from tools.search_eventos_riesgo import register_search_eventos_riesgo_tool
-from tools.search_inamhi_capas import register_search_inamhi_capas_tool
 from tools.search_indicadores_bce import register_search_indicadores_bce_tool
 from tools.search_inec_estadisticas import register_search_inec_estadisticas_tool
 from tools.search_inec_publicaciones import register_search_inec_publicaciones_tool
@@ -119,7 +103,6 @@ from tools.search_organizations import register_search_organizations_tool
 from tools.search_ranking import register_search_ranking_tool
 from tools.search_regulaciones import register_search_regulaciones_tool
 from tools.search_sgr_sitreps import register_search_sgr_sitreps_tool
-from tools.search_sipa_geoportal_capas import register_search_sipa_geoportal_capas_tool
 from tools.search_sismos import register_search_sismos_tool
 from tools.search_sri_ruc import register_search_sri_ruc_tool
 from tools.search_tramites import register_search_tramites_tool
@@ -132,8 +115,6 @@ def register_tools(mcp: MCPServer) -> None:
     register_search_eventos_riesgo_tool(mcp)
     register_search_sgr_sitreps_tool(mcp)
     register_get_sgr_sitrep_archivos_tool(mcp)
-    register_search_inamhi_capas_tool(mcp)
-    register_get_inamhi_capa_datos_tool(mcp)
     register_list_sat_tsunami_tool(mcp)
     register_search_sismos_tool(mcp)
     register_search_informes_igepn_tool(mcp)
@@ -186,8 +167,6 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_regulacion_info_tool(mcp)
 
     register_get_sipa_resumen_indicadores_tool(mcp)
-    register_search_sipa_geoportal_capas_tool(mcp)
-    register_get_sipa_geoportal_capa_datos_tool(mcp)
 
 
 
@@ -210,24 +189,19 @@ def register_tools(mcp: MCPServer) -> None:
     register_search_bce_iem_tool(mcp)
     register_get_bce_iem_table_tool(mcp)
     register_search_bce_publicaciones_tool(mcp)
-    register_search_bce_indices_tool(mcp)
-    register_get_bce_indice_archivo_tool(mcp)
     register_search_bce_remesas_tool(mcp)
+    register_bce_paginas_tools(mcp)
     register_search_bce_precios_comex_tool(mcp)
-    register_search_bce_cuentas_nacionales_tool(mcp)
-    register_get_bce_cuentas_nacionales_archivo_tool(mcp)
     register_search_bce_calendario_tool(mcp)
     register_list_bce_indicadores_diarios_tool(mcp)
     register_get_bce_indicador_diario_tool(mcp)
     register_get_cenace_tablero_tool(mcp)
     register_list_arconel_reportes_tool(mcp)
     register_get_arconel_reporte_tool(mcp)
-    register_search_centrosur_cortes_tool(mcp)
-    register_get_centrosur_cortes_horarios_tool(mcp)
-    register_search_eeq_cortes_tool(mcp)
-    register_get_eeq_cortes_horarios_tool(mcp)
+    register_cortes_tools(mcp)
     register_get_energia_ecuador_snapshot_tool(mcp)
     register_archivo_secciones_tools(mcp)
+    register_geoportal_tools(mcp)
     register_search_archivos_tool(mcp)
 
     register_search_companias_tool(mcp)

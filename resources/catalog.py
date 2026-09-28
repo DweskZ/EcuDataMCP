@@ -110,7 +110,7 @@ def _fuentes_payload() -> dict:
                 "id": "inamhi",
                 "nombre": "INAMHI (geoportal hidrometeorológico, capas WMS/WFS)",
                 "base": "https://geoservicios.inamhi.gob.ec/geoserver",
-                "tools": ["search_inamhi_capas", "get_inamhi_capa_datos"],
+                "tools": ["search_capas_geo", "get_capa_geo_datos"],
             },
             {
                 "id": "aviacion",
@@ -188,13 +188,11 @@ def _fuentes_payload() -> dict:
                     "search_bce_iem",
                     "get_bce_iem_table",
                     "search_bce_publicaciones",
-                    "search_bce_indices",
-                    "get_bce_indice_archivo",
+                    "search_bce_paginas",
+                    "get_bce_pagina_archivos",
                     "list_bce_indicadores_diarios",
                     "get_bce_indicador_diario",
                     "search_bce_remesas",
-                    "search_bce_cuentas_nacionales",
-                    "get_bce_cuentas_nacionales_archivo",
                     "search_bce_precios_comex",
                     "search_bce_calendario",
                 ],
@@ -207,8 +205,8 @@ def _fuentes_payload() -> dict:
                     "list_archivo_secciones",
                     "get_archivo_seccion",
                     "get_sipa_resumen_indicadores",
-                    "search_sipa_geoportal_capas",
-                    "get_sipa_geoportal_capa_datos",
+                    "search_capas_geo",
+                    "get_capa_geo_datos",
                 ],
             },
             {
@@ -268,7 +266,7 @@ def _fuentes_payload() -> dict:
                 "id": "eeq",
                 "nombre": "Empresa Eléctrica Quito (cronogramas de cortes de luz en PDF)",
                 "base": "https://www.eeq.com.ec/",
-                "tools": ["search_eeq_cortes", "get_eeq_cortes_horarios"],
+                "tools": ["search_cortes", "get_cortes_horarios"],
             },
             {
                 "id": "centrosur",
@@ -277,7 +275,7 @@ def _fuentes_payload() -> dict:
                     "y Morona Santiago)"
                 ),
                 "base": "https://www.centrosur.gob.ec/",
-                "tools": ["search_centrosur_cortes", "get_centrosur_cortes_horarios"],
+                "tools": ["search_cortes", "get_cortes_horarios"],
             },
             {
                 "id": "energia-ecuador",
