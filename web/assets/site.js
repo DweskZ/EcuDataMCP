@@ -10,6 +10,46 @@ function copyCode(btn) {
   });
 }
 
+// ---- theme toggle (light / dark) ----------------------------------------
+
+(function () {
+  var btn = document.querySelector("[data-theme-toggle]");
+  var nav = document.querySelector(".site-navbar");
+
+  function currentTheme() {
+    return document.documentElement.getAttribute("data-theme") === "light"
+      ? "light"
+      : "dark";
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    try {
+      localStorage.setItem("ecudata-theme", theme);
+    } catch (e) {}
+    if (nav) {
+      nav.setAttribute("data-bs-theme", theme === "light" ? "light" : "dark");
+    }
+    if (btn) {
+      var label =
+        theme === "dark"
+          ? btn.getAttribute("data-label-light")
+          : btn.getAttribute("data-label-dark");
+      if (label) {
+        btn.setAttribute("aria-label", label);
+        btn.setAttribute("title", label);
+      }
+    }
+  }
+
+  applyTheme(currentTheme());
+
+  if (!btn) return;
+  btn.addEventListener("click", function () {
+    applyTheme(currentTheme() === "dark" ? "light" : "dark");
+  });
+})();
+
 // ---- mobile navbar toggle (replaces bootstrap.bundle.min.js's Collapse) --
 
 (function () {

@@ -1,12 +1,372 @@
-/* Custom UI not present in the base Bootstrap darkly build: the search
-   toggle button, results panel, and language toggle. Everything else
-   (navbar collapse, Bootstrap tabs) reuses classes already baked into
-   styles.css. */
+/* Custom UI + Ecuador tricolor brand layer + light/dark themes.
+   Loads after styles.css so these rules win without rebuilding Bootstrap. */
+
+:root,
+html[data-theme="dark"] {
+  --ecu-yellow: #ffd100;
+  --ecu-blue: #0033a0;
+  --ecu-red: #ef3340;
+  --ecu-ink: #0b0c0e;
+  --ecu-panel: #131417;
+  --ecu-muted: #8a9099;
+  --ecu-line: #24262b;
+  --ecu-text: #e8e9eb;
+  --ecu-heading: #ffffff;
+  --ecu-accent-text: #ffd100;
+  --ecu-stat-blue: #6ea8ff;
+  --ecu-stat-red: #ff7a84;
+  --ecu-secondary-btn-bg: rgba(0, 51, 160, 0.18);
+  --ecu-secondary-btn-border: rgba(0, 51, 160, 0.55);
+  --ecu-secondary-btn-text: #dbe4ff;
+  --ecu-search-overlay: rgba(11, 12, 14, 0.72);
+  --ecu-hover-bg: #1c1e22;
+  --ecu-hero-base: linear-gradient(180deg, #0d1016 0%, #0b0c0e 72%);
+  --ecu-hero-glow-y: rgba(255, 209, 0, 0.16);
+  --ecu-hero-glow-b: rgba(0, 51, 160, 0.28);
+  --ecu-hero-glow-r: rgba(239, 51, 64, 0.14);
+  --ecu-nav-wash: rgba(0, 51, 160, 0.14);
+  --ecu-code-bg: #0b0c0e;
+  --ecu-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  --ecu-yellow: #f0c400;
+  --ecu-blue: #0033a0;
+  --ecu-red: #d32f2f;
+  --ecu-ink: #f3f6fb;
+  --ecu-panel: #ffffff;
+  --ecu-muted: #5b6575;
+  --ecu-line: #d5dbe6;
+  --ecu-text: #171b24;
+  --ecu-heading: #0f1420;
+  --ecu-accent-text: #0033a0;
+  --ecu-stat-blue: #0033a0;
+  --ecu-stat-red: #c62828;
+  --ecu-secondary-btn-bg: rgba(0, 51, 160, 0.08);
+  --ecu-secondary-btn-border: rgba(0, 51, 160, 0.35);
+  --ecu-secondary-btn-text: #0033a0;
+  --ecu-search-overlay: rgba(15, 20, 32, 0.45);
+  --ecu-hover-bg: #eef2f8;
+  --ecu-hero-base: linear-gradient(180deg, #eef3fb 0%, #f3f6fb 70%);
+  --ecu-hero-glow-y: rgba(255, 209, 0, 0.28);
+  --ecu-hero-glow-b: rgba(0, 51, 160, 0.12);
+  --ecu-hero-glow-r: rgba(239, 51, 64, 0.1);
+  --ecu-nav-wash: rgba(0, 51, 160, 0.05);
+  --ecu-code-bg: #eef2f8;
+  --ecu-shadow: 0 18px 40px rgba(15, 20, 32, 0.12);
+  color-scheme: light;
+}
+
+html[data-theme="light"] body {
+  background-color: var(--ecu-ink) !important;
+  color: var(--ecu-text) !important;
+}
+
+html[data-theme="light"] h1,
+html[data-theme="light"] h2,
+html[data-theme="light"] h3,
+html[data-theme="light"] .section-title,
+html[data-theme="light"] .closing-cta h2 {
+  color: var(--ecu-heading);
+}
+
+html[data-theme="light"] .section-lede,
+html[data-theme="light"] .hero-sub,
+html[data-theme="light"] .hero-stat .label,
+html[data-theme="light"] .step-card p,
+html[data-theme="light"] .client-intro {
+  color: var(--ecu-muted) !important;
+}
+
+html[data-theme="light"] .landing {
+  border-bottom-color: var(--ecu-line);
+}
+
+html[data-theme="light"] a:not(.btn-cta):not(.nav-link):not(.tool-chip):not(.lang-toggle-option) {
+  color: var(--ecu-blue);
+}
+
+html[data-theme="light"] .navbar,
+html[data-theme="light"] .site-navbar.navbar {
+  --bs-navbar-color: #2a3344;
+  --bs-navbar-hover-color: var(--ecu-blue);
+  --bs-navbar-active-color: var(--ecu-blue);
+  --bs-navbar-brand-color: var(--ecu-heading);
+  --bs-navbar-brand-hover-color: var(--ecu-blue);
+  color: #2a3344;
+}
+
+html[data-theme="light"] .navbar-toggler-icon {
+  filter: invert(1) brightness(0.35);
+}
+
+html[data-theme="light"] .data-card,
+html[data-theme="light"] .question-card,
+html[data-theme="light"] .quick-connect,
+html[data-theme="light"] .example-featured,
+html[data-theme="light"] .example-mini,
+html[data-theme="light"] .friction-list li {
+  background: var(--ecu-panel);
+  border-color: var(--ecu-line);
+  color: var(--ecu-text);
+}
+
+html[data-theme="light"] .tool-chip {
+  background: #eef2f8;
+  border-color: var(--ecu-line);
+  color: #2a3344;
+}
+
+html[data-theme="light"] a.tool-chip:hover {
+  border-color: var(--ecu-blue);
+  color: var(--ecu-blue);
+}
+
+html[data-theme="light"] .code-block pre,
+html[data-theme="light"] .atlas-filter {
+  background: var(--ecu-code-bg);
+  border-color: var(--ecu-line);
+  color: var(--ecu-text);
+}
+
+html[data-theme="light"] .copy-btn {
+  background: #fff;
+  color: var(--ecu-muted);
+  border-color: var(--ecu-line);
+}
+
+html[data-theme="light"] .nav-tabs {
+  border-bottom-color: var(--ecu-line);
+}
+
+html[data-theme="light"] .nav-tabs .nav-link {
+  color: var(--ecu-muted);
+}
+
+html[data-theme="light"] .nav-tabs .nav-link.active {
+  color: var(--ecu-blue);
+  border-bottom-color: var(--ecu-blue);
+}
+
+html[data-theme="light"] .tab-content {
+  border-color: var(--ecu-line);
+  background: var(--ecu-panel);
+}
+
+html[data-theme="light"] .atlas-category {
+  background: var(--ecu-panel);
+  border-color: var(--ecu-line);
+}
+
+html[data-theme="light"] .atlas-category-summary::before,
+html[data-theme="light"] .atlas-tool-name,
+html[data-theme="light"] .atlas-params code,
+html[data-theme="light"] .release-version,
+html[data-theme="light"] .example-source {
+  color: var(--ecu-blue);
+}
+
+html[data-theme="light"] .atlas-tool,
+html[data-theme="light"] .atlas-category-title,
+html[data-theme="light"] .atlas-params th,
+html[data-theme="light"] .atlas-params td,
+html[data-theme="light"] .release-row,
+html[data-theme="light"] .faq-item {
+  border-color: var(--ecu-line);
+}
+
+html[data-theme="light"] .atlas-tool-desc,
+html[data-theme="light"] .release-summary {
+  color: #2a3344;
+}
+
+html[data-theme="light"] .atlas-tool-long,
+html[data-theme="light"] .faq-item p {
+  color: var(--ecu-muted);
+}
+
+html[data-theme="light"] .faq-item summary::before {
+  color: var(--ecu-blue);
+}
+
+html[data-theme="light"] .page-footer .nav-footer {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 209, 0, 0.12),
+      rgba(0, 51, 160, 0.08),
+      rgba(239, 51, 64, 0.08)
+    ),
+    #eef2f8;
+  color: var(--ecu-muted);
+}
+
+html[data-theme="light"] .page-footer .nav-footer a {
+  color: var(--ecu-muted);
+}
+
+html[data-theme="light"] .landing.hero h1 .accent {
+  background: linear-gradient(120deg, #0033a0, #0050c8 55%, #1a6bff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+html[data-theme="light"] .kicker,
+html[data-theme="light"] .landing.hero .kicker {
+  color: var(--ecu-blue);
+}
+
+html[data-theme="light"] .btn-cta.primary {
+  background: var(--ecu-yellow);
+  color: #16130a;
+}
+
+html[data-theme="light"] .lang-toggle-option.active {
+  background: var(--ecu-yellow);
+  color: #16130a;
+}
+
+html[data-theme="light"] .notice-box {
+  background: rgba(0, 51, 160, 0.06);
+  border-left-color: var(--ecu-blue);
+  color: #3a4456;
+}
+
+html[data-theme="light"] .notice-box strong {
+  color: var(--ecu-blue);
+}
+
+html[data-theme="light"] .site-search-result-title {
+  color: var(--ecu-blue);
+}
+
+html[data-theme="light"] .hero-stat .num,
+html[data-theme="light"] .step-card:nth-child(1) .step-num,
+html[data-theme="light"] .step-card:nth-child(4) .step-num {
+  color: #b8860b;
+}
+
+/* ---- Flag stripe (proporciones bandera: amarillo ½, azul ¼, rojo ¼) ---- */
+
+.ecu-flag-stripe {
+  height: 5px;
+  width: 100%;
+  background: linear-gradient(
+    to bottom,
+    #ffd100 0%,
+    #ffd100 50%,
+    #0033a0 50%,
+    #0033a0 75%,
+    #ef3340 75%,
+    #ef3340 100%
+  );
+  animation: stripe-in 0.7s ease-out both;
+}
+
+@keyframes stripe-in {
+  from {
+    transform: scaleX(0);
+    transform-origin: left center;
+    opacity: 0.4;
+  }
+  to {
+    transform: scaleX(1);
+    transform-origin: left center;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ecu-flag-stripe {
+    animation: none;
+  }
+}
+
+/* ---- Navbar + brand mark ---- */
+
+.site-navbar.navbar {
+  border-bottom: 1px solid var(--ecu-line);
+  background:
+    linear-gradient(180deg, var(--ecu-nav-wash) 0%, transparent 100%),
+    var(--ecu-ink);
+}
+
+.navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.brand-mark {
+  width: 14px;
+  height: 18px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  background: linear-gradient(
+    to bottom,
+    #ffd100 0%,
+    #ffd100 50%,
+    #0033a0 50%,
+    #0033a0 75%,
+    #ef3340 75%,
+    #ef3340 100%
+  );
+  box-shadow: 0 0 0 1px rgba(127, 127, 127, 0.2);
+}
+
+.navbar-title {
+  font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.navbar .nav-link:hover .menu-text,
+.navbar .nav-link.active .menu-text {
+  color: var(--ecu-accent-text);
+}
+
+/* ---- Theme toggle ---- */
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  margin: 0.35rem 0.35rem 0.35rem 0;
+  padding: 0;
+  border: 1px solid var(--ecu-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ecu-muted);
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  color: var(--ecu-accent-text);
+  border-color: var(--ecu-accent-text);
+}
+
+.theme-toggle .icon-theme {
+  display: none;
+}
+
+html[data-theme="dark"] .theme-toggle .icon-sun {
+  display: block;
+}
+
+html[data-theme="light"] .theme-toggle .icon-moon {
+  display: block;
+}
+
+/* ---- Search / lang ---- */
 
 .site-search-toggle {
   background: transparent;
   border: none;
-  color: #7c8591;
+  color: var(--ecu-muted);
   font-size: 1.05rem;
   padding: 0.4rem 0.6rem;
   margin-left: auto;
@@ -15,7 +375,7 @@
 }
 
 .site-search-toggle:hover {
-  color: #f2b134;
+  color: var(--ecu-accent-text);
 }
 
 .icon-search {
@@ -32,7 +392,7 @@
 .site-search-panel {
   position: fixed;
   inset: 0;
-  background: rgba(11, 12, 14, 0.72);
+  background: var(--ecu-search-overlay);
   z-index: 1050;
   display: flex;
   justify-content: center;
@@ -48,27 +408,27 @@
   max-width: 640px;
   height: fit-content;
   margin: 0 1.25rem;
-  background: #131417;
-  border: 1px solid #24262b;
+  background: var(--ecu-panel);
+  border: 1px solid var(--ecu-line);
   border-radius: 10px;
   padding: 1rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--ecu-shadow);
 }
 
 .site-search-input {
   width: 100%;
   font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.95rem;
-  background: #0b0c0e;
-  border: 1px solid #24262b;
+  background: var(--ecu-code-bg);
+  border: 1px solid var(--ecu-line);
   border-radius: 6px;
   padding: 0.65rem 0.9rem;
-  color: #e6e6e6;
+  color: var(--ecu-text);
 }
 
 .site-search-input:focus {
   outline: none;
-  border-color: #f2b134;
+  border-color: var(--ecu-accent-text);
 }
 
 .site-search-results {
@@ -82,28 +442,28 @@
   padding: 0.7rem 0.6rem;
   border-radius: 6px;
   text-decoration: none;
-  color: #e6e6e6;
+  color: var(--ecu-text);
 }
 
 .site-search-result:hover,
 .site-search-result.is-active {
-  background: #1c1e22;
+  background: var(--ecu-hover-bg);
 }
 
 .site-search-result-title {
   font-weight: 700;
-  color: #f2b134;
+  color: var(--ecu-accent-text);
   font-size: 0.92rem;
 }
 
 .site-search-result-excerpt {
-  color: #7c8591;
+  color: var(--ecu-muted);
   font-size: 0.85rem;
   margin-top: 0.15rem;
 }
 
 .site-search-empty {
-  color: #7c8591;
+  color: var(--ecu-muted);
   font-size: 0.88rem;
   padding: 0.5rem 0.6rem;
 }
@@ -112,21 +472,21 @@
   max-width: 760px;
   margin: 1.25rem 0 2.25rem;
   padding: 0.85rem 1rem;
-  border-left: 3px solid #f2b134;
-  background: rgba(242, 177, 52, 0.08);
+  border-left: 3px solid var(--ecu-yellow);
+  background: rgba(255, 209, 0, 0.07);
   color: #c7c9cc;
   font-size: 0.92rem;
   line-height: 1.55;
 }
 
 .notice-box strong {
-  color: #f2b134;
+  color: var(--ecu-accent-text);
 }
 
 .lang-toggle {
   display: inline-flex;
   align-items: center;
-  border: 1px solid #24262b;
+  border: 1px solid var(--ecu-line);
   border-radius: 999px;
   overflow: hidden;
   margin: 0.4rem 0.5rem;
@@ -139,16 +499,465 @@
   letter-spacing: 0.02em;
   line-height: 1;
   padding: 0.32rem 0.6rem;
-  color: #7c8591;
+  color: var(--ecu-muted);
   text-decoration: none;
 }
 
 a.lang-toggle-option:hover {
-  color: #f2b134;
+  color: var(--ecu-accent-text);
 }
 
 .lang-toggle-option.active {
-  background: #f2b134;
+  background: var(--ecu-yellow);
   color: #0b0c0e;
   font-weight: 700;
+}
+
+/* ---- Hero atmosphere + motion ---- */
+
+.landing.hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 5.5rem 0 4.5rem;
+  background:
+    radial-gradient(ellipse 70% 55% at 12% 18%, var(--ecu-hero-glow-y), transparent 60%),
+    radial-gradient(ellipse 55% 50% at 88% 12%, var(--ecu-hero-glow-b), transparent 62%),
+    radial-gradient(ellipse 50% 45% at 70% 88%, var(--ecu-hero-glow-r), transparent 65%),
+    var(--ecu-hero-base);
+}
+
+.landing.hero::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #ffd100 18%,
+    #0033a0 50%,
+    #ef3340 82%,
+    transparent 100%
+  );
+  opacity: 0.7;
+  z-index: 1;
+}
+
+.landing.hero .container-page {
+  position: relative;
+  z-index: 2;
+  animation: hero-rise 0.85s ease-out both;
+}
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing.hero .container-page {
+    animation: none;
+  }
+}
+
+.brand-hero {
+  font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif;
+  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ecu-heading);
+  margin: 0 0 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.brand-hero::before {
+  content: "";
+  width: 12px;
+  height: 28px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to bottom,
+    #ffd100 0%,
+    #ffd100 50%,
+    #0033a0 50%,
+    #0033a0 75%,
+    #ef3340 75%,
+    #ef3340 100%
+  );
+  flex-shrink: 0;
+}
+
+.landing.hero .kicker {
+  color: var(--ecu-accent-text);
+}
+
+.landing.hero h1 .accent {
+  background: linear-gradient(120deg, #ffd100, #ffe566 55%, #fff1a8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.btn-cta.primary {
+  background: var(--ecu-yellow);
+  color: #16130a;
+  border: 1px solid transparent;
+}
+
+.btn-cta.primary:hover {
+  filter: brightness(1.05);
+}
+
+.btn-cta.secondary {
+  border-color: var(--ecu-secondary-btn-border);
+  color: var(--ecu-secondary-btn-text);
+  background: var(--ecu-secondary-btn-bg);
+}
+
+.btn-cta.secondary:hover {
+  border-color: var(--ecu-blue);
+  filter: brightness(1.05);
+}
+
+.hero-stat .num {
+  color: var(--ecu-accent-text);
+}
+
+.hero-stat:nth-child(2) .num {
+  color: var(--ecu-stat-blue);
+}
+
+.hero-stat:nth-child(3) .num {
+  color: var(--ecu-stat-red);
+}
+
+.hero-stat:nth-child(4) .num {
+  color: var(--ecu-accent-text);
+}
+
+/* ---- Section accents ---- */
+
+.kicker {
+  color: var(--ecu-accent-text);
+}
+
+.step-card .step-num {
+  color: var(--ecu-accent-text);
+}
+
+.step-card:nth-child(2) .step-num {
+  color: var(--ecu-stat-blue);
+}
+
+.step-card:nth-child(3) .step-num {
+  color: var(--ecu-stat-red);
+}
+
+.step-card:nth-child(4) .step-num {
+  color: var(--ecu-accent-text);
+}
+
+.step-card {
+  border-top: 2px solid transparent;
+  padding-top: 0.35rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.step-card:nth-child(1) {
+  border-top-color: #ffd100;
+}
+
+.step-card:nth-child(2) {
+  border-top-color: #0033a0;
+}
+
+.step-card:nth-child(3) {
+  border-top-color: #ef3340;
+}
+
+.step-card:nth-child(4) {
+  border-top-color: #ffd100;
+}
+
+.step-card:hover {
+  transform: translateY(-2px);
+}
+
+.question-card {
+  border-left-color: #ffd100;
+}
+
+.question-card:nth-child(3n + 2) {
+  border-left-color: #0033a0;
+}
+
+.question-card:nth-child(3n) {
+  border-left-color: #ef3340;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--ecu-accent-text);
+  border-bottom-color: var(--ecu-accent-text);
+}
+
+.page-footer .nav-footer {
+  border-top: 1px solid var(--ecu-line);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 209, 0, 0.08),
+      rgba(0, 51, 160, 0.1),
+      rgba(239, 51, 64, 0.08)
+    ),
+    var(--ecu-ink);
+}
+
+/* ---- Richer hero (inspired by FastMCP / Smithery / MCP.io) ---- */
+
+.container-page.hero-layout,
+.hero-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 2.5rem;
+  align-items: center;
+  max-width: 1120px;
+}
+
+@media (max-width: 900px) {
+  .hero-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.landing.hero {
+  padding: 4.5rem 0 3.5rem;
+}
+
+.hero-copy .hero-sub {
+  max-width: 36rem;
+}
+
+.chat-mock {
+  background: var(--ecu-panel);
+  border: 1px solid var(--ecu-line);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--ecu-shadow);
+  animation: hero-rise 1s ease-out 0.12s both;
+}
+
+.chat-mock-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--ecu-line);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 209, 0, 0.08),
+    rgba(0, 51, 160, 0.08),
+    rgba(239, 51, 64, 0.08)
+  );
+}
+
+.chat-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #5c6573;
+}
+
+.chat-dot:nth-child(1) { background: #ef3340; }
+.chat-dot:nth-child(2) { background: #ffd100; }
+.chat-dot:nth-child(3) { background: #0033a0; }
+
+.chat-mock-title {
+  margin-left: 0.5rem;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  color: var(--ecu-muted);
+  letter-spacing: 0.04em;
+}
+
+.chat-bubble {
+  margin: 0.85rem 1rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  max-width: 92%;
+}
+
+.chat-bubble.user {
+  margin-left: auto;
+  background: rgba(0, 51, 160, 0.16);
+  border: 1px solid rgba(0, 51, 160, 0.35);
+  color: var(--ecu-text);
+}
+
+.chat-bubble.assistant {
+  background: var(--ecu-code-bg);
+  border: 1px solid var(--ecu-line);
+  color: var(--ecu-text);
+}
+
+.chat-tool,
+.chat-cite {
+  display: inline-block;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+}
+
+.chat-tool { color: var(--ecu-accent-text); }
+.chat-cite { color: var(--ecu-stat-red); margin-top: 0.45rem; margin-bottom: 0; }
+
+.chat-bubble.assistant p {
+  margin: 0.25rem 0 0;
+}
+
+.chat-code {
+  margin: 0.45rem 0 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--ecu-line);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  color: var(--ecu-text);
+  overflow-x: auto;
+}
+
+html[data-theme="light"] .chat-code {
+  background: #e8edf5;
+}
+
+.strip-section {
+  padding: 2.25rem 0 2.75rem;
+}
+
+.arch-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.arch-node {
+  flex: 1 1 160px;
+  background: var(--ecu-panel);
+  border: 1px solid var(--ecu-line);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+}
+
+.arch-node.accent {
+  border-color: rgba(255, 209, 0, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(255, 209, 0, 0.15);
+  background:
+    linear-gradient(180deg, rgba(255, 209, 0, 0.08), transparent),
+    var(--ecu-panel);
+}
+
+.arch-label {
+  display: block;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ecu-muted);
+  margin-bottom: 0.35rem;
+}
+
+.arch-node strong {
+  font-size: 0.95rem;
+  color: var(--ecu-heading);
+}
+
+.arch-arrow {
+  align-self: center;
+  color: var(--ecu-accent-text);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+@media (max-width: 700px) {
+  .arch-arrow { display: none; }
+}
+
+.strip-section .hero-stats {
+  border-top: 1px solid var(--ecu-line);
+  padding-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.source-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.source-pill {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--ecu-line);
+  background: var(--ecu-panel);
+  color: var(--ecu-text);
+}
+
+.source-pill:nth-child(5n + 1) { border-color: rgba(255, 209, 0, 0.45); }
+.source-pill:nth-child(5n + 2) { border-color: rgba(0, 51, 160, 0.4); }
+.source-pill:nth-child(5n + 3) { border-color: rgba(239, 51, 64, 0.4); }
+
+.install-bar {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  align-items: center;
+  margin-bottom: 1.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--ecu-line);
+  border-radius: 10px;
+  background:
+    linear-gradient(90deg, rgba(255, 209, 0, 0.07), rgba(0, 51, 160, 0.06)),
+    var(--ecu-panel);
+}
+
+.install-label {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ecu-accent-text);
+  white-space: nowrap;
+}
+
+.install-code {
+  margin: 0;
+}
+
+.install-code pre {
+  margin: 0;
+  padding: 0.65rem 2.5rem 0.65rem 0.85rem;
+}
+
+@media (max-width: 700px) {
+  .install-bar {
+    grid-template-columns: 1fr;
+  }
 }

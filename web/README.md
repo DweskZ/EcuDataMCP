@@ -60,10 +60,19 @@ navbar/footer). No requiere ningún paso manual.
 ## Desarrollo local
 
 ```bash
-cd web/_site
-python -m http.server 8000
+cd web
+./preview.sh
 ```
 
-Y abre `http://localhost:8000/index.html`. Sirve el sitio como HTTP real (no `file://`) porque la
-búsqueda hace `fetch()` contra `search.json`, que el navegador bloquea por CORS si abres el HTML
-directamente desde el disco.
+Abre `http://127.0.0.1:8765/`. Sirve el sitio como HTTP real (no `file://`) porque la
+búsqueda hace `fetch()` contra `search.json`.
+
+Alternativa manual:
+
+```bash
+cd web
+uv sync
+uv run python build.py
+cd _site && python -m http.server 8000
+```
+
