@@ -293,33 +293,67 @@ html[data-theme="light"] .step-card:nth-child(4) .step-num {
     var(--ecu-ink);
 }
 
+.brand-logo-wrap {
+  position: relative;
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.brand-logo-wrap:has(.brand-logo-lg),
+.brand-hero .brand-logo-wrap {
+  width: 40px;
+  height: 40px;
+}
+
+.brand-logo {
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+html[data-theme="light"] .brand-logo.logo-light,
+html[data-theme="dark"] .brand-logo.logo-dark {
+  display: block;
+}
+
+html[data-theme="light"] .brand-logo.logo-dark {
+  display: none;
+}
+
+/* legacy stripe mark removed in favor of Valdivia SVG */
+.brand-mark {
+  display: none;
+}
+
 .navbar-brand {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
 }
 
-.brand-mark {
-  width: 14px;
-  height: 18px;
-  border-radius: 2px;
-  flex-shrink: 0;
-  background: linear-gradient(
-    to bottom,
-    #ffd100 0%,
-    #ffd100 50%,
-    #0033a0 50%,
-    #0033a0 75%,
-    #ef3340 75%,
-    #ef3340 100%
-  );
-  box-shadow: 0 0 0 1px rgba(127, 127, 127, 0.2);
-}
-
 .navbar-title {
   font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif;
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+
+.brand-hero {
+  font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif;
+  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ecu-heading);
+  margin: 0 0 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.brand-hero::before {
+  content: none;
+  display: none;
 }
 
 .navbar .nav-link:hover .menu-text,
@@ -565,35 +599,6 @@ a.lang-toggle-option:hover {
   .landing.hero .container-page {
     animation: none;
   }
-}
-
-.brand-hero {
-  font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif;
-  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: var(--ecu-heading);
-  margin: 0 0 0.85rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-}
-
-.brand-hero::before {
-  content: "";
-  width: 12px;
-  height: 28px;
-  border-radius: 2px;
-  background: linear-gradient(
-    to bottom,
-    #ffd100 0%,
-    #ffd100 50%,
-    #0033a0 50%,
-    #0033a0 75%,
-    #ef3340 75%,
-    #ef3340 100%
-  );
-  flex-shrink: 0;
 }
 
 .landing.hero .kicker {
