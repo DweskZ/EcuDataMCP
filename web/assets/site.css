@@ -860,9 +860,8 @@ a.btn-cta[href="https://github.com/DweskZ/EcuDataMCP"]::before {
 
 .chat-mock-body {
   min-height: 280px;
-  max-height: 340px;
-  overflow: hidden;
-  padding-bottom: 0.4rem;
+  overflow: visible;
+  padding-bottom: 0.35rem;
   transition: opacity 0.25s ease;
 }
 
