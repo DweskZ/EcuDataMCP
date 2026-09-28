@@ -116,6 +116,19 @@ html[data-theme="light"] .friction-list li {
   color: var(--ecu-text);
 }
 
+/* Questions and answers were hardcoded for the dark theme (#e6e6e6 / #d6d9de). */
+.example-question {
+  color: var(--ecu-heading);
+}
+
+.example-result {
+  color: var(--ecu-text);
+}
+
+.examples-more-label {
+  color: var(--ecu-muted);
+}
+
 html[data-theme="light"] .tool-chip {
   background: #eef2f8;
   border-color: var(--ecu-line);
