@@ -431,3 +431,72 @@ function copyCode(btn) {
     io.observe(el);
   });
 })();
+
+// ---- institution logo carousel ------------------------------------------
+
+(function () {
+  var root = document.querySelector("[data-org-carousel]");
+  if (!root) return;
+  var viewport = root.querySelector(".org-carousel-viewport");
+  var prev = root.querySelector("[data-org-prev]");
+  var next = root.querySelector("[data-org-next]");
+  if (!viewport || !prev || !next) return;
+
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var timer = 0;
+  var paused = false;
+
+  function stepSize() {
+    var card = viewport.querySelector(".org-logo");
+    if (!card) return 180;
+    var styles = getComputedStyle(viewport);
+    var gap = parseFloat(styles.columnGap || styles.gap) || 0;
+    return card.getBoundingClientRect().width + gap;
+  }
+
+  function go(dir) {
+    var max = viewport.scrollWidth - viewport.clientWidth;
+    var behavior = reduce ? "auto" : "smooth";
+    if (dir > 0 && viewport.scrollLeft >= max - 4) {
+      viewport.scrollTo({ left: 0, behavior: behavior });
+      return;
+    }
+    if (dir < 0 && viewport.scrollLeft <= 4) {
+      viewport.scrollTo({ left: max, behavior: behavior });
+      return;
+    }
+    viewport.scrollBy({ left: dir * stepSize(), behavior: behavior });
+  }
+
+  function arm() {
+    window.clearInterval(timer);
+    if (reduce || paused || document.hidden) return;
+    timer = window.setInterval(function () { go(1); }, 3200);
+  }
+
+  prev.addEventListener("click", function () { go(-1); });
+  next.addEventListener("click", function () { go(1); });
+  root.addEventListener("pointerenter", function () {
+    paused = true;
+    window.clearInterval(timer);
+  });
+  root.addEventListener("pointerleave", function () {
+    paused = false;
+    arm();
+  });
+  root.addEventListener("focusin", function () {
+    paused = true;
+    window.clearInterval(timer);
+  });
+  root.addEventListener("focusout", function (event) {
+    if (!root.contains(event.relatedTarget)) {
+      paused = false;
+      arm();
+    }
+  });
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) window.clearInterval(timer);
+    else arm();
+  });
+  arm();
+})();

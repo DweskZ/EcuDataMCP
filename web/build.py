@@ -214,6 +214,20 @@ def load_json(lang: str, name: str):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def load_org_logos(lang: str) -> list[dict]:
+    raw = json.loads((DATA / "org_logos.json").read_text(encoding="utf-8"))
+    title_key = "title_es" if lang == "es" else "title_en"
+    return [
+        {
+            "file": item["file"],
+            "short": item["short"],
+            "title": item[title_key],
+            "plate": item.get("plate", "light"),
+        }
+        for item in raw
+    ]
+
+
 def complete_tool_catalog(
     curated: list[dict], signatures: dict[str, dict], lang: str
 ) -> list[dict]:
@@ -349,6 +363,7 @@ def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
             releases=releases,
             tool_count=tool_count,
             source_count=source_count,
+            org_logos=load_org_logos(lang),
         )
         (out_dir / f"{page}.html").write_text(html, encoding="utf-8")
 

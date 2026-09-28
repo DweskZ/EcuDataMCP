@@ -180,8 +180,17 @@ previous passport, if it is still valid</pre>
 <p class="kicker">The backstage</p>
 <h2 class="section-title">Open-source MCP server.</h2>
 <p class="section-lede">EcuDataMCP runs as a <a href="https://github.com/jlowin/fastmcp" target="_blank" rel="noopener">FastMCP</a> server in Python, exposed over Streamable HTTP or stdio. There is no database of its own: every tool calls the matching official portal live (CKAN, gob.ec, SERCOP, BCE, Supercías, IG-EPN, SGR) and returns the formatted response.</p>
-<div class="tools-summary">
-{% for cat in tools %}<span class="tool-chip">{{ cat.category }}</span>{% endfor %}
+<div class="org-carousel" data-org-carousel>
+<button type="button" class="org-carousel-btn" data-org-prev aria-label="Previous institution">‹</button>
+<div class="org-carousel-viewport">
+{% for org in org_logos %}
+<a class="org-logo{% if org.plate == 'ink' %} org-logo-ink{% endif %}" href="fuentes.html" title="{{ org.title }}">
+<span class="org-logo-plate"><img src="{{ assets }}logos/{{ org.file }}" alt="{{ org.title }}" width="160" height="64" decoding="async"></span>
+<span class="org-logo-name">{{ org.short }}</span>
+</a>
+{% endfor %}
+</div>
+<button type="button" class="org-carousel-btn" data-org-next aria-label="Next institution">›</button>
 </div>
 <a class="btn-cta secondary" href="atlas.html">See the {{ tool_count }} tools in the Reference &rarr;</a>
 </div>

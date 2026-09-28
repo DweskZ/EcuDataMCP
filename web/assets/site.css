@@ -832,6 +832,105 @@ html[data-theme="light"] .closing-cta p {
   color: var(--ecu-heading);
 }
 
+/* Institution logos in place of the tool-category chip wall. */
+.org-carousel {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.55rem;
+  align-items: center;
+  margin: 0.4rem 0 1.5rem;
+}
+
+.org-carousel-viewport {
+  display: flex;
+  gap: 0.85rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  padding: 0.35rem 0.1rem 0.55rem;
+  min-width: 0;
+}
+
+.org-carousel-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.org-logo {
+  flex: 0 0 168px;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.org-logo-plate {
+  height: 96px;
+  display: grid;
+  place-items: center;
+  padding: 0.65rem 0.8rem;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid var(--ecu-line);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  transition: transform 0.22s ease;
+}
+
+.org-logo-ink .org-logo-plate {
+  background: #10203f;
+  border-color: #10203f;
+}
+
+.org-logo:hover .org-logo-plate,
+.org-logo:focus-visible .org-logo-plate {
+  transform: translateY(-3px);
+}
+
+.org-logo-plate img {
+  max-width: 100%;
+  max-height: 68px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.org-logo-name {
+  text-align: center;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--ecu-muted);
+}
+
+.org-carousel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  padding: 0;
+  border: 1px solid var(--ecu-line);
+  border-radius: 999px;
+  background: var(--ecu-panel);
+  color: var(--ecu-text);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.org-carousel-btn:hover {
+  border-color: var(--ecu-accent-text);
+  color: var(--ecu-accent-text);
+}
+
+@media (max-width: 640px) {
+  .org-logo {
+    flex-basis: 142px;
+  }
+}
+
 /* ---- Richer hero (inspired by FastMCP / Smithery / MCP.io) ---- */
 
 .container-page.hero-layout,
@@ -1472,7 +1571,13 @@ code a:any-link {
   }
 
   .question-card:hover,
-  .step-card:hover {
+  .step-card:hover,
+  .org-logo:hover .org-logo-plate,
+  .org-logo:focus-visible .org-logo-plate {
     transform: none;
+  }
+
+  .org-carousel-viewport {
+    scroll-behavior: auto;
   }
 }
