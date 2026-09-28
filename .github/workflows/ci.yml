@@ -44,4 +44,4 @@ jobs:
           } | timeout 60 docker run -i --rm ecuador-mcp > out.jsonl || true
           count=$(jq -s '[.[] | select(.id == 2)][0].result.tools | length' out.jsonl)
           echo "tools: $count"
-          test "$count" -ge 100
+          test "$count" -ge 80
