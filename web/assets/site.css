@@ -939,12 +939,53 @@ html[data-theme="light"] .closing-cta p {
   gap: 2.5rem;
   align-items: center;
   max-width: 1120px;
+  min-width: 0;
+}
+
+.hero-copy,
+.hero-visual,
+.chat-mock {
+  min-width: 0;
 }
 
 @media (max-width: 900px) {
+  .container-page.hero-layout,
   .hero-layout {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.75rem;
+  }
+
+  .landing.hero {
+    padding: 2.35rem 0 1rem;
+  }
+
+  .hero-copy .hero-sub {
+    font-size: 1.02rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-ctas {
+    margin-bottom: 0.25rem;
+  }
+
+  .hero-ctas .btn-cta {
+    max-width: 100%;
+  }
+
+  .chat-mock-bar {
+    flex-wrap: wrap;
+    row-gap: 0.35rem;
+  }
+
+  .chat-mock-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .chat-mock-body {
+    min-height: 0;
   }
 }
 
