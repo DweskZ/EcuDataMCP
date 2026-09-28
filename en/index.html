@@ -150,29 +150,61 @@
 <a class="btn-cta secondary" href="#connect">Install in 1 minute</a>
 </div>
 </div>
-<div class="hero-visual" aria-hidden="true">
+<div class="hero-visual">
 <div class="chat-mock" data-chat-demo="en">
 <div class="chat-mock-bar">
 <span class="chat-dot"></span><span class="chat-dot"></span><span class="chat-dot"></span>
 <span class="chat-mock-title">Claude · EcuDataMCP</span>
-<span class="chat-mock-status" data-chat-status></span>
+<span class="chat-mock-status" data-chat-status>real example</span>
 </div>
 <div class="chat-mock-body" data-chat-body>
-<div class="chat-bubble user">What does the BCE say about remittances in 2025?</div>
+<div class="chat-bubble user">Where did gold close, according to the BCE?</div>
 <div class="chat-bubble assistant">
-<span class="chat-tool">tool · search_ecuador</span>
-<p>I found <strong>BCE</strong> publications on remittances. Want me to open the series and show recent values?</p>
+<span class="chat-tool">tool · get_bce_indicador_diario</span>
+<p>On 25 September 2026 spot gold closed at <strong>4,284.81 dollars</strong> per troy ounce.</p>
+<pre class="chat-code">2026-09-23  4,287.65
+2026-09-24  4,275.03
+2026-09-25  4,284.81</pre>
 <span class="chat-cite">source · contenido.bce.fin.ec</span>
 </div>
-<div class="chat-bubble user">Yes — show me a preview.</div>
-<div class="chat-bubble assistant">
-<span class="chat-tool">tool · preview_resource_data</span>
-<pre class="chat-code">month, remittances_usd_m
-2025-01, 412.3
-2025-02, 398.7
-2025-03, 421.1</pre>
 </div>
+<div class="chat-nav">
+<button type="button" class="chat-nav-btn" data-chat-prev aria-label="Previous example">‹</button>
+<span class="chat-nav-label" data-chat-label>Gold · 1 / 4</span>
+<button type="button" class="chat-nav-btn" data-chat-next aria-label="Next example">›</button>
 </div>
+<script type="application/json" data-chat-examples>
+[
+  {
+    "label": "Gold",
+    "turns": [
+      {"role": "user", "text": "Where did gold close, according to the BCE?"},
+      {"role": "assistant", "tool": "get_bce_indicador_diario", "text": "On 25 September 2026 spot gold closed at 4,284.81 dollars per troy ounce.", "html": "On 25 September 2026 spot gold closed at <strong>4,284.81 dollars</strong> per troy ounce.", "code": "2026-09-23  4,287.65\n2026-09-24  4,275.03\n2026-09-25  4,284.81", "cite": "source · contenido.bce.fin.ec"}
+    ]
+  },
+  {
+    "label": "Country risk",
+    "turns": [
+      {"role": "user", "text": "Where did Ecuador's country risk close?"},
+      {"role": "assistant", "tool": "get_bce_indicador_diario", "text": "On 25 September 2026 the EMBI closed at 477.16 basis points.", "html": "On 25 September 2026 the EMBI closed at <strong>477.16</strong> basis points.", "code": "2026-09-23  432.14\n2026-09-24  445.93\n2026-09-25  477.16", "cite": "source · contenido.bce.fin.ec"}
+    ]
+  },
+  {
+    "label": "Quito",
+    "turns": [
+      {"role": "user", "text": "What is Quito's INEC code and population?"},
+      {"role": "assistant", "tool": "lookup_ubicacion", "text": "Quito is canton 1701 in Pichincha. The INEC record lists 2,853,320 inhabitants.", "html": "Quito is canton <strong>1701</strong> in Pichincha. The INEC record lists <strong>2,853,320</strong> inhabitants.", "code": "code 1701\nprovince Pichincha (17)\npopulation 2,853,320", "cite": "source · INEC, political-administrative division"}
+    ]
+  },
+  {
+    "label": "Remittances",
+    "turns": [
+      {"role": "user", "text": "How much did Ecuador receive in remittances in the first quarter of 2026?"},
+      {"role": "assistant", "tool": "get_bce_indicador_diario", "text": "The BCE quarterly series shows USD 1,856.7 million as of 31 March 2026.", "html": "The BCE quarterly series shows <strong>USD 1,856.7 million</strong> as of 31 March 2026.", "code": "2025-Q4  2,015.5\n2026-Q1  1,856.7\nunit: million USD", "cite": "source · contenido.bce.fin.ec"}
+    ]
+  }
+]
+</script>
 </div>
 </div>
 </div>
