@@ -67,7 +67,6 @@ TRANSLATIONS = {
 NAV = {
     "es": {
         "left": [
-            ("EcuDataMCP", "index.html"),
             ("Cómo funciona", "index.html#como-funciona"),
             ("Fuentes", "fuentes.html"),
             ("Referencia", "atlas.html"),
@@ -83,7 +82,6 @@ NAV = {
     },
     "en": {
         "left": [
-            ("EcuDataMCP", "index.html"),
             ("How it works", "index.html#how-it-works"),
             ("Sources", "fuentes.html"),
             ("Reference", "atlas.html"),
