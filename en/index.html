@@ -11,16 +11,32 @@
 <meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
+<script>
+(function () {
+  try {
+    var stored = localStorage.getItem("ecudata-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "dark");
+  }
+})();
+</script>
 <link rel="stylesheet" href="../assets/styles.css">
 <link rel="stylesheet" href="../assets/site.css">
 
 <style>html { scroll-behavior: smooth; }</style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="ecu-flag-stripe" aria-hidden="true"></div>
+<nav class="navbar navbar-expand-lg site-navbar" data-bs-theme="dark">
   <div class="navbar-container container-fluid">
     <div class="navbar-brand-container mx-auto">
       <a class="navbar-brand" href="index.html">
+        <span class="brand-logo-wrap" aria-hidden="true">
+          <img class="brand-logo logo-light" src="../assets/logo-navy.svg" width="28" height="28" alt="" decoding="async">
+          <img class="brand-logo logo-dark" src="../assets/logo-light.svg" width="28" height="28" alt="" decoding="async">
+        </span>
         <span class="navbar-title">EcuDataMCP</span>
       </a>
     </div>
@@ -83,6 +99,24 @@
         
       </ul>
       <ul class="navbar-nav navbar-nav-scroll ms-auto">
+        <li class="nav-item">
+          <button
+            type="button"
+            class="theme-toggle"
+            data-theme-toggle
+            aria-label="Switch to light mode"
+            data-label-light="Switch to light mode"
+            data-label-dark="Switch to dark mode"
+          >
+            <svg class="icon-theme icon-sun" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <circle cx="8" cy="8" r="2.75"/>
+              <path stroke-linecap="round" d="M8 1.5v1.4M8 13.1v1.4M1.5 8h1.4M13.1 8h1.4M3.4 3.4l1 1M11.6 11.6l1 1M12.6 3.4l-1 1M4.4 11.6l-1 1"/>
+            </svg>
+            <svg class="icon-theme icon-moon" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M13.2 9.2A5.2 5.2 0 0 1 6.8 2.8 5.4 5.4 0 1 0 13.2 9.2z"/>
+            </svg>
+          </button>
+        </li>
         <li class="nav-item lang-toggle" role="group" aria-label="Language / Idioma">
           
           <a class="lang-toggle-option" href="../index.html">ES</a>
@@ -109,19 +143,80 @@
 <main>
 
 <section class="landing hero">
-<div class="container-page">
+<div class="container-page hero-layout">
+<div class="hero-copy">
+<p class="brand-hero"><span class="brand-logo-wrap" aria-hidden="true"><img class="brand-logo brand-logo-lg logo-light" src="../assets/logo-navy.svg" width="40" height="40" alt="" decoding="async"><img class="brand-logo brand-logo-lg logo-dark" src="../assets/logo-light.svg" width="40" height="40" alt="" decoding="async"></span>EcuDataMCP</p>
 <p class="kicker">Open public-data infrastructure for Ecuador</p>
 <h1>Explore <span class="accent">open data.</span></h1>
-<p class="hero-sub">Connect your AI assistant to verifiable public data from Ecuador: datasets, procedures, contracts, earthquakes, BCE indicators, IEM tables, RUC lookup and companies. Find the right source, query with clear limits, and always cite the official origin.</p>
+<p class="hero-sub">Connect your AI assistant to verifiable public data from Ecuador: datasets, procedures, contracts, earthquakes, BCE indicators, RUC and companies. Find the source, query with limits, and always cite the official origin.</p>
 <div class="hero-ctas">
 <a class="btn-cta primary" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">Get started on GitHub</a>
-<a class="btn-cta secondary" href="#how-it-works">See how it works &darr;</a>
+<a class="btn-cta secondary" href="#connect">Install in 1 minute</a>
+</div>
+</div>
+<div class="hero-visual" aria-hidden="true">
+<div class="chat-mock" data-chat-demo="en">
+<div class="chat-mock-bar">
+<span class="chat-dot"></span><span class="chat-dot"></span><span class="chat-dot"></span>
+<span class="chat-mock-title">Claude · EcuDataMCP</span>
+<span class="chat-mock-status" data-chat-status></span>
+</div>
+<div class="chat-mock-body" data-chat-body>
+<div class="chat-bubble user">What does the BCE say about remittances in 2025?</div>
+<div class="chat-bubble assistant">
+<span class="chat-tool">tool · search_ecuador</span>
+<p>I found <strong>BCE</strong> publications on remittances. Want me to open the series and show recent values?</p>
+<span class="chat-cite">source · contenido.bce.fin.ec</span>
+</div>
+<div class="chat-bubble user">Yes — show me a preview.</div>
+<div class="chat-bubble assistant">
+<span class="chat-tool">tool · preview_resource_data</span>
+<pre class="chat-code">month, remittances_usd_m
+2025-01, 412.3
+2025-02, 398.7
+2025-03, 421.1</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="landing strip-section">
+<div class="container-page">
+<div class="arch-flow" aria-label="How EcuDataMCP connects">
+<div class="arch-node">
+<span class="arch-label">Your AI</span>
+<strong>Claude · Cursor · ChatGPT</strong>
+</div>
+<div class="arch-arrow" aria-hidden="true">→</div>
+<div class="arch-node accent">
+<span class="arch-label">MCP protocol</span>
+<strong>EcuDataMCP</strong>
+</div>
+<div class="arch-arrow" aria-hidden="true">→</div>
+<div class="arch-node">
+<span class="arch-label">Live sources</span>
+<strong>BCE · SRI · INEC · SERCOP</strong>
+</div>
 </div>
 <div class="hero-stats">
 <div class="hero-stat"><span class="num">1,581</span><span class="label">datasets</span></div>
 <div class="hero-stat"><span class="num">116</span><span class="label">MCP tools</span></div>
 <div class="hero-stat"><span class="num">56</span><span class="label">official sources</span></div>
 <div class="hero-stat"><span class="num">0</span><span class="label">API keys</span></div>
+</div>
+<div class="source-cloud" aria-label="Connected institutions">
+<span class="source-pill">BCE</span>
+<span class="source-pill">SRI</span>
+<span class="source-pill">INEC</span>
+<span class="source-pill">SERCOP</span>
+<span class="source-pill">Supercias</span>
+<span class="source-pill">IG-EPN</span>
+<span class="source-pill">gob.ec</span>
+<span class="source-pill">Open Data</span>
+<span class="source-pill">Superbancos</span>
+<span class="source-pill">IESS</span>
 </div>
 </div>
 </section>
@@ -216,11 +311,18 @@
 </div>
 </section>
 
-<section class="landing">
+<section class="landing" id="connect">
 <div class="container-page">
 <p class="kicker">Connect your assistant</p>
 <h2 class="section-title">Copy your client's configuration.</h2>
 <p class="section-lede">Run the server locally (Docker or <code>uv run</code>, see the <a href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">README</a>) and point your MCP client at <code>http://localhost:8000/mcp</code>.</p>
+<div class="install-bar">
+<span class="install-label">Quick start</span>
+<div class="code-block install-code">
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><code>uv sync && uv run python main.py --transport http --port 8000</code></pre>
+</div>
+</div>
 <div class="quick-connect">
 <p class="kicker">Quick option</p>
 <p class="client-intro">If your assistant has terminal access, hand it the repo link and let it install everything for you:</p>
