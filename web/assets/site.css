@@ -211,7 +211,8 @@ html[data-theme="light"] .page-footer .nav-footer a {
 }
 
 html[data-theme="light"] .landing.hero h1 .accent {
-  background: linear-gradient(120deg, #0033a0, #0050c8 55%, #1a6bff);
+  background: linear-gradient(110deg, #0033a0 0%, #7eb0ff 35%, #0033a0 55%, #1a6bff 100%);
+  background-size: 220% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

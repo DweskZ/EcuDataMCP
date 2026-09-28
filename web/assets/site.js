@@ -203,6 +203,7 @@ function copyCode(btn) {
   var index = 0;
   var timer = 0;
   var swapTimer = 0;
+  var generation = 0;
   var paused = false;
   var deadline = 0;
   var remaining = DWELL;
@@ -260,7 +261,20 @@ function copyCode(btn) {
     progressBar.style.animation = "";
   }
 
+  function schedule(ms) {
+    generation += 1;
+    var gen = generation;
+    window.clearTimeout(timer);
+    remaining = ms;
+    deadline = Date.now() + ms;
+    timer = window.setTimeout(function () {
+      if (gen !== generation) return;
+      go(1);
+    }, ms);
+  }
+
   function beginCycle() {
+    generation += 1;
     window.clearTimeout(timer);
     remaining = DWELL;
     if (reduce) return;
@@ -271,13 +285,13 @@ function copyCode(btn) {
       return;
     }
     root.classList.remove("is-paused");
-    deadline = Date.now() + remaining;
-    timer = window.setTimeout(function () { show(index + 1); }, remaining);
+    schedule(DWELL);
   }
 
   function pause() {
     if (paused || reduce) return;
     paused = true;
+    generation += 1;
     root.classList.add("is-paused");
     window.clearTimeout(timer);
     if (deadline) remaining = Math.max(400, deadline - Date.now());
@@ -286,10 +300,10 @@ function copyCode(btn) {
   function resume() {
     if (!paused) return;
     paused = false;
-    if (reduce || document.hidden || swapping) return;
+    if (reduce || document.hidden) return;
     root.classList.remove("is-paused");
-    deadline = Date.now() + remaining;
-    timer = window.setTimeout(function () { show(index + 1); }, remaining);
+    if (swapping) return;
+    schedule(remaining);
   }
 
   function paint(example) {
@@ -299,8 +313,11 @@ function copyCode(btn) {
     if (statusEl) statusEl.textContent = example.label;
   }
 
-  function show(nextIndex) {
-    pending = (nextIndex + examples.length) % examples.length;
+  function go(delta) {
+    var base = swapping ? pending : index;
+    pending = (base + delta + examples.length) % examples.length;
+    generation += 1;
+    window.clearTimeout(timer);
     function commit() {
       index = pending;
       swapping = false;
@@ -313,7 +330,6 @@ function copyCode(btn) {
       return;
     }
     swapping = true;
-    window.clearTimeout(timer);
     window.clearTimeout(swapTimer);
     body.classList.add("is-leaving");
     swapTimer = window.setTimeout(commit, 200);
@@ -328,8 +344,8 @@ function copyCode(btn) {
   if (statusEl && examples[0].label) statusEl.textContent = examples[0].label;
   beginCycle();
 
-  prevBtn.addEventListener("click", function () { show(index - 1); });
-  nextBtn.addEventListener("click", function () { show(index + 1); });
+  prevBtn.addEventListener("click", function () { go(-1); });
+  nextBtn.addEventListener("click", function () { go(1); });
   root.addEventListener("pointerenter", pause);
   root.addEventListener("pointerleave", resume);
   root.addEventListener("focusin", pause);
@@ -338,13 +354,13 @@ function copyCode(btn) {
   });
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) {
+      generation += 1;
       window.clearTimeout(timer);
       if (deadline) remaining = Math.max(400, deadline - Date.now());
       root.classList.add("is-paused");
     } else if (!paused && !swapping) {
       root.classList.remove("is-paused");
-      deadline = Date.now() + remaining;
-      timer = window.setTimeout(function () { show(index + 1); }, remaining);
+      schedule(remaining);
     }
   });
 })();
