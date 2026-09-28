@@ -42,9 +42,14 @@ editar un `data/*.json` y correr `build.py` ya refleja el cambio en el HTML.
 
 ## Cómo se publica
 
-`_site/` se copia tal cual a la rama `gh-pages` del repo (o del fork), que sirve el sitio vía GitHub
-Pages. No hay CI que lo automatice todavía — es un paso manual después de correr `build.py` y revisar el
-resultado.
+El workflow [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) construye `web/_site/` y lo
+publica en GitHub Pages en cada push a `main` que toque `web/` (también se puede disparar a mano con
+`workflow_dispatch`).
+
+URL del sitio: <https://dweskz.github.io/EcuDataMCP/>
+
+En el repo: **Settings → Pages → Source → GitHub Actions** (una sola vez). Mientras eso no esté
+activado, también se puede servir desde la rama `gh-pages` (contenido de `_site/` en la raíz).
 
 ## Búsqueda
 

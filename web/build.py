@@ -412,6 +412,9 @@ def main():
     render_lang(env, "en")
     copy_assets()
     write_seo_files()
+    # GitHub Pages runs Jekyll by default; this disables it so files like
+    # search.json and any future underscore-prefixed paths are served as-is.
+    (SITE / ".nojekyll").write_text("", encoding="utf-8")
 
     print(f"Built site -> {SITE}")
 
