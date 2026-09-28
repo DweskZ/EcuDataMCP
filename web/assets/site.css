@@ -869,6 +869,43 @@ a.btn-cta[href="https://github.com/DweskZ/EcuDataMCP"]::before {
   opacity: 0;
 }
 
+.chat-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.9rem 0.8rem;
+  border-top: 1px solid var(--ecu-line);
+}
+
+.chat-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  padding: 0;
+  border: 1px solid var(--ecu-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ecu-text);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.chat-nav-btn:hover {
+  border-color: var(--ecu-accent-text);
+  color: var(--ecu-accent-text);
+}
+
+.chat-nav-label {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  color: var(--ecu-muted);
+}
+
 .chat-bubble {
   margin: 0.85rem 1rem;
   padding: 0.75rem 0.9rem;
