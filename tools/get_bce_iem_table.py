@@ -40,6 +40,16 @@ def register_get_bce_iem_table_tool(mcp: MCPServer) -> None:
         rather than silently guessing columns. Always includes the BCE file
         and bulletin URLs for verification. Pass boletin_numero to retrieve
         a historical version returned by search_bce_iem(historico=true).
+
+        Args:
+            table_id: A table_id from search_bce_iem.
+            desde: Earliest period to include, as YYYY, YYYY-MM or a month-year
+                label.
+            hasta: Latest period to include, same formats as desde.
+            boletin_numero: Past bulletin number from
+                search_bce_iem(historico=true); 0 means the latest.
+            rows: Max rows returned (1-100, default 20).
+            format: text | json
         """
         rows = min(max(rows, 1), 100)
         try:

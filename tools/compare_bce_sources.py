@@ -37,6 +37,14 @@ def register_compare_bce_sources_tool(mcp: MCPServer) -> None:
         candidate overlaps and source-only entries, but does not claim that
         two labels have identical definitions. Confirm unit, frequency,
         coverage, values and revisions before combining them.
+
+        Args:
+            query: Free text narrowing which IEM tables are compared. Empty
+                compares all.
+            limit: Max IEM tables compared (1-100, default 100).
+            historico: Include tables from past IEM bulletins too.
+            guardar_revision: Save the candidate map as a review file.
+            format: text | json
         """
         limit = min(max(limit, 1), 100)
         try:

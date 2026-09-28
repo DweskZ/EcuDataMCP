@@ -48,6 +48,10 @@ def register_audit_bce_catalog_tool(mcp: MCPServer) -> None:
         Args:
             incluir_grupos: Include every discovered group's metadata in the
                 response. Defaults to false to keep mobile responses small.
+            guardar_snapshot: Save the audit under BCE_CATALOG_SNAPSHOT_DIR.
+            comparar_anterior: Compare against the last complete saved audit.
+            auditar_grid: Probe one latest period per frequency/unit
+                combination.
             format: text | json
         """
         try:

@@ -52,6 +52,21 @@ def register_search_bce_iem_tool(mcp: MCPServer) -> None:
         Set hash_archivos=true for an operator-style SHA-256 audit of the
         discovered XLSX files. This downloads complete files, so it is
         deliberately opt-in and bounded by max_hash_archivos.
+
+        Args:
+            query: Free text matched against table titles and sections
+                (accent-insensitive). Empty lists every table.
+            limit: Max tables returned (default 20).
+            offset: Pagination offset over the matched set.
+            historico: Also search past monthly bulletins, not just the latest.
+            desde_anio: Earliest bulletin year to search (implies historico).
+            hasta_anio: Latest bulletin year to search (implies historico).
+            guardar_catalogo: Save the full assembled catalog under
+                IEM_CATALOG_DIR.
+            hash_archivos: Download each discovered XLSX and report its SHA-256
+                (operator audit; slow).
+            max_hash_archivos: Cap on files hashed when hash_archivos is set.
+            format: text | json
         """
         limit = min(max(limit, 1), 100)
         offset = max(offset, 0)
