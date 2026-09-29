@@ -44,7 +44,7 @@ En lugar de navegar manualmente por portales gubernamentales, simplemente pregun
 - **Unifica múltiples fuentes en un solo punto**: Datos abiertos, trámites, regulaciones, contratación pública, riesgos, datos estadísticos y otras fuentes oficiales, todo accesible desde una sola conversación con tu IA.
 - **Preview de datos sin descargas**: `preview_resource_data` parsea CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX) y algunos archivos comprimidos en memoria; `query_resource_data` consulta el DataStore CKAN sin bajar el archivo completo.
 - **Cero fricción**: No necesitas API key ni permisos especiales para las fuentes públicas compatibles.
-- **Compatible con cualquier cliente MCP**: Claude, ChatGPT, Gemini, Cursor, VS Code, Windsurf, Le Chat, HuggingChat y más.
+- **Compatible con cualquier cliente MCP**: Claude, ChatGPT, Codex, Gemini, Cursor, VS Code, Windsurf, Le Chat, HuggingChat y más.
 - **Listo para producción**: Docker, health checks, logging estructurado, y un servidor HTTP Streamable compatible con MCP.
 
 ---
@@ -163,6 +163,18 @@ Agrega a tu archivo `mcp.json` (ejecuta **MCP: Open User Configuration** desde l
 
 ```bash
 claude mcp add --transport http ecuador-datos http://localhost:8000/mcp
+```
+
+### Codex
+
+```bash
+codex mcp add ecuador-datos --url http://localhost:8000/mcp
+```
+
+Esto guarda un bloque `[mcp_servers.ecuador-datos]` con `url` en `~/.codex/config.toml`. Para usar el servidor por stdio en vez de HTTP:
+
+```bash
+codex mcp add ecuador-datos -- uvx ecuador-mcp --transport stdio
 ```
 
 ### Gemini CLI
