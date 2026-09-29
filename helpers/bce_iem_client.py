@@ -1267,7 +1267,7 @@ def _open_legacy_zip_member(raw: bytes) -> tuple[Any, bool]:
     BCE sometimes ships a modern XLSX (an OOXML zip container) inside the
     legacy bulk ZIP but keeps the old ``.xls`` filename, which made xlrd
     fail outright. Sniff the actual bytes rather than trusting the
-    extension -- same principle as CLAUDE.md's CKAN-format guidance.
+    extension -- same principle as AGENTS.md's CKAN-format guidance.
     Returns (workbook, is_xlsx).
     """
     if raw.startswith(b"PK"):

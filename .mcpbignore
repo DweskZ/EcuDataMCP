@@ -23,5 +23,5 @@ Dockerfile
 CHANGELOG.md
 CONTRIBUTING.md
 .uv-cache*/
-CLAUDE.md
+AGENTS.md
 .dockerignore

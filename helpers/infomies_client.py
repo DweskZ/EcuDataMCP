@@ -75,7 +75,7 @@ bare `curl -I` with no prior request returns the real file headers
 directly), same as SIPA/Superbancos/MINEDEC's large-file portals.
 
 Because the BDD/Boletín Zonal files are `.rar` (explicitly out of scope for
-this project — see CLAUDE.md/ROADMAP.md's "Formatos y tipos de recursos"
+this project — see AGENTS.md/ROADMAP.md's "Formatos y tipos de recursos"
 section: subprocess/CVE risk, never read, only cataloged) and even the XLSX
 consolidated report is 9-15 MB (over this project's 5 MB download/preview
 cap — see helpers/csv_reader.MAX_DOWNLOAD_BYTES), this client, like

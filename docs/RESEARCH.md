@@ -1028,7 +1028,7 @@ fecha, segunda pasada) tras pedido explícito de Daniel: Observatorio
 Legislativo, Observatorio de los GADs, Observatorio de Gasto Público "y
 otros observatorios de la misma organización/fundación".
 
-**Nota de alcance:** este proyecto se describe (CLAUDE.md) como datos *del
+**Nota de alcance:** este proyecto se describe (AGENTS.md) como datos *del
 gobierno* ecuatoriano vía CKAN/gob.ec/SRI/BCE/etc. — estas fuentes son de
 una fundación de sociedad civil, no del Estado. Investigado igual porque se
 pidió explícitamente, pero decidir si integrarlas es una decisión de
@@ -1249,7 +1249,7 @@ Anticorrupción tienen mecanismos reales pero rotos o de difícil extracción
 datasets tabulares — ahí sí se sostiene la conclusión original. Cuentas
 Claras necesita atención de seguridad antes de cualquier otra cosa. Sigue
 pendiente la decisión de alcance: son fuentes de sociedad civil, no de
-gobierno, así que integrarlas implica ampliar lo que CLAUDE.md define como
+gobierno, así que integrarlas implica ampliar lo que AGENTS.md define como
 el alcance del proyecto — pero técnicamente, a diferencia de lo que se
 pensó inicialmente, sí hay con qué construir tools reales aquí.
 
@@ -3432,7 +3432,7 @@ boletín No. 1975 (`IEM-316b/312b/315a/322a.xls`) resultaban en `ValueError`
 porque son en realidad XLSX modernos (contenedor ZIP OOXML) con extensión
 `.xls` heredada; `xlrd.open_workbook` fallaba directo. Corregido con
 sniffing de bytes (`raw.startswith(b"PK")`) en vez de confiar en la
-extensión, igual que la regla ya documentada en `CLAUDE.md` para el campo
+extensión, igual que la regla ya documentada en `AGENTS.md` para el campo
 `format` de CKAN — ver `_open_legacy_zip_member` en
 `helpers/bce_iem_client.py`. Tras la corrección, cero errores en los 4
 boletines muestreados; los 4-7 `vista` restantes por boletín son tablas
@@ -4114,7 +4114,7 @@ removieron `helpers/sri_saiku_client.py`, los tres tools
 `query_sri_saiku_aggregate`), su registro en `tools/__init__.py`, sus
 menciones en `resources/catalog.py`/`tools/list_capabilities.py`/
 `docs/TOOLS.md`, y se actualizó el conteo de tools (103→100) en
-`CLAUDE.md` y `docs/MCP_ARCHITECTURE.md` (con nota fechada en vez de
+`AGENTS.md` y `docs/MCP_ARCHITECTURE.md` (con nota fechada en vez de
 reescribir los conteos históricos de esa página). Si el dominio vuelve a
 responder más adelante, reconstruir desde este mismo punto — la lógica de
 sesión anónima/discovery/query ya estaba resuelta, el bloqueo es
@@ -4198,7 +4198,7 @@ enlace de descarga final, no solo el HTML de listado — confirmado que
 un navegador real ejecutando JS (Playwright o similar) no hay forma de
 obtener las cookies de sesión que el WAF exige, y este proyecto no tiene
 esa dependencia en ningún otro helper (todos usan `httpx`, ver
-`CLAUDE.md`). Agregar Playwright solo para CNE es una dependencia pesada
+`AGENTS.md`). Agregar Playwright solo para CNE es una dependencia pesada
 y nueva para el proyecto — decisión pendiente de Daniel antes de
 construir `helpers/cne_client.py`. Si se decide seguir, la estructura de
 datos (procesos electorales 2002-2025 × subcategorías × archivos WPDM) y

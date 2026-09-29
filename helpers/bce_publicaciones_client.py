@@ -21,7 +21,7 @@ icon per row (dashicons class + title, e.g. "file-pdf" / "Documento PDF"),
 but the icon is an editorial choice (a couple of interactive-report rows
 use a generic "chart" icon instead of the real file type) -- the URL's own
 extension is the reliable source for `formato`, per the same
-don't-trust-the-declared-type rule CLAUDE.md documents for CKAN's `format`
+don't-trust-the-declared-type rule AGENTS.md documents for CKAN's `format`
 field. The icon title is kept as `icono_titulo` for reference only.
 """
 
