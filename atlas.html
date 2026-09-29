@@ -230,7 +230,7 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-search_datasets" data-search="search_datasets buscar datasets por palabras clave. soporta filtro por categoría. busca datasets en el portal de datos abiertos de ecuador (www.datosabiertos.gob.ec). es el punto de partida para explorar datos de 98+ instituciones públicas. usa queries cortos y específicos en español para mejores resultados. flujo típico: search_datasets → list_dataset_resources → preview_resource_data. query palabras clave (ej. &quot;empleo&quot;, &quot;salud&quot;, &quot;presupuesto&quot;, &quot;sri recaudación&quot;) page número de página (base 1, default: 1) page_size resultados por página (default: 20, máx. 100) category filtro opcional por categoría (ej. &quot;sal&quot; para salud, &quot;edu&quot; para educación). usa list_categories para ver todas las categorías disponibles. sort orden de los resultados (campo ckan, p. ej. `metadata_modified desc`). source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-search_datasets" data-search="search_datasets buscar datasets por palabras clave. soporta filtro por categoría. busca datasets en el portal de datos abiertos de ecuador (www.datosabiertos.gob.ec). es el punto de partida para explorar datos de 98+ instituciones públicas. usa queries cortos y específicos en español para mejores resultados. flujo típico: search_datasets → list_dataset_resources → preview_resource_data. query palabras clave (ej. &quot;empleo&quot;, &quot;salud&quot;, &quot;presupuesto&quot;, &quot;sri recaudación&quot;) page número de página (base 1, default: 1) page_size resultados por página (default: 20, máx. 100) category filtro opcional por categoría (ej. &quot;sal&quot; para salud, &quot;edu&quot; para educación). usa list_categories para ver todas las categorías disponibles. sort `relevance` (default, ranking propio de ckan) o `recent` (más recientes primero por metadata_modified; sirve sin query para descubrir datasets nuevos o actualizados). source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_datasets</code>
 <span class="atlas-tool-desc">Buscar datasets por palabras clave. Soporta filtro por categoría.</span>
@@ -250,7 +250,7 @@
 
 <tr><td><code>category</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Filtro opcional por categoría (ej. "sal" para Salud, "edu" para Educación). Usa list_categories para ver todas las categorías disponibles.</td></tr>
 
-<tr><td><code>sort</code></td><td><code>Literal['relevance', 'recent']</code></td><td><code>relevance</code></td><td>Orden de los resultados (campo CKAN, p. ej. `metadata_modified desc`).</td></tr>
+<tr><td><code>sort</code></td><td><code>Literal['relevance', 'recent']</code></td><td><code>relevance</code></td><td>`relevance` (default, ranking propio de CKAN) o `recent` (más recientes primero por metadata_modified; sirve sin query para descubrir datasets nuevos o actualizados).</td></tr>
 
 <tr><td><code>source</code></td><td><code>ckan_client.CkanSource</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
@@ -334,13 +334,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-preview_resource_data" data-search="preview_resource_data preview de csv/tsv, json/geojson o excel (xls/xlsx) como tabla (máx. 5 mb). descarga y previsualiza un recurso del portal de datos abiertos. soporta csv/tsv, json/geojson y excel (xlsx). devuelve las primeras n filas como tabla formateada para que el modelo pueda inspeccionar los datos sin descarga local. las columnas de geometría/wkt se descartan de la tabla (pueden pesar decenas de kb por celda); las columnas csv en notación decimal europea (7.760,2) se normalizan a notación estándar (7760.2). tamaño máximo de descarga: 5 mb. para recursos tabulares grandes en el datastore, preferí query_resource_data. resource_id el uuid del recurso (obtenlo de list_dataset_resources) rows cantidad de filas a previsualizar (default: 20, máx. 100) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-preview_resource_data" data-search="preview_resource_data vista previa de csv/tsv, json/geojson, excel (xls/xlsx/xlsb), ods o zip/tar.gz con un csv, como tabla (máx. 5 mb). descarga y muestra una vista previa de un recurso del portal de datos abiertos de ecuador. soporta csv/tsv, json/geojson, excel (xls/xlsx/xlsb), ods y .zip o .tar.gz que envuelven un csv/tsv/txt. devuelve las primeras n filas como tabla para que el modelo inspeccione los datos sin descargarlos. las columnas de geometría/wkt se descartan (pueden pesar decenas de kb por celda) y las de notación decimal europea (7.760,2) se normalizan (7760.2). tamaño máximo de descarga: 5 mb. para recursos tabulares grandes del datastore, prefiere query_resource_data. resource_id el uuid del recurso (obtenlo de list_dataset_resources) rows cantidad de filas a previsualizar (default: 20, máx. 100) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">preview_resource_data</code>
-<span class="atlas-tool-desc">Preview de CSV/TSV, JSON/GeoJSON o Excel (XLS/XLSX) como tabla (máx. 5 MB).</span>
+<span class="atlas-tool-desc">Vista previa de CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX/XLSB), ODS o ZIP/tar.gz con un CSV, como tabla (máx. 5 MB).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Descarga y previsualiza un recurso del portal de datos abiertos. Soporta CSV/TSV, JSON/GeoJSON y Excel (XLSX). Devuelve las primeras N filas como tabla formateada para que el modelo pueda inspeccionar los datos sin descarga local. Las columnas de geometría/WKT se descartan de la tabla (pueden pesar decenas de KB por celda); las columnas CSV en notación decimal europea (7.760,2) se normalizan a notación estándar (7760.2). Tamaño máximo de descarga: 5 MB. Para recursos tabulares grandes en el DataStore, preferí query_resource_data.</p>
+<p class="atlas-tool-long">Descarga y muestra una vista previa de un recurso del portal de datos abiertos de Ecuador. Soporta CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX/XLSB), ODS y .zip o .tar.gz que envuelven un CSV/TSV/TXT. Devuelve las primeras N filas como tabla para que el modelo inspeccione los datos sin descargarlos. Las columnas de geometría/WKT se descartan (pueden pesar decenas de KB por celda) y las de notación decimal europea (7.760,2) se normalizan (7760.2). Tamaño máximo de descarga: 5 MB. Para recursos tabulares grandes del DataStore, prefiere query_resource_data.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
@@ -360,13 +360,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-download_resource" data-search="download_resource baja el archivo crudo de un recurso en base64 (máx. 5 mb), para formatos que no se pueden previsualizar como tabla (.rar, .tar.gz, etc.). descarga los bytes crudos de un recurso del portal de datos abiertos, codificados en base64. úsalo para formatos que preview_resource_data no puede parsear como tabla (.rar, .tar.gz, .xls legacy, o cualquier formato no reconocido) — trae el archivo tal cual en vez de intentar leerlo. tamaño máximo: 5 mb (mismo límite que preview_resource_data). los archivos más grandes vuelven con un error y la url directa en su lugar, ya que serían demasiado grandes para incluir en una respuesta. llama con format=&quot;json&quot; para obtener el contenido real del archivo — el default format=&quot;text&quot; solo confirma la descarga y te indica que reintentes con json; nunca incluye content_base64. resource_id el uuid del recurso (obtenlo de list_dataset_resources) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format text | json (json incluye content_base64; úsalo para obtener el archivo real)">
+<details class="atlas-tool" id="tool-download_resource" data-search="download_resource bytes crudos en base64 (máx. 5 mb) para formatos que preview_resource_data no puede leer (.rar o no reconocidos). descarga los bytes crudos de un recurso del portal de datos abiertos de ecuador, en base64. úsalo para formatos que preview_resource_data no puede convertir en tabla (.rar o cualquier formato no reconocido): trae el archivo tal cual en vez de intentar leerlo. tamaño máximo: 5 mb (el mismo tope que preview_resource_data); los archivos más grandes devuelven un error y la url directa. llama con format=&quot;json&quot; para obtener el contenido: el default format=&quot;text&quot; solo confirma la descarga y nunca incluye content_base64. resource_id el uuid del recurso (obtenlo de list_dataset_resources) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format text | json (json incluye content_base64; úsalo para obtener el archivo real)">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">download_resource</code>
-<span class="atlas-tool-desc">Baja el archivo crudo de un recurso en base64 (máx. 5 MB), para formatos que no se pueden previsualizar como tabla (.rar, .tar.gz, etc.).</span>
+<span class="atlas-tool-desc">Bytes crudos en base64 (máx. 5 MB) para formatos que preview_resource_data no puede leer (.rar o no reconocidos).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Descarga los bytes crudos de un recurso del portal de datos abiertos, codificados en base64. Úsalo para formatos que preview_resource_data no puede parsear como tabla (.rar, .tar.gz, .xls legacy, o cualquier formato no reconocido) — trae el archivo tal cual en vez de intentar leerlo. Tamaño máximo: 5 MB (mismo límite que preview_resource_data). Los archivos más grandes vuelven con un error y la URL directa en su lugar, ya que serían demasiado grandes para incluir en una respuesta. Llama con format="json" para obtener el contenido real del archivo — el default format="text" solo confirma la descarga y te indica que reintentes con json; nunca incluye content_base64.</p>
+<p class="atlas-tool-long">Descarga los bytes crudos de un recurso del portal de datos abiertos de Ecuador, en base64. Úsalo para formatos que preview_resource_data no puede convertir en tabla (.rar o cualquier formato no reconocido): trae el archivo tal cual en vez de intentar leerlo. Tamaño máximo: 5 MB (el mismo tope que preview_resource_data); los archivos más grandes devuelven un error y la URL directa. Llama con format="json" para obtener el contenido: el default format="text" solo confirma la descarga y nunca incluye content_base64.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
@@ -456,13 +456,13 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-search_tramites" data-search="search_tramites buscar trámites del gobierno ecuatoriano (cédula, pasaporte, ruc, licencia, etc.). busca trámites del gobierno ecuatoriano en el portal oficial gob.ec. mejor enfoque: da un institution_id para obtener los trámites de esa institución. agrega un query para filtrar resultados por palabra clave (filtra por nombre y descripción). cuando se da query junto con institution_id, se recorren todas las páginas de trámites de esa institución y se filtran, así que siempre obtenés los resultados más relevantes. ids de institución comunes: &quot;8&quot; = sri (impuestos, ruc, facturación), &quot;23&quot; = registro civil (cédula, partidas de nacimiento), &quot;62&quot; = ant (licencias de conducir, matriculación vehicular), &quot;16&quot; = cancillería (pasaportes, apostilla), &quot;5&quot; = iess (seguro social, pensiones, fondos de reserva). usa list_instituciones para encontrar más ids. query palabras clave para filtrar resultados (ej. &quot;ruc&quot;, &quot;inscripción ruc persona natural&quot;). cada palabra debe aparecer en el nombre o la descripción del trámite. institution_id id de institución (muy recomendado para resultados relevantes) page número de página (base 1, default: 1). se ignora cuando se da query (se buscan todas las páginas automáticamente). format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-search_tramites" data-search="search_tramites buscar trámites del gobierno ecuatoriano (cédula, pasaporte, ruc, licencia, etc.). busca trámites del gobierno ecuatoriano en el portal oficial gob.ec. mejor enfoque: da un institution_id para obtener los trámites de esa institución. agrega un query para filtrar resultados por palabra clave (filtra por nombre y descripción). cuando se da query junto con institution_id, se recorren todas las páginas de trámites de esa institución y se filtran, así que siempre obtienes los resultados más relevantes. ids de institución comunes: &quot;8&quot; = sri (impuestos, ruc, facturación), &quot;23&quot; = registro civil (cédula, partidas de nacimiento), &quot;62&quot; = ant (licencias de conducir, matriculación vehicular), &quot;16&quot; = cancillería (pasaportes, apostilla), &quot;5&quot; = iess (seguro social, pensiones, fondos de reserva). usa list_instituciones para encontrar más ids. query palabras clave para filtrar resultados (ej. &quot;ruc&quot;, &quot;inscripción ruc persona natural&quot;). cada palabra debe aparecer en el nombre o la descripción del trámite. institution_id id de institución (muy recomendado para resultados relevantes) page número de página (base 1, default: 1). se ignora cuando se da query (se buscan todas las páginas automáticamente). format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_tramites</code>
 <span class="atlas-tool-desc">Buscar trámites del gobierno ecuatoriano (cédula, pasaporte, RUC, licencia, etc.).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Busca trámites del gobierno ecuatoriano en el portal oficial gob.ec. Mejor enfoque: da un institution_id para obtener los trámites de esa institución. Agrega un query para filtrar resultados por palabra clave (filtra por nombre y descripción). Cuando se da query junto con institution_id, se recorren TODAS las páginas de trámites de esa institución y se filtran, así que siempre obtenés los resultados más relevantes. IDs de institución comunes: "8" = SRI (impuestos, RUC, facturación), "23" = Registro Civil (cédula, partidas de nacimiento), "62" = ANT (licencias de conducir, matriculación vehicular), "16" = Cancillería (pasaportes, apostilla), "5" = IESS (seguro social, pensiones, fondos de reserva). Usa list_instituciones para encontrar más IDs.</p>
+<p class="atlas-tool-long">Busca trámites del gobierno ecuatoriano en el portal oficial gob.ec. Mejor enfoque: da un institution_id para obtener los trámites de esa institución. Agrega un query para filtrar resultados por palabra clave (filtra por nombre y descripción). Cuando se da query junto con institution_id, se recorren TODAS las páginas de trámites de esa institución y se filtran, así que siempre obtienes los resultados más relevantes. IDs de institución comunes: "8" = SRI (impuestos, RUC, facturación), "23" = Registro Civil (cédula, partidas de nacimiento), "62" = ANT (licencias de conducir, matriculación vehicular), "16" = Cancillería (pasaportes, apostilla), "5" = IESS (seguro social, pensiones, fondos de reserva). Usa list_instituciones para encontrar más IDs.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
@@ -482,10 +482,10 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_tramite_info" data-search="get_tramite_info detalle completo: requisitos, procedimiento, costo, tiempo estimado. información detallada de un trámite gubernamental específico. devuelve nombre, descripción, requisitos, beneficiarios, costo, y la institución responsable. obtén el tramite_id de search_tramites. tramite_id el id del trámite (ej. &quot;18009&quot;) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-get_tramite_info" data-search="get_tramite_info requisitos, beneficiarios, costo e institución responsable de un trámite. información detallada de un trámite gubernamental específico. devuelve nombre, descripción, requisitos, beneficiarios, costo, y la institución responsable. obtén el tramite_id de search_tramites. tramite_id el id del trámite (ej. &quot;18009&quot;) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_tramite_info</code>
-<span class="atlas-tool-desc">Detalle completo: requisitos, procedimiento, costo, tiempo estimado.</span>
+<span class="atlas-tool-desc">Requisitos, beneficiarios, costo e institución responsable de un trámite.</span>
 </summary>
 <div class="atlas-tool-body">
 <p class="atlas-tool-long">Información detallada de un trámite gubernamental específico. Devuelve nombre, descripción, requisitos, beneficiarios, costo, y la institución responsable. Obtén el tramite_id de search_tramites.</p>
@@ -686,13 +686,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_indicador_bce" data-search="get_indicador_bce serie de tiempo de un indicador por id_grupo: período, frecuencia y unidad configurables (defaults según el grupo). serie de tiempo de un grupo de indicadores del banco central del ecuador (bce). usa primero search_indicadores_bce para encontrar el id_grupo. frecuencia y unidad varían por grupo (ej. &quot;mensual&quot;/&quot;millones de usd&quot; para oferta monetaria, &quot;trimestral&quot;/&quot;porcentaje&quot; para crecimiento del pib) — omitilas para obtener el default del grupo, o revisa el mensaje de error para ver las opciones válidas si adivinás mal. id_grupo el id del grupo, de search_indicadores_bce. desde período de inicio en formato yyyy-mm. por default, el período más antiguo disponible para la frecuencia elegida. hasta período de fin en formato yyyy-mm. por default, el período más reciente disponible para la frecuencia elegida. frecuencia semanal | mensual | trimestral | anual. por default, la primera frecuencia disponible del grupo. unidad varía según el grupo (ej. &quot;millones de usd&quot;, &quot;indice&quot;, &quot;porcentaje&quot;). por default, la primera disponible para la frecuencia elegida. format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-get_indicador_bce" data-search="get_indicador_bce serie de tiempo de un indicador por id_grupo: período, frecuencia y unidad configurables (defaults según el grupo). serie de tiempo de un grupo de indicadores del banco central del ecuador (bce). usa primero search_indicadores_bce para encontrar el id_grupo. frecuencia y unidad varían por grupo (ej. &quot;mensual&quot;/&quot;millones de usd&quot; para oferta monetaria, &quot;trimestral&quot;/&quot;porcentaje&quot; para crecimiento del pib) — omitilas para obtener el default del grupo, o revisa el mensaje de error para ver las opciones válidas si te equivocas. id_grupo el id del grupo, de search_indicadores_bce. desde período de inicio en formato yyyy-mm. por default, el período más antiguo disponible para la frecuencia elegida. hasta período de fin en formato yyyy-mm. por default, el período más reciente disponible para la frecuencia elegida. frecuencia semanal | mensual | trimestral | anual. por default, la primera frecuencia disponible del grupo. unidad varía según el grupo (ej. &quot;millones de usd&quot;, &quot;indice&quot;, &quot;porcentaje&quot;). por default, la primera disponible para la frecuencia elegida. format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_indicador_bce</code>
 <span class="atlas-tool-desc">Serie de tiempo de un indicador por id_grupo: período, frecuencia y unidad configurables (defaults según el grupo).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Serie de tiempo de un grupo de indicadores del Banco Central del Ecuador (BCE). Usa primero search_indicadores_bce para encontrar el id_grupo. Frecuencia y unidad varían por grupo (ej. "Mensual"/"Millones de USD" para oferta monetaria, "Trimestral"/"Porcentaje" para crecimiento del PIB) — omitilas para obtener el default del grupo, o revisa el mensaje de error para ver las opciones válidas si adivinás mal.</p>
+<p class="atlas-tool-long">Serie de tiempo de un grupo de indicadores del Banco Central del Ecuador (BCE). Usa primero search_indicadores_bce para encontrar el id_grupo. Frecuencia y unidad varían por grupo (ej. "Mensual"/"Millones de USD" para oferta monetaria, "Trimestral"/"Porcentaje" para crecimiento del PIB) — omitilas para obtener el default del grupo, o revisa el mensaje de error para ver las opciones válidas si te equivocas.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
@@ -756,13 +756,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_compania_info" data-search="get_compania_info ficha completa de una compañía por ruc: representante legal, capital suscrito, ciiu, dirección. ficha completa del registro de una compañía por ruc (superintendencia de compañías). devuelve situación legal, fecha de constitución, representante legal, capital suscrito, actividad económica (ciiu), dirección y último año de balance. usa primero search_companias si no tenés el ruc exacto. ruc el ruc de 13 dígitos de la compañía format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-get_compania_info" data-search="get_compania_info ficha completa de una compañía por ruc: representante legal, capital suscrito, ciiu, dirección. ficha completa del registro de una compañía por ruc (superintendencia de compañías). devuelve situación legal, fecha de constitución, representante legal, capital suscrito, actividad económica (ciiu), dirección y último año de balance. usa primero search_companias si no tienes el ruc exacto. ruc el ruc de 13 dígitos de la compañía format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_compania_info</code>
 <span class="atlas-tool-desc">Ficha completa de una compañía por RUC: representante legal, capital suscrito, CIIU, dirección.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Ficha completa del registro de una compañía por RUC (Superintendencia de Compañías). Devuelve situación legal, fecha de constitución, representante legal, capital suscrito, actividad económica (CIIU), dirección y último año de balance. Usa primero search_companias si no tenés el RUC exacto.</p>
+<p class="atlas-tool-long">Ficha completa del registro de una compañía por RUC (Superintendencia de Compañías). Devuelve situación legal, fecha de constitución, representante legal, capital suscrito, actividad económica (CIIU), dirección y último año de balance. Usa primero search_companias si no tienes el RUC exacto.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
@@ -778,13 +778,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-search_ranking" data-search="search_ranking rankear/filtrar compañías por indicadores financieros (año, ciiu, cualquier columna); requiere el build local de la base financiera. rankea/filtra compañías de supercías por indicadores financieros de un año fiscal. filtra por año y/o actividad económica ciiu nivel 1 (una letra, ej. &quot;c&quot; para manufactura), ordenado por cualquier columna de indicador (default: posicion_general, ya precalculado en el dataset). cada resultado incluye el nombre/ruc de la compañía junto a sus financieros. cubre solo los últimos años fiscales cacheados, no el historial completo. usa get_financials para el detalle completo de una compañía, o get_compania_info para datos legales/de registro (dirección, representante legal, etc.). anio filtro opcional de año fiscal. ciiu_n1 filtro opcional de ciiu nivel 1, ej. &quot;c&quot;, &quot;g&quot;, &quot;i&quot;. order_by columna para ordenar ascendente (ej. &quot;posicion_general&quot;, &quot;activos&quot;, &quot;roe&quot;). vuelve a posicion_general si no se reconoce. descending orden descendente (default) o ascendente. limit máximo de resultados (default 20, máx. 100). offset offset de paginación. format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-search_ranking" data-search="search_ranking rankear/filtrar compañías por indicadores financieros (año, ciiu, cualquier columna); requiere el build local de la base financiera. rankea/filtra compañías de supercías por indicadores financieros de un año fiscal. filtra por año y/o actividad económica ciiu nivel 1 (una letra, ej. &quot;c&quot; para manufactura), ordenado por cualquier columna de indicador (default: posicion_general, ya precalculado en el dataset). cada resultado incluye el nombre/ruc de la compañía junto a sus financieros. cubre los últimos cinco años fiscales de la base local, no el historial completo. usa get_financials para el detalle completo de una compañía, o get_compania_info para datos legales/de registro (dirección, representante legal, etc.). anio filtro opcional de año fiscal. ciiu_n1 filtro opcional de ciiu nivel 1, ej. &quot;c&quot;, &quot;g&quot;, &quot;i&quot;. order_by columna para ordenar ascendente (ej. &quot;posicion_general&quot;, &quot;activos&quot;, &quot;roe&quot;). vuelve a posicion_general si no se reconoce. descending orden descendente si es true (default false = ascendente); úsalo para «top n» por una columna como roe. posicion_general ya viene ascendente (1 = mejor), déjalo en false al ordenar por ella. limit máximo de resultados (default 20, máx. 100). offset offset de paginación. format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_ranking</code>
 <span class="atlas-tool-desc">Rankear/filtrar compañías por indicadores financieros (año, CIIU, cualquier columna); requiere el build local de la base financiera.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Rankea/filtra compañías de Supercías por indicadores financieros de un año fiscal. Filtra por año y/o actividad económica CIIU nivel 1 (una letra, ej. "C" para manufactura), ordenado por cualquier columna de indicador (default: posicion_general, ya precalculado en el dataset). Cada resultado incluye el nombre/RUC de la compañía junto a sus financieros. Cubre solo los últimos años fiscales cacheados, no el historial completo. Usa get_financials para el detalle completo de una compañía, o get_compania_info para datos legales/de registro (dirección, representante legal, etc.).</p>
+<p class="atlas-tool-long">Rankea/filtra compañías de Supercías por indicadores financieros de un año fiscal. Filtra por año y/o actividad económica CIIU nivel 1 (una letra, ej. "C" para manufactura), ordenado por cualquier columna de indicador (default: posicion_general, ya precalculado en el dataset). Cada resultado incluye el nombre/RUC de la compañía junto a sus financieros. Cubre los últimos cinco años fiscales de la base local, no el historial completo. Usa get_financials para el detalle completo de una compañía, o get_compania_info para datos legales/de registro (dirección, representante legal, etc.).</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
@@ -796,7 +796,7 @@
 
 <tr><td><code>order_by</code></td><td><code>str</code></td><td><code>posicion_general</code></td><td>Columna para ordenar ascendente (ej. "posicion_general", "activos", "roe"). Vuelve a posicion_general si no se reconoce.</td></tr>
 
-<tr><td><code>descending</code></td><td><code>bool</code></td><td><code>False</code></td><td>Orden descendente (default) o ascendente.</td></tr>
+<tr><td><code>descending</code></td><td><code>bool</code></td><td><code>False</code></td><td>Orden descendente si es true (default false = ascendente); úsalo para «top N» por una columna como roe. posicion_general ya viene ascendente (1 = mejor), déjalo en false al ordenar por ella.</td></tr>
 
 <tr><td><code>limit</code></td><td><code>int</code></td><td><code>20</code></td><td>Máximo de resultados (default 20, máx. 100).</td></tr>
 
@@ -810,13 +810,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_financials" data-search="get_financials historial financiero de una compañía por expediente o ruc: ingresos, activos, patrimonio, ~38 ratios (liquidez, endeudamiento, rentabilidad). historial financiero de una compañía a partir de los balances de supercías. devuelve ingresos, activos, patrimonio, utilidad, cantidad de empleados, y ratios financieros (liquidez, endeudamiento, rentabilidad) por año fiscal. cubre solo los últimos años fiscales cacheados (lo que scripts/build_supercias_financials_db.py cacheó por última vez), no el historial completo desde 2008. complementa get_compania_info, que tiene datos legales/de registro pero no financieros. expediente_or_ruc el número de &quot;expediente&quot; de supercías de la compañía (de search_companias/get_compania_info) o su ruc de 13 dígitos. anio filtro opcional de un solo año fiscal. format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-get_financials" data-search="get_financials historial financiero de una compañía por expediente o ruc: ingresos, activos, patrimonio, ~38 ratios (liquidez, endeudamiento, rentabilidad). historial financiero de una compañía a partir de los balances de supercías. devuelve ingresos, activos, patrimonio, utilidad, cantidad de empleados, y ratios financieros (liquidez, endeudamiento, rentabilidad) por año fiscal. cubre los últimos cinco años fiscales de la base local (ver metadatos.base_local para su fecha de construcción y rango de años), no el historial completo desde 2008. complementa get_compania_info, que tiene datos legales/de registro pero no financieros. expediente_or_ruc el número de &quot;expediente&quot; de supercías de la compañía (de search_companias/get_compania_info) o su ruc de 13 dígitos. anio filtro opcional de un solo año fiscal. format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_financials</code>
 <span class="atlas-tool-desc">Historial financiero de una compañía por expediente o RUC: ingresos, activos, patrimonio, ~38 ratios (liquidez, endeudamiento, rentabilidad).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Historial financiero de una compañía a partir de los balances de Supercías. Devuelve ingresos, activos, patrimonio, utilidad, cantidad de empleados, y ratios financieros (liquidez, endeudamiento, rentabilidad) por año fiscal. Cubre solo los últimos años fiscales cacheados (lo que scripts/build_supercias_financials_db.py cacheó por última vez), no el historial completo desde 2008. Complementa get_compania_info, que tiene datos legales/de registro pero no financieros.</p>
+<p class="atlas-tool-long">Historial financiero de una compañía a partir de los balances de Supercías. Devuelve ingresos, activos, patrimonio, utilidad, cantidad de empleados, y ratios financieros (liquidez, endeudamiento, rentabilidad) por año fiscal. Cubre los últimos cinco años fiscales de la base local (ver metadatos.base_local para su fecha de construcción y rango de años), no el historial completo desde 2008. Complementa get_compania_info, que tiene datos legales/de registro pero no financieros.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
@@ -862,13 +862,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_auditor_info" data-search="get_auditor_info ficha completa de un auditor externo por identificación: resolución de autorización, nacionalidad, dirección, contacto. ficha completa del registro de un auditor externo autorizado por identificación (superintendencia de compañías). devuelve número/fecha de resolución de autorización, nacionalidad, dirección y datos de contacto. usa primero search_auditores si no tenés la identificación exacta (ruc/cédula). identificacion el ruc o cédula del auditor format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-get_auditor_info" data-search="get_auditor_info ficha completa de un auditor externo por identificación: resolución de autorización, nacionalidad, dirección, contacto. ficha completa del registro de un auditor externo autorizado por identificación (superintendencia de compañías). devuelve número/fecha de resolución de autorización, nacionalidad, dirección y datos de contacto. usa primero search_auditores si no tienes la identificación exacta (ruc/cédula). identificacion el ruc o cédula del auditor format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_auditor_info</code>
 <span class="atlas-tool-desc">Ficha completa de un auditor externo por identificación: resolución de autorización, nacionalidad, dirección, contacto.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Ficha completa del registro de un auditor externo autorizado por identificación (Superintendencia de Compañías). Devuelve número/fecha de resolución de autorización, nacionalidad, dirección y datos de contacto. Usa primero search_auditores si no tenés la identificación exacta (RUC/cédula).</p>
+<p class="atlas-tool-long">Ficha completa del registro de un auditor externo autorizado por identificación (Superintendencia de Compañías). Devuelve número/fecha de resolución de autorización, nacionalidad, dirección y datos de contacto. Usa primero search_auditores si no tienes la identificación exacta (RUC/cédula).</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
@@ -1250,7 +1250,7 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-get_bce_iem_table" data-search="get_bce_iem_table inspecciona una tabla xlsx oficial del boletín iem más reciente del bce. inspecciona una tabla xlsx oficial del boletín iem más reciente del bce. obtén table_id desde search_bce_iem. las tablas con el diseño común del bce (períodos en columnas y variables en filas) devuelven series estructuradas y filtrables por fecha. otros diseños devuelven una vista previa fiel en vez de adivinar columnas silenciosamente. siempre incluye las urls del archivo y del boletín del bce para verificación. pasa boletin_numero para obtener una versión histórica de las que devuelve search_bce_iem(historico=true). table_id parámetro documentado en el código fuente. desde parámetro documentado en el código fuente. hasta parámetro documentado en el código fuente. boletin_numero parámetro documentado en el código fuente. rows parámetro documentado en el código fuente. format parámetro documentado en el código fuente.">
+<details class="atlas-tool" id="tool-get_bce_iem_table" data-search="get_bce_iem_table inspecciona una tabla xlsx oficial del boletín iem más reciente del bce. inspecciona una tabla xlsx oficial del boletín iem más reciente del bce. obtén table_id desde search_bce_iem. las tablas con el diseño común del bce (períodos en columnas y variables en filas) devuelven series estructuradas y filtrables por fecha. otros diseños devuelven una vista previa fiel en vez de adivinar columnas silenciosamente. siempre incluye las urls del archivo y del boletín del bce para verificación. pasa boletin_numero para obtener una versión histórica de las que devuelve search_bce_iem(historico=true). table_id un table_id de search_bce_iem. desde primer período a incluir: yyyy, yyyy-mm o etiqueta mes-año. hasta último período a incluir; mismos formatos que desde. boletin_numero número de un boletín pasado de search_bce_iem(historico=true); 0 = el último. rows máximo de filas devueltas (1-100, default 20). format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_bce_iem_table</code>
 <span class="atlas-tool-desc">Inspecciona una tabla XLSX oficial del boletín IEM más reciente del BCE.</span>
@@ -1262,17 +1262,17 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>table_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>table_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Un table_id de search_bce_iem.</td></tr>
 
-<tr><td><code>desde</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>desde</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Primer período a incluir: YYYY, YYYY-MM o etiqueta mes-año.</td></tr>
 
-<tr><td><code>hasta</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>hasta</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Último período a incluir; mismos formatos que desde.</td></tr>
 
-<tr><td><code>boletin_numero</code></td><td><code>int</code></td><td><code>0</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>boletin_numero</code></td><td><code>int</code></td><td><code>0</code></td><td>Número de un boletín pasado de search_bce_iem(historico=true); 0 = el último.</td></tr>
 
-<tr><td><code>rows</code></td><td><code>int</code></td><td><code>20</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>rows</code></td><td><code>int</code></td><td><code>20</code></td><td>Máximo de filas devueltas (1-100, default 20).</td></tr>
 
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -1330,7 +1330,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-search_bce_iem" data-search="search_bce_iem busca tablas individuales de excel en el último boletín iem del bce. busca tablas individuales de excel en el último boletín iem del bce. úsalo para tablas detalladas del bce que no están disponibles fácilmente vía search_indicadores_bce/bcedata: comercio por país, deuda, finanzas públicas por nivel de gobierno, petróleo, desagregaciones del pib, y más. lista las tablas del boletín mensual vigente; usa get_bce_iem_table con un table_id devuelto para inspeccionar un archivo xlsx oficial. usa historico=true (o indica desde_anio/hasta_anio) para buscar en todas las páginas de boletines mensuales que coincidan; esto es más lento en la primera llamada porque hay que leer las páginas del archivo histórico. usa guardar_catalogo=true para persistir el catálogo completo armado por esta búsqueda en iem_catalog_dir (o data/iem_catalog_snapshots por defecto). la paginación sigue acotando la respuesta del mcp. usa hash_archivos=true para una auditoría sha-256 tipo operador de los archivos xlsx descubiertos. esto descarga los archivos completos, así que es deliberadamente opt-in y está acotado por max_hash_archivos. query parámetro documentado en el código fuente. limit parámetro documentado en el código fuente. offset parámetro documentado en el código fuente. historico parámetro documentado en el código fuente. desde_anio parámetro documentado en el código fuente. hasta_anio parámetro documentado en el código fuente. guardar_catalogo parámetro documentado en el código fuente. hash_archivos parámetro documentado en el código fuente. max_hash_archivos parámetro documentado en el código fuente. format parámetro documentado en el código fuente.">
+<details class="atlas-tool" id="tool-search_bce_iem" data-search="search_bce_iem busca tablas individuales de excel en el último boletín iem del bce. busca tablas individuales de excel en el último boletín iem del bce. úsalo para tablas detalladas del bce que no están disponibles fácilmente vía search_indicadores_bce/bcedata: comercio por país, deuda, finanzas públicas por nivel de gobierno, petróleo, desagregaciones del pib, y más. lista las tablas del boletín mensual vigente; usa get_bce_iem_table con un table_id devuelto para inspeccionar un archivo xlsx oficial. usa historico=true (o indica desde_anio/hasta_anio) para buscar en todas las páginas de boletines mensuales que coincidan; esto es más lento en la primera llamada porque hay que leer las páginas del archivo histórico. usa guardar_catalogo=true para persistir el catálogo completo armado por esta búsqueda en iem_catalog_dir (o data/iem_catalog_snapshots por defecto). la paginación sigue acotando la respuesta del mcp. usa hash_archivos=true para una auditoría sha-256 tipo operador de los archivos xlsx descubiertos. esto descarga los archivos completos, así que es deliberadamente opt-in y está acotado por max_hash_archivos. query texto libre que se busca, sin distinguir tildes, en títulos y secciones de las tablas. vacío lista todas. limit máximo de tablas devueltas (default 20). offset desplazamiento de paginación sobre las tablas encontradas. historico busca también en boletines mensuales pasados, no solo en el último. desde_anio primer año de boletín a buscar (implica historico). hasta_anio último año de boletín a buscar (implica historico). guardar_catalogo guarda el catálogo completo en iem_catalog_dir. hash_archivos descarga cada xlsx descubierto e informa su sha-256 (auditoría de operador; lento). max_hash_archivos tope de archivos a los que se calcula el hash cuando hash_archivos está activo. format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_bce_iem</code>
 <span class="atlas-tool-desc">Busca tablas individuales de Excel en el último boletín IEM del BCE.</span>
@@ -1342,25 +1342,25 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre que se busca, sin distinguir tildes, en títulos y secciones de las tablas. Vacío lista todas.</td></tr>
 
-<tr><td><code>limit</code></td><td><code>int</code></td><td><code>20</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>20</code></td><td>Máximo de tablas devueltas (default 20).</td></tr>
 
-<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Desplazamiento de paginación sobre las tablas encontradas.</td></tr>
 
-<tr><td><code>historico</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>historico</code></td><td><code>bool</code></td><td><code>False</code></td><td>Busca también en boletines mensuales pasados, no solo en el último.</td></tr>
 
-<tr><td><code>desde_anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>desde_anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Primer año de boletín a buscar (implica historico).</td></tr>
 
-<tr><td><code>hasta_anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>hasta_anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Último año de boletín a buscar (implica historico).</td></tr>
 
-<tr><td><code>guardar_catalogo</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>guardar_catalogo</code></td><td><code>bool</code></td><td><code>False</code></td><td>Guarda el catálogo completo en IEM_CATALOG_DIR.</td></tr>
 
-<tr><td><code>hash_archivos</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>hash_archivos</code></td><td><code>bool</code></td><td><code>False</code></td><td>Descarga cada XLSX descubierto e informa su SHA-256 (auditoría de operador; lento).</td></tr>
 
-<tr><td><code>max_hash_archivos</code></td><td><code>int</code></td><td><code>5000</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>max_hash_archivos</code></td><td><code>int</code></td><td><code>5000</code></td><td>Tope de archivos a los que se calcula el hash cuando hash_archivos está activo.</td></tr>
 
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -1368,7 +1368,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-search_bce_remesas" data-search="search_bce_remesas lista los enlaces directos a archivos de remesas de trabajadores del bce. lista los enlaces directos a archivos de remesas de trabajadores del bce. una serie separada de bcedata/iem (search_indicadores_bce, search_bce_iem): la serie agregada de flujos, la serie histórica completa, una nota metodológica para el usuario, y — desde un cambio a recolección basada en microdatos en julio de 2025 — bases de datos (bdd) agregadas mensuales y por entidad. trata los archivos &quot;histórica&quot; (previo al cambio) y &quot;bdd&quot; (posterior al cambio) como series metodológicamente distintas, no como una sola continua — revisa la nota al usuario (nota_al_usuario) para el detalle de comparabilidad. devuelve urls directas, no el contenido de los archivos — descárgalos tú mismo o vía download_resource. query free text matched against the file's label or url (accent-insensitive), e.g. &quot;historica&quot;, &quot;entidad&quot;, &quot;bdd&quot;. empty returns all files. format text | json">
+<details class="atlas-tool" id="tool-search_bce_remesas" data-search="search_bce_remesas lista los enlaces directos a archivos de remesas de trabajadores del bce. lista los enlaces directos a archivos de remesas de trabajadores del bce. una serie separada de bcedata/iem (search_indicadores_bce, search_bce_iem): la serie agregada de flujos, la serie histórica completa, una nota metodológica para el usuario, y — desde un cambio a recolección basada en microdatos en julio de 2025 — bases de datos (bdd) agregadas mensuales y por entidad. trata los archivos &quot;histórica&quot; (previo al cambio) y &quot;bdd&quot; (posterior al cambio) como series metodológicamente distintas, no como una sola continua — revisa la nota al usuario (nota_al_usuario) para el detalle de comparabilidad. devuelve urls directas, no el contenido de los archivos — descárgalos tú mismo o vía download_resource. query texto libre que se busca, sin distinguir tildes, en la etiqueta o url del archivo, p. ej. &quot;historica&quot;, &quot;entidad&quot;, &quot;bdd&quot;. vacío devuelve todos. format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_bce_remesas</code>
 <span class="atlas-tool-desc">Lista los enlaces directos a archivos de Remesas de Trabajadores del BCE.</span>
@@ -1380,7 +1380,7 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Free text matched against the file's label or URL (accent-insensitive), e.g. "historica", "entidad", "bdd". Empty returns all files.</td></tr>
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre que se busca, sin distinguir tildes, en la etiqueta o URL del archivo, p. ej. "historica", "entidad", "bdd". Vacío devuelve todos.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
@@ -1556,7 +1556,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_inec_publicacion_archivos" data-search="get_inec_publicacion_archivos lista los enlaces directos a archivos (pdf/xlsx/csv/zip) incrustados en una publicación del inec encontrada vía search_inec_publicaciones. lista los enlaces directos a archivos (pdf/xlsx/csv/zip) incrustados en una publicación del inec encontrada vía search_inec_publicaciones. post either the numeric &quot;id&quot; from search_inec_publicaciones, or the publication's full ecuadorencifras.gob.ec url. format text | json">
+<details class="atlas-tool" id="tool-get_inec_publicacion_archivos" data-search="get_inec_publicacion_archivos lista los enlaces directos a archivos (pdf/xlsx/csv/zip) incrustados en una publicación del inec encontrada vía search_inec_publicaciones. lista los enlaces directos a archivos (pdf/xlsx/csv/zip) incrustados en una publicación del inec encontrada vía search_inec_publicaciones. post el &quot;id&quot; numérico de search_inec_publicaciones, o la url completa de la publicación en ecuadorencifras.gob.ec. format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_inec_publicacion_archivos</code>
 <span class="atlas-tool-desc">Lista los enlaces directos a archivos (PDF/XLSX/CSV/ZIP) incrustados en una publicación del INEC encontrada vía search_inec_publicaciones.</span>
@@ -1568,7 +1568,7 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>post</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Either the numeric "id" from search_inec_publicaciones, or the publication's full ecuadorencifras.gob.ec URL.</td></tr>
+<tr><td><code>post</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El "id" numérico de search_inec_publicaciones, o la URL completa de la publicación en ecuadorencifras.gob.ec.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
@@ -1578,7 +1578,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-search_biinec_extras" data-search="search_biinec_extras revisa el biinec (&quot;banco de datos abiertos&quot;) del inec en busca de datos que no aparecen en search_anda ni en search_inec_estadisticas. revisa el biinec (&quot;banco de datos abiertos&quot;) del inec en busca de datos que no aparecen en search_anda ni en search_inec_estadisticas. último recurso para consultas de inec: biinec (aplicaciones3.ecuadorencifras.gob.ec) en su mayoría duplica anda y ecuador en cifras, así que este tool no scrapea ni busca en biinec en vivo — es una lista pequeña y verificada a mano de los pocos registros confirmados que existen solo ahí (módulos ambientales/administrativos, ej. desechos peligrosos en establecimientos de salud, módulos ambientales de enemdu/ecv). si tu búsqueda no coincide con nada aquí, eso no significa que biinec no tenga nada — significa que no valía la pena automatizarlo; busca directamente en el buscador propio del sitio. query free text matched against the registry's name/description (accent-insensitive). empty returns the full curated list. format text | json">
+<details class="atlas-tool" id="tool-search_biinec_extras" data-search="search_biinec_extras revisa el biinec (&quot;banco de datos abiertos&quot;) del inec en busca de datos que no aparecen en search_anda ni en search_inec_estadisticas. revisa el biinec (&quot;banco de datos abiertos&quot;) del inec en busca de datos que no aparecen en search_anda ni en search_inec_estadisticas. último recurso para consultas de inec: biinec (aplicaciones3.ecuadorencifras.gob.ec) en su mayoría duplica anda y ecuador en cifras, así que este tool no scrapea ni busca en biinec en vivo — es una lista pequeña y verificada a mano de los pocos registros confirmados que existen solo ahí (módulos ambientales/administrativos, ej. desechos peligrosos en establecimientos de salud, módulos ambientales de enemdu/ecv). si tu búsqueda no coincide con nada aquí, eso no significa que biinec no tenga nada — significa que no valía la pena automatizarlo; busca directamente en el buscador propio del sitio. query texto libre que se busca, sin distinguir tildes, en el nombre o descripción del registro. vacío devuelve la lista curada completa. format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_biinec_extras</code>
 <span class="atlas-tool-desc">Revisa el BIINEC ("Banco de Datos Abiertos") del INEC en busca de datos que no aparecen en search_anda ni en search_inec_estadisticas.</span>
@@ -1590,7 +1590,7 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Free text matched against the registry's name/description (accent-insensitive). Empty returns the full curated list.</td></tr>
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre que se busca, sin distinguir tildes, en el nombre o descripción del registro. Vacío devuelve la lista curada completa.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
@@ -1720,7 +1720,7 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-get_contraloria_informe" data-search="get_contraloria_informe descarga y previsualiza un documento de la contraloría (datos abiertos o plan anual de control). descarga y previsualiza un documento de la contraloría (datos abiertos o plan anual de control). obtén informe_id desde list_contraloria_informes. los documentos trimestrales &quot;datos abiertos&quot; devuelven una fila por cada informe de auditoría aprobado ese trimestre, para cualquier institución pública del país. los documentos &quot;plan anual de control&quot; son pdfs (uno por año); esto devuelve su metadata y te dirige a read_pdf en vez de una tabla. informe_id an id from list_contraloria_informes rows number of data rows to preview (default: 50, max: 200) format text | json">
+<details class="atlas-tool" id="tool-get_contraloria_informe" data-search="get_contraloria_informe descarga y previsualiza un documento de la contraloría (datos abiertos o plan anual de control). descarga y previsualiza un documento de la contraloría (datos abiertos o plan anual de control). obtén informe_id desde list_contraloria_informes. los documentos trimestrales &quot;datos abiertos&quot; devuelven una fila por cada informe de auditoría aprobado ese trimestre, para cualquier institución pública del país. los documentos &quot;plan anual de control&quot; son pdfs (uno por año); esto devuelve su metadata y te dirige a read_pdf en vez de una tabla. informe_id an id from list_contraloria_informes rows número de filas de datos a mostrar (default 50, máx. 200). format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_contraloria_informe</code>
 <span class="atlas-tool-desc">Descarga y previsualiza un documento de la Contraloría (Datos Abiertos o Plan Anual de Control).</span>
@@ -1734,7 +1734,7 @@
 
 <tr><td><code>informe_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>An id from list_contraloria_informes</td></tr>
 
-<tr><td><code>rows</code></td><td><code>int</code></td><td><code>50</code></td><td>Number of data rows to preview (default: 50, max: 200)</td></tr>
+<tr><td><code>rows</code></td><td><code>int</code></td><td><code>50</code></td><td>Número de filas de datos a mostrar (default 50, máx. 200).</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
@@ -2078,13 +2078,13 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-investigate_dataset" data-search="investigate_dataset atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de &quot;encuéntrame datos sobre x y muéstrame qué hay dentro&quot; atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de &quot;encuéntrame datos sobre x y muéstrame qué hay dentro&quot;. elige el resultado de búsqueda mejor rankeado y, entre sus recursos, el primero en un formato que este servidor puede parsear a una tabla (csv/json/xls/xlsx/ods/zip/targz), saltando los ilegibles (.rar, formatos no reconocidos) en vez de previsualizar el que aparezca primero en la lista. no reemplaza a los tools individuales: si el resultado top no es el dataset correcto, o necesitas un recurso específico dentro de él, usa search_datasets/list_dataset_resources/preview_resource_data directamente en vez de repetir esta llamada. query palabras clave de búsqueda (ej. &quot;empleo&quot;, &quot;sri recaudación&quot;) source &quot;nacional&quot; (default), &quot;cuenca&quot; (portal municipal de cuenca), &quot;latacunga&quot; (portal municipal de latacunga) o &quot;iadb&quot; (portal del bid, no exclusivo de ecuador) preview_rows filas de datos a previsualizar del recurso elegido (default: 10, máx.: 50) format text | json">
+<details class="atlas-tool" id="tool-investigate_dataset" data-search="investigate_dataset atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de &quot;encuéntrame datos sobre x y muéstrame qué hay dentro&quot; atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de &quot;encuéntrame datos sobre x y muéstrame qué hay dentro&quot;. elige el resultado de búsqueda mejor rankeado y, entre sus recursos, el primero en un formato que este servidor puede parsear a una tabla (csv/json/xls/xlsx/xlsb/ods/zip/targz), saltando los ilegibles (.rar, formatos no reconocidos) en vez de previsualizar el que aparezca primero en la lista. no reemplaza a los tools individuales: si el resultado top no es el dataset correcto, o necesitas un recurso específico dentro de él, usa search_datasets/list_dataset_resources/preview_resource_data directamente en vez de repetir esta llamada. query palabras clave de búsqueda (ej. &quot;empleo&quot;, &quot;sri recaudación&quot;) source &quot;nacional&quot; (default), &quot;cuenca&quot; (portal municipal de cuenca), &quot;latacunga&quot; (portal municipal de latacunga) o &quot;iadb&quot; (portal del bid, no exclusivo de ecuador) preview_rows filas de datos a previsualizar del recurso elegido (default: 10, máx.: 50) format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">investigate_dataset</code>
 <span class="atlas-tool-desc">Atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de "encuéntrame datos sobre X y muéstrame qué hay dentro"</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de "encuéntrame datos sobre X y muéstrame qué hay dentro". Elige el resultado de búsqueda mejor rankeado y, entre sus recursos, el primero en un formato que este servidor puede parsear a una tabla (CSV/JSON/XLS/XLSX/ODS/ZIP/TARGZ), saltando los ilegibles (.rar, formatos no reconocidos) en vez de previsualizar el que aparezca primero en la lista. No reemplaza a los tools individuales: si el resultado top no es el dataset correcto, o necesitas un recurso específico dentro de él, usa search_datasets/list_dataset_resources/preview_resource_data directamente en vez de repetir esta llamada.</p>
+<p class="atlas-tool-long">Atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de "encuéntrame datos sobre X y muéstrame qué hay dentro". Elige el resultado de búsqueda mejor rankeado y, entre sus recursos, el primero en un formato que este servidor puede parsear a una tabla (CSV/JSON/XLS/XLSX/XLSB/ODS/ZIP/TARGZ), saltando los ilegibles (.rar, formatos no reconocidos) en vez de previsualizar el que aparezca primero en la lista. No reemplaza a los tools individuales: si el resultado top no es el dataset correcto, o necesitas un recurso específico dentro de él, usa search_datasets/list_dataset_resources/preview_resource_data directamente en vez de repetir esta llamada.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
@@ -2104,13 +2104,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-list_zip_contents" data-search="list_zip_contents lista los archivos miembro (nombre, tamaño) de un .zip desde una url directa, sin descargar el archivo completo. lista los archivos miembro (nombre, tamaño) de un .zip desde una url directa, sin descargar el archivo completo. lee solo el registro end of central directory y el directorio central vía peticiones http range, así que funciona para archivos mucho más grandes que el tope de 5 mb de preview_zip/download_resource -- ej. zips de microdatos de inec o del censo de varios cientos de mb. requiere que el servidor respete peticiones range; falla con un error claro si no. no soporta archivos zip64. listar los nombres es barato de esta forma, pero previsualizar las filas de un miembro específico no lo es (igual hay que descomprimir desde el offset de ese miembro en adelante) -- este tool solo lista metadata. url url directa a un archivo .zip (del resultado de otro tool, ej. get_inec_publicacion_archivos, search_archivos). limit máximo de miembros devueltos (default 200, máx. 1000). offset desplazamiento de paginación sobre la lista de miembros. format text | json">
+<details class="atlas-tool" id="tool-list_zip_contents" data-search="list_zip_contents lista los archivos miembro (nombre, tamaño) de un .zip desde una url directa, sin descargar el archivo completo. lista los archivos miembro (nombre, tamaño) de un .zip desde una url directa, sin descargar el archivo completo. lee solo el registro end of central directory y el directorio central vía peticiones http range, así que funciona para archivos mucho más grandes que el tope de 5 mb de preview_resource_data/download_resource -- ej. zips de microdatos de inec o del censo de varios cientos de mb. requiere que el servidor respete peticiones range; falla con un error claro si no. no soporta archivos zip64. listar los nombres es barato de esta forma, pero previsualizar las filas de un miembro específico no lo es (igual hay que descomprimir desde el offset de ese miembro en adelante) -- este tool solo lista metadata. url url directa a un archivo .zip (del resultado de otro tool, ej. get_inec_publicacion_archivos, search_archivos). limit máximo de miembros devueltos (default 200, máx. 1000). offset desplazamiento de paginación sobre la lista de miembros. format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">list_zip_contents</code>
 <span class="atlas-tool-desc">Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo. Lee solo el registro End Of Central Directory y el directorio central vía peticiones HTTP Range, así que funciona para archivos mucho más grandes que el tope de 5 MB de preview_zip/download_resource -- ej. ZIPs de microdatos de INEC o del censo de varios cientos de MB. Requiere que el servidor respete peticiones Range; falla con un error claro si no. No soporta archivos ZIP64. Listar los nombres es barato de esta forma, pero previsualizar las filas de un miembro específico no lo es (igual hay que descomprimir desde el offset de ese miembro en adelante) -- este tool solo lista metadata.</p>
+<p class="atlas-tool-long">Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo. Lee solo el registro End Of Central Directory y el directorio central vía peticiones HTTP Range, así que funciona para archivos mucho más grandes que el tope de 5 MB de preview_resource_data/download_resource -- ej. ZIPs de microdatos de INEC o del censo de varios cientos de MB. Requiere que el servidor respete peticiones Range; falla con un error claro si no. No soporta archivos ZIP64. Listar los nombres es barato de esta forma, pero previsualizar las filas de un miembro específico no lo es (igual hay que descomprimir desde el offset de ese miembro en adelante) -- este tool solo lista metadata.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>

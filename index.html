@@ -161,7 +161,7 @@
 <div class="chat-bubble user">¿Cuánto cuesta el pasaporte y qué piden?</div>
 <div class="chat-bubble assistant">
 <span class="chat-tool">tool · get_tramite_info</span>
-<p>Para mayores de 18 años el pasaporte electrónico cuesta <strong>USD 90</strong>, sin IVA. La tercera edad paga la mitad. Con discapacidad del 30% o más, no se paga.</p>
+<p>El trámite tiene costo, salvo con discapacidad del 30% o más, que <strong>no paga</strong>. El monto lo fija el Registro Civil: confírmalo en la fuente enlazada.</p>
 <pre class="chat-code">comprobante de pago
 cédula vigente
 pasaporte anterior, si sigue vigente</pre>
@@ -179,7 +179,7 @@ pasaporte anterior, si sigue vigente</pre>
     "label": "Pasaporte",
     "turns": [
       {"role": "user", "text": "¿Cuánto cuesta el pasaporte y qué piden?"},
-      {"role": "assistant", "tool": "get_tramite_info", "text": "Para mayores de 18 años el pasaporte electrónico cuesta USD 90, sin IVA. La tercera edad paga la mitad. Con discapacidad del 30% o más, no se paga.", "html": "Para mayores de 18 años el pasaporte electrónico cuesta <strong>USD 90</strong>, sin IVA. La tercera edad paga la mitad. Con discapacidad del 30% o más, no se paga.", "code": "comprobante de pago\ncédula vigente\npasaporte anterior, si sigue vigente", "cite": "fuente · gob.ec, Registro Civil"}
+      {"role": "assistant", "tool": "get_tramite_info", "text": "El trámite tiene costo, salvo con discapacidad del 30% o más, que no paga. El monto lo fija el Registro Civil: confírmalo en la fuente enlazada.", "html": "El trámite tiene costo, salvo con discapacidad del 30% o más, que <strong>no paga</strong>. El monto lo fija el Registro Civil: confírmalo en la fuente enlazada.", "code": "comprobante de pago\ncédula vigente\npasaporte anterior, si sigue vigente", "cite": "fuente · gob.ec, Registro Civil"}
     ]
   },
   {
@@ -229,10 +229,9 @@ pasaporte anterior, si sigue vigente</pre>
 </div>
 </div>
 <div class="hero-stats">
-<div class="hero-stat"><span class="num">1,581</span><span class="label">datasets</span></div>
 <div class="hero-stat"><span class="num">90</span><span class="label">tools MCP</span></div>
-<div class="hero-stat"><span class="num">56</span><span class="label">fuentes oficiales</span></div>
-<div class="hero-stat"><span class="num">0</span><span class="label">API keys</span></div>
+<div class="hero-stat"><span class="num">59</span><span class="label">fuentes oficiales</span></div>
+<div class="hero-stat"><span class="num">0</span><span class="label">API keys de fuentes</span></div>
 </div>
 <div class="source-cloud" aria-label="Instituciones conectadas">
 <span class="source-pill">BCE</span>
@@ -291,8 +290,8 @@ pasaporte anterior, si sigue vigente</pre>
 <section class="landing">
 <div class="container-page">
 <p class="kicker">¿Qué puedes preguntar?</p>
-<h2 class="section-title">Nunca antes había sido tan fácil navegar los datos sobre Ecuador.</h2>
-<p class="section-lede">56 fuentes oficiales, en una sola conversación.</p>
+<h2 class="section-title">Pregunta en lenguaje natural, sin buscar portal por portal.</h2>
+<p class="section-lede">59 fuentes oficiales, en una sola conversación.</p>
 <div class="questions-grid">
 
 <div class="question-card">&ldquo;¿Qué datos tiene el SRI sobre recaudación tributaria?&rdquo;</div>
@@ -319,11 +318,11 @@ pasaporte anterior, si sigue vigente</pre>
 <div class="container-page" id="fuentes">
 <p class="kicker">Fuentes</p>
 <h2 class="section-title">Datos oficiales, siempre citados.</h2>
-<p class="section-lede">EcuDataMCP no copia ni almacena estos catálogos: cada consulta va en vivo contra el portal de origen. 56 fuentes agrupadas por tema — Banco Central, SRI, INEC, Supercías, Superbancos y más — cada una con su institución de origen.</p>
+<p class="section-lede">EcuDataMCP no copia ni almacena estos catálogos: cada consulta va en vivo contra el portal de origen. 59 fuentes agrupadas por tema — Banco Central, SRI, INEC, Supercías, Superbancos y más — cada una con su institución de origen.</p>
 <div class="tools-summary">
 <span class="tool-chip">Catálogos de datos abiertos</span><span class="tool-chip">Trámites, regulaciones y contratación pública</span><span class="tool-chip">Riesgos y desastres naturales</span><span class="tool-chip">Economía y finanzas</span><span class="tool-chip">Estadísticas y demografía</span><span class="tool-chip">Agricultura</span><span class="tool-chip">Energía</span><span class="tool-chip">Trabajo y empleo</span><span class="tool-chip">Control y transparencia</span><span class="tool-chip">Transporte y aviación civil</span><span class="tool-chip">Salud</span><span class="tool-chip">Telecomunicaciones</span><span class="tool-chip">Fuentes internacionales con foco Ecuador</span>
 </div>
-<a class="btn-cta secondary" href="fuentes.html">Ver las 56 fuentes agrupadas &rarr;</a>
+<a class="btn-cta secondary" href="fuentes.html">Ver las 59 fuentes agrupadas &rarr;</a>
 </div>
 </section>
 
@@ -417,7 +416,7 @@ pasaporte anterior, si sigue vigente</pre>
 <div class="container-page">
 <p class="kicker">Conecta tu asistente</p>
 <h2 class="section-title">Copia la configuración de tu cliente.</h2>
-<p class="section-lede">Corre el servidor localmente (Docker o <code>uv run</code>, ver el <a href="https://github.com/DweskZ/EcuDataMCP#ejecutar-localmente" target="_blank" rel="noopener">README</a>) y apunta tu cliente MCP a <code>http://localhost:8000/mcp</code>.</p>
+<p class="section-lede">Corre el servidor localmente (Docker o <code>uv run</code>, ver el <a href="https://github.com/DweskZ/EcuDataMCP#ejecutar-localmente" target="_blank" rel="noopener">README</a>) y apunta tu cliente MCP a <code>http://localhost:8000/mcp</code>. El compose de Docker exige un token: define <code>MCP_AUTH_TOKEN</code> (o <code>MCP_REQUIRE_AUTH=0</code> solo en local). Para un cliente local por stdio, lo más simple es <code>uvx ecuador-mcp --transport stdio</code>.</p>
 <div class="install-bar">
 <span class="install-label">Inicio rápido</span>
 <div class="code-block install-code">
@@ -608,12 +607,12 @@ Verifica que el servidor responda antes de darlo por terminado.</code></pre>
 <section class="landing">
 <div class="container-page">
 <p class="kicker">Sin fricción</p>
-<h2 class="section-title">Listo para usar, sin trámite propio.</h2>
+<h2 class="section-title">Listo para usar, sin registros.</h2>
 <ul class="friction-list">
-<li><strong>Sin API key</strong>Todas las fuentes son datos públicos, sin autenticación.</li>
+<li><strong>Sin API key</strong>Todas las fuentes son datos públicos, sin autenticación. (El endpoint HTTP puede protegerse con tu propio token, <code>MCP_AUTH_TOKEN</code>.)</li>
 <li><strong>Sin cuenta</strong>No hay registro ni cuenta de usuario que crear.</li>
 <li><strong>100% datos públicos</strong>Bajo licencia abierta, tal como los publica el Estado ecuatoriano.</li>
-<li><strong>Sin telemetría</strong>El servidor corre en tu máquina y no registra ni envía ninguna de tus consultas.</li>
+<li><strong>Sin telemetría</strong>El servidor corre en tu máquina y no envía tus consultas a nadie; solo lleva contadores locales de uso por tool (nunca los argumentos).</li>
 </ul>
 </div>
 </section>
@@ -644,7 +643,7 @@ Verifica que el servidor responda antes de darlo por terminado.</code></pre>
 </details>
 <details class="faq-item">
 <summary>¿El servidor guarda mis preguntas?</summary>
-<p>No hay telemetría. El servidor corre localmente en tu máquina y cada consulta va directo del cliente MCP al portal oficial correspondiente.</p>
+<p>No hay telemetría externa. El servidor corre localmente en tu máquina y cada consulta va directo del cliente MCP al portal oficial correspondiente. Lo único que se registra son contadores locales de uso por tool (nombre, resultado y duración, nunca los argumentos).</p>
 </details>
 <details class="faq-item">
 <summary>¿Qué formatos soporta?</summary>

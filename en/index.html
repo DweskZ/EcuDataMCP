@@ -161,7 +161,7 @@
 <div class="chat-bubble user">How much does a passport cost, and what do they ask for?</div>
 <div class="chat-bubble assistant">
 <span class="chat-tool">tool · get_tramite_info</span>
-<p>For adults the electronic passport costs <strong>USD 90</strong>, with no VAT. Seniors pay half. A disability of 30% or more means no fee.</p>
+<p>The procedure has a fee, except with a disability of 30% or more, which <strong>pays nothing</strong>. The Registro Civil sets the amount: confirm it at the linked source.</p>
 <pre class="chat-code">proof of payment
 valid ID card
 previous passport, if it is still valid</pre>
@@ -179,7 +179,7 @@ previous passport, if it is still valid</pre>
     "label": "Passport",
     "turns": [
       {"role": "user", "text": "How much does a passport cost, and what do they ask for?"},
-      {"role": "assistant", "tool": "get_tramite_info", "text": "For adults the electronic passport costs USD 90, with no VAT. Seniors pay half. A disability of 30% or more means no fee.", "html": "For adults the electronic passport costs <strong>USD 90</strong>, with no VAT. Seniors pay half. A disability of 30% or more means no fee.", "code": "proof of payment\nvalid ID card\nprevious passport, if it is still valid", "cite": "source · gob.ec, Civil Registry"}
+      {"role": "assistant", "tool": "get_tramite_info", "text": "The procedure has a fee, except with a disability of 30% or more, which pays nothing. The Registro Civil sets the amount: confirm it at the linked source.", "html": "The procedure has a fee, except with a disability of 30% or more, which <strong>pays nothing</strong>. The Registro Civil sets the amount: confirm it at the linked source.", "code": "proof of payment\nvalid ID card\nprevious passport, if it is still valid", "cite": "source · gob.ec, Civil Registry"}
     ]
   },
   {
@@ -229,10 +229,9 @@ previous passport, if it is still valid</pre>
 </div>
 </div>
 <div class="hero-stats">
-<div class="hero-stat"><span class="num">1,581</span><span class="label">datasets</span></div>
 <div class="hero-stat"><span class="num">90</span><span class="label">MCP tools</span></div>
-<div class="hero-stat"><span class="num">56</span><span class="label">official sources</span></div>
-<div class="hero-stat"><span class="num">0</span><span class="label">API keys</span></div>
+<div class="hero-stat"><span class="num">59</span><span class="label">official sources</span></div>
+<div class="hero-stat"><span class="num">0</span><span class="label">source API keys</span></div>
 </div>
 <div class="source-cloud" aria-label="Connected institutions">
 <span class="source-pill">BCE</span>
@@ -291,8 +290,8 @@ previous passport, if it is still valid</pre>
 <section class="landing">
 <div class="container-page">
 <p class="kicker">What can you ask?</p>
-<h2 class="section-title">It has never been this easy to navigate Ecuador's data.</h2>
-<p class="section-lede">56 official sources, in a single conversation.</p>
+<h2 class="section-title">Ask in plain language, without searching portal by portal.</h2>
+<p class="section-lede">59 official sources, in a single conversation.</p>
 <div class="questions-grid">
 
 <div class="question-card">&ldquo;What data does the SRI have on tax collection?&rdquo;</div>
@@ -319,11 +318,11 @@ previous passport, if it is still valid</pre>
 <div class="container-page" id="sources">
 <p class="kicker">Sources</p>
 <h2 class="section-title">Official data, always cited.</h2>
-<p class="section-lede">EcuDataMCP never copies or stores these catalogs: every query goes live against the source portal. 56 sources grouped by theme — Central Bank, SRI, INEC, Supercías, Superbancos and more — each tied to its own institution.</p>
+<p class="section-lede">EcuDataMCP never copies or stores these catalogs: every query goes live against the source portal. 59 sources grouped by theme — Central Bank, SRI, INEC, Supercías, Superbancos and more — each tied to its own institution.</p>
 <div class="tools-summary">
 <span class="tool-chip">Open data catalogs</span><span class="tool-chip">Procedures, regulations & public procurement</span><span class="tool-chip">Risk & natural hazards</span><span class="tool-chip">Economy & finance</span><span class="tool-chip">Statistics & demographics</span><span class="tool-chip">Agriculture</span><span class="tool-chip">Energy</span><span class="tool-chip">Labour & employment</span><span class="tool-chip">Oversight & transparency</span><span class="tool-chip">Transport & civil aviation</span><span class="tool-chip">Health</span><span class="tool-chip">Telecommunications</span><span class="tool-chip">International sources with an Ecuador angle</span>
 </div>
-<a class="btn-cta secondary" href="fuentes.html">See the 56 sources, grouped &rarr;</a>
+<a class="btn-cta secondary" href="fuentes.html">See the 59 sources, grouped &rarr;</a>
 </div>
 </section>
 
@@ -417,7 +416,7 @@ previous passport, if it is still valid</pre>
 <div class="container-page">
 <p class="kicker">Connect your assistant</p>
 <h2 class="section-title">Copy your client's configuration.</h2>
-<p class="section-lede">Run the server locally (Docker or <code>uv run</code>, see the <a href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">README</a>) and point your MCP client at <code>http://localhost:8000/mcp</code>.</p>
+<p class="section-lede">Run the server locally (Docker or <code>uv run</code>, see the <a href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">README</a>) and point your MCP client at <code>http://localhost:8000/mcp</code>. The Docker compose file requires a token: set <code>MCP_AUTH_TOKEN</code> (or <code>MCP_REQUIRE_AUTH=0</code> for local use only). For a local stdio client, the simplest option is <code>uvx ecuador-mcp --transport stdio</code>.</p>
 <div class="install-bar">
 <span class="install-label">Quick start</span>
 <div class="code-block install-code">
@@ -610,10 +609,10 @@ Verify the server responds before calling it done.</code></pre>
 <p class="kicker">No friction</p>
 <h2 class="section-title">Ready to use, no setup of your own.</h2>
 <ul class="friction-list">
-<li><strong>No API key</strong>All sources are public data, no authentication.</li>
+<li><strong>No API key</strong>All sources are public data, no authentication. (The HTTP endpoint can be protected with your own token, <code>MCP_AUTH_TOKEN</code>.)</li>
 <li><strong>No account</strong>There is no sign-up or user account to create.</li>
 <li><strong>100% public data</strong>Under an open license, exactly as the Ecuadorian state publishes it.</li>
-<li><strong>No telemetry</strong>The server runs on your machine and never logs or sends any of your queries.</li>
+<li><strong>No telemetry</strong>The server runs on your machine and sends your queries to no one; it only keeps local per-tool usage counters (never the arguments).</li>
 </ul>
 </div>
 </section>
@@ -644,7 +643,7 @@ Verify the server responds before calling it done.</code></pre>
 </details>
 <details class="faq-item">
 <summary>Does the server store my questions?</summary>
-<p>There is no telemetry. The server runs locally on your machine, and every query goes straight from the MCP client to the matching official portal.</p>
+<p>There is no external telemetry. The server runs locally on your machine, and every query goes straight from the MCP client to the matching official portal. The only thing recorded is local per-tool usage counters (name, outcome and duration, never the arguments).</p>
 </details>
 <details class="faq-item">
 <summary>What formats does it support?</summary>

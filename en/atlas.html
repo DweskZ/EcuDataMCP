@@ -230,7 +230,7 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-search_datasets" data-search="search_datasets search datasets by keyword. supports filtering by category. search for datasets on ecuador's open data portal (www.datosabiertos.gob.ec). this is the starting point for exploring government data from 98+ public institutions. use short, specific queries in spanish for best results. typical workflow: search_datasets → list_dataset_resources → preview_resource_data query search keywords (e.g. &quot;empleo&quot;, &quot;salud&quot;, &quot;presupuesto&quot;, &quot;sri recaudación&quot;) page page number (1-based, default: 1) page_size results per page (default: 20, max: 100) category optional category filter (e.g. &quot;sal&quot; for salud, &quot;edu&quot; for educación). use list_categories to see all available categories. sort result order (a ckan sort field, e.g. `metadata_modified desc`). source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, independent municipal portal), or &quot;iadb&quot; (data.iadb.org, iadb's open-data portal — not ecuador-only, a regional/global catalog: latin macro watch and world bank/iadb indicators) format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-search_datasets" data-search="search_datasets search datasets by keyword. supports filtering by category. search for datasets on ecuador's open data portal (www.datosabiertos.gob.ec). this is the starting point for exploring government data from 98+ public institutions. use short, specific queries in spanish for best results. typical workflow: search_datasets → list_dataset_resources → preview_resource_data query search keywords (e.g. &quot;empleo&quot;, &quot;salud&quot;, &quot;presupuesto&quot;, &quot;sri recaudación&quot;) page page number (1-based, default: 1) page_size results per page (default: 20, max: 100) category optional category filter (e.g. &quot;sal&quot; for salud, &quot;edu&quot; for educación). use list_categories to see all available categories. sort `relevance` (default, ckan's own ranking) or `recent` (newest first by metadata_modified; works without a query to discover new or freshly refreshed datasets). source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, independent municipal portal), or &quot;iadb&quot; (data.iadb.org, iadb's open-data portal — not ecuador-only, a regional/global catalog: latin macro watch and world bank/iadb indicators) format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_datasets</code>
 <span class="atlas-tool-desc">Search datasets by keyword. Supports filtering by category.</span>
@@ -250,7 +250,7 @@
 
 <tr><td><code>category</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional category filter (e.g. "sal" for Salud, "edu" for Educación). Use list_categories to see all available categories.</td></tr>
 
-<tr><td><code>sort</code></td><td><code>Literal['relevance', 'recent']</code></td><td><code>relevance</code></td><td>Result order (a CKAN sort field, e.g. `metadata_modified desc`).</td></tr>
+<tr><td><code>sort</code></td><td><code>Literal['relevance', 'recent']</code></td><td><code>relevance</code></td><td>`relevance` (default, CKAN's own ranking) or `recent` (newest first by metadata_modified; works without a query to discover new or freshly refreshed datasets).</td></tr>
 
 <tr><td><code>source</code></td><td><code>ckan_client.CkanSource</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, independent municipal portal), "latacunga" (datosabiertos.latacunga.gob.ec, independent municipal portal), or "iadb" (data.iadb.org, IADB's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch and World Bank/IADB indicators)</td></tr>
 
@@ -334,13 +334,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-preview_resource_data" data-search="preview_resource_data preview of csv/tsv, json/geojson, or excel (xls/xlsx) as a table (max 5 mb). download and preview a resource from ecuador's open data portal. supports csv/tsv, json/geojson and excel (xlsx). returns the first n rows as a formatted table so the model can inspect data without a local download. geometry/wkt columns are dropped from the table (they can be tens of kb per cell); csv columns in european decimal notation (7.760,2) are normalized to standard notation (7760.2). max download size: 5 mb. for large tabular datastore resources prefer query_resource_data. resource_id the resource uuid (get it from list_dataset_resources) rows number of data rows to preview (default: 20, max: 100) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, independent municipal portal), or &quot;iadb&quot; (data.iadb.org, iadb's open-data portal — not ecuador-only, a regional/global catalog: latin macro watch and world bank/iadb indicators) format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-preview_resource_data" data-search="preview_resource_data preview csv/tsv, json/geojson, excel (xls/xlsx/xlsb), ods or a zip/tar.gz wrapping a csv as a table (max 5 mb). download and preview a resource from ecuador's open data portal. supports csv/tsv, json/geojson, excel (xls/xlsx/xlsb), ods, and .zip or .tar.gz wrapping a csv/tsv/txt. returns the first n rows as a formatted table so the model can inspect data without a local download. geometry/wkt columns are dropped from the table (they can be tens of kb per cell); csv columns in european decimal notation (7.760,2) are normalized to standard notation (7760.2). max download size: 5 mb. for large tabular datastore resources prefer query_resource_data. resource_id the resource uuid (get it from list_dataset_resources) rows number of data rows to preview (default: 20, max: 100) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, independent municipal portal), or &quot;iadb&quot; (data.iadb.org, iadb's open-data portal — not ecuador-only, a regional/global catalog: latin macro watch and world bank/iadb indicators) format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">preview_resource_data</code>
-<span class="atlas-tool-desc">Preview of CSV/TSV, JSON/GeoJSON, or Excel (XLS/XLSX) as a table (max 5 MB).</span>
+<span class="atlas-tool-desc">Preview CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX/XLSB), ODS or a ZIP/tar.gz wrapping a CSV as a table (max 5 MB).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Download and preview a resource from Ecuador's open data portal. Supports CSV/TSV, JSON/GeoJSON and Excel (XLSX). Returns the first N rows as a formatted table so the model can inspect data without a local download. Geometry/WKT columns are dropped from the table (they can be tens of KB per cell); CSV columns in European decimal notation (7.760,2) are normalized to standard notation (7760.2). Max download size: 5 MB. For large tabular DataStore resources prefer query_resource_data.</p>
+<p class="atlas-tool-long">Download and preview a resource from Ecuador's open data portal. Supports CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX/XLSB), ODS, and .zip or .tar.gz wrapping a CSV/TSV/TXT. Returns the first N rows as a formatted table so the model can inspect data without a local download. Geometry/WKT columns are dropped from the table (they can be tens of KB per cell); CSV columns in European decimal notation (7.760,2) are normalized to standard notation (7760.2). Max download size: 5 MB. For large tabular DataStore resources prefer query_resource_data.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
@@ -360,13 +360,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-download_resource" data-search="download_resource downloads the raw file of a resource as base64 (max 5 mb), for formats that can't be previewed as a table (.rar, .tar.gz, etc.). download a resource's raw bytes from ecuador's open data portal, base64-encoded. use this for formats preview_resource_data can't parse into a table (.rar, .tar.gz, legacy .xls, or anything unrecognized) — it fetches the file as-is instead of trying to read it. max size: 5 mb (same cap as preview_resource_data). larger files come back with an error and the direct url instead, since they'd be too big to embed in a response. call with format=&quot;json&quot; to get the actual file content — the default format=&quot;text&quot; only confirms the download and tells you to retry with json; it never includes content_base64. resource_id the resource uuid (get it from list_dataset_resources) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, independent municipal portal), or &quot;iadb&quot; (data.iadb.org, iadb's open-data portal — not ecuador-only, a regional/global catalog: latin macro watch and world bank/iadb indicators) format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-download_resource" data-search="download_resource raw base64 bytes of a resource (max 5 mb) for formats preview_resource_data can't parse (.rar or unrecognized). download a resource's raw bytes from ecuador's open data portal, base64-encoded. use this for formats preview_resource_data can't parse into a table (.rar or anything unrecognized) — it fetches the file as-is instead of trying to read it. max size: 5 mb (same cap as preview_resource_data). larger files come back with an error and the direct url instead, since they'd be too big to embed in a response. call with format=&quot;json&quot; to get the actual file content — the default format=&quot;text&quot; only confirms the download and never includes content_base64. resource_id the resource uuid (get it from list_dataset_resources) source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, independent municipal portal), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, independent municipal portal), or &quot;iadb&quot; (data.iadb.org, iadb's open-data portal — not ecuador-only, a regional/global catalog: latin macro watch and world bank/iadb indicators) format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">download_resource</code>
-<span class="atlas-tool-desc">Downloads the raw file of a resource as base64 (max 5 MB), for formats that can't be previewed as a table (.rar, .tar.gz, etc.).</span>
+<span class="atlas-tool-desc">Raw base64 bytes of a resource (max 5 MB) for formats preview_resource_data can't parse (.rar or unrecognized).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Download a resource's raw bytes from Ecuador's open data portal, base64-encoded. Use this for formats preview_resource_data can't parse into a table (.rar, .tar.gz, legacy .xls, or anything unrecognized) — it fetches the file as-is instead of trying to read it. Max size: 5 MB (same cap as preview_resource_data). Larger files come back with an error and the direct URL instead, since they'd be too big to embed in a response. Call with format="json" to get the actual file content — the default format="text" only confirms the download and tells you to retry with json; it never includes content_base64.</p>
+<p class="atlas-tool-long">Download a resource's raw bytes from Ecuador's open data portal, base64-encoded. Use this for formats preview_resource_data can't parse into a table (.rar or anything unrecognized) — it fetches the file as-is instead of trying to read it. Max size: 5 MB (same cap as preview_resource_data). Larger files come back with an error and the direct URL instead, since they'd be too big to embed in a response. Call with format="json" to get the actual file content — the default format="text" only confirms the download and never includes content_base64.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
@@ -482,10 +482,10 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_tramite_info" data-search="get_tramite_info full detail: requirements, procedure, cost, estimated time. get detailed information about a specific government procedure (trámite). returns the procedure name, description, requirements, beneficiaries, cost, and the institution responsible. get the tramite_id from search_tramites. tramite_id the procedure id (e.g. &quot;18009&quot;) format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-get_tramite_info" data-search="get_tramite_info requirements, beneficiaries, cost and responsible institution of one trámite. get detailed information about a specific government procedure (trámite). returns the procedure name, description, requirements, beneficiaries, cost, and the institution responsible. get the tramite_id from search_tramites. tramite_id the procedure id (e.g. &quot;18009&quot;) format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_tramite_info</code>
-<span class="atlas-tool-desc">Full detail: requirements, procedure, cost, estimated time.</span>
+<span class="atlas-tool-desc">Requirements, beneficiaries, cost and responsible institution of one trámite.</span>
 </summary>
 <div class="atlas-tool-body">
 <p class="atlas-tool-long">Get detailed information about a specific government procedure (trámite). Returns the procedure name, description, requirements, beneficiaries, cost, and the institution responsible. Get the tramite_id from search_tramites.</p>
@@ -778,13 +778,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-search_ranking" data-search="search_ranking rank/filter companies by financial indicators (year, ciiu, any column); requires the local financial database build. rank/filter supercías companies by financial indicators for a fiscal year. filter by year and/or ciiu level-1 economic activity (single letter, e.g. &quot;c&quot; for manufacturing), sorted by any indicator column (defaults to the dataset's own precomputed posicion_general). each result includes the company's nombre/ruc alongside its financials. covers only the last few cached fiscal years, not the full history. use get_financials for one company's full detail, or get_compania_info for legal/registry data (address, legal representative, etc.). anio optional fiscal year filter. ciiu_n1 optional ciiu level-1 filter, e.g. &quot;c&quot;, &quot;g&quot;, &quot;i&quot;. order_by column to sort ascending by (e.g. &quot;posicion_general&quot;, &quot;activos&quot;, &quot;roe&quot;). falls back to posicion_general if unknown. descending descending (default) or ascending order. limit max results (default 20, max 100). offset pagination offset. format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-search_ranking" data-search="search_ranking rank/filter companies by financial indicators (year, ciiu, any column); requires the local financial database build. rank/filter supercías companies by financial indicators for a fiscal year. filter by year and/or ciiu level-1 economic activity (single letter, e.g. &quot;c&quot; for manufacturing), sorted by any indicator column (defaults to the dataset's own precomputed posicion_general). each result includes the company's nombre/ruc alongside its financials. covers the last five fiscal years in the local build, not the full history. use get_financials for one company's full detail, or get_compania_info for legal/registry data (address, legal representative, etc.). anio optional fiscal year filter. ciiu_n1 optional ciiu level-1 filter, e.g. &quot;c&quot;, &quot;g&quot;, &quot;i&quot;. order_by column to sort ascending by (e.g. &quot;posicion_general&quot;, &quot;activos&quot;, &quot;roe&quot;). falls back to posicion_general if unknown. descending sort descending if true (default false = ascending); use it for top-n by a column such as roe. posicion_general is already ascending (1 = best), so leave it false when sorting by it. limit max results (default 20, max 100). offset pagination offset. format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_ranking</code>
 <span class="atlas-tool-desc">Rank/filter companies by financial indicators (year, CIIU, any column); requires the local financial database build.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Rank/filter Supercías companies by financial indicators for a fiscal year. Filter by year and/or CIIU level-1 economic activity (single letter, e.g. "C" for manufacturing), sorted by any indicator column (defaults to the dataset's own precomputed posicion_general). Each result includes the company's nombre/ruc alongside its financials. Covers only the last few cached fiscal years, not the full history. Use get_financials for one company's full detail, or get_compania_info for legal/registry data (address, legal representative, etc.).</p>
+<p class="atlas-tool-long">Rank/filter Supercías companies by financial indicators for a fiscal year. Filter by year and/or CIIU level-1 economic activity (single letter, e.g. "C" for manufacturing), sorted by any indicator column (defaults to the dataset's own precomputed posicion_general). Each result includes the company's nombre/ruc alongside its financials. Covers the last five fiscal years in the local build, not the full history. Use get_financials for one company's full detail, or get_compania_info for legal/registry data (address, legal representative, etc.).</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
@@ -796,7 +796,7 @@
 
 <tr><td><code>order_by</code></td><td><code>str</code></td><td><code>posicion_general</code></td><td>Column to sort ascending by (e.g. "posicion_general", "activos", "roe"). Falls back to posicion_general if unknown.</td></tr>
 
-<tr><td><code>descending</code></td><td><code>bool</code></td><td><code>False</code></td><td>Descending (default) or ascending order.</td></tr>
+<tr><td><code>descending</code></td><td><code>bool</code></td><td><code>False</code></td><td>Sort descending if true (default false = ascending); use it for top-N by a column such as roe. posicion_general is already ascending (1 = best), so leave it false when sorting by it.</td></tr>
 
 <tr><td><code>limit</code></td><td><code>int</code></td><td><code>20</code></td><td>Max results (default 20, max 100).</td></tr>
 
@@ -810,13 +810,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_financials" data-search="get_financials a company's financial history by filing number or ruc: revenue, assets, equity, ~38 ratios (liquidity, leverage, profitability). get a company's financial history from supercías balance-sheet filings. returns revenue, assets, equity, profit, employee count, and financial ratios (liquidity, leverage, profitability) per fiscal year. covers only the last few fiscal years (whatever scripts/build_supercias_financials_db.py last cached), not the full history back to 2008. complements get_compania_info, which has legal/registry data but no financials. expediente_or_ruc the company's supercías &quot;expediente&quot; number (from search_companias/get_compania_info) or its 13-digit ruc. anio optional single fiscal year filter. format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-get_financials" data-search="get_financials a company's financial history by filing number or ruc: revenue, assets, equity, ~38 ratios (liquidity, leverage, profitability). get a company's financial history from supercías balance-sheet filings. returns revenue, assets, equity, profit, employee count, and financial ratios (liquidity, leverage, profitability) per fiscal year. covers the last five fiscal years in the local build (see metadatos.base_local for its build date and year range), not the full history back to 2008. complements get_compania_info, which has legal/registry data but no financials. expediente_or_ruc the company's supercías &quot;expediente&quot; number (from search_companias/get_compania_info) or its 13-digit ruc. anio optional single fiscal year filter. format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_financials</code>
 <span class="atlas-tool-desc">A company's financial history by filing number or RUC: revenue, assets, equity, ~38 ratios (liquidity, leverage, profitability).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Get a company's financial history from Supercías balance-sheet filings. Returns revenue, assets, equity, profit, employee count, and financial ratios (liquidity, leverage, profitability) per fiscal year. Covers only the last few fiscal years (whatever scripts/build_supercias_financials_db.py last cached), not the full history back to 2008. Complements get_compania_info, which has legal/registry data but no financials.</p>
+<p class="atlas-tool-long">Get a company's financial history from Supercías balance-sheet filings. Returns revenue, assets, equity, profit, employee count, and financial ratios (liquidity, leverage, profitability) per fiscal year. Covers the last five fiscal years in the local build (see metadatos.base_local for its build date and year range), not the full history back to 2008. Complements get_compania_info, which has legal/registry data but no financials.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
@@ -1250,7 +1250,7 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-get_bce_iem_table" data-search="get_bce_iem_table inspect one official xlsx table from the latest bce iem bulletin. inspect one official xlsx table from the latest bce iem bulletin. get table_id from search_bce_iem. tables with the common bce layout (periods across columns and variables down rows) return structured, date-filterable series. other layouts return a faithful preview rather than silently guessing columns. always includes the bce file and bulletin urls for verification. pass boletin_numero to retrieve a historical version returned by search_bce_iem(historico=true). table_id parameter documented in the source code. desde parameter documented in the source code. hasta parameter documented in the source code. boletin_numero parameter documented in the source code. rows parameter documented in the source code. format parameter documented in the source code.">
+<details class="atlas-tool" id="tool-get_bce_iem_table" data-search="get_bce_iem_table inspect one official xlsx table from the latest bce iem bulletin. inspect one official xlsx table from the latest bce iem bulletin. get table_id from search_bce_iem. tables with the common bce layout (periods across columns and variables down rows) return structured, date-filterable series. other layouts return a faithful preview rather than silently guessing columns. always includes the bce file and bulletin urls for verification. pass boletin_numero to retrieve a historical version returned by search_bce_iem(historico=true). table_id a table_id from search_bce_iem. desde earliest period to include, as yyyy, yyyy-mm or a month-year label. hasta latest period to include, same formats as desde. boletin_numero past bulletin number from search_bce_iem(historico=true); 0 means the latest. rows max rows returned (1-100, default 20). format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_bce_iem_table</code>
 <span class="atlas-tool-desc">Inspect one official XLSX table from the latest BCE IEM bulletin.</span>
@@ -1262,17 +1262,17 @@
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>table_id</code></td><td><code>str</code></td><td><code>required</code></td><td>Parameter documented in the source code.</td></tr>
+<tr><td><code>table_id</code></td><td><code>str</code></td><td><code>required</code></td><td>A table_id from search_bce_iem.</td></tr>
 
-<tr><td><code>desde</code></td><td><code>str</code></td><td><code>empty</code></td><td>Parameter documented in the source code.</td></tr>
+<tr><td><code>desde</code></td><td><code>str</code></td><td><code>empty</code></td><td>Earliest period to include, as YYYY, YYYY-MM or a month-year label.</td></tr>
 
-<tr><td><code>hasta</code></td><td><code>str</code></td><td><code>empty</code></td><td>Parameter documented in the source code.</td></tr>
+<tr><td><code>hasta</code></td><td><code>str</code></td><td><code>empty</code></td><td>Latest period to include, same formats as desde.</td></tr>
 
-<tr><td><code>boletin_numero</code></td><td><code>int</code></td><td><code>0</code></td><td>Parameter documented in the source code.</td></tr>
+<tr><td><code>boletin_numero</code></td><td><code>int</code></td><td><code>0</code></td><td>Past bulletin number from search_bce_iem(historico=true); 0 means the latest.</td></tr>
 
-<tr><td><code>rows</code></td><td><code>int</code></td><td><code>20</code></td><td>Parameter documented in the source code.</td></tr>
+<tr><td><code>rows</code></td><td><code>int</code></td><td><code>20</code></td><td>Max rows returned (1-100, default 20).</td></tr>
 
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Parameter documented in the source code.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
 
 </tbody>
 </table>
@@ -1330,7 +1330,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-search_bce_iem" data-search="search_bce_iem search individual excel tables in the bce's latest iem bulletin. search individual excel tables in the bce's latest iem bulletin. use this for detailed bce tables not conveniently available through search_indicadores_bce/bcedata: trade by country, debt, public finance by government level, oil, gdp breakdowns, and more. it lists tables from the current monthly bulletin; use get_bce_iem_table with a returned table_id to inspect one official xlsx file. set historico=true (or provide desde_anio/hasta_anio) to search across all matching monthly bulletin pages; this is slower on the first call because the archive pages must be read. set guardar_catalogo=true to persist the complete catalog assembled by this search under iem_catalog_dir (or data/iem_catalog_snapshots by default). pagination still keeps the mcp response bounded. set hash_archivos=true for an operator-style sha-256 audit of the discovered xlsx files. this downloads complete files, so it is deliberately opt-in and bounded by max_hash_archivos. query parameter documented in the source code. limit parameter documented in the source code. offset parameter documented in the source code. historico parameter documented in the source code. desde_anio parameter documented in the source code. hasta_anio parameter documented in the source code. guardar_catalogo parameter documented in the source code. hash_archivos parameter documented in the source code. max_hash_archivos parameter documented in the source code. format parameter documented in the source code.">
+<details class="atlas-tool" id="tool-search_bce_iem" data-search="search_bce_iem search individual excel tables in the bce's latest iem bulletin. search individual excel tables in the bce's latest iem bulletin. use this for detailed bce tables not conveniently available through search_indicadores_bce/bcedata: trade by country, debt, public finance by government level, oil, gdp breakdowns, and more. it lists tables from the current monthly bulletin; use get_bce_iem_table with a returned table_id to inspect one official xlsx file. set historico=true (or provide desde_anio/hasta_anio) to search across all matching monthly bulletin pages; this is slower on the first call because the archive pages must be read. set guardar_catalogo=true to persist the complete catalog assembled by this search under iem_catalog_dir (or data/iem_catalog_snapshots by default). pagination still keeps the mcp response bounded. set hash_archivos=true for an operator-style sha-256 audit of the discovered xlsx files. this downloads complete files, so it is deliberately opt-in and bounded by max_hash_archivos. query free text matched against table titles and sections (accent-insensitive). empty lists every table. limit max tables returned (default 20). offset pagination offset over the matched set. historico also search past monthly bulletins, not just the latest. desde_anio earliest bulletin year to search (implies historico). hasta_anio latest bulletin year to search (implies historico). guardar_catalogo save the full assembled catalog under iem_catalog_dir. hash_archivos download each discovered xlsx and report its sha-256 (operator audit; slow). max_hash_archivos cap on files hashed when hash_archivos is set. format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_bce_iem</code>
 <span class="atlas-tool-desc">Search individual Excel tables in the BCE's latest IEM bulletin.</span>
@@ -1342,25 +1342,25 @@
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Parameter documented in the source code.</td></tr>
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched against table titles and sections (accent-insensitive). Empty lists every table.</td></tr>
 
-<tr><td><code>limit</code></td><td><code>int</code></td><td><code>20</code></td><td>Parameter documented in the source code.</td></tr>
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>20</code></td><td>Max tables returned (default 20).</td></tr>
 
-<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Parameter documented in the source code.</td></tr>
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Pagination offset over the matched set.</td></tr>
 
-<tr><td><code>historico</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parameter documented in the source code.</td></tr>
+<tr><td><code>historico</code></td><td><code>bool</code></td><td><code>False</code></td><td>Also search past monthly bulletins, not just the latest.</td></tr>
 
-<tr><td><code>desde_anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Parameter documented in the source code.</td></tr>
+<tr><td><code>desde_anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Earliest bulletin year to search (implies historico).</td></tr>
 
-<tr><td><code>hasta_anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Parameter documented in the source code.</td></tr>
+<tr><td><code>hasta_anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Latest bulletin year to search (implies historico).</td></tr>
 
-<tr><td><code>guardar_catalogo</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parameter documented in the source code.</td></tr>
+<tr><td><code>guardar_catalogo</code></td><td><code>bool</code></td><td><code>False</code></td><td>Save the full assembled catalog under IEM_CATALOG_DIR.</td></tr>
 
-<tr><td><code>hash_archivos</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parameter documented in the source code.</td></tr>
+<tr><td><code>hash_archivos</code></td><td><code>bool</code></td><td><code>False</code></td><td>Download each discovered XLSX and report its SHA-256 (operator audit; slow).</td></tr>
 
-<tr><td><code>max_hash_archivos</code></td><td><code>int</code></td><td><code>5000</code></td><td>Parameter documented in the source code.</td></tr>
+<tr><td><code>max_hash_archivos</code></td><td><code>int</code></td><td><code>5000</code></td><td>Cap on files hashed when hash_archivos is set.</td></tr>
 
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Parameter documented in the source code.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
 
 </tbody>
 </table>
@@ -2078,13 +2078,13 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-investigate_dataset" data-search="investigate_dataset one-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of &quot;find me data about x and show me what's in it&quot; one-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of &quot;find me data about x and show me what's in it&quot;. picks the top-ranked search result and, among its resources, the first one in a format this server can actually parse into a table (csv/json/xls/xlsx/ods/zip/targz), skipping unreadable ones (.rar, unrecognized formats) rather than previewing whichever resource happens to be listed first. not a replacement for the individual tools: if the top search result isn't the right dataset, or you need a specific resource within it, use search_datasets/list_dataset_resources/ preview_resource_data directly instead of re-running this. query search keywords (e.g. &quot;empleo&quot;, &quot;sri recaudación&quot;) source &quot;nacional&quot; (default), &quot;cuenca&quot; (cuenca municipal portal), &quot;latacunga&quot; (latacunga municipal portal), or &quot;iadb&quot; (iadb's portal, not ecuador-only) preview_rows data rows to preview from the chosen resource (default: 10, max: 50) format text | json">
+<details class="atlas-tool" id="tool-investigate_dataset" data-search="investigate_dataset one-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of &quot;find me data about x and show me what's in it&quot; one-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of &quot;find me data about x and show me what's in it&quot;. picks the top-ranked search result and, among its resources, the first one in a format this server can actually parse into a table (csv/json/xls/xlsx/xlsb/ods/zip/targz), skipping unreadable ones (.rar, unrecognized formats) rather than previewing whichever resource happens to be listed first. not a replacement for the individual tools: if the top search result isn't the right dataset, or you need a specific resource within it, use search_datasets/list_dataset_resources/ preview_resource_data directly instead of re-running this. query search keywords (e.g. &quot;empleo&quot;, &quot;sri recaudación&quot;) source &quot;nacional&quot; (default), &quot;cuenca&quot; (cuenca municipal portal), &quot;latacunga&quot; (latacunga municipal portal), or &quot;iadb&quot; (iadb's portal, not ecuador-only) preview_rows data rows to preview from the chosen resource (default: 10, max: 50) format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">investigate_dataset</code>
 <span class="atlas-tool-desc">One-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of "find me data about X and show me what's in it"</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">One-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of "find me data about X and show me what's in it". Picks the top-ranked search result and, among its resources, the first one in a format this server can actually parse into a table (CSV/JSON/XLS/XLSX/ODS/ZIP/TARGZ), skipping unreadable ones (.rar, unrecognized formats) rather than previewing whichever resource happens to be listed first. Not a replacement for the individual tools: if the top search result isn't the right dataset, or you need a specific resource within it, use search_datasets/list_dataset_resources/ preview_resource_data directly instead of re-running this.</p>
+<p class="atlas-tool-long">One-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of "find me data about X and show me what's in it". Picks the top-ranked search result and, among its resources, the first one in a format this server can actually parse into a table (CSV/JSON/XLS/XLSX/XLSB/ODS/ZIP/TARGZ), skipping unreadable ones (.rar, unrecognized formats) rather than previewing whichever resource happens to be listed first. Not a replacement for the individual tools: if the top search result isn't the right dataset, or you need a specific resource within it, use search_datasets/list_dataset_resources/ preview_resource_data directly instead of re-running this.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
@@ -2104,13 +2104,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-list_zip_contents" data-search="list_zip_contents list a .zip archive's member files (name, size) from a direct url, without downloading the archive. list a .zip archive's member files (name, size) from a direct url, without downloading the archive. reads only the end of central directory record and the central directory via http range requests, so it works for archives far larger than the 5 mb preview_zip/download_resource cap -- e.g. inec or censo microdata zips of multiple hundred mb. requires the server to honor range requests; fails with a clear error otherwise. does not support zip64 archives. listing names is cheap this way, but previewing a specific member's rows is not (still needs decompressing from that member's offset onward) -- this tool only lists metadata. url direct url to a .zip file (from another tool's result, e.g. get_inec_publicacion_archivos, search_archivos). limit max members returned (default 200, max 1000). offset pagination offset over the member list. format text | json">
+<details class="atlas-tool" id="tool-list_zip_contents" data-search="list_zip_contents list a .zip archive's member files (name, size) from a direct url, without downloading the archive. list a .zip archive's member files (name, size) from a direct url, without downloading the archive. reads only the end of central directory record and the central directory via http range requests, so it works for archives far larger than the 5 mb preview_resource_data/download_resource cap -- e.g. inec or censo microdata zips of multiple hundred mb. requires the server to honor range requests; fails with a clear error otherwise. does not support zip64 archives. listing names is cheap this way, but previewing a specific member's rows is not (still needs decompressing from that member's offset onward) -- this tool only lists metadata. url direct url to a .zip file (from another tool's result, e.g. get_inec_publicacion_archivos, search_archivos). limit max members returned (default 200, max 1000). offset pagination offset over the member list. format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">list_zip_contents</code>
 <span class="atlas-tool-desc">List a .zip archive's member files (name, size) from a direct URL, without downloading the archive.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">List a .zip archive's member files (name, size) from a direct URL, without downloading the archive. Reads only the End Of Central Directory record and the central directory via HTTP Range requests, so it works for archives far larger than the 5 MB preview_zip/download_resource cap -- e.g. INEC or censo microdata ZIPs of multiple hundred MB. Requires the server to honor Range requests; fails with a clear error otherwise. Does not support ZIP64 archives. Listing names is cheap this way, but previewing a specific member's rows is not (still needs decompressing from that member's offset onward) -- this tool only lists metadata.</p>
+<p class="atlas-tool-long">List a .zip archive's member files (name, size) from a direct URL, without downloading the archive. Reads only the End Of Central Directory record and the central directory via HTTP Range requests, so it works for archives far larger than the 5 MB preview_resource_data/download_resource cap -- e.g. INEC or censo microdata ZIPs of multiple hundred MB. Requires the server to honor Range requests; fails with a clear error otherwise. Does not support ZIP64 archives. Listing names is cheap this way, but previewing a specific member's rows is not (still needs decompressing from that member's offset onward) -- this tool only lists metadata.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
