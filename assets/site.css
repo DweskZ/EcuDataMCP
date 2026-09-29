@@ -1339,55 +1339,167 @@ html[data-theme="light"] .chat-code {
 }
 
 .arch-flow {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2.25rem minmax(0, 1.08fr) 2.25rem minmax(0, 1fr);
+  gap: 0.35rem;
   align-items: stretch;
-  gap: 0.75rem;
   margin-bottom: 2rem;
 }
 
 .arch-node {
-  flex: 1 1 160px;
+  position: relative;
+  min-width: 0;
   background: var(--ecu-panel);
   border: 1px solid var(--ecu-line);
-  border-radius: 10px;
-  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  padding: 0.95rem 1.05rem 1rem;
+  overflow: hidden;
 }
 
+.arch-node::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+}
+
+.arch-node.arch-ai::before { background: #0033a0; }
+.arch-node.arch-src::before { background: #ef3340; }
+
 .arch-node.accent {
-  border-color: rgba(255, 209, 0, 0.55);
-  box-shadow: inset 0 0 0 1px rgba(255, 209, 0, 0.15);
+  border-color: #e6b400;
   background:
-    linear-gradient(180deg, rgba(255, 209, 0, 0.08), transparent),
-    var(--ecu-panel);
+    linear-gradient(180deg, rgba(255, 209, 0, 0.22), var(--ecu-panel) 62%);
   animation: node-breathe 3.4s ease-in-out infinite;
 }
 
+.arch-node.accent::before { background: #ffd100; }
+
+html[data-theme="dark"] .arch-node.accent {
+  border-color: rgba(255, 209, 0, 0.75);
+  background:
+    linear-gradient(180deg, rgba(255, 209, 0, 0.16), var(--ecu-panel) 68%);
+}
+
 .arch-label {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   font-family: "IBM Plex Mono", ui-monospace, monospace;
   font-size: 0.68rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ecu-muted);
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.45rem;
 }
 
-.arch-node strong {
-  font-size: 0.95rem;
+.arch-label::before {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 2px;
+  background: currentColor;
+  flex: 0 0 auto;
+}
+
+.arch-node.arch-ai .arch-label { color: var(--ecu-stat-blue); }
+.arch-node.arch-src .arch-label { color: var(--ecu-stat-red); }
+.arch-node.accent .arch-label { color: #7a5b00; }
+
+html[data-theme="dark"] .arch-node.accent .arch-label { color: #ffd100; }
+
+.arch-node strong,
+.arch-value {
+  font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--ecu-heading);
 }
 
+.arch-value {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  row-gap: 0.15rem;
+}
+
+.arch-value span:not(:last-child)::after {
+  content: "·";
+  margin: 0 0.4rem;
+  color: var(--ecu-muted);
+  font-weight: 500;
+}
+
+.arch-node.accent .arch-value {
+  font-size: 1.2rem;
+}
+
 .arch-arrow {
+  position: relative;
   align-self: center;
-  color: var(--ecu-accent-text);
-  font-size: 1.25rem;
-  font-weight: 700;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--ecu-stat-blue), #ffd100);
   animation: arch-nudge 1.7s ease-in-out infinite;
 }
 
+.arch-flow > .arch-arrow:last-of-type {
+  background: linear-gradient(90deg, #ffd100, var(--ecu-stat-red));
+}
+
+.arch-arrow::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -4px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  color: var(--ecu-stat-blue);
+  transform: rotate(45deg);
+}
+
+.arch-flow > .arch-arrow:last-of-type::after {
+  color: var(--ecu-stat-red);
+}
+
 @media (max-width: 700px) {
-  .arch-arrow { display: none; }
+  .arch-flow {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 0;
+  }
+
+  .arch-node {
+    width: 100%;
+  }
+
+  .arch-arrow {
+    width: 2px;
+    height: 1.35rem;
+    margin: 0.15rem 0;
+    background: linear-gradient(180deg, var(--ecu-stat-blue), #ffd100);
+    animation: none;
+  }
+
+  .arch-flow > .arch-arrow:last-of-type {
+    background: linear-gradient(180deg, #ffd100, var(--ecu-stat-red));
+  }
+
+  .arch-arrow::after {
+    right: auto;
+    left: 50%;
+    top: auto;
+    bottom: -1px;
+    margin-top: 0;
+    margin-left: -4px;
+    transform: rotate(135deg);
+  }
 }
 
 .strip-section .hero-stats {
