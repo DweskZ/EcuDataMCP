@@ -448,6 +448,8 @@ Verifica que el servidor responda antes de darlo por terminado.</code></pre>
 
 <li class="nav-item" role="presentation"><button class="nav-link" id="claude-code-tab" data-tab-target="claude-code-pane" type="button" role="tab">Claude Code</button></li>
 
+<li class="nav-item" role="presentation"><button class="nav-link" id="codex-tab" data-tab-target="codex-pane" type="button" role="tab">Codex</button></li>
+
 <li class="nav-item" role="presentation"><button class="nav-link" id="gemini-cli-tab" data-tab-target="gemini-cli-pane" type="button" role="tab">Gemini CLI</button></li>
 
 <li class="nav-item" role="presentation"><button class="nav-link" id="le-chat-tab" data-tab-target="le-chat-pane" type="button" role="tab">Le Chat (Mistral)</button></li>
@@ -511,6 +513,12 @@ Verifica que el servidor responda antes de darlo por terminado.</code></pre>
 
 
 <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>claude mcp add --transport http ecuador-datos http://localhost:8000/mcp</code></pre></div>
+</div>
+
+<div class="tab-pane fade" id="codex-pane" role="tabpanel">
+<p class="client-intro">Guarda la configuración en <code>~/.codex/config.toml</code> (bloque <code>[mcp_servers.ecuador-datos]</code> con <code>url</code>). Para usar el servidor por stdio en vez de HTTP: <code>codex mcp add ecuador-datos -- uvx ecuador-mcp --transport stdio</code>.</p>
+
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>codex mcp add ecuador-datos --url http://localhost:8000/mcp</code></pre></div>
 </div>
 
 <div class="tab-pane fade" id="gemini-cli-pane" role="tabpanel">
