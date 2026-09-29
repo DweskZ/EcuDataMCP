@@ -623,7 +623,7 @@
         "default": "'text'"
       }
     ],
-    "description": "Observations of one CEPALSTAT indicator for one country (Ecuador by default), with dimension ids decoded to labels.",
+    "description": "Observations of one CEPALSTAT indicator for one country (Ecuador by default), with dimension ids decoded to labels. Take indicator_id from search_cepalstat_indicadores.",
     "summary": "Fetch one CEPALSTAT indicator's observations, filtered to one country (Ecuador by default) so the response stays small — CEPAL's raw API returns every country in the region (and often the world) per indicator otherwise, confirmed live at ~2.5 MB unfiltered vs. ~85 KB filtered to one country. Get indicator_id from search_cepalstat_indicadores. Each returned record decodes CEPALSTAT's raw dimension ids into readable labels (e.g. \"Sexo\": \"Mujeres\", \"Años\": \"1975\") using that same indicator's own dimension catalog — not every indicator has the same dimensions (some are just country × year, others add sex, age group, etc.).",
     "args_doc": {
       "indicator_id": "An \"indicator_id\" from search_cepalstat_indicadores.",
@@ -741,7 +741,7 @@
         "default": "'text'"
       }
     ],
-    "description": "Metadata for one CKAN dataset: description, organization, tags, dates, license, update frequency and the publisher's source URL.",
+    "description": "Metadata for one CKAN dataset: description, organization, tags, dates, license, update frequency and the publisher's source URL. Take dataset_id from search_datasets; next list_dataset_resources for its files.",
     "summary": "Get detailed metadata about a specific dataset from Ecuador's open data portal. Returns title, description, organization, tags, resource count, creation/update dates, license, update frequency, the publisher's source URL (where the entity keeps the authoritative data, if any), and any custom metadata fields the publisher added.",
     "args_doc": {
       "dataset_id": "The dataset ID or slug (e.g. \"registro-estadistico-de-recursos-y-actividades-de-salud-2019\")",
@@ -763,7 +763,7 @@
         "default": "'text'"
       }
     ],
-    "description": "Wayback Machine snapshot (2024-04-24) of the national blackout-schedule portal energia-ecuador.com; only EEQ's Pichincha rotation survived.",
+    "description": "Frozen Wayback Machine copy (2024-04-24) of the defunct national blackout-schedule portal energia-ecuador.com; only EEQ's Pichincha rotation survived. For current schedules use search_cortes and get_cortes_horarios.",
     "summary": "Recover, via the Wayback Machine, the national blackout-schedule aggregator the Ministry of Energy and Mines briefly ran during the 2024 crisis at energia-ecuador.com (\"Portal para actualización de racionamiento energético\"). The domain itself is dead (parked since 2025) and the site went behind a Cloudflare bot-block within days of launch, so only one of its nine distributor pages was fully archived: Empresa Eléctrica Quito, a single frozen snapshot from 2024-04-24 (province/canton/sector-level rotation for Pichincha, 40 rows). Centrosur, CNEL, Emelnorte, EEASA, and four other distributors' pages are confirmed to have existed (via the site's own archived sitemap) but were never successfully archived — not recoverable from this or any other source found so far. This is a one-time historical snapshot, not an ongoing series — there is no newer page to discover.",
     "args_doc": {
       "query": "Free text matched (accent-insensitive) against canton or sectores. Empty returns all rows.",
@@ -976,7 +976,7 @@
         "default": "'text'"
       }
     ],
-    "description": "One gob.ec institution's acronym, sector, description and websites.",
+    "description": "One gob.ec institution's acronym, sector, description and websites. Take institucion_id from list_instituciones (SRI=8, IESS=5, Registro Civil=23); for its procedures use search_tramites.",
     "summary": "Get detailed information about a public institution registered on gob.ec. Returns name, acronym, sector, description, website and portal URL. Get the institucion_id from list_instituciones. Common IDs: SRI=8, IESS=5, Registro Civil=23, ANT=62, Cancillería=16.",
     "args_doc": {
       "institucion_id": "Institution ID (e.g. \"8\")",
@@ -1018,7 +1018,7 @@
         "default": "'text'"
       }
     ],
-    "description": "Active NOTAMs for an Ecuadorian aerodrome (ICAO code, e.g. SEQM): raw ICAO text plus DGAC's decoded fields.",
+    "description": "Active NOTAMs for an Ecuadorian aerodrome (ICAO code, e.g. SEQM): raw ICAO text plus DGAC's decoded fields. For its fixed data sheet use get_aip_aerodromo; for weather, get_metar.",
     "summary": "Fetch active NOTAMs (Notices to Airmen) for an Ecuadorian aerodrome or helipad, from DGAC's IFIS site (ais.aviacioncivil.gob.ec) — publicly queryable with no login. Each NOTAM includes its series number (e.g. \"A1784/26\"), the raw ICAO-format text (Q)/A)/B)/C)/D)/E)/F)/G) lines, e.g. runway/navaid outages, temporary restrictions, obstacle warnings), and the site's own decoded field table (a label -> value map: Tipo, FIR, Código, Tránsito, Objetivo, Alcance, Limites, Coordenadas, Comienzo/Término validez, Horario, etc. — present when the site fills them in for that NOTAM). An unknown designador returns zero NOTAMs rather than an error.",
     "args_doc": {
       "designador": "ICAO code of the aerodrome/helipad, e.g. SEQM (Quito — Mariscal Sucre), SEGU (Guayaquil — José Joaquín de Olmedo), SECU (Cuenca — Mariscal Lamar).",
@@ -1049,7 +1049,7 @@
         "default": "'text'"
       }
     ],
-    "description": "One CKAN organization and its datasets; the way to browse large publishers (e.g. sri-servicio-de-rentas-internas). query filters dataset titles.",
+    "description": "One CKAN organization and its datasets, the way to browse a large publisher (e.g. sri-servicio-de-rentas-internas). Take the slug from search_organizations; query filters dataset titles. To search by topic across publishers use search_datasets.",
     "summary": "Get detailed information about a public institution and its published datasets — the main way to browse a CKAN organization's full package list, including large ones with no dedicated tool of their own (e.g. \"sri-servicio-de-rentas-internas\" —127 packages—, \"ministerio-de-economia-y-finanzas\" —97—, \"ieps\" —106—, \"cosede\" —88—, \"ipaip\" —70—, \"mag\" —69—; get the exact slug from search_organizations first if unsure). Returns the institution name, description, dataset count, and its datasets. format=json always returns every dataset; format=text caps display and tells you how many more exist — use query to narrow a large organization down instead of scrolling past the cap.",
     "args_doc": {
       "organization_id": "The organization slug (e.g. \"sri-servicio-de-rentas-internas\")",
@@ -1072,7 +1072,7 @@
         "default": "'text'"
       }
     ],
-    "description": "One gob.ec regulation's type, Registro Oficial reference, description and PDF link.",
+    "description": "One gob.ec regulation's type, Registro Oficial reference, description and PDF link. Take regulacion_id from search_regulaciones; read the PDF's text with read_pdf.",
     "summary": "Get detailed information about a regulation published on gob.ec. Returns type, Registro Oficial reference, description and PDF/archivo URL when available. Get the regulacion_id from search_regulaciones.",
     "args_doc": {
       "regulacion_id": "Regulation ID (e.g. \"5051\")",
@@ -1098,7 +1098,7 @@
         "default": "'text'"
       }
     ],
-    "description": "Metadata for one CKAN resource (file): format, size, MIME type, download URL and parent dataset.",
+    "description": "Metadata for one CKAN resource (file): format, size, MIME type, download URL and parent dataset. Take resource_id from list_dataset_resources; then preview_resource_data or query_resource_data for its contents.",
     "summary": "Get detailed information about a specific resource (file) from Ecuador's open data portal. Returns format, size, MIME type, download URL, and dataset association. For CSV files, you can then use preview_resource_data to see the actual data.",
     "args_doc": {
       "resource_id": "The resource UUID",
@@ -1225,7 +1225,7 @@
         "default": "'text'"
       }
     ],
-    "description": "Monthly attentions and complaints for one gob.ec trámite since mid-2021.",
+    "description": "Monthly attentions (people served) and complaints for one gob.ec trámite since mid-2021, one trámite at a time. Take tramite_id from search_tramites; for requirements and cost use get_tramite_info.",
     "summary": "Monthly usage/complaint stats (atenciones/quejas) for one trámite. A separate transparency series from get_tramite_info: how many people were actually attended each month, and how many complaints were filed, since gob.ec started publishing this (mid-2021). Get tramite_id from search_tramites. There is no bulk endpoint -- this fetches one trámite's series at a time (currently a few dozen months, oldest and newest bounds returned as-is, no pagination needed).",
     "args_doc": {
       "tramite_id": "The procedure ID (e.g. \"11752\")",
@@ -1310,7 +1310,7 @@
         "default": "'text'"
       }
     ],
-    "description": "BCE daily and monthly indicator widgets outside BCEData: riesgo país (daily since 2004), gold, WTI, bonds, payments, reserves, fiscal and external series. Next: get_bce_indicador_diario.",
+    "description": "BCE daily and monthly indicator widgets outside BCEData: riesgo país (daily since 2004), gold, WTI, bonds, payments, reserves, fiscal and external series. Next: get_bce_indicador_diario. For BCEData series use search_indicadores_bce.",
     "summary": "List BCE's family of daily/monthly \"indicador\" widgets published outside both BCEData and IEM (contenido.bce.fin.ec's Highcharts widget pages) — includes Riesgo País (EMBI) as a genuine daily series back to 2004, which BCEData only exposes as a monthly end-of-period aggregate. Also covers: Precio del Oro, Petróleo WTI, Índice Dow Jones, Tasa SOFR/LIBOR, Ecuador sovereign bond prices (all daily); Sistema de Pagos/Cobros Interbancarios, Sistema de Pagos en Línea, Cámara de Compensación de Cheques (monthly); Producción Petrolera Nacional (daily); inflación, desempleo, confianza del consumidor, PIB (monthly/quarterly/annual, likely duplicates BCEData); Reservas Internacionales, Liquidez Total M2, Crédito al Sector Privado, Tasas Activa/Pasiva Referencial, Captaciones OSD (monetary, monthly); Ingresos/Erogaciones/Resultado Global SPNF, Deuda Pública Interna (fiscal, monthly); Cuenta Corriente, Remesas de Trabajadores, Tipo de Cambio Efectivo Real, Balanza Comercial (total/no petrolera), Exportaciones/Importaciones de Bienes (external sector, monthly/quarterly). The catalog is discovered live from each file's own data, not hardcoded — a \"codigo\" only means one thing within its own \"archivo\", not across files. Follow up with get_bce_indicador_diario(archivo, codigo) for one series.",
     "args_doc": {
       "format": "text | json"
@@ -1435,7 +1435,7 @@
         "default": "'text'"
       }
     ],
-    "description": "SGR tsunami early-warning (SAT) stations with codes and coordinates.",
+    "description": "SGR tsunami early-warning (SAT) stations with codes and coordinates: a static station list, not alerts. For recent seismic events use search_sismos.",
     "summary": "List tsunami early-warning SAT stations published by SGR (Gestión de Riesgos). Returns station codes and coordinates from the public SAT MapServer.",
     "args_doc": {
       "limit": "Max stations to include in the response (default 30)",
@@ -1654,7 +1654,7 @@
         "default": "'text'"
       }
     ],
-    "description": "Live query of one SUT dashboard's data model with any combination of campos, optional equality filtros (plain columns only) and a row limite.",
+    "description": "Live query of one SUT dashboard's data model: choose campos, optional equality filtros (plain columns only) and a row limite. Take the indicador from list_sut_indicadores and its valid campos from get_sut_indicador_schema.",
     "summary": "Run a live query against one SUT Power BI dashboard's underlying data model — any combination of its fields, e.g. month AND industry together for \"contratos\" (a real monthly time series since 2015 by CIIU industry, province, gender, contract status — none of this is in the ministerio-del-trabajo CKAN datasets, which are a single current-snapshot stock count with no time dimension). Get valid campos from get_sut_indicador_schema(indicador) first — an unrecognized field name raises an error naming the tool to call instead of guessing. filtros only accepts plain-column fields (not \"[medida]\"/hierarchy-level fields) and matches exact text equality, e.g. {\"public contratos.Estado contrato\": \"Vigente\"}. Rows can run into the thousands for a wide breakdown (e.g. every month x every industry) — narrow with filtros or fewer campos rather than raising limite past what's actually needed; format \"json\" is exact but still subject to the same limite cap.",
     "args_doc": {
       "indicador": "A key from list_sut_indicadores.",
@@ -1845,7 +1845,7 @@
         "default": "'text'"
       }
     ],
-    "description": "BCE's forward-looking statistical release calendar: dates, category, periodicity and reference period. solo_proximas=true keeps upcoming releases.",
+    "description": "BCE's forward-looking statistical release calendar: dates, category, periodicity and reference period. solo_proximas=true keeps upcoming releases. Says when data will be published, not the data itself; for values use get_indicador_bce.",
     "summary": "Search BCE's own statistical publication calendar — scheduled release dates for IEM, Cuentas Nacionales, IMAEc, balance of payments, and more, each with category, periodicity, reference period, and a direct link to the publication's page. Distinct from search_bce_publicaciones (a rolling window of ~30 already-published items, no future dates): this is BCE's own forward-looking release schedule for the full calendar year.",
     "args_doc": {
       "query": "Free text matched against the publication name or its observations note (accent-insensitive). Empty matches all.",
@@ -1990,7 +1990,7 @@
         "default": "'text'"
       }
     ],
-    "description": "BCE worker-remittance file links: historical series, methodology note and, since July 2025, microdata-based monthly databases (a distinct series). Returns links.",
+    "description": "BCE worker-remittance file links: historical series, methodology note and, since July 2025, microdata-based monthly databases (a distinct series). Returns links, not contents; download them directly or with download_resource.",
     "summary": "List BCE's Remesas de Trabajadores (worker remittances) direct file links. A dedicated series separate from BCEData/IEM (search_indicadores_bce, search_bce_iem): the aggregate flow series, the full historical series, a methodology user note, and — since a July 2025 change to microdata-based collection — monthly aggregate and entity-level databases (BDD). Treat \"histórica\" (pre-change) and \"BDD\" (post-change) files as methodologically distinct series, not one continuous one — see the user note (Nota_al_usuario) for the comparability details. Returns direct URLs, not file contents — download them yourself or via download_resource.",
     "args_doc": {
       "query": "Free text matched against the file's label or URL (accent-insensitive), e.g. \"historica\", \"entidad\", \"bdd\". Empty returns all files.",
@@ -2174,7 +2174,7 @@
         "default": "'text'"
       }
     ],
-    "description": "Search CKAN open-data datasets (national portal by default; see source). Use sort=\"recent\" without a query to browse new or updated datasets. Next: list_dataset_resources.",
+    "description": "Search CKAN open-data datasets (national portal by default; see source). Use sort=\"recent\" without a query to browse new or updated datasets. Next: list_dataset_resources. For trámites, regulations or contracts use search_ecuador.",
     "summary": "Search for datasets on Ecuador's open data portal (www.datosabiertos.gob.ec). This is the starting point for exploring government data from 98+ public institutions. Use short, specific queries in Spanish for best results. Typical workflow: search_datasets → list_dataset_resources → preview_resource_data",
     "args_doc": {
       "query": "Search keywords (e.g. \"empleo\", \"salud\", \"presupuesto\", \"SRI recaudación\"). Optional when sort=\"recent\" — omit it to browse newly published/updated datasets without a keyword.",
@@ -2205,7 +2205,7 @@
         "default": "'text'"
       }
     ],
-    "description": "Unified first-step search across CKAN datasets, organizations, gob.ec trámites and regulations, SERCOP contracts and SGR risk events. Drill down afterwards with the source-specific get_* tools.",
+    "description": "Unified first-step search across CKAN datasets, organizations, gob.ec trámites and regulations, SERCOP contracts and SGR risk events, a few hits per source. Drill down with the source-specific get_* tools; for CKAN datasets alone use search_datasets.",
     "summary": "Unified search across Ecuador open data, trámites, regulations, contracts and risk events. Use this as the first step for broad questions. Then drill down with get_dataset_info, query_resource_data, get_tramite_info, get_regulacion_info, get_contrato_info or search_eventos_riesgo.",
     "args_doc": {
       "query": "Search terms in Spanish (e.g. \"salud\", \"RUC\", \"medicinas\")",
@@ -2503,7 +2503,7 @@
         "default": "'text'"
       }
     ],
-    "description": "Search the institutions publishing on a CKAN portal (98+ on the national one: INEC, SRI, MSP, BCE...).",
+    "description": "Search the institutions publishing on a CKAN portal (98+ on the national one: INEC, SRI, MSP, BCE...). Returns the slugs get_organization_info takes; to find datasets by topic use search_datasets.",
     "summary": "Search for public institutions that publish data on Ecuador's open data portal. There are 98+ organizations including INEC, SRI, Ministerio de Salud, BCE, etc.",
     "args_doc": {
       "query": "Optional search term (e.g. \"salud\", \"SRI\", \"INEC\")",

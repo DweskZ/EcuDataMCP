@@ -12,7 +12,7 @@ from helpers.tool_meta import READ_ONLY
 def register_list_sat_tsunami_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Listar estaciones del SAT de tsunami",
-        description="SGR tsunami early-warning (SAT) stations with codes and coordinates.",
+        description="SGR tsunami early-warning (SAT) stations with codes and coordinates: a static station list, not alerts. For recent seismic events use search_sismos.",
         annotations=READ_ONLY,
     )
     @log_tool

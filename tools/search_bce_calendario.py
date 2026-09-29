@@ -12,11 +12,7 @@ from helpers.tool_meta import READ_ONLY
 def register_search_bce_calendario_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Buscar el calendario de publicaciones del BCE",
-        description=(
-            "BCE's forward-looking statistical release calendar: dates, category, "
-            "periodicity and reference period. solo_proximas=true keeps upcoming "
-            "releases."
-        ),
+        description="BCE's forward-looking statistical release calendar: dates, category, periodicity and reference period. solo_proximas=true keeps upcoming releases. Says when data will be published, not the data itself; for values use get_indicador_bce.",
         annotations=READ_ONLY,
     )
     @log_tool

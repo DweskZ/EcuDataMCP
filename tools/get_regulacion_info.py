@@ -13,10 +13,7 @@ from helpers.tool_meta import READ_ONLY
 def register_get_regulacion_info_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Ver detalle de una regulación de gob.ec",
-        description=(
-            "One gob.ec regulation's type, Registro Oficial reference, description "
-            "and PDF link."
-        ),
+        description="One gob.ec regulation's type, Registro Oficial reference, description and PDF link. Take regulacion_id from search_regulaciones; read the PDF's text with read_pdf.",
         annotations=READ_ONLY,
     )
     @log_tool

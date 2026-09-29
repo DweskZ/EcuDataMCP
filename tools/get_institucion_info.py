@@ -13,7 +13,7 @@ from helpers.tool_meta import READ_ONLY
 def register_get_institucion_info_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Ver detalle de una institución pública",
-        description="One gob.ec institution's acronym, sector, description and websites.",
+        description="One gob.ec institution's acronym, sector, description and websites. Take institucion_id from list_instituciones (SRI=8, IESS=5, Registro Civil=23); for its procedures use search_tramites.",
         annotations=READ_ONLY,
     )
     @log_tool

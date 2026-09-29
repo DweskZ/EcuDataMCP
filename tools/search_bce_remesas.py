@@ -12,11 +12,7 @@ from helpers.tool_meta import READ_ONLY
 def register_search_bce_remesas_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Buscar archivos de remesas de trabajadores del BCE",
-        description=(
-            "BCE worker-remittance file links: historical series, methodology note "
-            "and, since July 2025, microdata-based monthly databases (a distinct "
-            "series). Returns links."
-        ),
+        description="BCE worker-remittance file links: historical series, methodology note and, since July 2025, microdata-based monthly databases (a distinct series). Returns links, not contents; download them directly or with download_resource.",
         annotations=READ_ONLY,
     )
     @log_tool

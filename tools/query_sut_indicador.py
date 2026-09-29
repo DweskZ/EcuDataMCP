@@ -14,11 +14,7 @@ _TEXT_ROW_CAP = 200
 def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Consultar datos de un indicador del SUT",
-        description=(
-            "Live query of one SUT dashboard's data model with any combination of "
-            "campos, optional equality filtros (plain columns only) and a row "
-            "limite."
-        ),
+        description="Live query of one SUT dashboard's data model: choose campos, optional equality filtros (plain columns only) and a row limite. Take the indicador from list_sut_indicadores and its valid campos from get_sut_indicador_schema.",
         annotations=READ_ONLY,
     )
     @log_tool

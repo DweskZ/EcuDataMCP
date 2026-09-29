@@ -13,10 +13,7 @@ from helpers.tool_meta import READ_ONLY
 def register_get_dataset_info_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Ver metadata de un dataset",
-        description=(
-            "Metadata for one CKAN dataset: description, organization, tags, dates, "
-            "license, update frequency and the publisher's source URL."
-        ),
+        description="Metadata for one CKAN dataset: description, organization, tags, dates, license, update frequency and the publisher's source URL. Take dataset_id from search_datasets; next list_dataset_resources for its files.",
         annotations=READ_ONLY,
     )
     @log_tool

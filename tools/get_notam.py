@@ -12,10 +12,7 @@ from helpers.tool_meta import READ_ONLY
 def register_get_notam_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Consultar NOTAM activos de un aeródromo",
-        description=(
-            "Active NOTAMs for an Ecuadorian aerodrome (ICAO code, e.g. SEQM): raw "
-            "ICAO text plus DGAC's decoded fields."
-        ),
+        description="Active NOTAMs for an Ecuadorian aerodrome (ICAO code, e.g. SEQM): raw ICAO text plus DGAC's decoded fields. For its fixed data sheet use get_aip_aerodromo; for weather, get_metar.",
         annotations=READ_ONLY,
     )
     @log_tool

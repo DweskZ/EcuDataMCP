@@ -12,11 +12,7 @@ from helpers.tool_meta import READ_ONLY
 def register_get_energia_ecuador_snapshot_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Recuperar snapshot del portal nacional de cortes (energia-ecuador.com, 2024)",
-        description=(
-            "Wayback Machine snapshot (2024-04-24) of the national "
-            "blackout-schedule portal energia-ecuador.com; only EEQ's Pichincha "
-            "rotation survived."
-        ),
+        description="Frozen Wayback Machine copy (2024-04-24) of the defunct national blackout-schedule portal energia-ecuador.com; only EEQ's Pichincha rotation survived. For current schedules use search_cortes and get_cortes_horarios.",
         annotations=READ_ONLY,
     )
     @log_tool

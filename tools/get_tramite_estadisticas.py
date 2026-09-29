@@ -29,10 +29,7 @@ def _periodo(anio, mes) -> str:
 def register_get_tramite_estadisticas_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Ver estadísticas de uso de un trámite",
-        description=(
-            "Monthly attentions and complaints for one gob.ec trámite since "
-            "mid-2021."
-        ),
+        description="Monthly attentions (people served) and complaints for one gob.ec trámite since mid-2021, one trámite at a time. Take tramite_id from search_tramites; for requirements and cost use get_tramite_info.",
         annotations=READ_ONLY,
     )
     @log_tool

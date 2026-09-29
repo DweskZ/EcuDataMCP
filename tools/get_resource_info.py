@@ -25,10 +25,7 @@ def _format_size(size: int | None) -> str:
 def register_get_resource_info_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Ver metadata de un recurso (archivo)",
-        description=(
-            "Metadata for one CKAN resource (file): format, size, MIME type, "
-            "download URL and parent dataset."
-        ),
+        description="Metadata for one CKAN resource (file): format, size, MIME type, download URL and parent dataset. Take resource_id from list_dataset_resources; then preview_resource_data or query_resource_data for its contents.",
         annotations=READ_ONLY,
     )
     @log_tool

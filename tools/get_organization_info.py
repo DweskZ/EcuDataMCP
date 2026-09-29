@@ -15,11 +15,7 @@ _TEXT_DISPLAY_LIMIT = 60
 def register_get_organization_info_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Ver una organización y sus datasets",
-        description=(
-            "One CKAN organization and its datasets; the way to browse large "
-            "publishers (e.g. sri-servicio-de-rentas-internas). query filters "
-            "dataset titles."
-        ),
+        description="One CKAN organization and its datasets, the way to browse a large publisher (e.g. sri-servicio-de-rentas-internas). Take the slug from search_organizations; query filters dataset titles. To search by topic across publishers use search_datasets.",
         annotations=READ_ONLY,
     )
     @log_tool

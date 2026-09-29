@@ -12,10 +12,7 @@ from helpers.tool_meta import READ_ONLY
 def register_search_organizations_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Buscar organizaciones publicadoras",
-        description=(
-            "Search the institutions publishing on a CKAN portal (98+ on the "
-            "national one: INEC, SRI, MSP, BCE...)."
-        ),
+        description="Search the institutions publishing on a CKAN portal (98+ on the national one: INEC, SRI, MSP, BCE...). Returns the slugs get_organization_info takes; to find datasets by topic use search_datasets.",
         annotations=READ_ONLY,
     )
     @log_tool

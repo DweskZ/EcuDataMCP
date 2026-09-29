@@ -15,7 +15,8 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
         description=(
             "Search CKAN open-data datasets (national portal by default; see "
             'source). Use sort="recent" without a query to browse new or updated '
-            "datasets. Next: list_dataset_resources."
+            "datasets. Next: list_dataset_resources. For trámites, regulations or "
+            "contracts use search_ecuador."
         ),
         annotations=READ_ONLY,
     )
