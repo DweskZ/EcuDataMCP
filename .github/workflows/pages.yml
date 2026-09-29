@@ -1,10 +1,7 @@
 name: Deploy GitHub Pages
 
 # Builds web/ and publishes the result to the gh-pages branch, which Pages
-# serves today (Settings > Pages > "Deploy from a branch"). Publishing to a
-# branch needs only write access; once a repo admin switches the Pages source
-# to "GitHub Actions", replace the publish step with upload-pages-artifact +
-# deploy-pages and delete gh-pages.
+# serves (Settings > Pages > "Deploy from a branch").
 
 on:
   push:
