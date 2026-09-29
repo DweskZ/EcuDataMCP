@@ -1,24 +1,29 @@
 name: Deploy GitHub Pages
 
+# Builds web/ and publishes the result to the gh-pages branch, which Pages
+# serves today (Settings > Pages > "Deploy from a branch"). Publishing to a
+# branch needs only write access; once a repo admin switches the Pages source
+# to "GitHub Actions", replace the publish step with upload-pages-artifact +
+# deploy-pages and delete gh-pages.
+
 on:
   push:
     branches: [main]
     paths:
       - "web/**"
+      - "tools/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -29,19 +34,23 @@ jobs:
         working-directory: web
         run: |
           uv sync --locked
+          uv run python scripts/extract_tool_signatures.py
           uv run python build.py
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: web/_site
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Publish to gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages
+          git worktree add ../gh-pages origin/gh-pages
+          cd ../gh-pages
+          git checkout -B gh-pages
+          # Replace the whole tree so files removed from the site disappear.
+          find . -mindepth 1 -maxdepth 1 -not -name .git -exec rm -rf {} +
+          cp -a "$GITHUB_WORKSPACE/web/_site/." .
+          git add -A
+          if git diff --cached --quiet; then
+            echo "gh-pages already up to date"
+          else
+            git commit -m "Publish site from ${GITHUB_SHA::7}"
+            git push origin gh-pages
+          fi
