@@ -49,6 +49,14 @@
     "code": "claude mcp add --transport http ecuador-datos http://localhost:8000/mcp"
   },
   {
+    "id": "codex",
+    "name": "Codex",
+    "intro": "Saves the configuration to `~/.codex/config.toml` (an `[mcp_servers.ecuador-datos]` block with `url`). To use the server over stdio instead of HTTP: `codex mcp add ecuador-datos -- uvx ecuador-mcp --transport stdio`.",
+    "steps": [],
+    "lang": "bash",
+    "code": "codex mcp add ecuador-datos --url http://localhost:8000/mcp"
+  },
+  {
     "id": "gemini-cli",
     "name": "Gemini CLI",
     "intro": "Add to `~/.gemini/settings.json`:",
