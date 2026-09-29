@@ -33,7 +33,7 @@ PAGES = ["index", "atlas", "examples", "releases", "about", "colaborar"]
 EXTRA_PAGES = {"es": ["fuentes"], "en": ["fuentes"]}
 
 STATUS_BADGES = {
-    "es": {"build-local": "build local", "offline": "offline"},
+    "es": {"build-local": "build local", "offline": "sin conexión"},
     "en": {"build-local": "local build", "offline": "offline"},
 }
 

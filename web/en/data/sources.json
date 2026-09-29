@@ -29,6 +29,15 @@
             "coverage": "cuencaendatos.cuenca.gob.ec",
             "url": "https://cuencaendatos.cuenca.gob.ec",
             "status": "live"
+          },
+          {
+            "id": "latacunga",
+            "name": "Data Mashca (Latacunga)",
+            "tag": "CKAN",
+            "description": "Third municipal CKAN portal (15 datasets: property cadastre, current ordinances, waste-collection routes); same tools with source=\"latacunga\"",
+            "coverage": "datosabiertos.latacunga.gob.ec",
+            "url": "https://datosabiertos.latacunga.gob.ec",
+            "status": "live"
           }
         ]
       }
@@ -166,7 +175,7 @@
             "id": "bce-bcedata",
             "name": "BCEData",
             "tag": "BCE",
-            "description": "Full macroeconomic catalog: monetary/financial, public finance, external sector and real sector, with coverage auditing",
+            "description": "Full macroeconomic catalog: monetary/financial, public finance, external sector and real sector",
             "coverage": "contenido.bce.fin.ec/bcedata",
             "url": "https://contenido.bce.fin.ec/bcedata/",
             "status": "live"
@@ -344,7 +353,7 @@
             "status": "live"
           },
           {
-            "id": "inec-publications",
+            "id": "inec-publicaciones",
             "name": "INEC Publications",
             "tag": "INEC",
             "description": "Public WordPress REST API covering INEC's 1,700+ publications and bulletins, with full-text search",
@@ -525,6 +534,29 @@
             "description": "EEQ's 2024 blackout schedules, recovered from the Wayback Machine (frozen snapshot)",
             "coverage": "web.archive.org",
             "url": "https://web.archive.org/web/2024/https://energia-ecuador.com/",
+            "status": "live"
+          },
+          {
+            "id": "eeq-cortes",
+            "name": "EEQ power cuts",
+            "tag": "Energy",
+            "description": "Scheduled power cuts of Empresa Eléctrica Quito, 2023 and 2024 blackout crises (26 PDFs); same search_cortes and get_cortes_horarios tools with distribuidora=\"eeq\"",
+            "coverage": "eeq.com.ec",
+            "url": "https://www.eeq.com.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "ARCONEL (Energy and Non-Renewable Natural Resources Regulation and Control Agency)",
+        "sources": [
+          {
+            "id": "arconel-reportes",
+            "name": "ARCONEL reports",
+            "tag": "Energy",
+            "description": "Public electricity statistics builder: 28 report types (energy balance, losses, billing, infrastructure), 1998 on",
+            "coverage": "reportes.arconel.gob.ec",
+            "url": "https://reportes.arconel.gob.ec",
             "status": "live"
           }
         ]

@@ -107,7 +107,7 @@
             "name": "sort",
             "type": "Literal['relevance', 'recent']",
             "default": "'relevance'",
-            "description": "Orden de los resultados (campo CKAN, p. ej. `metadata_modified desc`)."
+            "description": "`relevance` (default, ranking propio de CKAN) o `recent` (más recientes primero por metadata_modified; sirve sin query para descubrir datasets nuevos o actualizados)."
           },
           {
             "name": "source",
@@ -201,7 +201,7 @@
       },
       {
         "name": "preview_resource_data",
-        "description": "Preview de CSV/TSV, JSON/GeoJSON o Excel (XLS/XLSX) como tabla (máx. 5 MB).",
+        "description": "Vista previa de CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX/XLSB), ODS o ZIP/tar.gz con un CSV, como tabla (máx. 5 MB).",
         "params": [
           {
             "name": "resource_id",
@@ -228,11 +228,11 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Descarga y previsualiza un recurso del portal de datos abiertos. Soporta CSV/TSV, JSON/GeoJSON y Excel (XLSX). Devuelve las primeras N filas como tabla formateada para que el modelo pueda inspeccionar los datos sin descarga local. Las columnas de geometría/WKT se descartan de la tabla (pueden pesar decenas de KB por celda); las columnas CSV en notación decimal europea (7.760,2) se normalizan a notación estándar (7760.2). Tamaño máximo de descarga: 5 MB. Para recursos tabulares grandes en el DataStore, preferí query_resource_data."
+        "long_description": "Descarga y muestra una vista previa de un recurso del portal de datos abiertos de Ecuador. Soporta CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX/XLSB), ODS y .zip o .tar.gz que envuelven un CSV/TSV/TXT. Devuelve las primeras N filas como tabla para que el modelo inspeccione los datos sin descargarlos. Las columnas de geometría/WKT se descartan (pueden pesar decenas de KB por celda) y las de notación decimal europea (7.760,2) se normalizan (7760.2). Tamaño máximo de descarga: 5 MB. Para recursos tabulares grandes del DataStore, prefiere query_resource_data."
       },
       {
         "name": "download_resource",
-        "description": "Baja el archivo crudo de un recurso en base64 (máx. 5 MB), para formatos que no se pueden previsualizar como tabla (.rar, .tar.gz, etc.).",
+        "description": "Bytes crudos en base64 (máx. 5 MB) para formatos que preview_resource_data no puede leer (.rar o no reconocidos).",
         "params": [
           {
             "name": "resource_id",
@@ -253,7 +253,7 @@
             "description": "text | json (json incluye content_base64; úsalo para obtener el archivo real)"
           }
         ],
-        "long_description": "Descarga los bytes crudos de un recurso del portal de datos abiertos, codificados en base64. Úsalo para formatos que preview_resource_data no puede parsear como tabla (.rar, .tar.gz, .xls legacy, o cualquier formato no reconocido) — trae el archivo tal cual en vez de intentar leerlo. Tamaño máximo: 5 MB (mismo límite que preview_resource_data). Los archivos más grandes vuelven con un error y la URL directa en su lugar, ya que serían demasiado grandes para incluir en una respuesta. Llama con format=\"json\" para obtener el contenido real del archivo — el default format=\"text\" solo confirma la descarga y te indica que reintentes con json; nunca incluye content_base64."
+        "long_description": "Descarga los bytes crudos de un recurso del portal de datos abiertos de Ecuador, en base64. Úsalo para formatos que preview_resource_data no puede convertir en tabla (.rar o cualquier formato no reconocido): trae el archivo tal cual en vez de intentar leerlo. Tamaño máximo: 5 MB (el mismo tope que preview_resource_data); los archivos más grandes devuelven un error y la URL directa. Llama con format=\"json\" para obtener el contenido: el default format=\"text\" solo confirma la descarga y nunca incluye content_base64."
       },
       {
         "name": "query_resource_data",
@@ -381,11 +381,11 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Busca trámites del gobierno ecuatoriano en el portal oficial gob.ec. Mejor enfoque: da un institution_id para obtener los trámites de esa institución. Agrega un query para filtrar resultados por palabra clave (filtra por nombre y descripción). Cuando se da query junto con institution_id, se recorren TODAS las páginas de trámites de esa institución y se filtran, así que siempre obtenés los resultados más relevantes. IDs de institución comunes: \"8\" = SRI (impuestos, RUC, facturación), \"23\" = Registro Civil (cédula, partidas de nacimiento), \"62\" = ANT (licencias de conducir, matriculación vehicular), \"16\" = Cancillería (pasaportes, apostilla), \"5\" = IESS (seguro social, pensiones, fondos de reserva). Usa list_instituciones para encontrar más IDs."
+        "long_description": "Busca trámites del gobierno ecuatoriano en el portal oficial gob.ec. Mejor enfoque: da un institution_id para obtener los trámites de esa institución. Agrega un query para filtrar resultados por palabra clave (filtra por nombre y descripción). Cuando se da query junto con institution_id, se recorren TODAS las páginas de trámites de esa institución y se filtran, así que siempre obtienes los resultados más relevantes. IDs de institución comunes: \"8\" = SRI (impuestos, RUC, facturación), \"23\" = Registro Civil (cédula, partidas de nacimiento), \"62\" = ANT (licencias de conducir, matriculación vehicular), \"16\" = Cancillería (pasaportes, apostilla), \"5\" = IESS (seguro social, pensiones, fondos de reserva). Usa list_instituciones para encontrar más IDs."
       },
       {
         "name": "get_tramite_info",
-        "description": "Detalle completo: requisitos, procedimiento, costo, tiempo estimado.",
+        "description": "Requisitos, beneficiarios, costo e institución responsable de un trámite.",
         "params": [
           {
             "name": "tramite_id",
@@ -610,7 +610,7 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Serie de tiempo de un grupo de indicadores del Banco Central del Ecuador (BCE). Usa primero search_indicadores_bce para encontrar el id_grupo. Frecuencia y unidad varían por grupo (ej. \"Mensual\"/\"Millones de USD\" para oferta monetaria, \"Trimestral\"/\"Porcentaje\" para crecimiento del PIB) — omitilas para obtener el default del grupo, o revisa el mensaje de error para ver las opciones válidas si adivinás mal."
+        "long_description": "Serie de tiempo de un grupo de indicadores del Banco Central del Ecuador (BCE). Usa primero search_indicadores_bce para encontrar el id_grupo. Frecuencia y unidad varían por grupo (ej. \"Mensual\"/\"Millones de USD\" para oferta monetaria, \"Trimestral\"/\"Porcentaje\" para crecimiento del PIB) — omitilas para obtener el default del grupo, o revisa el mensaje de error para ver las opciones válidas si te equivocas."
       }
     ]
   },
@@ -677,7 +677,7 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Ficha completa del registro de una compañía por RUC (Superintendencia de Compañías). Devuelve situación legal, fecha de constitución, representante legal, capital suscrito, actividad económica (CIIU), dirección y último año de balance. Usa primero search_companias si no tenés el RUC exacto."
+        "long_description": "Ficha completa del registro de una compañía por RUC (Superintendencia de Compañías). Devuelve situación legal, fecha de constitución, representante legal, capital suscrito, actividad económica (CIIU), dirección y último año de balance. Usa primero search_companias si no tienes el RUC exacto."
       },
       {
         "name": "search_ranking",
@@ -705,7 +705,7 @@
             "name": "descending",
             "type": "bool",
             "default": "False",
-            "description": "Orden descendente (default) o ascendente."
+            "description": "Orden descendente si es true (default false = ascendente); úsalo para «top N» por una columna como roe. posicion_general ya viene ascendente (1 = mejor), déjalo en false al ordenar por ella."
           },
           {
             "name": "limit",
@@ -726,7 +726,7 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Rankea/filtra compañías de Supercías por indicadores financieros de un año fiscal. Filtra por año y/o actividad económica CIIU nivel 1 (una letra, ej. \"C\" para manufactura), ordenado por cualquier columna de indicador (default: posicion_general, ya precalculado en el dataset). Cada resultado incluye el nombre/RUC de la compañía junto a sus financieros. Cubre solo los últimos años fiscales cacheados, no el historial completo. Usa get_financials para el detalle completo de una compañía, o get_compania_info para datos legales/de registro (dirección, representante legal, etc.)."
+        "long_description": "Rankea/filtra compañías de Supercías por indicadores financieros de un año fiscal. Filtra por año y/o actividad económica CIIU nivel 1 (una letra, ej. \"C\" para manufactura), ordenado por cualquier columna de indicador (default: posicion_general, ya precalculado en el dataset). Cada resultado incluye el nombre/RUC de la compañía junto a sus financieros. Cubre los últimos cinco años fiscales de la base local, no el historial completo. Usa get_financials para el detalle completo de una compañía, o get_compania_info para datos legales/de registro (dirección, representante legal, etc.)."
       },
       {
         "name": "get_financials",
@@ -751,7 +751,7 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Historial financiero de una compañía a partir de los balances de Supercías. Devuelve ingresos, activos, patrimonio, utilidad, cantidad de empleados, y ratios financieros (liquidez, endeudamiento, rentabilidad) por año fiscal. Cubre solo los últimos años fiscales cacheados (lo que scripts/build_supercias_financials_db.py cacheó por última vez), no el historial completo desde 2008. Complementa get_compania_info, que tiene datos legales/de registro pero no financieros."
+        "long_description": "Historial financiero de una compañía a partir de los balances de Supercías. Devuelve ingresos, activos, patrimonio, utilidad, cantidad de empleados, y ratios financieros (liquidez, endeudamiento, rentabilidad) por año fiscal. Cubre los últimos cinco años fiscales de la base local (ver metadatos.base_local para su fecha de construcción y rango de años), no el historial completo desde 2008. Complementa get_compania_info, que tiene datos legales/de registro pero no financieros."
       },
       {
         "name": "search_auditores",
@@ -807,7 +807,7 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Ficha completa del registro de un auditor externo autorizado por identificación (Superintendencia de Compañías). Devuelve número/fecha de resolución de autorización, nacionalidad, dirección y datos de contacto. Usa primero search_auditores si no tenés la identificación exacta (RUC/cédula)."
+        "long_description": "Ficha completa del registro de un auditor externo autorizado por identificación (Superintendencia de Compañías). Devuelve número/fecha de resolución de autorización, nacionalidad, dirección y datos de contacto. Usa primero search_auditores si no tienes la identificación exacta (RUC/cédula)."
       }
     ]
   },
@@ -1204,37 +1204,37 @@
             "name": "table_id",
             "type": "str",
             "default": null,
-            "description": "Parámetro documentado en el código fuente."
+            "description": "Un table_id de search_bce_iem."
           },
           {
             "name": "desde",
             "type": "str",
             "default": "''",
-            "description": "Parámetro documentado en el código fuente."
+            "description": "Primer período a incluir: YYYY, YYYY-MM o etiqueta mes-año."
           },
           {
             "name": "hasta",
             "type": "str",
             "default": "''",
-            "description": "Parámetro documentado en el código fuente."
+            "description": "Último período a incluir; mismos formatos que desde."
           },
           {
             "name": "boletin_numero",
             "type": "int",
             "default": "0",
-            "description": "Parámetro documentado en el código fuente."
+            "description": "Número de un boletín pasado de search_bce_iem(historico=true); 0 = el último."
           },
           {
             "name": "rows",
             "type": "int",
             "default": "20",
-            "description": "Parámetro documentado en el código fuente."
+            "description": "Máximo de filas devueltas (1-100, default 20)."
           },
           {
             "name": "format",
             "type": "Literal['text', 'json']",
             "default": "'text'",
-            "description": "Parámetro documentado en el código fuente."
+            "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
         "long_description": "Inspecciona una tabla XLSX oficial del boletín IEM más reciente del BCE. Obtén table_id desde search_bce_iem. Las tablas con el diseño común del BCE (períodos en columnas y variables en filas) devuelven series estructuradas y filtrables por fecha. Otros diseños devuelven una vista previa fiel en vez de adivinar columnas silenciosamente. Siempre incluye las URLs del archivo y del boletín del BCE para verificación. Pasa boletin_numero para obtener una versión histórica de las que devuelve search_bce_iem(historico=true)."
@@ -1303,61 +1303,61 @@
             "name": "query",
             "type": "str",
             "default": "''",
-            "description": "Parámetro documentado en el código fuente."
+            "description": "Texto libre que se busca, sin distinguir tildes, en títulos y secciones de las tablas. Vacío lista todas."
           },
           {
             "name": "limit",
             "type": "int",
             "default": "20",
-            "description": "Parámetro documentado en el código fuente."
+            "description": "Máximo de tablas devueltas (default 20)."
           },
           {
             "name": "offset",
             "type": "int",
             "default": "0",
-            "description": "Parámetro documentado en el código fuente."
+            "description": "Desplazamiento de paginación sobre las tablas encontradas."
           },
           {
             "name": "historico",
             "type": "bool",
             "default": "False",
-            "description": "Parámetro documentado en el código fuente."
+            "description": "Busca también en boletines mensuales pasados, no solo en el último."
           },
           {
             "name": "desde_anio",
             "type": "int",
             "default": "0",
-            "description": "Parámetro documentado en el código fuente."
+            "description": "Primer año de boletín a buscar (implica historico)."
           },
           {
             "name": "hasta_anio",
             "type": "int",
             "default": "0",
-            "description": "Parámetro documentado en el código fuente."
+            "description": "Último año de boletín a buscar (implica historico)."
           },
           {
             "name": "guardar_catalogo",
             "type": "bool",
             "default": "False",
-            "description": "Parámetro documentado en el código fuente."
+            "description": "Guarda el catálogo completo en IEM_CATALOG_DIR."
           },
           {
             "name": "hash_archivos",
             "type": "bool",
             "default": "False",
-            "description": "Parámetro documentado en el código fuente."
+            "description": "Descarga cada XLSX descubierto e informa su SHA-256 (auditoría de operador; lento)."
           },
           {
             "name": "max_hash_archivos",
             "type": "int",
             "default": "5000",
-            "description": "Parámetro documentado en el código fuente."
+            "description": "Tope de archivos a los que se calcula el hash cuando hash_archivos está activo."
           },
           {
             "name": "format",
             "type": "Literal['text', 'json']",
             "default": "'text'",
-            "description": "Parámetro documentado en el código fuente."
+            "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
         "long_description": "Busca tablas individuales de Excel en el último boletín IEM del BCE. Úsalo para tablas detalladas del BCE que no están disponibles fácilmente vía search_indicadores_bce/BCEData: comercio por país, deuda, finanzas públicas por nivel de gobierno, petróleo, desagregaciones del PIB, y más. Lista las tablas del boletín mensual vigente; usa get_bce_iem_table con un table_id devuelto para inspeccionar un archivo XLSX oficial. Usa historico=true (o indica desde_anio/hasta_anio) para buscar en todas las páginas de boletines mensuales que coincidan; esto es más lento en la primera llamada porque hay que leer las páginas del archivo histórico. Usa guardar_catalogo=true para persistir el catálogo completo armado por esta búsqueda en IEM_CATALOG_DIR (o data/iem_catalog_snapshots por defecto). La paginación sigue acotando la respuesta del MCP. Usa hash_archivos=true para una auditoría SHA-256 tipo operador de los archivos XLSX descubiertos. Esto descarga los archivos completos, así que es deliberadamente opt-in y está acotado por max_hash_archivos."
@@ -1370,7 +1370,7 @@
             "name": "query",
             "type": "str",
             "default": "''",
-            "description": "Free text matched against the file's label or URL (accent-insensitive), e.g. \"historica\", \"entidad\", \"bdd\". Empty returns all files."
+            "description": "Texto libre que se busca, sin distinguir tildes, en la etiqueta o URL del archivo, p. ej. \"historica\", \"entidad\", \"bdd\". Vacío devuelve todos."
           },
           {
             "name": "format",
@@ -1580,7 +1580,7 @@
             "name": "post",
             "type": "str",
             "default": null,
-            "description": "Either the numeric \"id\" from search_inec_publicaciones, or the publication's full ecuadorencifras.gob.ec URL."
+            "description": "El \"id\" numérico de search_inec_publicaciones, o la URL completa de la publicación en ecuadorencifras.gob.ec."
           },
           {
             "name": "format",
@@ -1599,7 +1599,7 @@
             "name": "query",
             "type": "str",
             "default": "''",
-            "description": "Free text matched against the registry's name/description (accent-insensitive). Empty returns the full curated list."
+            "description": "Texto libre que se busca, sin distinguir tildes, en el nombre o descripción del registro. Vacío devuelve la lista curada completa."
           },
           {
             "name": "format",
@@ -1746,7 +1746,7 @@
             "name": "rows",
             "type": "int",
             "default": "50",
-            "description": "Number of data rows to preview (default: 50, max: 200)"
+            "description": "Número de filas de datos a mostrar (default 50, máx. 200)."
           },
           {
             "name": "format",
@@ -2127,7 +2127,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de \"encuéntrame datos sobre X y muéstrame qué hay dentro\". Elige el resultado de búsqueda mejor rankeado y, entre sus recursos, el primero en un formato que este servidor puede parsear a una tabla (CSV/JSON/XLS/XLSX/ODS/ZIP/TARGZ), saltando los ilegibles (.rar, formatos no reconocidos) en vez de previsualizar el que aparezca primero en la lista. No reemplaza a los tools individuales: si el resultado top no es el dataset correcto, o necesitas un recurso específico dentro de él, usa search_datasets/list_dataset_resources/preview_resource_data directamente en vez de repetir esta llamada."
+        "long_description": "Atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de \"encuéntrame datos sobre X y muéstrame qué hay dentro\". Elige el resultado de búsqueda mejor rankeado y, entre sus recursos, el primero en un formato que este servidor puede parsear a una tabla (CSV/JSON/XLS/XLSX/XLSB/ODS/ZIP/TARGZ), saltando los ilegibles (.rar, formatos no reconocidos) en vez de previsualizar el que aparezca primero en la lista. No reemplaza a los tools individuales: si el resultado top no es el dataset correcto, o necesitas un recurso específico dentro de él, usa search_datasets/list_dataset_resources/preview_resource_data directamente en vez de repetir esta llamada."
       },
       {
         "name": "list_zip_contents",
@@ -2158,7 +2158,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo. Lee solo el registro End Of Central Directory y el directorio central vía peticiones HTTP Range, así que funciona para archivos mucho más grandes que el tope de 5 MB de preview_zip/download_resource -- ej. ZIPs de microdatos de INEC o del censo de varios cientos de MB. Requiere que el servidor respete peticiones Range; falla con un error claro si no. No soporta archivos ZIP64. Listar los nombres es barato de esta forma, pero previsualizar las filas de un miembro específico no lo es (igual hay que descomprimir desde el offset de ese miembro en adelante) -- este tool solo lista metadata."
+        "long_description": "Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo. Lee solo el registro End Of Central Directory y el directorio central vía peticiones HTTP Range, así que funciona para archivos mucho más grandes que el tope de 5 MB de preview_resource_data/download_resource -- ej. ZIPs de microdatos de INEC o del censo de varios cientos de MB. Requiere que el servidor respete peticiones Range; falla con un error claro si no. No soporta archivos ZIP64. Listar los nombres es barato de esta forma, pero previsualizar las filas de un miembro específico no lo es (igual hay que descomprimir desde el offset de ese miembro en adelante) -- este tool solo lista metadata."
       },
       {
         "name": "read_pdf",

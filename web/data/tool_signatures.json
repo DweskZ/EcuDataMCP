@@ -1482,7 +1482,7 @@
       }
     ],
     "description": "List a remote ZIP's members (name, size) via HTTP Range requests, without downloading it; works for archives far beyond 5 MB. No ZIP64.",
-    "summary": "List a .zip archive's member files (name, size) from a direct URL, without downloading the archive. Reads only the End Of Central Directory record and the central directory via HTTP Range requests, so it works for archives far larger than the 5 MB preview_zip/download_resource cap -- e.g. INEC or censo microdata ZIPs of multiple hundred MB. Requires the server to honor Range requests; fails with a clear error otherwise. Does not support ZIP64 archives. Listing names is cheap this way, but previewing a specific member's rows is not (still needs decompressing from that member's offset onward) -- this tool only lists metadata.",
+    "summary": "List a .zip archive's member files (name, size) from a direct URL, without downloading the archive. Reads only the End Of Central Directory record and the central directory via HTTP Range requests, so it works for archives far larger than the 5 MB preview_resource_data/download_resource cap -- e.g. INEC or censo microdata ZIPs of multiple hundred MB. Requires the server to honor Range requests; fails with a clear error otherwise. Does not support ZIP64 archives. Listing names is cheap this way, but previewing a specific member's rows is not (still needs decompressing from that member's offset onward) -- this tool only lists metadata.",
     "args_doc": {
       "url": "Direct URL to a .zip file (from another tool's result, e.g. get_inec_publicacion_archivos, search_archivos(fuente=\"censo\")).",
       "limit": "Max members returned (default 200, max 1000).",

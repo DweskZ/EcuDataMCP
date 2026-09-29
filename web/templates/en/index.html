@@ -91,10 +91,9 @@ previous passport, if it is still valid</pre>
 </div>
 </div>
 <div class="hero-stats">
-<div class="hero-stat"><span class="num">1,581</span><span class="label">datasets</span></div>
 <div class="hero-stat"><span class="num">{{ tool_count }}</span><span class="label">MCP tools</span></div>
 <div class="hero-stat"><span class="num">{{ source_count }}</span><span class="label">official sources</span></div>
-<div class="hero-stat"><span class="num">0</span><span class="label">API keys</span></div>
+<div class="hero-stat"><span class="num">0</span><span class="label">source API keys</span></div>
 </div>
 <div class="source-cloud" aria-label="Connected institutions">
 <span class="source-pill">BCE</span>
@@ -153,7 +152,7 @@ previous passport, if it is still valid</pre>
 <section class="landing">
 <div class="container-page">
 <p class="kicker">What can you ask?</p>
-<h2 class="section-title">It has never been this easy to navigate Ecuador's data.</h2>
+<h2 class="section-title">Ask in plain language, without searching portal by portal.</h2>
 <p class="section-lede">{{ source_count }} official sources, in a single conversation.</p>
 <div class="questions-grid">
 {% for q in questions %}
@@ -200,7 +199,7 @@ previous passport, if it is still valid</pre>
 <div class="container-page">
 <p class="kicker">Connect your assistant</p>
 <h2 class="section-title">Copy your client's configuration.</h2>
-<p class="section-lede">Run the server locally (Docker or <code>uv run</code>, see the <a href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">README</a>) and point your MCP client at <code>http://localhost:8000/mcp</code>.</p>
+<p class="section-lede">Run the server locally (Docker or <code>uv run</code>, see the <a href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">README</a>) and point your MCP client at <code>http://localhost:8000/mcp</code>. The Docker compose file requires a token: set <code>MCP_AUTH_TOKEN</code> (or <code>MCP_REQUIRE_AUTH=0</code> for local use only). For a local stdio client, the simplest option is <code>uvx ecuador-mcp --transport stdio</code>.</p>
 <div class="install-bar">
 <span class="install-label">Quick start</span>
 <div class="code-block install-code">
@@ -292,10 +291,10 @@ Verify the server responds before calling it done.</code></pre>
 <p class="kicker">No friction</p>
 <h2 class="section-title">Ready to use, no setup of your own.</h2>
 <ul class="friction-list">
-<li><strong>No API key</strong>All sources are public data, no authentication.</li>
+<li><strong>No API key</strong>All sources are public data, no authentication. (The HTTP endpoint can be protected with your own token, <code>MCP_AUTH_TOKEN</code>.)</li>
 <li><strong>No account</strong>There is no sign-up or user account to create.</li>
 <li><strong>100% public data</strong>Under an open license, exactly as the Ecuadorian state publishes it.</li>
-<li><strong>No telemetry</strong>The server runs on your machine and never logs or sends any of your queries.</li>
+<li><strong>No telemetry</strong>The server runs on your machine and sends your queries to no one; it only keeps local per-tool usage counters (never the arguments).</li>
 </ul>
 </div>
 </section>
@@ -326,7 +325,7 @@ Verify the server responds before calling it done.</code></pre>
 </details>
 <details class="faq-item">
 <summary>Does the server store my questions?</summary>
-<p>There is no telemetry. The server runs locally on your machine, and every query goes straight from the MCP client to the matching official portal.</p>
+<p>There is no external telemetry. The server runs locally on your machine, and every query goes straight from the MCP client to the matching official portal. The only thing recorded is local per-tool usage counters (name, outcome and duration, never the arguments).</p>
 </details>
 <details class="faq-item">
 <summary>What formats does it support?</summary>

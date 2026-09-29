@@ -107,7 +107,7 @@
             "name": "sort",
             "type": "Literal['relevance', 'recent']",
             "default": "'relevance'",
-            "description": "Result order (a CKAN sort field, e.g. `metadata_modified desc`)."
+            "description": "`relevance` (default, CKAN's own ranking) or `recent` (newest first by metadata_modified; works without a query to discover new or freshly refreshed datasets)."
           },
           {
             "name": "source",
@@ -201,7 +201,7 @@
       },
       {
         "name": "preview_resource_data",
-        "description": "Preview of CSV/TSV, JSON/GeoJSON, or Excel (XLS/XLSX) as a table (max 5 MB).",
+        "description": "Preview CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX/XLSB), ODS or a ZIP/tar.gz wrapping a CSV as a table (max 5 MB).",
         "params": [
           {
             "name": "resource_id",
@@ -228,11 +228,11 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Download and preview a resource from Ecuador's open data portal. Supports CSV/TSV, JSON/GeoJSON and Excel (XLSX). Returns the first N rows as a formatted table so the model can inspect data without a local download. Geometry/WKT columns are dropped from the table (they can be tens of KB per cell); CSV columns in European decimal notation (7.760,2) are normalized to standard notation (7760.2). Max download size: 5 MB. For large tabular DataStore resources prefer query_resource_data."
+        "long_description": "Download and preview a resource from Ecuador's open data portal. Supports CSV/TSV, JSON/GeoJSON, Excel (XLS/XLSX/XLSB), ODS, and .zip or .tar.gz wrapping a CSV/TSV/TXT. Returns the first N rows as a formatted table so the model can inspect data without a local download. Geometry/WKT columns are dropped from the table (they can be tens of KB per cell); CSV columns in European decimal notation (7.760,2) are normalized to standard notation (7760.2). Max download size: 5 MB. For large tabular DataStore resources prefer query_resource_data."
       },
       {
         "name": "download_resource",
-        "description": "Downloads the raw file of a resource as base64 (max 5 MB), for formats that can't be previewed as a table (.rar, .tar.gz, etc.).",
+        "description": "Raw base64 bytes of a resource (max 5 MB) for formats preview_resource_data can't parse (.rar or unrecognized).",
         "params": [
           {
             "name": "resource_id",
@@ -253,7 +253,7 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Download a resource's raw bytes from Ecuador's open data portal, base64-encoded. Use this for formats preview_resource_data can't parse into a table (.rar, .tar.gz, legacy .xls, or anything unrecognized) — it fetches the file as-is instead of trying to read it. Max size: 5 MB (same cap as preview_resource_data). Larger files come back with an error and the direct URL instead, since they'd be too big to embed in a response. Call with format=\"json\" to get the actual file content — the default format=\"text\" only confirms the download and tells you to retry with json; it never includes content_base64."
+        "long_description": "Download a resource's raw bytes from Ecuador's open data portal, base64-encoded. Use this for formats preview_resource_data can't parse into a table (.rar or anything unrecognized) — it fetches the file as-is instead of trying to read it. Max size: 5 MB (same cap as preview_resource_data). Larger files come back with an error and the direct URL instead, since they'd be too big to embed in a response. Call with format=\"json\" to get the actual file content — the default format=\"text\" only confirms the download and never includes content_base64."
       },
       {
         "name": "query_resource_data",
@@ -385,7 +385,7 @@
       },
       {
         "name": "get_tramite_info",
-        "description": "Full detail: requirements, procedure, cost, estimated time.",
+        "description": "Requirements, beneficiaries, cost and responsible institution of one trámite.",
         "params": [
           {
             "name": "tramite_id",
@@ -705,7 +705,7 @@
             "name": "descending",
             "type": "bool",
             "default": "False",
-            "description": "Descending (default) or ascending order."
+            "description": "Sort descending if true (default false = ascending); use it for top-N by a column such as roe. posicion_general is already ascending (1 = best), so leave it false when sorting by it."
           },
           {
             "name": "limit",
@@ -726,7 +726,7 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Rank/filter Supercías companies by financial indicators for a fiscal year. Filter by year and/or CIIU level-1 economic activity (single letter, e.g. \"C\" for manufacturing), sorted by any indicator column (defaults to the dataset's own precomputed posicion_general). Each result includes the company's nombre/ruc alongside its financials. Covers only the last few cached fiscal years, not the full history. Use get_financials for one company's full detail, or get_compania_info for legal/registry data (address, legal representative, etc.)."
+        "long_description": "Rank/filter Supercías companies by financial indicators for a fiscal year. Filter by year and/or CIIU level-1 economic activity (single letter, e.g. \"C\" for manufacturing), sorted by any indicator column (defaults to the dataset's own precomputed posicion_general). Each result includes the company's nombre/ruc alongside its financials. Covers the last five fiscal years in the local build, not the full history. Use get_financials for one company's full detail, or get_compania_info for legal/registry data (address, legal representative, etc.)."
       },
       {
         "name": "get_financials",
@@ -751,7 +751,7 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Get a company's financial history from Supercías balance-sheet filings. Returns revenue, assets, equity, profit, employee count, and financial ratios (liquidity, leverage, profitability) per fiscal year. Covers only the last few fiscal years (whatever scripts/build_supercias_financials_db.py last cached), not the full history back to 2008. Complements get_compania_info, which has legal/registry data but no financials."
+        "long_description": "Get a company's financial history from Supercías balance-sheet filings. Returns revenue, assets, equity, profit, employee count, and financial ratios (liquidity, leverage, profitability) per fiscal year. Covers the last five fiscal years in the local build (see metadatos.base_local for its build date and year range), not the full history back to 2008. Complements get_compania_info, which has legal/registry data but no financials."
       },
       {
         "name": "search_auditores",
@@ -1204,37 +1204,37 @@
             "name": "table_id",
             "type": "str",
             "default": null,
-            "description": "Parameter documented in the source code."
+            "description": "A table_id from search_bce_iem."
           },
           {
             "name": "desde",
             "type": "str",
             "default": "''",
-            "description": "Parameter documented in the source code."
+            "description": "Earliest period to include, as YYYY, YYYY-MM or a month-year label."
           },
           {
             "name": "hasta",
             "type": "str",
             "default": "''",
-            "description": "Parameter documented in the source code."
+            "description": "Latest period to include, same formats as desde."
           },
           {
             "name": "boletin_numero",
             "type": "int",
             "default": "0",
-            "description": "Parameter documented in the source code."
+            "description": "Past bulletin number from search_bce_iem(historico=true); 0 means the latest."
           },
           {
             "name": "rows",
             "type": "int",
             "default": "20",
-            "description": "Parameter documented in the source code."
+            "description": "Max rows returned (1-100, default 20)."
           },
           {
             "name": "format",
             "type": "Literal['text', 'json']",
             "default": "'text'",
-            "description": "Parameter documented in the source code."
+            "description": "Output format: `text` (default) or `json`."
           }
         ],
         "long_description": "Inspect one official XLSX table from the latest BCE IEM bulletin. Get table_id from search_bce_iem. Tables with the common BCE layout (periods across columns and variables down rows) return structured, date-filterable series. Other layouts return a faithful preview rather than silently guessing columns. Always includes the BCE file and bulletin URLs for verification. Pass boletin_numero to retrieve a historical version returned by search_bce_iem(historico=true)."
@@ -1303,61 +1303,61 @@
             "name": "query",
             "type": "str",
             "default": "''",
-            "description": "Parameter documented in the source code."
+            "description": "Free text matched against table titles and sections (accent-insensitive). Empty lists every table."
           },
           {
             "name": "limit",
             "type": "int",
             "default": "20",
-            "description": "Parameter documented in the source code."
+            "description": "Max tables returned (default 20)."
           },
           {
             "name": "offset",
             "type": "int",
             "default": "0",
-            "description": "Parameter documented in the source code."
+            "description": "Pagination offset over the matched set."
           },
           {
             "name": "historico",
             "type": "bool",
             "default": "False",
-            "description": "Parameter documented in the source code."
+            "description": "Also search past monthly bulletins, not just the latest."
           },
           {
             "name": "desde_anio",
             "type": "int",
             "default": "0",
-            "description": "Parameter documented in the source code."
+            "description": "Earliest bulletin year to search (implies historico)."
           },
           {
             "name": "hasta_anio",
             "type": "int",
             "default": "0",
-            "description": "Parameter documented in the source code."
+            "description": "Latest bulletin year to search (implies historico)."
           },
           {
             "name": "guardar_catalogo",
             "type": "bool",
             "default": "False",
-            "description": "Parameter documented in the source code."
+            "description": "Save the full assembled catalog under IEM_CATALOG_DIR."
           },
           {
             "name": "hash_archivos",
             "type": "bool",
             "default": "False",
-            "description": "Parameter documented in the source code."
+            "description": "Download each discovered XLSX and report its SHA-256 (operator audit; slow)."
           },
           {
             "name": "max_hash_archivos",
             "type": "int",
             "default": "5000",
-            "description": "Parameter documented in the source code."
+            "description": "Cap on files hashed when hash_archivos is set."
           },
           {
             "name": "format",
             "type": "Literal['text', 'json']",
             "default": "'text'",
-            "description": "Parameter documented in the source code."
+            "description": "Output format: `text` (default) or `json`."
           }
         ],
         "long_description": "Search individual Excel tables in the BCE's latest IEM bulletin. Use this for detailed BCE tables not conveniently available through search_indicadores_bce/BCEData: trade by country, debt, public finance by government level, oil, GDP breakdowns, and more. It lists tables from the current monthly bulletin; use get_bce_iem_table with a returned table_id to inspect one official XLSX file. Set historico=true (or provide desde_anio/hasta_anio) to search across all matching monthly bulletin pages; this is slower on the first call because the archive pages must be read. Set guardar_catalogo=true to persist the complete catalog assembled by this search under IEM_CATALOG_DIR (or data/iem_catalog_snapshots by default). Pagination still keeps the MCP response bounded. Set hash_archivos=true for an operator-style SHA-256 audit of the discovered XLSX files. This downloads complete files, so it is deliberately opt-in and bounded by max_hash_archivos."
@@ -2127,7 +2127,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "One-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of \"find me data about X and show me what's in it\". Picks the top-ranked search result and, among its resources, the first one in a format this server can actually parse into a table (CSV/JSON/XLS/XLSX/ODS/ZIP/TARGZ), skipping unreadable ones (.rar, unrecognized formats) rather than previewing whichever resource happens to be listed first. Not a replacement for the individual tools: if the top search result isn't the right dataset, or you need a specific resource within it, use search_datasets/list_dataset_resources/ preview_resource_data directly instead of re-running this."
+        "long_description": "One-shot research shortcut: search for a dataset, list its resources, and preview the most promising one's actual data -- the search_datasets -> list_dataset_resources -> preview_resource_data workflow in a single call, for the common case of \"find me data about X and show me what's in it\". Picks the top-ranked search result and, among its resources, the first one in a format this server can actually parse into a table (CSV/JSON/XLS/XLSX/XLSB/ODS/ZIP/TARGZ), skipping unreadable ones (.rar, unrecognized formats) rather than previewing whichever resource happens to be listed first. Not a replacement for the individual tools: if the top search result isn't the right dataset, or you need a specific resource within it, use search_datasets/list_dataset_resources/ preview_resource_data directly instead of re-running this."
       },
       {
         "name": "list_zip_contents",
@@ -2158,7 +2158,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List a .zip archive's member files (name, size) from a direct URL, without downloading the archive. Reads only the End Of Central Directory record and the central directory via HTTP Range requests, so it works for archives far larger than the 5 MB preview_zip/download_resource cap -- e.g. INEC or censo microdata ZIPs of multiple hundred MB. Requires the server to honor Range requests; fails with a clear error otherwise. Does not support ZIP64 archives. Listing names is cheap this way, but previewing a specific member's rows is not (still needs decompressing from that member's offset onward) -- this tool only lists metadata."
+        "long_description": "List a .zip archive's member files (name, size) from a direct URL, without downloading the archive. Reads only the End Of Central Directory record and the central directory via HTTP Range requests, so it works for archives far larger than the 5 MB preview_resource_data/download_resource cap -- e.g. INEC or censo microdata ZIPs of multiple hundred MB. Requires the server to honor Range requests; fails with a clear error otherwise. Does not support ZIP64 archives. Listing names is cheap this way, but previewing a specific member's rows is not (still needs decompressing from that member's offset onward) -- this tool only lists metadata."
       },
       {
         "name": "read_pdf",

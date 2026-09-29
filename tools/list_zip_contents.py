@@ -40,7 +40,7 @@ def register_list_zip_contents_tool(mcp: MCPServer) -> None:
 
         Reads only the End Of Central Directory record and the central
         directory via HTTP Range requests, so it works for archives far
-        larger than the 5 MB preview_zip/download_resource cap -- e.g. INEC
+        larger than the 5 MB preview_resource_data/download_resource cap -- e.g. INEC
         or censo microdata ZIPs of multiple hundred MB. Requires the server
         to honor Range requests; fails with a clear error otherwise. Does
         not support ZIP64 archives. Listing names is cheap this way, but

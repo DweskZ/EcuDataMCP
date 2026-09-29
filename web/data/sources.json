@@ -29,6 +29,15 @@
             "coverage": "cuencaendatos.cuenca.gob.ec",
             "url": "https://cuencaendatos.cuenca.gob.ec",
             "status": "live"
+          },
+          {
+            "id": "latacunga",
+            "name": "Data Mashca (Latacunga)",
+            "tag": "CKAN",
+            "description": "Tercer portal municipal CKAN (15 datasets: catastro predial, ordenanzas vigentes, rutas de recolección); mismos tools con source=\"latacunga\"",
+            "coverage": "datosabiertos.latacunga.gob.ec",
+            "url": "https://datosabiertos.latacunga.gob.ec",
+            "status": "live"
           }
         ]
       }
@@ -166,7 +175,7 @@
             "id": "bce-bcedata",
             "name": "BCEData",
             "tag": "BCE",
-            "description": "Catálogo macroeconómico completo: monetario/financiero, finanzas públicas, sector externo y sector real, con auditoría de cobertura",
+            "description": "Catálogo macroeconómico completo: monetario/financiero, finanzas públicas, sector externo y sector real",
             "coverage": "contenido.bce.fin.ec/bcedata",
             "url": "https://contenido.bce.fin.ec/bcedata/",
             "status": "live"
@@ -288,7 +297,7 @@
           {
             "id": "superbancos",
             "name": "Superbancos",
-            "tag": "SB",
+            "tag": "Banca",
             "description": "Boletines financieros mensuales, servicios financieros, información histórica y calendario estadístico",
             "coverage": "superbancos.gob.ec",
             "url": "https://www.superbancos.gob.ec/estadisticas/portalestudios",
@@ -525,6 +534,29 @@
             "description": "Horarios de racionamiento de 2024 de la EEQ, recuperados del Wayback Machine (foto fija)",
             "coverage": "web.archive.org",
             "url": "https://web.archive.org/web/2024/https://energia-ecuador.com/",
+            "status": "live"
+          },
+          {
+            "id": "eeq-cortes",
+            "name": "Cortes EEQ",
+            "tag": "Energía",
+            "description": "Programación de cortes de luz de la Empresa Eléctrica Quito, crisis de 2023 y 2024 (26 PDF); mismos tools search_cortes y get_cortes_horarios con distribuidora=\"eeq\"",
+            "coverage": "eeq.com.ec",
+            "url": "https://www.eeq.com.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "ARCONEL (Agencia de Regulación y Control de Energía y Recursos Naturales no Renovables)",
+        "sources": [
+          {
+            "id": "arconel-reportes",
+            "name": "Reportes ARCONEL",
+            "tag": "Energía",
+            "description": "Generador público de estadísticas eléctricas: 28 tipos de reporte (balance de energía, pérdidas, facturación, infraestructura), desde 1998",
+            "coverage": "reportes.arconel.gob.ec",
+            "url": "https://reportes.arconel.gob.ec",
             "status": "live"
           }
         ]
