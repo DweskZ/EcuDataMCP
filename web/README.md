@@ -15,15 +15,14 @@ para que un solo PR pueda actualizar el README del servidor y el sitio a la vez.
 - `data/*.json` / `en/data/*.json` — fuentes, clientes MCP, tools, preguntas de ejemplo y releases.
   Editar estos archivos no requiere saber Python — es solo JSON.
 - `data/tool_signatures.json` — extracción cruda en inglés (nombre, parámetros con tipo/default,
-  docstring completo) de los tools en `../tools/*.py`, generada por `scripts/extract_tool_signatures.py`
-  (un script `ast`, no a mano). Es la fuente de la que se traduce a mano `description`/`long_description`/
-  `params` en `data/tools.json` y `en/data/tools.json`. Si se agrega o cambia un tool, correr ese script
-  y portar a mano lo que cambió — no hay sincronización automática.
-- `styles.scss` — se mantiene como referencia legible (variables de tema, comentarios), pero **ya no se
-  compila automáticamente**. El CSS real que sirve el sitio es `assets/styles.css`, ya compilado
-  (Bootstrap `darkly` + este SCSS, fusionados una sola vez). Para cambiar el tema: edita `styles.css`
-  directamente (es CSS plano, no minificado más allá de lo que ya traía), o instala Dart Sass
-  una vez para recompilar `styles.scss` y pega el resultado en `styles.css`.
+  descripción del decorador y docstring) de todas las tools públicas registradas en `../tools/*.py`
+  (no incluye las de mantenimiento), generada por `scripts/extract_tool_signatures.py` (un script `ast`,
+  no a mano; el workflow de Pages lo corre en cada build). Es la fuente de verdad de qué tools existen y
+  qué parámetros tienen: `build.py` descarta de `tools.json` las tools que ya no existen, sincroniza sus
+  parámetros con el código y muestra las tools nuevas en una categoría aparte, en inglés, hasta que se
+  traduzcan a mano `description`/`long_description`/`params` en `data/tools.json` y `en/data/tools.json`.
+- `assets/styles.css` — el CSS del sitio, en texto plano; es la única fuente (no hay SCSS que recompilar).
+  Edítalo directamente.
 - `assets/` — CSS compilado, `site.js` (toggle de navbar móvil, tabs de clientes MCP, panel de búsqueda,
   botón de copiar), `fuse.min.js` (vendored, motor de la búsqueda), favicon, imagen OG. El ícono de
   búsqueda del navbar es un SVG inline en `templates/base.html`, no una fuente de íconos.

@@ -23,6 +23,7 @@ from pathlib import Path
 WEB = Path(__file__).resolve().parent.parent
 TOOLS_DIR = WEB.parent / "tools"
 OUT_PATH = WEB / "data" / "tool_signatures.json"
+MAINTENANCE_TOOLS = {"audit_bce_catalog", "compare_bce_sources"}
 
 
 def unparse_default(node):
@@ -46,10 +47,23 @@ def is_mcp_tool(func: ast.AsyncFunctionDef) -> bool:
     return False
 
 
-def find_tool_func(tree: ast.Module):
-    for node in ast.walk(tree):
-        if isinstance(node, ast.AsyncFunctionDef) and is_mcp_tool(node):
-            return node
+def find_tool_funcs(tree: ast.Module) -> list:
+    """Every @mcp.tool function in the file (some files register several)."""
+    return [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.AsyncFunctionDef) and is_mcp_tool(node)
+    ]
+
+
+def decorator_description(func: ast.AsyncFunctionDef) -> str | None:
+    """The `description=` string passed to @mcp.tool(...), when present."""
+    for dec in func.decorator_list:
+        if isinstance(dec, ast.Call):
+            for keyword in dec.keywords:
+                if keyword.arg == "description":
+                    value = ast.literal_eval(keyword.value)
+                    return re.sub(r"\s+", " ", value).strip()
     return None
 
 
@@ -131,17 +145,21 @@ def main():
         if py_file.name == "__init__.py":
             continue
         tree = ast.parse(py_file.read_text(encoding="utf-8"))
-        func = find_tool_func(tree)
-        if func is None:
-            continue
-        doc = ast.get_docstring(func) or ""
-        summary, args_doc = split_docstring(doc)
-        result[func.name] = {
-            "file": py_file.name,
-            "params": extract_params(func),
-            "summary": summary,
-            "args_doc": args_doc,
-        }
+        for func in find_tool_funcs(tree):
+            # Operator-only tools are registered only under MCP_PROFILE=
+            # maintenance/all (tools/__init__.py:register_maintenance_tools),
+            # so the public site does not list them.
+            if func.name in MAINTENANCE_TOOLS:
+                continue
+            doc = ast.get_docstring(func) or ""
+            summary, args_doc = split_docstring(doc)
+            result[func.name] = {
+                "file": py_file.name,
+                "params": extract_params(func),
+                "description": decorator_description(func),
+                "summary": summary,
+                "args_doc": args_doc,
+            }
 
     OUT_PATH.write_text(
         json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
