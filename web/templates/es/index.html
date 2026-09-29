@@ -23,7 +23,7 @@
 <div class="chat-bubble user">¿Cuánto cuesta el pasaporte y qué piden?</div>
 <div class="chat-bubble assistant">
 <span class="chat-tool">tool · get_tramite_info</span>
-<p>Para mayores de 18 años el pasaporte electrónico cuesta <strong>USD 90</strong>, sin IVA. La tercera edad paga la mitad. Con discapacidad del 30% o más, no se paga.</p>
+<p>El trámite tiene costo, salvo con discapacidad del 30% o más, que <strong>no paga</strong>. El monto lo fija el Registro Civil: confírmalo en la fuente enlazada.</p>
 <pre class="chat-code">comprobante de pago
 cédula vigente
 pasaporte anterior, si sigue vigente</pre>
@@ -41,7 +41,7 @@ pasaporte anterior, si sigue vigente</pre>
     "label": "Pasaporte",
     "turns": [
       {"role": "user", "text": "¿Cuánto cuesta el pasaporte y qué piden?"},
-      {"role": "assistant", "tool": "get_tramite_info", "text": "Para mayores de 18 años el pasaporte electrónico cuesta USD 90, sin IVA. La tercera edad paga la mitad. Con discapacidad del 30% o más, no se paga.", "html": "Para mayores de 18 años el pasaporte electrónico cuesta <strong>USD 90</strong>, sin IVA. La tercera edad paga la mitad. Con discapacidad del 30% o más, no se paga.", "code": "comprobante de pago\ncédula vigente\npasaporte anterior, si sigue vigente", "cite": "fuente · gob.ec, Registro Civil"}
+      {"role": "assistant", "tool": "get_tramite_info", "text": "El trámite tiene costo, salvo con discapacidad del 30% o más, que no paga. El monto lo fija el Registro Civil: confírmalo en la fuente enlazada.", "html": "El trámite tiene costo, salvo con discapacidad del 30% o más, que <strong>no paga</strong>. El monto lo fija el Registro Civil: confírmalo en la fuente enlazada.", "code": "comprobante de pago\ncédula vigente\npasaporte anterior, si sigue vigente", "cite": "fuente · gob.ec, Registro Civil"}
     ]
   },
   {
