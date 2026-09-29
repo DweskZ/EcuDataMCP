@@ -99,7 +99,7 @@ NAV = {
 
 PAGE_TITLES = {
     "es": {
-        "index": "EcuDataMCP",
+        "index": "Datos abiertos de Ecuador para tu asistente de IA",
         "atlas": "Referencia",
         "examples": "Ejemplos",
         "releases": "Releases",
@@ -108,7 +108,7 @@ PAGE_TITLES = {
         "fuentes": "Fuentes",
     },
     "en": {
-        "index": "EcuDataMCP",
+        "index": "Ecuador open data for your AI assistant",
         "atlas": "Reference",
         "examples": "Examples",
         "releases": "Releases",
@@ -231,43 +231,70 @@ def load_org_logos(lang: str) -> list[dict]:
 def complete_tool_catalog(
     curated: list[dict], signatures: dict[str, dict], lang: str
 ) -> list[dict]:
-    """Keep the human-written Atlas current when new tools are added.
+    """Keep the human-written Atlas in step with the code.
 
-    The curated entries retain their translated descriptions. New tools appear
-    under one explicit supplementary category using their source docstrings,
-    rather than being silently omitted until a full editorial pass is made.
-    `signatures` is always the English extraction (there is only one
-    tool_signatures.json -- docstrings are written in English) regardless of
-    `lang`, so on the Spanish site this fallback text is English by
-    construction; the category label says so explicitly instead of silently
-    mixing languages.
+    `signatures` (data/tool_signatures.json, from scripts/
+    extract_tool_signatures.py) is the source of truth for which tools exist
+    and what parameters they take. Curated entries keep their translated
+    descriptions, but a tool that no longer exists is dropped, and each
+    entry's parameter list follows the code (new parameters get the source
+    docstring text). Tools with no curated entry appear under one explicit
+    supplementary category using their source docstrings, rather than being
+    silently omitted until an editorial pass is made. `signatures` is the
+    English extraction (docstrings are written in English), so on the
+    Spanish site that fallback text is English by construction; the category
+    label says so instead of silently mixing languages.
     """
-    listed = {tool["name"] for category in curated for tool in category["tools"]}
-    missing = sorted(set(signatures) - listed)
-    if not missing:
-        return curated
-
     fallback_description = (
         "Parámetro documentado en el código fuente."
         if lang == "es"
         else "Parameter documented in the source code."
     )
+
+    def param_entry(name: str, signature: dict, existing: dict | None) -> dict:
+        code_param = next(p for p in signature["params"] if p["name"] == name)
+        description = (
+            existing["description"]
+            if existing
+            else signature["args_doc"].get(name, fallback_description)
+        )
+        return {**code_param, "description": description}
+
+    catalog = []
+    for category in curated:
+        tools = []
+        for tool in category["tools"]:
+            signature = signatures.get(tool["name"])
+            if signature is None:
+                continue
+            existing = {}
+            for param in tool["params"]:
+                existing.setdefault(param["name"], param)
+            params = [
+                param_entry(p["name"], signature, existing.get(p["name"]))
+                for p in signature["params"]
+            ]
+            tools.append({**tool, "params": params})
+        if tools:
+            catalog.append({**category, "tools": tools})
+
+    listed = {tool["name"] for category in catalog for tool in category["tools"]}
+    missing = sorted(set(signatures) - listed)
+    if not missing:
+        return catalog
+
     generated = []
     for name in missing:
         signature = signatures[name]
+        description = signature.get("description") or signature["summary"]
         generated.append(
             {
                 "name": name,
-                "description": signature["summary"].split(". ", 1)[0],
+                "description": description.split(". ", 1)[0],
                 "long_description": signature["summary"],
                 "params": [
-                    {
-                        **parameter,
-                        "description": signature["args_doc"].get(
-                            parameter["name"], fallback_description
-                        ),
-                    }
-                    for parameter in signature["params"]
+                    param_entry(p["name"], signature, None)
+                    for p in signature["params"]
                 ],
             }
         )
@@ -280,7 +307,7 @@ def complete_tool_catalog(
         ),
         "tools": generated,
     }
-    return [*curated, category]
+    return [*catalog, category]
 
 
 def build_env() -> jinja2.Environment:
