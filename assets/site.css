@@ -67,6 +67,52 @@ html[data-theme="light"] body {
   color: var(--ecu-text) !important;
 }
 
+/* One soft wash for the whole page, so the color does not restart at each section. */
+body {
+  position: relative;
+  z-index: 0;
+  background-color: var(--ecu-ink);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 62% 48% at 6% 8%, rgba(255, 209, 0, 0.1), transparent 68%),
+    radial-gradient(ellipse 50% 42% at 96% 16%, rgba(0, 51, 160, 0.09), transparent 70%),
+    radial-gradient(ellipse 46% 40% at 72% 96%, rgba(239, 51, 64, 0.07), transparent 72%);
+  background-repeat: no-repeat;
+  background-size: 140% 140%, 130% 130%, 140% 140%;
+  animation: page-wash 26s ease-in-out infinite alternate;
+}
+
+html[data-theme="light"] body::before {
+  background:
+    radial-gradient(ellipse 62% 48% at 6% 8%, rgba(255, 209, 0, 0.14), transparent 70%),
+    radial-gradient(ellipse 50% 42% at 96% 16%, rgba(0, 51, 160, 0.06), transparent 72%),
+    radial-gradient(ellipse 46% 40% at 72% 96%, rgba(239, 51, 64, 0.05), transparent 74%);
+}
+
+@keyframes page-wash {
+  from { background-position: 0% 0%, 100% 0%, 40% 100%; }
+  to { background-position: 8% 10%, 78% 16%, 52% 82%; }
+}
+
+.site-navbar,
+main,
+.page-footer {
+  position: relative;
+  z-index: 1;
+}
+
+.landing {
+  background: transparent;
+  border-bottom-color: transparent;
+}
+
 html[data-theme="light"] h1,
 html[data-theme="light"] h2,
 html[data-theme="light"] h3,
@@ -207,24 +253,25 @@ html[data-theme="light"] .faq-item summary::before {
   color: var(--ecu-blue);
 }
 
-html[data-theme="light"] .page-footer .nav-footer {
-  background:
-    linear-gradient(
-      90deg,
-      rgba(255, 209, 0, 0.12),
-      rgba(0, 51, 160, 0.08),
-      rgba(239, 51, 64, 0.08)
-    ),
-    #eef2f8;
+html[data-theme="light"] .page-footer .nav-footer,
+html[data-theme="light"] .site-footer {
+  background: transparent;
   color: var(--ecu-muted);
 }
 
-html[data-theme="light"] .page-footer .nav-footer a {
-  color: var(--ecu-muted);
+html[data-theme="light"] .site-footer a.site-footer-name,
+html[data-theme="light"] .site-footer .site-footer-links a {
+  color: var(--ecu-heading);
 }
 
 html[data-theme="light"] .landing.hero h1 .accent {
-  background: linear-gradient(110deg, #0033a0 0%, #7eb0ff 35%, #0033a0 55%, #1a6bff 100%);
+  background-image: linear-gradient(
+    100deg,
+    #8a6400 0%,
+    #0033a0 34%,
+    #b42333 67%,
+    #8a6400 100%
+  );
   background-size: 220% 100%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -614,14 +661,9 @@ a.btn-cta[href="https://github.com/DweskZ/EcuDataMCP"]::before {
 
 .landing.hero {
   position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  padding: 5.5rem 0 4.5rem;
-  background:
-    radial-gradient(ellipse 70% 55% at 12% 18%, var(--ecu-hero-glow-y), transparent 60%),
-    radial-gradient(ellipse 55% 50% at 88% 12%, var(--ecu-hero-glow-b), transparent 62%),
-    radial-gradient(ellipse 50% 45% at 70% 88%, var(--ecu-hero-glow-r), transparent 65%),
-    var(--ecu-hero-base);
+  overflow: visible;
+  padding: 4.5rem 0 1.25rem;
+  background: transparent;
 }
 
 .landing.hero,
@@ -657,12 +699,18 @@ a.btn-cta[href="https://github.com/DweskZ/EcuDataMCP"]::before {
 }
 
 .landing.hero h1 .accent {
-  background: linear-gradient(110deg, #ffd100 0%, #fff6c2 35%, #ffd100 55%, #ffe566 100%);
+  background-image: linear-gradient(
+    100deg,
+    #ffe14a 0%,
+    #9ec2ff 34%,
+    #ff9aa3 67%,
+    #ffe14a 100%
+  );
   background-size: 220% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: accent-shift 6s ease-in-out infinite;
+  animation: accent-shift 9s linear infinite;
 }
 
 .btn-cta.primary {
@@ -774,30 +822,73 @@ a.btn-cta[href="https://github.com/DweskZ/EcuDataMCP"]::before {
 
 .page-footer .nav-footer {
   border-top: 1px solid var(--ecu-line);
-  background:
-    linear-gradient(
-      90deg,
-      rgba(255, 209, 0, 0.08),
-      rgba(0, 51, 160, 0.1),
-      rgba(239, 51, 64, 0.08)
-    ),
-    var(--ecu-ink);
+  background: transparent;
+}
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.35rem 1.5rem 1.6rem;
+  border-top: 1px solid var(--ecu-line);
+}
+
+.site-footer-brand {
+  min-width: 0;
+}
+
+.site-footer-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ecu-heading);
+  text-decoration: none;
+}
+
+.site-footer-brand p {
+  margin: 0.35rem 0 0;
+  max-width: 38rem;
+  color: var(--ecu-muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.site-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 1.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer-links a {
+  color: var(--ecu-heading);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.site-footer-links a:hover {
+  color: var(--ecu-stat-blue);
 }
 
 /* Closing line. styles.css paints the sentence #e6e6e6, which disappears
    on the light page. Give it its own band and a theme-aware heading color. */
 .closing-cta {
   position: relative;
-  isolation: isolate;
-  overflow: hidden;
   text-align: center;
-  padding: 4.75rem 1.25rem 5rem;
-  background:
-    radial-gradient(ellipse 48% 90% at 50% 115%, var(--ecu-hero-glow-b), transparent 64%),
-    radial-gradient(ellipse 36% 80% at 0% 0%, var(--ecu-hero-glow-y), transparent 70%),
-    radial-gradient(ellipse 36% 80% at 100% 0%, var(--ecu-hero-glow-r), transparent 70%),
-    var(--ecu-panel);
-  border-top: 1px solid var(--ecu-line);
+  padding: 4.75rem 1.25rem 3.5rem;
+  background: transparent;
+  border-top: none;
 }
 
 .closing-cta::before {
@@ -806,15 +897,8 @@ a.btn-cta[href="https://github.com/DweskZ/EcuDataMCP"]::before {
   left: 0;
   right: 0;
   top: 0;
-  height: 3px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    #ffd100 16%,
-    #0033a0 50%,
-    #ef3340 84%,
-    transparent 100%
-  );
+  height: 1px;
+  background: var(--ecu-line);
 }
 
 .closing-cta p {
@@ -844,8 +928,8 @@ html[data-theme="light"] .closing-cta p {
   display: flex;
   gap: 0.85rem;
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
+  scroll-snap-type: none;
+  scroll-behavior: auto;
   scrollbar-width: none;
   padding: 0.35rem 0.1rem 0.55rem;
   min-width: 0;
@@ -989,10 +1073,6 @@ html[data-theme="light"] .closing-cta p {
   }
 }
 
-.landing.hero {
-  padding: 4.5rem 0 1.25rem;
-}
-
 .hero-copy .hero-sub {
   max-width: 36rem;
 }
@@ -1012,11 +1092,7 @@ html[data-theme="light"] .closing-cta p {
 }
 
 .hero-orbs {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 
 .hero-orb {
@@ -1632,8 +1708,8 @@ code a:any-link {
 /* ---- Landing motion ---- */
 
 @keyframes accent-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
 }
 
 @keyframes chat-float {
@@ -1698,6 +1774,7 @@ code a:any-link {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  body::before,
   .landing.hero h1 .accent,
   .hero-copy > *,
   .hero-visual,

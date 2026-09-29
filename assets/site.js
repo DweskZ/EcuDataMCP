@@ -370,18 +370,6 @@ function copyCode(btn) {
 (function () {
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var hero = document.querySelector(".landing.hero");
-  if (hero && !reduce && !hero.querySelector(".hero-orbs")) {
-    var wrap = document.createElement("div");
-    wrap.className = "hero-orbs";
-    wrap.setAttribute("aria-hidden", "true");
-    ["y", "b", "r"].forEach(function (name) {
-      var orb = document.createElement("span");
-      orb.className = "hero-orb hero-orb-" + name;
-      wrap.appendChild(orb);
-    });
-    hero.prepend(wrap);
-  }
-
   if (reduce || !("IntersectionObserver" in window)) return;
 
   var nodes = document.querySelectorAll(".landing:not(.hero), .closing-cta");
@@ -443,8 +431,29 @@ function copyCode(btn) {
   if (!viewport || !prev || !next) return;
 
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var timer = 0;
   var paused = false;
+  var last = 0;
+  var speed = 36;
+
+  Array.prototype.forEach.call(viewport.children, function (node) {
+    var clone = node.cloneNode(true);
+    clone.setAttribute("aria-hidden", "true");
+    var link = clone.querySelector("a") || (clone.matches("a") ? clone : null);
+    if (link) link.setAttribute("tabindex", "-1");
+    if (clone.matches("a")) clone.setAttribute("tabindex", "-1");
+    viewport.appendChild(clone);
+  });
+
+  function halfWidth() {
+    return viewport.scrollWidth / 2;
+  }
+
+  function wrap() {
+    var half = halfWidth();
+    if (!half) return;
+    if (viewport.scrollLeft >= half) viewport.scrollLeft -= half;
+    else if (viewport.scrollLeft < 0) viewport.scrollLeft += half;
+  }
 
   function stepSize() {
     var card = viewport.querySelector(".org-logo");
@@ -455,48 +464,32 @@ function copyCode(btn) {
   }
 
   function go(dir) {
-    var max = viewport.scrollWidth - viewport.clientWidth;
-    var behavior = reduce ? "auto" : "smooth";
-    if (dir > 0 && viewport.scrollLeft >= max - 4) {
-      viewport.scrollTo({ left: 0, behavior: behavior });
-      return;
-    }
-    if (dir < 0 && viewport.scrollLeft <= 4) {
-      viewport.scrollTo({ left: max, behavior: behavior });
-      return;
-    }
-    viewport.scrollBy({ left: dir * stepSize(), behavior: behavior });
+    viewport.scrollLeft += dir * stepSize();
+    wrap();
   }
 
-  function arm() {
-    window.clearInterval(timer);
-    if (reduce || paused || document.hidden) return;
-    timer = window.setInterval(function () { go(1); }, 3200);
+  function frame(now) {
+    if (!last) last = now;
+    var dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    if (!reduce && !paused && !document.hidden) {
+      viewport.scrollLeft += speed * dt;
+      wrap();
+    }
+    window.requestAnimationFrame(frame);
   }
 
   prev.addEventListener("click", function () { go(-1); });
   next.addEventListener("click", function () { go(1); });
-  root.addEventListener("pointerenter", function () {
-    paused = true;
-    window.clearInterval(timer);
-  });
-  root.addEventListener("pointerleave", function () {
-    paused = false;
-    arm();
-  });
-  root.addEventListener("focusin", function () {
-    paused = true;
-    window.clearInterval(timer);
-  });
+  root.addEventListener("pointerenter", function () { paused = true; });
+  root.addEventListener("pointerleave", function () { paused = false; last = 0; });
+  root.addEventListener("focusin", function () { paused = true; });
   root.addEventListener("focusout", function (event) {
     if (!root.contains(event.relatedTarget)) {
       paused = false;
-      arm();
+      last = 0;
     }
   });
-  document.addEventListener("visibilitychange", function () {
-    if (document.hidden) window.clearInterval(timer);
-    else arm();
-  });
-  arm();
+  document.addEventListener("visibilitychange", function () { last = 0; });
+  if (!reduce) window.requestAnimationFrame(frame);
 })();
