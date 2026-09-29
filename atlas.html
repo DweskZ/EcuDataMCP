@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Referencia – EcuDataMCP</title>
-<meta name="description" content="Los 116 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
+<meta name="description" content="Los 90 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <meta property="og:title" content="Referencia – EcuDataMCP">
-<meta property="og:description" content="Los 116 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
+<meta property="og:description" content="Los 90 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
 <meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
@@ -141,13 +141,13 @@
 <section class="landing hero">
 <div class="container-page">
 <p class="kicker">Referencia</p>
-<h1>Los <span class="accent">116 tools</span>, uno por uno.</h1>
+<h1>Los <span class="accent">90 tools</span>, uno por uno.</h1>
 <p class="hero-sub">Encuentra un tool por nombre, fuente o tarea. Abre solo el grupo y el detalle que necesitas.</p>
 <div class="atlas-filter-wrap">
 <input type="text" id="atlas-filter" class="atlas-filter" placeholder="Filtrar por nombre o palabra clave…" autocomplete="off">
 </div>
 <div class="atlas-toolbar" aria-live="polite">
-<p id="atlas-result-count">116 tools · abre un grupo para ver sus detalles.</p>
+<p id="atlas-result-count">90 tools · abre un grupo para ver sus detalles.</p>
 <div class="atlas-actions">
 <button type="button" data-atlas-action="open">Expandir grupos</button>
 <button type="button" data-atlas-action="close">Cerrar grupos</button>
@@ -161,30 +161,10 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">Entrada unificada<span class="tag">3</span></span>
+<span class="atlas-category-title">Entrada unificada<span class="tag">2</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
-
-<details class="atlas-tool" id="tool-list_capabilities" data-search="list_capabilities resume fuentes, tools, prompts y límites del servidor. describe lo que puede hacer este mcp: fuentes, tools principales, prompts y límites. llámalo primero si no tienes claro qué tool usar. format formato de salida: `text` (default) o `json`.">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">list_capabilities</code>
-<span class="atlas-tool-desc">Resume fuentes, tools, prompts y límites del servidor.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Describe lo que puede hacer este MCP: fuentes, tools principales, prompts y límites. Llámalo primero si no tienes claro qué tool usar.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
 
 <details class="atlas-tool" id="tool-search_ecuador" data-search="search_ecuador busca a la vez en datasets, orgs, trámites, regulaciones, contratos y riesgos. búsqueda unificada en datos abiertos, trámites, regulaciones, contratos y eventos de riesgo de ecuador. úsalo como primer paso para preguntas amplias. luego profundiza con get_dataset_info, query_resource_data, get_tramite_info, get_regulacion_info, get_contrato_info o search_eventos_riesgo. query términos de búsqueda en español (ej. &quot;salud&quot;, &quot;ruc&quot;, &quot;medicinas&quot;) limit máximo de resultados por sección (default 5, máx. 10) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
@@ -202,7 +182,7 @@
 
 <tr><td><code>limit</code></td><td><code>int</code></td><td><code>5</code></td><td>Máximo de resultados por sección (default 5, máx. 10)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -230,9 +210,9 @@
 
 <tr><td><code>canton</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Filtro opcional por cantón (útil para parroquias)</td></tr>
 
-<tr><td><code>nivel</code></td><td><code>str</code></td><td><code>auto</code></td><td>auto | provincia | canton | parroquia</td></tr>
+<tr><td><code>nivel</code></td><td><code>Literal['auto', 'provincia', 'canton', 'parroquia']</code></td><td><code>auto</code></td><td>auto | provincia | canton | parroquia</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -245,12 +225,12 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">Datos Abiertos<span class="tag">9</span></span>
+<span class="atlas-category-title">Datos Abiertos<span class="tag">8</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-search_datasets" data-search="search_datasets buscar datasets por palabras clave. soporta filtro por categoría. busca datasets en el portal de datos abiertos de ecuador (www.datosabiertos.gob.ec). es el punto de partida para explorar datos de 98+ instituciones públicas. usa queries cortos y específicos en español para mejores resultados. flujo típico: search_datasets → list_dataset_resources → preview_resource_data. query palabras clave (ej. &quot;empleo&quot;, &quot;salud&quot;, &quot;presupuesto&quot;, &quot;sri recaudación&quot;) page número de página (base 1, default: 1) page_size resultados por página (default: 20, máx. 100) category filtro opcional por categoría (ej. &quot;sal&quot; para salud, &quot;edu&quot; para educación). usa list_categories para ver todas las categorías disponibles. source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-search_datasets" data-search="search_datasets buscar datasets por palabras clave. soporta filtro por categoría. busca datasets en el portal de datos abiertos de ecuador (www.datosabiertos.gob.ec). es el punto de partida para explorar datos de 98+ instituciones públicas. usa queries cortos y específicos en español para mejores resultados. flujo típico: search_datasets → list_dataset_resources → preview_resource_data. query palabras clave (ej. &quot;empleo&quot;, &quot;salud&quot;, &quot;presupuesto&quot;, &quot;sri recaudación&quot;) page número de página (base 1, default: 1) page_size resultados por página (default: 20, máx. 100) category filtro opcional por categoría (ej. &quot;sal&quot; para salud, &quot;edu&quot; para educación). usa list_categories para ver todas las categorías disponibles. sort orden de los resultados (campo ckan, p. ej. `metadata_modified desc`). source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_datasets</code>
 <span class="atlas-tool-desc">Buscar datasets por palabras clave. Soporta filtro por categoría.</span>
@@ -262,7 +242,7 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Palabras clave (ej. "empleo", "salud", "presupuesto", "SRI recaudación")</td></tr>
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Palabras clave (ej. "empleo", "salud", "presupuesto", "SRI recaudación")</td></tr>
 
 <tr><td><code>page</code></td><td><code>int</code></td><td><code>1</code></td><td>Número de página (base 1, default: 1)</td></tr>
 
@@ -270,9 +250,11 @@
 
 <tr><td><code>category</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Filtro opcional por categoría (ej. "sal" para Salud, "edu" para Educación). Usa list_categories para ver todas las categorías disponibles.</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
+<tr><td><code>sort</code></td><td><code>Literal['relevance', 'recent']</code></td><td><code>relevance</code></td><td>Orden de los resultados (campo CKAN, p. ej. `metadata_modified desc`).</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>source</code></td><td><code>ckan_client.CkanSource</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -294,9 +276,9 @@
 
 <tr><td><code>dataset_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El ID o slug del dataset (ej. "registro-estadistico-de-recursos-y-actividades-de-salud-2019")</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
+<tr><td><code>source</code></td><td><code>ckan_client.CkanSource</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -318,9 +300,9 @@
 
 <tr><td><code>dataset_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El ID o slug del dataset</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
+<tr><td><code>source</code></td><td><code>ckan_client.CkanSource</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -342,9 +324,9 @@
 
 <tr><td><code>resource_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El UUID del recurso</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
+<tr><td><code>source</code></td><td><code>ckan_client.CkanSource</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -368,9 +350,9 @@
 
 <tr><td><code>rows</code></td><td><code>int</code></td><td><code>20</code></td><td>Cantidad de filas a previsualizar (default: 20, máx. 100)</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
+<tr><td><code>source</code></td><td><code>ckan_client.CkanSource</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -392,9 +374,9 @@
 
 <tr><td><code>resource_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El UUID del recurso (obtenlo de list_dataset_resources)</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
+<tr><td><code>source</code></td><td><code>ckan_client.CkanSource</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json (json incluye content_base64; úsalo para obtener el archivo real)</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json (json incluye content_base64; úsalo para obtener el archivo real)</td></tr>
 
 </tbody>
 </table>
@@ -426,9 +408,9 @@
 
 <tr><td><code>sort</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Expresión de orden opcional, ej. "anio desc"</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
+<tr><td><code>source</code></td><td><code>ckan_client.CkanSource</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -454,35 +436,9 @@
 
 <tr><td><code>resource_id_old</code></td><td><code>str | None</code></td><td><code>ninguno</code></td><td>Opcional -- ID del recurso más antiguo a comparar (auto-detectado si se omite). resource_id_new/resource_id_old deben pasarse juntos, o ninguno de los dos.</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
+<tr><td><code>source</code></td><td><code>ckan_client.CkanSource</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_sri_datasets" data-search="search_sri_datasets buscar entre ~130 archivos del sri publicados fuera del portal ckan: catastro ruc por provincia, recaudación, ventas/compras, vehículos, cel, diccionarios de variables. busca en la página de datasets abiertos del sri (sri.gob.ec/datasets) enlaces directos a archivos. cubre ~130 archivos csv/xlsx/zip no alcanzables vía search_datasets (viven en el sitio propio del sri, no en el datastore de ckan): catastro ruc por provincia, recaudación por año, ventas/compras, vehículos nuevos, comprobantes electrónicos (cel), inscripciones/cierres, más diccionarios de variables (*_dd.xlsx). devuelve urls directas, no el contenido del archivo — descárgalos vos mismo o vía download_resource. query texto libre contra la etiqueta o url del archivo (sin distinguir tildes), ej. &quot;recaudación&quot;, &quot;vehiculos&quot;, &quot;pichincha&quot;. vacío devuelve todos los archivos. limit máximo de resultados (default 30, máx. 100) offset offset de paginación sobre el conjunto encontrado format formato de salida: `text` (default) o `json`.">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_sri_datasets</code>
-<span class="atlas-tool-desc">Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN: catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Busca en la página de datasets abiertos del SRI (sri.gob.ec/datasets) enlaces directos a archivos. Cubre ~130 archivos CSV/XLSX/ZIP no alcanzables vía search_datasets (viven en el sitio propio del SRI, no en el DataStore de CKAN): catastro RUC por provincia, recaudación por año, ventas/compras, vehículos nuevos, comprobantes electrónicos (CEL), inscripciones/cierres, más diccionarios de variables (*_DD.xlsx). Devuelve URLs directas, no el contenido del archivo — descárgalos vos mismo o vía download_resource.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra la etiqueta o URL del archivo (sin distinguir tildes), ej. "recaudación", "vehiculos", "Pichincha". Vacío devuelve todos los archivos.</td></tr>
-
-<tr><td><code>limit</code></td><td><code>int</code></td><td><code>30</code></td><td>Máximo de resultados (default 30, máx. 100)</td></tr>
-
-<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Offset de paginación sobre el conjunto encontrado</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -518,7 +474,7 @@
 
 <tr><td><code>page</code></td><td><code>int</code></td><td><code>1</code></td><td>Número de página (base 1, default: 1). Se ignora cuando se da query (se buscan todas las páginas automáticamente).</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -540,7 +496,7 @@
 
 <tr><td><code>tramite_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El ID del trámite (ej. "18009")</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -562,7 +518,7 @@
 
 <tr><td><code>tramite_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El ID del trámite (ej. "11752")</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -586,7 +542,7 @@
 
 <tr><td><code>page</code></td><td><code>int</code></td><td><code>1</code></td><td>Número de página (base 1, default: 1, solo se usa sin query)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -608,7 +564,7 @@
 
 <tr><td><code>institucion_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>ID de institución (ej. "8")</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -642,7 +598,7 @@
 
 <tr><td><code>limit</code></td><td><code>int</code></td><td><code>10</code></td><td>Máximo de resultados (default: 10, máx. 50)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -664,7 +620,7 @@
 
 <tr><td><code>idno</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Identificador de la encuesta de search_anda (el campo "idno")</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -686,7 +642,7 @@
 
 <tr><td><code>idno</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Identificador de la encuesta de search_anda (el campo "idno")</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -722,7 +678,7 @@
 
 <tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Offset de paginación sobre el conjunto encontrado</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -748,11 +704,11 @@
 
 <tr><td><code>hasta</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Período de fin en formato YYYY-MM. Por default, el período más reciente disponible para la frecuencia elegida.</td></tr>
 
-<tr><td><code>frecuencia</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Semanal | Mensual | Trimestral | Anual. Por default, la primera frecuencia disponible del grupo.</td></tr>
+<tr><td><code>frecuencia</code></td><td><code>Literal['', 'Semanal', 'Mensual', 'Trimestral', 'Anual']</code></td><td><code>vacío</code></td><td>Semanal | Mensual | Trimestral | Anual. Por default, la primera frecuencia disponible del grupo.</td></tr>
 
 <tr><td><code>unidad</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Varía según el grupo (ej. "Millones de USD", "Indice", "Porcentaje"). Por default, la primera disponible para la frecuencia elegida.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -792,7 +748,7 @@
 
 <tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Offset de paginación sobre el conjunto encontrado</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -814,7 +770,7 @@
 
 <tr><td><code>ruc</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El RUC de 13 dígitos de la compañía</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -822,7 +778,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-search_ranking" data-search="search_ranking rankear/filtrar compañías por indicadores financieros (año, ciiu, cualquier columna); requiere el build local de la base financiera. rankea/filtra compañías de supercías por indicadores financieros de un año fiscal. filtra por año y/o actividad económica ciiu nivel 1 (una letra, ej. &quot;c&quot; para manufactura), ordenado por cualquier columna de indicador (default: posicion_general, ya precalculado en el dataset). cada resultado incluye el nombre/ruc de la compañía junto a sus financieros. cubre solo los últimos años fiscales cacheados, no el historial completo. usa get_financials para el detalle completo de una compañía, o get_compania_info para datos legales/de registro (dirección, representante legal, etc.). anio filtro opcional de año fiscal. ciiu_n1 filtro opcional de ciiu nivel 1, ej. &quot;c&quot;, &quot;g&quot;, &quot;i&quot;. order_by columna para ordenar ascendente (ej. &quot;posicion_general&quot;, &quot;activos&quot;, &quot;roe&quot;). vuelve a posicion_general si no se reconoce. limit máximo de resultados (default 20, máx. 100). offset offset de paginación. format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-search_ranking" data-search="search_ranking rankear/filtrar compañías por indicadores financieros (año, ciiu, cualquier columna); requiere el build local de la base financiera. rankea/filtra compañías de supercías por indicadores financieros de un año fiscal. filtra por año y/o actividad económica ciiu nivel 1 (una letra, ej. &quot;c&quot; para manufactura), ordenado por cualquier columna de indicador (default: posicion_general, ya precalculado en el dataset). cada resultado incluye el nombre/ruc de la compañía junto a sus financieros. cubre solo los últimos años fiscales cacheados, no el historial completo. usa get_financials para el detalle completo de una compañía, o get_compania_info para datos legales/de registro (dirección, representante legal, etc.). anio filtro opcional de año fiscal. ciiu_n1 filtro opcional de ciiu nivel 1, ej. &quot;c&quot;, &quot;g&quot;, &quot;i&quot;. order_by columna para ordenar ascendente (ej. &quot;posicion_general&quot;, &quot;activos&quot;, &quot;roe&quot;). vuelve a posicion_general si no se reconoce. descending orden descendente (default) o ascendente. limit máximo de resultados (default 20, máx. 100). offset offset de paginación. format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_ranking</code>
 <span class="atlas-tool-desc">Rankear/filtrar compañías por indicadores financieros (año, CIIU, cualquier columna); requiere el build local de la base financiera.</span>
@@ -840,11 +796,13 @@
 
 <tr><td><code>order_by</code></td><td><code>str</code></td><td><code>posicion_general</code></td><td>Columna para ordenar ascendente (ej. "posicion_general", "activos", "roe"). Vuelve a posicion_general si no se reconoce.</td></tr>
 
+<tr><td><code>descending</code></td><td><code>bool</code></td><td><code>False</code></td><td>Orden descendente (default) o ascendente.</td></tr>
+
 <tr><td><code>limit</code></td><td><code>int</code></td><td><code>20</code></td><td>Máximo de resultados (default 20, máx. 100).</td></tr>
 
 <tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Offset de paginación.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -868,7 +826,7 @@
 
 <tr><td><code>anio</code></td><td><code>int | None</code></td><td><code>ninguno</code></td><td>Filtro opcional de un solo año fiscal.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -896,7 +854,7 @@
 
 <tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Offset de paginación sobre el conjunto encontrado</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -918,7 +876,7 @@
 
 <tr><td><code>identificacion</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El RUC o cédula del auditor</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -952,7 +910,7 @@
 
 <tr><td><code>page</code></td><td><code>int</code></td><td><code>1</code></td><td>Número de página cuando query está vacío (base 1)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -974,7 +932,7 @@
 
 <tr><td><code>regulacion_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>ID de la regulación (ej. "5051")</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -1004,7 +962,7 @@
 
 <tr><td><code>supplier</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Palabra clave opcional de proveedor (mín. 3 caracteres)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -1026,7 +984,7 @@
 
 <tr><td><code>ocid</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Open Contracting ID, ej. "ocds-5wno2w-001-LICO-GPLR-2020-2805"</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -1039,7 +997,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">Riesgos y sismos<span class="tag">9</span></span>
+<span class="atlas-category-title">Riesgos y sismos<span class="tag">5</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
@@ -1068,7 +1026,7 @@
 
 <tr><td><code>limit</code></td><td><code>int</code></td><td><code>15</code></td><td>Máximo de eventos a devolver (default 15, máx. 100)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -1090,7 +1048,7 @@
 
 <tr><td><code>limit</code></td><td><code>int</code></td><td><code>30</code></td><td>Máximo de estaciones a incluir en la respuesta (default 30)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -1118,7 +1076,7 @@
 
 <tr><td><code>limit</code></td><td><code>int</code></td><td><code>15</code></td><td>Máximo de eventos a devolver (default 15, máx. 100)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -1140,7 +1098,7 @@
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el título, estado o descripción del evento (ignora tildes), ej. "terremoto", "en curso", "manabi". Vacío devuelve todos los eventos.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -1162,97 +1120,7 @@
 
 <tr><td><code>evento_url</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Una URL de evento tomada del campo "url" de search_sgr_sitreps (debe ser de gestionderiesgos.gob.ec).</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-list_sgr_biblioteca_categorias" data-search="list_sgr_biblioteca_categorias categorías de la biblioteca documental de la sgr (~1660 documentos). lista las categorías de la biblioteca documental de la secretaría de gestión de riesgos (gestionderiesgos.gob.ec/biblioteca/) — resoluciones, planes de contingencia, mapas de amenaza, rutas de evacuación por tsunami y más, cerca de 1660 documentos en 19 categorías de nivel superior. es una fuente distinta de search_eventos_riesgo/search_sgr_sitreps: una biblioteca permanente, no reportes de eventos. una parte real de los enlaces da error 404 (confirmado en vivo) — trata esto como un catálogo candidato, no una garantía de que todo documento resuelve. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">list_sgr_biblioteca_categorias</code>
-<span class="atlas-tool-desc">Categorías de la biblioteca documental de la SGR (~1660 documentos).</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista las categorías de la biblioteca documental de la Secretaría de Gestión de Riesgos (gestionderiesgos.gob.ec/biblioteca/) — resoluciones, planes de contingencia, mapas de amenaza, rutas de evacuación por tsunami y más, cerca de 1660 documentos en 19 categorías de nivel superior. Es una fuente distinta de search_eventos_riesgo/search_sgr_sitreps: una biblioteca permanente, no reportes de eventos. Una parte real de los enlaces da error 404 (confirmado en vivo) — trata esto como un catálogo candidato, no una garantía de que todo documento resuelve.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-get_sgr_biblioteca_categoria_archivos" data-search="get_sgr_biblioteca_categoria_archivos documentos de una categoría de la biblioteca de la sgr. lista los documentos de una categoría de nivel superior de la biblioteca de la sgr. devuelve, por documento, el subgrupo (subcategoría anidada, cuando existe), título, id y url directa. el formato se reporta como desconocido para toda entrada, porque el enlace de descarga no trae extensión de archivo. categoria un &quot;id&quot; o &quot;nombre&quot; de categoría, tomado de list_sgr_biblioteca_categorias (la coincidencia por nombre ignora tildes y mayúsculas). format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_sgr_biblioteca_categoria_archivos</code>
-<span class="atlas-tool-desc">Documentos de una categoría de la biblioteca de la SGR.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los documentos de una categoría de nivel superior de la Biblioteca de la SGR. Devuelve, por documento, el subgrupo (subcategoría anidada, cuando existe), título, id y URL directa. El formato se reporta como desconocido para toda entrada, porque el enlace de descarga no trae extensión de archivo.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>categoria</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Un "id" o "nombre" de categoría, tomado de list_sgr_biblioteca_categorias (la coincidencia por nombre ignora tildes y mayúsculas).</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_inamhi_capas" data-search="search_inamhi_capas catálogo de capas del geoportal de inamhi (meteorología e hidrología). busca en el catálogo de capas del geoportal de inamhi (geoservicios.inamhi.gob.ec) — un geoserver/geonode que expone las capas espaciales del instituto de meteorología e hidrología de ecuador vía wms/wfs. 222 capas confirmadas en vivo: normales climáticas de precipitación, compuestos diarios de anomalía de lluvia, salidas del modelo numérico wrf, límites de cuencas y divisiones administrativas. 199 de las 222 exponen wfs; el resto son solo raster. esta fuente no incluye una capa de observación cruda por estación — todo aquí está agregado por polígono. query texto libre contra el nombre, título o resumen de la capa (ignora tildes), ej. &quot;precipitacion&quot;, &quot;cuencas&quot;, &quot;anomalias&quot;. vacío devuelve todas las capas. solo_wfs si es true, devuelve solo las capas con wfs (datos de atributo) disponible. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_inamhi_capas</code>
-<span class="atlas-tool-desc">Catálogo de capas del geoportal de INAMHI (meteorología e hidrología).</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Busca en el catálogo de capas del geoportal de INAMHI (geoservicios.inamhi.gob.ec) — un GeoServer/GeoNode que expone las capas espaciales del instituto de meteorología e hidrología de Ecuador vía WMS/WFS. 222 capas confirmadas en vivo: normales climáticas de precipitación, compuestos diarios de anomalía de lluvia, salidas del modelo numérico WRF, límites de cuencas y divisiones administrativas. 199 de las 222 exponen WFS; el resto son solo raster. Esta fuente no incluye una capa de observación cruda por estación — todo aquí está agregado por polígono.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el nombre, título o resumen de la capa (ignora tildes), ej. "precipitacion", "cuencas", "anomalias". Vacío devuelve todas las capas.</td></tr>
-
-<tr><td><code>solo_wfs</code></td><td><code>bool</code></td><td><code>False</code></td><td>Si es True, devuelve solo las capas con WFS (datos de atributo) disponible.</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-get_inamhi_capa_datos" data-search="get_inamhi_capa_datos muestra de atributos reales de una capa del geoportal de inamhi. trae una muestra pequeña y acotada de los atributos reales de una capa wfs del geoportal de inamhi (vía wfs getfeature, salida json). usa primero search_inamhi_capas para encontrar el nombre de capa y verificar wfs_disponible=true (las capas solo-raster, como las grillas del modelo wrf, no tienen datos de atributo). no es un motor de consulta espacial: sin filtro por bbox/cql, sin reproyección. layer_name nombre de capa devuelto por search_inamhi_capas, incluyendo el prefijo de workspace &quot;geonode:&quot;, ej. &quot;geonode:regiones_precip&quot;. count número de entidades a traer (1-20, default 5). format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_inamhi_capa_datos</code>
-<span class="atlas-tool-desc">Muestra de atributos reales de una capa del geoportal de INAMHI.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Trae una muestra pequeña y acotada de los atributos reales de una capa WFS del geoportal de INAMHI (vía WFS GetFeature, salida JSON). Usa primero search_inamhi_capas para encontrar el nombre de capa y verificar wfs_disponible=True (las capas solo-raster, como las grillas del modelo WRF, no tienen datos de atributo). No es un motor de consulta espacial: sin filtro por bbox/CQL, sin reproyección.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>layer_name</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Nombre de capa devuelto por search_inamhi_capas, incluyendo el prefijo de workspace "geonode:", ej. "geonode:regiones_precip".</td></tr>
-
-<tr><td><code>count</code></td><td><code>int</code></td><td><code>5</code></td><td>Número de entidades a traer (1-20, default 5).</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -1288,9 +1156,9 @@
 
 <tr><td><code>page_size</code></td><td><code>int</code></td><td><code>20</code></td><td>Resultados por página (default: 20, máx. 100)</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
+<tr><td><code>source</code></td><td><code>ckan_client.CkanSource</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -1298,7 +1166,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_organization_info" data-search="get_organization_info info de una organización, con datasets filtrables por texto. información detallada de una institución pública y sus datasets publicados — la forma principal de navegar el catálogo completo de una organización ckan, incluyendo organizaciones grandes sin tool propia (ej. &quot;sri-servicio-de-rentas-internas&quot; —127 paquetes—, &quot;ministerio-de-economia-y-finanzas&quot; —97—, &quot;ieps&quot; —106—, &quot;cosede&quot; —88—, &quot;ipaip&quot; —70—, &quot;mag&quot; —69—; consigue el slug exacto con search_organizations si no lo conoces). format=json siempre devuelve todos los datasets; format=text limita lo mostrado e indica cuántos más hay — usa query para acotar una organización grande en vez de depender del tope. organization_id el slug de la organización (ej. &quot;sri-servicio-de-rentas-internas&quot;) query texto libre contra el título de cada dataset (ignora tildes). vacío devuelve todos los datasets. query texto libre contra el título de cada dataset (ignora tildes). vacío devuelve todos los datasets. source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) o &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-get_organization_info" data-search="get_organization_info info de una organización, con datasets filtrables por texto. información detallada de una institución pública y sus datasets publicados — la forma principal de navegar el catálogo completo de una organización ckan, incluyendo organizaciones grandes sin tool propia (ej. &quot;sri-servicio-de-rentas-internas&quot; —127 paquetes—, &quot;ministerio-de-economia-y-finanzas&quot; —97—, &quot;ieps&quot; —106—, &quot;cosede&quot; —88—, &quot;ipaip&quot; —70—, &quot;mag&quot; —69—; consigue el slug exacto con search_organizations si no lo conoces). format=json siempre devuelve todos los datasets; format=text limita lo mostrado e indica cuántos más hay — usa query para acotar una organización grande en vez de depender del tope. organization_id el slug de la organización (ej. &quot;sri-servicio-de-rentas-internas&quot;) query texto libre contra el título de cada dataset (ignora tildes). vacío devuelve todos los datasets. source &quot;nacional&quot; (default, www.datosabiertos.gob.ec) o &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_organization_info</code>
 <span class="atlas-tool-desc">Info de una organización, con datasets filtrables por texto.</span>
@@ -1314,11 +1182,9 @@
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el título de cada dataset (ignora tildes). Vacío devuelve todos los datasets.</td></tr>
 
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el título de cada dataset (ignora tildes). Vacío devuelve todos los datasets.</td></tr>
+<tr><td><code>source</code></td><td><code>ckan_client.CkanSource</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) o "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente)</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec) o "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente)</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -1338,9 +1204,9 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
+<tr><td><code>source</code></td><td><code>ckan_client.CkanSource</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -1364,9 +1230,9 @@
 
 <tr><td><code>include_datasets</code></td><td><code>bool</code></td><td><code>True</code></td><td>Incluir datasets de ejemplo en la categoría (default True)</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
+<tr><td><code>source</code></td><td><code>ckan_client.CkanSource</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -1379,64 +1245,10 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">BCE y series especializadas<span class="tag">14</span></span>
+<span class="atlas-category-title">BCE y series especializadas<span class="tag">10</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
-
-<details class="atlas-tool" id="tool-audit_bce_catalog" data-search="audit_bce_catalog audita en vivo el catálogo bcedata y reporta su cobertura. audita en vivo el catálogo bcedata y reporta su cobertura. descarga el árbol del catálogo y la metadata de cada grupo de indicadores. el reporte cuenta grupos, series, secciones y solicitudes de metadata que fallaron. usa incluir_grupos=true para incluir el inventario completo por grupo. usa get_indicador_bce para los valores reales de un grupo seleccionado. usa guardar_snapshot=true para persistir la auditoría en bce_catalog_snapshot_dir (o data/bce_catalog_snapshots por defecto). usa comparar_anterior=true para comparar el catálogo actual con la última auditoría completa guardada. usa auditar_grid=true para probar el período más reciente de cada combinación de frecuencia/unidad descubierta. la auditoría de valores está acotada y se persiste por separado cuando guardar_snapshot=true. incluir_grupos incluye la metadata completa de cada grupo descubierto en la respuesta. por defecto es false para mantener las respuestas livianas en móvil. guardar_snapshot parámetro documentado en el código fuente. comparar_anterior parámetro documentado en el código fuente. auditar_grid parámetro documentado en el código fuente. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">audit_bce_catalog</code>
-<span class="atlas-tool-desc">Audita en vivo el catálogo BCEData y reporta su cobertura.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Audita en vivo el catálogo BCEData y reporta su cobertura. Descarga el árbol del catálogo y la metadata de cada grupo de indicadores. El reporte cuenta grupos, series, secciones y solicitudes de metadata que fallaron. Usa incluir_grupos=true para incluir el inventario completo por grupo. Usa get_indicador_bce para los valores reales de un grupo seleccionado. Usa guardar_snapshot=true para persistir la auditoría en BCE_CATALOG_SNAPSHOT_DIR (o data/bce_catalog_snapshots por defecto). Usa comparar_anterior=true para comparar el catálogo actual con la última auditoría completa guardada. Usa auditar_grid=true para probar el período más reciente de cada combinación de frecuencia/unidad descubierta. La auditoría de valores está acotada y se persiste por separado cuando guardar_snapshot=true.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>incluir_grupos</code></td><td><code>bool</code></td><td><code>False</code></td><td>Incluye la metadata completa de cada grupo descubierto en la respuesta. Por defecto es false para mantener las respuestas livianas en móvil.</td></tr>
-
-<tr><td><code>guardar_snapshot</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parámetro documentado en el código fuente.</td></tr>
-
-<tr><td><code>comparar_anterior</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parámetro documentado en el código fuente.</td></tr>
-
-<tr><td><code>auditar_grid</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parámetro documentado en el código fuente.</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-compare_bce_sources" data-search="compare_bce_sources construye un mapa cauteloso de equivalencias candidatas entre bcedata e iem. construye un mapa cauteloso de equivalencias candidatas entre bcedata e iem. el emparejamiento usa etiquetas normalizadas de grupo/serie/tabla. reporta coincidencias candidatas y entradas que solo aparecen en una fuente, pero no afirma que dos etiquetas tengan definiciones idénticas. confirma unidad, frecuencia, cobertura, valores y revisiones antes de combinarlas. query parámetro documentado en el código fuente. limit parámetro documentado en el código fuente. historico parámetro documentado en el código fuente. format parámetro documentado en el código fuente.">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">compare_bce_sources</code>
-<span class="atlas-tool-desc">Construye un mapa cauteloso de equivalencias candidatas entre BCEData e IEM.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Construye un mapa cauteloso de equivalencias candidatas entre BCEData e IEM. El emparejamiento usa etiquetas normalizadas de grupo/serie/tabla. Reporta coincidencias candidatas y entradas que solo aparecen en una fuente, pero no afirma que dos etiquetas tengan definiciones idénticas. Confirma unidad, frecuencia, cobertura, valores y revisiones antes de combinarlas.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Parámetro documentado en el código fuente.</td></tr>
-
-<tr><td><code>limit</code></td><td><code>int</code></td><td><code>100</code></td><td>Parámetro documentado en el código fuente.</td></tr>
-
-<tr><td><code>historico</code></td><td><code>bool</code></td><td><code>False</code></td><td>Parámetro documentado en el código fuente.</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Parámetro documentado en el código fuente.</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
 
 <details class="atlas-tool" id="tool-get_bce_iem_table" data-search="get_bce_iem_table inspecciona una tabla xlsx oficial del boletín iem más reciente del bce. inspecciona una tabla xlsx oficial del boletín iem más reciente del bce. obtén table_id desde search_bce_iem. las tablas con el diseño común del bce (períodos en columnas y variables en filas) devuelven series estructuradas y filtrables por fecha. otros diseños devuelven una vista previa fiel en vez de adivinar columnas silenciosamente. siempre incluye las urls del archivo y del boletín del bce para verificación. pasa boletin_numero para obtener una versión histórica de las que devuelve search_bce_iem(historico=true). table_id parámetro documentado en el código fuente. desde parámetro documentado en el código fuente. hasta parámetro documentado en el código fuente. boletin_numero parámetro documentado en el código fuente. rows parámetro documentado en el código fuente. format parámetro documentado en el código fuente.">
 <summary class="atlas-tool-summary">
@@ -1460,7 +1272,7 @@
 
 <tr><td><code>rows</code></td><td><code>int</code></td><td><code>20</code></td><td>Parámetro documentado en el código fuente.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Parámetro documentado en el código fuente.</td></tr>
 
 </tbody>
 </table>
@@ -1490,7 +1302,7 @@
 
 <tr><td><code>hasta</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Fecha de fin opcional, YYYY-MM-DD.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -1510,7 +1322,7 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -1548,7 +1360,7 @@
 
 <tr><td><code>max_hash_archivos</code></td><td><code>int</code></td><td><code>5000</code></td><td>Parámetro documentado en el código fuente.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>Parámetro documentado en el código fuente.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Parámetro documentado en el código fuente.</td></tr>
 
 </tbody>
 </table>
@@ -1570,7 +1382,7 @@
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Free text matched against the file's label or URL (accent-insensitive), e.g. "historica", "entidad", "bdd". Empty returns all files.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -1592,31 +1404,9 @@
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el título de la publicación (ignora tildes). Vacío devuelve todas.</td></tr>
 
-<tr><td><code>formato</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Coincidencia exacta con el formato derivado — PDF, XLSX, XLS, CSV, ZIP, HTML. Vacío devuelve todos los formatos.</td></tr>
+<tr><td><code>formato</code></td><td><code>Literal['', 'PDF', 'XLSX', 'XLS', 'CSV', 'ZIP', 'HTML']</code></td><td><code>vacío</code></td><td>Coincidencia exacta con el formato derivado — PDF, XLSX, XLS, CSV, ZIP, HTML. Vacío devuelve todos los formatos.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_bce_indices" data-search="search_bce_indices catálogo de páginas &quot;índice&quot; del bce con archivo histórico por serie. lista las páginas &quot;índice&quot; del bce — una por cada serie de publicaciones con nombre propio (boletines sectoriales de petróleo/minería/cemento, índices de precios de comercio exterior, índices de confianza emoe, tipo de cambio, balanza de pagos, boletines de remesas, y más), cada una con un archivo histórico año por año o semana por semana que en algunas series llega hasta 2004. devuelve solo resúmenes — usa el pagina_id devuelto en get_bce_indice_archivo para leer el archivo de una serie. query texto libre contra el título o la url de la página (ignora tildes). vacío devuelve todas las páginas encontradas. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_bce_indices</code>
-<span class="atlas-tool-desc">Catálogo de páginas "índice" del BCE con archivo histórico por serie.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista las páginas "índice" del BCE — una por cada serie de publicaciones con nombre propio (boletines sectoriales de petróleo/minería/cemento, índices de precios de comercio exterior, índices de confianza EMOE, tipo de cambio, balanza de pagos, boletines de remesas, y más), cada una con un archivo histórico año por año o semana por semana que en algunas series llega hasta 2004. Devuelve solo resúmenes — usa el pagina_id devuelto en get_bce_indice_archivo para leer el archivo de una serie.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el título o la URL de la página (ignora tildes). Vacío devuelve todas las páginas encontradas.</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -1624,39 +1414,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_bce_indice_archivo" data-search="get_bce_indice_archivo archivo de archivos de una página &quot;índice&quot; del bce. lee el archivo de archivos publicados de una página &quot;índice&quot; del bce (obtenida con search_bce_indices). cada elemento es un archivo publicado: año, etiqueta de período (trimestre, mes o número de semana), fecha en español cuando la fuente la da (solo series semanales), url directa y formato. pagina_id el slug de la página, tomado del campo pagina_id de search_bce_indices (ej. &quot;boletin-analitico-del-sector-petrolero-indice&quot;). anio restringe a un año calendario. 0 devuelve todos los años encontrados. max_archivos tope de archivos devueltos (años más recientes primero), 1-200. usa anio para llegar más atrás del tope. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_bce_indice_archivo</code>
-<span class="atlas-tool-desc">Archivo de archivos de una página "índice" del BCE.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lee el archivo de archivos publicados de una página "índice" del BCE (obtenida con search_bce_indices). Cada elemento es un archivo publicado: año, etiqueta de período (trimestre, mes o número de semana), fecha en español cuando la fuente la da (solo series semanales), URL directa y formato.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>pagina_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El slug de la página, tomado del campo pagina_id de search_bce_indices (ej. "boletin-analitico-del-sector-petrolero-indice").</td></tr>
-
-<tr><td><code>anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Restringe a un año calendario. 0 devuelve todos los años encontrados.</td></tr>
-
-<tr><td><code>max_archivos</code></td><td><code>int</code></td><td><code>30</code></td><td>Tope de archivos devueltos (años más recientes primero), 1-200. Usa anio para llegar más atrás del tope.</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_bce_precios_comex" data-search="search_bce_precios_comex índices de precios de comercio exterior del bce, desagregados. lista los enlaces a los archivos desagregados de índices de precios de comercio exterior del bce — precios de importación por categoría de uso económico y precios de exportación por producto individual (petróleo crudo, camarón, banano, cacao, cobre, oro, rosas), cada uno con hojas separadas de precio/valor/volumen y variaciones. es una fuente distinta del catálogo bcedata de search_indicadores_bce (que solo tiene las tres series *agregadas*) y de search_bce_indices (que no cubre precios de comercio exterior). devuelve urls directas, no el contenido de los archivos. query texto libre contra la etiqueta del archivo, el título de la página o el id de página (ignora tildes), ej. &quot;importacion&quot;, &quot;exportacion&quot;. vacío devuelve todos los archivos. format text | json">
+<details class="atlas-tool" id="tool-search_bce_precios_comex" data-search="search_bce_precios_comex índices de precios de comercio exterior del bce, desagregados. lista los enlaces a los archivos desagregados de índices de precios de comercio exterior del bce — precios de importación por categoría de uso económico y precios de exportación por producto individual (petróleo crudo, camarón, banano, cacao, cobre, oro, rosas), cada uno con hojas separadas de precio/valor/volumen y variaciones. es una fuente distinta del catálogo bcedata de search_indicadores_bce (que solo tiene las tres series *agregadas*) y de search_bce_paginas (que no cubre precios de comercio exterior). devuelve urls directas, no el contenido de los archivos. query texto libre contra la etiqueta del archivo, el título de la página o el id de página (ignora tildes), ej. &quot;importacion&quot;, &quot;exportacion&quot;. vacío devuelve todos los archivos. format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_bce_precios_comex</code>
 <span class="atlas-tool-desc">Índices de precios de comercio exterior del BCE, desagregados.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los enlaces a los archivos desagregados de índices de precios de comercio exterior del BCE — precios de importación por categoría de uso económico y precios de exportación por producto individual (petróleo crudo, camarón, banano, cacao, cobre, oro, rosas), cada uno con hojas separadas de precio/valor/volumen y variaciones. Es una fuente distinta del catálogo BCEData de search_indicadores_bce (que solo tiene las tres series *agregadas*) y de search_bce_indices (que no cubre precios de comercio exterior). Devuelve URLs directas, no el contenido de los archivos.</p>
+<p class="atlas-tool-long">Lista los enlaces a los archivos desagregados de índices de precios de comercio exterior del BCE — precios de importación por categoría de uso económico y precios de exportación por producto individual (petróleo crudo, camarón, banano, cacao, cobre, oro, rosas), cada uno con hojas separadas de precio/valor/volumen y variaciones. Es una fuente distinta del catálogo BCEData de search_indicadores_bce (que solo tiene las tres series *agregadas*) y de search_bce_paginas (que no cubre precios de comercio exterior). Devuelve URLs directas, no el contenido de los archivos.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
@@ -1664,7 +1428,7 @@
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra la etiqueta del archivo, el título de la página o el id de página (ignora tildes), ej. "importacion", "exportacion". Vacío devuelve todos los archivos.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -1700,7 +1464,7 @@
 
 <tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Desplazamiento de paginación sobre el conjunto filtrado.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -1708,21 +1472,23 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-search_bce_cuentas_nacionales" data-search="search_bce_cuentas_nacionales páginas de publicación de cuentas nacionales del bce. lista las familias de páginas de cuentas nacionales del bce — cuentas anuales, trimestrales y regionales, la serie histórica de retropolación del pib desde 1965, matrices insumo-producto y de contabilidad social, series de base fija (2007=100), la cuenta satélite temática de bioeconomía, y los resultados mensuales del imaec. distinto de search_indicadores_bce (los agregados propios de pib de bcedata) y de get_bce_iem_table (las tablas del boletín mensual iem): esto cubre los paquetes de publicación de cuentas nacionales en sí — tabla de oferta y utilización (tou), cuadro económico integrado (cei), matriz de empleo e ingresos (mei), matriz insumo-producto y sus documentos metodológicos. devuelve solo resúmenes — pasa el pagina_id a get_bce_cuentas_nacionales_archivo para leer el listado de archivos de una página. query texto libre contra el título, categoría o id de la página (ignora tildes), ej. &quot;trimestral&quot;, &quot;mip&quot;, &quot;regional&quot;. vacío devuelve todas las páginas. format text | json">
+<details class="atlas-tool" id="tool-search_bce_paginas" data-search="search_bce_paginas páginas de publicaciones del bce con archivos: índices o cuentas nacionales. lista las páginas de publicaciones del bce de un catálogo: indices (boletines sectoriales, índices de precios y de confianza, tipo de cambio, balanza de pagos; algunos desde 2004) o cuentas_nacionales (anuales, trimestrales, regionales, insumo-producto, imaec). siguiente paso: get_bce_pagina_archivos(pagina_id). catalogo indices o cuentas_nacionales. query texto libre que se busca, sin distinguir tildes, en el título, la categoría o el id de la página. vacío devuelve todas. format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_bce_cuentas_nacionales</code>
-<span class="atlas-tool-desc">Páginas de publicación de Cuentas Nacionales del BCE.</span>
+<code class="atlas-tool-name">search_bce_paginas</code>
+<span class="atlas-tool-desc">Páginas de publicaciones del BCE con archivos: índices o cuentas nacionales.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista las familias de páginas de Cuentas Nacionales del BCE — cuentas anuales, trimestrales y regionales, la serie histórica de retropolación del PIB desde 1965, matrices insumo-producto y de contabilidad social, series de base fija (2007=100), la cuenta satélite temática de bioeconomía, y los resultados mensuales del IMAEC. Distinto de search_indicadores_bce (los agregados propios de PIB de BCEData) y de get_bce_iem_table (las tablas del boletín mensual IEM): esto cubre los paquetes de publicación de cuentas nacionales en sí — Tabla de Oferta y Utilización (TOU), Cuadro Económico Integrado (CEI), Matriz de Empleo e Ingresos (MEI), Matriz Insumo-Producto y sus documentos metodológicos. Devuelve solo resúmenes — pasa el pagina_id a get_bce_cuentas_nacionales_archivo para leer el listado de archivos de una página.</p>
+<p class="atlas-tool-long">Lista las páginas de publicaciones del BCE de un catálogo: indices (boletines sectoriales, índices de precios y de confianza, tipo de cambio, balanza de pagos; algunos desde 2004) o cuentas_nacionales (anuales, trimestrales, regionales, insumo-producto, IMAEC). Siguiente paso: get_bce_pagina_archivos(pagina_id).</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el título, categoría o id de la página (ignora tildes), ej. "trimestral", "mip", "regional". Vacío devuelve todas las páginas.</td></tr>
+<tr><td><code>catalogo</code></td><td><code>Catalogo</code></td><td><code>requerido</code></td><td>indices o cuentas_nacionales.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre que se busca, sin distinguir tildes, en el título, la categoría o el id de la página. Vacío devuelve todas.</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -1730,23 +1496,27 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_bce_cuentas_nacionales_archivo" data-search="get_bce_cuentas_nacionales_archivo listado de archivos de una página de cuentas nacionales del bce. lee el listado de archivos de una página de cuentas nacionales del bce (de search_bce_cuentas_nacionales). cada entrada es un archivo publicado (reporte, paquete de datos o documento metodológico) con etiqueta, url directa y formato. devuelve urls directas, no el contenido — descárgalos tú mismo o vía download_resource. pagina_id el &quot;pagina_id&quot; de la página, de search_bce_cuentas_nacionales (ej. &quot;boletin-de-cuentas-nacionales-trimestrales&quot;). max_archivos tope de archivos devueltos, 1-200. format text | json">
+<details class="atlas-tool" id="tool-get_bce_pagina_archivos" data-search="get_bce_pagina_archivos archivos de una página de publicación del bce, del más reciente al más antiguo. lee la lista de archivos de una página del bce (pagina_id de search_bce_paginas): título, url y formato. para índices también trae año y período (trimestre, mes o semana). devuelve enlaces, no contenido. catalogo indices o cuentas_nacionales. pagina_id el `pagina_id` de la página, de search_bce_paginas. anio solo para catalogo=&quot;indices&quot;: limita a un año (0 = todos). max_archivos tope de archivos devueltos, 1-200 (los más recientes primero); usa anio para ir más atrás. format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_bce_cuentas_nacionales_archivo</code>
-<span class="atlas-tool-desc">Listado de archivos de una página de Cuentas Nacionales del BCE.</span>
+<code class="atlas-tool-name">get_bce_pagina_archivos</code>
+<span class="atlas-tool-desc">Archivos de una página de publicación del BCE, del más reciente al más antiguo.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Lee el listado de archivos de una página de Cuentas Nacionales del BCE (de search_bce_cuentas_nacionales). Cada entrada es un archivo publicado (reporte, paquete de datos o documento metodológico) con etiqueta, URL directa y formato. Devuelve URLs directas, no el contenido — descárgalos tú mismo o vía download_resource.</p>
+<p class="atlas-tool-long">Lee la lista de archivos de una página del BCE (pagina_id de search_bce_paginas): título, URL y formato. Para índices también trae año y período (trimestre, mes o semana). Devuelve enlaces, no contenido.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>pagina_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El "pagina_id" de la página, de search_bce_cuentas_nacionales (ej. "boletin-de-cuentas-nacionales-trimestrales").</td></tr>
+<tr><td><code>catalogo</code></td><td><code>Catalogo</code></td><td><code>requerido</code></td><td>indices o cuentas_nacionales.</td></tr>
 
-<tr><td><code>max_archivos</code></td><td><code>int</code></td><td><code>50</code></td><td>Tope de archivos devueltos, 1-200.</td></tr>
+<tr><td><code>pagina_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El `pagina_id` de la página, de search_bce_paginas.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Solo para catalogo="indices": limita a un año (0 = todos).</td></tr>
+
+<tr><td><code>max_archivos</code></td><td><code>int</code></td><td><code>30</code></td><td>Tope de archivos devueltos, 1-200 (los más recientes primero); usa anio para ir más atrás.</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -1759,7 +1529,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">INEC: estadísticas, BIINEC y censo<span class="tag">6</span></span>
+<span class="atlas-category-title">INEC: estadísticas, BIINEC y censo<span class="tag">5</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
@@ -1778,7 +1548,7 @@
 
 <tr><td><code>url</code></td><td><code>str</code></td><td><code>requerido</code></td><td>A topic URL from search_inec_estadisticas's "url" field (must be on ecuadorencifras.gob.ec)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -1800,7 +1570,7 @@
 
 <tr><td><code>post</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Either the numeric "id" from search_inec_publicaciones, or the publication's full ecuadorencifras.gob.ec URL.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -1822,33 +1592,7 @@
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Free text matched against the registry's name/description (accent-insensitive). Empty returns the full curated list.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_censo_recursos" data-search="search_censo_recursos busca en el micrositio dedicado del censo 2022 del inec (censoecuador.gob.ec) enlaces directos a archivos de microdatos/metodología. busca en el micrositio dedicado del censo 2022 del inec (censoecuador.gob.ec) enlaces directos a archivos de microdatos/metodología. mucho más completo que el resultado general &quot;censo de población y vivienda&quot; de search_inec_estadisticas: microdatos completos a nivel de sector, cantón y manzana (manloc) en csv, spss (sav) y redatam, además de los censos 2010 y 2001 recodificados sobre la geografía 2022 para comparabilidad, diccionarios de variables y documentos de metodología/calidad. devuelve solo metadata y urls directas, nunca el contenido de los archivos -- son archivos de microdatos grandes (varios cientos de mb en algunos casos), no previsualizables con este tool. query texto libre (sin distinguir tildes) contra la etiqueta del archivo, ej. &quot;manlo&quot; (nivel manzana), &quot;sector&quot;, &quot;2010&quot;, &quot;spss&quot;, &quot;diccionario&quot;, &quot;metodologia&quot;. vacío devuelve todos los archivos encontrados. limit máximo de resultados (default 30, máx. 100). offset desplazamiento de paginación sobre el conjunto encontrado. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_censo_recursos</code>
-<span class="atlas-tool-desc">Busca en el micrositio dedicado del Censo 2022 del INEC (censoecuador.gob.ec) enlaces directos a archivos de microdatos/metodología.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Busca en el micrositio dedicado del Censo 2022 del INEC (censoecuador.gob.ec) enlaces directos a archivos de microdatos/metodología. Mucho más completo que el resultado general "Censo de Población y Vivienda" de search_inec_estadisticas: microdatos completos a nivel de sector, cantón y manzana (MANLOC) en CSV, SPSS (SAV) y REDATAM, además de los censos 2010 y 2001 recodificados sobre la geografía 2022 para comparabilidad, diccionarios de variables y documentos de metodología/calidad. Devuelve solo metadata y URLs directas, nunca el contenido de los archivos -- son archivos de microdatos grandes (varios cientos de MB en algunos casos), no previsualizables con este tool.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre (sin distinguir tildes) contra la etiqueta del archivo, ej. "manlo" (nivel manzana), "sector", "2010", "spss", "diccionario", "metodologia". Vacío devuelve todos los archivos encontrados.</td></tr>
-
-<tr><td><code>limit</code></td><td><code>int</code></td><td><code>30</code></td><td>Máximo de resultados (default 30, máx. 100).</td></tr>
-
-<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Desplazamiento de paginación sobre el conjunto encontrado.</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -1874,7 +1618,7 @@
 
 <tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Desplazamiento de paginación sobre el conjunto encontrado</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -1900,7 +1644,7 @@
 
 <tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Desplazamiento de paginación sobre el conjunto encontrado.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -1913,7 +1657,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">SRI: RUC y recaudación<span class="tag">3</span></span>
+<span class="atlas-category-title">SRI: RUC y recaudación<span class="tag">2</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
@@ -1934,33 +1678,7 @@
 
 <tr><td><code>include_establecimientos</code></td><td><code>bool</code></td><td><code>True</code></td><td>incluir establecimientos registrados</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_sri_estadisticas_recaudacion" data-search="search_sri_estadisticas_recaudacion busca en la página &quot;estadísticas de recaudación&quot; del sri enlaces directos a archivos. busca en la página &quot;estadísticas de recaudación&quot; del sri enlaces directos a archivos. separado de search_sri_datasets (exportaciones anuales crudas de declaraciones): esto cubre reportes xlsx mensuales pre-agregados por impuesto, provincia/cantón y actividad económica (actualizados mensualmente), además de un zip de indicadores históricos, un boletín técnico pdf anual, e infografías. devuelve urls directas, no el contenido de los archivos — descárgalos tú mismo, vía download_resource, o con read_pdf para los pdf. query texto libre (sin distinguir tildes) contra la etiqueta o url del archivo, ej. &quot;recaudación&quot;, &quot;provincia&quot;, &quot;actividad economica&quot;. vacío devuelve todos los archivos. limit máximo de resultados (default 30, máx. 100) offset desplazamiento de paginación sobre el conjunto encontrado format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_sri_estadisticas_recaudacion</code>
-<span class="atlas-tool-desc">Busca en la página "Estadísticas de Recaudación" del SRI enlaces directos a archivos.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Busca en la página "Estadísticas de Recaudación" del SRI enlaces directos a archivos. Separado de search_sri_datasets (exportaciones anuales crudas de declaraciones): esto cubre reportes XLSX mensuales pre-agregados por impuesto, provincia/cantón y actividad económica (actualizados mensualmente), además de un ZIP de indicadores históricos, un boletín técnico PDF anual, e infografías. Devuelve URLs directas, no el contenido de los archivos — descárgalos tú mismo, vía download_resource, o con read_pdf para los PDF.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre (sin distinguir tildes) contra la etiqueta o URL del archivo, ej. "recaudación", "provincia", "actividad economica". Vacío devuelve todos los archivos.</td></tr>
-
-<tr><td><code>limit</code></td><td><code>int</code></td><td><code>30</code></td><td>Máximo de resultados (default 30, máx. 100)</td></tr>
-
-<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Desplazamiento de paginación sobre el conjunto encontrado</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -1984,7 +1702,7 @@
 
 <tr><td><code>max_resultados</code></td><td><code>int</code></td><td><code>25</code></td><td>Cuántos resultados con detalle completo devolver (máx 100)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -1997,7 +1715,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">SIPA, Contraloría y Superbancos<span class="tag">9</span></span>
+<span class="atlas-category-title">SIPA, Contraloría y Superbancos<span class="tag">3</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
@@ -2018,51 +1736,7 @@
 
 <tr><td><code>rows</code></td><td><code>int</code></td><td><code>50</code></td><td>Number of data rows to preview (default: 50, max: 200)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-get_sipa_modulo_archivos" data-search="get_sipa_modulo_archivos lista los enlaces de descarga directa publicados en un módulo de estadísticas de sipa. lista los enlaces de descarga directa publicados en un módulo de estadísticas de sipa. obtén la clave modulo desde list_sipa_modulos. devuelve el título, descripción, url directa xlsx/xls y formato de cada archivo — no el contenido del archivo. los archivos pueden ser grandes (uno confirmado de 41 mb); descarga la url directamente en vez de pasarla por preview_resource_data o download_resource, que tienen un tope de 5 mb. modulo a module key from list_sipa_modulos, e.g. &quot;economico&quot;, &quot;productivo&quot;, &quot;social&quot;, &quot;censos&quot;. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_sipa_modulo_archivos</code>
-<span class="atlas-tool-desc">Lista los enlaces de descarga directa publicados en un módulo de estadísticas de SIPA.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los enlaces de descarga directa publicados en un módulo de estadísticas de SIPA. Obtén la clave modulo desde list_sipa_modulos. Devuelve el título, descripción, URL directa XLSX/XLS y formato de cada archivo — no el contenido del archivo. Los archivos pueden ser grandes (uno confirmado de 41 MB); descarga la URL directamente en vez de pasarla por preview_resource_data o download_resource, que tienen un tope de 5 MB.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>modulo</code></td><td><code>str</code></td><td><code>requerido</code></td><td>A module key from list_sipa_modulos, e.g. "economico", "productivo", "social", "censos".</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-get_superbancos_seccion_archivos" data-search="get_superbancos_seccion_archivos lista los enlaces de descarga directa publicados en una sección de estadísticas de superbancos. lista los enlaces de descarga directa publicados en una sección de estadísticas de superbancos. obtén la clave seccion desde list_superbancos_secciones. devuelve el grupo (sección de la tabla, ej. &quot;tarjetas de crédito&quot;), periodo (etiqueta de año, cuando la tabla lo separa del título del archivo), titulo, url directa y formato de cada archivo — no el contenido. los archivos pueden pesar varios mb; descarga la url directamente en vez de pasarla por preview_resource_data o download_resource, que tienen un tope de 5 mb. la cobertura se detiene donde terminan las tablas estáticas de archivo de la página — los años más recientes viven en un widget de onedrive del lado del cliente que este tool no lee. no presentes el &quot;periodo&quot;/&quot;titulo&quot; más reciente encontrado aquí como el dato más actual disponible en superbancos. seccion a section key from list_superbancos_secciones, e.g. &quot;boletines_financieros&quot;, &quot;servicios_financieros&quot;, &quot;informacion_historica&quot;, &quot;calendario_estadistico&quot;. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_superbancos_seccion_archivos</code>
-<span class="atlas-tool-desc">Lista los enlaces de descarga directa publicados en una sección de estadísticas de Superbancos.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los enlaces de descarga directa publicados en una sección de estadísticas de Superbancos. Obtén la clave seccion desde list_superbancos_secciones. Devuelve el grupo (sección de la tabla, ej. "TARJETAS DE CRÉDITO"), periodo (etiqueta de año, cuando la tabla lo separa del título del archivo), titulo, URL directa y formato de cada archivo — no el contenido. Los archivos pueden pesar varios MB; descarga la URL directamente en vez de pasarla por preview_resource_data o download_resource, que tienen un tope de 5 MB. La cobertura se detiene donde terminan las tablas estáticas de archivo de la página — los años más recientes viven en un widget de OneDrive del lado del cliente que este tool no lee. No presentes el "periodo"/"titulo" más reciente encontrado aquí como el dato más actual disponible en Superbancos.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>seccion</code></td><td><code>str</code></td><td><code>requerido</code></td><td>A section key from list_superbancos_secciones, e.g. "boletines_financieros", "servicios_financieros", "informacion_historica", "calendario_estadistico".</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2082,47 +1756,7 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-list_sipa_modulos" data-search="list_sipa_modulos lista los módulos de descarga de estadísticas de sipa (sipa.agricultura.gob.ec). lista los módulos de descarga de estadísticas de sipa (sipa.agricultura.gob.ec). sipa (sistema de información pública agropecuaria) es el portal de estadísticas del ministerio de agricultura, ganadería y pesca — distinto de mpceip (industria/comercio). publica archivos excel reales con series de precios, comercio, crédito, producción y censos agropecuarios desde inicios de los 2000, organizados en cuatro módulos: económico, productivo, social, y censos y registros administrativos. continúa con get_sipa_modulo_archivos(modulo) para el listado de archivos de un módulo. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">list_sipa_modulos</code>
-<span class="atlas-tool-desc">Lista los módulos de descarga de estadísticas de SIPA (sipa.agricultura.gob.ec).</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los módulos de descarga de estadísticas de SIPA (sipa.agricultura.gob.ec). SIPA (Sistema de Información Pública Agropecuaria) es el portal de estadísticas del Ministerio de Agricultura, Ganadería y Pesca — distinto de MPCEIP (industria/comercio). Publica archivos Excel reales con series de precios, comercio, crédito, producción y censos agropecuarios desde inicios de los 2000, organizados en cuatro módulos: económico, productivo, social, y censos y registros administrativos. Continúa con get_sipa_modulo_archivos(modulo) para el listado de archivos de un módulo.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-list_superbancos_secciones" data-search="list_superbancos_secciones lista las secciones de estadísticas de la superintendencia de bancos (superbancos.gob.ec/estadisticas/portalestudios/). lista las secciones de estadísticas de la superintendencia de bancos (superbancos.gob.ec/estadisticas/portalestudios/). superbancos no tiene organización ckan ni sección de &quot;datos abiertos&quot;, así que este es el único camino a sus estadísticas publicadas: boletines financieros mensuales, estadísticas de servicios de tarjetas/cajeros/corresponsales, comportamiento financiero anual comparativo, y el calendario de publicaciones. importante: cada página de sección también incrusta un widget de onedrive del lado del cliente que carga de forma diferida los archivos de los años *más recientes* fuera del html de la página — no cubierto aquí. este tool solo devuelve lo que está en las tablas estáticas de archivo de la página, que para la mayoría de secciones se detienen alrededor de 2020-2021 (boletines financieros: solo 1997-2008). continúa con get_superbancos_seccion_archivos(seccion) para el listado real de archivos y cobertura de una sección. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">list_superbancos_secciones</code>
-<span class="atlas-tool-desc">Lista las secciones de estadísticas de la Superintendencia de Bancos (superbancos.gob.ec/estadisticas/portalestudios/).</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista las secciones de estadísticas de la Superintendencia de Bancos (superbancos.gob.ec/estadisticas/portalestudios/). Superbancos no tiene organización CKAN ni sección de "datos abiertos", así que este es el único camino a sus estadísticas publicadas: boletines financieros mensuales, estadísticas de servicios de tarjetas/cajeros/corresponsales, comportamiento financiero anual comparativo, y el calendario de publicaciones. IMPORTANTE: cada página de sección también incrusta un widget de OneDrive del lado del cliente que carga de forma diferida los archivos de los años *más recientes* fuera del HTML de la página — no cubierto aquí. Este tool solo devuelve lo que está en las tablas estáticas de archivo de la página, que para la mayoría de secciones se detienen alrededor de 2020-2021 (boletines financieros: solo 1997-2008). Continúa con get_superbancos_seccion_archivos(seccion) para el listado real de archivos y cobertura de una sección.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2144,57 +1778,7 @@
 
 <tr><td><code>anio</code></td><td><code>int</code></td><td><code>requerido</code></td><td>Año, ej. 2025. El más antiguo confirmado en vivo es 2018.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_sipa_geoportal_capas" data-search="search_sipa_geoportal_capas catálogo de capas del geoportal del ministerio de agricultura (sipa). busca en el catálogo de capas del geoportal del ministerio de agricultura (geoportal.agricultura.gob.ec) — un geoserver que expone las capas espaciales agropecuarias de ecuador vía wms/wfs. 277 capas confirmadas en vivo en 24 endpoints y 8 categorías: censos y registros administrativos, zonificación agroecológica, infraestructura agroindustrial, inventario de recursos naturales, cobertura de tierra, geomorfología, el catastro rural de sigtierras y estadística agropecuaria. 257 de las 277 exponen wfs; el resto son solo wms. filtra con solo_wfs=true para ver solo las consultables. usa get_sipa_geoportal_capa_datos(id) para muestrear los valores reales de una capa. query texto libre contra el id, nombre, título o resumen de la capa (ignora tildes), ej. &quot;catastro&quot;, &quot;zonificacion&quot;, &quot;riesgo&quot;, &quot;palmicultor&quot;. vacío devuelve todas las capas. solo_wfs si es true, devuelve solo las capas con wfs (datos de atributo) disponible. categoria filtro exacto opcional por una de las 8 categorías de nivel superior. vacío devuelve todas. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_sipa_geoportal_capas</code>
-<span class="atlas-tool-desc">Catálogo de capas del geoportal del Ministerio de Agricultura (SIPA).</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Busca en el catálogo de capas del geoportal del Ministerio de Agricultura (geoportal.agricultura.gob.ec) — un GeoServer que expone las capas espaciales agropecuarias de Ecuador vía WMS/WFS. 277 capas confirmadas en vivo en 24 endpoints y 8 categorías: censos y registros administrativos, zonificación agroecológica, infraestructura agroindustrial, inventario de recursos naturales, cobertura de tierra, geomorfología, el catastro rural de SIGTIERRAS y estadística agropecuaria. 257 de las 277 exponen WFS; el resto son solo WMS. Filtra con solo_wfs=True para ver solo las consultables. Usa get_sipa_geoportal_capa_datos(id) para muestrear los valores reales de una capa.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el id, nombre, título o resumen de la capa (ignora tildes), ej. "catastro", "zonificacion", "riesgo", "palmicultor". Vacío devuelve todas las capas.</td></tr>
-
-<tr><td><code>solo_wfs</code></td><td><code>bool</code></td><td><code>False</code></td><td>Si es True, devuelve solo las capas con WFS (datos de atributo) disponible.</td></tr>
-
-<tr><td><code>categoria</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Filtro exacto opcional por una de las 8 categorías de nivel superior. Vacío devuelve todas.</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-get_sipa_geoportal_capa_datos" data-search="get_sipa_geoportal_capa_datos muestra de atributos reales de una capa del geoportal de sipa. trae una muestra pequeña y acotada de los atributos reales de una capa wfs del geoportal del ministerio de agricultura (vía wfs getfeature, salida json). usa primero search_sipa_geoportal_capas para encontrar el id de capa y verificar wfs_disponible=true. no es un motor de consulta espacial: sin filtro por bbox/cql, sin reproyección, y las coordenadas de la geometría se descartan del resultado. layer_id id de capa devuelto por search_sipa_geoportal_capas, la tripleta &quot;categoria/store/name&quot;, ej. &quot;demarcacion/e25k/vw_hg000_zae_cafe_arabigo&quot;. count número de entidades a traer (1-20, default 5). format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_sipa_geoportal_capa_datos</code>
-<span class="atlas-tool-desc">Muestra de atributos reales de una capa del geoportal de SIPA.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Trae una muestra pequeña y acotada de los atributos reales de una capa WFS del geoportal del Ministerio de Agricultura (vía WFS GetFeature, salida JSON). Usa primero search_sipa_geoportal_capas para encontrar el id de capa y verificar wfs_disponible=True. No es un motor de consulta espacial: sin filtro por bbox/CQL, sin reproyección, y las coordenadas de la geometría se descartan del resultado.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>layer_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Id de capa devuelto por search_sipa_geoportal_capas, la tripleta "categoria/store/name", ej. "demarcacion/E25k/vw_hg000_zae_cafe_arabigo".</td></tr>
-
-<tr><td><code>count</code></td><td><code>int</code></td><td><code>5</code></td><td>Número de entidades a traer (1-20, default 5).</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2207,7 +1791,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">CENACE, SUT, IG-EPN y cortes de luz<span class="tag">8</span></span>
+<span class="atlas-category-title">CENACE, SUT, IG-EPN y cortes de luz<span class="tag">11</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
@@ -2224,9 +1808,9 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>tablero</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Uno de los 5 nombres indicados arriba.</td></tr>
+<tr><td><code>tablero</code></td><td><code>Literal['produccion_tiempo_real', 'demanda_tiempo_real', 'operativa_diaria', 'acumulada_mensual', 'acumulada_anual']</code></td><td><code>requerido</code></td><td>Uno de los 5 nombres indicados arriba.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2250,13 +1834,13 @@
 
 <tr><td><code>volcan</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Nombre del volcán, solo necesario para desambiguar un nombre duplicado</td></tr>
 
-<tr><td><code>grupo</code></td><td><code>str</code></td><td><code>vacío</code></td><td>"sismico" | "volcanico" | "" (ambos) -- el mismo valor usado para encontrarlo</td></tr>
+<tr><td><code>grupo</code></td><td><code>Literal['sismico', 'volcanico', '']</code></td><td><code>vacío</code></td><td>"sismico" | "volcanico" | "" (ambos) -- el mismo valor usado para encontrarlo</td></tr>
 
 <tr><td><code>anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Año del informe (0 = año actual) -- el mismo valor usado para encontrarlo</td></tr>
 
 <tr><td><code>pages</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Rango de páginas, indexado desde 1 (ej. "3", "1-5"). Vacío = documento completo, con tope de 20 páginas por llamada</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2278,7 +1862,7 @@
 
 <tr><td><code>indicador</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Una clave de list_sut_indicadores.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2298,7 +1882,7 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2326,7 +1910,7 @@
 
 <tr><td><code>limite</code></td><td><code>int</code></td><td><code>500</code></td><td>Tope de filas aplicado del lado del servidor por la propia consulta.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2348,35 +1932,13 @@
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre sobre nombre del informe/volcán (ej. "cotopaxi", "trimestral")</td></tr>
 
-<tr><td><code>grupo</code></td><td><code>str</code></td><td><code>vacío</code></td><td>"sismico" | "volcanico" | "" (ambos)</td></tr>
+<tr><td><code>grupo</code></td><td><code>Literal['sismico', 'volcanico', '']</code></td><td><code>vacío</code></td><td>"sismico" | "volcanico" | "" (ambos)</td></tr>
 
 <tr><td><code>anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Año del informe (0 = año actual)</td></tr>
 
 <tr><td><code>limit</code></td><td><code>int</code></td><td><code>15</code></td><td>Máximo de informes a devolver (default 15, máx. 30)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_centrosur_cortes" data-search="search_centrosur_cortes archivo de pdfs de cortes de luz programados de centrosur, 2023 en adelante. lista la programación de cortes de energía de centrosur (azuay, cañar y morona santiago), incluidos los apagones de la crisis de estiaje de 2024 y los cortes ordinarios por mantenimiento. es regional, no nacional. se enumera mediante la api pública de medios de wordpress del sitio, sin login. query texto libre contra título, año, mes o url, sin tildes. vacío devuelve todo. format formato de salida: `text` (default) o `json`.">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_centrosur_cortes</code>
-<span class="atlas-tool-desc">Archivo de PDFs de cortes de luz programados de Centrosur, 2023 en adelante.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista la programación de cortes de energía de Centrosur (Azuay, Cañar y Morona Santiago), incluidos los apagones de la crisis de estiaje de 2024 y los cortes ordinarios por mantenimiento. Es regional, no nacional. Se enumera mediante la API pública de medios de WordPress del sitio, sin login.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra título, año, mes o URL, sin tildes. Vacío devuelve todo.</td></tr>
-
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2397,6 +1959,106 @@
 <tbody>
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra cantón o sectores, sin tildes. Vacío devuelve todas las filas.</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_cortes" data-search="search_cortes pdf de cortes de luz programados de una empresa eléctrica (eeq o centrosur). lista el archivo de pdf de cortes programados de una distribuidora: eeq (quito, crisis de apagones 2023-2024) o centrosur (azuay, cañar, morona santiago, desde 2023). es regional, no nacional. siguiente paso: get_cortes_horarios con el `archivo` de un pdf. distribuidora eeq o centrosur. query texto libre que se busca, sin distinguir tildes, en el período, fecha, título o url del archivo, p. ej. &quot;noviembre&quot;, &quot;2024-10&quot;. vacío devuelve todos. format formato de salida: `text` (default) o `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_cortes</code>
+<span class="atlas-tool-desc">PDF de cortes de luz programados de una empresa eléctrica (EEQ o CentroSur).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Lista el archivo de PDF de cortes programados de una distribuidora: eeq (Quito, crisis de apagones 2023-2024) o centrosur (Azuay, Cañar, Morona Santiago, desde 2023). Es regional, no nacional. Siguiente paso: get_cortes_horarios con el `archivo` de un PDF.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>distribuidora</code></td><td><code>Distribuidora</code></td><td><code>requerido</code></td><td>eeq o centrosur.</td></tr>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre que se busca, sin distinguir tildes, en el período, fecha, título o URL del archivo, p. ej. "noviembre", "2024-10". Vacío devuelve todos.</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_cortes_horarios" data-search="get_cortes_horarios lee un pdf de cortes de luz y lo convierte en filas: fecha, horario, ubicación y sectores. convierte un pdf de cortes programados (`archivo` de search_cortes) en filas con página, fecha, horario sin energía, sectores y los campos de ubicación de la empresa (eeq: subestación; centrosur: provincia/cantón/zona). el parámetro query filtra por lugar. distribuidora eeq o centrosur. archivo el `archivo` de search_cortes (eeq: slug o url; centrosur: url del pdf). query texto libre que se busca, sin distinguir tildes, en la ubicación y los sectores, p. ej. &quot;la floresta&quot;, &quot;gualaceo&quot;. vacío devuelve todas las filas. format formato de salida: `text` (default) o `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_cortes_horarios</code>
+<span class="atlas-tool-desc">Lee un PDF de cortes de luz y lo convierte en filas: fecha, horario, ubicación y sectores.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Convierte un PDF de cortes programados (`archivo` de search_cortes) en filas con página, fecha, horario sin energía, sectores y los campos de ubicación de la empresa (EEQ: subestación; CentroSur: provincia/cantón/zona). El parámetro query filtra por lugar.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>distribuidora</code></td><td><code>Distribuidora</code></td><td><code>requerido</code></td><td>eeq o centrosur.</td></tr>
+
+<tr><td><code>archivo</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El `archivo` de search_cortes (EEQ: slug o URL; CentroSur: URL del PDF).</td></tr>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre que se busca, sin distinguir tildes, en la ubicación y los sectores, p. ej. "La Floresta", "Gualaceo". Vacío devuelve todas las filas.</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_arconel_reportes" data-search="list_arconel_reportes tipos de reporte, años (desde 1998) y grupos de empresas del generador de estadísticas de arconel. lista los reportes del generador público de estadísticas de arconel (regulador eléctrico), por sección: datos por parroquia (medidores, facturación, subsidio tarifa dignidad), infraestructura, transacciones y más. siguiente paso: get_arconel_reporte. format formato de salida: `text` (default) o `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_arconel_reportes</code>
+<span class="atlas-tool-desc">Tipos de reporte, años (desde 1998) y grupos de empresas del generador de estadísticas de ARCONEL.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Lista los reportes del generador público de estadísticas de ARCONEL (regulador eléctrico), por sección: datos por parroquia (medidores, facturación, subsidio Tarifa Dignidad), infraestructura, transacciones y más. Siguiente paso: get_arconel_reporte.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_arconel_reporte" data-search="get_arconel_reporte ejecuta un reporte de arconel (p. ej. «balance energía» de un año) y devuelve sus filas. ejecuta un reporte del generador de arconel y devuelve sus filas, p. ej. «balance energía» 2023: energía recibida, vendida y perdida por mes y distribuidora, con porcentajes de pérdida técnica y no técnica. es lento (unas 50 filas por página): max_paginas limita el trabajo y `completo` indica si se leyó todo. tipo nombre del reporte según list_arconel_reportes (sin distinguir tildes ni mayúsculas), p. ej. &quot;balance energía&quot;, &quot;pérdidas&quot;. anio año, desde 1998 hasta el actual. grupo todos | cnel | empresas_electricas. mes 1-12, solo para reportes con filtro de mes; los demás ya desglosan por mes. max_paginas máximo de páginas a leer (1-40). format formato de salida: `text` (default) o `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_arconel_reporte</code>
+<span class="atlas-tool-desc">Ejecuta un reporte de ARCONEL (p. ej. «Balance Energía» de un año) y devuelve sus filas.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Ejecuta un reporte del generador de ARCONEL y devuelve sus filas, p. ej. «Balance Energía» 2023: energía recibida, vendida y perdida por mes y distribuidora, con porcentajes de pérdida técnica y no técnica. Es lento (unas 50 filas por página): max_paginas limita el trabajo y `completo` indica si se leyó todo.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>tipo</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Nombre del reporte según list_arconel_reportes (sin distinguir tildes ni mayúsculas), p. ej. "Balance Energía", "Pérdidas".</td></tr>
+
+<tr><td><code>anio</code></td><td><code>int</code></td><td><code>requerido</code></td><td>Año, desde 1998 hasta el actual.</td></tr>
+
+<tr><td><code>grupo</code></td><td><code>Literal['todos', 'cnel', 'empresas_electricas']</code></td><td><code>todos</code></td><td>todos | cnel | empresas_electricas.</td></tr>
+
+<tr><td><code>mes</code></td><td><code>int | None</code></td><td><code>ninguno</code></td><td>1-12, solo para reportes con filtro de mes; los demás ya desglosan por mes.</td></tr>
+
+<tr><td><code>max_paginas</code></td><td><code>int</code></td><td><code>10</code></td><td>Máximo de páginas a leer (1-40).</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -2430,11 +2092,11 @@
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Palabras clave de búsqueda (ej. "empleo", "SRI recaudación")</td></tr>
 
-<tr><td><code>source</code></td><td><code>str</code></td><td><code>nacional</code></td><td>"nacional" (default), "cuenca" (portal municipal de Cuenca), "latacunga" (portal municipal de Latacunga) o "iadb" (portal del BID, no exclusivo de Ecuador)</td></tr>
+<tr><td><code>source</code></td><td><code>ckan_client.CkanSource</code></td><td><code>nacional</code></td><td>"nacional" (default), "cuenca" (portal municipal de Cuenca), "latacunga" (portal municipal de Latacunga) o "iadb" (portal del BID, no exclusivo de Ecuador)</td></tr>
 
 <tr><td><code>preview_rows</code></td><td><code>int</code></td><td><code>10</code></td><td>Filas de datos a previsualizar del recurso elegido (default: 10, máx.: 50)</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2442,7 +2104,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-list_zip_contents" data-search="list_zip_contents lista los archivos miembro (nombre, tamaño) de un .zip desde una url directa, sin descargar el archivo completo. lista los archivos miembro (nombre, tamaño) de un .zip desde una url directa, sin descargar el archivo completo. lee solo el registro end of central directory y el directorio central vía peticiones http range, así que funciona para archivos mucho más grandes que el tope de 5 mb de preview_zip/download_resource -- ej. zips de microdatos de inec o del censo de varios cientos de mb. requiere que el servidor respete peticiones range; falla con un error claro si no. no soporta archivos zip64. listar los nombres es barato de esta forma, pero previsualizar las filas de un miembro específico no lo es (igual hay que descomprimir desde el offset de ese miembro en adelante) -- este tool solo lista metadata. url url directa a un archivo .zip (del resultado de otro tool, ej. get_inec_publicacion_archivos, search_censo_recursos). limit máximo de miembros devueltos (default 200, máx. 1000). offset desplazamiento de paginación sobre la lista de miembros. format text | json">
+<details class="atlas-tool" id="tool-list_zip_contents" data-search="list_zip_contents lista los archivos miembro (nombre, tamaño) de un .zip desde una url directa, sin descargar el archivo completo. lista los archivos miembro (nombre, tamaño) de un .zip desde una url directa, sin descargar el archivo completo. lee solo el registro end of central directory y el directorio central vía peticiones http range, así que funciona para archivos mucho más grandes que el tope de 5 mb de preview_zip/download_resource -- ej. zips de microdatos de inec o del censo de varios cientos de mb. requiere que el servidor respete peticiones range; falla con un error claro si no. no soporta archivos zip64. listar los nombres es barato de esta forma, pero previsualizar las filas de un miembro específico no lo es (igual hay que descomprimir desde el offset de ese miembro en adelante) -- este tool solo lista metadata. url url directa a un archivo .zip (del resultado de otro tool, ej. get_inec_publicacion_archivos, search_archivos). limit máximo de miembros devueltos (default 200, máx. 1000). offset desplazamiento de paginación sobre la lista de miembros. format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">list_zip_contents</code>
 <span class="atlas-tool-desc">Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo.</span>
@@ -2454,13 +2116,13 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>url</code></td><td><code>str</code></td><td><code>requerido</code></td><td>URL directa a un archivo .zip (del resultado de otro tool, ej. get_inec_publicacion_archivos, search_censo_recursos).</td></tr>
+<tr><td><code>url</code></td><td><code>str</code></td><td><code>requerido</code></td><td>URL directa a un archivo .zip (del resultado de otro tool, ej. get_inec_publicacion_archivos, search_archivos).</td></tr>
 
 <tr><td><code>limit</code></td><td><code>int</code></td><td><code>200</code></td><td>Máximo de miembros devueltos (default 200, máx. 1000).</td></tr>
 
 <tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Desplazamiento de paginación sobre la lista de miembros.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2484,59 +2146,7 @@
 
 <tr><td><code>pages</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Rango de páginas, indexado desde 1 (ej. "3", "1-5", "1,4,9"). Vacío significa el documento completo, con tope de 20 páginas por llamada.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-</div>
-</details>
-
-<details class="atlas-category">
-<summary class="atlas-category-summary">
-<span class="atlas-category-title">SEPS y economía popular<span class="tag">2</span></span>
-<span class="atlas-category-action">Mostrar</span>
-</summary>
-<div class="atlas-category-tools">
-
-<details class="atlas-tool" id="tool-list_seps_secciones" data-search="list_seps_secciones secciones de estadísticas de la seps (sector financiero popular y solidario). lista las secciones de estadísticas de la superintendencia de economía popular y solidaria (estadisticas.seps.gob.ec). el sitio principal de la seps bloquea conexiones automatizadas, pero este subdominio es un wordpress normal sin organización en ckan: 22 secciones de &quot;estadísticas sfps&quot; (cooperativas, mutualistas, cajas) más 4 de &quot;estadísticas eps&quot;. incluye boletines de calificación de riesgo, uno por año 2020-2025. continúa con get_seps_seccion_archivos(seccion). format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">list_seps_secciones</code>
-<span class="atlas-tool-desc">Secciones de estadísticas de la SEPS (sector financiero popular y solidario).</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista las secciones de estadísticas de la Superintendencia de Economía Popular y Solidaria (estadisticas.seps.gob.ec). El sitio principal de la SEPS bloquea conexiones automatizadas, pero este subdominio es un WordPress normal sin organización en CKAN: 22 secciones de "Estadísticas SFPS" (cooperativas, mutualistas, cajas) más 4 de "Estadísticas EPS". Incluye boletines de calificación de riesgo, uno por año 2020-2025. Continúa con get_seps_seccion_archivos(seccion).</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-get_seps_seccion_archivos" data-search="get_seps_seccion_archivos documentos de una sección de estadísticas de la seps. lista los enlaces de descarga directa publicados en una sección de estadísticas de la seps. devuelve la descripción propia de la sección más, por archivo, el grupo, el período/título, la url directa y el formato. algunos enlaces son directos; otros pasan por el plugin &quot;simple download monitor&quot; del sitio y el formato aparece como desconocido en esos casos. seccion una clave de sección tomada de list_seps_secciones, ej. &quot;sfps_reportes_calificacion_de_riesgos&quot;. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_seps_seccion_archivos</code>
-<span class="atlas-tool-desc">Documentos de una sección de estadísticas de la SEPS.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los enlaces de descarga directa publicados en una sección de estadísticas de la SEPS. Devuelve la descripción propia de la sección más, por archivo, el grupo, el período/título, la URL directa y el formato. Algunos enlaces son directos; otros pasan por el plugin "Simple Download Monitor" del sitio y el formato aparece como desconocido en esos casos.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>seccion</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Una clave de sección tomada de list_seps_secciones, ej. "sfps_reportes_calificacion_de_riesgos".</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2566,7 +2176,7 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2592,7 +2202,7 @@
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el título (y descripción/grupo cuando la colección lo tiene), ignora tildes.</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2627,58 +2237,6 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">INEVAL: evaluación educativa<span class="tag">2</span></span>
-<span class="atlas-category-action">Mostrar</span>
-</summary>
-<div class="atlas-category-tools">
-
-<details class="atlas-tool" id="tool-list_ineval_familias" data-search="list_ineval_familias familias de evaluación del ineval con página de bases de datos. lista las familias de evaluación del ineval (instituto nacional de evaluación educativa) con una página real de &quot;bases de datos&quot; — una institución distinta de senescyt/mineduc. publica nueve familias: ser bachiller, ser estudiante (con variantes), ser maestro, ser profesional y llece (erce/serce/terce). el sitio también enlaza páginas informativas sin descargas — solo las claves devueltas aquí apuntan a archivos reales. continúa con get_ineval_familia_archivos(familia). format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">list_ineval_familias</code>
-<span class="atlas-tool-desc">Familias de evaluación del INEVAL con página de bases de datos.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista las familias de evaluación del INEVAL (Instituto Nacional de Evaluación Educativa) con una página real de "Bases de Datos" — una institución distinta de SENESCYT/MINEDUC. Publica nueve familias: Ser Bachiller, Ser Estudiante (con variantes), Ser Maestro, Ser Profesional y Llece (ERCE/SERCE/TERCE). El sitio también enlaza páginas informativas sin descargas — solo las claves devueltas aquí apuntan a archivos reales. Continúa con get_ineval_familia_archivos(familia).</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-get_ineval_familia_archivos" data-search="get_ineval_familia_archivos enlaces de descarga de una familia de evaluación del ineval. lista los enlaces de descarga directa publicados en la página &quot;bases de datos&quot; de una familia de evaluación del ineval. devuelve, por archivo, el grupo, el período, el título y el formato (csv, sav, xlsx, sintaxis, metadato, diccionario, o desconocido). algunos archivos pesan varios mb — descarga la url directamente en vez de pasarla por preview_resource_data o download_resource, que tienen un tope de 5 mb. familia una clave de familia tomada de list_ineval_familias, ej. &quot;ser_bachiller&quot;, &quot;ser_estudiante&quot;, &quot;llece&quot;. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_ineval_familia_archivos</code>
-<span class="atlas-tool-desc">Enlaces de descarga de una familia de evaluación del INEVAL.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los enlaces de descarga directa publicados en la página "Bases de Datos" de una familia de evaluación del INEVAL. Devuelve, por archivo, el grupo, el período, el título y el formato (CSV, SAV, XLSX, SINTAXIS, METADATO, DICCIONARIO, o desconocido). Algunos archivos pesan varios MB — descarga la URL directamente en vez de pasarla por preview_resource_data o download_resource, que tienen un tope de 5 MB.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>familia</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Una clave de familia tomada de list_ineval_familias, ej. "ser_bachiller", "ser_estudiante", "llece".</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-</div>
-</details>
-
-<details class="atlas-category">
-<summary class="atlas-category-summary">
 <span class="atlas-category-title">Aviación civil (DGAC)<span class="tag">5</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
@@ -2698,7 +2256,7 @@
 
 <tr><td><code>designador</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Código ICAO del aeródromo/helipuerto, ej. SEQM (Quito), SEGU (Guayaquil), SECU (Cuenca).</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2720,7 +2278,7 @@
 
 <tr><td><code>designador</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Código ICAO del aeródromo/helipuerto, ej. SEQM (Quito), SEGU (Guayaquil), SECU (Cuenca).</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2740,7 +2298,7 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2760,7 +2318,7 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2782,7 +2340,7 @@
 
 <tr><td><code>designador</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Código ICAO del aeródromo/helipuerto, ej. SEQM (Quito), SEGU (Guayaquil), SECU (Cuenca).</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2795,164 +2353,10 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">ARCOTEL: telecomunicaciones<span class="tag">1</span></span>
+<span class="atlas-category-title">Fuentes sectoriales adicionales<span class="tag">2</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
-
-<details class="atlas-tool" id="tool-search_arcotel" data-search="search_arcotel series estadísticas en pdf de arcotel: boletines o reportes mensuales. lista las dos series estadísticas en pdf que arcotel publica en su sitio institucional, fuera de su organización ckan congelada desde 2021/2022. devuelve urls directas, no tablas: descárgalas con download_resource o léelas con read_pdf. reemplaza a search_arcotel_boletines y search_arcotel_reportes_mensuales. tipo &quot;boletines&quot; (boletín estadístico del sector de telecomunicaciones, 2015-2024) o &quot;reportes_mensuales&quot; (reportes estadísticos mensuales, enero 2017 a junio 2026). query texto libre contra etiqueta, año o url, sin tildes (ej. &quot;roaming&quot;, &quot;2025&quot;, &quot;portabilidad&quot;). vacío devuelve todo. format formato de salida: `text` (default) o `json`.">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_arcotel</code>
-<span class="atlas-tool-desc">Series estadísticas en PDF de ARCOTEL: boletines o reportes mensuales.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista las dos series estadísticas en PDF que ARCOTEL publica en su sitio institucional, fuera de su organización CKAN congelada desde 2021/2022. Devuelve URLs directas, no tablas: descárgalas con download_resource o léelas con read_pdf. Reemplaza a search_arcotel_boletines y search_arcotel_reportes_mensuales.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>tipo</code></td><td><code>Literal['boletines', 'reportes_mensuales']</code></td><td><code>requerido</code></td><td>"boletines" (Boletín Estadístico del Sector de Telecomunicaciones, 2015-2024) o "reportes_mensuales" (Reportes Estadísticos Mensuales, enero 2017 a junio 2026).</td></tr>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra etiqueta, año o URL, sin tildes (ej. "roaming", "2025", "portabilidad"). Vacío devuelve todo.</td></tr>
-
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-</div>
-</details>
-
-<details class="atlas-category">
-<summary class="atlas-category-summary">
-<span class="atlas-category-title">ARCSA: registro sanitario<span class="tag">2</span></span>
-<span class="atlas-category-action">Mostrar</span>
-</summary>
-<div class="atlas-category-tools">
-
-<details class="atlas-tool" id="tool-list_arcsa_categorias" data-search="list_arcsa_categorias categorías del registro sanitario de arcsa (base de registros emitidos). lista las categorías de la &quot;base de registros emitidos&quot; de arcsa (controlsanitario.gob.ec/base-de-datos/): el registro sanitario vigente de alimentos, medicamentos, cosméticos, dispositivos médicos, productos naturales, plaguicidas y establecimientos/permisos afines — 27 categorías con 77 documentos en total. es una fuente distinta de los datasets ckan de arcsa (que solo cubren registros suspendidos o cancelados): esta es la base viva de autorizaciones vigentes. algunas categorías anidan subcategorías (por ejemplo, por año), visibles como &quot;subgrupo&quot; en get_arcsa_categoria_archivos. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">list_arcsa_categorias</code>
-<span class="atlas-tool-desc">Categorías del registro sanitario de ARCSA (Base de Registros Emitidos).</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista las categorías de la "Base de Registros Emitidos" de ARCSA (controlsanitario.gob.ec/base-de-datos/): el registro sanitario vigente de alimentos, medicamentos, cosméticos, dispositivos médicos, productos naturales, plaguicidas y establecimientos/permisos afines — 27 categorías con 77 documentos en total. Es una fuente distinta de los datasets CKAN de ARCSA (que solo cubren registros suspendidos o cancelados): esta es la base viva de autorizaciones vigentes. Algunas categorías anidan subcategorías (por ejemplo, por año), visibles como "subgrupo" en get_arcsa_categoria_archivos.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-get_arcsa_categoria_archivos" data-search="get_arcsa_categoria_archivos documentos de una categoría del registro sanitario de arcsa. lista los documentos de una categoría de la &quot;base de registros emitidos&quot; de arcsa. obtén categoria (un id o nombre) desde list_arcsa_categorias. devuelve, por documento, el subgrupo (subcategoría anidada, cuando existe), título, id y url directa. el formato se reporta como &quot;desconocido&quot; porque el enlace de descarga no trae extensión de archivo, aunque una verificación puntual confirmó archivos reales. categoria un &quot;id&quot; o &quot;nombre&quot; de categoría, tomado de list_arcsa_categorias (la coincidencia por nombre ignora tildes y mayúsculas). format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_arcsa_categoria_archivos</code>
-<span class="atlas-tool-desc">Documentos de una categoría del registro sanitario de ARCSA.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los documentos de una categoría de la "Base de Registros Emitidos" de ARCSA. Obtén categoria (un id o nombre) desde list_arcsa_categorias. Devuelve, por documento, el subgrupo (subcategoría anidada, cuando existe), título, id y URL directa. El formato se reporta como "DESCONOCIDO" porque el enlace de descarga no trae extensión de archivo, aunque una verificación puntual confirmó archivos reales.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>categoria</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Un "id" o "nombre" de categoría, tomado de list_arcsa_categorias (la coincidencia por nombre ignora tildes y mayúsculas).</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-</div>
-</details>
-
-<details class="atlas-category">
-<summary class="atlas-category-summary">
-<span class="atlas-category-title">Fuentes sectoriales adicionales<span class="tag">11</span></span>
-<span class="atlas-category-action">Mostrar</span>
-</summary>
-<div class="atlas-category-tools">
-
-<details class="atlas-tool" id="tool-search_cnig_femicidios" data-search="search_cnig_femicidios estadísticas de violencia de género del cnig, incluyendo femicidios. lista los pdf estadísticos de la página &quot;violencia&quot; del consejo nacional para la igualdad de género (cnig) — incluye la matriz de femicidios y homicidios intencionales de mujeres más otras 19 tablas relacionadas (por provincia, etnia, discapacidad, edad, quintil de ingreso, población lgbti, casos judicializados). el propio pdf indica que sus cifras se compilan a partir de datos del consejo de la judicatura, la fiscalía y el ministerio del interior, y describe el indicador como de actualización semanal, aunque lo publicado en la página es un corte fechado (a abril de 2023), no un flujo en vivo. query texto libre contra la etiqueta de la entrada (ignora tildes), ej. &quot;femicidio&quot;, &quot;lgbti&quot;, &quot;provincia&quot;. vacío devuelve las 20 entradas de la página. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_cnig_femicidios</code>
-<span class="atlas-tool-desc">Estadísticas de violencia de género del CNIG, incluyendo femicidios.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los PDF estadísticos de la página "Violencia" del Consejo Nacional para la Igualdad de Género (CNIG) — incluye la matriz de femicidios y homicidios intencionales de mujeres más otras 19 tablas relacionadas (por provincia, etnia, discapacidad, edad, quintil de ingreso, población LGBTI, casos judicializados). El propio PDF indica que sus cifras se compilan a partir de datos del Consejo de la Judicatura, la Fiscalía y el Ministerio del Interior, y describe el indicador como de actualización semanal, aunque lo publicado en la página es un corte fechado (a abril de 2023), no un flujo en vivo.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra la etiqueta de la entrada (ignora tildes), ej. "femicidio", "lgbti", "provincia". Vacío devuelve las 20 entradas de la página.</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_minedec_matricula" data-search="search_minedec_matricula registro histórico de matrícula de educación básica y bachillerato. lista los archivos del &quot;registro administrativo histórico&quot; de matrícula de educación básica y bachillerato de minedec, 2009 en adelante. es un subdominio distinto de la cobertura ckan de educación superior de senescyt ya integrada en este proyecto: aquella cubre universidades e institutos técnicos, esta cubre matrícula de educación básica. devuelve enlaces xlsx directos, no el contenido — los registros pesan entre 30 y 140 mb (demasiado para previsualizar o descargar por este servidor). query texto libre contra la etiqueta, tipo (&quot;registro&quot;/&quot;metadato&quot;/&quot;diccionario&quot;), período (&quot;inicio&quot;/&quot;fin&quot;) o url del archivo (ignora tildes). vacío devuelve todos los archivos. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_minedec_matricula</code>
-<span class="atlas-tool-desc">Registro histórico de matrícula de educación básica y bachillerato.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los archivos del "Registro Administrativo Histórico" de matrícula de educación básica y bachillerato de MINEDEC, 2009 en adelante. Es un subdominio distinto de la cobertura CKAN de educación superior de SENESCYT ya integrada en este proyecto: aquella cubre universidades e institutos técnicos, esta cubre matrícula de educación básica. Devuelve enlaces XLSX directos, no el contenido — los registros pesan entre 30 y 140 MB (demasiado para previsualizar o descargar por este servidor).</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra la etiqueta, tipo ("registro"/"metadato"/"diccionario"), período ("inicio"/"fin") o URL del archivo (ignora tildes). Vacío devuelve todos los archivos.</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_mef_fiscal" data-search="search_mef_fiscal cifras fiscales de ecuador (mef/mdep o senae), incluyendo ingresos arancelarios. lista los libros de operaciones fiscales de ecuador desde dos fuentes posibles. fuente=&quot;mef&quot; (default): el archivo &quot;estadística nueva metodología&quot; del ministerio de economía y finanzas/mdep — cuentas fiscales bajo metodología fmi/gfsm, actualizado mensualmente, 76 archivos xlsx confirmados en vivo. para ingresos arancelarios, descarga el archivo más reciente de &quot;operaciones de ingresos y gastos spnf&quot; y lee la fila &quot;1214 arancelarios&quot;. fuente=&quot;senae&quot;: el archivo &quot;tributos recaudados&quot; de senae, 60 xlsx confirmados pero desactualizados (solo 2012-2021). &quot;arancelarios&quot;/&quot;advalorem&quot; son solo el arancel — menor que la cifra de &quot;recaudación aduanera&quot; que citan algunos medios, que también incluye iva e ice cobrados en frontera. fuente &quot;mef&quot; (default) o &quot;senae&quot;. query texto libre contra la etiqueta del archivo (y, para &quot;senae&quot;, su categoría), ignora tildes, ej. &quot;ingresos&quot;, &quot;2026-06&quot;, &quot;advalorem&quot;, &quot;totales&quot;. vacío devuelve todos los archivos de la fuente elegida. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_mef_fiscal</code>
-<span class="atlas-tool-desc">Cifras fiscales de Ecuador (MEF/MDEP o SENAE), incluyendo ingresos arancelarios.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los libros de operaciones fiscales de Ecuador desde dos fuentes posibles. fuente="mef" (default): el archivo "Estadística Nueva Metodología" del Ministerio de Economía y Finanzas/MDEP — cuentas fiscales bajo metodología FMI/GFSM, actualizado mensualmente, 76 archivos XLSX confirmados en vivo. Para ingresos arancelarios, descarga el archivo más reciente de "Operaciones de Ingresos y Gastos SPNF" y lee la fila "1214 Arancelarios". fuente="senae": el archivo "Tributos Recaudados" de SENAE, 60 XLSX confirmados pero desactualizados (solo 2012-2021). "Arancelarios"/"ADVALOREM" son solo el arancel — menor que la cifra de "recaudación aduanera" que citan algunos medios, que también incluye IVA e ICE cobrados en frontera.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>fuente</code></td><td><code>str</code></td><td><code>mef</code></td><td>"mef" (default) o "senae".</td></tr>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra la etiqueta del archivo (y, para "senae", su categoría), ignora tildes, ej. "ingresos", "2026-06", "advalorem", "totales". Vacío devuelve todos los archivos de la fuente elegida.</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
 
 <details class="atlas-tool" id="tool-search_infomies_bases_mensuales" data-search="search_infomies_bases_mensuales bases de datos mensuales de infomies (inclusión económica y social). lista las bases de datos mensuales de infomies (info.desarrollohumano.gob.ec, portal de estadísticas del antiguo mies) para un programa: &quot;anc&quot; o &quot;is&quot;. es más detallado que la cobertura ckan existente de este proyecto para los mismos programas, que solo tiene cortes trimestrales. confirmado en vivo: solo el año en curso tiene un archivo por mes hasta la fecha; cada año cerrado (2019-2025) tiene exactamente un archivo, el corte de diciembre. los archivos son .rar (fuera del soporte de formatos de este proyecto por riesgo de subprocess/cve) — se devuelven metadatos y la url directa, no el contenido. serie &quot;anc&quot; (aseguramiento no contributivo / inclusión económica) o &quot;is&quot; (usuarios del siimies / inclusión social). anio año específico a traer, ej. 2024. si se omite, trae todos los años conocidos y los agrega (varias solicitudes en frío). query texto libre contra la etiqueta, año o url del archivo (ignora tildes), ej. &quot;julio&quot;, &quot;2023&quot;. vacío devuelve todos los archivos del/los año(s) elegido(s). format text | json">
 <summary class="atlas-tool-summary">
@@ -2966,13 +2370,13 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>serie</code></td><td><code>str</code></td><td><code>requerido</code></td><td>"anc" (Aseguramiento No Contributivo / inclusión económica) o "is" (usuarios del SIIMIES / inclusión social).</td></tr>
+<tr><td><code>serie</code></td><td><code>Literal['anc', 'is']</code></td><td><code>requerido</code></td><td>"anc" (Aseguramiento No Contributivo / inclusión económica) o "is" (usuarios del SIIMIES / inclusión social).</td></tr>
 
 <tr><td><code>anio</code></td><td><code>int | None</code></td><td><code>ninguno</code></td><td>Año específico a traer, ej. 2024. Si se omite, trae todos los años conocidos y los agrega (varias solicitudes en frío).</td></tr>
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra la etiqueta, año o URL del archivo (ignora tildes), ej. "julio", "2023". Vacío devuelve todos los archivos del/los año(s) elegido(s).</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2992,7 +2396,7 @@
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>modo</code></td><td><code>str</code></td><td><code>zonal</code></td><td>"zonal" o "consolidado".</td></tr>
+<tr><td><code>modo</code></td><td><code>Literal['zonal', 'consolidado']</code></td><td><code>zonal</code></td><td>"zonal" o "consolidado".</td></tr>
 
 <tr><td><code>zona</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Obligatorio para modo="zonal": una de "zona-1-bz".."zona-9-bz". Se ignora en modo="consolidado". Déjalo vacío con modo="zonal" para obtener solo la lista de claves de zona válidas.</td></tr>
 
@@ -3000,137 +2404,7 @@
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra la etiqueta, año o URL del archivo (ignora tildes).</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_trabajo_boletin_anual" data-search="search_trabajo_boletin_anual boletín estadístico anual del mercado laboral ecuatoriano. lista las ediciones conocidas del &quot;boletín estadístico anual: el mercado laboral en el ecuador&quot; del ministerio del trabajo — un reporte anual en pdf basado en la encuesta enemdu del inec más los registros administrativos propios del ministerio. importante: no es una serie histórica completa — solo se conocen 3 ediciones (2020, 2021, 2022). la página que alguna vez listó varias ediciones no puede extraerse en vivo hoy y solo enlaza la edición 2022; 2020 y 2021 se recuperaron de una instantánea de wayback machine de enero de 2024. no se encontró ninguna edición 2023-2025. query texto libre contra el año, título o url de la edición (ignora tildes), ej. &quot;2021&quot;. vacío devuelve todas las ediciones conocidas. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_trabajo_boletin_anual</code>
-<span class="atlas-tool-desc">Boletín estadístico anual del mercado laboral ecuatoriano.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista las ediciones conocidas del "Boletín Estadístico Anual: El Mercado Laboral en el Ecuador" del Ministerio del Trabajo — un reporte anual en PDF basado en la encuesta ENEMDU del INEC más los registros administrativos propios del ministerio. Importante: no es una serie histórica completa — solo se conocen 3 ediciones (2020, 2021, 2022). La página que alguna vez listó varias ediciones no puede extraerse en vivo hoy y solo enlaza la edición 2022; 2020 y 2021 se recuperaron de una instantánea de Wayback Machine de enero de 2024. No se encontró ninguna edición 2023-2025.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el año, título o URL de la edición (ignora tildes), ej. "2021". Vacío devuelve todas las ediciones conocidas.</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_salarios_sectoriales" data-search="search_salarios_sectoriales tablas de salarios mínimos sectoriales de ecuador. lista los documentos con las tablas de salarios mínimos sectoriales de ecuador (pisos salariales por rama de actividad económica, fijados por el consejo nacional de trabajo y salarios, distintos del salario básico unificado nacional). extraído de la biblioteca documental del ministerio del trabajo, que sí responde de forma estable a diferencia de las páginas dinámicas del ministerio. cobertura confirmada: un registro por año 2020-2025. no se ha publicado tabla 2026 — la de 2025 sigue vigente por defecto de actualización. anio filtra a este año (según el título del propio documento). ninguno devuelve todos los años encontrados. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_salarios_sectoriales</code>
-<span class="atlas-tool-desc">Tablas de salarios mínimos sectoriales de Ecuador.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los documentos con las tablas de salarios mínimos sectoriales de Ecuador (pisos salariales por rama de actividad económica, fijados por el Consejo Nacional de Trabajo y Salarios, distintos del Salario Básico Unificado nacional). Extraído de la biblioteca documental del Ministerio del Trabajo, que sí responde de forma estable a diferencia de las páginas dinámicas del ministerio. Cobertura confirmada: un registro por año 2020-2025. No se ha publicado tabla 2026 — la de 2025 sigue vigente por defecto de actualización.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>anio</code></td><td><code>int | None</code></td><td><code>ninguno</code></td><td>Filtra a este año (según el título del propio documento). Ninguno devuelve todos los años encontrados.</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_senescyt_estadisticas" data-search="search_senescyt_estadisticas reportes del siau de senescyt: estadísticas de educación superior y cti. lista los reportes del portal siau de senescyt: fichas metodológicas, reportes de indicadores (2021/2022/2024), el índice de competitividad del ecuador, el inventario de indicadores de cti y saberes ancestrales, la caracterización de la demanda laboral, y el estudio de impacto del covid-19 en educación superior. distinto de la cobertura ckan de senescyt ya existente (matrícula, docentes, becarios), del registro de títulos (bloqueado por captcha, no automatizable) y de la matrícula básica de minedec (search_minedec_matricula). query texto libre contra la sección, título, tipo (&quot;wpdm&quot;/&quot;directo&quot;) o url del archivo (ignora tildes). vacío devuelve todos los archivos. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_senescyt_estadisticas</code>
-<span class="atlas-tool-desc">Reportes del SIAU de SENESCYT: estadísticas de educación superior y CTI.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los reportes del portal SIAU de SENESCYT: fichas metodológicas, reportes de indicadores (2021/2022/2024), el índice de competitividad del Ecuador, el inventario de indicadores de CTI y saberes ancestrales, la caracterización de la demanda laboral, y el estudio de impacto del COVID-19 en educación superior. Distinto de la cobertura CKAN de SENESCYT ya existente (matrícula, docentes, becarios), del registro de títulos (bloqueado por captcha, no automatizable) y de la matrícula básica de MINEDEC (search_minedec_matricula).</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra la sección, título, tipo ("wpdm"/"directo") o URL del archivo (ignora tildes). Vacío devuelve todos los archivos.</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-list_senescyt_biblioteca_categorias" data-search="list_senescyt_biblioteca_categorias categorías de la biblioteca de educación superior (minedec/senescyt). lista las categorías de la biblioteca documental del viceministerio de educación superior (educacion.gob.ec/edusuperior/biblioteca/) — pac por año, normativa loes/snna, acuerdos institucionales desde 2015, exámenes especiales/auditoría, indicadores acti y más; ~1.259 documentos en 17 categorías de primer nivel. distinto de search_senescyt_estadisticas (un archivo curado de 12 entradas en siau.senescyt.gob.ec) y de search_minedec_matricula (matrícula básica, mismo dominio pero una página simple, no esta biblioteca). format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">list_senescyt_biblioteca_categorias</code>
-<span class="atlas-tool-desc">Categorías de la Biblioteca de Educación Superior (MINEDEC/SENESCYT).</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista las categorías de la Biblioteca documental del Viceministerio de Educación Superior (educacion.gob.ec/edusuperior/biblioteca/) — PAC por año, normativa LOES/SNNA, acuerdos institucionales desde 2015, exámenes especiales/auditoría, indicadores ACTI y más; ~1.259 documentos en 17 categorías de primer nivel. Distinto de search_senescyt_estadisticas (un archivo curado de 12 entradas en siau.senescyt.gob.ec) y de search_minedec_matricula (matrícula básica, mismo dominio pero una página simple, no esta biblioteca).</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-get_senescyt_biblioteca_categoria_archivos" data-search="get_senescyt_biblioteca_categoria_archivos documentos de una categoría de la biblioteca de educación superior. lista los documentos de una categoría de primer nivel de la biblioteca. algunas categorías anidan sub-categorías varios niveles de profundidad — el campo &quot;subgrupo&quot; de cada documento solo muestra el encabezado anidado más cercano, no una ruta completa. el formato se reporta como &quot;desconocido&quot;: el link de descarga no lleva extensión de archivo. categoria un &quot;id&quot; o &quot;nombre&quot; de categoría de list_senescyt_biblioteca_categorias (el nombre se compara ignorando tildes/mayúsculas). format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_senescyt_biblioteca_categoria_archivos</code>
-<span class="atlas-tool-desc">Documentos de una categoría de la Biblioteca de Educación Superior.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los documentos de una categoría de primer nivel de la Biblioteca. Algunas categorías anidan sub-categorías varios niveles de profundidad — el campo "subgrupo" de cada documento solo muestra el encabezado anidado más cercano, no una ruta completa. El formato se reporta como "DESCONOCIDO": el link de descarga no lleva extensión de archivo.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>categoria</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Un "id" o "nombre" de categoría de list_senescyt_biblioteca_categorias (el nombre se compara ignorando tildes/mayúsculas).</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_gacetas_inmunoprevenibles" data-search="search_gacetas_inmunoprevenibles gacetas epidemiológicas semanales de enfermedades prevenibles por vacunación (msp). lista los boletines semanales del msp (&quot;gaceta de inmunoprevenibles&quot;, por semana epidemiológica) sobre vigilancia de enfermedades prevenibles por vacunación, 2019 al presente — 362 pdfs confirmados en vivo. el descubrimiento de páginas es dinámico (vía la api rest de wordpress del msp), así que los años futuros aparecen solos. desde 2024 algunas semanas incluyen un reporte complementario por enfermedad específica (tosferina). una de varias series paralelas de gacetas del msp (vectoriales, enfermedades de la piel/reemergentes, indicadores existen también pero no están cubiertas por este tool todavía). query texto libre contra el título, año, semana o tipo (&quot;general&quot;/&quot;tosferina&quot;) del archivo (ignora tildes). vacío devuelve todos los archivos. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_gacetas_inmunoprevenibles</code>
-<span class="atlas-tool-desc">Gacetas epidemiológicas semanales de enfermedades prevenibles por vacunación (MSP).</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los boletines semanales del MSP ("Gaceta de Inmunoprevenibles", por Semana Epidemiológica) sobre vigilancia de enfermedades prevenibles por vacunación, 2019 al presente — 362 PDFs confirmados en vivo. El descubrimiento de páginas es dinámico (vía la API REST de WordPress del MSP), así que los años futuros aparecen solos. Desde 2024 algunas semanas incluyen un reporte complementario por enfermedad específica (tosferina). Una de varias series paralelas de gacetas del MSP (vectoriales, enfermedades de la piel/reemergentes, indicadores existen también pero no están cubiertas por este tool todavía).</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el título, año, semana o tipo ("general"/"tosferina") del archivo (ignora tildes). Vacío devuelve todos los archivos.</td></tr>
-
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -3162,9 +2436,9 @@
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el nombre del indicador o su ruta temática (ignora tildes), ej. "poblacion", "pobreza", "comercio exterior". Vacío devuelve el catálogo completo (grande — mejor usar un query).</td></tr>
 
-<tr><td><code>lang</code></td><td><code>str</code></td><td><code>es</code></td><td>"es" (default) o "en"</td></tr>
+<tr><td><code>lang</code></td><td><code>Literal['es', 'en']</code></td><td><code>es</code></td><td>"es" (default) o "en"</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -3188,9 +2462,157 @@
 
 <tr><td><code>pais</code></td><td><code>str</code></td><td><code>Ecuador</code></td><td>País al que filtrar (ignora tildes, ej. "Ecuador", "Peru"). String vacío devuelve todos los países del indicador — puede ser de varios MB para un indicador rico.</td></tr>
 
-<tr><td><code>lang</code></td><td><code>str</code></td><td><code>es</code></td><td>"es" (default) o "en"</td></tr>
+<tr><td><code>lang</code></td><td><code>Literal['es', 'en']</code></td><td><code>es</code></td><td>"es" (default) o "en"</td></tr>
 
-<tr><td><code>format</code></td><td><code>str</code></td><td><code>text</code></td><td>text | json</td></tr>
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+</div>
+</details>
+
+<details class="atlas-category">
+<summary class="atlas-category-summary">
+<span class="atlas-category-title">Archivos institucionales<span class="tag">3</span></span>
+<span class="atlas-category-action">Mostrar</span>
+</summary>
+<div class="atlas-category-tools">
+
+<details class="atlas-tool" id="tool-search_archivos" data-search="search_archivos enlaces a archivos publicados por una institución (sri, mef, senae, inec, minedec, etc.). busca en el catálogo de archivos de una institución y devuelve enlaces directos (título, url, formato), no el contenido. fuentes: sri_datasets, sri_recaudacion, mef, senae, censo, minedec, senescyt, msp, cnig, trabajo_boletin, salarios, arcotel_boletines y arcotel_mensuales. descarga con download_resource o read_pdf (tope de 5 mb). fuente catálogo a consultar (ver la lista de fuentes). query texto libre que se busca, sin distinguir tildes, en el título y los campos de cada archivo. vacío devuelve todos. limit máximo de archivos devueltos (1-100, default 50). offset desplazamiento de paginación sobre los archivos encontrados. format formato de salida: `text` (default) o `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_archivos</code>
+<span class="atlas-tool-desc">Enlaces a archivos publicados por una institución (SRI, MEF, SENAE, INEC, MINEDEC, etc.).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Busca en el catálogo de archivos de una institución y devuelve enlaces directos (título, URL, formato), no el contenido. Fuentes: sri_datasets, sri_recaudacion, mef, senae, censo, minedec, senescyt, msp, cnig, trabajo_boletin, salarios, arcotel_boletines y arcotel_mensuales. Descarga con download_resource o read_pdf (tope de 5 MB).</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>requerido</code></td><td>Catálogo a consultar (ver la lista de fuentes).</td></tr>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre que se busca, sin distinguir tildes, en el título y los campos de cada archivo. Vacío devuelve todos.</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>50</code></td><td>Máximo de archivos devueltos (1-100, default 50).</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Desplazamiento de paginación sobre los archivos encontrados.</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_archivo_secciones" data-search="list_archivo_secciones secciones del archivo documental de una institución (arcsa, superbancos, seps, ineval, sgr, senescyt, sipa). lista las secciones del archivo documental de una institución: registro sanitario de arcsa, estadísticas de superbancos y seps, bases de ineval, bibliotecas de la sgr y de educación superior, o estadísticas agropecuarias del sipa. siguiente paso: get_archivo_seccion(fuente, seccion). fuente una de arcsa, superbancos, seps, ineval, sgr, senescyt, sipa. format formato de salida: `text` (default) o `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_archivo_secciones</code>
+<span class="atlas-tool-desc">Secciones del archivo documental de una institución (ARCSA, Superbancos, SEPS, INEVAL, SGR, SENESCYT, SIPA).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Lista las secciones del archivo documental de una institución: registro sanitario de ARCSA, estadísticas de Superbancos y SEPS, bases de INEVAL, bibliotecas de la SGR y de Educación Superior, o estadísticas agropecuarias del SIPA. Siguiente paso: get_archivo_seccion(fuente, seccion).</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>requerido</code></td><td>Una de arcsa, superbancos, seps, ineval, sgr, senescyt, sipa.</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_archivo_seccion" data-search="get_archivo_seccion archivos descargables de una sección de un archivo documental (título, url, formato). lista los archivos de una sección obtenida con list_archivo_secciones. cada archivo trae título, url y formato, más contexto propio de la fuente (grupo, período, subgrupo, descripción). devuelve enlaces, no contenido; descarga los archivos grandes directamente (las tools de vista previa y descarga tienen un tope de 5 mb). fuente una de arcsa, superbancos, seps, ineval, sgr, senescyt, sipa. seccion el `id` de una sección de list_archivo_secciones. format formato de salida: `text` (default) o `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_archivo_seccion</code>
+<span class="atlas-tool-desc">Archivos descargables de una sección de un archivo documental (título, URL, formato).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Lista los archivos de una sección obtenida con list_archivo_secciones. Cada archivo trae título, URL y formato, más contexto propio de la fuente (grupo, período, subgrupo, descripción). Devuelve enlaces, no contenido; descarga los archivos grandes directamente (las tools de vista previa y descarga tienen un tope de 5 MB).</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>requerido</code></td><td>Una de arcsa, superbancos, seps, ineval, sgr, senescyt, sipa.</td></tr>
+
+<tr><td><code>seccion</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El `id` de una sección de list_archivo_secciones.</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+</div>
+</details>
+
+<details class="atlas-category">
+<summary class="atlas-category-summary">
+<span class="atlas-category-title">Geoportales (INAMHI y MAG)<span class="tag">2</span></span>
+<span class="atlas-category-action">Mostrar</span>
+</summary>
+<div class="atlas-category-tools">
+
+<details class="atlas-tool" id="tool-search_capas_geo" data-search="search_capas_geo capas de los geoportales de inamhi y mag (lluvia, cobertura, zonificación agropecuaria). busca en el catálogo de capas (wms/wfs) de un geoportal geoserver: inamhi (normales de precipitación, anomalías, grillas del modelo wrf, cuencas) o mag (zonificación agroecológica, cobertura, censos agropecuarios, catastro rural, riesgo agroclimático). con solo_wfs=true deja las capas con datos de atributos. fuente inamhi o mag. query texto libre que se busca, sin distinguir tildes, en el id, nombre, título o resumen de la capa. vacío devuelve todas. solo_wfs devuelve solo las capas con wfs (datos de atributos). categoria solo para fuente=&quot;mag&quot;: una de sus 8 categorías. se ignora para inamhi. format formato de salida: `text` (default) o `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_capas_geo</code>
+<span class="atlas-tool-desc">Capas de los geoportales de INAMHI y MAG (lluvia, cobertura, zonificación agropecuaria).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Busca en el catálogo de capas (WMS/WFS) de un geoportal GeoServer: inamhi (normales de precipitación, anomalías, grillas del modelo WRF, cuencas) o mag (zonificación agroecológica, cobertura, censos agropecuarios, catastro rural, riesgo agroclimático). Con solo_wfs=true deja las capas con datos de atributos.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>requerido</code></td><td>inamhi o mag.</td></tr>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre que se busca, sin distinguir tildes, en el id, nombre, título o resumen de la capa. Vacío devuelve todas.</td></tr>
+
+<tr><td><code>solo_wfs</code></td><td><code>bool</code></td><td><code>False</code></td><td>Devuelve solo las capas con WFS (datos de atributos).</td></tr>
+
+<tr><td><code>categoria</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Solo para fuente="mag": una de sus 8 categorías. Se ignora para inamhi.</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_capa_geo_datos" data-search="get_capa_geo_datos muestra de atributos (hasta 20 objetos) de una capa con wfs. trae una muestra pequeña de atributos de una capa del geoportal (capa de search_capas_geo) mediante wfs getfeature. es una vista previa, no una consulta espacial: sin bbox ni filtros, y sin coordenadas de geometría. las capas sin wfs (rásteres, algunas del mag) devuelven error. fuente inamhi o mag. capa el campo `capa` de search_capas_geo (inamhi: nombre &quot;geonode:...&quot;; mag: &quot;categoria/store/nombre&quot;). count número de objetos a traer (1-20, default 5). format formato de salida: `text` (default) o `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_capa_geo_datos</code>
+<span class="atlas-tool-desc">Muestra de atributos (hasta 20 objetos) de una capa con WFS.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Trae una muestra pequeña de atributos de una capa del geoportal (capa de search_capas_geo) mediante WFS GetFeature. Es una vista previa, no una consulta espacial: sin bbox ni filtros, y sin coordenadas de geometría. Las capas sin WFS (rásteres, algunas del MAG) devuelven error.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>requerido</code></td><td>inamhi o mag.</td></tr>
+
+<tr><td><code>capa</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El campo `capa` de search_capas_geo (INAMHI: nombre "geonode:..."; MAG: "categoria/store/nombre").</td></tr>
+
+<tr><td><code>count</code></td><td><code>int</code></td><td><code>5</code></td><td>Número de objetos a traer (1-20, default 5).</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -3258,7 +2680,7 @@ window.SITE_SEARCH_EMPTY_LABEL = "Sin resultados.";
     var count = visibleTools().length;
     resultCount.textContent = query
       ? count + " tool" + (count === 1 ? "" : "s") + " coincide" + (count === 1 ? "" : "n") + "."
-      : "116 tools · abre un grupo para ver sus detalles.";
+      : "90 tools · abre un grupo para ver sus detalles.";
   }
 
   function applyFilter(query) {

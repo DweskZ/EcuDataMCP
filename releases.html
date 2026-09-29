@@ -150,6 +150,36 @@
 <div class="container-page">
 
 <div class="release-row">
+<div class="release-meta"><span class="release-version">v0.10.0</span><span class="release-date">2026-09-28</span></div>
+<p class="release-summary">Cambio incompatible en los nombres de las tools: de 109 a 90 en el perfil por defecto. Cada parámetro tiene ahora una descripción en el esquema. Varias tools se fusionan detrás de un selector: search_archivos(fuente) reemplaza a 11 buscadores de archivos (SRI, MEF, Censo, MINEDEC, SENESCYT, ARCOTEL y otros); search_cortes y get_cortes_horarios cubren EEQ y Centrosur; search_capas_geo y get_capa_geo_datos cubren los geoportales de INAMHI y MAG; search_bce_paginas y get_bce_pagina_archivos cubren índices y cuentas nacionales del BCE. El perfil MCP_PROFILE por defecto es public: las dos tools de mantenimiento ya no aparecen en los clientes.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.9.1</span><span class="release-date">2026-09-27</span></div>
+<p class="release-summary">Corrige Superbancos, que devolvía solo sus tablas estáticas: boletines_financieros pasa de 13 a 225 archivos y servicios_financieros recupera sus tres árboles del widget.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.9.0</span><span class="release-date">2026-09-27</span></div>
+<p class="release-summary">tools/list se reduce a un tercio (de 199 mil a 66 mil caracteres): cada tool anuncia una descripción corta y la completa se sirve en el recurso ecuador://herramientas/{nombre}. Contadores de uso por tool (/usage). 14 tools de archivos institucionales se fusionan en list_archivo_secciones y get_archivo_seccion. Por stdio, la base financiera de Supercías espera a la primera consulta antes de descargar ~356 MB. Corrige la verificación del certificado de INEVAL.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.8.13</span><span class="release-date">2026-09-27</span></div>
+<p class="release-summary">La imagen de Docker arranca por stdio por defecto y el CI la prueba. Nuevo scripts/publish_smithery.py. Corrige search_ranking y get_financials fuera de un checkout del código: la construcción de la base vive ahora en helpers/ y los datos van a un directorio por usuario.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.8.12</span><span class="release-date">2026-09-27</span></div>
+<p class="release-summary">Paquete MCPB para instalar el servidor como extensión local, glama.json y la versión real del servidor en la respuesta initialize.</p>
+</div>
+
+<div class="release-row">
+<div class="release-meta"><span class="release-version">v0.8.11</span><span class="release-date">2026-09-27</span></div>
+<p class="release-summary">Cortes de luz programados de la EEQ y de Centrosur convertidos en filas (fecha, horario, subestación, sectores), y los reportes de ARCONEL (28 tipos, desde 1998). Empaquetado en PyPI y registro oficial de MCP. La base de Supercías desactualizada se sigue sirviendo, marcada, mientras se refresca; y ecuador://fuentes y list_capabilities ya listan todas las tools registradas.</p>
+</div>
+
+<div class="release-row">
 <div class="release-meta"><span class="release-version">v0.8.10</span><span class="release-date">2026-09-24</span></div>
 <p class="release-summary">Verificación de cumplimiento patronal del IESS (mora/no mora por RUC o cédula), el archivo de cortes de luz programados de Centrosur desde 2023 y los horarios de racionamiento de 2024 de energia-ecuador.com recuperados del Wayback Machine. Corrige desconexiones aleatorias en clientes stdio como Claude Desktop, acelera el arranque (~4,7 s a ~2,9 s), evita que el certificado del IESS reporte como al día a un empleador en mora cuando no puede leer el texto, corrige un fallo de search_sri_ruc con respuestas vacías y blinda el campo n_empleados de Supercías.</p>
 </div>
