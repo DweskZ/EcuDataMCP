@@ -1,0 +1,352 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="landing hero">
+<div class="container-page hero-layout">
+<div class="hero-copy">
+<p class="brand-hero"><span class="brand-logo-wrap" aria-hidden="true"><img class="brand-logo brand-logo-lg logo-light" src="{{ assets }}logo-navy.svg" width="40" height="40" alt="" decoding="async"><img class="brand-logo brand-logo-lg logo-dark" src="{{ assets }}logo-light.svg" width="40" height="40" alt="" decoding="async"></span>EcuDataMCP</p>
+<p class="kicker">Open public-data infrastructure for Ecuador</p>
+<h1>Explore <span class="accent">open data.</span></h1>
+<p class="hero-sub">Connect your AI assistant to verifiable public data from Ecuador: datasets, procedures, contracts, earthquakes, BCE indicators, RUC and companies. Find the source, query with limits, and always cite the official origin.</p>
+<div class="hero-ctas">
+<a class="btn-cta primary" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">Get started on GitHub</a>
+<a class="btn-cta secondary" href="#connect">Install in 1 minute</a>
+</div>
+</div>
+<div class="hero-visual">
+<div class="chat-mock" data-chat-demo="en">
+<div class="chat-mock-bar">
+<span class="chat-dot"></span><span class="chat-dot"></span><span class="chat-dot"></span>
+<span class="chat-mock-title">Claude · EcuDataMCP</span>
+<span class="chat-mock-status" data-chat-status>real example</span>
+</div>
+<div class="chat-mock-body" data-chat-body>
+<div class="chat-bubble user">How much does a passport cost, and what do they ask for?</div>
+<div class="chat-bubble assistant">
+<span class="chat-tool">tool · get_tramite_info</span>
+<p>For adults the electronic passport costs <strong>USD 90</strong>, with no VAT. Seniors pay half. A disability of 30% or more means no fee.</p>
+<pre class="chat-code">proof of payment
+valid ID card
+previous passport, if it is still valid</pre>
+<span class="chat-cite">source · gob.ec, Civil Registry</span>
+</div>
+</div>
+<div class="chat-nav">
+<button type="button" class="chat-nav-btn" data-chat-prev aria-label="Previous example">‹</button>
+<span class="chat-nav-label" data-chat-label>Passport · 1 / 4</span>
+<button type="button" class="chat-nav-btn" data-chat-next aria-label="Next example">›</button>
+</div>
+<script type="application/json" data-chat-examples>
+[
+  {
+    "label": "Passport",
+    "turns": [
+      {"role": "user", "text": "How much does a passport cost, and what do they ask for?"},
+      {"role": "assistant", "tool": "get_tramite_info", "text": "For adults the electronic passport costs USD 90, with no VAT. Seniors pay half. A disability of 30% or more means no fee.", "html": "For adults the electronic passport costs <strong>USD 90</strong>, with no VAT. Seniors pay half. A disability of 30% or more means no fee.", "code": "proof of payment\nvalid ID card\nprevious passport, if it is still valid", "cite": "source · gob.ec, Civil Registry"}
+    ]
+  },
+  {
+    "label": "Country risk",
+    "turns": [
+      {"role": "user", "text": "Where did Ecuador's country risk close?"},
+      {"role": "assistant", "tool": "get_bce_indicador_diario", "text": "On 25 September 2026 the EMBI closed at 477.16 basis points.", "html": "On 25 September 2026 the EMBI closed at <strong>477.16</strong> basis points.", "code": "2026-09-23  432.14\n2026-09-24  445.93\n2026-09-25  477.16", "cite": "source · contenido.bce.fin.ec"}
+    ]
+  },
+  {
+    "label": "Quito",
+    "turns": [
+      {"role": "user", "text": "What is Quito's INEC code and population?"},
+      {"role": "assistant", "tool": "lookup_ubicacion", "text": "Quito is canton 1701 in Pichincha. The INEC record lists 2,853,320 inhabitants.", "html": "Quito is canton <strong>1701</strong> in Pichincha. The INEC record lists <strong>2,853,320</strong> inhabitants.", "code": "code 1701\nprovince Pichincha (17)\npopulation 2,853,320", "cite": "source · INEC, political-administrative division"}
+    ]
+  },
+  {
+    "label": "Remittances",
+    "turns": [
+      {"role": "user", "text": "How much did Ecuador receive in remittances in the first quarter of 2026?"},
+      {"role": "assistant", "tool": "get_bce_indicador_diario", "text": "The BCE quarterly series shows USD 1,856.7 million as of 31 March 2026.", "html": "The BCE quarterly series shows <strong>USD 1,856.7 million</strong> as of 31 March 2026.", "code": "2025-Q4  2,015.5\n2026-Q1  1,856.7\nunit: million USD", "cite": "source · contenido.bce.fin.ec"}
+    ]
+  }
+]
+</script>
+</div>
+</div>
+</div>
+</section>
+
+<section class="landing strip-section">
+<div class="container-page">
+<div class="arch-flow" aria-label="How EcuDataMCP connects">
+<div class="arch-node arch-ai">
+<span class="arch-label">Your AI</span>
+<strong class="arch-value"><span>Claude</span><span>Cursor</span><span>ChatGPT</span></strong>
+</div>
+<div class="arch-arrow" aria-hidden="true"></div>
+<div class="arch-node accent">
+<span class="arch-label">MCP protocol</span>
+<strong class="arch-value"><span>EcuDataMCP</span></strong>
+</div>
+<div class="arch-arrow" aria-hidden="true"></div>
+<div class="arch-node arch-src">
+<span class="arch-label">Live sources</span>
+<strong class="arch-value"><span>BCE</span><span>SRI</span><span>INEC</span><span>SERCOP</span></strong>
+</div>
+</div>
+<div class="hero-stats">
+<div class="hero-stat"><span class="num">1,581</span><span class="label">datasets</span></div>
+<div class="hero-stat"><span class="num">{{ tool_count }}</span><span class="label">MCP tools</span></div>
+<div class="hero-stat"><span class="num">{{ source_count }}</span><span class="label">official sources</span></div>
+<div class="hero-stat"><span class="num">0</span><span class="label">API keys</span></div>
+</div>
+<div class="source-cloud" aria-label="Connected institutions">
+<span class="source-pill">BCE</span>
+<span class="source-pill">SRI</span>
+<span class="source-pill">INEC</span>
+<span class="source-pill">SERCOP</span>
+<span class="source-pill">Supercias</span>
+<span class="source-pill">IG-EPN</span>
+<span class="source-pill">gob.ec</span>
+<span class="source-pill">Open Data</span>
+<span class="source-pill">Superbancos</span>
+<span class="source-pill">IESS</span>
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">The problem</p>
+<h2 class="section-title">Less time in portals. More answers from your data.</h2>
+<p class="section-lede">Ecuador publishes a huge amount of public data, but finding it means navigating different portals, checking separate catalogs, and guessing which file is current. EcuDataMCP gives your AI assistant the tools to do that work for you, and still cites the official source in every answer.</p>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="how-it-works">
+<p class="kicker">How it works</p>
+<h2 class="section-title">A traceable path.</h2>
+<p class="section-lede">Four steps, from natural language to the official source.</p>
+<div class="steps-grid">
+<div class="step-card">
+<div class="step-num">01</div>
+<h3>Search</h3>
+<p><code>search_ecuador</code> searches datasets, procedures, regulations, contracts, and risk events by keyword, all at once.</p>
+</div>
+<div class="step-card">
+<div class="step-num">02</div>
+<h3>Inspect</h3>
+<p><code>get_dataset_info</code> and <code>list_dataset_resources</code> check fields, formats, and dates before pulling any data.</p>
+</div>
+<div class="step-card">
+<div class="step-num">03</div>
+<h3>Query</h3>
+<p><code>query_resource_data</code> filters the CKAN DataStore without downloading the whole file, or <code>preview_resource_data</code> for CSV, JSON, and XLSX.</p>
+</div>
+<div class="step-card">
+<div class="step-num">04</div>
+<h3>Cite</h3>
+<p>Every result links back to the official source (the dataset, the procedure, the SERCOP record) so you can verify it.</p>
+</div>
+</div>
+<div class="notice-box" role="note"><strong>Notice:</strong> Some tool definitions, parameters and descriptions were generated or assisted by AI. They may be incomplete or outdated; a tool may return partial results, reject valid parameters, or behave unexpectedly when the official source changes. Always check the response against the linked source and manually review results before using them for important decisions.</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">What can you ask?</p>
+<h2 class="section-title">It has never been this easy to navigate Ecuador's data.</h2>
+<p class="section-lede">{{ source_count }} official sources, in a single conversation.</p>
+<div class="questions-grid">
+{% for q in questions %}
+<div class="question-card">&ldquo;{{ q }}&rdquo;</div>
+{% endfor %}
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="sources">
+<p class="kicker">Sources</p>
+<h2 class="section-title">Official data, always cited.</h2>
+<p class="section-lede">EcuDataMCP never copies or stores these catalogs: every query goes live against the source portal. {{ source_count }} sources grouped by theme — Central Bank, SRI, INEC, Supercías, Superbancos and more — each tied to its own institution.</p>
+<div class="tools-summary">
+{% for theme in source_themes %}<span class="tool-chip">{{ theme.theme }}</span>{% endfor %}
+</div>
+<a class="btn-cta secondary" href="fuentes.html">See the {{ source_count }} sources, grouped &rarr;</a>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="tools">
+<p class="kicker">The backstage</p>
+<h2 class="section-title">Open-source MCP server.</h2>
+<p class="section-lede">EcuDataMCP runs as a <a href="https://github.com/jlowin/fastmcp" target="_blank" rel="noopener">FastMCP</a> server in Python, exposed over Streamable HTTP or stdio. There is no database of its own: every tool calls the matching official portal live (CKAN, gob.ec, SERCOP, BCE, Supercías, IG-EPN, SGR) and returns the formatted response.</p>
+<div class="org-carousel" data-org-carousel>
+<button type="button" class="org-carousel-btn" data-org-prev aria-label="Previous institution">‹</button>
+<div class="org-carousel-viewport">
+{% for org in org_logos %}
+<a class="org-logo{% if org.plate == 'ink' %} org-logo-ink{% endif %}" href="fuentes.html" title="{{ org.title }}">
+<span class="org-logo-plate"><img src="{{ assets }}logos/{{ org.file }}" alt="{{ org.title }}" width="160" height="64" decoding="async"></span>
+<span class="org-logo-name">{{ org.short }}</span>
+</a>
+{% endfor %}
+</div>
+<button type="button" class="org-carousel-btn" data-org-next aria-label="Next institution">›</button>
+</div>
+<a class="btn-cta secondary" href="atlas.html">See the {{ tool_count }} tools in the Reference &rarr;</a>
+</div>
+</section>
+
+<section class="landing" id="connect">
+<div class="container-page">
+<p class="kicker">Connect your assistant</p>
+<h2 class="section-title">Copy your client's configuration.</h2>
+<p class="section-lede">Run the server locally (Docker or <code>uv run</code>, see the <a href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">README</a>) and point your MCP client at <code>http://localhost:8000/mcp</code>.</p>
+<div class="install-bar">
+<span class="install-label">Quick start</span>
+<div class="code-block install-code">
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><code>uv sync && uv run python main.py --transport http --port 8000</code></pre>
+</div>
+</div>
+<div class="quick-connect">
+<p class="kicker">Quick option</p>
+<p class="client-intro">If your assistant has terminal access, hand it the repo link and let it install everything for you:</p>
+<div class="code-block">
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><code>Clone https://github.com/DweskZ/EcuDataMCP, install its dependencies with uv sync,
+and register it as an MCP server in my client using stdio mode with
+`uv run --directory &lt;clone-path&gt; python main.py --transport stdio`.
+Verify the server responds before calling it done.</code></pre>
+</div>
+<p class="client-intro">Always review what your assistant changes (config files, commands run) before confirming. This option only works with assistants that can run commands on their own: today that's <strong>Claude Code</strong>, <strong>Cursor</strong>, and <strong>Windsurf</strong> in agent mode. With ChatGPT, chat-only Claude.ai, or other terminal-less clients, use the manual configuration below.</p>
+</div>
+<ul class="nav nav-tabs" id="client-tabs" role="tablist">
+{% for cl in clients %}
+<li class="nav-item" role="presentation"><button class="nav-link{% if loop.first %} active{% endif %}" id="{{ cl.id }}-tab" data-tab-target="{{ cl.id }}-pane" type="button" role="tab">{{ cl.name }}</button></li>
+{% endfor %}
+</ul>
+<div class="tab-content" id="client-tabs-content">
+{% for cl in clients %}
+<div class="tab-pane fade{% if loop.first %} show active{% endif %}" id="{{ cl.id }}-pane" role="tabpanel">
+{% if cl.intro %}<p class="client-intro">{{ cl.intro | mdlite }}</p>{% endif %}
+{% if cl.steps %}<ol class="client-steps">{% for step in cl.steps %}<li>{{ step | mdlite }}</li>{% endfor %}</ol>{% endif %}
+{% if cl.code %}<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{{ cl.code | codeescape }}</code></pre></div>{% endif %}
+</div>
+{% endfor %}
+</div>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page" id="troubleshooting">
+<p class="kicker">Troubleshooting</p>
+<h2 class="section-title">Something not working?</h2>
+<p class="section-lede">Start by confirming the server is alive. If it responds, the problem is almost always in the client configuration or the upstream portal, not in EcuDataMCP.</p>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>curl http://localhost:8000/health</code></pre></div>
+<p class="client-intro">It should return <code>{"status":"ok", "version": ...}</code>. If it doesn't respond, the server isn't running or is listening on a different port.</p>
+<details class="faq-item">
+<summary>My client shows no tools</summary>
+<p>Check, in order: (1) the server is running (<code>/health</code> responds); (2) the URL ends in <code>/mcp</code>, not <code>/</code> or <code>/health</code>; (3) the config JSON is valid (one stray comma silently breaks it); and (4) you <strong>fully restarted the client</strong> after editing the config. Claude Desktop, Cursor, and Windsurf only read the file at startup.</p>
+</details>
+<details class="faq-item">
+<summary>Claude Desktop or Windsurf: <code>npx</code> not found</summary>
+<p>Those configs use <code>mcp-remote</code> as a bridge, which needs Node.js 18+ installed and on the <code>PATH</code>. Install it from nodejs.org and restart the client. Node-free alternative: use stdio mode with <code>"command": "uv"</code> and <code>"args": ["run", "--directory", "&lt;clone-path&gt;", "python", "main.py", "--transport", "stdio"]</code>.</p>
+</details>
+<details class="faq-item">
+<summary>Port 8000 is already in use</summary>
+<p>Start the server on another port (<code>uv run main.py --port 8007</code>, or <code>MCP_PORT=8007 docker compose up -d</code>) and change the client URL to <code>http://localhost:8007/mcp</code>.</p>
+</details>
+<details class="faq-item">
+<summary>In stdio mode the server exits immediately</summary>
+<p>Run the same command by hand in a terminal to see the real error. Typical causes are a wrong <code>--directory</code> path, not having run <code>uv sync</code> in the clone, or <code>uv</code> not being on the <code>PATH</code> the client sees (in that case, use the absolute path to <code>uv</code>).</p>
+</details>
+<details class="faq-item">
+<summary>ChatGPT or Le Chat can't reach <code>localhost</code></summary>
+<p>Web clients run in the cloud and can't see your machine. You need to expose the server at a public HTTPS URL (a tunnel or your own deployment) and, in that case, enable <code>MCP_REQUIRE_AUTH=1</code> with an <code>MCP_AUTH_TOKEN</code>. Never expose the server without a token.</p>
+</details>
+<details class="faq-item">
+<summary>401, 429, or 503 error from the server</summary>
+<p><strong>401</strong>: the server requires a token (<code>MCP_AUTH_TOKEN</code>) and the client isn't sending it as <code>Authorization: Bearer ...</code>. <strong>429</strong>: you exceeded the per-window request limit (<code>MCP_RATE_LIMIT_REQUESTS</code>, 120 per 60 s by default); wait, or raise it for local use. <strong>503</strong>: too many concurrent requests (<code>MCP_MAX_CONCURRENT_REQUESTS</code>, 8 by default).</p>
+</details>
+<details class="faq-item">
+<summary>403 error or timeout from the Open Data portal</summary>
+<p><code>www.datosabiertos.gob.ec</code> sometimes rejects connections coming from outside Latin America (403 error). If you see this, run the server from a connection with an exit point in Ecuador or the region (a VPN, for example). The procedures and institutions tools use a different portal and don't have this issue. Government portals also have their own outages: if a single tool fails while the rest respond, try again later.</p>
+</details>
+<details class="faq-item">
+<summary>TLS / SSL certificate error</summary>
+<p>Some official portals have served expired certificates or incomplete chains (the Open Data portal's expired in July 2026). For that portal there's an opt-in retry: <code>CKAN_INSECURE_TLS=1</code> in your <code>.env</code>. Use it only while the portal is broken and remove it afterward.</p>
+</details>
+<details class="faq-item">
+<summary>The preview is cut off or says the file is too large</summary>
+<p>That's intentional: downloads are capped at 5 MB and ZIP/tar.gz decompression at 20 MB. For large resources use <code>query_resource_data</code> (filters in the CKAN DataStore without downloading the file) or <code>list_zip_contents</code> to see what a ZIP contains before opening it.</p>
+</details>
+<details class="faq-item">
+<summary>I need more detail to report a bug</summary>
+<p>Start with <code>LOG_LEVEL=DEBUG</code>, reproduce the error, and open a <a href="https://github.com/DweskZ/EcuDataMCP/issues" target="_blank" rel="noopener">GitHub issue</a> with the tool, its parameters, the <code>/health</code> output, and the log. Don't include tokens.</p>
+</details>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">No friction</p>
+<h2 class="section-title">Ready to use, no setup of your own.</h2>
+<ul class="friction-list">
+<li><strong>No API key</strong>All sources are public data, no authentication.</li>
+<li><strong>No account</strong>There is no sign-up or user account to create.</li>
+<li><strong>100% public data</strong>Under an open license, exactly as the Ecuadorian state publishes it.</li>
+<li><strong>No telemetry</strong>The server runs on your machine and never logs or sends any of your queries.</li>
+</ul>
+</div>
+</section>
+
+<section class="landing">
+<div class="container-page">
+<p class="kicker">FAQ</p>
+<h2 class="section-title">Got more questions?</h2>
+<details class="faq-item">
+<summary>What is EcuDataMCP?</summary>
+<p>An open-source MCP (Model Context Protocol) server that helps your AI assistant discover and query Ecuador's open government data: datasets, procedures, regulations, public contracts, risk events, earthquakes, Central Bank indicators, and companies.</p>
+</details>
+<details class="faq-item">
+<summary>What is MCP?</summary>
+<p>Model Context Protocol is an open standard for connecting AI assistants to external tools and data sources, while keeping control over what the model can do and what data it can read.</p>
+</details>
+<details class="faq-item">
+<summary>What assistants can I use?</summary>
+<p>Any MCP-compatible client: Claude Desktop, Claude Code, ChatGPT (paid plans), Cursor, VS Code, Gemini CLI, Le Chat, Windsurf, HuggingChat, and more.</p>
+</details>
+<details class="faq-item">
+<summary>Do I need an API key?</summary>
+<p>No. Every source the server uses is public data with no authentication.</p>
+</details>
+<details class="faq-item">
+<summary>Is this an official service of the Ecuadorian government?</summary>
+<p>No. EcuDataMCP is an independent, open-source project that queries the same public sources the Ecuadorian state already publishes. It is not affiliated with any institution.</p>
+</details>
+<details class="faq-item">
+<summary>Does the server store my questions?</summary>
+<p>There is no telemetry. The server runs locally on your machine, and every query goes straight from the MCP client to the matching official portal.</p>
+</details>
+<details class="faq-item">
+<summary>What formats does it support?</summary>
+<p>In-memory preview of CSV, TSV, JSON, GeoJSON, and XLSX; filtered tabular queries via the CKAN DataStore when the resource supports it.</p>
+</details>
+<details class="faq-item">
+<summary>Something isn't working, where do I look?</summary>
+<p>See the <a href="#troubleshooting">Troubleshooting</a> section: it covers clients that show no tools, busy ports, 401/403/429 errors, TLS certificates, and oversized files.</p>
+</details>
+<details class="faq-item">
+<summary>Can I contribute?</summary>
+<p>Yes, the project is MIT-licensed and accepts pull requests. See the guide at <a href="colaborar.html">Contribute</a>.</p>
+</details>
+</div>
+</section>
+
+<section class="closing-cta">
+<div class="container-page">
+<p>Ecuador's open data, with your favorite AI assistant.</p>
+<a class="btn-cta primary" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">View on GitHub</a>
+</div>
+</section>
+{% endblock %}

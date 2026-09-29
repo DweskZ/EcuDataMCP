@@ -1,0 +1,100 @@
+[
+  {
+    "file": "gobec.png",
+    "short": "gob.ec",
+    "title_es": "gob.ec",
+    "title_en": "gob.ec",
+    "plate": "ink"
+  },
+  {
+    "file": "inec.png",
+    "short": "INEC",
+    "title_es": "Instituto Nacional de Estadística y Censos",
+    "title_en": "National Institute of Statistics and Census",
+    "plate": "light"
+  },
+  {
+    "file": "bce.svg",
+    "short": "BCE",
+    "title_es": "Banco Central del Ecuador",
+    "title_en": "Central Bank of Ecuador",
+    "plate": "light"
+  },
+  {
+    "file": "sri.svg",
+    "short": "SRI",
+    "title_es": "Servicio de Rentas Internas",
+    "title_en": "Internal Revenue Service",
+    "plate": "light"
+  },
+  {
+    "file": "supercias.png",
+    "short": "Supercías",
+    "title_es": "Superintendencia de Compañías, Valores y Seguros",
+    "title_en": "Superintendence of Companies, Securities and Insurance",
+    "plate": "light"
+  },
+  {
+    "file": "superbancos.png",
+    "short": "Superbancos",
+    "title_es": "Superintendencia de Bancos",
+    "title_en": "Superintendence of Banks",
+    "plate": "light"
+  },
+  {
+    "file": "contraloria.svg",
+    "short": "Contraloría",
+    "title_es": "Contraloría General del Estado",
+    "title_en": "Office of the Comptroller General",
+    "plate": "light"
+  },
+  {
+    "file": "iess.png",
+    "short": "IESS",
+    "title_es": "Instituto Ecuatoriano de Seguridad Social",
+    "title_en": "Ecuadorian Social Security Institute",
+    "plate": "light"
+  },
+  {
+    "file": "seps.svg",
+    "short": "SEPS",
+    "title_es": "Superintendencia de Economía Popular y Solidaria",
+    "title_en": "Superintendence of the Popular and Solidarity Economy",
+    "plate": "light"
+  },
+  {
+    "file": "cenace.png",
+    "short": "CENACE",
+    "title_es": "Operador Nacional de Electricidad",
+    "title_en": "National Electricity Operator",
+    "plate": "light"
+  },
+  {
+    "file": "sgr.png",
+    "short": "SGR",
+    "title_es": "Secretaría de Gestión de Riesgos",
+    "title_en": "Risk Management Secretariat",
+    "plate": "light"
+  },
+  {
+    "file": "ineval.png",
+    "short": "INEVAL",
+    "title_es": "Instituto Nacional de Evaluación Educativa",
+    "title_en": "National Institute for Educational Evaluation",
+    "plate": "light"
+  },
+  {
+    "file": "dgac.png",
+    "short": "DGAC",
+    "title_es": "Dirección General de Aviación Civil",
+    "title_en": "Civil Aviation Authority",
+    "plate": "light"
+  },
+  {
+    "file": "arcsa.svg",
+    "short": "ARCSA",
+    "title_es": "Agencia Nacional de Regulación, Control y Vigilancia Sanitaria",
+    "title_en": "National Agency for Sanitary Regulation and Control",
+    "plate": "ink"
+  }
+]

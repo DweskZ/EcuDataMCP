@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="EcuDataMCP">
+  <title>EcuDataMCP  -  Venus de Valdivia + datos</title>
+  <defs>
+    <path id="ecu-binary-ring" d="M100,100 m-86,0 a86,86 0 1,1 172,0 a86,86 0 1,1 -172,0"/>
+  </defs>
+
+  <!-- Outer ring -->
+  <circle cx="100" cy="100" r="96" fill="none" stroke="#f2f4f8" stroke-width="2.2"/>
+
+  <!-- Binary orbit -->
+  <text fill="#f2f4f8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="5.2" letter-spacing="1.2">
+    <textPath href="#ecu-binary-ring" startOffset="0%">
+      01001101 01000011 01010000 00100000 01000101 01000011 01010101 00100000 01000100 01000001 01010100 01001111 01010011 00100000
+    </textPath>
+  </text>
+
+  <!-- Circuit traces (left) -->
+  <g fill="none" stroke="#f2f4f8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M38 72 H52 V58 H64"/>
+    <path d="M38 100 H58"/>
+    <path d="M42 128 H54 V142 H68"/>
+    <path d="M48 86 H60 V112 H48"/>
+    <circle cx="38" cy="72" r="2.2" fill="#f2f4f8"/>
+    <circle cx="38" cy="100" r="2.2" fill="#f2f4f8"/>
+    <circle cx="42" cy="128" r="2.2" fill="#f2f4f8"/>
+    <circle cx="64" cy="58" r="2.2" fill="#f2f4f8"/>
+    <circle cx="68" cy="142" r="2.2" fill="#f2f4f8"/>
+  </g>
+
+  <!-- Circuit traces (right) -->
+  <g fill="none" stroke="#f2f4f8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M162 72 H148 V58 H136"/>
+    <path d="M162 100 H142"/>
+    <path d="M158 128 H146 V142 H132"/>
+    <path d="M152 86 H140 V112 H152"/>
+    <circle cx="162" cy="72" r="2.2" fill="#f2f4f8"/>
+    <circle cx="162" cy="100" r="2.2" fill="#f2f4f8"/>
+    <circle cx="158" cy="128" r="2.2" fill="#f2f4f8"/>
+    <circle cx="136" cy="58" r="2.2" fill="#f2f4f8"/>
+    <circle cx="132" cy="142" r="2.2" fill="#f2f4f8"/>
+  </g>
+
+  <!-- Valdivia-inspired geometric figure -->
+  <g fill="none" stroke="#f2f4f8" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Hex head -->
+    <path d="M100 42 L112 49 L112 63 L100 70 L88 63 L88 49 Z"/>
+    <!-- Neck -->
+    <path d="M96 70 L96 76 L104 76 L104 70"/>
+    <!-- Shoulders / upper torso -->
+    <path d="M78 78 L100 72 L122 78 L118 98 L100 104 L82 98 Z"/>
+    <!-- Arms folded on belly -->
+    <path d="M82 98 L92 110 L100 106 L108 110 L118 98"/>
+    <path d="M92 110 L100 118 L108 110"/>
+    <!-- Lower torso / hips -->
+    <path d="M86 112 L100 108 L114 112 L120 132 L100 142 L80 132 Z"/>
+    <!-- Legs (faceted) -->
+    <path d="M86 132 L92 156 L100 148 L100 142"/>
+    <path d="M114 132 L108 156 L100 148"/>
+    <!-- Inner crystal facet -->
+    <path d="M100 84 L108 92 L100 100 L92 92 Z" opacity="0.9"/>
+  </g>
+</svg>

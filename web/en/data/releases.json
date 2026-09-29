@@ -1,0 +1,112 @@
+[
+  {
+    "version": "0.8.10",
+    "date": "2026-09-24",
+    "summary": "IESS employer compliance check (arrears or not, by RUC or cédula), Centrosur's archive of scheduled power cuts since 2023, and energia-ecuador.com's 2024 blackout schedules recovered from the Wayback Machine. Fixes random disconnects in stdio clients like Claude Desktop, speeds up startup (~4.7 s to ~2.9 s), stops the IESS certificate from reporting an employer in arrears as compliant when its text can't be parsed, fixes a search_sri_ruc crash on empty responses, and hardens Supercías' n_empleados field."
+  },
+  {
+    "version": "0.8.9",
+    "date": "2026-09-14",
+    "summary": "MCP architecture cleanup: duplicate tools removed (list_recent_datasets folded into search_datasets(sort=\"recent\")) and the ARCOTEL pair merged into search_arcotel(tipo=...); a new MCP_PROFILE separates maintenance tools; every tool now declares a Spanish title, MCP annotations, and native structuredContent. The Supercías financials DB (search_ranking/get_financials) now builds and refreshes itself in the background."
+  },
+  {
+    "version": "0.8.8",
+    "date": "2026-09-10",
+    "summary": "BCE National Accounts and publication calendar, SENESCYT's SIAU/CTI statistics and Higher Education Library, CEPALSTAT (CEPAL's regional indicator API, filtered to Ecuador by default), IADB's open-data portal as a new source=\"iadb\" on the generic CKAN tools, and MSP's weekly vaccine-preventable-disease gazette archive. get_organization_info gained a text filter and no longer truncates large organizations at 25 datasets. Fixes redundant ZIP re-hashing in the IEM pipeline."
+  },
+  {
+    "version": "0.8.7",
+    "date": "2026-09-07",
+    "summary": "AIP data sheets for Ecuadorian aerodromes and helipads (DGAC) and ARCSA's live sanitary registry by category, .xlsb preview support, and a download cap raised to 20 MB for XLSX/XLSB/ODS. Removes the SRI Saiku tools (endpoint confirmed unreachable in live verification)."
+  },
+  {
+    "version": "0.8.6",
+    "date": "2026-09-04",
+    "summary": "IESS (statistical bulletins, actuarial studies, audit reports), Data Mashca (a third municipal CKAN portal), and everything accumulated since 0.8.5: ARCOTEL, SGR's document library and SITREP archive, SIPA's geoportal and indicator summaries, MEF/SENAE, MINEDEC, SEPS, CNIG, INAMHI, INEVAL, and more."
+  },
+  {
+    "version": "0.8.5",
+    "date": "2026-08-31",
+    "summary": "Ten new sources — SRI Saiku, RUC lookup, BCE daily indicators, SUT, Superbancos, IG-EPN, CENACE, SRI tax-collection stats, BCE remittances, and more — plus BCEData/IEM audit snapshots, investigate_dataset, and remote deployment with authentication and per-client limits. Includes a follow-up fix: synchronized the editable package version in uv.lock with the release version so `uv sync --locked` can install the project in GitHub Actions."
+  },
+  {
+    "version": "0.8.3",
+    "date": "2026-08-30",
+    "summary": "Census 2022 microdata, INEC publications via its REST API, and fixes to DPA geography (La Concordia, Sevilla Don Bosco) that had drifted from the official classifier."
+  },
+  {
+    "version": "0.8.2",
+    "date": "2026-08-29",
+    "summary": "SIPA (agricultural statistics), Contraloría General del Estado, and BCE's IEM monthly bulletin tables. Fixed CSV delimiter sniffing and 26 bugs found in a full adversarial code review."
+  },
+  {
+    "version": "0.8.1",
+    "date": "2026-08-29",
+    "summary": "inec_client now goes through the shared SSRF guard. Consolidated 13 duplicated accent-stripping functions, switched the Docker image to a non-root user, and enabled Dependabot."
+  },
+  {
+    "version": "0.8.0",
+    "date": "2026-08-29",
+    "summary": "Ecuador en Cifras/INEC, Cuenca en Datos (municipal CKAN portal), PDF text extraction (read_pdf), .ods support, and detect_series_pattern to classify periodic series as cumulative or incremental."
+  },
+  {
+    "version": "0.7.0",
+    "date": "2026-08-26",
+    "summary": "Preview support for legacy .xls, .tar.gz, and .zip (wrapping a CSV/TSV/TXT). Acronym expansion and Content-Type sniffing in search/preview. Several reliability fixes found verifying against the live portal."
+  },
+  {
+    "version": "0.6.0",
+    "date": "2026-08-18",
+    "summary": "Central Bank of Ecuador, SRI Datasets, and full Supercías coverage (directory, financial ranking, external auditors). SSRF guard, uv.lock, CI on Python 3.11 through 3.13."
+  },
+  {
+    "version": "0.5.1",
+    "date": "2026-08-13",
+    "summary": "Per-resource creation/modification dates, periodic-series detection, geometry-column cleanup in previews."
+  },
+  {
+    "version": "0.5.0",
+    "date": "2026-08-10",
+    "summary": "Geophysical Institute (IG-EPN) integration: search_sismos over the public seismic catalog."
+  },
+  {
+    "version": "0.4.4",
+    "date": "2026-08-04",
+    "summary": "format=json across the remaining tools."
+  },
+  {
+    "version": "0.4.3",
+    "date": "2026-08-04",
+    "summary": "DPA parishes (offline, ~1040) and lookup_ubicacion at the parish level."
+  },
+  {
+    "version": "0.4.2",
+    "date": "2026-08-04",
+    "summary": "Rate limiting and an expanded cache for SERCOP."
+  },
+  {
+    "version": "0.4.1",
+    "date": "2026-08-04",
+    "summary": "list_recent_datasets and the first end-to-end smoke test."
+  },
+  {
+    "version": "0.4.0",
+    "date": "2026-08-04",
+    "summary": "DPA cantons, integration with the risk management agency (SGR), 23 tools."
+  },
+  {
+    "version": "0.3.2",
+    "date": "2026-08-04",
+    "summary": "list_capabilities, lookup_ubicacion, and the first ecuador:// resources."
+  },
+  {
+    "version": "0.3.1",
+    "date": "2026-08-04",
+    "summary": "MCP prompts and the procedure-to-regulation link."
+  },
+  {
+    "version": "0.3.0",
+    "date": "2026-08-04",
+    "summary": "First release: unified search, CKAN DataStore, regulations, and SERCOP contracts."
+  }
+]

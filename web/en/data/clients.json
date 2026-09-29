@@ -1,0 +1,90 @@
+[
+  {
+    "id": "claude-desktop",
+    "name": "Claude Desktop",
+    "intro": "Add this to your Claude Desktop config file (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS, `%APPDATA%\\Claude\\claude_desktop_config.json` on Windows):",
+    "steps": [],
+    "lang": "json",
+    "code": "{\n  \"mcpServers\": {\n    \"ecuador-datos\": {\n      \"command\": \"npx\",\n      \"args\": [\n        \"mcp-remote\",\n        \"http://localhost:8000/mcp\"\n      ]\n    }\n  }\n}"
+  },
+  {
+    "id": "cursor",
+    "name": "Cursor",
+    "intro": "",
+    "steps": [
+      "Open Cursor Settings",
+      "Search for \"MCP\"",
+      "Add a new MCP server:"
+    ],
+    "lang": "json",
+    "code": "{\n  \"mcpServers\": {\n    \"ecuador-datos\": {\n      \"url\": \"http://localhost:8000/mcp\",\n      \"transport\": \"http\"\n    }\n  }\n}"
+  },
+  {
+    "id": "vscode",
+    "name": "VS Code",
+    "intro": "Add to your `mcp.json` file (run **MCP: Open User Configuration** from the command palette):",
+    "steps": [],
+    "lang": "json",
+    "code": "{\n  \"servers\": {\n    \"ecuador-datos\": {\n      \"url\": \"http://localhost:8000/mcp\",\n      \"type\": \"http\"\n    }\n  }\n}"
+  },
+  {
+    "id": "chatgpt",
+    "name": "ChatGPT",
+    "intro": "*Available on paid plans (Plus, Pro, Team, Enterprise).*",
+    "steps": [
+      "Go to `Settings` > `Apps and connectors`",
+      "Open `Advanced settings` and enable **Developer mode**",
+      "In `Settings` > `Connectors` > `Browse connectors`, click **Add a new connector**",
+      "Set the URL: `http://localhost:8000/mcp`"
+    ],
+    "lang": null,
+    "code": null
+  },
+  {
+    "id": "claude-code",
+    "name": "Claude Code",
+    "intro": "",
+    "steps": [],
+    "lang": "bash",
+    "code": "claude mcp add --transport http ecuador-datos http://localhost:8000/mcp"
+  },
+  {
+    "id": "gemini-cli",
+    "name": "Gemini CLI",
+    "intro": "Add to `~/.gemini/settings.json`:",
+    "steps": [],
+    "lang": "json",
+    "code": "{\n  \"mcpServers\": {\n    \"ecuador-datos\": {\n      \"httpUrl\": \"http://localhost:8000/mcp\"\n    }\n  }\n}"
+  },
+  {
+    "id": "le-chat",
+    "name": "Le Chat (Mistral)",
+    "intro": "",
+    "steps": [
+      "Go to `Intelligence` > `Connectors`",
+      "`Add connector` > `Custom MCP Connector`",
+      "Name: \"Ecuador Datos\" / URL: `http://localhost:8000/mcp`"
+    ],
+    "lang": null,
+    "code": null
+  },
+  {
+    "id": "windsurf",
+    "name": "Windsurf",
+    "intro": "Add to `~/.codeium/windsurf/mcp_config.json`:",
+    "steps": [],
+    "lang": "json",
+    "code": "{\n  \"mcpServers\": {\n    \"ecuador-datos\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"mcp-remote\", \"http://localhost:8000/mcp\"]\n    }\n  }\n}"
+  },
+  {
+    "id": "huggingchat",
+    "name": "HuggingChat",
+    "intro": "",
+    "steps": [
+      "In the chat, click the `+` icon > `MCP Servers` > `Manage MCP Servers`",
+      "`Add Server` with name \"Ecuador Datos\" and URL `http://localhost:8000/mcp`"
+    ],
+    "lang": null,
+    "code": null
+  }
+]

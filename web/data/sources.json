@@ -1,0 +1,752 @@
+[
+  {
+    "id": "catalogos",
+    "theme": "Catálogos de datos abiertos",
+    "lede": "Los portales CKAN de propósito general: cualquier dataset publicado por una institución del Estado o un municipio.",
+    "institutions": [
+      {
+        "name": "CKAN nacional",
+        "sources": [
+          {
+            "id": "datos-abiertos",
+            "name": "Datos Abiertos",
+            "tag": "CKAN",
+            "description": "Catálogo nacional + DataStore + preview CSV/JSON/XLSX",
+            "coverage": "www.datosabiertos.gob.ec",
+            "url": "https://www.datosabiertos.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "CKAN municipal",
+        "sources": [
+          {
+            "id": "cuenca",
+            "name": "Cuenca en Datos",
+            "tag": "CKAN",
+            "description": "Portal municipal CKAN independiente del nacional (92 datasets); mismos tools con source=\"cuenca\"",
+            "coverage": "cuencaendatos.cuenca.gob.ec",
+            "url": "https://cuencaendatos.cuenca.gob.ec",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tramites-contratacion",
+    "theme": "Trámites, regulaciones y contratación pública",
+    "lede": "Qué exige el Estado, qué normas aplica y en qué se está gastando.",
+    "institutions": [
+      {
+        "name": "Gob.ec",
+        "sources": [
+          {
+            "id": "tramites",
+            "name": "Trámites e instituciones",
+            "tag": "Gob.ec",
+            "description": "Procedimientos, requisitos, costos",
+            "coverage": "gob.ec/api/v1",
+            "url": "https://www.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "regulaciones",
+            "name": "Regulaciones",
+            "tag": "Gob.ec",
+            "description": "Normas, acuerdos, Registro Oficial",
+            "coverage": "gob.ec/api/v1/regulaciones",
+            "url": "https://www.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "SERCOP",
+        "sources": [
+          {
+            "id": "contratos",
+            "name": "Contratos públicos",
+            "tag": "SERCOP/OCDS",
+            "description": "Licitaciones, compradores, proveedores",
+            "coverage": "datosabiertos.compraspublicas.gob.ec",
+            "url": "https://datosabiertos.compraspublicas.gob.ec",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "riesgos",
+    "theme": "Riesgos y desastres naturales",
+    "lede": "Eventos en curso y el archivo sismológico/volcánico detrás de ellos.",
+    "institutions": [
+      {
+        "name": "Secretaría de Gestión de Riesgos (SGR)",
+        "sources": [
+          {
+            "id": "riesgos",
+            "name": "Gestión de Riesgos",
+            "tag": "SGR",
+            "description": "Eventos COE + estaciones SAT tsunami",
+            "coverage": "sgrportal.gestionderiesgos.gob.ec",
+            "url": "https://sgrportal.gestionderiesgos.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "sgr-biblioteca",
+            "name": "Biblioteca de riesgos",
+            "tag": "SGR",
+            "description": "Resoluciones, planes de contingencia, mapas de amenaza y rutas de evacuación (~1660 documentos)",
+            "coverage": "gestionderiesgos.gob.ec/biblioteca",
+            "url": "https://www.gestionderiesgos.gob.ec/biblioteca/",
+            "status": "live"
+          },
+          {
+            "id": "sgr-sitrep",
+            "name": "SITREP",
+            "tag": "SGR",
+            "description": "Archivo histórico de informes de situación por evento adverso, 2016-2026",
+            "coverage": "gestionderiesgos.gob.ec",
+            "url": "https://www.gestionderiesgos.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Instituto Geofísico (IG-EPN)",
+        "sources": [
+          {
+            "id": "sismos",
+            "name": "Catálogo sísmico",
+            "tag": "IG-EPN",
+            "description": "Sismos recientes: magnitud, ubicación, profundidad",
+            "coverage": "www.igepn.edu.ec",
+            "url": "https://www.igepn.edu.ec",
+            "status": "live"
+          },
+          {
+            "id": "igepn-informes",
+            "name": "Informes sísmicos y volcánicos",
+            "tag": "IG-EPN",
+            "description": "Buscador de informes técnicos por tipo (sísmico/volcánico), volcán y año, con extracción de texto del PDF",
+            "coverage": "informes.igepn.edu.ec",
+            "url": "https://www.igepn.edu.ec/servicios/busqueda-informes",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "INAMHI",
+        "sources": [
+          {
+            "id": "inamhi-geoportal",
+            "name": "Geoportal INAMHI",
+            "tag": "INAMHI",
+            "description": "222 capas meteorológicas e hidrológicas vía WMS/WFS",
+            "coverage": "geoservicios.inamhi.gob.ec",
+            "url": "https://geoservicios.inamhi.gob.ec",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "economia-finanzas",
+    "theme": "Economía y finanzas",
+    "lede": "Banco Central, SRI, Supercías y Superbancos: la parte del Estado con más series numéricas.",
+    "institutions": [
+      {
+        "name": "Banco Central del Ecuador (BCE)",
+        "sources": [
+          {
+            "id": "bce-bcedata",
+            "name": "BCEData",
+            "tag": "BCE",
+            "description": "Catálogo macroeconómico completo: monetario/financiero, finanzas públicas, sector externo y sector real, con auditoría de cobertura",
+            "coverage": "contenido.bce.fin.ec/bcedata",
+            "url": "https://contenido.bce.fin.ec/bcedata/",
+            "status": "live"
+          },
+          {
+            "id": "bce-iem",
+            "name": "Información Estadística Mensual (IEM)",
+            "tag": "BCE",
+            "description": "Boletín mensual con ~60 tablas XLSX individuales, más rico que BCEData en desagregación",
+            "coverage": "contenido.bce.fin.ec/documentos",
+            "url": "https://contenido.bce.fin.ec/documentos/informacioneconomica/",
+            "status": "live"
+          },
+          {
+            "id": "bce-indicadores-diarios",
+            "name": "Indicadores en línea",
+            "tag": "BCE",
+            "description": "Riesgo país, precio del oro y del petróleo, bonos soberanos y otras series verdaderamente diarias, sin agregar a mensual",
+            "coverage": "contenido.bce.fin.ec (widgets)",
+            "url": "https://contenido.bce.fin.ec/estadisticas-de-publicaciones-generales/",
+            "status": "live"
+          },
+          {
+            "id": "bce-remesas",
+            "name": "Remesas de trabajadores",
+            "tag": "BCE",
+            "description": "Serie histórica y bases mensuales, con la desagregación por entidad disponible desde julio de 2025",
+            "coverage": "contenido.bce.fin.ec/series-de-datos-remesas",
+            "url": "https://contenido.bce.fin.ec/series-de-datos-remesas-de-trabajadores/",
+            "status": "live"
+          },
+          {
+            "id": "bce-indices",
+            "name": "Índices y publicaciones",
+            "tag": "BCE",
+            "description": "Archivo histórico por serie de boletines sectoriales y últimas publicaciones editoriales del BCE",
+            "coverage": "contenido.bce.fin.ec",
+            "url": "https://contenido.bce.fin.ec",
+            "status": "live"
+          },
+          {
+            "id": "bce-precios-comex",
+            "name": "Precios de comercio exterior",
+            "tag": "BCE",
+            "description": "Índices de precios de importación y exportación desagregados por categoría/producto",
+            "coverage": "contenido.bce.fin.ec",
+            "url": "https://contenido.bce.fin.ec",
+            "status": "live"
+          },
+          {
+            "id": "bce-cuentas-nacionales",
+            "name": "Cuentas Nacionales",
+            "tag": "BCE",
+            "description": "Cuentas anuales, trimestrales y regionales, retropolación del PIB desde 1965, matrices insumo-producto, TOU, CEI, MEI e IMAEC mensual",
+            "coverage": "contenido.bce.fin.ec",
+            "url": "https://contenido.bce.fin.ec",
+            "status": "live"
+          },
+          {
+            "id": "bce-calendario",
+            "name": "Calendario de publicaciones",
+            "tag": "BCE",
+            "description": "Fechas programadas de publicación para el año completo, por categoría y periodicidad",
+            "coverage": "contenido.bce.fin.ec",
+            "url": "https://contenido.bce.fin.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Servicio de Rentas Internas (SRI)",
+        "sources": [
+          {
+            "id": "sri-datasets",
+            "name": "SRI Datasets",
+            "tag": "SRI",
+            "description": "Archivos públicos de recaudación, ventas/compras, vehículos y más",
+            "coverage": "www.sri.gob.ec/datasets",
+            "url": "https://www.sri.gob.ec/datasets",
+            "status": "live"
+          },
+          {
+            "id": "sri-ruc",
+            "name": "Consulta de RUC",
+            "tag": "SRI",
+            "description": "Datos públicos de un contribuyente por número de RUC o razón social",
+            "coverage": "srienlinea.sri.gob.ec",
+            "url": "https://srienlinea.sri.gob.ec/facturacion-internet/consultas/publico/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Superintendencia de Compañías (Supercías)",
+        "sources": [
+          {
+            "id": "supercias",
+            "name": "Directorio de compañías",
+            "tag": null,
+            "description": "Directorio de compañías (226k+): representante legal, capital, CIIU",
+            "coverage": "mercadodevalores.supercias.gob.ec",
+            "url": "https://mercadodevalores.supercias.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "supercias-ranking",
+            "name": "Ranking financiero",
+            "tag": null,
+            "description": "Financieros por balance (ingresos, activos, ROE, ~38 ratios), últimos años; requiere build local",
+            "coverage": "appscvsmovil.supercias.gob.ec",
+            "url": "https://appscvsmovil.supercias.gob.ec",
+            "status": "build-local"
+          }
+        ]
+      },
+      {
+        "name": "Superintendencia de Bancos (Superbancos)",
+        "sources": [
+          {
+            "id": "superbancos",
+            "name": "Superbancos",
+            "tag": "SB",
+            "description": "Boletines financieros mensuales, servicios financieros, información histórica y calendario estadístico",
+            "coverage": "superbancos.gob.ec",
+            "url": "https://www.superbancos.gob.ec/estadisticas/portalestudios",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Superintendencia de Economía Popular y Solidaria (SEPS)",
+        "sources": [
+          {
+            "id": "seps-estadisticas",
+            "name": "Estadísticas SEPS",
+            "tag": "SEPS",
+            "description": "26 secciones de estadísticas del sector financiero popular y solidario y de la economía popular y solidaria",
+            "coverage": "estadisticas.seps.gob.ec",
+            "url": "https://estadisticas.seps.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Ministerio de Economía y Finanzas (MEF)",
+        "sources": [
+          {
+            "id": "mef-fiscal",
+            "name": "Estadística fiscal SPNF",
+            "tag": "MEF",
+            "description": "Cuentas fiscales del Sector Público No Financiero bajo metodología FMI/GFSM, más el archivo histórico de SENAE",
+            "coverage": "economicoproductivo.gob.ec",
+            "url": "https://www.economicoproductivo.gob.ec/estadistica-nueva-metodologia-2017-2022/",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "estadisticas-demografia",
+    "theme": "Estadísticas y demografía",
+    "lede": "Todo lo que produce el INEC: encuestas, censo, geografía oficial y sus publicaciones.",
+    "institutions": [
+      {
+        "name": "Instituto Nacional de Estadística y Censos (INEC)",
+        "sources": [
+          {
+            "id": "inec-estadisticas",
+            "name": "INEC Estadísticas",
+            "tag": "INEC",
+            "description": "Temas estadísticos, series agregadas, boletines y archivos publicados",
+            "coverage": "ecuadorencifras.gob.ec",
+            "url": "https://www.ecuadorencifras.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "inec-publicaciones",
+            "name": "INEC Publicaciones",
+            "tag": "INEC",
+            "description": "API REST pública de WordPress con las 1,700+ publicaciones y boletines del INEC, búsqueda de texto completo",
+            "coverage": "ecuadorencifras.gob.ec",
+            "url": "https://www.ecuadorencifras.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "inec-biinec",
+            "name": "BIINEC",
+            "tag": "INEC",
+            "description": "Registros estadísticos complementarios y módulos curados",
+            "coverage": "aplicaciones3.ecuadorencifras.gob.ec/BIINEC-war",
+            "url": "https://aplicaciones3.ecuadorencifras.gob.ec/BIINEC-war/",
+            "status": "live"
+          },
+          {
+            "id": "inec-censo",
+            "name": "Censo Ecuador 2022",
+            "tag": "INEC",
+            "description": "Recursos, microdatos y documentos metodológicos del censo",
+            "coverage": "censoecuador.gob.ec",
+            "url": "https://www.censoecuador.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "anda",
+            "name": "ANDA",
+            "tag": "NADA/IHSN",
+            "description": "Catálogo de encuestas y censos del INEC (437 encuestas)",
+            "coverage": "anda.inec.gob.ec",
+            "url": "https://anda.inec.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "geografia",
+            "name": "Geografía (DPA)",
+            "tag": "DPA",
+            "description": "24 provincias + 225 cantones, según el Clasificador Geográfico oficial del INEC",
+            "coverage": "referencia offline",
+            "url": null,
+            "status": "offline"
+          }
+        ]
+      },
+      {
+        "name": "MINEDEC",
+        "sources": [
+          {
+            "id": "minedec-matricula",
+            "name": "Matrícula educación básica",
+            "tag": "MINEDEC",
+            "description": "Registro administrativo histórico de matrícula K-12, 2009 en adelante",
+            "coverage": "educacion.gob.ec",
+            "url": "https://educacion.gob.ec/datos-abiertos-minedec/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "CNIG",
+        "sources": [
+          {
+            "id": "cnig-violencia",
+            "name": "Estadísticas de violencia de género",
+            "tag": "CNIG",
+            "description": "Matriz de femicidios y 19 tablas relacionadas de violencia de género",
+            "coverage": "igualdadgenero.gob.ec",
+            "url": "https://www.igualdadgenero.gob.ec/violencia/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "INEVAL",
+        "sources": [
+          {
+            "id": "ineval-evaluacion",
+            "name": "Evaluación educativa",
+            "tag": "INEVAL",
+            "description": "Bases de datos de Ser Bachiller, Ser Estudiante, Ser Maestro, Ser Profesional y Llece",
+            "coverage": "evaluaciones.evaluacion.gob.ec",
+            "url": "https://evaluaciones.evaluacion.gob.ec/BI/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "SENESCYT",
+        "sources": [
+          {
+            "id": "senescyt-siau",
+            "name": "SIAU: estadísticas de educación superior y CTI",
+            "tag": "SENESCYT",
+            "description": "Fichas metodológicas, reportes de indicadores, índice de competitividad, inventario de indicadores CTI",
+            "coverage": "siau.senescyt.gob.ec",
+            "url": "https://siau.senescyt.gob.ec/estadisticas-de-educacion-superior-ciencia-tecnologia-e-innovacion/",
+            "status": "live"
+          },
+          {
+            "id": "senescyt-biblioteca",
+            "name": "Biblioteca de Educación Superior",
+            "tag": "SENESCYT",
+            "description": "~1.259 documentos (PAC, normativa LOES/SNNA, acuerdos, indicadores ACTI) en 17 categorías",
+            "coverage": "educacion.gob.ec/edusuperior",
+            "url": "https://educacion.gob.ec/edusuperior/biblioteca/",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "agricultura",
+    "theme": "Agricultura",
+    "lede": "Producción, precios y estadísticas del sector agropecuario.",
+    "institutions": [
+      {
+        "name": "Ministerio de Agricultura",
+        "sources": [
+          {
+            "id": "sipa",
+            "name": "SIPA",
+            "tag": "Agricultura",
+            "description": "Módulos de descargas y estadísticas agropecuarias",
+            "coverage": "sipa.agricultura.gob.ec",
+            "url": "https://sipa.agricultura.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "sipa-geoportal",
+            "name": "Geoportal SIPA",
+            "tag": "Agricultura",
+            "description": "277 capas espaciales agropecuarias vía WMS/WFS",
+            "coverage": "geoportal.agricultura.gob.ec",
+            "url": "http://geoportal.agricultura.gob.ec",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "energia",
+    "theme": "Energía",
+    "lede": "El pulso del sistema eléctrico nacional, en vivo.",
+    "institutions": [
+      {
+        "name": "CENACE",
+        "sources": [
+          {
+            "id": "cenace",
+            "name": "CENACE",
+            "tag": "Energía",
+            "description": "Snapshot operativo de demanda, generación y despacho eléctrico",
+            "coverage": "cenace.gob.ec",
+            "url": "https://www.cenace.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Distribuidoras eléctricas",
+        "sources": [
+          {
+            "id": "centrosur-cortes",
+            "name": "Cortes Centrosur",
+            "tag": "Energía",
+            "description": "Programación de cortes de luz de Centrosur (Azuay, Cañar, Morona Santiago), 2023 en adelante, incluida la crisis de 2024",
+            "coverage": "centrosur.gob.ec",
+            "url": "https://www.centrosur.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "energia-ecuador",
+            "name": "energia-ecuador.com (archivo)",
+            "tag": "Energía",
+            "description": "Horarios de racionamiento de 2024 de la EEQ, recuperados del Wayback Machine (foto fija)",
+            "coverage": "web.archive.org",
+            "url": "https://web.archive.org/web/2024/https://energia-ecuador.com/",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "trabajo-empleo",
+    "theme": "Trabajo y empleo",
+    "lede": "Indicadores laborales descifrados directamente de los tableros oficiales.",
+    "institutions": [
+      {
+        "name": "Ministerio del Trabajo",
+        "sources": [
+          {
+            "id": "sut",
+            "name": "SUT",
+            "tag": "Trabajo",
+            "description": "Indicadores públicos del Ministerio del Trabajo mediante sus tableros estadísticos (Power BI)",
+            "coverage": "sut.trabajo.gob.ec",
+            "url": "https://sut.trabajo.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "salarios-sectoriales",
+            "name": "Salarios sectoriales",
+            "tag": "Trabajo",
+            "description": "Tablas de salarios mínimos sectoriales, 2020-2025",
+            "coverage": "trabajo.gob.ec/biblioteca",
+            "url": "https://www.trabajo.gob.ec/biblioteca/",
+            "status": "live"
+          },
+          {
+            "id": "boletin-laboral-anual",
+            "name": "Boletín laboral anual",
+            "tag": "Trabajo",
+            "description": "Boletín estadístico anual del mercado laboral ecuatoriano (ediciones 2020-2022 conocidas)",
+            "coverage": "trabajo.gob.ec",
+            "url": "https://www.trabajo.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "IESS",
+        "sources": [
+          {
+            "id": "iess-documentos",
+            "name": "Documentos IESS",
+            "tag": "IESS",
+            "description": "Boletines estadísticos, estudios actuariales e informes de auditoría",
+            "coverage": "iess.gob.ec",
+            "url": "https://www.iess.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "iess-certificado-patronal",
+            "name": "Certificado patronal IESS",
+            "tag": "IESS",
+            "description": "Certificado público de cumplimiento de obligaciones patronales (mora/no mora)",
+            "coverage": "iess.gob.ec/empleador-web",
+            "url": "https://www.iess.gob.ec/empleador-web/pages/morapatronal/certificadoCumplimientoPublico.jsf",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "MIES",
+        "sources": [
+          {
+            "id": "infomies",
+            "name": "infoMIES",
+            "tag": "MIES",
+            "description": "Bases de datos mensuales y boletines zonales de inclusión económica y social",
+            "coverage": "info.desarrollohumano.gob.ec",
+            "url": "https://info.desarrollohumano.gob.ec",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "control-transparencia",
+    "theme": "Control y transparencia",
+    "lede": "Auditorías e informes de control sobre cualquier institución pública.",
+    "institutions": [
+      {
+        "name": "Contraloría General del Estado",
+        "sources": [
+          {
+            "id": "contraloria",
+            "name": "Contraloría General del Estado",
+            "tag": "CGE",
+            "description": "Datos abiertos de auditorías y Plan Anual de Control",
+            "coverage": "contraloria.gob.ec",
+            "url": "https://www.contraloria.gob.ec",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "transporte-aviacion",
+    "theme": "Transporte y aviación civil",
+    "lede": "Aeródromos, meteorología aeronáutica y avisos a aviadores, directo de la DGAC.",
+    "institutions": [
+      {
+        "name": "Dirección General de Aviación Civil (DGAC)",
+        "sources": [
+          {
+            "id": "dgac-aip",
+            "name": "AIP Ecuador (eAIP)",
+            "tag": "DGAC",
+            "description": "Fichas AIP AD 2.x por aeródromo/helipuerto: coordenadas, pista, horarios, frecuencias",
+            "coverage": "ais.aviacioncivil.gob.ec",
+            "url": "https://www.ais.aviacioncivil.gob.ec/ifis3",
+            "status": "live"
+          },
+          {
+            "id": "dgac-ifis",
+            "name": "METAR / NOTAM / SIGMET",
+            "tag": "DGAC",
+            "description": "Reportes meteorológicos y avisos a aviadores en tiempo real",
+            "coverage": "ais.aviacioncivil.gob.ec",
+            "url": "https://www.ais.aviacioncivil.gob.ec",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "salud",
+    "theme": "Salud",
+    "lede": "El registro sanitario vigente de alimentos, medicamentos y dispositivos médicos, más la vigilancia epidemiológica semanal del MSP.",
+    "institutions": [
+      {
+        "name": "ARCSA",
+        "sources": [
+          {
+            "id": "arcsa-registro",
+            "name": "Registro sanitario",
+            "tag": "ARCSA",
+            "description": "Base de Registros Emitidos: alimentos, medicamentos, cosméticos, dispositivos médicos y más (27 categorías)",
+            "coverage": "controlsanitario.gob.ec",
+            "url": "https://www.controlsanitario.gob.ec/base-de-datos/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Ministerio de Salud Pública (MSP)",
+        "sources": [
+          {
+            "id": "msp-gacetas-inmunoprevenibles",
+            "name": "Gacetas de Inmunoprevenibles",
+            "tag": "MSP",
+            "description": "Boletines semanales de vigilancia de enfermedades prevenibles por vacunación, 2019-presente",
+            "coverage": "salud.gob.ec",
+            "url": "https://www.salud.gob.ec/gacetas-inmunoprevenibles/",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "telecomunicaciones",
+    "theme": "Telecomunicaciones",
+    "lede": "Estadísticas sectoriales del regulador de telecomunicaciones.",
+    "institutions": [
+      {
+        "name": "ARCOTEL",
+        "sources": [
+          {
+            "id": "arcotel-reportes",
+            "name": "Reportes y boletines",
+            "tag": "ARCOTEL",
+            "description": "Reportes estadísticos mensuales (2017-2026) y boletines anuales/temáticos (2015-2024)",
+            "coverage": "arcotel.gob.ec",
+            "url": "https://www.arcotel.gob.ec",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fuentes-internacionales",
+    "theme": "Fuentes internacionales con foco Ecuador",
+    "lede": "Catálogos regionales/globales donde Ecuador es una entrada consultable, no una fuente exclusiva — úsalos para comparar a Ecuador con la región.",
+    "institutions": [
+      {
+        "name": "CEPAL",
+        "sources": [
+          {
+            "id": "cepalstat",
+            "name": "CEPALSTAT",
+            "tag": "CEPAL",
+            "description": "2.059 indicadores regionales de CEPAL; cada consulta filtra a Ecuador por defecto",
+            "coverage": "api-cepalstat.cepal.org",
+            "url": "https://statistics.cepal.org/portal/cepalstat/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "BID (IADB)",
+        "sources": [
+          {
+            "id": "iadb-ckan",
+            "name": "Datos Abiertos del BID",
+            "tag": "BID",
+            "description": "Latin Macro Watch (665 recursos, 26 países) y la Database of Political Institutions del Banco Mundial/BID — portal CKAN estándar, accesible con source=\"iadb\" en los tools CKAN genéricos",
+            "coverage": "data.iadb.org",
+            "url": "https://data.iadb.org",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  }
+]
