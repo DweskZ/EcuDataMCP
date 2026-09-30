@@ -23,6 +23,34 @@ jobs:
           python-version: "3.12"
       - name: Install
         run: uv sync --group dev --locked
+      # Runners sit outside LatAm, so datosabiertos.gob.ec and similar hosts
+      # answer 403. With a LatAm SSH egress (docs/GEOBLOCK_PLAN.md, 2a) we open
+      # a SOCKS tunnel; without the secrets (forks, not yet provisioned) the
+      # step is skipped and those checks stay degraded.
+      - name: Open geo tunnel
+        env:
+          GEO_SSH_KEY: ${{ secrets.GEO_SSH_KEY }}
+          GEO_SSH_HOST: ${{ secrets.GEO_SSH_HOST }}
+          GEO_SSH_KNOWN_HOSTS: ${{ secrets.GEO_SSH_KNOWN_HOSTS }}
+        run: |
+          if [ -z "$GEO_SSH_KEY" ] || [ -z "$GEO_SSH_HOST" ]; then
+            echo "GEO_SSH_KEY/GEO_SSH_HOST not set; skipping geo tunnel."
+            exit 0
+          fi
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$GEO_SSH_KEY" > ~/.ssh/geo_key
+          chmod 600 ~/.ssh/geo_key
+          if [ -n "$GEO_SSH_KNOWN_HOSTS" ]; then
+            printf '%s\n' "$GEO_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+            host_check=yes
+          else
+            host_check=accept-new
+          fi
+          ssh -f -N -D 127.0.0.1:1080 -i ~/.ssh/geo_key \
+            -o StrictHostKeyChecking=$host_check \
+            -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 \
+            "$GEO_SSH_HOST"
+          echo "ECUADOR_MCP_GEO_PROXY=socks5://127.0.0.1:1080" >> "$GITHUB_ENV"
       - name: Start server
         run: |
           uv run main.py > server.log 2>&1 &
