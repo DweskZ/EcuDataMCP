@@ -133,7 +133,12 @@ def with_health_endpoint(
 
 asgi_app = with_health_endpoint(
     with_http_security(
-        mcp.streamable_http_app(stateless_http=True),
+        mcp.streamable_http_app(
+            stateless_http=True,
+            # The SDK only trusts loopback Host headers unless told the bind
+            # host; without it a non-loopback deploy answers 421.
+            host=get_mcp_host(),
+        ),
         auth_token=get_mcp_auth_token(),
         max_concurrent_requests=get_mcp_max_concurrent_requests(),
         rate_limit_requests=get_mcp_rate_limit_requests(),
