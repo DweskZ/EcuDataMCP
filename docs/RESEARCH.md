@@ -2024,7 +2024,9 @@ año en curso, el histórico profundo vive en los datasets CKAN. El
 Boletín/Estadística Mensual de Transacciones Comerciales (costos
 marginales, enero 2019 - junio 2026) está atrapado en un flipbook
 FlipHTML5 de terceros — mismo tipo de fricción que otros embeds JS ya
-documentados, sin archivo estático encontrado.
+documentados, sin archivo estático encontrado. *(Corregido en la
+Trigésimo quinta pasada: el texto de cada página se lee con un GET plano
+a `files/search/search_config.js`.)*
 
 **ARCONEL/ARCERNNR** — el sitio en vivo sigue en `arconel.gob.ec` y
 sigue branding "Agencia de Regulación y Control de Electricidad";
@@ -2236,7 +2238,8 @@ semestrales de indisponibilidad de transmisión 2018-2026. También un
 data/boletines.xlsx` (14 KB) mapea cada boletín mensual (ene-2019 a hoy)
 a su link individual de `fliphtml5.com` — sirve para enumerar los ~90
 boletines programáticamente, pero no resuelve la fricción del flipbook
-por boletín. Confirmado de nuevo (esta vez inspeccionando la red del
+por boletín *(corregido en la Trigésimo quinta pasada: sí la resuelve,
+vía `files/search/search_config.js`)*. Confirmado de nuevo (esta vez inspeccionando la red del
 browser durante la carga): el dashboard en tiempo real no dispara **ni
 una sola petición XHR/JSON** — los datos están en el HTML servido por el
 servidor, ni siquiera es "Plotly JSON embebido", es más directo que eso.
@@ -3722,7 +3725,9 @@ De los siete ítems nombrados bajo "tablero-dinámico/indicadores-sectoriales"
 comparable al de `helpers/sut_powerbi_client.py`, fuera de alcance.
 "Panorama Agroeconómico", "Atlas Agroeconómico" y "Hoja de Balance de
 Alimentos" están cada uno atrapados en un flipbook JS de `fliphtml5.com`
-con `bookConfig` codificado — confirmado en vivo para los tres. Pero la
+con `bookConfig` codificado — confirmado en vivo para los tres. *(Sin
+reverificar: el `files/search/search_config.js` que destrabó el boletín de
+CENACE en la Trigésimo quinta pasada probablemente sirva también aquí.)* Pero la
 misma página tiene un séptimo ítem no nombrado originalmente, **"Resumen
 de Indicadores"**, que sí es real: una página Joomla estática con PDFs
 mensuales directos, 2018-2026 confirmado en vivo (convención de nombre de
@@ -5063,7 +5068,8 @@ desmontada después, como era de esperar. El propio dominio del ministerio
 (`www.ambienteyenergia.gob.ec`) sí tiene varios posts de prensa sobre
 anuncios de cortes (ej. "Condiciones hidrológicas permiten suspender
 cortes de energía el 18 y 19 de diciembre"), pero **su `/wp-json/` está
-bloqueado a nivel de conexión** (`Recv failure: Connection was reset`, de
+bloqueado a nivel de conexión** *(ya no al 2026-09-29: responde con UA de
+navegador, ver Trigésimo quinta pasada)* (`Recv failure: Connection was reset`, de
 forma consistente en 3 intentos distintos, incluyendo una prueba mínima a
 la raíz `/wp-json/`) — un WAF bloqueando el path completo, no solo
 queries específicas. Los posts individuales sí son alcanzables por URL
@@ -5595,6 +5601,380 @@ que la estimación de anchos no ve), así que la primera palabra de los
 sectores puede quedar al final de la zona ("SANTA ANA SAN" / "PEDRO,
 ..."). Resultado en los 5 PDFs con texto propio de Centrosur: 207 filas, 0
 sin horario, 2 sin cantón, 5 sin zona.
+
+## Trigésimo quinta pasada — sector eléctrico: revisión completa del dominio y fuentes nuevas (2026-09-29)
+
+Pedido de Daniel: revisar lo pendiente del sector eléctrico y buscar
+fuentes nuevas. Cuatro frentes en paralelo (CENACE/CELEC, ARCONEL y
+Ministerio, fuentes internacionales, distribuidoras), todo verificado en
+vivo con curl y browser; nada construido todavía. Varias conclusiones de
+pasadas anteriores cambian (ver "Correcciones" al final).
+
+### Acceso y dominios (estado al 2026-09-29)
+
+- `www.arconel.gob.ec`, `energia.gob.ec`, `recursosyenergia.gob.ec` e
+  `historico.energia.gob.ec` **ya no resuelven en DNS**. Vivos:
+  `arconel.gob.ec` sin `www` (detrás de Imperva), `www.ambienteyenergia.gob.ec`
+  y `www.geoenergia.gob.ec` (IIGE).
+- El Ministerio y el IIGE cortan la conexión a cualquier cliente sin
+  User-Agent de navegador (el UA por defecto de httpx recibe "Server
+  disconnected" o timeout; UA de Chrome → 200). Filtro de UA, no TLS ni
+  geobloqueo.
+- `controlrecursosyenergia.gob.ec` (aparece en los enlaces de compartir de
+  ARCONEL) falla por certificado.
+- Ningún host del sector resultó geobloqueado desde Canadá en esta pasada.
+
+### ARCONEL — servicios ArcGIS REST públicos (hallazgo principal)
+
+La página `arconel.gob.ec/geosisdat/` enlaza un ArcGIS Hub (org
+`5Gdbxgyani9QGxyU`); la búsqueda de ArcGIS Online
+`q=orgid:5Gdbxgyani9QGxyU AND access:public` lista 72 ítems públicos. Dos
+grupos importan, ambos con `/query` anónimo y paginado
+(`maxRecordCount` 2000):
+
+- `https://geoportal.arconel.gob.ec:6443/arcgis/rest/services/ServDashboards`
+  (8 FeatureServers):
+  - `CENTRALES_PRODUCCION/1`: energía bruta y neta por central por mes,
+    219.047 filas, con 2026 hasta el mes 7.
+  - `CENTRALES_COMBUSTIBLES/1`: consumo de combustible por central,
+    1999-2026.
+  - `CENTRALES/0`: 730 centrales con potencia y ubicación.
+  - `LUMINARIAS/2`: alumbrado público, 1999-2026.
+  - Líneas y subestaciones de transmisión y distribución.
+  - Las tablas de `DISTRIBUCION_TRANSACCIONES` (pérdidas, facturación)
+    devuelven 400.
+  - Certificado con la misma cadena GoGetSSL incompleta que
+    `reportes.arconel.gob.ec`; el sufijo `arconel.gob.ec` y el intermedio
+    empaquetado en `helpers/tls.py` deberían cubrirlo (no probado desde
+    Python).
+- `services3.arcgis.com/5Gdbxgyani9QGxyU/.../resumen_balance_energia`
+  (6.078 filas, 1999-2024: balance y pérdidas técnicas/no técnicas por
+  distribuidora por mes) y `resumen_facturacion` (35.546 filas,
+  1999-2025: facturación, recaudación, subsidios y clientes por
+  distribuidora, grupo de consumo y mes). Instantáneas estáticas, última
+  edición julio 2025.
+
+Es el mismo dato SISDAT que sirve `reportes.arconel.gob.ec`, pero como
+JSON limpio y rápido: para varios tipos de reporte reemplazaría el
+raspado SSRS (~50 filas y varios segundos por página). Construirlo como
+cliente ArcGIS REST genérico, idealmente como otro backend de
+`search_capas_geo`/`get_capa_geo_datos` (hoy solo GeoServer WFS) en vez
+de tools nuevas; el mismo cliente serviría a CELEC, EEQ e IIGE (abajo).
+
+### ARCONEL — archivos estáticos, tarifas, regulaciones, Power BI
+
+- **La API de medios de WordPress no los lista**: Download Monitor los
+  guarda fuera de la media library (0 de 1.233 ítems bajo
+  `/uploads/downloads/`). Se enumeran raspando páginas:
+  - `/publicaciones-estadistica-del-sector-electrico-2/`: 49 enlaces
+    `download-monitor/download.php?id=N` (302 a PDF). Estadística anual
+    1990-2025 y Atlas 2014-2025. **Sin XLSX acompañante**, los 49 son PDF.
+  - `/mapas-del-sector-electrico/`: 38 PDFs de mapas.
+  - Un XLS/XLSX vigente por página, formateado para presentación:
+    `/balance-nacional-de-energia-electrica/` →
+    `BNEE_junio_2026_revACH.xls` (12 meses móviles a junio 2026, más nuevo
+    que el de CKAN, agosto 2025); `/balance-multianual-de-energia/`
+    (2015-2024); `/cobertura-anual-del-servicio/` (por provincia,
+    2015-2024); `/consumo-anual-per-capita/` (2024).
+- **Tarifas**: `/tarifas-del-sector-electrico/` enlaza 4 subpáginas
+  (servicio público de energía eléctrica, alumbrado público general, carga
+  de vehículos eléctricos, proyección de subsidios) con ~39 PDFs directos:
+  resoluciones, pliegos tarifarios, informes de costos. **Solo 2024-2026.**
+  Tienen capa de texto (el pliego codificado 2025, 39 págs., sale limpio
+  con pypdf), pero las tablas necesitan parseo.
+- **Regulaciones**: `search_regulaciones` (gob.ec) devuelve solo 6 ítems
+  de ARCONEL. El post `/regulaciones-vigentes-del-sector-electrico-ecuatoriano/`
+  (post WP 3765) embebe un array JS `TEMAS`: 10 temas, 51 ítems (37
+  regulaciones, 14 resoluciones) con código, título y PDF; se lee desde
+  `/wp-json/wp/v2/posts/3765`. Otro post enlaza dos PDFs índice
+  (regulaciones vigentes, 15 págs., e históricas).
+  `/proyectos-de-regulacion-difusion-externa/` apunta a un libro de
+  SharePoint personal, no usable.
+- **Power BI "Pérdidas por distribuidora"**: embed público
+  (`app.powerbi.com/view?r=...`), clúster `wabi-south-central-us-api` (sin
+  el `-c-primary` del `_BASE` del cliente SUT). `modelsAndExploration` y
+  `conceptualschema` responden 200; modelo refrescado 2026-09-29, entidades
+  `%` y `GWh` (año, mes, empresa, pérdidas por distribuidora/CNEL/
+  eléctricas/total). No se probó `querydata`. Duplica en buena parte los
+  servicios ArcGIS y `reportes.arconel.gob.ec`; baja prioridad.
+
+### CENACE — boletín mensual legible sin flipbook
+
+- Índice: `cenace.gob.ec/wp-content/plugins/ez-addons/data/boletines.xlsx`,
+  91 filas URL | NOMBRE, ENERO 2019 a JULIO 2026, todas a
+  `online.fliphtml5.com/htwhr/<código>/`.
+- **Cada libro sirve el texto de sus páginas en
+  `<libro>/files/search/search_config.js`** (`var textForPages = [...]`,
+  un string por página), GET plano sin JS. Julio 2026 (`kffn`): 13 páginas
+  con tablas reales — producción por recurso, demanda comercial mensual
+  por distribuidora (`CNEL - Guayaquil 610.75 556.53 …`), autoconsumo,
+  precios medios en USD¢/kWh, transacciones internacionales con Colombia y
+  Perú. No se vio sección de costos marginales en ese número.
+- Libros viejos (2019, 2020) mandan el archivo con doble gzip y BOM UTF-8:
+  hay que `gzip.decompress` otra vez después de la decodificación de
+  httpx. 2022, 2025 y 2026 vienen planos.
+- Sin PDF: `publication.pdf` da 404, `DownloadButtonVisible` es false, las
+  páginas son imágenes webp.
+- **No está en CKAN**: los 45 datasets de la org `cenace` son solo
+  producción, exportaciones, potencia efectiva/despachada y capacidad
+  instalada; nada de precios, demanda por distribuidora ni transacciones
+  con Colombia/Perú.
+- Propuesta: `list_cenace_boletines` + `get_cenace_boletin(mes)` que
+  devuelva el texto por página. Esfuerzo S.
+
+### CENACE — Biblioteca, tableros, despacho
+
+- **Biblioteca** (`cenace.gob.ec/biblioteca/`): una sola página estática
+  de ~2,2 MB con el mismo plugin de descargas que SGR/ARCSA/SENESCYT
+  (acordeón `<li class="li-gray1" id="cat-N">`, `span.titulo`,
+  `download.php?id=N&force=0` → `wp-content/uploads/downloads/YYYY/MM/*.pdf`).
+  2.464 documentos en 11 categorías, mayoría administrativa (viáticos
+  1.276, contrataciones 350, informes de gestión 249, información del
+  sector eléctrico 57, resto 532). Lo útil: Informe Ejecutivo de Gestión
+  Mensual 2016-01 a 2026-07 (PDF de 10 págs. exportado de PowerPoint;
+  `pdftotext` recupera una tabla móvil de 13 meses de producción neta,
+  importaciones, consumo y exportaciones en GWh), Informe Anual 2012-2025
+  por partes, Informe Operativo Anual 2018-2023, Factor de Emisión de CO₂
+  2011 y 2014-2024 (informes narrativos, no tabulares; 2024 = 0,1616 t
+  CO₂-eq/MWh), Indisponibilidad del SNT semestral 2018-2026 S1, POA
+  2016-2026, PEI, unifilares del SNI (abril 2026), convenios de
+  interconexión con Colombia y Perú. Todo PDF. `wp-json` está abierto (405
+  medios, 168 posts) pero no indexa el plugin de descargas; el HTML de la
+  Biblioteca es el único índice. Encaja como `fuente="cenace"` de
+  `list_archivo_secciones`/`get_archivo_seccion`. El Plan Maestro
+  2023-2032 redirige a `ambienteyenergia.gob.ec/plan-maestro-de-electricidad/`;
+  el PME 2016-2025 a mediafire.
+- **Plotly de `info-operativa`**: 17 llamadas `Plotly.newPlot("uuid", …)`
+  en la página de 266 KB, cada una parseable con
+  `json.JSONDecoder().raw_decode(html, match.end())`. Por cada uno de los
+  4 tableros de producción: torta de 5 fuentes, barras por central
+  hidroeléctrica (Coca Codo, Paute, Sopladora, Delsitanisagua, Mazar, San
+  Francisco, Agoyán, Minas San Francisco, "Otras Hidro"), barras Térmica/
+  Gas Natural/Renovable, y curva semihoraria de 48 puntos con 7 series (y
+  en `bdata` base64 f8). Tablero de demanda: torta CNEL vs. Eléctricas y
+  barras de 19 distribuidoras. Los IDs de div parecen UUID aleatorios:
+  mapear gráficos a tableros por orden en el documento. Extensión S de
+  `get_cenace_tablero`.
+- **Despacho diario**: la API de medios solo expone 5 XLSX huérfanos de
+  feb-mar 2024 (`wp-content/uploads/2024/0X/R1_2024-03-09.xlsx`, hojas
+  DESPACHO/REDESPACHO con mix, precios de bolsa y causas); fechas vecinas
+  dan 404. No es serie. Nada público de posdespacho, costos marginales,
+  pronóstico de demanda ni embalses; `info-operativa/` da 403 y los
+  subdominios probados no resuelven.
+
+### CELEC EP — sin niveles de embalse, pero ArcGIS abierto
+
+- No hay publicación recurrente de cota/embalse/caudal (Mazar, Paute): la
+  búsqueda en `wp-json` y la media library solo devuelven noticias y
+  fotos; `/hidropaute/` da 404; `/celecsur/`, `/transelectric/` y
+  `/informacion-tecnica/*` sin archivos de datos. Sin plan de expansión de
+  transmisión; `/plan-maestro-de-electricidad/` tiene un solo PDF.
+- **Nuevo:** `https://portalarcgis.celec.gob.ec/server/rest/services/Hosted`
+  abierto sin login. `CENTRAL_GENERACION`: 40 centrales de CELEC con
+  potencia instalada/efectiva, tipo, unidades y código de parroquia.
+  `SNT_03_2025`: 9 capas de la red de transmisión (13.654 estructuras, 132
+  subestaciones, 2.010 vías de acceso...). El mismo servidor expone capas
+  `_results` de Survey123 que pueden contener datos personales: **no se
+  consultaron y hay que excluirlas** de cualquier cliente.
+
+### Ministerio de Ambiente y Energía e IIGE
+
+- **BEN** (`/balanceenergetico/`): PDFs 2017-2025 (2025 en 9 capítulos).
+  La media library (15.575 ítems, buscable) no tiene anexos XLSX del BEN;
+  lo más cercano es `2025/05/7.1.2_insumo_rpconsolidadobalenergia_2024.xls`.
+- **Plan Maestro de Electricidad** (`/plan-maestro-de-electricidad/`): 13
+  enlaces de Google Drive a capítulos y anexos más el plan completo, y el
+  ajuste de junio 2026 (`MAE-MAE-2026-0066-AM.pdf`,
+  `Anexos-A-B-y-C_ajuste_pme_20260611.pdf`).
+- El sistema "sieEcuador" (con OLADE) anunciado en 2019 no tiene URL viva.
+- **IIGE**: `https://capas.geoenergia.gob.ec/arcgis/rest/services`
+  (ArcGIS 11.5) anónimo, pero solo geología (`Geologia_General` 7.595
+  entidades, cartas 1:100K, deslizamientos, zonificación climática, erosión
+  del río Coca); la carpeta `GeologiaEconomica` pide token. **Sin capas de
+  potencial solar, eólico ni geotérmico**; el único estudio de potencial
+  fotovoltaico es una carpeta de Drive enlazada desde el Plan Maestro.
+  `bioenergiaecuador.geoenergia.gob.ec` falla TLS.
+
+### Fuentes internacionales
+
+- **XM (operador de Colombia)**, `POST https://servapibi.xm.com.co/hourly`
+  con `{"MetricId","StartDate","EndDate","Entity","Filter":[]}`; catálogo
+  por `POST /lists` con `{"MetricId":"ListadoMetricas"}` (193 métricas).
+  Sin key, JSON plano. Máximo 31 días por petición (3 meses → 400). Métricas
+  útiles, horarias: `ExpoEner`/`ImpoEner` por `Enlace` en kWh (enlaces
+  "ECUADOR 230" y "ECUADOR 138"; en 2003-2005 "POMASQUI-ECUADOR 230 KV") o
+  por `Sistema`, `ExpoMoneda`/`ImpoMoneda` en COP, liquidación TIE
+  (`SnTIEMerito`, `CompBolsaTIEEner`). Cobertura 2003-03 a 2026-09-26 (~3
+  días de rezago). Exportaciones Colombia→Ecuador 2024 sumadas en vivo:
+  marzo 129,1 GWh, agosto 282,9, **octubre 5,5** (suspensión colombiana),
+  noviembre 140,5, diciembre 256,6; la semana del 4-10 nov casi cero. Ninguna
+  fuente ecuatoriana da flujos transfronterizos horarios con 23 años de
+  historia. Esfuerzo S-M.
+- **IRENA** (PxWeb, `https://pxweb.irena.org/api/v1/en/IRENASTAT/...`), sin
+  key, GET metadatos/POST datos en CSV o JSON. El ID de tabla lleva la
+  edición (`Country_ELECSTAT_2026_H2_PX.px`): hay que descubrirlo desde el
+  listado de carpeta. Ecuador 2000-2024, capacidad (MW) y generación (GWh)
+  en 24 tecnologías, on/off-grid. 2024: hidro 5.419,17 MW y 22.614,43 GWh,
+  solar FV 84,27 MW, eólica 71,15 MW. Esfuerzo S.
+- **World Bank WDI** (`api.worldbank.org/v2/country/ECU/indicator/{id}?format=json`),
+  sin key, **aún no integrado en el proyecto** (también serviría fuera de
+  energía). Acceso a electricidad `EG.ELC.ACCS.ZS` 1995-2024 (98,5%, rural
+  95,9%), pérdidas T&D `EG.ELC.LOSS.ZS` 1990-2023 (17,0%), consumo per
+  cápita `EG.USE.ELEC.KH.PC` (1.675,6 kWh en 2023), participación hidro
+  `EG.ELC.HYRO.ZS` (71,7% en 2023). Esfuerzo S.
+- **Ember**: API con key gratuita (registro por correo; sin key → 403).
+  CSV masivos sin key pero de 70 MB (mensual) y 49 MB (anual), muy sobre el
+  tope de 5 MB: haría falta un subconjunto cacheado o la API con key.
+  CC-BY-4.0. Ecuador mensual 2019-01 a 2026-04 (generación por fuente,
+  demanda, importaciones netas, emisiones, intensidad de CO₂) y anual
+  2000-2025 con capacidad. Importaciones netas oct-dic 2024 (0,01/0,14/0,26
+  TWh) cuadran con XM. Esfuerzo M.
+- **Our World in Data**: por país vía
+  `ourworldindata.org/grapher/<slug>.csv?country=~ECU&csvType=filtered`
+  (con `~`; `country=ECU` no filtra); el CSV completo pesa 9,2 MB. Anual,
+  reempaqueta Ember/EI. Opcional.
+- **EIA**: 403 sin key, funciona con `DEMO_KEY` limitado; Ecuador solo
+  anual. No agrega nada.
+- **OLADE sieLAC**: `sielac.olade.org` redirige a `sielac.olacde.org`; la
+  API (`sielacapi.olacde.org`) exige usuario y contraseña que OLACDE envía
+  por correo, sin registro autoservicio (sin credenciales → 500). Rico
+  pero anual (balances desde 1970, tarifas de referencia mensuales desde
+  1988); términos restringen a visualización y análisis. Descartado salvo
+  que se pidan credenciales.
+- **COES (Perú)**: endpoint vivo
+  (`POST coes.org.pe/Portal/Interconexiones/reportes/ListarIntercambioElectricidad`,
+  `idPtomedicion=5020`, línea Zorritos-Machala L-2280) pero toda consulta
+  devolvió tabla vacía (oct-dic 2024, sep 2026) o 500 (nov 2023, rangos de
+  más de un mes); el endpoint JSON de gráfico trae series nulas.
+  Descartado.
+
+### Distribuidoras — cortes de mantenimiento vigentes y archivo de crisis
+
+Feeds **vigentes** de mantenimiento programado (no de crisis):
+- **Emelnorte**, WordPress REST abierto:
+  `https://www.emelnorte.com/wp-json/wp/v2/posts?categories=7` ("Trabajos
+  Programados", 298 posts desde 2024-04-23) y `categories=9`
+  ("Suspensiones Emergentes", 46). 8-19 posts al mes, último 2026-09-29.
+  Cuerpo en texto plano (`FECHAS: / HORA: DE 09:00 A 12:00 / SECTORES
+  AFECTADOS: ...` + motivo), paginado con `page=`, parseable con regex.
+  Esfuerzo S.
+- **ElecGalápagos**, WordPress REST abierto:
+  `https://www.elecgalapagos.com.ec/wp-json/wp/v2/posts?categories=77,78,79`
+  (San Cristóbal 126, Santa Cruz 139, Isabela 64 posts, desde 2021-12).
+  Cuerpo `Fecha: / De 14H00 a 18H00 / Sectores: ...`; casi diario (21
+  posts en sep 2026). Esfuerzo S.
+- **EEASA**: `https://www.eeasa.com.ec/suspensiones-programadas/`, HTML
+  servidor con tarjetas `Fecha / Horario / Sector / Motivo` (6 ítems hoy,
+  29 sep-2 oct, Tungurahua y Pastaza). Sin archivo (`wp-json` 401/403):
+  historia solo si se guarda en cada llamada. Esfuerzo S.
+
+Encajan como nuevos valores de `distribuidora` en `search_cortes`/
+`get_cortes_horarios`.
+
+Sin feed vigente: **EEQ** (`/consulte-suspensiones-programadas` dice
+"Contenido pendiente"; la búsqueda del sitio no tiene horarios 2025-26),
+**CNEL** (`/trabajos-programados/?unidad=<un>` dice "Por el momento no
+contamos con Trabajos Programados" en las 11 unidades probadas; categorías
+"Trabajos <unidad>" en 0 posts; tag 337 "corte-de-energia" ahora en 0),
+**Centrosur** (imágenes de cortes más nuevas son de 2023), **ELEPCO**
+(`/servicios/suspensiones/` vacío), **E.E. Riobamba** (`eersa.com.ec`, 403
+a curl y challenge de Cloudflare), **E.E. Azogues** (`eea.gob.ec`, un 200 y
+luego timeouts). No hay agregador nacional vivo.
+
+Archivo de crisis, fuentes nuevas:
+- **Centrosur, API JSON de la app de cortes**:
+  `POST https://nest.centrosur.gob.ec/cortes/api/v2/database/findOne` con
+  `{"library":"PUBLIC","table":"parame","conditions":[{"name":"desconexiones"}]}`,
+  curl plano. JSON estructurado (provincia, día, horas, cantón/zona/
+  sectores): hoy 61 bloques y 405 lugares, todos del 9-13 oct 2024
+  (guardado 2025-08-27). Cada publicación sobrescribe la anterior, sin
+  historia; sería feed vivo en el próximo racionamiento. Usar solo esa
+  consulta; no tocar otros endpoints del bundle.
+- **EEQ, ArcGIS de polígonos de corte**:
+  `https://arcgis.eeq.com.ec/arcgis/rest/services/Hosted/Cortes_Escenario_22/FeatureServer/0/query`
+  público: 217 polígonos de alimentador con `alimentadorid, se, corte1,
+  corte2, bloque, fecha` ("Miercoles 09 a domingo 13", oct 2024). También
+  `Escenario_27` y `Escenario_27_17_oct`; los lista
+  `/portal/sharing/rest/search`. Histórico, esfuerzo S-M con el cliente
+  ArcGIS.
+- **CNEL, solo cronogramas de emergencia**: categoría 853 "Trabajos
+  Emergentes" (18 posts, 4-21 mar 2026, autotransformador de Santa Elena),
+  cada uno con un `CRONOGRAMA-DD.MM.YY.pdf`; página
+  `trabajos-emergentes-esmeraldas` (14-19 may 2026);
+  `interrupciones-controladas-por-el-cenace` con `Corte-1.pdf`. PDFs con
+  capa de texto (cantón / sectores / bloque horario);
+  `wp/v2/media?search=cronograma` los enumera con ruido (563 resultados).
+  Episódico, esfuerzo M.
+- **Ministerio**: páginas `programacion-racionamientos-de-energia-por-distribuidora-*`
+  y `unidades-de-negocio-cnel-ep-*` son el hub de enlaces nacional de 2024
+  (Drive por unidad de CNEL, la app ArcGIS de EEQ, un `suspension*.xhtml`
+  de Emelnorte). `mantenimientoseedprogramados` (modificada 2026-06-05)
+  cubre los fines de semana de mantenimiento por El Niño (30-31 may y 6-7
+  jun 2026); su `30-y-31.pdf` es una infografía solo de EEQ. Agrega
+  enlaces, no datos.
+- **EEASA, PDFs de crisis**: dominio de vuelta;
+  `Cortes-30-de-abril-Tungurahua.pdf` y
+  `Desconexiones-del-30-de-septiembre-al-06-de-octubre-Tungurahua-Actualizada.pdf`
+  dan 200, con capa de texto (cantón / parroquia / alimentador / sectores ×
+  días). Sin enumeración (REST cerrado, sitemaps solo de posts/páginas):
+  lista semilla por buscador. Esfuerzo M.
+- **Centrosur `CortesEstiaje/`**: el listado de directorio sigue en 403.
+  Una consulta CDX de Wayback por prefijo (en browser; curl recibe bloqueo
+  anti-bot) lista 8 archivos: `20231214_4_14a16`, `20231215_3_15a18`,
+  `20231218_5_16a18`, los tres `azuay_*_20231030`,
+  `Cortes_18_19_ABRIL_2024` y `Cortes_manana_17_Abril_2024v2`. Esos 8 más
+  el `_consolidado` conocido están vivos (200): lista semilla fija,
+  esfuerzo S.
+
+Estadísticas de distribuidoras fuera de CKAN:
+- **EEASA `/estadisticas/`**: estadística anual 2008-2024, `.xls` para
+  2008-2013 y PDFs con texto para 2014-2024 (ej. `Inf-Anual-2024.pdf`, 25
+  págs.): tablas mensuales de energía por provincia y facturación vs.
+  recaudación. Esfuerzo M.
+- **CNEL `/intranet-indicadores/`**: tablas HTML de FMIK/TTIK (calidad de
+  servicio) 2011 a abril 2024, % pérdidas, % recaudación, cobertura. Sin
+  actualizar desde 2024-06. Esfuerzo S.
+- **Centrosur `estadisticas-centrosur`**: sigue con solo dos PDFs, sin
+  serie detrás.
+
+### Ranking de qué construir
+
+1. Cliente ArcGIS REST genérico con ARCONEL `ServDashboards` + resúmenes
+   de balance/facturación (S-M); después CELEC, EEQ e IIGE con el mismo
+   cliente.
+2. Boletín mensual de CENACE vía `search_config.js` (S).
+3. XM Colombia, flujos con Ecuador (S-M).
+4. Biblioteca de CENACE como `fuente="cenace"` (S).
+5. Cortes de mantenimiento vigentes: Emelnorte, ElecGalápagos, EEASA (S
+   cada uno).
+6. Raspador de páginas de ARCONEL: estadística anual/Atlas, BNEE vigente,
+   tarifas 2024-2026, regulaciones `TEMAS` (S).
+7. IRENA y World Bank WDI (S cada uno).
+8. Desglose Plotly en `get_cenace_tablero` (S).
+
+Menor prioridad: Ember (tamaño/key), `CortesEstiaje/` como semilla, EEASA
+estadísticas y PDFs de crisis, CNEL emergencias e indicadores, Power BI de
+pérdidas. Descartados: OLADE, COES, EIA, OWID (reempaqueta), despacho
+diario de CENACE, niveles de embalse de CELEC, capas de potencial
+energético del IIGE (no existen).
+
+### Correcciones a pasadas anteriores
+
+- **Boletín de CENACE** (Séptima y Octava pasada): no está "atrapado en el
+  flipbook"; el texto por página es un GET plano.
+- **`ambienteyenergia.gob.ec/wp-json/`** (Vigésimo séptima pasada): ya no
+  está bloqueado por el WAF; responde con UA de navegador.
+- **`arcernnr.gob.ec`/`recursosyenergia.gob.ec`**: además de no resolver
+  el primero, ahora tampoco resuelven `recursosyenergia.gob.ec`,
+  `energia.gob.ec` ni `www.arconel.gob.ec`.
+- **EEASA** (Vigésimo séptima pasada): dominio de vuelta.
+- **EERSSA** (Vigésimo séptima pasada): el 403 no es un bloqueo fijo. Las
+  primeras peticiones obtuvieron la home y `cortes_eerssa_2024.pdf` (200,
+  `application/pdf`, 109 KB); tras unas pocas más, todo 403 incluida la
+  home. Parece límite de tasa o baneo de IP.
+- **CNEL**: el tag 337 "corte-de-energia" bajó a 0 posts (antes solo 2026).
+- **CELEC EP** (Decimoquinta pasada, descartado por LOTAIP): sigue sin dato
+  sectorial en el sitio, pero su servidor ArcGIS sí tiene datos útiles.
 
 ## Notas históricas
 
