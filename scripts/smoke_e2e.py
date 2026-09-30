@@ -246,7 +246,6 @@ async def main() -> int:
             ("search_bce_publicaciones", {"query": ""}, []),
             ("search_bce_paginas", {"catalogo": "indices", "query": "petrolero"}, []),
             ("search_bce_remesas", {"query": ""}, []),
-            ("audit_bce_catalog", {}, ["grupos", "series"]),
             ("list_bce_indicadores_diarios", {}, ["Riesgo", "serie"]),
             (
                 "get_cenace_tablero",
