@@ -5,6 +5,7 @@ from typing import Any
 import httpx
 
 from helpers import env_config
+from helpers.geo_proxy import proxy_for
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.user_agent import USER_AGENT
 
@@ -44,7 +45,10 @@ async def search_catalog(
     """
     own = session is None
     if own:
-        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
+        session = httpx.AsyncClient(
+            headers={"User-Agent": USER_AGENT},
+            proxy=proxy_for(env_config.get_base_url("anda_site")),
+        )
     assert session is not None
     try:
         params: dict[str, Any] = {"ps": min(limit, 50)}
@@ -71,7 +75,10 @@ async def get_survey(
     """Fetch full DDI-style metadata for one survey by its idno (not its numeric id)."""
     own = session is None
     if own:
-        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
+        session = httpx.AsyncClient(
+            headers={"User-Agent": USER_AGENT},
+            proxy=proxy_for(env_config.get_base_url("anda_site")),
+        )
     assert session is not None
     try:
         logger.debug("ANDA GET catalog detail idno=%s", idno)
@@ -116,7 +123,10 @@ async def list_microdata_files(
     """
     own = session is None
     if own:
-        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
+        session = httpx.AsyncClient(
+            headers={"User-Agent": USER_AGENT},
+            proxy=proxy_for(env_config.get_base_url("anda_site")),
+        )
     assert session is not None
     try:
         url = f"{env_config.get_base_url('anda_site')}index.php/catalog/{survey_id}/get-microdata"

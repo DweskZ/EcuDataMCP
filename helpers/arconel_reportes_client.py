@@ -42,6 +42,7 @@ from typing import Any
 import httpx
 
 from helpers.cache import TtlCache
+from helpers.geo_proxy import proxy_for
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.text_utils import strip_accents as _strip
 from helpers.tls import os_trust_context
@@ -327,6 +328,7 @@ def _client() -> httpx.AsyncClient:
         timeout=_TIMEOUT,
         verify=os_trust_context(),
         follow_redirects=True,
+        proxy=proxy_for("https://reportes.arconel.gob.ec/"),
     )
 
 

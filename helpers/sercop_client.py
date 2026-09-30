@@ -12,6 +12,7 @@ import httpx
 
 from helpers import env_config
 from helpers.cache import TtlCache, sercop_search_cache
+from helpers.geo_proxy import proxy_for
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.user_agent import USER_AGENT
 
@@ -56,6 +57,7 @@ async def _get_json(
         session = httpx.AsyncClient(
             headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
             follow_redirects=True,
+            proxy=proxy_for(url),
         )
     assert session is not None
     try:

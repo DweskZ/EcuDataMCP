@@ -7,6 +7,7 @@ import httpx
 from helpers import env_config
 from helpers.acronyms import expand_acronyms
 from helpers.cache import categories_cache
+from helpers.geo_proxy import proxy_for
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.tls import should_retry_insecure
 from helpers.user_agent import USER_AGENT
@@ -28,7 +29,9 @@ async def _fetch_json(
 ) -> dict[str, Any]:
     own = session is None
     if own:
-        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
+        session = httpx.AsyncClient(
+            headers={"User-Agent": USER_AGENT}, proxy=proxy_for(url)
+        )
     assert session is not None
     try:
         logger.debug("CKAN GET %s params=%s", url, params)
@@ -46,7 +49,9 @@ async def _fetch_json(
                 url,
             )
             async with httpx.AsyncClient(
-                headers={"User-Agent": USER_AGENT}, verify=False
+                headers={"User-Agent": USER_AGENT},
+                verify=False,
+                proxy=proxy_for(url),
             ) as insecure_session:
                 resp = await insecure_session.get(url, params=params, timeout=_TIMEOUT)
         if resp.status_code == 403:
