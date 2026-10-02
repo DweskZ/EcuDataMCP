@@ -119,9 +119,7 @@ def _fuentes_payload() -> dict:
                 "tools": [
                     "list_aip_aerodromos",
                     "get_aip_aerodromo",
-                    "get_metar",
-                    "get_notam",
-                    "get_sigmet",
+                    "get_aviso_aeronautico",
                 ],
             },
             {
@@ -187,13 +185,10 @@ def _fuentes_payload() -> dict:
                     "compare_bce_sources",
                     "search_bce_iem",
                     "get_bce_iem_table",
-                    "search_bce_publicaciones",
                     "search_bce_paginas",
                     "get_bce_pagina_archivos",
-                    "list_bce_indicadores_diarios",
+                    "list_catalogo",
                     "get_bce_indicador_diario",
-                    "search_bce_remesas",
-                    "search_bce_precios_comex",
                     "search_bce_calendario",
                 ],
             },
@@ -214,7 +209,7 @@ def _fuentes_payload() -> dict:
                 "nombre": "Contraloría General del Estado (informes de auditoría)",
                 "base": "https://www.contraloria.gob.ec/Portal/24287",
                 "tools": [
-                    "list_contraloria_informes",
+                    "list_catalogo",
                     "get_contraloria_informe",
                 ],
             },
@@ -260,7 +255,7 @@ def _fuentes_payload() -> dict:
                 "id": "arconel",
                 "nombre": "ARCONEL (reportes estadísticos del sector eléctrico)",
                 "base": "https://reportes.arconel.gob.ec/",
-                "tools": ["list_arconel_reportes", "get_arconel_reporte"],
+                "tools": ["list_catalogo", "get_arconel_reporte"],
             },
             {
                 "id": "eeq",
@@ -294,7 +289,7 @@ def _fuentes_payload() -> dict:
                 ),
                 "base": "https://sut.trabajo.gob.ec/",
                 "tools": [
-                    "list_sut_indicadores",
+                    "list_catalogo",
                     "get_sut_indicador_schema",
                     "query_sut_indicador",
                 ],
@@ -327,7 +322,7 @@ def _fuentes_payload() -> dict:
                 ),
                 "base": "https://www.iess.gob.ec/",
                 "tools": [
-                    "list_iess_colecciones",
+                    "list_catalogo",
                     "get_iess_archivos",
                     "get_certificado_cumplimiento_patronal",
                 ],

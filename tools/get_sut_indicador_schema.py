@@ -41,7 +41,7 @@ def register_get_sut_indicador_schema_tool(mcp: MCPServer) -> None:
         the same as any other field.
 
         Args:
-            indicador: A key from list_sut_indicadores.
+            indicador: A key from list_catalogo(fuente='sut').
             format: text | json
         """
         try:

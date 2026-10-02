@@ -5,7 +5,19 @@
 - **International series**: `get_serie_internacional(fuente)` covers World Bank
   WDI (1,400+ yearly indicators), IRENA electricity capacity/generation by
   technology, and XM Colombia hourly Colombia-Ecuador flows since 2003. One
-  tool with a `fuente` selector, so 90 → 91 tools in the default profile.
+  tool with a `fuente` selector.
+- **Breaking: tools merged behind a selector** (90 → 82 tools in the default
+  profile together with the item above; same results, new call shape):
+  - `search_archivos` also takes `fuente="bce_remesas"`,
+    `"bce_precios_comex"` and `"bce_publicaciones"`, replacing
+    `search_bce_remesas`, `search_bce_precios_comex` and
+    `search_bce_publicaciones` (the `formato` filter of the last one is gone;
+    `query` still matches titles).
+  - `list_catalogo(fuente)` replaces `list_arconel_reportes`,
+    `list_bce_indicadores_diarios`, `list_contraloria_informes`,
+    `list_iess_colecciones` and `list_sut_indicadores`.
+  - `get_aviso_aeronautico(tipo, designador)` replaces `get_metar`,
+    `get_notam` and `get_sigmet`.
 
 ## 0.10.0 — 2026-09-28
 

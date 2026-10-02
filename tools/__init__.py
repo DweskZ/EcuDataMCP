@@ -3,9 +3,9 @@ from mcp.server.mcpserver import MCPServer
 from tools.archivo_secciones import register_archivo_secciones_tools
 from tools.arconel_reportes import (
     register_get_arconel_reporte_tool,
-    register_list_arconel_reportes_tool,
 )
 from tools.audit_bce_catalog import register_audit_bce_catalog_tool
+from tools.aviso_aeronautico import register_aviso_aeronautico_tool
 from tools.bce_paginas import register_bce_paginas_tools
 from tools.compare_bce_sources import register_compare_bce_sources_tool
 from tools.cortes import register_cortes_tools
@@ -40,13 +40,10 @@ from tools.get_inec_publicacion_archivos import (
 )
 from tools.get_informe_igepn import register_get_informe_igepn_tool
 from tools.get_institucion_info import register_get_institucion_info_tool
-from tools.get_metar import register_get_metar_tool
-from tools.get_notam import register_get_notam_tool
 from tools.get_organization_info import register_get_organization_info_tool
 from tools.get_regulacion_info import register_get_regulacion_info_tool
 from tools.get_resource_info import register_get_resource_info_tool
 from tools.get_sgr_sitrep_archivos import register_get_sgr_sitrep_archivos_tool
-from tools.get_sigmet import register_get_sigmet_tool
 from tools.get_sipa_resumen_indicadores import (
     register_get_sipa_resumen_indicadores_tool,
 )
@@ -56,16 +53,11 @@ from tools.get_tramite_estadisticas import register_get_tramite_estadisticas_too
 from tools.get_tramite_info import register_get_tramite_info_tool
 from tools.investigate_dataset import register_investigate_dataset_tool
 from tools.list_aip_aerodromos import register_list_aip_aerodromos_tool
-from tools.list_bce_indicadores_diarios import (
-    register_list_bce_indicadores_diarios_tool,
-)
+from tools.list_catalogo import register_list_catalogo_tool
 from tools.list_categories import register_list_categories_tool
-from tools.list_contraloria_informes import register_list_contraloria_informes_tool
 from tools.list_dataset_resources import register_list_dataset_resources_tool
-from tools.list_iess_colecciones import register_list_iess_colecciones_tool
 from tools.list_instituciones import register_list_instituciones_tool
 from tools.list_sat_tsunami import register_list_sat_tsunami_tool
-from tools.list_sut_indicadores import register_list_sut_indicadores_tool
 from tools.list_zip_contents import register_list_zip_contents_tool
 from tools.lookup_ubicacion import register_lookup_ubicacion_tool
 from tools.preview_resource_data import register_preview_resource_data_tool
@@ -77,9 +69,6 @@ from tools.search_archivos import register_search_archivos_tool
 from tools.search_auditores import register_search_auditores_tool
 from tools.search_bce_calendario import register_search_bce_calendario_tool
 from tools.search_bce_iem import register_search_bce_iem_tool
-from tools.search_bce_precios_comex import register_search_bce_precios_comex_tool
-from tools.search_bce_publicaciones import register_search_bce_publicaciones_tool
-from tools.search_bce_remesas import register_search_bce_remesas_tool
 from tools.search_biinec_extras import register_search_biinec_extras_tool
 from tools.search_cepalstat_indicadores import (
     register_search_cepalstat_indicadores_tool,
@@ -120,9 +109,7 @@ def register_tools(mcp: MCPServer) -> None:
     register_search_sismos_tool(mcp)
     register_search_informes_igepn_tool(mcp)
     register_get_informe_igepn_tool(mcp)
-    register_get_metar_tool(mcp)
-    register_get_notam_tool(mcp)
-    register_get_sigmet_tool(mcp)
+    register_aviso_aeronautico_tool(mcp)
     register_list_aip_aerodromos_tool(mcp)
     register_get_aip_aerodromo_tool(mcp)
 
@@ -171,14 +158,12 @@ def register_tools(mcp: MCPServer) -> None:
 
 
 
-    register_list_sut_indicadores_tool(mcp)
+    register_list_catalogo_tool(mcp)
     register_get_sut_indicador_schema_tool(mcp)
     register_query_sut_indicador_tool(mcp)
 
-    register_list_contraloria_informes_tool(mcp)
     register_get_contraloria_informe_tool(mcp)
 
-    register_list_iess_colecciones_tool(mcp)
     register_get_iess_archivos_tool(mcp)
     register_get_certificado_cumplimiento_patronal_tool(mcp)
 
@@ -189,15 +174,10 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_indicador_bce_tool(mcp)
     register_search_bce_iem_tool(mcp)
     register_get_bce_iem_table_tool(mcp)
-    register_search_bce_publicaciones_tool(mcp)
-    register_search_bce_remesas_tool(mcp)
     register_bce_paginas_tools(mcp)
-    register_search_bce_precios_comex_tool(mcp)
     register_search_bce_calendario_tool(mcp)
-    register_list_bce_indicadores_diarios_tool(mcp)
     register_get_bce_indicador_diario_tool(mcp)
     register_get_cenace_tablero_tool(mcp)
-    register_list_arconel_reportes_tool(mcp)
     register_get_arconel_reporte_tool(mcp)
     register_cortes_tools(mcp)
     register_get_energia_ecuador_snapshot_tool(mcp)

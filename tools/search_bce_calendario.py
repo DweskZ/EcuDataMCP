@@ -33,7 +33,7 @@ def register_search_bce_calendario_tool(mcp: MCPServer) -> None:
         payments, and more, each with category, periodicity, reference
         period, and a direct link to the publication's page.
 
-        Distinct from search_bce_publicaciones (a rolling window of ~30
+        Distinct from search_archivos(fuente='bce_publicaciones') (a rolling window of ~30
         already-published items, no future dates): this is BCE's own
         forward-looking release schedule for the full calendar year.
 

@@ -14,7 +14,7 @@ def register_get_bce_indicador_diario_tool(mcp: MCPServer) -> None:
         title="Ver serie de un indicador diario del BCE",
         description=(
             "One BCE daily/monthly indicator (archivo and codigo from "
-            "list_bce_indicadores_diarios): the last ultimos_n points or a date "
+            "list_catalogo(fuente='bce_diarios')): the last ultimos_n points or a date "
             "range, capped at 366 rows."
         ),
         annotations=READ_ONLY,
@@ -33,7 +33,7 @@ def register_get_bce_indicador_diario_tool(mcp: MCPServer) -> None:
         País), bounded to a window — never the full series (some run
         7,000+ observations).
 
-        Get archivo/codigo from list_bce_indicadores_diarios first — a
+        Get archivo/codigo from list_catalogo(fuente='bce_diarios') first — a
         codigo only means one thing within its own archivo. Without
         desde/hasta, returns the most recent ultimos_n observations
         (capped at 366). With desde/hasta (YYYY-MM-DD, inclusive), returns
@@ -47,7 +47,7 @@ def register_get_bce_indicador_diario_tool(mcp: MCPServer) -> None:
         "Acumulada":...} instead.
 
         Args:
-            archivo: A file name from list_bce_indicadores_diarios.
+            archivo: A file name from list_catalogo(fuente='bce_diarios').
             codigo: A "Código Variable Dinámica" from that same archivo.
             ultimos_n: Most recent N observations when no date range is given.
             desde: Optional start date YYYY-MM-DD.

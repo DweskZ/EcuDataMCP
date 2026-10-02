@@ -102,13 +102,13 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `compare_bce_sources` | Construye un mapa cauteloso de equivalencias candidatas entre BCEData e IEM. |
 | `get_bce_iem_table` | Inspecciona una tabla XLSX oficial del boletín IEM más reciente del BCE. |
 | `get_bce_indicador_diario` | Obtiene la serie temporal de un indicador diario/mensual del BCE (ej. Riesgo País). |
-| `list_bce_indicadores_diarios` | Lista la familia de widgets "indicador" diarios/mensuales del BCE, publicados fuera de BCEData e IEM (páginas de widgets Highcharts de contenido.bce.fin.ec) — incluye Riesgo País (EMBI) como serie genuinamente diaria desde 2004, que BCEData solo expone como agregado mensual de fin de período. |
+| `list_catalogo` (`fuente="bce_diarios"|"arconel"|"contraloria"|"iess"|"sut"`) | Catálogo previo al `get_*` de cada fuente: widgets diarios/mensuales del BCE (Riesgo País desde 2004), reportes de ARCONEL, informes de Contraloría, colecciones del IESS y tableros del SUT. |
+| `search_archivos` (`fuente="bce_remesas"|"bce_precios_comex"|"bce_publicaciones"`) | Enlaces a archivos de remesas, índices de precios de comercio exterior y las publicaciones recientes del BCE. |
+| `get_aviso_aeronautico` (`tipo="metar"|"notam"|"sigmet"`) | METAR/SPECI y NOTAM de un aeródromo (código ICAO) y SIGMET activos del FIR ecuatoriano, desde DGAC/AIS. |
+| `get_serie_internacional` (`fuente="wdi"|"irena"|"xm"`) | Series con Ecuador del Banco Mundial (WDI), IRENA (capacidad y generación) y XM Colombia (flujos horarios Colombia-Ecuador desde 2003). |
 | `search_bce_iem` | Busca tablas individuales de Excel en el último boletín IEM del BCE. |
-| `search_bce_remesas` | Lista los enlaces directos a archivos de Remesas de Trabajadores del BCE. |
-| `search_bce_publicaciones` | Publicaciones recientes del BCE (boletines, reportes, avisos). |
 | `search_bce_paginas` (`catalogo="indices"`) | Catálogo de páginas "índice" del BCE con archivo histórico por serie. |
 | `get_bce_pagina_archivos` (`catalogo="indices"`) | Archivo de archivos de una página "índice" del BCE. |
-| `search_bce_precios_comex` | Índices de precios de comercio exterior del BCE, desagregados. |
 | `search_bce_calendario` | Calendario de publicaciones estadísticas programadas del BCE. |
 | `search_bce_paginas` (`catalogo="cuentas_nacionales"`) | Páginas de publicación de Cuentas Nacionales del BCE. |
 | `get_bce_pagina_archivos` (`catalogo="cuentas_nacionales"`) | Listado de archivos de una página de Cuentas Nacionales del BCE. |
@@ -139,7 +139,6 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `get_contraloria_informe` | Descarga y previsualiza un documento de la Contraloría (Datos Abiertos o Plan Anual de Control). |
 | `get_archivo_seccion` (`fuente="sipa"`) | Lista los enlaces de descarga directa publicados en un módulo de estadísticas de SIPA. |
 | `get_archivo_seccion` (`fuente="superbancos"`) | Lista los enlaces de descarga directa publicados en una sección de estadísticas de Superbancos. |
-| `list_contraloria_informes` | Lista los documentos "Datos Abiertos" y "Plan Anual de Control" de la Contraloría General del Estado. |
 | `list_archivo_secciones` (`fuente="sipa"`) | Lista los módulos de descarga de estadísticas de SIPA (sipa.agricultura.gob.ec). |
 | `list_archivo_secciones` (`fuente="superbancos"`) | Lista las secciones de estadísticas de la Superintendencia de Bancos (superbancos.gob.ec/estadisticas/portalestudios/). |
 | `get_sipa_resumen_indicadores` | PDF mensuales del "Resumen de Indicadores" de SIPA (Ministerio de Agricultura), por año. |
@@ -151,14 +150,12 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | Tool | Descripción |
 |------|-------------|
 | `get_cenace_tablero` | Obtiene un tablero del snapshot en vivo de la operación de la red eléctrica de CENACE (el operador nacional de Ecuador) — mezcla de generación y demanda, siempre al instante. |
-| `list_arconel_reportes` | Tipos de reporte, años (1998 en adelante) y grupos de empresas del generador de reportes estadísticos de ARCONEL. |
 | `get_arconel_reporte` | Ejecuta un reporte de ARCONEL (p. ej. "Balance Energía" de un año) y devuelve sus filas. |
 | `search_cortes` (`distribuidora="eeq"`\|`"centrosur"`) | Archivo de PDFs de cortes de luz programados de EEQ (Quito, crisis 2023-2024) o Centrosur (Azuay, Cañar, Morona Santiago, 2023 en adelante). |
 | `get_cortes_horarios` | Convierte un PDF de cortes en filas: fecha, bloques horarios sin luz, ubicación (subestación o provincia/cantón/zona) y sectores. |
 | `get_energia_ecuador_snapshot` | Snapshot (2024-04-24, Wayback Machine) del portal nacional de horarios de apagones energia-ecuador.com; solo sobrevivió la rotación de EEQ. |
 | `get_informe_igepn` | Descarga y extrae el texto de un informe del IG-EPN encontrado vía search_informes_igepn. |
 | `get_sut_indicador_schema` | Lista las columnas/medidas/niveles de fecha consultables de un tablero Power BI del SUT, descubiertos desde la definición propia del reporte (la consulta subyacente de cada visual), no por adivinanza. |
-| `list_sut_indicadores` | Lista los tableros públicos de Power BI "Indicadores" del Ministerio del Trabajo/SUT (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml). |
 | `query_sut_indicador` | Ejecuta una consulta en vivo contra el modelo de datos subyacente de un tablero Power BI del SUT — cualquier combinación de sus campos, ej. mes y provincia juntos. |
 | `search_informes_igepn` | Busca en el archivo de informes PDF del IG-EPN (Instituto Geofísico): boletines sísmicos diarios/semanales/mensuales/especiales, alertas volcánicas "IG Al Instante", informes de campo/anuales, etc. |
 
@@ -181,7 +178,6 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 
 | Tool | Descripción |
 |------|-------------|
-| `list_iess_colecciones` | Colecciones documentales del IESS (boletines, estudios actuariales, auditorías). |
 | `get_iess_archivos` | Documentos de una colección del IESS. |
 
 ## INEVAL: evaluación educativa
@@ -195,9 +191,6 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 
 | Tool | Descripción |
 |------|-------------|
-| `get_metar` | Reportes METAR/SPECI recientes de un aeródromo ecuatoriano. |
-| `get_notam` | NOTAMs activos para un aeródromo ecuatoriano. |
-| `get_sigmet` | SIGMET activos para el espacio aéreo ecuatoriano (FIR único). |
 | `list_aip_aerodromos` | Lista de aeródromos/helipuertos con ficha AIP publicada. |
 | `get_aip_aerodromo` | Ficha AIP AD 2.x completa de un aeródromo ecuatoriano. |
 

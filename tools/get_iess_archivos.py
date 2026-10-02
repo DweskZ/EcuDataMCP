@@ -30,7 +30,7 @@ def register_get_iess_archivos_tool(mcp: MCPServer) -> None:
         """
         List one IESS (Instituto Ecuatoriano de Seguridad Social) document
         collection's actual documents, each resolved to a direct download
-        URL, título, and formato. Call list_iess_colecciones first to see
+        URL, título, and formato. Call list_catalogo(fuente='iess') first to see
         what years/counts each collection has.
 
         Args:
@@ -66,7 +66,7 @@ def register_get_iess_archivos_tool(mcp: MCPServer) -> None:
                 if anio is None:
                     raise ToolError(
                         "Error: coleccion='informes_auditoria' requiere anio. "
-                        "Use list_iess_colecciones para ver los años disponibles "
+                        "Use list_catalogo(fuente='iess') para ver los años disponibles "
                         "(2007-2026 confirmado) y su conteo de documentos."
                     )
                 result = await iess_client.get_auditoria_documentos(

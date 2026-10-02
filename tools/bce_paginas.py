@@ -79,7 +79,7 @@ def register_bce_paginas_tools(mcp: MCPServer) -> None:
           buy/sell, balance of payments, weekly monetary and remittance
           bulletins...), each with a year-by-year or week-by-week file
           archive. Distinct from BCEData/IEM (numeric series) and from
-          search_bce_publicaciones (rolling ~30 recent items).
+          search_archivos(fuente='bce_publicaciones') (rolling ~30 recent items).
         - cuentas_nacionales: national-accounts publication packages
           (annual, quarterly, regional, retropolation back to 1965,
           input-output and social-accounting matrices, 2007=100 series,

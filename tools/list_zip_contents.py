@@ -49,7 +49,7 @@ def register_list_zip_contents_tool(mcp: MCPServer) -> None:
 
         Args:
             url: Direct URL to a .zip file (from another tool's result, e.g.
-                get_inec_publicacion_archivos, search_archivos(fuente="censo")).
+                get_inec_publicacion_archivos, search_archivos(fuente='censo')).
             limit: Max members returned (default 200, max 1000).
             offset: Pagination offset over the member list.
             format: text | json

@@ -47,21 +47,6 @@
       "format": "text | json"
     }
   },
-  "list_arconel_reportes": {
-    "file": "arconel_reportes.py",
-    "params": [
-      {
-        "name": "format",
-        "type": "Literal['text', 'json']",
-        "default": "'text'"
-      }
-    ],
-    "description": "Report types, years (1998 on) and company groups in ARCONEL's electricity statistics builder. Next: get_arconel_reporte.",
-    "summary": "List the report types available in ARCONEL's public statistics report builder (reportes.arconel.gob.ec — Ecuador's electricity regulator), grouped by section: per-parish data (meters, billing, Tarifa Dignidad subsidy), infrastructure (substations, lines, plants, meters, public lighting), transactions (energy balance, bought/sold/produced energy, losses, billing), and service-quality indicators. Also lists the available years (1998-current) and company groups. Use `get_arconel_reporte` to run one.",
-    "args_doc": {
-      "format": "text | json"
-    }
-  },
   "get_arconel_reporte": {
     "file": "arconel_reportes.py",
     "params": [
@@ -99,12 +84,39 @@
     "description": "Run one ARCONEL report (e.g. \"Balance Energía\" for a year) and return its rows. Slow, ~50 rows per page; max_paginas caps work and completo says if everything was read.",
     "summary": "Run one report from ARCONEL's public statistics builder (reportes.arconel.gob.ec) and return its rows, e.g. \"Balance Energía\" 2023 → monthly energy received, sold, and lost per distributor (CNEL units and Empresas Eléctricas), with technical and non-technical loss percentages. Slow by nature: ARCONEL renders the report server-side, page by page (~50 rows each, several seconds per page). A year of \"Balance Energía\" is 6 pages (~10-60 s); per-parish reports can run to many pages, so `max_paginas` caps the work and the result's `completo` says whether the whole report was read. Results are cached 24h.",
     "args_doc": {
-      "tipo": "Report name as listed by `list_arconel_reportes` (accent/case-insensitive), e.g. \"Balance Energía\", \"Pérdidas\", \"Medidores Catastro\".",
+      "tipo": "Report name as listed by `list_catalogo(fuente='arconel')` (accent/case-insensitive), e.g. \"Balance Energía\", \"Pérdidas\", \"Medidores Catastro\".",
       "anio": "Year, 1998-current.",
       "grupo": "todos | cnel | empresas_electricas.",
       "mes": "1-12, only for report types with a month filter (e.g. per-parish reports); others already break down by month.",
       "max_paginas": "Maximum pages to read (1-40, default 10).",
       "format": "text | json (json returns every row)."
+    }
+  },
+  "get_aviso_aeronautico": {
+    "file": "aviso_aeronautico.py",
+    "params": [
+      {
+        "name": "tipo",
+        "type": "Literal['metar', 'notam', 'sigmet']",
+        "default": null
+      },
+      {
+        "name": "designador",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "Literal['text', 'json']",
+        "default": "'text'"
+      }
+    ],
+    "description": "Live aeronautical notices from DGAC/AIS: metar (latest weather reports) or notam (active notices) for an aerodrome ICAO code, e.g. SEQM; sigmet (active SIGMETs for the whole FIR, no code needed). Raw ICAO text.",
+    "summary": "Fetch aeronautical notices from DGAC's IFIS site (ais.aviacioncivil.gob.ec), publicly queryable with no login. - metar: most recent METAR/SPECI reports of an aerodrome or helipad (type, UTC time, raw ICAO text; usually hourly). Decode the raw text yourself for a plain-language breakdown. - notam: active NOTAMs of an aerodrome: series number (e.g. \"A1784/26\"), raw Q)/A)/B)/C)/D)/E) text and DGAC's decoded fields. For its fixed data sheet use get_aip_aerodromo. - sigmet: active SIGMETs (volcanic ash, turbulence, icing, storms) for Ecuador's single FIR (SEFG); no per-aerodrome filter. Zero results means none are active, not an error. An unknown designador returns an empty result rather than an error.",
+    "args_doc": {
+      "tipo": "metar, notam or sigmet.",
+      "designador": "ICAO code of the aerodrome, e.g. SEQM (Quito), SEGU (Guayaquil), SECU (Cuenca). Required for metar and notam; ignored by sigmet.",
+      "format": "text | json"
     }
   },
   "search_bce_paginas": {
@@ -127,7 +139,7 @@
       }
     ],
     "description": "BCE publication pages with file archives: indices (sector bulletins, price and confidence indices, FX, balance of payments; some back to 2004) or cuentas_nacionales (annual, quarterly, regional accounts, input-output, IMAEC). Next: get_bce_pagina_archivos(pagina_id).",
-    "summary": "List the BCE's page-based publication archives of one catalog. - indices: one page per named publication series (petroleum, mining and cement bulletins, trade price indices, EMOE/confidence, FX buy/sell, balance of payments, weekly monetary and remittance bulletins...), each with a year-by-year or week-by-week file archive. Distinct from BCEData/IEM (numeric series) and from search_bce_publicaciones (rolling ~30 recent items). - cuentas_nacionales: national-accounts publication packages (annual, quarterly, regional, retropolation back to 1965, input-output and social-accounting matrices, 2007=100 series, bioeconomy satellite account, IMAEC), with TOU, CEI, MEI and methodology documents found nowhere else in this server. Returns page summaries; pass a page's `pagina_id` to get_bce_pagina_archivos for its files.",
+    "summary": "List the BCE's page-based publication archives of one catalog. - indices: one page per named publication series (petroleum, mining and cement bulletins, trade price indices, EMOE/confidence, FX buy/sell, balance of payments, weekly monetary and remittance bulletins...), each with a year-by-year or week-by-week file archive. Distinct from BCEData/IEM (numeric series) and from search_archivos(fuente='bce_publicaciones') (rolling ~30 recent items). - cuentas_nacionales: national-accounts publication packages (annual, quarterly, regional, retropolation back to 1965, input-output and social-accounting matrices, 2007=100 series, bioeconomy satellite account, IMAEC), with TOU, CEI, MEI and methodology documents found nowhere else in this server. Returns page summaries; pass a page's `pagina_id` to get_bce_pagina_archivos for its files.",
     "args_doc": {
       "catalogo": "indices or cuentas_nacionales.",
       "query": "Free text matched (accent-insensitive) against the page's title, category or id. Empty returns all pages.",
@@ -534,10 +546,10 @@
         "default": "'text'"
       }
     ],
-    "description": "One BCE daily/monthly indicator (archivo and codigo from list_bce_indicadores_diarios): the last ultimos_n points or a date range, capped at 366 rows.",
-    "summary": "Fetch one BCE daily/monthly indicator's time series (e.g. Riesgo País), bounded to a window — never the full series (some run 7,000+ observations). Get archivo/codigo from list_bce_indicadores_diarios first — a codigo only means one thing within its own archivo. Without desde/hasta, returns the most recent ultimos_n observations (capped at 366). With desde/hasta (YYYY-MM-DD, inclusive), returns that date range instead, also capped at 366 rows (most recent within the range if it's larger). The response always includes rango_completo (the series' true full date range and row count) so the window returned is never mistaken for the whole series. Each point in \"datos\" has \"valor\" (one number) for almost every indicator, except Inflación (datos_ipc.json), which has no single value — its points carry \"valores\": {\"Mensual\":..., \"Anual\":..., \"Acumulada\":...} instead.",
+    "description": "One BCE daily/monthly indicator (archivo and codigo from list_catalogo(fuente='bce_diarios')): the last ultimos_n points or a date range, capped at 366 rows.",
+    "summary": "Fetch one BCE daily/monthly indicator's time series (e.g. Riesgo País), bounded to a window — never the full series (some run 7,000+ observations). Get archivo/codigo from list_catalogo(fuente='bce_diarios') first — a codigo only means one thing within its own archivo. Without desde/hasta, returns the most recent ultimos_n observations (capped at 366). With desde/hasta (YYYY-MM-DD, inclusive), returns that date range instead, also capped at 366 rows (most recent within the range if it's larger). The response always includes rango_completo (the series' true full date range and row count) so the window returned is never mistaken for the whole series. Each point in \"datos\" has \"valor\" (one number) for almost every indicator, except Inflación (datos_ipc.json), which has no single value — its points carry \"valores\": {\"Mensual\":..., \"Anual\":..., \"Acumulada\":...} instead.",
     "args_doc": {
-      "archivo": "A file name from list_bce_indicadores_diarios.",
+      "archivo": "A file name from list_catalogo(fuente='bce_diarios').",
       "codigo": "A \"Código Variable Dinámica\" from that same archivo.",
       "ultimos_n": "Most recent N observations when no date range is given.",
       "desde": "Optional start date YYYY-MM-DD.",
@@ -694,9 +706,9 @@
       }
     ],
     "description": "Rows of one Contraloría audit-reports CSV (one row per approved report), or metadata and a read_pdf pointer for an annual plan.",
-    "summary": "Download and preview one Contraloría document (Datos Abiertos or Plan Anual de Control). Get informe_id from list_contraloria_informes. Quarterly \"Datos Abiertos\" documents return one row per audit report approved that quarter, across every public institution in the country. \"Plan Anual de Control\" documents are PDFs (one per year); this returns their metadata and points you at read_pdf instead of a table.",
+    "summary": "Download and preview one Contraloría document (Datos Abiertos or Plan Anual de Control). Get informe_id from list_catalogo(fuente='contraloria'). Quarterly \"Datos Abiertos\" documents return one row per audit report approved that quarter, across every public institution in the country. \"Plan Anual de Control\" documents are PDFs (one per year); this returns their metadata and points you at read_pdf instead of a table.",
     "args_doc": {
-      "informe_id": "An id from list_contraloria_informes",
+      "informe_id": "An id from list_catalogo(fuente='contraloria')",
       "rows": "Number of data rows to preview (default: 50, max: 200)",
       "format": "text | json"
     }
@@ -822,7 +834,7 @@
       }
     ],
     "description": "Documents in one IESS collection with direct links. anio is required for informes_auditoria.",
-    "summary": "List one IESS (Instituto Ecuatoriano de Seguridad Social) document collection's actual documents, each resolved to a direct download URL, título, and formato. Call list_iess_colecciones first to see what years/counts each collection has.",
+    "summary": "List one IESS (Instituto Ecuatoriano de Seguridad Social) document collection's actual documents, each resolved to a direct download URL, título, and formato. Call list_catalogo(fuente='iess') first to see what years/counts each collection has.",
     "args_doc": {
       "coleccion": "\"boletines\" (Boletines Estadísticos, annual, 1978- 2024 confirmed), \"estudios_actuariales\" (actuarial valuation studies per fund, published only for a handful of years so far), or \"informes_auditoria\" (audit reports, 2007-2026 confirmed, folders by year).",
       "anio": "Filter to one year. REQUIRED for \"informes_auditoria\" (a year can hold up to ~42 documents, each needing its own detail-page fetch to resolve — there's no cheap \"all years\" call). Optional for the other two collections, which are small enough to always resolve in full.",
@@ -983,48 +995,6 @@
       "format": "text | json"
     }
   },
-  "get_metar": {
-    "file": "get_metar.py",
-    "params": [
-      {
-        "name": "designador",
-        "type": "str",
-        "default": null
-      },
-      {
-        "name": "format",
-        "type": "Literal['text', 'json']",
-        "default": "'text'"
-      }
-    ],
-    "description": "Latest METAR/SPECI weather reports for an Ecuadorian aerodrome (ICAO code, e.g. SEQM), raw ICAO text with UTC times, from DGAC/AIS.",
-    "summary": "Fetch the most recent METAR/SPECI aerodrome weather reports for an Ecuadorian aerodrome or helipad, from DGAC's IFIS site (ais.aviacioncivil.gob.ec) — the country's real aeronautical information service, publicly queryable with no login. Returns each report's type (METAR or SPECI), its UTC observation timestamp, and the raw ICAO-format codification text (e.g. \"SEQM 030100Z 30004KT 9999 FEW030 17/08 Q1026 NOSIG RMK A3032=\") — decode it yourself if you need the plain-language breakdown. Reports are usually hourly with occasional SPECI in between; an unknown designador returns an empty result rather than an error.",
-    "args_doc": {
-      "designador": "ICAO code of the aerodrome/helipad, e.g. SEQM (Quito — Mariscal Sucre), SEGU (Guayaquil — José Joaquín de Olmedo), SECU (Cuenca — Mariscal Lamar).",
-      "format": "text | json"
-    }
-  },
-  "get_notam": {
-    "file": "get_notam.py",
-    "params": [
-      {
-        "name": "designador",
-        "type": "str",
-        "default": null
-      },
-      {
-        "name": "format",
-        "type": "Literal['text', 'json']",
-        "default": "'text'"
-      }
-    ],
-    "description": "Active NOTAMs for an Ecuadorian aerodrome (ICAO code, e.g. SEQM): raw ICAO text plus DGAC's decoded fields. For its fixed data sheet use get_aip_aerodromo; for weather, get_metar.",
-    "summary": "Fetch active NOTAMs (Notices to Airmen) for an Ecuadorian aerodrome or helipad, from DGAC's IFIS site (ais.aviacioncivil.gob.ec) — publicly queryable with no login. Each NOTAM includes its series number (e.g. \"A1784/26\"), the raw ICAO-format text (Q)/A)/B)/C)/D)/E)/F)/G) lines, e.g. runway/navaid outages, temporary restrictions, obstacle warnings), and the site's own decoded field table (a label -> value map: Tipo, FIR, Código, Tránsito, Objetivo, Alcance, Limites, Coordenadas, Comienzo/Término validez, Horario, etc. — present when the site fills them in for that NOTAM). An unknown designador returns zero NOTAMs rather than an error.",
-    "args_doc": {
-      "designador": "ICAO code of the aerodrome/helipad, e.g. SEQM (Quito — Mariscal Sucre), SEGU (Guayaquil — José Joaquín de Olmedo), SECU (Cuenca — Mariscal Lamar).",
-      "format": "text | json"
-    }
-  },
   "get_organization_info": {
     "file": "get_organization_info.py",
     "params": [
@@ -1127,21 +1097,6 @@
       "format": "text | json"
     }
   },
-  "get_sigmet": {
-    "file": "get_sigmet.py",
-    "params": [
-      {
-        "name": "format",
-        "type": "Literal['text', 'json']",
-        "default": "'text'"
-      }
-    ],
-    "description": "Active SIGMETs for Ecuador's single FIR (SEFG): volcanic ash, turbulence, icing, storms. Empty means none active.",
-    "summary": "Fetch currently active SIGMETs (significant meteorological information — volcanic ash, severe turbulence/icing, thunderstorms, etc.) for Ecuador's FIR, from DGAC's IFIS site (ais.aviacioncivil.gob.ec) — publicly queryable with no login. Ecuador has a single FIR (SEFG), so this covers the whole country; there is no per-aerodrome parameter. Each SIGMET includes the raw ICAO-format codification text and the site's own decoded field table (Tipo, País, FIR Origen, Número, Desde/Hasta, MWO, FIR Afectado, Causa, Fenómeno, Observación, Coordenadas, Posición Pronosticada, etc.). Zero results means no advisories are currently active, not an error.",
-    "args_doc": {
-      "format": "text | json"
-    }
-  },
   "get_sipa_resumen_indicadores": {
     "file": "get_sipa_resumen_indicadores.py",
     "params": [
@@ -1207,7 +1162,7 @@
     "description": "Queryable fields of one SUT dashboard: columns, measures ([medida]) and date levels, for query_sut_indicador.",
     "summary": "List the queryable columns/measures/date-levels for one SUT Power BI dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing. A field like \"public contratos.nombre_padre_activ_econ_empresa\" is a plain column usable in query_sut_indicador's campos or filtros; one ending in \"[medida]\" is an aggregate measure (only valid in campos, never filtros); one ending in \"[Año]\"/\"[Mes]\" is a date-hierarchy level. denuncias_publico and encuentra_empleo use an older report layout where visuals don't expose their query this way at all — their fields come from a small manually-captured set instead (recovered by driving the live dashboard and reading the queries it actually sent), not from this automatic discovery, but they show up here the same as any other field.",
     "args_doc": {
-      "indicador": "A key from list_sut_indicadores.",
+      "indicador": "A key from list_catalogo(fuente='sut').",
       "format": "text | json"
     }
   },
@@ -1301,18 +1256,24 @@
       "format": "text | json"
     }
   },
-  "list_bce_indicadores_diarios": {
-    "file": "list_bce_indicadores_diarios.py",
+  "list_catalogo": {
+    "file": "list_catalogo.py",
     "params": [
+      {
+        "name": "fuente",
+        "type": "Fuente",
+        "default": null
+      },
       {
         "name": "format",
         "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
-    "description": "BCE daily and monthly indicator widgets outside BCEData: riesgo país (daily since 2004), gold, WTI, bonds, payments, reserves, fiscal and external series. Next: get_bce_indicador_diario. For BCEData series use search_indicadores_bce.",
-    "summary": "List BCE's family of daily/monthly \"indicador\" widgets published outside both BCEData and IEM (contenido.bce.fin.ec's Highcharts widget pages) — includes Riesgo País (EMBI) as a genuine daily series back to 2004, which BCEData only exposes as a monthly end-of-period aggregate. Also covers: Precio del Oro, Petróleo WTI, Índice Dow Jones, Tasa SOFR/LIBOR, Ecuador sovereign bond prices (all daily); Sistema de Pagos/Cobros Interbancarios, Sistema de Pagos en Línea, Cámara de Compensación de Cheques (monthly); Producción Petrolera Nacional (daily); inflación, desempleo, confianza del consumidor, PIB (monthly/quarterly/annual, likely duplicates BCEData); Reservas Internacionales, Liquidez Total M2, Crédito al Sector Privado, Tasas Activa/Pasiva Referencial, Captaciones OSD (monetary, monthly); Ingresos/Erogaciones/Resultado Global SPNF, Deuda Pública Interna (fiscal, monthly); Cuenta Corriente, Remesas de Trabajadores, Tipo de Cambio Efectivo Real, Balanza Comercial (total/no petrolera), Exportaciones/Importaciones de Bienes (external sector, monthly/quarterly). The catalog is discovered live from each file's own data, not hardcoded — a \"codigo\" only means one thing within its own \"archivo\", not across files. Follow up with get_bce_indicador_diario(archivo, codigo) for one series.",
+    "description": "List one source's catalog, the step before its get tool: arconel (get_arconel_reporte), bce_diarios (get_bce_indicador_diario), contraloria (get_contraloria_informe), iess (get_iess_archivos), sut (get_sut_indicador_schema, query_sut_indicador).",
+    "summary": "List the catalog of one source that has no search filters. - arconel: ARCONEL electricity report types by section, years (1998 on) and company groups; run one with get_arconel_reporte. - bce_diarios: BCE daily/monthly indicator widgets outside BCEData (riesgo país daily since 2004, gold, WTI, bonds, payments, reserves, fiscal and external series); a `codigo` only means one thing within its `archivo`. Follow with get_bce_indicador_diario(archivo, codigo). - contraloria: Contraloría \"Datos Abiertos\" quarterly audit-report CSVs and annual control plans; follow with get_contraloria_informe. - iess: IESS document collections (statistical bulletins, actuarial studies, audit reports) with years and counts; follow with get_iess_archivos(coleccion, anio). - sut: Ministerio del Trabajo SUT Power BI dashboards (contracts since 2015, labor demand, gender policy); follow with get_sut_indicador_schema, then query_sut_indicador.",
     "args_doc": {
+      "fuente": "Catalog to list; see the list above.",
       "format": "text | json"
     }
   },
@@ -1334,21 +1295,6 @@
     "summary": "List all thematic categories of Ecuador's open data portal. Categories include: Salud, Educación, Economía y Finanzas, Seguridad y Defensa, Anticorrupción, Ambiente y Agua, Transporte, Turismo, and more. Each category shows the number of datasets it contains. Use the category 'name' field as the 'category' parameter in search_datasets to filter results by topic.",
     "args_doc": {
       "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), \"latacunga\" (Latacunga municipal portal), or \"iadb\" (IADB's open-data portal, data.iadb.org — NOT Ecuador-only, a regional/global catalog)",
-      "format": "text | json"
-    }
-  },
-  "list_contraloria_informes": {
-    "file": "list_contraloria_informes.py",
-    "params": [
-      {
-        "name": "format",
-        "type": "Literal['text', 'json']",
-        "default": "'text'"
-      }
-    ],
-    "description": "Contraloría's quarterly CSVs of audit reports approved for any public institution, plus annual control plans. Next: get_contraloria_informe.",
-    "summary": "List Contraloría General del Estado's \"Datos Abiertos\" and \"Plan Anual de Control\" documents. \"Datos Abiertos\" are quarterly CSV exports of audit reports approved for ANY public institution in the country (Unidad de Control, Entidad, Diligencia, periodo, tipo de informe, N° de informe, fecha de aprobación) — much broader than any single-institution audit archive already covered elsewhere in this MCP. New quarters are added roughly every three months. \"Plan Anual de Control\" documents are one PDF per year (the approved annual control plan). Follow up with get_contraloria_informe(informe_id) for one document's parsed rows (CSV) or metadata + read_pdf pointer (PDF).",
-    "args_doc": {
       "format": "text | json"
     }
   },
@@ -1376,21 +1322,6 @@
     "args_doc": {
       "dataset_id": "The dataset ID or slug",
       "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), \"latacunga\" (Latacunga municipal portal), or \"iadb\" (IADB's open-data portal, data.iadb.org — NOT Ecuador-only, a regional/global catalog)",
-      "format": "text | json"
-    }
-  },
-  "list_iess_colecciones": {
-    "file": "list_iess_colecciones.py",
-    "params": [
-      {
-        "name": "format",
-        "type": "Literal['text', 'json']",
-        "default": "'text'"
-      }
-    ],
-    "description": "IESS document collections (statistical bulletins, actuarial studies, audit reports) with years and counts. Next: get_iess_archivos.",
-    "summary": "List IESS's (Instituto Ecuatoriano de Seguridad Social) three document-archive collections (iess.gob.ec) — Boletines Estadísticos, Estudios Actuariales, and Informes de Auditoría — with the years/counts each currently has published. Call get_iess_archivos(coleccion, anio=...) next to get one collection's actual documents (título, url, formato).",
-    "args_doc": {
       "format": "text | json"
     }
   },
@@ -1442,21 +1373,6 @@
       "format": "text | json"
     }
   },
-  "list_sut_indicadores": {
-    "file": "list_sut_indicadores.py",
-    "params": [
-      {
-        "name": "format",
-        "type": "Literal['text', 'json']",
-        "default": "'text'"
-      }
-    ],
-    "description": "Ministerio del Trabajo SUT Power BI dashboards (contracts since 2015 by industry/province/gender, labor demand, gender policy). Next: get_sut_indicador_schema, then query_sut_indicador.",
-    "summary": "List the Ministerio del Trabajo/SUT's public Power BI \"Indicadores\" dashboards (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml). These are live queryable semantic models, not static files — they cover monthly contract registrations by industry/province/gender since 2015 (contratos), employer-reported labor demand and skills gaps, training/certification stats, provincial employment-gap indicators, and a gender/workplace-policy compliance dashboard (PEA, wage gaps, lactation rooms, childcare, teleworking). None of this overlaps with what's already covered by CKAN's ministerio-del-trabajo datasets, which are current-snapshot-only. Follow up with get_sut_indicador_schema(indicador) to see one dashboard's queryable fields, then query_sut_indicador to pull actual data — any combination of fields, not just what one chart already shows.",
-    "args_doc": {
-      "format": "text | json"
-    }
-  },
   "list_zip_contents": {
     "file": "list_zip_contents.py",
     "params": [
@@ -1484,7 +1400,7 @@
     "description": "List a remote ZIP's members (name, size) via HTTP Range requests, without downloading it; works for archives far beyond 5 MB. No ZIP64.",
     "summary": "List a .zip archive's member files (name, size) from a direct URL, without downloading the archive. Reads only the End Of Central Directory record and the central directory via HTTP Range requests, so it works for archives far larger than the 5 MB preview_resource_data/download_resource cap -- e.g. INEC or censo microdata ZIPs of multiple hundred MB. Requires the server to honor Range requests; fails with a clear error otherwise. Does not support ZIP64 archives. Listing names is cheap this way, but previewing a specific member's rows is not (still needs decompressing from that member's offset onward) -- this tool only lists metadata.",
     "args_doc": {
-      "url": "Direct URL to a .zip file (from another tool's result, e.g. get_inec_publicacion_archivos, search_archivos(fuente=\"censo\")).",
+      "url": "Direct URL to a .zip file (from another tool's result, e.g. get_inec_publicacion_archivos, search_archivos(fuente='censo')).",
       "limit": "Max members returned (default 200, max 1000).",
       "offset": "Pagination offset over the member list.",
       "format": "text | json"
@@ -1654,10 +1570,10 @@
         "default": "'text'"
       }
     ],
-    "description": "Live query of one SUT dashboard's data model: choose campos, optional equality filtros (plain columns only) and a row limite. Take the indicador from list_sut_indicadores and its valid campos from get_sut_indicador_schema.",
+    "description": "Live query of one SUT dashboard's data model: choose campos, optional equality filtros (plain columns only) and a row limite. Take the indicador from list_catalogo(fuente='sut') and its valid campos from get_sut_indicador_schema.",
     "summary": "Run a live query against one SUT Power BI dashboard's underlying data model — any combination of its fields, e.g. month AND industry together for \"contratos\" (a real monthly time series since 2015 by CIIU industry, province, gender, contract status — none of this is in the ministerio-del-trabajo CKAN datasets, which are a single current-snapshot stock count with no time dimension). Get valid campos from get_sut_indicador_schema(indicador) first — an unrecognized field name raises an error naming the tool to call instead of guessing. filtros only accepts plain-column fields (not \"[medida]\"/hierarchy-level fields) and matches exact text equality, e.g. {\"public contratos.Estado contrato\": \"Vigente\"}. Rows can run into the thousands for a wide breakdown (e.g. every month x every industry) — narrow with filtros or fewer campos rather than raising limite past what's actually needed; format \"json\" is exact but still subject to the same limite cap.",
     "args_doc": {
-      "indicador": "A key from list_sut_indicadores.",
+      "indicador": "A key from list_catalogo(fuente='sut').",
       "campos": "Field labels exactly as returned by get_sut_indicador_schema.",
       "filtros": "Optional {campo: valor} equality filters, plain columns only.",
       "limite": "Row cap applied server-side by the query itself.",
@@ -1747,8 +1663,8 @@
         "default": "'text'"
       }
     ],
-    "description": "File links from one institution's catalog, filtered by text: sri_datasets, sri_recaudacion (SRI), mef, senae (fiscal), censo (Census 2022), minedec (enrollment), senescyt, msp (vaccine gazettes), cnig (gender violence), trabajo_boletin, salarios, arcotel_boletines, arcotel_mensuales. Links, not contents.",
-    "summary": "Search one institution's catalog of published files (direct links). Every file has `titulo`, `url` and `formato`, plus the source's own fields (e.g. `anio`, `categoria`, `semana`, `tipo`, `periodo`). Returns links, not contents: download them directly or with download_resource / read_pdf (5 MB cap for those tools). Sources (`fuente`): - sri_datasets: ~130 SRI files outside CKAN (sri.gob.ec/datasets): RUC catastro by province, recaudación, ventas/compras, vehículos, electronic receipts, variable dictionaries. - sri_recaudacion: SRI \"Estadísticas de Recaudación\": monthly XLSX by tax, province/canton and activity, historical indicators, bulletin. - mef: MEF/MDEP \"Operaciones SPNF\" (GFSM) workbooks, monthly, current. For tariff revenue read row \"1214 Arancelarios\" (sheet GC). - senae: SENAE customs collection by ADVALOREM/FODINFA/IVA/ICE/ TOTALES, 2012-2021 only. Arancelarios/ADVALOREM are the tariff alone, smaller than the press \"recaudación aduanera\" (which adds IVA and ICE at the border). - censo: Census 2022 microsite (censoecuador.gob.ec): microdata by sector, cantón and city block (CSV, SPSS, REDATAM), 2010/2001 recoded to 2022 geography, dictionaries, methodology. Files can be hundreds of MB. - minedec: MINEDEC basic-education enrollment registry 2009-present (start/end-of-year XLSX of 30-140 MB, metadata, dictionary). - senescyt: SENESCYT SIAU higher-education and CTI reports; \"wpdm\" links have no extension (formato DESCONOCIDO). - msp: MSP weekly vaccine-preventable disease gazettes, 2019 to date; `tipo` separates the general bulletin from disease companions. - cnig: CNIG gender-violence PDFs incl. the femicide matrix (snapshot to April 2023, not a live feed). - trabajo_boletin: Ministerio del Trabajo annual labor-market bulletin; only the 2020-2022 editions are known. - salarios: sectoral minimum-wage tables 2020-2025 (no 2026 table published); entries may be titled by the year they were signed. - arcotel_boletines: ARCOTEL annual/topical telecom bulletins 2015-2024 (PDF). - arcotel_mensuales: ARCOTEL monthly statistics reports 2017-2026 (PDF).",
+    "description": "File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications). Links, not contents.",
+    "summary": "Search one institution's catalog of published files (direct links). Every file has `titulo`, `url` and `formato`, plus the source's own fields (e.g. `anio`, `categoria`, `semana`, `tipo`, `periodo`). Returns links, not contents: download them directly or with download_resource / read_pdf (5 MB cap for those tools). Sources (`fuente`): - sri_datasets: ~130 SRI files outside CKAN (sri.gob.ec/datasets): RUC catastro by province, recaudación, ventas/compras, vehículos, electronic receipts, variable dictionaries. - sri_recaudacion: SRI \"Estadísticas de Recaudación\": monthly XLSX by tax, province/canton and activity, historical indicators, bulletin. - mef: MEF/MDEP \"Operaciones SPNF\" (GFSM) workbooks, monthly, current. For tariff revenue read row \"1214 Arancelarios\" (sheet GC). - senae: SENAE customs collection by ADVALOREM/FODINFA/IVA/ICE/ TOTALES, 2012-2021 only. Arancelarios/ADVALOREM are the tariff alone, smaller than the press \"recaudación aduanera\" (which adds IVA and ICE at the border). - censo: Census 2022 microsite (censoecuador.gob.ec): microdata by sector, cantón and city block (CSV, SPSS, REDATAM), 2010/2001 recoded to 2022 geography, dictionaries, methodology. Files can be hundreds of MB. - minedec: MINEDEC basic-education enrollment registry 2009-present (start/end-of-year XLSX of 30-140 MB, metadata, dictionary). - senescyt: SENESCYT SIAU higher-education and CTI reports; \"wpdm\" links have no extension (formato DESCONOCIDO). - msp: MSP weekly vaccine-preventable disease gazettes, 2019 to date; `tipo` separates the general bulletin from disease companions. - cnig: CNIG gender-violence PDFs incl. the femicide matrix (snapshot to April 2023, not a live feed). - trabajo_boletin: Ministerio del Trabajo annual labor-market bulletin; only the 2020-2022 editions are known. - salarios: sectoral minimum-wage tables 2020-2025 (no 2026 table published); entries may be titled by the year they were signed. - arcotel_boletines: ARCOTEL annual/topical telecom bulletins 2015-2024 (PDF). - arcotel_mensuales: ARCOTEL monthly statistics reports 2017-2026 (PDF). - bce_remesas: BCE worker-remittance files: historical series, methodology note and, since July 2025, microdata-based monthly databases. \"histórica\" and \"BDD\" files are different series. - bce_precios_comex: BCE foreign-trade price indices by import use category and export product (oil, shrimp, banana, cacao...); BCEData only has the three aggregates. - bce_publicaciones: BCE's ~30 most recent reports and bulletins (rolling window, newest first, with `fecha`); an editorial feed, not data series.",
     "args_doc": {
       "fuente": "Catalog to search; see the list above.",
       "query": "Free text matched (accent-insensitive) against each file's title and source-specific fields. Empty returns all files.",
@@ -1846,7 +1762,7 @@
       }
     ],
     "description": "BCE's forward-looking statistical release calendar: dates, category, periodicity and reference period. solo_proximas=true keeps upcoming releases. Says when data will be published, not the data itself; for values use get_indicador_bce.",
-    "summary": "Search BCE's own statistical publication calendar — scheduled release dates for IEM, Cuentas Nacionales, IMAEc, balance of payments, and more, each with category, periodicity, reference period, and a direct link to the publication's page. Distinct from search_bce_publicaciones (a rolling window of ~30 already-published items, no future dates): this is BCE's own forward-looking release schedule for the full calendar year.",
+    "summary": "Search BCE's own statistical publication calendar — scheduled release dates for IEM, Cuentas Nacionales, IMAEc, balance of payments, and more, each with category, periodicity, reference period, and a direct link to the publication's page. Distinct from search_archivos(fuente='bce_publicaciones') (a rolling window of ~30 already-published items, no future dates): this is BCE's own forward-looking release schedule for the full calendar year.",
     "args_doc": {
       "query": "Free text matched against the publication name or its observations note (accent-insensitive). Empty matches all.",
       "categoria": "Exact category filter (accent-insensitive), e.g. \"cuentas nacionales\", \"balanza de pagos y comercio exterior\".",
@@ -1925,75 +1841,6 @@
       "guardar_catalogo": "Save the full assembled catalog under IEM_CATALOG_DIR.",
       "hash_archivos": "Download each discovered XLSX and report its SHA-256 (operator audit; slow).",
       "max_hash_archivos": "Cap on files hashed when hash_archivos is set.",
-      "format": "text | json"
-    }
-  },
-  "search_bce_precios_comex": {
-    "file": "search_bce_precios_comex.py",
-    "params": [
-      {
-        "name": "query",
-        "type": "str",
-        "default": "''"
-      },
-      {
-        "name": "format",
-        "type": "Literal['text', 'json']",
-        "default": "'text'"
-      }
-    ],
-    "description": "BCE foreign-trade price-index files by import use category and export product (oil, shrimp, banana, cacao...). BCEData only has the aggregates. Returns links.",
-    "summary": "List BCE's disaggregated foreign-trade price-index file links — import prices by economic-use category (fuels/lubricants, raw materials, consumer goods, capital goods) and export prices by individual product (crude oil, shrimp, banana, cacao, copper, gold, roses, ...), each with separate price/value/volume sheets and monthly/annual/cumulative variation sheets. Genuinely distinct from search_indicadores_bce's BCEData catalog (id_grupo 134 \"Índices IPX - IPM - ITI\" only has the three *aggregate* series — general export index, general import index, ITI) and from search_bce_paginas(catalogo=\"indices\") (a year-archived widget that doesn't cover trade prices). Returns direct URLs, not file contents — download them yourself or via download_resource.",
-    "args_doc": {
-      "query": "Free text matched against the file's label, page title, or page id (accent-insensitive), e.g. \"importacion\", \"exportacion\". Empty returns all files.",
-      "format": "text | json"
-    }
-  },
-  "search_bce_publicaciones": {
-    "file": "search_bce_publicaciones.py",
-    "params": [
-      {
-        "name": "query",
-        "type": "str",
-        "default": "''"
-      },
-      {
-        "name": "formato",
-        "type": "Literal['', 'PDF', 'XLSX', 'XLS', 'CSV', 'ZIP', 'HTML']",
-        "default": "''"
-      },
-      {
-        "name": "format",
-        "type": "Literal['text', 'json']",
-        "default": "'text'"
-      }
-    ],
-    "description": "BCE's ~30 most recent published reports and bulletins (editorial feed, not data series), filterable by title and format. Returns links.",
-    "summary": "List recent BCE publications from \"Últimas Publicaciones\" — named bulletins and reports (weekly/monthly monetary bulletins, interest-rate reports, sector-analysis bulletins, IEM release notices, etc.), each with its publication date, title, direct URL, and format. A dedicated catalog separate from BCEData/IEM (search_indicadores_bce, search_bce_iem): most of what shows up here has no equivalent numeric series in either — it's the BCE's own editorial feed of published reports, not raw data. Only the rolling window the page itself shows (currently the ~30 most recent publications, newest first) — there is no server-side pagination or date-range filter to reach further back. Returns direct URLs, not file contents — download them yourself or via download_resource.",
-    "args_doc": {
-      "query": "Free text matched against the publication's title (accent-insensitive). Empty returns all.",
-      "formato": "Exact match against the derived format — PDF, XLSX, XLS, CSV, ZIP, HTML. Empty returns all formats.",
-      "format": "text | json"
-    }
-  },
-  "search_bce_remesas": {
-    "file": "search_bce_remesas.py",
-    "params": [
-      {
-        "name": "query",
-        "type": "str",
-        "default": "''"
-      },
-      {
-        "name": "format",
-        "type": "Literal['text', 'json']",
-        "default": "'text'"
-      }
-    ],
-    "description": "BCE worker-remittance file links: historical series, methodology note and, since July 2025, microdata-based monthly databases (a distinct series). Returns links, not contents; download them directly or with download_resource.",
-    "summary": "List BCE's Remesas de Trabajadores (worker remittances) direct file links. A dedicated series separate from BCEData/IEM (search_indicadores_bce, search_bce_iem): the aggregate flow series, the full historical series, a methodology user note, and — since a July 2025 change to microdata-based collection — monthly aggregate and entity-level databases (BDD). Treat \"histórica\" (pre-change) and \"BDD\" (post-change) files as methodologically distinct series, not one continuous one — see the user note (Nota_al_usuario) for the comparability details. Returns direct URLs, not file contents — download them yourself or via download_resource.",
-    "args_doc": {
-      "query": "Free text matched against the file's label or URL (accent-insensitive), e.g. \"historica\", \"entidad\", \"bdd\". Empty returns all files.",
       "format": "text | json"
     }
   },
