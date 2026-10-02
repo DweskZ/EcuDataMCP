@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Referencia – EcuDataMCP</title>
-<meta name="description" content="Los 91 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
+<meta name="description" content="Los 82 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <meta property="og:title" content="Referencia – EcuDataMCP">
-<meta property="og:description" content="Los 91 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
+<meta property="og:description" content="Los 82 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
 <meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
@@ -141,13 +141,13 @@
 <section class="landing hero">
 <div class="container-page">
 <p class="kicker">Referencia</p>
-<h1>Los <span class="accent">91 tools</span>, uno por uno.</h1>
+<h1>Los <span class="accent">82 tools</span>, uno por uno.</h1>
 <p class="hero-sub">Encuentra un tool por nombre, fuente o tarea. Abre solo el grupo y el detalle que necesitas.</p>
 <div class="atlas-filter-wrap">
 <input type="text" id="atlas-filter" class="atlas-filter" placeholder="Filtrar por nombre o palabra clave…" autocomplete="off">
 </div>
 <div class="atlas-toolbar" aria-live="polite">
-<p id="atlas-result-count">91 tools · abre un grupo para ver sus detalles.</p>
+<p id="atlas-result-count">82 tools · abre un grupo para ver sus detalles.</p>
 <div class="atlas-actions">
 <button type="button" data-atlas-action="open">Expandir grupos</button>
 <button type="button" data-atlas-action="close">Cerrar grupos</button>
@@ -1245,7 +1245,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">BCE y series especializadas<span class="tag">10</span></span>
+<span class="atlas-category-title">BCE y series especializadas<span class="tag">6</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
@@ -1310,26 +1310,6 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-list_bce_indicadores_diarios" data-search="list_bce_indicadores_diarios lista la familia de widgets &quot;indicador&quot; diarios/mensuales del bce, publicados fuera de bcedata e iem (páginas de widgets highcharts de contenido.bce.fin.ec) — incluye riesgo país (embi) como serie genuinamente diaria desde 2004, que bcedata solo expone como agregado mensual de fin de período. lista la familia de widgets &quot;indicador&quot; diarios/mensuales del bce, publicados fuera de bcedata e iem (páginas de widgets highcharts de contenido.bce.fin.ec) — incluye riesgo país (embi) como serie genuinamente diaria desde 2004, que bcedata solo expone como agregado mensual de fin de período. también cubre: precio del oro, petróleo wti, índice dow jones, tasa sofr/libor, precios de bonos soberanos de ecuador (todos diarios); sistema de pagos/cobros interbancarios, sistema de pagos en línea, cámara de compensación de cheques (mensual); producción petrolera nacional (diaria); inflación, desempleo, confianza del consumidor, pib (mensual/trimestral/anual, probablemente duplican bcedata). el catálogo se descubre en vivo desde los datos de cada archivo, no está hardcodeado — un &quot;codigo&quot; solo tiene sentido dentro de su propio &quot;archivo&quot;, no entre archivos distintos. continúa con get_bce_indicador_diario(archivo, codigo) para una serie. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">list_bce_indicadores_diarios</code>
-<span class="atlas-tool-desc">Lista la familia de widgets "indicador" diarios/mensuales del BCE, publicados fuera de BCEData e IEM (páginas de widgets Highcharts de contenido.bce.fin.ec) — incluye Riesgo País (EMBI) como serie genuinamente diaria desde 2004, que BCEData solo expone como agregado mensual de fin de período.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista la familia de widgets "indicador" diarios/mensuales del BCE, publicados fuera de BCEData e IEM (páginas de widgets Highcharts de contenido.bce.fin.ec) — incluye Riesgo País (EMBI) como serie genuinamente diaria desde 2004, que BCEData solo expone como agregado mensual de fin de período. También cubre: Precio del Oro, Petróleo WTI, Índice Dow Jones, Tasa SOFR/LIBOR, precios de bonos soberanos de Ecuador (todos diarios); Sistema de Pagos/Cobros Interbancarios, Sistema de Pagos en Línea, Cámara de Compensación de Cheques (mensual); Producción Petrolera Nacional (diaria); inflación, desempleo, confianza del consumidor, PIB (mensual/trimestral/anual, probablemente duplican BCEData). El catálogo se descubre en vivo desde los datos de cada archivo, no está hardcodeado — un "codigo" solo tiene sentido dentro de su propio "archivo", no entre archivos distintos. Continúa con get_bce_indicador_diario(archivo, codigo) para una serie.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
 <details class="atlas-tool" id="tool-search_bce_iem" data-search="search_bce_iem busca tablas individuales de excel en el último boletín iem del bce. busca tablas individuales de excel en el último boletín iem del bce. úsalo para tablas detalladas del bce que no están disponibles fácilmente vía search_indicadores_bce/bcedata: comercio por país, deuda, finanzas públicas por nivel de gobierno, petróleo, desagregaciones del pib, y más. lista las tablas del boletín mensual vigente; usa get_bce_iem_table con un table_id devuelto para inspeccionar un archivo xlsx oficial. usa historico=true (o indica desde_anio/hasta_anio) para buscar en todas las páginas de boletines mensuales que coincidan; esto es más lento en la primera llamada porque hay que leer las páginas del archivo histórico. usa guardar_catalogo=true para persistir el catálogo completo armado por esta búsqueda en iem_catalog_dir (o data/iem_catalog_snapshots por defecto). la paginación sigue acotando la respuesta del mcp. usa hash_archivos=true para una auditoría sha-256 tipo operador de los archivos xlsx descubiertos. esto descarga los archivos completos, así que es deliberadamente opt-in y está acotado por max_hash_archivos. query texto libre que se busca, sin distinguir tildes, en títulos y secciones de las tablas. vacío lista todas. limit máximo de tablas devueltas (default 20). offset desplazamiento de paginación sobre las tablas encontradas. historico busca también en boletines mensuales pasados, no solo en el último. desde_anio primer año de boletín a buscar (implica historico). hasta_anio último año de boletín a buscar (implica historico). guardar_catalogo guarda el catálogo completo en iem_catalog_dir. hash_archivos descarga cada xlsx descubierto e informa su sha-256 (auditoría de operador; lento). max_hash_archivos tope de archivos a los que se calcula el hash cuando hash_archivos está activo. format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_bce_iem</code>
@@ -1361,74 +1341,6 @@
 <tr><td><code>max_hash_archivos</code></td><td><code>int</code></td><td><code>5000</code></td><td>Tope de archivos a los que se calcula el hash cuando hash_archivos está activo.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_bce_remesas" data-search="search_bce_remesas lista los enlaces directos a archivos de remesas de trabajadores del bce. lista los enlaces directos a archivos de remesas de trabajadores del bce. una serie separada de bcedata/iem (search_indicadores_bce, search_bce_iem): la serie agregada de flujos, la serie histórica completa, una nota metodológica para el usuario, y — desde un cambio a recolección basada en microdatos en julio de 2025 — bases de datos (bdd) agregadas mensuales y por entidad. trata los archivos &quot;histórica&quot; (previo al cambio) y &quot;bdd&quot; (posterior al cambio) como series metodológicamente distintas, no como una sola continua — revisa la nota al usuario (nota_al_usuario) para el detalle de comparabilidad. devuelve urls directas, no el contenido de los archivos — descárgalos tú mismo o vía download_resource. query texto libre que se busca, sin distinguir tildes, en la etiqueta o url del archivo, p. ej. &quot;historica&quot;, &quot;entidad&quot;, &quot;bdd&quot;. vacío devuelve todos. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_bce_remesas</code>
-<span class="atlas-tool-desc">Lista los enlaces directos a archivos de Remesas de Trabajadores del BCE.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los enlaces directos a archivos de Remesas de Trabajadores del BCE. Una serie separada de BCEData/IEM (search_indicadores_bce, search_bce_iem): la serie agregada de flujos, la serie histórica completa, una nota metodológica para el usuario, y — desde un cambio a recolección basada en microdatos en julio de 2025 — bases de datos (BDD) agregadas mensuales y por entidad. Trata los archivos "histórica" (previo al cambio) y "BDD" (posterior al cambio) como series metodológicamente distintas, no como una sola continua — revisa la nota al usuario (Nota_al_usuario) para el detalle de comparabilidad. Devuelve URLs directas, no el contenido de los archivos — descárgalos tú mismo o vía download_resource.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre que se busca, sin distinguir tildes, en la etiqueta o URL del archivo, p. ej. "historica", "entidad", "bdd". Vacío devuelve todos.</td></tr>
-
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_bce_publicaciones" data-search="search_bce_publicaciones publicaciones recientes del bce (boletines, reportes, avisos). lista las publicaciones recientes del banco central del ecuador desde su sección &quot;últimas publicaciones&quot;: boletines monetarios, reportes de tasas de interés, boletines sectoriales, avisos del iem, entre otros, cada uno con fecha, título, url directa y formato. es un catálogo distinto de bcedata/iem (search_indicadores_bce, search_bce_iem): la mayoría de lo que aparece aquí no tiene una serie numérica equivalente. solo muestra la ventana reciente que exhibe la propia página (unas 30 publicaciones más recientes) — no hay paginación ni filtro de rango de fechas. query texto libre contra el título de la publicación (ignora tildes). vacío devuelve todas. formato coincidencia exacta con el formato derivado — pdf, xlsx, xls, csv, zip, html. vacío devuelve todos los formatos. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_bce_publicaciones</code>
-<span class="atlas-tool-desc">Publicaciones recientes del BCE (boletines, reportes, avisos).</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista las publicaciones recientes del Banco Central del Ecuador desde su sección "Últimas Publicaciones": boletines monetarios, reportes de tasas de interés, boletines sectoriales, avisos del IEM, entre otros, cada uno con fecha, título, URL directa y formato. Es un catálogo distinto de BCEData/IEM (search_indicadores_bce, search_bce_iem): la mayoría de lo que aparece aquí no tiene una serie numérica equivalente. Solo muestra la ventana reciente que exhibe la propia página (unas 30 publicaciones más recientes) — no hay paginación ni filtro de rango de fechas.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra el título de la publicación (ignora tildes). Vacío devuelve todas.</td></tr>
-
-<tr><td><code>formato</code></td><td><code>Literal['', 'PDF', 'XLSX', 'XLS', 'CSV', 'ZIP', 'HTML']</code></td><td><code>vacío</code></td><td>Coincidencia exacta con el formato derivado — PDF, XLSX, XLS, CSV, ZIP, HTML. Vacío devuelve todos los formatos.</td></tr>
-
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-search_bce_precios_comex" data-search="search_bce_precios_comex índices de precios de comercio exterior del bce, desagregados. lista los enlaces a los archivos desagregados de índices de precios de comercio exterior del bce — precios de importación por categoría de uso económico y precios de exportación por producto individual (petróleo crudo, camarón, banano, cacao, cobre, oro, rosas), cada uno con hojas separadas de precio/valor/volumen y variaciones. es una fuente distinta del catálogo bcedata de search_indicadores_bce (que solo tiene las tres series *agregadas*) y de search_bce_paginas (que no cubre precios de comercio exterior). devuelve urls directas, no el contenido de los archivos. query texto libre contra la etiqueta del archivo, el título de la página o el id de página (ignora tildes), ej. &quot;importacion&quot;, &quot;exportacion&quot;. vacío devuelve todos los archivos. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">search_bce_precios_comex</code>
-<span class="atlas-tool-desc">Índices de precios de comercio exterior del BCE, desagregados.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los enlaces a los archivos desagregados de índices de precios de comercio exterior del BCE — precios de importación por categoría de uso económico y precios de exportación por producto individual (petróleo crudo, camarón, banano, cacao, cobre, oro, rosas), cada uno con hojas separadas de precio/valor/volumen y variaciones. Es una fuente distinta del catálogo BCEData de search_indicadores_bce (que solo tiene las tres series *agregadas*) y de search_bce_paginas (que no cubre precios de comercio exterior). Devuelve URLs directas, no el contenido de los archivos.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra la etiqueta del archivo, el título de la página o el id de página (ignora tildes), ej. "importacion", "exportacion". Vacío devuelve todos los archivos.</td></tr>
-
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -1715,7 +1627,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">SIPA, Contraloría y Superbancos<span class="tag">3</span></span>
+<span class="atlas-category-title">SIPA, Contraloría y Superbancos<span class="tag">2</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
@@ -1735,26 +1647,6 @@
 <tr><td><code>informe_id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>An id from list_contraloria_informes</td></tr>
 
 <tr><td><code>rows</code></td><td><code>int</code></td><td><code>50</code></td><td>Número de filas de datos a mostrar (default 50, máx. 200).</td></tr>
-
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-list_contraloria_informes" data-search="list_contraloria_informes lista los documentos &quot;datos abiertos&quot; y &quot;plan anual de control&quot; de la contraloría general del estado. lista los documentos &quot;datos abiertos&quot; y &quot;plan anual de control&quot; de la contraloría general del estado. &quot;datos abiertos&quot; son exportaciones csv trimestrales de informes de auditoría aprobados para cualquier institución pública del país (unidad de control, entidad, diligencia, periodo, tipo de informe, n° de informe, fecha de aprobación) — mucho más amplio que cualquier archivo de auditoría de una sola institución ya cubierto en otra parte de este mcp. se agregan trimestres nuevos aproximadamente cada tres meses. los documentos &quot;plan anual de control&quot; son un pdf por año (el plan anual de control aprobado). continúa con get_contraloria_informe(informe_id) para las filas parseadas de un documento (csv) o su metadata + puntero a read_pdf (pdf). format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">list_contraloria_informes</code>
-<span class="atlas-tool-desc">Lista los documentos "Datos Abiertos" y "Plan Anual de Control" de la Contraloría General del Estado.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los documentos "Datos Abiertos" y "Plan Anual de Control" de la Contraloría General del Estado. "Datos Abiertos" son exportaciones CSV trimestrales de informes de auditoría aprobados para CUALQUIER institución pública del país (Unidad de Control, Entidad, Diligencia, periodo, tipo de informe, N° de informe, fecha de aprobación) — mucho más amplio que cualquier archivo de auditoría de una sola institución ya cubierto en otra parte de este MCP. Se agregan trimestres nuevos aproximadamente cada tres meses. Los documentos "Plan Anual de Control" son un PDF por año (el plan anual de control aprobado). Continúa con get_contraloria_informe(informe_id) para las filas parseadas de un documento (CSV) o su metadata + puntero a read_pdf (PDF).</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
@@ -1791,7 +1683,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">CENACE, SUT, IG-EPN y cortes de luz<span class="tag">11</span></span>
+<span class="atlas-category-title">CENACE, SUT, IG-EPN y cortes de luz<span class="tag">9</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
@@ -1861,26 +1753,6 @@
 <tbody>
 
 <tr><td><code>indicador</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Una clave de list_sut_indicadores.</td></tr>
-
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-list_sut_indicadores" data-search="list_sut_indicadores lista los tableros públicos de power bi &quot;indicadores&quot; del ministerio del trabajo/sut (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml). lista los tableros públicos de power bi &quot;indicadores&quot; del ministerio del trabajo/sut (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml). son modelos semánticos consultables en vivo, no archivos estáticos — cubren registro mensual de contratos por industria/provincia/género desde 2015 (contratos), demanda laboral y brechas de habilidades reportadas por empleadores, estadísticas de capacitación/certificación, indicadores provinciales de brecha de empleo, y un tablero de cumplimiento de políticas de género/lugar de trabajo (pea, brechas salariales, salas de lactancia, cuidado infantil, teletrabajo). nada de esto se solapa con lo que ya cubren los datasets ckan de ministerio-del-trabajo, que son solo una foto del stock actual. continúa con get_sut_indicador_schema(indicador) para ver los campos consultables de un tablero, y luego query_sut_indicador para extraer datos reales — cualquier combinación de campos, no solo lo que ya muestra un gráfico. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">list_sut_indicadores</code>
-<span class="atlas-tool-desc">Lista los tableros públicos de Power BI "Indicadores" del Ministerio del Trabajo/SUT (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml).</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los tableros públicos de Power BI "Indicadores" del Ministerio del Trabajo/SUT (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml). Son modelos semánticos consultables en vivo, no archivos estáticos — cubren registro mensual de contratos por industria/provincia/género desde 2015 (contratos), demanda laboral y brechas de habilidades reportadas por empleadores, estadísticas de capacitación/certificación, indicadores provinciales de brecha de empleo, y un tablero de cumplimiento de políticas de género/lugar de trabajo (PEA, brechas salariales, salas de lactancia, cuidado infantil, teletrabajo). Nada de esto se solapa con lo que ya cubren los datasets CKAN de ministerio-del-trabajo, que son solo una foto del stock actual. Continúa con get_sut_indicador_schema(indicador) para ver los campos consultables de un tablero, y luego query_sut_indicador para extraer datos reales — cualquier combinación de campos, no solo lo que ya muestra un gráfico.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
@@ -2018,26 +1890,6 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-list_arconel_reportes" data-search="list_arconel_reportes tipos de reporte, años (desde 1998) y grupos de empresas del generador de estadísticas de arconel. lista los reportes del generador público de estadísticas de arconel (regulador eléctrico), por sección: datos por parroquia (medidores, facturación, subsidio tarifa dignidad), infraestructura, transacciones y más. siguiente paso: get_arconel_reporte. format formato de salida: `text` (default) o `json`.">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">list_arconel_reportes</code>
-<span class="atlas-tool-desc">Tipos de reporte, años (desde 1998) y grupos de empresas del generador de estadísticas de ARCONEL.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los reportes del generador público de estadísticas de ARCONEL (regulador eléctrico), por sección: datos por parroquia (medidores, facturación, subsidio Tarifa Dignidad), infraestructura, transacciones y más. Siguiente paso: get_arconel_reporte.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
 <details class="atlas-tool" id="tool-get_arconel_reporte" data-search="get_arconel_reporte ejecuta un reporte de arconel (p. ej. «balance energía» de un año) y devuelve sus filas. ejecuta un reporte del generador de arconel y devuelve sus filas, p. ej. «balance energía» 2023: energía recibida, vendida y perdida por mes y distribuidora, con porcentajes de pérdida técnica y no técnica. es lento (unas 50 filas por página): max_paginas limita el trabajo y `completo` indica si se leyó todo. tipo nombre del reporte según list_arconel_reportes (sin distinguir tildes ni mayúsculas), p. ej. &quot;balance energía&quot;, &quot;pérdidas&quot;. anio año, desde 1998 hasta el actual. grupo todos | cnel | empresas_electricas. mes 1-12, solo para reportes con filtro de mes; los demás ya desglosan por mes. max_paginas máximo de páginas a leer (1-40). format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_arconel_reporte</code>
@@ -2159,30 +2011,10 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">IESS: documentos y cumplimiento patronal<span class="tag">3</span></span>
+<span class="atlas-category-title">IESS: documentos y cumplimiento patronal<span class="tag">2</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
-
-<details class="atlas-tool" id="tool-list_iess_colecciones" data-search="list_iess_colecciones colecciones documentales del iess (boletines, estudios actuariales, auditorías). lista las tres colecciones documentales del iess (instituto ecuatoriano de seguridad social) — boletines estadísticos, estudios actuariales e informes de auditoría —, con los años y cantidades que tiene publicados cada una. continúa con get_iess_archivos(coleccion, anio=...) para obtener los documentos reales de una colección. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">list_iess_colecciones</code>
-<span class="atlas-tool-desc">Colecciones documentales del IESS (boletines, estudios actuariales, auditorías).</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista las tres colecciones documentales del IESS (Instituto Ecuatoriano de Seguridad Social) — Boletines Estadísticos, Estudios Actuariales e Informes de Auditoría —, con los años y cantidades que tiene publicados cada una. Continúa con get_iess_archivos(coleccion, anio=...) para obtener los documentos reales de una colección.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
 
 <details class="atlas-tool" id="tool-get_iess_archivos" data-search="get_iess_archivos documentos de una colección del iess. lista los documentos reales de una colección del iess, cada uno resuelto a su url de descarga directa, título y formato. llama primero a list_iess_colecciones para ver qué años y cantidades tiene disponible cada colección. coleccion &quot;boletines&quot; (anuales, 1978-2024 confirmados), &quot;estudios_actuariales&quot; (por fondo, solo algunos años) o &quot;informes_auditoria&quot; (2007-2026 confirmados, por año). anio filtra a un año. obligatorio para &quot;informes_auditoria&quot;. opcional para las otras dos colecciones. query texto libre contra el título (y descripción/grupo cuando la colección lo tiene), ignora tildes. format text | json">
 <summary class="atlas-tool-summary">
@@ -2237,74 +2069,10 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">Aviación civil (DGAC)<span class="tag">5</span></span>
+<span class="atlas-category-title">Aviación civil (DGAC)<span class="tag">2</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
-
-<details class="atlas-tool" id="tool-get_metar" data-search="get_metar reportes metar/speci recientes de un aeródromo ecuatoriano. consulta los reportes meteorológicos metar/speci más recientes de un aeródromo o helipuerto ecuatoriano, desde el sitio ifis de la dgac (ais.aviacioncivil.gob.ec), de acceso público sin login. devuelve el tipo de reporte, la marca de tiempo utc de observación y el texto crudo en codificación icao (ej. &quot;seqm 030100z 30004kt 9999 few030 17/08 q1026 nosig rmk a3032=&quot;). un designador desconocido devuelve un resultado vacío, no un error. designador código icao del aeródromo/helipuerto, ej. seqm (quito), segu (guayaquil), secu (cuenca). format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_metar</code>
-<span class="atlas-tool-desc">Reportes METAR/SPECI recientes de un aeródromo ecuatoriano.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Consulta los reportes meteorológicos METAR/SPECI más recientes de un aeródromo o helipuerto ecuatoriano, desde el sitio IFIS de la DGAC (ais.aviacioncivil.gob.ec), de acceso público sin login. Devuelve el tipo de reporte, la marca de tiempo UTC de observación y el texto crudo en codificación ICAO (ej. "SEQM 030100Z 30004KT 9999 FEW030 17/08 Q1026 NOSIG RMK A3032="). Un designador desconocido devuelve un resultado vacío, no un error.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>designador</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Código ICAO del aeródromo/helipuerto, ej. SEQM (Quito), SEGU (Guayaquil), SECU (Cuenca).</td></tr>
-
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-get_notam" data-search="get_notam notams activos para un aeródromo ecuatoriano. consulta los notam (avisos a aviadores) activos para un aeródromo o helipuerto ecuatoriano, desde el sitio ifis de la dgac, también de acceso público sin login. cada notam incluye su número de serie (ej. &quot;a1784/26&quot;), el texto crudo en formato icao y la tabla de campos decodificados que publica el propio sitio (tipo, fir, vigencia, horario, etc.). un designador desconocido devuelve cero notam, no un error. designador código icao del aeródromo/helipuerto, ej. seqm (quito), segu (guayaquil), secu (cuenca). format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_notam</code>
-<span class="atlas-tool-desc">NOTAMs activos para un aeródromo ecuatoriano.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Consulta los NOTAM (avisos a aviadores) activos para un aeródromo o helipuerto ecuatoriano, desde el sitio IFIS de la DGAC, también de acceso público sin login. Cada NOTAM incluye su número de serie (ej. "A1784/26"), el texto crudo en formato ICAO y la tabla de campos decodificados que publica el propio sitio (Tipo, FIR, vigencia, horario, etc.). Un designador desconocido devuelve cero NOTAM, no un error.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>designador</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Código ICAO del aeródromo/helipuerto, ej. SEQM (Quito), SEGU (Guayaquil), SECU (Cuenca).</td></tr>
-
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-get_sigmet" data-search="get_sigmet sigmet activos para el espacio aéreo ecuatoriano (fir único). consulta los sigmet (información meteorológica significativa: ceniza volcánica, turbulencia o engelamiento severos, tormentas) actualmente activos para el fir de ecuador (sefg), desde el sitio ifis de la dgac. como el país tiene un único fir, no existe parámetro por aeródromo. cero resultados significa que no hay avisos activos, no un error. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_sigmet</code>
-<span class="atlas-tool-desc">SIGMET activos para el espacio aéreo ecuatoriano (FIR único).</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Consulta los SIGMET (información meteorológica significativa: ceniza volcánica, turbulencia o engelamiento severos, tormentas) actualmente activos para el FIR de Ecuador (SEFG), desde el sitio IFIS de la DGAC. Como el país tiene un único FIR, no existe parámetro por aeródromo. Cero resultados significa que no hay avisos activos, no un error.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
 
 <details class="atlas-tool" id="tool-list_aip_aerodromos" data-search="list_aip_aerodromos lista de aeródromos/helipuertos con ficha aip publicada. lista los designadores icao y nombres de todos los aeródromos y helipuertos con una página aip ad 2.x publicada, tomada del eaip público de la dgac (ais.aviacioncivil.gob.ec/ifis3), sin necesidad de login. usa get_aip_aerodromo con uno de estos designadores para obtener la ficha completa (coordenadas, pista, horarios, tarifas, frecuencias ats, etc.). format text | json">
 <summary class="atlas-tool-summary">
@@ -2625,10 +2393,34 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">Herramientas incorporadas recientemente (descripción original en inglés, pendiente de traducir)<span class="tag">1</span></span>
+<span class="atlas-category-title">Herramientas incorporadas recientemente (descripción original en inglés, pendiente de traducir)<span class="tag">3</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
+
+<details class="atlas-tool" id="tool-get_aviso_aeronautico" data-search="get_aviso_aeronautico live aeronautical notices from dgac/ais: metar (latest weather reports) or notam (active notices) for an aerodrome icao code, e.g fetch aeronautical notices from dgac's ifis site (ais.aviacioncivil.gob.ec), publicly queryable with no login. - metar: most recent metar/speci reports of an aerodrome or helipad (type, utc time, raw icao text; usually hourly). decode the raw text yourself for a plain-language breakdown. - notam: active notams of an aerodrome: series number (e.g. &quot;a1784/26&quot;), raw q)/a)/b)/c)/d)/e) text and dgac's decoded fields. for its fixed data sheet use get_aip_aerodromo. - sigmet: active sigmets (volcanic ash, turbulence, icing, storms) for ecuador's single fir (sefg); no per-aerodrome filter. zero results means none are active, not an error. an unknown designador returns an empty result rather than an error. tipo metar, notam or sigmet. designador icao code of the aerodrome, e.g. seqm (quito), segu (guayaquil), secu (cuenca). required for metar and notam; ignored by sigmet. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_aviso_aeronautico</code>
+<span class="atlas-tool-desc">Live aeronautical notices from DGAC/AIS: metar (latest weather reports) or notam (active notices) for an aerodrome ICAO code, e.g</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Fetch aeronautical notices from DGAC's IFIS site (ais.aviacioncivil.gob.ec), publicly queryable with no login. - metar: most recent METAR/SPECI reports of an aerodrome or helipad (type, UTC time, raw ICAO text; usually hourly). Decode the raw text yourself for a plain-language breakdown. - notam: active NOTAMs of an aerodrome: series number (e.g. "A1784/26"), raw Q)/A)/B)/C)/D)/E) text and DGAC's decoded fields. For its fixed data sheet use get_aip_aerodromo. - sigmet: active SIGMETs (volcanic ash, turbulence, icing, storms) for Ecuador's single FIR (SEFG); no per-aerodrome filter. Zero results means none are active, not an error. An unknown designador returns an empty result rather than an error.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>tipo</code></td><td><code>Literal['metar', 'notam', 'sigmet']</code></td><td><code>requerido</code></td><td>metar, notam or sigmet.</td></tr>
+
+<tr><td><code>designador</code></td><td><code>str</code></td><td><code>vacío</code></td><td>ICAO code of the aerodrome, e.g. SEQM (Quito), SEGU (Guayaquil), SECU (Cuenca). Required for metar and notam; ignored by sigmet.</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
 
 <details class="atlas-tool" id="tool-get_serie_internacional" data-search="get_serie_internacional world bank wdi indicators (wdi: set indicador, or query to search the catalog), irena capacity/generation by technology (irena), or hourly colombia-ecuador electricity flows since 2003 (xm) fetch a series from an international source, filtered to ecuador. - wdi: world bank world development indicators (1,400+ series, yearly). with `indicador` (e.g. eg.elc.accs.zs access to electricity, eg.elc.loss.zs grid losses, eg.use.elec.kh.pc kwh per capita) returns the series; with only `query` (english) searches the catalog. years without a value are dropped and counted. - irena: irenastat electricity installed capacity (mw) and generation (gwh) by technology, 2000 to latest, on/off-grid. - xm: xm colombia hourly energy on the colombia-ecuador interconnection, summed to days or months. requires desde/hasta. blank hours (no flow) count as zero. shows the oct-2024 suspension. fuente wdi, irena or xm. indicador wdi only: wdi code. empty with `query` searches instead. query wdi only: catalog search text, used when indicador is empty. pais wdi/irena: iso3 code (irena also accepts the english name). ignored by xm. default ecu. desde start: a year (aaaa) for wdi/irena, a date (aaaa-mm-dd) for xm. hasta end, same format as desde. xm allows at most 366 days. tecnologia irena only: technology label substring (solar, hydro, total renewable...). empty returns all technologies. tipo irena only: generacion (gwh), capacidad (mw) or ambos. conexion irena only: all, on-grid or off-grid. sentido xm only: exportaciones (colombia to ecuador) or importaciones (ecuador to colombia). agregacion xm only: dia or mes. limit wdi catalog search only: maximum indicators (1-200). format text | json">
 <summary class="atlas-tool-summary">
@@ -2665,6 +2457,28 @@
 <tr><td><code>agregacion</code></td><td><code>Literal['dia', 'mes']</code></td><td><code>dia</code></td><td>xm only: dia or mes.</td></tr>
 
 <tr><td><code>limit</code></td><td><code>int</code></td><td><code>30</code></td><td>wdi catalog search only: maximum indicators (1-200).</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_catalogo" data-search="list_catalogo list one source's catalog, the step before its get tool: arconel (get_arconel_reporte), bce_diarios (get_bce_indicador_diario), contraloria (get_contraloria_informe), iess (get_iess_archivos), sut (get_sut_indicador_schema, query_sut_indicador). list the catalog of one source that has no search filters. - arconel: arconel electricity report types by section, years (1998 on) and company groups; run one with get_arconel_reporte. - bce_diarios: bce daily/monthly indicator widgets outside bcedata (riesgo país daily since 2004, gold, wti, bonds, payments, reserves, fiscal and external series); a `codigo` only means one thing within its `archivo`. follow with get_bce_indicador_diario(archivo, codigo). - contraloria: contraloría &quot;datos abiertos&quot; quarterly audit-report csvs and annual control plans; follow with get_contraloria_informe. - iess: iess document collections (statistical bulletins, actuarial studies, audit reports) with years and counts; follow with get_iess_archivos(coleccion, anio). - sut: ministerio del trabajo sut power bi dashboards (contracts since 2015, labor demand, gender policy); follow with get_sut_indicador_schema, then query_sut_indicador. fuente catalog to list; see the list above. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_catalogo</code>
+<span class="atlas-tool-desc">List one source's catalog, the step before its get tool: arconel (get_arconel_reporte), bce_diarios (get_bce_indicador_diario), contraloria (get_contraloria_informe), iess (get_iess_archivos), sut (get_sut_indicador_schema, query_sut_indicador).</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List the catalog of one source that has no search filters. - arconel: ARCONEL electricity report types by section, years (1998 on) and company groups; run one with get_arconel_reporte. - bce_diarios: BCE daily/monthly indicator widgets outside BCEData (riesgo país daily since 2004, gold, WTI, bonds, payments, reserves, fiscal and external series); a `codigo` only means one thing within its `archivo`. Follow with get_bce_indicador_diario(archivo, codigo). - contraloria: Contraloría "Datos Abiertos" quarterly audit-report CSVs and annual control plans; follow with get_contraloria_informe. - iess: IESS document collections (statistical bulletins, actuarial studies, audit reports) with years and counts; follow with get_iess_archivos(coleccion, anio). - sut: Ministerio del Trabajo SUT Power BI dashboards (contracts since 2015, labor demand, gender policy); follow with get_sut_indicador_schema, then query_sut_indicador.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>requerido</code></td><td>Catalog to list; see the list above.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
@@ -2734,7 +2548,7 @@ window.SITE_SEARCH_EMPTY_LABEL = "Sin resultados.";
     var count = visibleTools().length;
     resultCount.textContent = query
       ? count + " tool" + (count === 1 ? "" : "s") + " coincide" + (count === 1 ? "" : "n") + "."
-      : "91 tools · abre un grupo para ver sus detalles.";
+      : "82 tools · abre un grupo para ver sus detalles.";
   }
 
   function applyFilter(query) {
