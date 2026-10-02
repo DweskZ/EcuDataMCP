@@ -64,4 +64,5 @@ Siete tools (`list_ineval_familias`, `list_sut_indicadores`,
 `dict` — `structuredContent` debe ser un objeto JSON, no un arreglo, así
 que se envolvieron en `{"total": N, "<nombre>": [...]}`. Es un cambio de
 forma en la salida `format="json"` de esas 7 tools específicamente (el
-texto de `format="text"` no cambió).
+texto de `format="text"` no cambió). Las tres de SUT, BCE diarios y Contraloría ahora
+son `list_catalogo(fuente=...)`, que conserva ese mismo envoltorio.

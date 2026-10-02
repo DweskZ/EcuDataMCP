@@ -12,9 +12,14 @@ import os
 from urllib.parse import urlsplit
 
 # Confirmed blocked from Render's network on 2026-09-30 (CKAN 403, ANDA 403,
-# ARCONEL reportes 504) or documented in docs/RESEARCH.md.
+# ARCONEL reportes 504) or documented in docs/RESEARCH.md. www.gob.ec (reset)
+# and censoecuador.gob.ec (403) were confirmed from a Canadian home IP on
+# 2026-10-02; listed as www.gob.ec, not gob.ec, so the suffix match doesn't
+# send every *.gob.ec host through the proxy.
 _DEFAULT_GEO_HOSTS = (
     "datosabiertos.gob.ec",
+    "www.gob.ec",
+    "censoecuador.gob.ec",
     "anda.inec.gob.ec",
     "reportes.arconel.gob.ec",
     "sisdatbi.arconel.gob.ec",

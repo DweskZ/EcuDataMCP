@@ -16,6 +16,16 @@ datacenter IPs (see `RESEARCH.md` and `helpers/smoke_status.py`):
 | `anda.inec.gob.ec`, `censoecuador.gob.ec` | 403 from GitHub runners | datacenter IP or bot filter |
 | `gob.ec` | HTTP 200 with empty body from runners | datacenter IP or bot filter |
 
+Re-checked 2026-10-02 from a residential IP in Canada (not a datacenter):
+`datosabiertos`, `anda.inec`, `censoecuador` and `eerssa` answer Apache 403,
+`reportes.arconel` and `compraspublicas` time out, `www.gob.ec` resets the
+connection, while `sisdatbi.arconel` and `www.ecuadorencifras.gob.ec` answer
+200. A home IP failing the same way points to a country block, not a
+datacenter or bot filter, for ANDA, the census site and gob.ec as well; so
+`www.gob.ec` and `censoecuador.gob.ec` joined the default proxied hosts
+(`helpers/geo_proxy.py`), and `download_bytes` and `gobec_client` now route
+through `proxy_for`. INEC's main site is reachable and stays direct.
+
 The current workaround (a local VPN) does not help CI, PyPI/MCPB installs or
 anyone else. Goal: a free path that works away from one laptop.
 

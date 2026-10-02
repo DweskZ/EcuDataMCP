@@ -11,6 +11,7 @@ from typing import Any
 
 import httpx
 
+from helpers.geo_proxy import proxy_for
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.safe_download import safe_stream
 from helpers.tls import (
@@ -187,7 +188,7 @@ async def download_bytes(
         # makes its own per-request follow_redirects=False and handles
         # redirects itself (validating each hop), so a client-level default
         # would be misleading rather than wrong.
-        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
+        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT}, proxy=proxy_for(url))
     assert session is not None
     try:
         logger.debug("Downloading from %s (max %d bytes)", url, max_bytes)
@@ -206,6 +207,7 @@ async def download_bytes(
                 async with httpx.AsyncClient(
                     headers={"User-Agent": USER_AGENT},
                     verify=os_trust_context(),
+                    proxy=proxy_for(url),
                 ) as os_trust_session:
                     return await _download(
                         os_trust_session,
@@ -223,6 +225,7 @@ async def download_bytes(
             async with httpx.AsyncClient(
                 headers={"User-Agent": USER_AGENT},
                 verify=False,
+                proxy=proxy_for(url),
             ) as insecure_session:
                 return await _download(
                     insecure_session,
@@ -233,6 +236,34 @@ async def download_bytes(
     finally:
         if own:
             await session.aclose()
+
+
+async def post_json_bytes(
+    url: str,
+    body: dict[str, Any],
+    *,
+    timeout: float = 60.0,
+    max_bytes: int = MAX_DOWNLOAD_BYTES,
+) -> tuple[bytes, bool]:
+    """POST a JSON body to a fixed first-party API and read the response up
+    to `max_bytes`, the same cap download_bytes applies to GETs. Returns
+    (content, truncated). Not for URLs taken from external metadata: there
+    is no SSRF hop validation here because redirects are not followed."""
+    chunks: list[bytes] = []
+    total = 0
+    async with (
+        httpx.AsyncClient(
+            headers={"User-Agent": USER_AGENT}, timeout=timeout, follow_redirects=False
+        ) as client,
+        client.stream("POST", url, json=body) as resp,
+    ):
+        resp.raise_for_status()
+        async for chunk in resp.aiter_bytes(chunk_size=64 * 1024):
+            chunks.append(chunk)
+            total += len(chunk)
+            if total > max_bytes:
+                return b"".join(chunks), True
+    return b"".join(chunks), False
 
 
 async def sniff_content_type(

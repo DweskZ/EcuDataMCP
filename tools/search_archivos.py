@@ -102,8 +102,15 @@ def _normalize_file(item: dict[str, Any]) -> dict[str, Any]:
     return normalized
 
 
-async def _search(fuente: str, query: str, limit: int, offset: int) -> dict[str, Any]:
+async def _search(
+    fuente: str, query: str, limit: int, offset: int, formato: str = ""
+) -> dict[str, Any]:
+    fmt = formato.strip().upper()
     if fuente in _PAGINATED:
+        # These clients slice before returning, so a filter here would see
+        # one page only and report a wrong total.
+        if fmt:
+            raise ValueError(f"`formato` no está disponible para {fuente}; usa `query`.")
         result = await _PAGINATED[fuente](query=query, limit=limit, offset=offset)
         items = result.get("archivos") or result.get("recursos") or []
         total = result.get("total", len(items))
@@ -126,6 +133,8 @@ async def _search(fuente: str, query: str, limit: int, offset: int) -> dict[str,
                 (result[k] for k in ("archivos", "ediciones", "publicaciones") if isinstance(result.get(k), list)),
                 [],
             )
+        if fmt:
+            items = [i for i in items if str(_first(i, _FORMAT_KEYS) or "").upper() == fmt]
         total = len(items)
         items = items[offset : offset + limit]
 
@@ -157,6 +166,7 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
         query: str = "",
         limit: int = 50,
         offset: int = 0,
+        formato: str = "",
         format: Literal["text", "json"] = "text",
     ) -> dict[str, Any]:
         """
@@ -215,12 +225,14 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
                 title and source-specific fields. Empty returns all files.
             limit: Max files returned (1-100, default 50).
             offset: Pagination offset over the matched files.
+            formato: Optional exact file format (PDF, XLSX, CSV, ZIP...); not
+                for sri_datasets, sri_recaudacion or censo.
             format: text | json
         """
         limit = min(max(limit, 1), 100)
         offset = max(offset, 0)
         try:
-            result = await _search(fuente, query, limit, offset)
+            result = await _search(fuente, query, limit, offset, formato)
         except ValueError as e:
             raise ToolError(f"Error: {e}") from e
         except Exception as e:

@@ -376,7 +376,7 @@ async def get_arconel_reporte(
 
     Args:
         tipo: Report name exactly as ARCONEL lists it (see
-            list_arconel_reportes), matched accent/case-insensitively.
+            list_catalogo(fuente='arconel')), matched accent/case-insensitively.
         anio: Year, 1998 to current.
         grupo: todos | cnel | empresas_electricas.
         mes: 1-12, only for report types whose month filter is enabled.
@@ -397,7 +397,7 @@ async def get_arconel_reporte(
     )
     if tipo_real is None:
         raise ArconelError(
-            f"tipo de reporte desconocido: {tipo!r} (ver list_arconel_reportes)"
+            f"tipo de reporte desconocido: {tipo!r} (ver list_catalogo(fuente='arconel'))"
         )
 
     key = f"{tipo_real}|{anio_str}|{mes_str}|{grupo_value}|{max_paginas}"

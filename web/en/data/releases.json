@@ -1,5 +1,10 @@
 [
   {
+    "version": "0.11.0",
+    "date": "2026-10-02",
+    "summary": "Breaking change in tool names: 90 down to 82 in the default profile. New get_serie_internacional(fuente) with World Bank WDI indicators, IRENA electricity capacity and generation, and XM's Colombia-Ecuador power flows since 2003. list_catalogo(fuente) replaces five listings (ARCONEL, BCE daily indicators, Contraloría, IESS and SUT); get_aviso_aeronautico(tipo) replaces get_metar, get_notam and get_sigmet; search_archivos absorbs BCE remittance, foreign-trade price and publication files and gains a formato filter. XM shows days without flow as 0 GWh, so the October 2024 suspension appears as zeros."
+  },
+  {
     "version": "0.10.0",
     "date": "2026-09-28",
     "summary": "Breaking change in tool names: 109 down to 90 in the default profile. Every parameter now has a description in the schema. Several tools merge behind a selector: search_archivos(fuente) replaces 11 file searchers (SRI, MEF, Census, MINEDEC, SENESCYT, ARCOTEL and others); search_cortes and get_cortes_horarios cover EEQ and Centrosur; search_capas_geo and get_capa_geo_datos cover the INAMHI and MAG geoportals; search_bce_paginas and get_bce_pagina_archivos cover BCE indices and national accounts. The default MCP_PROFILE is public: the two maintenance tools no longer appear in clients."

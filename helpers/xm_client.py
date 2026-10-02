@@ -7,7 +7,9 @@ interconnection, the only source with 2003-present depth (docs/RESEARCH.md
 limited to 31 days per request, so longer ranges are split into chunks.
 Hourly values arrive as strings in kWh; an empty string means no flow that
 hour and is counted as zero in the daily/monthly totals (`horas_con_flujo`
-reports how many hours had a value). Metrics are Colombian exports
+reports how many hours had a value). Every day or month in the range is
+reported, with 0 GWh when no hour had flow, so a suspension shows as zeros
+rather than as missing periods. Metrics are Colombian exports
 (`ExpoEner`, Colombia -> Ecuador) and imports (`ImpoEner`, Ecuador ->
 Colombia), by `Enlace`; Ecuador links are those whose code contains
 "ECUADOR".
@@ -22,9 +24,8 @@ from collections import defaultdict
 from datetime import date, timedelta
 from typing import Any
 
-import httpx
-
 from helpers.cache import TtlCache
+from helpers.csv_reader import post_json_bytes
 from helpers.logging import MAIN_LOGGER_NAME
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
@@ -67,20 +68,29 @@ async def _fetch_chunk(metric: str, start: date, end: date) -> list[dict[str, An
     }
     async with _sem:
         logger.info("XM POST %s %s..%s", metric, start, end)
-        async with httpx.AsyncClient(timeout=60.0, follow_redirects=False) as client:
-            resp = await client.post(_URL, json=body)
-            resp.raise_for_status()
-    data = json.loads(resp.content)
+        content, truncated = await post_json_bytes(_URL, body)
+    if truncated:
+        raise ValueError(f"La respuesta de XM para {start}..{end} superó el límite de descarga.")
+    data = json.loads(content)
     items = data.get("Items") or []
     _chunk_cache.set(key, items)
     return items
 
 
-def _to_kwh(raw: str) -> float | None:
-    try:
-        return float(raw) if raw != "" else None
-    except ValueError:
+def _to_kwh(raw: Any) -> float | None:
+    # Blank strings and nulls both mean no value for that hour.
+    if raw is None or raw == "":
         return None
+    try:
+        return float(raw)
+    except (TypeError, ValueError):
+        return None
+
+
+def _periods(desde: date, hasta: date, agregacion: str) -> list[str]:
+    days = [desde + timedelta(days=n) for n in range((hasta - desde).days + 1)]
+    labels = [d.isoformat() if agregacion == "dia" else d.isoformat()[:7] for d in days]
+    return list(dict.fromkeys(labels))
 
 
 async def get_intercambio(
@@ -136,18 +146,22 @@ async def get_intercambio(
                     kwh[(period, enlace)] += v
                     hours[(period, enlace)] += 1
 
+    # Fill every period x link with zero so days without flow stay visible.
+    periodos = _periods(d0, d1, agregacion)
+    enlaces = sorted({enlace for _, enlace in kwh})
     registros = [
         {
             "periodo": period,
             "enlace": enlace,
-            "energia_gwh": round(total / 1_000_000, 6),
-            "horas_con_flujo": hours[(period, enlace)],
+            "energia_gwh": round(kwh.get((period, enlace), 0.0) / 1_000_000, 6),
+            "horas_con_flujo": hours.get((period, enlace), 0),
         }
-        for (period, enlace), total in sorted(kwh.items())
+        for period in periodos
+        for enlace in enlaces
     ]
-    por_periodo: dict[str, float] = defaultdict(float)
-    for r in registros:
-        por_periodo[r["periodo"]] += r["energia_gwh"]
+    por_periodo: dict[str, float] = dict.fromkeys(periodos, 0.0)
+    for (period, _), total in kwh.items():
+        por_periodo[period] += total / 1_000_000
     return {
         "sentido": _SENTIDO[sentido],
         "agregacion": agregacion,

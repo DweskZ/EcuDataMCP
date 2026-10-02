@@ -101,7 +101,7 @@ duplicados, son hermanos con la misma forma de parámetros:**
 
 | Candidato | Forma actual | Fusión posible |
 |---|---|---|
-| `get_metar(designador)`, `get_notam(designador)`, `get_sigmet()` | 3 tools DGAC, firma casi idéntica | `get_reporte_aeronautico(tipo, designador=None)` |
+| `get_metar(designador)`, `get_notam(designador)`, `get_sigmet()` | 3 tools DGAC, firma casi idéntica | Hecho: `get_aviso_aeronautico(tipo, designador="")` |
 | `search_arcotel_boletines(query)`, `search_arcotel_reportes_mensuales(query)` | 2 tools ARCOTEL, firma idéntica | `search_arcotel(tipo, query="")` |
 
 Ejecutar estas dos fusiones bajaría el conteo en hasta 3 (115 → 112), sumado

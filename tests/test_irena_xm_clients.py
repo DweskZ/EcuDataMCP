@@ -87,6 +87,31 @@ async def test_irena_unknown_country_raises(httpx_mock):
         await irena_client.get_electricidad(pais="Atlantis")
 
 
+async def test_irena_dimension_names_are_case_insensitive(httpx_mock):
+    renamed = {**_DATA, "id": [d.replace("Grid connection", "Grid Connection") for d in _DATA["id"]]}
+    renamed["dimension"] = {
+        ("Grid Connection" if k == "Grid connection" else k): v for k, v in _DATA["dimension"].items()
+    }
+    httpx_mock.add_response(url=_FOLDER, json=_LISTING)
+    httpx_mock.add_response(url=_TABLE_URL, method="GET", json=_META)
+    httpx_mock.add_response(url=_TABLE_URL, method="POST", json=renamed)
+
+    result = await irena_client.get_electricidad(tecnologia="solar", tipo="capacidad")
+
+    assert result["total_registros"] == 1
+
+
+async def test_irena_missing_dimension_names_what_changed(httpx_mock):
+    broken = {**_DATA, "id": [d.replace("Year", "Period") for d in _DATA["id"]]}
+    broken["dimension"] = {("Period" if k == "Year" else k): v for k, v in _DATA["dimension"].items()}
+    httpx_mock.add_response(url=_FOLDER, json=_LISTING)
+    httpx_mock.add_response(url=_TABLE_URL, method="GET", json=_META)
+    httpx_mock.add_response(url=_TABLE_URL, method="POST", json=broken)
+
+    with pytest.raises(ValueError, match="no tiene la dimensión 'Year'"):
+        await irena_client.get_electricidad()
+
+
 def _xm_item(day, values):
     return {
         "Date": day,
@@ -110,6 +135,27 @@ async def test_xm_daily_totals_skip_blank_hours_and_non_ecuador_links(httpx_mock
     assert result["registros"] == [
         {"periodo": "2024-11-01", "enlace": "ECUADOR 230", "energia_gwh": 1.5, "horas_con_flujo": 2}
     ]
+
+
+async def test_xm_reports_zero_for_days_without_flow_and_null_hours(httpx_mock):
+    items = [_xm_item("2024-11-01", {"Hour01": "2000000", "Hour02": None})]
+    httpx_mock.add_response(url=xm_client._URL, method="POST", json={"Items": items})
+
+    result = await xm_client.get_intercambio("2024-11-01", "2024-11-03")
+
+    assert result["total_por_periodo"] == {"2024-11-01": 2.0, "2024-11-02": 0.0, "2024-11-03": 0.0}
+    assert [r["energia_gwh"] for r in result["registros"]] == [2.0, 0.0, 0.0]
+    assert result["registros"][1]["horas_con_flujo"] == 0
+
+
+async def test_xm_full_suspension_still_lists_every_month(httpx_mock):
+    httpx_mock.add_response(url=xm_client._URL, method="POST", json={"Items": []})
+    httpx_mock.add_response(url=xm_client._URL, method="POST", json={"Items": []})
+
+    result = await xm_client.get_intercambio("2024-10-01", "2024-11-15", agregacion="mes")
+
+    assert result["total_por_periodo"] == {"2024-10": 0.0, "2024-11": 0.0}
+    assert result["total_gwh"] == 0.0
 
 
 async def test_xm_splits_long_ranges_into_31_day_chunks(httpx_mock):

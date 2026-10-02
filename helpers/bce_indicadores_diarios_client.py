@@ -255,7 +255,7 @@ async def get_indicador_diario(
     if not matching:
         raise ValueError(
             f"Código '{codigo}' no encontrado en '{archivo}'. "
-            "Usa list_bce_indicadores_diarios para ver los códigos válidos."
+            "Usa list_catalogo(fuente='bce_diarios') para ver los códigos válidos."
         )
     matching.sort(key=lambda r: r["Fecha"])
 

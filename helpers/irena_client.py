@@ -21,7 +21,7 @@ from typing import Any
 from urllib.parse import quote
 
 from helpers.cache import TtlCache
-from helpers.csv_reader import download_bytes
+from helpers.csv_reader import download_bytes, post_json_bytes
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.text_utils import strip_accents as _strip
 
@@ -40,12 +40,7 @@ async def _request(url: str, body: dict[str, Any] | None = None) -> Any:
     if body is None:
         content, truncated = await download_bytes(url)
     else:
-        import httpx
-
-        async with httpx.AsyncClient(timeout=60.0, follow_redirects=False) as client:
-            resp = await client.post(url, json=body)
-            resp.raise_for_status()
-            content, truncated = resp.content, False
+        content, truncated = await post_json_bytes(url, body)
     if truncated:
         raise ValueError(f"La respuesta de {url} superó el límite de descarga.")
     return json.loads(content)
@@ -93,6 +88,20 @@ def _resolve_country(variable: dict[str, Any], pais: str) -> tuple[str, str]:
     )
 
 
+def _dim(available: list[str], name: str, tabla: str) -> str:
+    """The dimension id matching `name`, ignoring case and spacing, so a new
+    edition that only re-capitalizes a dimension still parses; a real rename
+    fails with the names the table does have."""
+    key = name.replace(" ", "").lower()
+    for d in available:
+        if d.replace(" ", "").lower() == key:
+            return d
+    raise ValueError(
+        f"La tabla {tabla} de IRENASTAT no tiene la dimensión {name!r} "
+        f"(tiene: {', '.join(available)}); su estructura cambió."
+    )
+
+
 async def get_electricidad(
     pais: str = "ECU",
     tecnologia: str = "",
@@ -121,14 +130,15 @@ async def get_electricidad(
 
     table = await _table()
     variables = table["variables"]
-    code, country_name = _resolve_country(variables["Country/area"], pais)
+    country_dim = _dim(list(variables), "Country/area", table["id"])
+    code, country_name = _resolve_country(variables[country_dim], pais)
 
     cache_key = f"{table['id']}:{code}"
     payload = _data_cache.get(cache_key)
     if payload is None:
         body = {
             "query": [
-                {"code": "Country/area", "selection": {"filter": "item", "values": [code]}}
+                {"code": country_dim, "selection": {"filter": "item", "values": [code]}}
             ],
             "response": {"format": "json-stat2"},
         }
@@ -143,6 +153,9 @@ async def get_electricidad(
     order = {d: list(payload["dimension"][d]["category"]["index"]) for d in dims}
     sizes = payload["size"]
     values = payload["value"]
+    tech_dim, type_dim, conn_dim, year_dim = (
+        _dim(dims, n, table["id"]) for n in ("Technology", "Data Type", "Grid connection", "Year")
+    )
 
     want_tech = _strip(tecnologia)
     want_conn = _strip(conexion)
@@ -155,10 +168,10 @@ async def get_electricidad(
         if valor is None:
             continue
         pos = {d: order[d][(idx // stride[i]) % sizes[i]] for i, d in enumerate(dims)}
-        tech = labels["Technology"][pos["Technology"]]
-        dtype = labels["Data Type"][pos["Data Type"]]
-        conn = labels["Grid connection"][pos["Grid connection"]]
-        year = int(labels["Year"][pos["Year"]])
+        tech = labels[tech_dim][pos[tech_dim]]
+        dtype = labels[type_dim][pos[type_dim]]
+        conn = labels[conn_dim][pos[conn_dim]]
+        year = int(labels[year_dim][pos[year_dim]])
         if want_tech and want_tech not in _strip(tech):
             continue
         if _strip(conn) != want_conn:
