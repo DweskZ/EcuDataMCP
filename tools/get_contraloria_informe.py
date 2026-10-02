@@ -27,14 +27,14 @@ def register_get_contraloria_informe_tool(mcp: MCPServer) -> None:
         Download and preview one Contraloría document (Datos Abiertos or
         Plan Anual de Control).
 
-        Get informe_id from list_contraloria_informes. Quarterly "Datos
+        Get informe_id from list_catalogo(fuente='contraloria'). Quarterly "Datos
         Abiertos" documents return one row per audit report approved that
         quarter, across every public institution in the country. "Plan
         Anual de Control" documents are PDFs (one per year); this returns
         their metadata and points you at read_pdf instead of a table.
 
         Args:
-            informe_id: An id from list_contraloria_informes
+            informe_id: An id from list_catalogo(fuente='contraloria')
             rows: Number of data rows to preview (default: 50, max: 200)
             format: text | json
         """

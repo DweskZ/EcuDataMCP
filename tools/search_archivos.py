@@ -19,6 +19,9 @@ from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import (
     arcotel_client,
+    bce_precios_comex_client,
+    bce_publicaciones_client,
+    bce_remesas_client,
     censo_client,
     cnig_client,
     mef_fiscal_client,
@@ -48,6 +51,9 @@ Fuente = Literal[
     "salarios",
     "arcotel_boletines",
     "arcotel_mensuales",
+    "bce_remesas",
+    "bce_precios_comex",
+    "bce_publicaciones",
 ]
 
 # Clients that paginate themselves; the rest return every match and are
@@ -67,6 +73,9 @@ _UNPAGINATED: dict[str, Callable[..., Awaitable[dict[str, Any]]]] = {
     "trabajo_boletin": trabajo_boletin_anual_client.search_boletines,
     "arcotel_boletines": arcotel_client.search_boletines_estadisticos,
     "arcotel_mensuales": arcotel_client.search_reportes_mensuales,
+    "bce_remesas": bce_remesas_client.search_archivos,
+    "bce_precios_comex": bce_precios_comex_client.search_archivos,
+    "bce_publicaciones": bce_publicaciones_client.search_publicaciones,
 }
 
 # Keys the clients use for the same three things, first match wins.
@@ -114,7 +123,7 @@ async def _search(fuente: str, query: str, limit: int, offset: int) -> dict[str,
         else:
             result = await _UNPAGINATED[fuente](query=query)
             items = next(
-                (result[k] for k in ("archivos", "ediciones") if isinstance(result.get(k), list)),
+                (result[k] for k in ("archivos", "ediciones", "publicaciones") if isinstance(result.get(k), list)),
                 [],
             )
         total = len(items)
@@ -136,11 +145,9 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Buscar archivos publicados por una institución",
         description=(
-            "File links from one institution's catalog, filtered by text: "
-            "sri_datasets, sri_recaudacion (SRI), mef, senae (fiscal), censo "
-            "(Census 2022), minedec (enrollment), senescyt, msp (vaccine "
-            "gazettes), cnig (gender violence), trabajo_boletin, salarios, "
-            "arcotel_boletines, arcotel_mensuales. Links, not contents."
+            "File links from one institution's catalog, filtered by text: SRI, MEF, "
+            "SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and "
+            "BCE (remesas, comex prices, latest publications). Links, not contents."
         ),
         annotations=READ_ONLY,
     )
@@ -192,6 +199,15 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
           2015-2024 (PDF).
         - arcotel_mensuales: ARCOTEL monthly statistics reports 2017-2026
           (PDF).
+        - bce_remesas: BCE worker-remittance files: historical series,
+          methodology note and, since July 2025, microdata-based monthly
+          databases. "histórica" and "BDD" files are different series.
+        - bce_precios_comex: BCE foreign-trade price indices by import use
+          category and export product (oil, shrimp, banana, cacao...); BCEData
+          only has the three aggregates.
+        - bce_publicaciones: BCE's ~30 most recent reports and bulletins
+          (rolling window, newest first, with `fecha`); an editorial feed, not
+          data series.
 
         Args:
             fuente: Catalog to search; see the list above.
@@ -226,7 +242,7 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
             for a in data["archivos"]:
                 contexto = ", ".join(
                     str(a[k])
-                    for k in ("anio", "periodo", "categoria", "semana", "tipo")
+                    for k in ("anio", "periodo", "categoria", "semana", "tipo", "fecha")
                     if a.get(k)
                 )
                 parts.append(

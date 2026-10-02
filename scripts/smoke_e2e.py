@@ -243,10 +243,10 @@ async def main() -> int:
             ("search_sri_ruc", {"razon_social": "BANCO", "max_resultados": 3}, []),
             ("search_indicadores_bce", {"query": "inflacion", "limit": 5}, []),
             ("search_bce_iem", {"query": "inflacion", "limit": 5}, []),
-            ("search_bce_publicaciones", {"query": ""}, []),
+            ("search_archivos", {"fuente": "bce_publicaciones", "limit": 3}, []),
             ("search_bce_paginas", {"catalogo": "indices", "query": "petrolero"}, []),
-            ("search_bce_remesas", {"query": ""}, []),
-            ("list_bce_indicadores_diarios", {}, ["Riesgo", "serie"]),
+            ("search_archivos", {"fuente": "bce_remesas", "limit": 3}, []),
+            ("list_catalogo", {"fuente": "bce_diarios"}, ["Riesgo", "serie"]),
             (
                 "get_cenace_tablero",
                 {"tablero": "produccion_tiempo_real"},
@@ -259,8 +259,8 @@ async def main() -> int:
             ("search_ranking", {"limit": 3}, []),
             ("list_archivo_secciones", {"fuente": "sipa"}, ["SIPA", "economico"]),
             ("list_archivo_secciones", {"fuente": "superbancos"}, ["boletines_financieros"]),
-            ("list_sut_indicadores", {}, ["indicador"]),
-            ("list_contraloria_informes", {}, ["Contraloría"]),
+            ("list_catalogo", {"fuente": "sut"}, ["indicador"]),
+            ("list_catalogo", {"fuente": "contraloria"}, ["Contraloría"]),
             ("search_anda", {"query": "empleo", "limit": 3}, []),
             ("search_biinec_extras", {"query": "ambiental"}, []),
             ("search_archivos", {"fuente": "censo", "query": "poblacion", "limit": 3}, []),
@@ -315,7 +315,7 @@ async def main() -> int:
 
 async def chain_sut(client: httpx.AsyncClient) -> None:
     listing = json.loads(
-        await call_chain_step(client, "list_sut_indicadores", {"format": "json"})
+        await call_chain_step(client, "list_catalogo", {"fuente": "sut", "format": "json"})
     )
     indicador = listing["indicadores"][0]["indicador"]
     await call_chain_step(
