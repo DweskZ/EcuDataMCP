@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Reference – EcuDataMCP</title>
-<meta name="description" content="EcuDataMCP's 90 tools, with a full description and a direct link to each one.">
+<meta name="description" content="EcuDataMCP's 91 tools, with a full description and a direct link to each one.">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <meta property="og:title" content="Reference – EcuDataMCP">
-<meta property="og:description" content="EcuDataMCP's 90 tools, with a full description and a direct link to each one.">
+<meta property="og:description" content="EcuDataMCP's 91 tools, with a full description and a direct link to each one.">
 <meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
@@ -141,13 +141,13 @@
 <section class="landing hero">
 <div class="container-page">
 <p class="kicker">Reference</p>
-<h1>All <span class="accent">90 tools</span>, one by one.</h1>
+<h1>All <span class="accent">91 tools</span>, one by one.</h1>
 <p class="hero-sub">Find a tool by name, source, or task. Open only the group and detail you need.</p>
 <div class="atlas-filter-wrap">
 <input type="text" id="atlas-filter" class="atlas-filter" placeholder="Filter by name or keyword…" autocomplete="off">
 </div>
 <div class="atlas-toolbar" aria-live="polite">
-<p id="atlas-result-count">90 tools · open a group to see its details.</p>
+<p id="atlas-result-count">91 tools · open a group to see its details.</p>
 <div class="atlas-actions">
 <button type="button" data-atlas-action="open">Expand groups</button>
 <button type="button" data-atlas-action="close">Collapse groups</button>
@@ -2623,6 +2623,60 @@
 </div>
 </details>
 
+<details class="atlas-category">
+<summary class="atlas-category-summary">
+<span class="atlas-category-title">Recently added tools<span class="tag">1</span></span>
+<span class="atlas-category-action">Show</span>
+</summary>
+<div class="atlas-category-tools">
+
+<details class="atlas-tool" id="tool-get_serie_internacional" data-search="get_serie_internacional world bank wdi indicators (wdi: set indicador, or query to search the catalog), irena capacity/generation by technology (irena), or hourly colombia-ecuador electricity flows since 2003 (xm) fetch a series from an international source, filtered to ecuador. - wdi: world bank world development indicators (1,400+ series, yearly). with `indicador` (e.g. eg.elc.accs.zs access to electricity, eg.elc.loss.zs grid losses, eg.use.elec.kh.pc kwh per capita) returns the series; with only `query` (english) searches the catalog. years without a value are dropped and counted. - irena: irenastat electricity installed capacity (mw) and generation (gwh) by technology, 2000 to latest, on/off-grid. - xm: xm colombia hourly energy on the colombia-ecuador interconnection, summed to days or months. requires desde/hasta. blank hours (no flow) count as zero. shows the oct-2024 suspension. fuente wdi, irena or xm. indicador wdi only: wdi code. empty with `query` searches instead. query wdi only: catalog search text, used when indicador is empty. pais wdi/irena: iso3 code (irena also accepts the english name). ignored by xm. default ecu. desde start: a year (aaaa) for wdi/irena, a date (aaaa-mm-dd) for xm. hasta end, same format as desde. xm allows at most 366 days. tecnologia irena only: technology label substring (solar, hydro, total renewable...). empty returns all technologies. tipo irena only: generacion (gwh), capacidad (mw) or ambos. conexion irena only: all, on-grid or off-grid. sentido xm only: exportaciones (colombia to ecuador) or importaciones (ecuador to colombia). agregacion xm only: dia or mes. limit wdi catalog search only: maximum indicators (1-200). format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_serie_internacional</code>
+<span class="atlas-tool-desc">World Bank WDI indicators (wdi: set indicador, or query to search the catalog), IRENA capacity/generation by technology (irena), or hourly Colombia-Ecuador electricity flows since 2003 (xm)</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Fetch a series from an international source, filtered to Ecuador. - wdi: World Bank World Development Indicators (1,400+ series, yearly). With `indicador` (e.g. EG.ELC.ACCS.ZS access to electricity, EG.ELC.LOSS.ZS grid losses, EG.USE.ELEC.KH.PC kWh per capita) returns the series; with only `query` (English) searches the catalog. Years without a value are dropped and counted. - irena: IRENASTAT electricity installed capacity (MW) and generation (GWh) by technology, 2000 to latest, on/off-grid. - xm: XM Colombia hourly energy on the Colombia-Ecuador interconnection, summed to days or months. Requires desde/hasta. Blank hours (no flow) count as zero. Shows the Oct-2024 suspension.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>wdi, irena or xm.</td></tr>
+
+<tr><td><code>indicador</code></td><td><code>str</code></td><td><code>empty</code></td><td>wdi only: WDI code. Empty with `query` searches instead.</td></tr>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>wdi only: catalog search text, used when indicador is empty.</td></tr>
+
+<tr><td><code>pais</code></td><td><code>str</code></td><td><code>ECU</code></td><td>wdi/irena: ISO3 code (irena also accepts the English name). Ignored by xm. Default ECU.</td></tr>
+
+<tr><td><code>desde</code></td><td><code>str</code></td><td><code>empty</code></td><td>Start: a year (AAAA) for wdi/irena, a date (AAAA-MM-DD) for xm.</td></tr>
+
+<tr><td><code>hasta</code></td><td><code>str</code></td><td><code>empty</code></td><td>End, same format as desde. xm allows at most 366 days.</td></tr>
+
+<tr><td><code>tecnologia</code></td><td><code>str</code></td><td><code>empty</code></td><td>irena only: technology label substring (solar, hydro, Total Renewable...). Empty returns all technologies.</td></tr>
+
+<tr><td><code>tipo</code></td><td><code>Literal['ambos', 'generacion', 'capacidad']</code></td><td><code>ambos</code></td><td>irena only: generacion (GWh), capacidad (MW) or ambos.</td></tr>
+
+<tr><td><code>conexion</code></td><td><code>Literal['All', 'On-grid', 'Off-grid']</code></td><td><code>All</code></td><td>irena only: All, On-grid or Off-grid.</td></tr>
+
+<tr><td><code>sentido</code></td><td><code>Literal['exportaciones', 'importaciones']</code></td><td><code>exportaciones</code></td><td>xm only: exportaciones (Colombia to Ecuador) or importaciones (Ecuador to Colombia).</td></tr>
+
+<tr><td><code>agregacion</code></td><td><code>Literal['dia', 'mes']</code></td><td><code>dia</code></td><td>xm only: dia or mes.</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>30</code></td><td>wdi catalog search only: maximum indicators (1-200).</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+</div>
+</details>
+
 <p id="atlas-empty" class="atlas-empty" style="display:none;">No tool matches that search.</p>
 </div>
 </section>
@@ -2680,7 +2734,7 @@ window.SITE_SEARCH_EMPTY_LABEL = "No results.";
     var count = visibleTools().length;
     resultCount.textContent = query
       ? count + " tool" + (count === 1 ? "" : "s") + " match" + (count === 1 ? "es" : "") + "."
-      : "90 tools · open a group to see its details.";
+      : "91 tools · open a group to see its details.";
   }
 
   function applyFilter(query) {
