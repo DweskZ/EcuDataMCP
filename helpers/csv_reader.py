@@ -235,6 +235,34 @@ async def download_bytes(
             await session.aclose()
 
 
+async def post_json_bytes(
+    url: str,
+    body: dict[str, Any],
+    *,
+    timeout: float = 60.0,
+    max_bytes: int = MAX_DOWNLOAD_BYTES,
+) -> tuple[bytes, bool]:
+    """POST a JSON body to a fixed first-party API and read the response up
+    to `max_bytes`, the same cap download_bytes applies to GETs. Returns
+    (content, truncated). Not for URLs taken from external metadata: there
+    is no SSRF hop validation here because redirects are not followed."""
+    chunks: list[bytes] = []
+    total = 0
+    async with (
+        httpx.AsyncClient(
+            headers={"User-Agent": USER_AGENT}, timeout=timeout, follow_redirects=False
+        ) as client,
+        client.stream("POST", url, json=body) as resp,
+    ):
+        resp.raise_for_status()
+        async for chunk in resp.aiter_bytes(chunk_size=64 * 1024):
+            chunks.append(chunk)
+            total += len(chunk)
+            if total > max_bytes:
+                return b"".join(chunks), True
+    return b"".join(chunks), False
+
+
 async def sniff_content_type(
     url: str, session: httpx.AsyncClient | None = None
 ) -> str | None:

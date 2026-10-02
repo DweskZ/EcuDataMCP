@@ -17,6 +17,7 @@ import asyncio
 import json
 import logging
 import re
+from datetime import UTC, datetime
 from typing import Any
 from urllib.parse import urlencode
 
@@ -29,6 +30,7 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 _BASE = "https://api.worldbank.org/v2"
 _SOURCE_WDI = 2
+_FIRST_YEAR = 1960  # WDI series start in 1960 at the earliest
 
 # The catalog changes a few times a year; the series refresh with each WDI
 # release, so a day is enough for data.
@@ -75,10 +77,11 @@ async def _fetch_catalog() -> list[dict[str, Any]]:
         )
         catalog = [
             {
+                # The API sends null as well as "" for missing text fields.
                 "indicador": i["id"],
-                "nombre": i.get("name", ""),
-                "descripcion": i.get("sourceNote", ""),
-                "organizacion": i.get("sourceOrganization", ""),
+                "nombre": i.get("name") or "",
+                "descripcion": i.get("sourceNote") or "",
+                "organizacion": i.get("sourceOrganization") or "",
             }
             for i in payload[1] or []
         ]
@@ -108,13 +111,17 @@ async def search_indicadores(query: str = "", limit: int = 30) -> dict[str, Any]
 async def get_indicador(
     indicador: str, pais: str = "ECU", desde: int | None = None, hasta: int | None = None
 ) -> dict[str, Any]:
-    """One WDI series for one country (ISO3/ISO2 code), optionally a year range."""
+    """One WDI series for one country (ISO3/ISO2 code), optionally a year
+    range; a single bound runs from 1960 or up to the current year."""
     if not _INDICATOR_ID.match(indicador):
         raise ValueError(f"Código de indicador inválido: {indicador!r}")
     if not _COUNTRY_ID.match(pais):
         raise ValueError(f"Código de país inválido: {pais!r} (usa ISO3, p. ej. ECU)")
-    if (desde is None) != (hasta is None):
-        raise ValueError("Indica `desde` y `hasta` juntos, o ninguno.")
+    # The API only takes a closed `date=YYYY:YYYY` range, so close an open one.
+    if desde is not None and hasta is None:
+        hasta = datetime.now(UTC).year
+    elif hasta is not None and desde is None:
+        desde = _FIRST_YEAR
     if desde is not None and hasta is not None and desde > hasta:
         raise ValueError("`desde` no puede ser mayor que `hasta`.")
 
@@ -130,12 +137,14 @@ async def get_indicador(
         await _fetch_json(f"/country/{pais.upper()}/indicator/{indicador}", **params)
     )
     meta, rows = payload[0], payload[1] or []
+    # Almost every WDI series is yearly; a quarterly/monthly one ("2020Q1")
+    # keeps its period label instead of failing the int() conversion.
     serie = [
-        {"anio": int(r["date"]), "valor": r["value"]}
+        {"anio": int(r["date"]) if str(r["date"]).isdigit() else r["date"], "valor": r["value"]}
         for r in rows
         if r.get("value") is not None
     ]
-    serie.sort(key=lambda r: r["anio"])
+    serie.sort(key=lambda r: str(r["anio"]))
     result = {
         "indicador": indicador,
         "nombre": rows[0]["indicator"]["value"] if rows else None,

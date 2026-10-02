@@ -1658,6 +1658,11 @@
         "default": "0"
       },
       {
+        "name": "formato",
+        "type": "str",
+        "default": "''"
+      },
+      {
         "name": "format",
         "type": "Literal['text', 'json']",
         "default": "'text'"
@@ -1670,6 +1675,7 @@
       "query": "Free text matched (accent-insensitive) against each file's title and source-specific fields. Empty returns all files.",
       "limit": "Max files returned (1-100, default 50).",
       "offset": "Pagination offset over the matched files.",
+      "formato": "Optional exact file format (PDF, XLSX, CSV, ZIP...); not for sri_datasets, sri_recaudacion or censo.",
       "format": "text | json"
     }
   },

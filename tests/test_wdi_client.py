@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 import pytest
 
 from helpers import wdi_client as client
@@ -91,6 +93,29 @@ async def test_get_indicador_passes_year_range(httpx_mock):
     assert result["total_registros"] == 2
 
 
+async def test_get_indicador_closes_open_range_with_current_year(httpx_mock):
+    year = datetime.now(UTC).year
+    httpx_mock.add_response(
+        url=f"{_SERIES_URL}?format=json&per_page=1000&date=2020%3A{year}", json=_SERIES
+    )
+
+    result = await client.get_indicador("EG.ELC.ACCS.ZS", desde=2020)
+
+    assert result["total_registros"] == 2
+
+
+async def test_search_tolerates_null_text_fields(httpx_mock):
+    catalog = [_CATALOG[0], [{"id": "X.Y", "name": None, "sourceNote": None}]]
+    httpx_mock.add_response(
+        url="https://api.worldbank.org/v2/indicator?source=2&format=json&per_page=5000",
+        json=catalog,
+    )
+
+    result = await client.search_indicadores(query="x.y")
+
+    assert result["indicadores"][0]["descripcion"] == ""
+
+
 async def test_api_error_payload_raises(httpx_mock):
     httpx_mock.add_response(
         url="https://api.worldbank.org/v2/country/ECU/indicator/NOPE.X?format=json&per_page=1000",
@@ -106,7 +131,6 @@ async def test_api_error_payload_raises(httpx_mock):
     [
         ({"indicador": "bad code!"}, "indicador inválido"),
         ({"indicador": "A.B", "pais": "../x"}, "país inválido"),
-        ({"indicador": "A.B", "desde": 2020}, "juntos"),
         ({"indicador": "A.B", "desde": 2024, "hasta": 2020}, "mayor"),
     ],
 )

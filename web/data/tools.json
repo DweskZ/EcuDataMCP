@@ -1247,7 +1247,7 @@
             "name": "archivo",
             "type": "str",
             "default": null,
-            "description": "Un nombre de archivo devuelto por list_bce_indicadores_diarios."
+            "description": "Un nombre de archivo devuelto por list_catalogo(fuente='bce_diarios')."
           },
           {
             "name": "codigo",
@@ -1280,20 +1280,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Obtiene la serie temporal de un indicador diario/mensual del BCE (ej. Riesgo País), acotada a una ventana — nunca la serie completa (algunas superan las 7,000 observaciones). Obtén archivo/codigo primero desde list_bce_indicadores_diarios — un codigo solo tiene sentido dentro de su propio archivo. Sin desde/hasta, devuelve las ultimos_n observaciones más recientes (tope 366). Con desde/hasta (YYYY-MM-DD, inclusive), devuelve ese rango en su lugar, también con tope de 366 filas (las más recientes dentro del rango si este es mayor). La respuesta siempre incluye rango_completo (el rango de fechas real y el número de filas de la serie completa) para que la ventana devuelta nunca se confunda con la serie entera. Cada punto en \"datos\" trae \"valor\" (un solo número) para casi todos los indicadores, excepto Inflación (datos_ipc.json), que no tiene un valor único — sus puntos traen \"valores\": {\"Mensual\":..., \"Anual\":..., \"Acumulada\":...} en su lugar."
-      },
-      {
-        "name": "list_bce_indicadores_diarios",
-        "description": "Lista la familia de widgets \"indicador\" diarios/mensuales del BCE, publicados fuera de BCEData e IEM (páginas de widgets Highcharts de contenido.bce.fin.ec) — incluye Riesgo País (EMBI) como serie genuinamente diaria desde 2004, que BCEData solo expone como agregado mensual de fin de período.",
-        "params": [
-          {
-            "name": "format",
-            "type": "Literal['text', 'json']",
-            "default": "'text'",
-            "description": "text | json"
-          }
-        ],
-        "long_description": "Lista la familia de widgets \"indicador\" diarios/mensuales del BCE, publicados fuera de BCEData e IEM (páginas de widgets Highcharts de contenido.bce.fin.ec) — incluye Riesgo País (EMBI) como serie genuinamente diaria desde 2004, que BCEData solo expone como agregado mensual de fin de período. También cubre: Precio del Oro, Petróleo WTI, Índice Dow Jones, Tasa SOFR/LIBOR, precios de bonos soberanos de Ecuador (todos diarios); Sistema de Pagos/Cobros Interbancarios, Sistema de Pagos en Línea, Cámara de Compensación de Cheques (mensual); Producción Petrolera Nacional (diaria); inflación, desempleo, confianza del consumidor, PIB (mensual/trimestral/anual, probablemente duplican BCEData). El catálogo se descubre en vivo desde los datos de cada archivo, no está hardcodeado — un \"codigo\" solo tiene sentido dentro de su propio \"archivo\", no entre archivos distintos. Continúa con get_bce_indicador_diario(archivo, codigo) para una serie."
+        "long_description": "Obtiene la serie temporal de un indicador diario/mensual del BCE (ej. Riesgo País), acotada a una ventana — nunca la serie completa (algunas superan las 7,000 observaciones). Obtén archivo/codigo primero desde list_catalogo(fuente='bce_diarios') — un codigo solo tiene sentido dentro de su propio archivo. Sin desde/hasta, devuelve las ultimos_n observaciones más recientes (tope 366). Con desde/hasta (YYYY-MM-DD, inclusive), devuelve ese rango en su lugar, también con tope de 366 filas (las más recientes dentro del rango si este es mayor). La respuesta siempre incluye rango_completo (el rango de fechas real y el número de filas de la serie completa) para que la ventana devuelta nunca se confunda con la serie entera. Cada punto en \"datos\" trae \"valor\" (un solo número) para casi todos los indicadores, excepto Inflación (datos_ipc.json), que no tiene un valor único — sus puntos traen \"valores\": {\"Mensual\":..., \"Anual\":..., \"Acumulada\":...} en su lugar."
       },
       {
         "name": "search_bce_iem",
@@ -1363,69 +1350,6 @@
         "long_description": "Busca tablas individuales de Excel en el último boletín IEM del BCE. Úsalo para tablas detalladas del BCE que no están disponibles fácilmente vía search_indicadores_bce/BCEData: comercio por país, deuda, finanzas públicas por nivel de gobierno, petróleo, desagregaciones del PIB, y más. Lista las tablas del boletín mensual vigente; usa get_bce_iem_table con un table_id devuelto para inspeccionar un archivo XLSX oficial. Usa historico=true (o indica desde_anio/hasta_anio) para buscar en todas las páginas de boletines mensuales que coincidan; esto es más lento en la primera llamada porque hay que leer las páginas del archivo histórico. Usa guardar_catalogo=true para persistir el catálogo completo armado por esta búsqueda en IEM_CATALOG_DIR (o data/iem_catalog_snapshots por defecto). La paginación sigue acotando la respuesta del MCP. Usa hash_archivos=true para una auditoría SHA-256 tipo operador de los archivos XLSX descubiertos. Esto descarga los archivos completos, así que es deliberadamente opt-in y está acotado por max_hash_archivos."
       },
       {
-        "name": "search_bce_remesas",
-        "description": "Lista los enlaces directos a archivos de Remesas de Trabajadores del BCE.",
-        "params": [
-          {
-            "name": "query",
-            "type": "str",
-            "default": "''",
-            "description": "Texto libre que se busca, sin distinguir tildes, en la etiqueta o URL del archivo, p. ej. \"historica\", \"entidad\", \"bdd\". Vacío devuelve todos."
-          },
-          {
-            "name": "format",
-            "type": "Literal['text', 'json']",
-            "default": "'text'",
-            "description": "text | json"
-          }
-        ],
-        "long_description": "Lista los enlaces directos a archivos de Remesas de Trabajadores del BCE. Una serie separada de BCEData/IEM (search_indicadores_bce, search_bce_iem): la serie agregada de flujos, la serie histórica completa, una nota metodológica para el usuario, y — desde un cambio a recolección basada en microdatos en julio de 2025 — bases de datos (BDD) agregadas mensuales y por entidad. Trata los archivos \"histórica\" (previo al cambio) y \"BDD\" (posterior al cambio) como series metodológicamente distintas, no como una sola continua — revisa la nota al usuario (Nota_al_usuario) para el detalle de comparabilidad. Devuelve URLs directas, no el contenido de los archivos — descárgalos tú mismo o vía download_resource."
-      },
-      {
-        "name": "search_bce_publicaciones",
-        "description": "Publicaciones recientes del BCE (boletines, reportes, avisos).",
-        "params": [
-          {
-            "name": "query",
-            "type": "str",
-            "default": "''",
-            "description": "Texto libre contra el título de la publicación (ignora tildes). Vacío devuelve todas."
-          },
-          {
-            "name": "formato",
-            "type": "Literal['', 'PDF', 'XLSX', 'XLS', 'CSV', 'ZIP', 'HTML']",
-            "default": "''",
-            "description": "Coincidencia exacta con el formato derivado — PDF, XLSX, XLS, CSV, ZIP, HTML. Vacío devuelve todos los formatos."
-          },
-          {
-            "name": "format",
-            "type": "Literal['text', 'json']",
-            "default": "'text'",
-            "description": "text | json"
-          }
-        ],
-        "long_description": "Lista las publicaciones recientes del Banco Central del Ecuador desde su sección \"Últimas Publicaciones\": boletines monetarios, reportes de tasas de interés, boletines sectoriales, avisos del IEM, entre otros, cada uno con fecha, título, URL directa y formato. Es un catálogo distinto de BCEData/IEM (search_indicadores_bce, search_bce_iem): la mayoría de lo que aparece aquí no tiene una serie numérica equivalente. Solo muestra la ventana reciente que exhibe la propia página (unas 30 publicaciones más recientes) — no hay paginación ni filtro de rango de fechas."
-      },
-      {
-        "name": "search_bce_precios_comex",
-        "description": "Índices de precios de comercio exterior del BCE, desagregados.",
-        "params": [
-          {
-            "name": "query",
-            "type": "str",
-            "default": "''",
-            "description": "Texto libre contra la etiqueta del archivo, el título de la página o el id de página (ignora tildes), ej. \"importacion\", \"exportacion\". Vacío devuelve todos los archivos."
-          },
-          {
-            "name": "format",
-            "type": "Literal['text', 'json']",
-            "default": "'text'",
-            "description": "text | json"
-          }
-        ],
-        "long_description": "Lista los enlaces a los archivos desagregados de índices de precios de comercio exterior del BCE — precios de importación por categoría de uso económico y precios de exportación por producto individual (petróleo crudo, camarón, banano, cacao, cobre, oro, rosas), cada uno con hojas separadas de precio/valor/volumen y variaciones. Es una fuente distinta del catálogo BCEData de search_indicadores_bce (que solo tiene las tres series *agregadas*) y de search_bce_paginas (que no cubre precios de comercio exterior). Devuelve URLs directas, no el contenido de los archivos."
-      },
-      {
         "name": "search_bce_calendario",
         "description": "Calendario de publicaciones estadísticas programadas del BCE.",
         "params": [
@@ -1484,7 +1408,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Busca en el calendario propio de publicaciones estadísticas del BCE — fechas programadas de publicación del IEM, Cuentas Nacionales, IMAEC, balanza de pagos y más, cada una con categoría, periodicidad, período de referencia y un link directo a su página. Distinto de search_bce_publicaciones (una ventana rodante de ~30 publicaciones ya salidas, sin fechas futuras): este es el calendario propio del BCE, hacia adelante, para todo el año."
+        "long_description": "Busca en el calendario propio de publicaciones estadísticas del BCE — fechas programadas de publicación del IEM, Cuentas Nacionales, IMAEC, balanza de pagos y más, cada una con categoría, periodicidad, período de referencia y un link directo a su página. Distinto de search_archivos(fuente='bce_publicaciones') (una ventana rodante de ~30 publicaciones ya salidas, sin fechas futuras): este es el calendario propio del BCE, hacia adelante, para todo el año."
       },
       {
         "name": "search_bce_paginas",
@@ -1740,7 +1664,7 @@
             "name": "informe_id",
             "type": "str",
             "default": null,
-            "description": "An id from list_contraloria_informes"
+            "description": "An id from list_catalogo(fuente='contraloria')"
           },
           {
             "name": "rows",
@@ -1755,20 +1679,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Descarga y previsualiza un documento de la Contraloría (Datos Abiertos o Plan Anual de Control). Obtén informe_id desde list_contraloria_informes. Los documentos trimestrales \"Datos Abiertos\" devuelven una fila por cada informe de auditoría aprobado ese trimestre, para cualquier institución pública del país. Los documentos \"Plan Anual de Control\" son PDFs (uno por año); esto devuelve su metadata y te dirige a read_pdf en vez de una tabla."
-      },
-      {
-        "name": "list_contraloria_informes",
-        "description": "Lista los documentos \"Datos Abiertos\" y \"Plan Anual de Control\" de la Contraloría General del Estado.",
-        "params": [
-          {
-            "name": "format",
-            "type": "Literal['text', 'json']",
-            "default": "'text'",
-            "description": "text | json"
-          }
-        ],
-        "long_description": "Lista los documentos \"Datos Abiertos\" y \"Plan Anual de Control\" de la Contraloría General del Estado. \"Datos Abiertos\" son exportaciones CSV trimestrales de informes de auditoría aprobados para CUALQUIER institución pública del país (Unidad de Control, Entidad, Diligencia, periodo, tipo de informe, N° de informe, fecha de aprobación) — mucho más amplio que cualquier archivo de auditoría de una sola institución ya cubierto en otra parte de este MCP. Se agregan trimestres nuevos aproximadamente cada tres meses. Los documentos \"Plan Anual de Control\" son un PDF por año (el plan anual de control aprobado). Continúa con get_contraloria_informe(informe_id) para las filas parseadas de un documento (CSV) o su metadata + puntero a read_pdf (PDF)."
+        "long_description": "Descarga y previsualiza un documento de la Contraloría (Datos Abiertos o Plan Anual de Control). Obtén informe_id desde list_catalogo(fuente='contraloria'). Los documentos trimestrales \"Datos Abiertos\" devuelven una fila por cada informe de auditoría aprobado ese trimestre, para cualquier institución pública del país. Los documentos \"Plan Anual de Control\" son PDFs (uno por año); esto devuelve su metadata y te dirige a read_pdf en vez de una tabla."
       },
       {
         "name": "get_sipa_resumen_indicadores",
@@ -1864,7 +1775,7 @@
             "name": "indicador",
             "type": "str",
             "default": null,
-            "description": "Una clave de list_sut_indicadores."
+            "description": "Una clave de list_catalogo(fuente='sut')."
           },
           {
             "name": "format",
@@ -1876,19 +1787,6 @@
         "long_description": "Lista las columnas/medidas/niveles de fecha consultables de un tablero Power BI del SUT, descubiertos desde la definición propia del reporte (la consulta subyacente de cada visual), no por adivinanza. Un campo como \"public contratos.nombre_padre_activ_econ_empresa\" es una columna plana usable en campos o filtros de query_sut_indicador; uno que termina en \"[medida]\" es una medida agregada (válida solo en campos, nunca en filtros); uno que termina en \"[Año]\"/\"[Mes]\" es un nivel de jerarquía de fecha. denuncias_publico y encuentra_empleo usan un formato de reporte más antiguo donde los visuales no exponen su consulta de esta manera — sus campos vienen de un conjunto pequeño capturado a mano (recuperado navegando el tablero en vivo y leyendo las consultas que realmente envía), no de este descubrimiento automático, pero aparecen aquí igual que cualquier otro campo."
       },
       {
-        "name": "list_sut_indicadores",
-        "description": "Lista los tableros públicos de Power BI \"Indicadores\" del Ministerio del Trabajo/SUT (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml).",
-        "params": [
-          {
-            "name": "format",
-            "type": "Literal['text', 'json']",
-            "default": "'text'",
-            "description": "text | json"
-          }
-        ],
-        "long_description": "Lista los tableros públicos de Power BI \"Indicadores\" del Ministerio del Trabajo/SUT (sut.trabajo.gob.ec/mrl/contenido/indicadores/*.xhtml). Son modelos semánticos consultables en vivo, no archivos estáticos — cubren registro mensual de contratos por industria/provincia/género desde 2015 (contratos), demanda laboral y brechas de habilidades reportadas por empleadores, estadísticas de capacitación/certificación, indicadores provinciales de brecha de empleo, y un tablero de cumplimiento de políticas de género/lugar de trabajo (PEA, brechas salariales, salas de lactancia, cuidado infantil, teletrabajo). Nada de esto se solapa con lo que ya cubren los datasets CKAN de ministerio-del-trabajo, que son solo una foto del stock actual. Continúa con get_sut_indicador_schema(indicador) para ver los campos consultables de un tablero, y luego query_sut_indicador para extraer datos reales — cualquier combinación de campos, no solo lo que ya muestra un gráfico."
-      },
-      {
         "name": "query_sut_indicador",
         "description": "Ejecuta una consulta en vivo contra el modelo de datos subyacente de un tablero Power BI del SUT — cualquier combinación de sus campos, ej. mes y provincia juntos.",
         "params": [
@@ -1896,7 +1794,7 @@
             "name": "indicador",
             "type": "str",
             "default": null,
-            "description": "Una clave de list_sut_indicadores."
+            "description": "Una clave de list_catalogo(fuente='sut')."
           },
           {
             "name": "campos",
@@ -2038,19 +1936,6 @@
         "long_description": "Convierte un PDF de cortes programados (`archivo` de search_cortes) en filas con página, fecha, horario sin energía, sectores y los campos de ubicación de la empresa (EEQ: subestación; CentroSur: provincia/cantón/zona). El parámetro query filtra por lugar."
       },
       {
-        "name": "list_arconel_reportes",
-        "description": "Tipos de reporte, años (desde 1998) y grupos de empresas del generador de estadísticas de ARCONEL.",
-        "params": [
-          {
-            "name": "format",
-            "type": "Literal['text', 'json']",
-            "default": "'text'",
-            "description": "Formato de salida: `text` (default) o `json`."
-          }
-        ],
-        "long_description": "Lista los reportes del generador público de estadísticas de ARCONEL (regulador eléctrico), por sección: datos por parroquia (medidores, facturación, subsidio Tarifa Dignidad), infraestructura, transacciones y más. Siguiente paso: get_arconel_reporte."
-      },
-      {
         "name": "get_arconel_reporte",
         "description": "Ejecuta un reporte de ARCONEL (p. ej. «Balance Energía» de un año) y devuelve sus filas.",
         "params": [
@@ -2058,7 +1943,7 @@
             "name": "tipo",
             "type": "str",
             "default": null,
-            "description": "Nombre del reporte según list_arconel_reportes (sin distinguir tildes ni mayúsculas), p. ej. \"Balance Energía\", \"Pérdidas\"."
+            "description": "Nombre del reporte según list_catalogo(fuente='arconel') (sin distinguir tildes ni mayúsculas), p. ej. \"Balance Energía\", \"Pérdidas\"."
           },
           {
             "name": "anio",
@@ -2191,19 +2076,6 @@
     "category": "IESS: documentos y cumplimiento patronal",
     "tools": [
       {
-        "name": "list_iess_colecciones",
-        "description": "Colecciones documentales del IESS (boletines, estudios actuariales, auditorías).",
-        "params": [
-          {
-            "name": "format",
-            "type": "Literal['text', 'json']",
-            "default": "'text'",
-            "description": "text | json"
-          }
-        ],
-        "long_description": "Lista las tres colecciones documentales del IESS (Instituto Ecuatoriano de Seguridad Social) — Boletines Estadísticos, Estudios Actuariales e Informes de Auditoría —, con los años y cantidades que tiene publicados cada una. Continúa con get_iess_archivos(coleccion, anio=...) para obtener los documentos reales de una colección."
-      },
-      {
         "name": "get_iess_archivos",
         "description": "Documentos de una colección del IESS.",
         "params": [
@@ -2232,7 +2104,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Lista los documentos reales de una colección del IESS, cada uno resuelto a su URL de descarga directa, título y formato. Llama primero a list_iess_colecciones para ver qué años y cantidades tiene disponible cada colección."
+        "long_description": "Lista los documentos reales de una colección del IESS, cada uno resuelto a su URL de descarga directa, título y formato. Llama primero a list_catalogo(fuente='iess') para ver qué años y cantidades tiene disponible cada colección."
       },
       {
         "name": "get_certificado_cumplimiento_patronal",
@@ -2259,14 +2131,20 @@
     "category": "Aviación civil (DGAC)",
     "tools": [
       {
-        "name": "get_metar",
-        "description": "Reportes METAR/SPECI recientes de un aeródromo ecuatoriano.",
+        "name": "get_aviso_aeronautico",
+        "description": "Avisos aeronáuticos en vivo de la DGAC: METAR, NOTAM o SIGMET de Ecuador.",
         "params": [
+          {
+            "name": "tipo",
+            "type": "Literal['metar', 'notam', 'sigmet']",
+            "default": null,
+            "description": "metar, notam o sigmet."
+          },
           {
             "name": "designador",
             "type": "str",
-            "default": null,
-            "description": "Código ICAO del aeródromo/helipuerto, ej. SEQM (Quito), SEGU (Guayaquil), SECU (Cuenca)."
+            "default": "''",
+            "description": "Código OACI del aeródromo, p. ej. SEQM (Quito), SEGU (Guayaquil), SECU (Cuenca). Obligatorio para metar y notam; sigmet lo ignora."
           },
           {
             "name": "format",
@@ -2275,39 +2153,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Consulta los reportes meteorológicos METAR/SPECI más recientes de un aeródromo o helipuerto ecuatoriano, desde el sitio IFIS de la DGAC (ais.aviacioncivil.gob.ec), de acceso público sin login. Devuelve el tipo de reporte, la marca de tiempo UTC de observación y el texto crudo en codificación ICAO (ej. \"SEQM 030100Z 30004KT 9999 FEW030 17/08 Q1026 NOSIG RMK A3032=\"). Un designador desconocido devuelve un resultado vacío, no un error."
-      },
-      {
-        "name": "get_notam",
-        "description": "NOTAMs activos para un aeródromo ecuatoriano.",
-        "params": [
-          {
-            "name": "designador",
-            "type": "str",
-            "default": null,
-            "description": "Código ICAO del aeródromo/helipuerto, ej. SEQM (Quito), SEGU (Guayaquil), SECU (Cuenca)."
-          },
-          {
-            "name": "format",
-            "type": "Literal['text', 'json']",
-            "default": "'text'",
-            "description": "text | json"
-          }
-        ],
-        "long_description": "Consulta los NOTAM (avisos a aviadores) activos para un aeródromo o helipuerto ecuatoriano, desde el sitio IFIS de la DGAC, también de acceso público sin login. Cada NOTAM incluye su número de serie (ej. \"A1784/26\"), el texto crudo en formato ICAO y la tabla de campos decodificados que publica el propio sitio (Tipo, FIR, vigencia, horario, etc.). Un designador desconocido devuelve cero NOTAM, no un error."
-      },
-      {
-        "name": "get_sigmet",
-        "description": "SIGMET activos para el espacio aéreo ecuatoriano (FIR único).",
-        "params": [
-          {
-            "name": "format",
-            "type": "Literal['text', 'json']",
-            "default": "'text'",
-            "description": "text | json"
-          }
-        ],
-        "long_description": "Consulta los SIGMET (información meteorológica significativa: ceniza volcánica, turbulencia o engelamiento severos, tormentas) actualmente activos para el FIR de Ecuador (SEFG), desde el sitio IFIS de la DGAC. Como el país tiene un único FIR, no existe parámetro por aeródromo. Cero resultados significa que no hay avisos activos, no un error."
+        "long_description": "Consulta el sitio IFIS de la DGAC (ais.aviacioncivil.gob.ec), público y sin login. metar: reportes METAR/SPECI más recientes de un aeródromo (tipo, hora UTC, texto OACI crudo; normalmente cada hora). notam: NOTAM activos de un aeródromo con su serie (p. ej. A1784/26), el texto Q)/A)/B)/C)/D)/E) y los campos que decodifica la DGAC; para la ficha fija usa get_aip_aerodromo. sigmet: SIGMET activos (ceniza volcánica, turbulencia, engelamiento, tormentas) de la única FIR de Ecuador (SEFG); cero resultados significa que no hay ninguno activo. Un designador desconocido devuelve un resultado vacío, no un error."
       },
       {
         "name": "list_aip_aerodromos",
@@ -2474,6 +2320,91 @@
           }
         ],
         "long_description": "Obtiene las observaciones de un indicador de CEPALSTAT, filtradas a un país (Ecuador por defecto) para mantener la respuesta chica — la API cruda de CEPAL devuelve todos los países de la región (y a menudo del mundo) por indicador si no se filtra, confirmado en vivo en ~2.5 MB sin filtro vs. ~85 KB filtrado a un país. Consigue el indicator_id con search_cepalstat_indicadores. Cada registro devuelto decodifica los ids de dimensión crudos de CEPALSTAT a etiquetas legibles (ej. \"Sexo\": \"Mujeres\", \"Años\": \"1975\") usando el propio catálogo de dimensiones de ese indicador — no todos los indicadores tienen las mismas dimensiones (algunos son solo país × año, otros agregan sexo, grupo de edad, etc.)."
+      },
+      {
+        "name": "get_serie_internacional",
+        "description": "Series internacionales con datos de Ecuador: indicadores WDI del Banco Mundial, capacidad y generación eléctrica de IRENA y flujos eléctricos Colombia-Ecuador de XM.",
+        "params": [
+          {
+            "name": "fuente",
+            "type": "Fuente",
+            "default": null,
+            "description": "wdi, irena o xm."
+          },
+          {
+            "name": "indicador",
+            "type": "str",
+            "default": "''",
+            "description": "Solo wdi: código WDI. Vacío con query busca en el catálogo."
+          },
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Solo wdi: texto de búsqueda en el catálogo (en inglés), usado si indicador está vacío."
+          },
+          {
+            "name": "pais",
+            "type": "str",
+            "default": "'ECU'",
+            "description": "wdi/irena: código ISO3 (irena también acepta el nombre en inglés). xm lo ignora. Por defecto ECU."
+          },
+          {
+            "name": "desde",
+            "type": "str",
+            "default": "''",
+            "description": "Inicio: un año (AAAA) para wdi/irena, una fecha (AAAA-MM-DD) para xm."
+          },
+          {
+            "name": "hasta",
+            "type": "str",
+            "default": "''",
+            "description": "Fin, en el mismo formato que desde. xm admite como máximo 366 días."
+          },
+          {
+            "name": "tecnologia",
+            "type": "str",
+            "default": "''",
+            "description": "Solo irena: parte del nombre de la tecnología (solar, hydro, Total Renewable...). Vacío devuelve todas."
+          },
+          {
+            "name": "tipo",
+            "type": "Literal['ambos', 'generacion', 'capacidad']",
+            "default": "'ambos'",
+            "description": "Solo irena: generacion (GWh), capacidad (MW) o ambos."
+          },
+          {
+            "name": "conexion",
+            "type": "Literal['All', 'On-grid', 'Off-grid']",
+            "default": "'All'",
+            "description": "Solo irena: All, On-grid u Off-grid."
+          },
+          {
+            "name": "sentido",
+            "type": "Literal['exportaciones', 'importaciones']",
+            "default": "'exportaciones'",
+            "description": "Solo xm: exportaciones (Colombia a Ecuador) o importaciones (Ecuador a Colombia)."
+          },
+          {
+            "name": "agregacion",
+            "type": "Literal['dia', 'mes']",
+            "default": "'dia'",
+            "description": "Solo xm: dia o mes."
+          },
+          {
+            "name": "limit",
+            "type": "int",
+            "default": "30",
+            "description": "Solo búsqueda en el catálogo WDI: máximo de indicadores (1-200)."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Trae una serie de una fuente internacional filtrada a Ecuador. wdi: World Development Indicators del Banco Mundial (más de 1.400 series anuales); con indicador (p. ej. EG.ELC.ACCS.ZS acceso a electricidad) devuelve la serie, con solo query (en inglés) busca en el catálogo; los años sin valor se omiten y se cuentan. irena: capacidad instalada (MW) y generación (GWh) por tecnología de IRENASTAT, desde 2000, conectada o no a la red. xm: energía horaria en la interconexión Colombia-Ecuador según XM, sumada por día o mes desde 2003; requiere desde y hasta (máximo 366 días); los días sin flujo aparecen con 0 GWh, así que la suspensión de octubre de 2024 se ve como ceros."
       }
     ]
   },
@@ -2507,6 +2438,12 @@
             "type": "int",
             "default": "0",
             "description": "Desplazamiento de paginación sobre los archivos encontrados."
+          },
+          {
+            "name": "formato",
+            "type": "str",
+            "default": "''",
+            "description": "Formato exacto opcional (PDF, XLSX, CSV, ZIP...); no disponible para sri_datasets, sri_recaudacion ni censo."
           },
           {
             "name": "format",
@@ -2560,6 +2497,25 @@
           }
         ],
         "long_description": "Lista los archivos de una sección obtenida con list_archivo_secciones. Cada archivo trae título, URL y formato, más contexto propio de la fuente (grupo, período, subgrupo, descripción). Devuelve enlaces, no contenido; descarga los archivos grandes directamente (las tools de vista previa y descarga tienen un tope de 5 MB)."
+      },
+      {
+        "name": "list_catalogo",
+        "description": "Lista el catálogo de una fuente sin filtros de búsqueda: ARCONEL, indicadores diarios del BCE, Contraloría, IESS o SUT.",
+        "params": [
+          {
+            "name": "fuente",
+            "type": "Fuente",
+            "default": null,
+            "description": "Catálogo a listar: arconel, bce_diarios, contraloria, iess o sut."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lista el catálogo de una fuente que no tiene filtros, el paso previo a su tool get. arconel: tipos de reporte del sector eléctrico por sección, años (desde 1998) y grupos de empresas; sigue con get_arconel_reporte. bce_diarios: widgets de indicadores diarios/mensuales del BCE fuera de BCEData (riesgo país diario desde 2004, oro, WTI, bonos, pagos, reservas, series fiscales y externas); un codigo solo tiene sentido dentro de su archivo; sigue con get_bce_indicador_diario(archivo, codigo). contraloria: CSV trimestrales de informes de auditoría aprobados y planes anuales de control; sigue con get_contraloria_informe. iess: colecciones de documentos del IESS (boletines estadísticos, estudios actuariales, informes de auditoría) con años y conteos; sigue con get_iess_archivos(coleccion, anio). sut: tableros Power BI del Ministerio del Trabajo (contratos desde 2015, demanda laboral, política de género); sigue con get_sut_indicador_schema y query_sut_indicador."
       }
     ]
   },

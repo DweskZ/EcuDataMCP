@@ -11,13 +11,25 @@
   - `search_archivos` also takes `fuente="bce_remesas"`,
     `"bce_precios_comex"` and `"bce_publicaciones"`, replacing
     `search_bce_remesas`, `search_bce_precios_comex` and
-    `search_bce_publicaciones` (the `formato` filter of the last one is gone;
-    `query` still matches titles).
+    `search_bce_publicaciones`. Its new `formato` filter (PDF, XLSX...)
+    restores the one `search_bce_publicaciones` had and works for every
+    source except `sri_datasets`, `sri_recaudacion` and `censo`.
   - `list_catalogo(fuente)` replaces `list_arconel_reportes`,
     `list_bce_indicadores_diarios`, `list_contraloria_informes`,
     `list_iess_colecciones` and `list_sut_indicadores`.
   - `get_aviso_aeronautico(tipo, designador)` replaces `get_metar`,
     `get_notam` and `get_sigmet`.
+- **Fixed (review of the above)**:
+  - XM now reports every day or month in the range, with 0 GWh when
+    nothing flowed, so the Oct-2024 suspension shows as zeros instead of
+    missing periods; a `null` hourly value no longer fails the whole range.
+  - IRENA and XM POST responses are capped at 5 MB like every other
+    download (`csv_reader.post_json_bytes`); IRENA matches dimension names
+    case-insensitively and names the missing one if a new edition renames it.
+  - WDI accepts a single `desde` or `hasta` (open ends become 1960 / the
+    current year), tolerates `null` catalog text and non-yearly periods.
+  - Error messages of `get_bce_indicador_diario` and `get_arconel_reporte`
+    point to `list_catalogo` instead of the removed tools.
 
 ## 0.10.0 — 2026-09-28
 
