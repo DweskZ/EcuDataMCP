@@ -1280,19 +1280,19 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_bce_indicador_diario" data-search="get_bce_indicador_diario fetch one bce daily/monthly indicator's time series (e.g. riesgo país). fetch one bce daily/monthly indicator's time series (e.g. riesgo país), bounded to a window — never the full series (some run 7,000+ observations). get archivo/codigo from list_bce_indicadores_diarios first — a codigo only means one thing within its own archivo. without desde/hasta, returns the most recent ultimos_n observations (capped at 366). with desde/hasta (yyyy-mm-dd, inclusive), returns that date range instead, also capped at 366 rows (most recent within the range if it's larger). the response always includes rango_completo (the series' true full date range and row count) so the window returned is never mistaken for the whole series. each point in &quot;datos&quot; has &quot;valor&quot; (one number) for almost every indicator, except inflación (datos_ipc.json), which has no single value — its points carry &quot;valores&quot;: {&quot;mensual&quot;:..., &quot;anual&quot;:..., &quot;acumulada&quot;:...} instead. archivo a file name from list_bce_indicadores_diarios. codigo a &quot;código variable dinámica&quot; from that same archivo. ultimos_n most recent n observations when no date range is given. desde optional start date yyyy-mm-dd. hasta optional end date yyyy-mm-dd. format text | json">
+<details class="atlas-tool" id="tool-get_bce_indicador_diario" data-search="get_bce_indicador_diario fetch one bce daily/monthly indicator's time series (e.g. riesgo país). fetch one bce daily/monthly indicator's time series (e.g. riesgo país), bounded to a window — never the full series (some run 7,000+ observations). get archivo/codigo from list_catalogo(fuente='bce_diarios') first — a codigo only means one thing within its own archivo. without desde/hasta, returns the most recent ultimos_n observations (capped at 366). with desde/hasta (yyyy-mm-dd, inclusive), returns that date range instead, also capped at 366 rows (most recent within the range if it's larger). the response always includes rango_completo (the series' true full date range and row count) so the window returned is never mistaken for the whole series. each point in &quot;datos&quot; has &quot;valor&quot; (one number) for almost every indicator, except inflación (datos_ipc.json), which has no single value — its points carry &quot;valores&quot;: {&quot;mensual&quot;:..., &quot;anual&quot;:..., &quot;acumulada&quot;:...} instead. archivo a file name from list_catalogo(fuente='bce_diarios'). codigo a &quot;código variable dinámica&quot; from that same archivo. ultimos_n most recent n observations when no date range is given. desde optional start date yyyy-mm-dd. hasta optional end date yyyy-mm-dd. format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_bce_indicador_diario</code>
 <span class="atlas-tool-desc">Fetch one BCE daily/monthly indicator's time series (e.g. Riesgo País).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Fetch one BCE daily/monthly indicator's time series (e.g. Riesgo País), bounded to a window — never the full series (some run 7,000+ observations). Get archivo/codigo from list_bce_indicadores_diarios first — a codigo only means one thing within its own archivo. Without desde/hasta, returns the most recent ultimos_n observations (capped at 366). With desde/hasta (YYYY-MM-DD, inclusive), returns that date range instead, also capped at 366 rows (most recent within the range if it's larger). The response always includes rango_completo (the series' true full date range and row count) so the window returned is never mistaken for the whole series. Each point in "datos" has "valor" (one number) for almost every indicator, except Inflación (datos_ipc.json), which has no single value — its points carry "valores": {"Mensual":..., "Anual":..., "Acumulada":...} instead.</p>
+<p class="atlas-tool-long">Fetch one BCE daily/monthly indicator's time series (e.g. Riesgo País), bounded to a window — never the full series (some run 7,000+ observations). Get archivo/codigo from list_catalogo(fuente='bce_diarios') first — a codigo only means one thing within its own archivo. Without desde/hasta, returns the most recent ultimos_n observations (capped at 366). With desde/hasta (YYYY-MM-DD, inclusive), returns that date range instead, also capped at 366 rows (most recent within the range if it's larger). The response always includes rango_completo (the series' true full date range and row count) so the window returned is never mistaken for the whole series. Each point in "datos" has "valor" (one number) for almost every indicator, except Inflación (datos_ipc.json), which has no single value — its points carry "valores": {"Mensual":..., "Anual":..., "Acumulada":...} instead.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>archivo</code></td><td><code>str</code></td><td><code>required</code></td><td>A file name from list_bce_indicadores_diarios.</td></tr>
+<tr><td><code>archivo</code></td><td><code>str</code></td><td><code>required</code></td><td>A file name from list_catalogo(fuente='bce_diarios').</td></tr>
 
 <tr><td><code>codigo</code></td><td><code>str</code></td><td><code>required</code></td><td>A "Código Variable Dinámica" from that same archivo.</td></tr>
 
@@ -1348,13 +1348,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-search_bce_calendario" data-search="search_bce_calendario bce's scheduled statistical-publication calendar. search bce's own statistical publication calendar — scheduled release dates for iem, cuentas nacionales, imaec, balance of payments, and more, each with category, periodicity, reference period, and a direct link to the publication's page. distinct from search_bce_publicaciones (a rolling window of ~30 already-published items, no future dates): this is bce's own forward-looking release schedule for the full calendar year. query free text matched against the publication name or its observations note (accent-insensitive). empty matches all. categoria exact category filter (accent-insensitive), e.g. &quot;cuentas nacionales&quot;, &quot;balanza de pagos y comercio exterior&quot;. periodicidad exact periodicity filter, e.g. &quot;mensual&quot;, &quot;anual&quot;, &quot;trimestral&quot;, &quot;semanal&quot;. desde restrict to release date >= this date (yyyy-mm-dd). hasta restrict to release date <= this date (yyyy-mm-dd). solo_proximas if true, only releases scheduled today or later. limit max results (1-200, default 50). offset pagination offset over the matched set. format text | json">
+<details class="atlas-tool" id="tool-search_bce_calendario" data-search="search_bce_calendario bce's scheduled statistical-publication calendar. search bce's own statistical publication calendar — scheduled release dates for iem, cuentas nacionales, imaec, balance of payments, and more, each with category, periodicity, reference period, and a direct link to the publication's page. distinct from search_archivos(fuente='bce_publicaciones') (a rolling window of ~30 already-published items, no future dates): this is bce's own forward-looking release schedule for the full calendar year. query free text matched against the publication name or its observations note (accent-insensitive). empty matches all. categoria exact category filter (accent-insensitive), e.g. &quot;cuentas nacionales&quot;, &quot;balanza de pagos y comercio exterior&quot;. periodicidad exact periodicity filter, e.g. &quot;mensual&quot;, &quot;anual&quot;, &quot;trimestral&quot;, &quot;semanal&quot;. desde restrict to release date >= this date (yyyy-mm-dd). hasta restrict to release date <= this date (yyyy-mm-dd). solo_proximas if true, only releases scheduled today or later. limit max results (1-200, default 50). offset pagination offset over the matched set. format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_bce_calendario</code>
 <span class="atlas-tool-desc">BCE's scheduled statistical-publication calendar.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Search BCE's own statistical publication calendar — scheduled release dates for IEM, Cuentas Nacionales, IMAEC, balance of payments, and more, each with category, periodicity, reference period, and a direct link to the publication's page. Distinct from search_bce_publicaciones (a rolling window of ~30 already-published items, no future dates): this is BCE's own forward-looking release schedule for the full calendar year.</p>
+<p class="atlas-tool-long">Search BCE's own statistical publication calendar — scheduled release dates for IEM, Cuentas Nacionales, IMAEC, balance of payments, and more, each with category, periodicity, reference period, and a direct link to the publication's page. Distinct from search_archivos(fuente='bce_publicaciones') (a rolling window of ~30 already-published items, no future dates): this is BCE's own forward-looking release schedule for the full calendar year.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
@@ -1632,19 +1632,19 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-get_contraloria_informe" data-search="get_contraloria_informe download and preview one contraloría document (datos abiertos or plan anual de control). download and preview one contraloría document (datos abiertos or plan anual de control). get informe_id from list_contraloria_informes. quarterly &quot;datos abiertos&quot; documents return one row per audit report approved that quarter, across every public institution in the country. &quot;plan anual de control&quot; documents are pdfs (one per year); this returns their metadata and points you at read_pdf instead of a table. informe_id an id from list_contraloria_informes rows number of data rows to preview (default: 50, max: 200) format text | json">
+<details class="atlas-tool" id="tool-get_contraloria_informe" data-search="get_contraloria_informe download and preview one contraloría document (datos abiertos or plan anual de control). download and preview one contraloría document (datos abiertos or plan anual de control). get informe_id from list_catalogo(fuente='contraloria'). quarterly &quot;datos abiertos&quot; documents return one row per audit report approved that quarter, across every public institution in the country. &quot;plan anual de control&quot; documents are pdfs (one per year); this returns their metadata and points you at read_pdf instead of a table. informe_id an id from list_catalogo(fuente='contraloria') rows number of data rows to preview (default: 50, max: 200) format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_contraloria_informe</code>
 <span class="atlas-tool-desc">Download and preview one Contraloría document (Datos Abiertos or Plan Anual de Control).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Download and preview one Contraloría document (Datos Abiertos or Plan Anual de Control). Get informe_id from list_contraloria_informes. Quarterly "Datos Abiertos" documents return one row per audit report approved that quarter, across every public institution in the country. "Plan Anual de Control" documents are PDFs (one per year); this returns their metadata and points you at read_pdf instead of a table.</p>
+<p class="atlas-tool-long">Download and preview one Contraloría document (Datos Abiertos or Plan Anual de Control). Get informe_id from list_catalogo(fuente='contraloria'). Quarterly "Datos Abiertos" documents return one row per audit report approved that quarter, across every public institution in the country. "Plan Anual de Control" documents are PDFs (one per year); this returns their metadata and points you at read_pdf instead of a table.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>informe_id</code></td><td><code>str</code></td><td><code>required</code></td><td>An id from list_contraloria_informes</td></tr>
+<tr><td><code>informe_id</code></td><td><code>str</code></td><td><code>required</code></td><td>An id from list_catalogo(fuente='contraloria')</td></tr>
 
 <tr><td><code>rows</code></td><td><code>int</code></td><td><code>50</code></td><td>Number of data rows to preview (default: 50, max: 200)</td></tr>
 
@@ -1740,7 +1740,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_sut_indicador_schema" data-search="get_sut_indicador_schema list the queryable columns/measures/date-levels for one sut power bi dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing. list the queryable columns/measures/date-levels for one sut power bi dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing. a field like &quot;public contratos.nombre_padre_activ_econ_empresa&quot; is a plain column usable in query_sut_indicador's campos or filtros; one ending in &quot;[medida]&quot; is an aggregate measure (only valid in campos, never filtros); one ending in &quot;[año]&quot;/&quot;[mes]&quot; is a date-hierarchy level. denuncias_publico and encuentra_empleo use an older report layout where visuals don't expose their query this way at all — their fields come from a small manually-captured set instead (recovered by driving the live dashboard and reading the queries it actually sent), not from this automatic discovery, but they show up here the same as any other field. indicador a key from list_sut_indicadores. format text | json">
+<details class="atlas-tool" id="tool-get_sut_indicador_schema" data-search="get_sut_indicador_schema list the queryable columns/measures/date-levels for one sut power bi dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing. list the queryable columns/measures/date-levels for one sut power bi dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing. a field like &quot;public contratos.nombre_padre_activ_econ_empresa&quot; is a plain column usable in query_sut_indicador's campos or filtros; one ending in &quot;[medida]&quot; is an aggregate measure (only valid in campos, never filtros); one ending in &quot;[año]&quot;/&quot;[mes]&quot; is a date-hierarchy level. denuncias_publico and encuentra_empleo use an older report layout where visuals don't expose their query this way at all — their fields come from a small manually-captured set instead (recovered by driving the live dashboard and reading the queries it actually sent), not from this automatic discovery, but they show up here the same as any other field. indicador a key from list_catalogo(fuente='sut'). format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_sut_indicador_schema</code>
 <span class="atlas-tool-desc">List the queryable columns/measures/date-levels for one SUT Power BI dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing.</span>
@@ -1752,7 +1752,7 @@
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>indicador</code></td><td><code>str</code></td><td><code>required</code></td><td>A key from list_sut_indicadores.</td></tr>
+<tr><td><code>indicador</code></td><td><code>str</code></td><td><code>required</code></td><td>A key from list_catalogo(fuente='sut').</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
@@ -1762,7 +1762,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-query_sut_indicador" data-search="query_sut_indicador run a live query against one sut power bi dashboard's underlying data model — any combination of its fields, e.g. month and industry together. run a live query against one sut power bi dashboard's underlying data model — any combination of its fields, e.g. month and industry together for &quot;contratos&quot; (a real monthly time series since 2015 by ciiu industry, province, gender, contract status — none of this is in the ministerio-del-trabajo ckan datasets, which are a single current-snapshot stock count with no time dimension). get valid campos from get_sut_indicador_schema(indicador) first — an unrecognized field name raises an error naming the tool to call instead of guessing. filtros only accepts plain-column fields (not &quot;[medida]&quot;/hierarchy-level fields) and matches exact text equality, e.g. {&quot;public contratos.estado contrato&quot;: &quot;vigente&quot;}. rows can run into the thousands for a wide breakdown (e.g. every month x every industry) — narrow with filtros or fewer campos rather than raising limite past what's actually needed; format &quot;json&quot; is exact but still subject to the same limite cap. indicador a key from list_sut_indicadores. campos field labels exactly as returned by get_sut_indicador_schema. filtros optional {campo: valor} equality filters, plain columns only. limite row cap applied server-side by the query itself. format text | json">
+<details class="atlas-tool" id="tool-query_sut_indicador" data-search="query_sut_indicador run a live query against one sut power bi dashboard's underlying data model — any combination of its fields, e.g. month and industry together. run a live query against one sut power bi dashboard's underlying data model — any combination of its fields, e.g. month and industry together for &quot;contratos&quot; (a real monthly time series since 2015 by ciiu industry, province, gender, contract status — none of this is in the ministerio-del-trabajo ckan datasets, which are a single current-snapshot stock count with no time dimension). get valid campos from get_sut_indicador_schema(indicador) first — an unrecognized field name raises an error naming the tool to call instead of guessing. filtros only accepts plain-column fields (not &quot;[medida]&quot;/hierarchy-level fields) and matches exact text equality, e.g. {&quot;public contratos.estado contrato&quot;: &quot;vigente&quot;}. rows can run into the thousands for a wide breakdown (e.g. every month x every industry) — narrow with filtros or fewer campos rather than raising limite past what's actually needed; format &quot;json&quot; is exact but still subject to the same limite cap. indicador a key from list_catalogo(fuente='sut'). campos field labels exactly as returned by get_sut_indicador_schema. filtros optional {campo: valor} equality filters, plain columns only. limite row cap applied server-side by the query itself. format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">query_sut_indicador</code>
 <span class="atlas-tool-desc">Run a live query against one SUT Power BI dashboard's underlying data model — any combination of its fields, e.g. month and industry together.</span>
@@ -1774,7 +1774,7 @@
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>indicador</code></td><td><code>str</code></td><td><code>required</code></td><td>A key from list_sut_indicadores.</td></tr>
+<tr><td><code>indicador</code></td><td><code>str</code></td><td><code>required</code></td><td>A key from list_catalogo(fuente='sut').</td></tr>
 
 <tr><td><code>campos</code></td><td><code>list[str]</code></td><td><code>required</code></td><td>Field labels exactly as returned by get_sut_indicador_schema.</td></tr>
 
@@ -1890,7 +1890,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_arconel_reporte" data-search="get_arconel_reporte run one arconel report (e.g. &quot;balance energía&quot; for a year) and return its rows. runs one report from arconel's builder and returns its rows, e.g. &quot;balance energía&quot; 2023: energy received, sold and lost per month and distributor, with technical and non-technical loss percentages. slow (about 50 rows per page): max_paginas caps the work and `completo` says whether everything was read. tipo report name as listed by list_arconel_reportes (accent/case-insensitive), e.g. &quot;balance energía&quot;, &quot;pérdidas&quot;. anio year, 1998-current. grupo todos | cnel | empresas_electricas. mes 1-12, only for report types with a month filter; others already break down by month. max_paginas maximum pages to read (1-40). format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-get_arconel_reporte" data-search="get_arconel_reporte run one arconel report (e.g. &quot;balance energía&quot; for a year) and return its rows. runs one report from arconel's builder and returns its rows, e.g. &quot;balance energía&quot; 2023: energy received, sold and lost per month and distributor, with technical and non-technical loss percentages. slow (about 50 rows per page): max_paginas caps the work and `completo` says whether everything was read. tipo report name as listed by list_catalogo(fuente='arconel') (accent/case-insensitive), e.g. &quot;balance energía&quot;, &quot;pérdidas&quot;. anio year, 1998-current. grupo todos | cnel | empresas_electricas. mes 1-12, only for report types with a month filter; others already break down by month. max_paginas maximum pages to read (1-40). format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_arconel_reporte</code>
 <span class="atlas-tool-desc">Run one ARCONEL report (e.g. "Balance Energía" for a year) and return its rows.</span>
@@ -1902,7 +1902,7 @@
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>tipo</code></td><td><code>str</code></td><td><code>required</code></td><td>Report name as listed by list_arconel_reportes (accent/case-insensitive), e.g. "Balance Energía", "Pérdidas".</td></tr>
+<tr><td><code>tipo</code></td><td><code>str</code></td><td><code>required</code></td><td>Report name as listed by list_catalogo(fuente='arconel') (accent/case-insensitive), e.g. "Balance Energía", "Pérdidas".</td></tr>
 
 <tr><td><code>anio</code></td><td><code>int</code></td><td><code>required</code></td><td>Year, 1998-current.</td></tr>
 
@@ -2016,13 +2016,13 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-get_iess_archivos" data-search="get_iess_archivos documents in one iess collection. lists one iess document collection's actual documents, each resolved to a direct download url, título, and formato. call list_iess_colecciones first to see what years/counts each collection has. coleccion &quot;boletines&quot; (annual, 1978-2024 confirmed), &quot;estudios_actuariales&quot; (per fund, only a handful of years), or &quot;informes_auditoria&quot; (2007-2026 confirmed, by year). anio filter to one year. required for &quot;informes_auditoria&quot;. optional for the other two collections. query free text matched (accent-insensitive) against título and, where available, descripción/grupo. format text | json">
+<details class="atlas-tool" id="tool-get_iess_archivos" data-search="get_iess_archivos documents in one iess collection. lists one iess document collection's actual documents, each resolved to a direct download url, título, and formato. call list_catalogo(fuente='iess') first to see what years/counts each collection has. coleccion &quot;boletines&quot; (annual, 1978-2024 confirmed), &quot;estudios_actuariales&quot; (per fund, only a handful of years), or &quot;informes_auditoria&quot; (2007-2026 confirmed, by year). anio filter to one year. required for &quot;informes_auditoria&quot;. optional for the other two collections. query free text matched (accent-insensitive) against título and, where available, descripción/grupo. format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_iess_archivos</code>
 <span class="atlas-tool-desc">Documents in one IESS collection.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Lists one IESS document collection's actual documents, each resolved to a direct download URL, título, and formato. Call list_iess_colecciones first to see what years/counts each collection has.</p>
+<p class="atlas-tool-long">Lists one IESS document collection's actual documents, each resolved to a direct download URL, título, and formato. Call list_catalogo(fuente='iess') first to see what years/counts each collection has.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
@@ -2069,10 +2069,34 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">Civil aviation (DGAC)<span class="tag">2</span></span>
+<span class="atlas-category-title">Civil aviation (DGAC)<span class="tag">3</span></span>
 <span class="atlas-category-action">Show</span>
 </summary>
 <div class="atlas-category-tools">
+
+<details class="atlas-tool" id="tool-get_aviso_aeronautico" data-search="get_aviso_aeronautico live aeronautical notices from dgac: metar, notam or sigmet for ecuador. queries dgac's ifis site (ais.aviacioncivil.gob.ec), public with no login. metar: latest metar/speci reports of an aerodrome (type, utc time, raw icao text; usually hourly). notam: active notams of an aerodrome with series number (e.g. a1784/26), the q)/a)/b)/c)/d)/e) text and dgac's decoded fields; for the fixed data sheet use get_aip_aerodromo. sigmet: active sigmets (volcanic ash, turbulence, icing, storms) for ecuador's single fir (sefg); zero results means none are active. an unknown designador returns an empty result, not an error. tipo metar, notam or sigmet. designador icao code of the aerodrome, e.g. seqm (quito), segu (guayaquil), secu (cuenca). required for metar and notam; ignored by sigmet. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_aviso_aeronautico</code>
+<span class="atlas-tool-desc">Live aeronautical notices from DGAC: METAR, NOTAM or SIGMET for Ecuador.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Queries DGAC's IFIS site (ais.aviacioncivil.gob.ec), public with no login. metar: latest METAR/SPECI reports of an aerodrome (type, UTC time, raw ICAO text; usually hourly). notam: active NOTAMs of an aerodrome with series number (e.g. A1784/26), the Q)/A)/B)/C)/D)/E) text and DGAC's decoded fields; for the fixed data sheet use get_aip_aerodromo. sigmet: active SIGMETs (volcanic ash, turbulence, icing, storms) for Ecuador's single FIR (SEFG); zero results means none are active. An unknown designador returns an empty result, not an error.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>tipo</code></td><td><code>Literal['metar', 'notam', 'sigmet']</code></td><td><code>required</code></td><td>metar, notam or sigmet.</td></tr>
+
+<tr><td><code>designador</code></td><td><code>str</code></td><td><code>empty</code></td><td>ICAO code of the aerodrome, e.g. SEQM (Quito), SEGU (Guayaquil), SECU (Cuenca). Required for metar and notam; ignored by sigmet.</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
 
 <details class="atlas-tool" id="tool-list_aip_aerodromos" data-search="list_aip_aerodromos aerodromes/helipads with a published aip data sheet. lists the icao designators and names of every aerodrome/helipad with a published aip ad 2.x page, from dgac's public eaip — no login required. use get_aip_aerodromo with one of these designators to fetch its full data sheet (coordinates, runway, operating hours, fees, ats frequencies, etc.). format text | json">
 <summary class="atlas-tool-summary">
@@ -2185,7 +2209,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">International sources<span class="tag">2</span></span>
+<span class="atlas-category-title">International sources<span class="tag">3</span></span>
 <span class="atlas-category-action">Show</span>
 </summary>
 <div class="atlas-category-tools">
@@ -2240,17 +2264,61 @@
 </div>
 </details>
 
+<details class="atlas-tool" id="tool-get_serie_internacional" data-search="get_serie_internacional international series with ecuador data: world bank wdi indicators, irena electricity capacity and generation, and xm's colombia-ecuador power flows. fetches a series from an international source, filtered to ecuador. wdi: world bank world development indicators (1,400+ yearly series); with indicador (e.g. eg.elc.accs.zs access to electricity) returns the series, with only query (english) searches the catalog; years without a value are dropped and counted. irena: irenastat installed capacity (mw) and generation (gwh) by technology, 2000 on, on/off-grid. xm: xm's hourly energy on the colombia-ecuador interconnection, summed by day or month since 2003; needs desde and hasta (at most 366 days); days without flow show as 0 gwh, so the october 2024 suspension appears as zeros. fuente wdi, irena or xm. indicador wdi only: wdi code. empty with query searches the catalog. query wdi only: catalog search text (english), used when indicador is empty. pais wdi/irena: iso3 code (irena also accepts the english name). ignored by xm. default ecu. desde start: a year (yyyy) for wdi/irena, a date (yyyy-mm-dd) for xm. hasta end, same format as desde. xm allows at most 366 days. tecnologia irena only: technology label substring (solar, hydro, total renewable...). empty returns all. tipo irena only: generacion (gwh), capacidad (mw) or ambos. conexion irena only: all, on-grid or off-grid. sentido xm only: exportaciones (colombia to ecuador) or importaciones (ecuador to colombia). agregacion xm only: dia or mes. limit wdi catalog search only: maximum indicators (1-200). format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_serie_internacional</code>
+<span class="atlas-tool-desc">International series with Ecuador data: World Bank WDI indicators, IRENA electricity capacity and generation, and XM's Colombia-Ecuador power flows.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Fetches a series from an international source, filtered to Ecuador. wdi: World Bank World Development Indicators (1,400+ yearly series); with indicador (e.g. EG.ELC.ACCS.ZS access to electricity) returns the series, with only query (English) searches the catalog; years without a value are dropped and counted. irena: IRENASTAT installed capacity (MW) and generation (GWh) by technology, 2000 on, on/off-grid. xm: XM's hourly energy on the Colombia-Ecuador interconnection, summed by day or month since 2003; needs desde and hasta (at most 366 days); days without flow show as 0 GWh, so the October 2024 suspension appears as zeros.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>wdi, irena or xm.</td></tr>
+
+<tr><td><code>indicador</code></td><td><code>str</code></td><td><code>empty</code></td><td>wdi only: WDI code. Empty with query searches the catalog.</td></tr>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>wdi only: catalog search text (English), used when indicador is empty.</td></tr>
+
+<tr><td><code>pais</code></td><td><code>str</code></td><td><code>ECU</code></td><td>wdi/irena: ISO3 code (irena also accepts the English name). Ignored by xm. Default ECU.</td></tr>
+
+<tr><td><code>desde</code></td><td><code>str</code></td><td><code>empty</code></td><td>Start: a year (YYYY) for wdi/irena, a date (YYYY-MM-DD) for xm.</td></tr>
+
+<tr><td><code>hasta</code></td><td><code>str</code></td><td><code>empty</code></td><td>End, same format as desde. xm allows at most 366 days.</td></tr>
+
+<tr><td><code>tecnologia</code></td><td><code>str</code></td><td><code>empty</code></td><td>irena only: technology label substring (solar, hydro, Total Renewable...). Empty returns all.</td></tr>
+
+<tr><td><code>tipo</code></td><td><code>Literal['ambos', 'generacion', 'capacidad']</code></td><td><code>ambos</code></td><td>irena only: generacion (GWh), capacidad (MW) or ambos.</td></tr>
+
+<tr><td><code>conexion</code></td><td><code>Literal['All', 'On-grid', 'Off-grid']</code></td><td><code>All</code></td><td>irena only: All, On-grid or Off-grid.</td></tr>
+
+<tr><td><code>sentido</code></td><td><code>Literal['exportaciones', 'importaciones']</code></td><td><code>exportaciones</code></td><td>xm only: exportaciones (Colombia to Ecuador) or importaciones (Ecuador to Colombia).</td></tr>
+
+<tr><td><code>agregacion</code></td><td><code>Literal['dia', 'mes']</code></td><td><code>dia</code></td><td>xm only: dia or mes.</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>30</code></td><td>WDI catalog search only: maximum indicators (1-200).</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
 </div>
 </details>
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">Institutional file archives<span class="tag">3</span></span>
+<span class="atlas-category-title">Institutional file archives<span class="tag">4</span></span>
 <span class="atlas-category-action">Show</span>
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-search_archivos" data-search="search_archivos file links published by one institution (sri, mef, senae, inec, minedec, etc.). searches one institution's catalog of published files and returns direct links (title, url, format), not contents. sources: sri_datasets, sri_recaudacion, mef, senae, censo, minedec, senescyt, msp, cnig, trabajo_boletin, salarios, arcotel_boletines and arcotel_mensuales. download with download_resource or read_pdf (5 mb cap). fuente catalog to search; see the list of sources. query free text matched (accent-insensitive) against each file's title and source fields. empty returns all files. limit max files returned (1-100, default 50). offset pagination offset over the matched files. format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-search_archivos" data-search="search_archivos file links published by one institution (sri, mef, senae, inec, minedec, etc.). searches one institution's catalog of published files and returns direct links (title, url, format), not contents. sources: sri_datasets, sri_recaudacion, mef, senae, censo, minedec, senescyt, msp, cnig, trabajo_boletin, salarios, arcotel_boletines and arcotel_mensuales. download with download_resource or read_pdf (5 mb cap). fuente catalog to search; see the list of sources. query free text matched (accent-insensitive) against each file's title and source fields. empty returns all files. limit max files returned (1-100, default 50). offset pagination offset over the matched files. formato optional exact file format (pdf, xlsx, csv, zip...); not for sri_datasets, sri_recaudacion or censo. format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_archivos</code>
 <span class="atlas-tool-desc">File links published by one institution (SRI, MEF, SENAE, INEC, MINEDEC, etc.).</span>
@@ -2269,6 +2337,8 @@
 <tr><td><code>limit</code></td><td><code>int</code></td><td><code>50</code></td><td>Max files returned (1-100, default 50).</td></tr>
 
 <tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Pagination offset over the matched files.</td></tr>
+
+<tr><td><code>formato</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional exact file format (PDF, XLSX, CSV, ZIP...); not for sri_datasets, sri_recaudacion or censo.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
 
@@ -2317,6 +2387,28 @@
 <tr><td><code>seccion</code></td><td><code>str</code></td><td><code>required</code></td><td>A section `id` from list_archivo_secciones.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-list_catalogo" data-search="list_catalogo list one source's catalog that has no search filters: arconel, bce daily indicators, contraloría, iess or sut. list the catalog of one source that has no filters, the step before its get tool. arconel: electricity report types by section, years (1998 on) and company groups; then get_arconel_reporte. bce_diarios: bce daily/monthly indicator widgets outside bcedata (daily riesgo país since 2004, gold, wti, bonds, payments, reserves, fiscal and external series); a codigo only means one thing within its archivo; then get_bce_indicador_diario(archivo, codigo). contraloria: quarterly csvs of approved audit reports and annual control plans; then get_contraloria_informe. iess: iess document collections (statistical bulletins, actuarial studies, audit reports) with years and counts; then get_iess_archivos(coleccion, anio). sut: ministerio del trabajo power bi dashboards (contracts since 2015, labor demand, gender policy); then get_sut_indicador_schema and query_sut_indicador. fuente catalog to list: arconel, bce_diarios, contraloria, iess or sut. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">list_catalogo</code>
+<span class="atlas-tool-desc">List one source's catalog that has no search filters: ARCONEL, BCE daily indicators, Contraloría, IESS or SUT.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">List the catalog of one source that has no filters, the step before its get tool. arconel: electricity report types by section, years (1998 on) and company groups; then get_arconel_reporte. bce_diarios: BCE daily/monthly indicator widgets outside BCEData (daily riesgo país since 2004, gold, WTI, bonds, payments, reserves, fiscal and external series); a codigo only means one thing within its archivo; then get_bce_indicador_diario(archivo, codigo). contraloria: quarterly CSVs of approved audit reports and annual control plans; then get_contraloria_informe. iess: IESS document collections (statistical bulletins, actuarial studies, audit reports) with years and counts; then get_iess_archivos(coleccion, anio). sut: Ministerio del Trabajo Power BI dashboards (contracts since 2015, labor demand, gender policy); then get_sut_indicador_schema and query_sut_indicador.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>Catalog to list: arconel, bce_diarios, contraloria, iess or sut.</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2381,106 +2473,6 @@
 <tr><td><code>count</code></td><td><code>int</code></td><td><code>5</code></td><td>Number of features to fetch (1-20, default 5).</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-</div>
-</details>
-
-<details class="atlas-category">
-<summary class="atlas-category-summary">
-<span class="atlas-category-title">Recently added tools<span class="tag">3</span></span>
-<span class="atlas-category-action">Show</span>
-</summary>
-<div class="atlas-category-tools">
-
-<details class="atlas-tool" id="tool-get_aviso_aeronautico" data-search="get_aviso_aeronautico live aeronautical notices from dgac/ais: metar (latest weather reports) or notam (active notices) for an aerodrome icao code, e.g fetch aeronautical notices from dgac's ifis site (ais.aviacioncivil.gob.ec), publicly queryable with no login. - metar: most recent metar/speci reports of an aerodrome or helipad (type, utc time, raw icao text; usually hourly). decode the raw text yourself for a plain-language breakdown. - notam: active notams of an aerodrome: series number (e.g. &quot;a1784/26&quot;), raw q)/a)/b)/c)/d)/e) text and dgac's decoded fields. for its fixed data sheet use get_aip_aerodromo. - sigmet: active sigmets (volcanic ash, turbulence, icing, storms) for ecuador's single fir (sefg); no per-aerodrome filter. zero results means none are active, not an error. an unknown designador returns an empty result rather than an error. tipo metar, notam or sigmet. designador icao code of the aerodrome, e.g. seqm (quito), segu (guayaquil), secu (cuenca). required for metar and notam; ignored by sigmet. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_aviso_aeronautico</code>
-<span class="atlas-tool-desc">Live aeronautical notices from DGAC/AIS: metar (latest weather reports) or notam (active notices) for an aerodrome ICAO code, e.g</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Fetch aeronautical notices from DGAC's IFIS site (ais.aviacioncivil.gob.ec), publicly queryable with no login. - metar: most recent METAR/SPECI reports of an aerodrome or helipad (type, UTC time, raw ICAO text; usually hourly). Decode the raw text yourself for a plain-language breakdown. - notam: active NOTAMs of an aerodrome: series number (e.g. "A1784/26"), raw Q)/A)/B)/C)/D)/E) text and DGAC's decoded fields. For its fixed data sheet use get_aip_aerodromo. - sigmet: active SIGMETs (volcanic ash, turbulence, icing, storms) for Ecuador's single FIR (SEFG); no per-aerodrome filter. Zero results means none are active, not an error. An unknown designador returns an empty result rather than an error.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
-<tbody>
-
-<tr><td><code>tipo</code></td><td><code>Literal['metar', 'notam', 'sigmet']</code></td><td><code>required</code></td><td>metar, notam or sigmet.</td></tr>
-
-<tr><td><code>designador</code></td><td><code>str</code></td><td><code>empty</code></td><td>ICAO code of the aerodrome, e.g. SEQM (Quito), SEGU (Guayaquil), SECU (Cuenca). Required for metar and notam; ignored by sigmet.</td></tr>
-
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-get_serie_internacional" data-search="get_serie_internacional world bank wdi indicators (wdi: set indicador, or query to search the catalog), irena capacity/generation by technology (irena), or hourly colombia-ecuador electricity flows since 2003 (xm) fetch a series from an international source, filtered to ecuador. - wdi: world bank world development indicators (1,400+ series, yearly). with `indicador` (e.g. eg.elc.accs.zs access to electricity, eg.elc.loss.zs grid losses, eg.use.elec.kh.pc kwh per capita) returns the series; with only `query` (english) searches the catalog. years without a value are dropped and counted. - irena: irenastat electricity installed capacity (mw) and generation (gwh) by technology, 2000 to latest, on/off-grid. - xm: xm colombia hourly energy on the colombia-ecuador interconnection, summed to days or months. requires desde/hasta. blank hours (no flow) count as zero. shows the oct-2024 suspension. fuente wdi, irena or xm. indicador wdi only: wdi code. empty with `query` searches instead. query wdi only: catalog search text, used when indicador is empty. pais wdi/irena: iso3 code (irena also accepts the english name). ignored by xm. default ecu. desde start: a year (aaaa) for wdi/irena, a date (aaaa-mm-dd) for xm. hasta end, same format as desde. xm allows at most 366 days. tecnologia irena only: technology label substring (solar, hydro, total renewable...). empty returns all technologies. tipo irena only: generacion (gwh), capacidad (mw) or ambos. conexion irena only: all, on-grid or off-grid. sentido xm only: exportaciones (colombia to ecuador) or importaciones (ecuador to colombia). agregacion xm only: dia or mes. limit wdi catalog search only: maximum indicators (1-200). format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_serie_internacional</code>
-<span class="atlas-tool-desc">World Bank WDI indicators (wdi: set indicador, or query to search the catalog), IRENA capacity/generation by technology (irena), or hourly Colombia-Ecuador electricity flows since 2003 (xm)</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Fetch a series from an international source, filtered to Ecuador. - wdi: World Bank World Development Indicators (1,400+ series, yearly). With `indicador` (e.g. EG.ELC.ACCS.ZS access to electricity, EG.ELC.LOSS.ZS grid losses, EG.USE.ELEC.KH.PC kWh per capita) returns the series; with only `query` (English) searches the catalog. Years without a value are dropped and counted. - irena: IRENASTAT electricity installed capacity (MW) and generation (GWh) by technology, 2000 to latest, on/off-grid. - xm: XM Colombia hourly energy on the Colombia-Ecuador interconnection, summed to days or months. Requires desde/hasta. Blank hours (no flow) count as zero. Shows the Oct-2024 suspension.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
-<tbody>
-
-<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>wdi, irena or xm.</td></tr>
-
-<tr><td><code>indicador</code></td><td><code>str</code></td><td><code>empty</code></td><td>wdi only: WDI code. Empty with `query` searches instead.</td></tr>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>wdi only: catalog search text, used when indicador is empty.</td></tr>
-
-<tr><td><code>pais</code></td><td><code>str</code></td><td><code>ECU</code></td><td>wdi/irena: ISO3 code (irena also accepts the English name). Ignored by xm. Default ECU.</td></tr>
-
-<tr><td><code>desde</code></td><td><code>str</code></td><td><code>empty</code></td><td>Start: a year (AAAA) for wdi/irena, a date (AAAA-MM-DD) for xm.</td></tr>
-
-<tr><td><code>hasta</code></td><td><code>str</code></td><td><code>empty</code></td><td>End, same format as desde. xm allows at most 366 days.</td></tr>
-
-<tr><td><code>tecnologia</code></td><td><code>str</code></td><td><code>empty</code></td><td>irena only: technology label substring (solar, hydro, Total Renewable...). Empty returns all technologies.</td></tr>
-
-<tr><td><code>tipo</code></td><td><code>Literal['ambos', 'generacion', 'capacidad']</code></td><td><code>ambos</code></td><td>irena only: generacion (GWh), capacidad (MW) or ambos.</td></tr>
-
-<tr><td><code>conexion</code></td><td><code>Literal['All', 'On-grid', 'Off-grid']</code></td><td><code>All</code></td><td>irena only: All, On-grid or Off-grid.</td></tr>
-
-<tr><td><code>sentido</code></td><td><code>Literal['exportaciones', 'importaciones']</code></td><td><code>exportaciones</code></td><td>xm only: exportaciones (Colombia to Ecuador) or importaciones (Ecuador to Colombia).</td></tr>
-
-<tr><td><code>agregacion</code></td><td><code>Literal['dia', 'mes']</code></td><td><code>dia</code></td><td>xm only: dia or mes.</td></tr>
-
-<tr><td><code>limit</code></td><td><code>int</code></td><td><code>30</code></td><td>wdi catalog search only: maximum indicators (1-200).</td></tr>
-
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-list_catalogo" data-search="list_catalogo list one source's catalog, the step before its get tool: arconel (get_arconel_reporte), bce_diarios (get_bce_indicador_diario), contraloria (get_contraloria_informe), iess (get_iess_archivos), sut (get_sut_indicador_schema, query_sut_indicador). list the catalog of one source that has no search filters. - arconel: arconel electricity report types by section, years (1998 on) and company groups; run one with get_arconel_reporte. - bce_diarios: bce daily/monthly indicator widgets outside bcedata (riesgo país daily since 2004, gold, wti, bonds, payments, reserves, fiscal and external series); a `codigo` only means one thing within its `archivo`. follow with get_bce_indicador_diario(archivo, codigo). - contraloria: contraloría &quot;datos abiertos&quot; quarterly audit-report csvs and annual control plans; follow with get_contraloria_informe. - iess: iess document collections (statistical bulletins, actuarial studies, audit reports) with years and counts; follow with get_iess_archivos(coleccion, anio). - sut: ministerio del trabajo sut power bi dashboards (contracts since 2015, labor demand, gender policy); follow with get_sut_indicador_schema, then query_sut_indicador. fuente catalog to list; see the list above. format text | json">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">list_catalogo</code>
-<span class="atlas-tool-desc">List one source's catalog, the step before its get tool: arconel (get_arconel_reporte), bce_diarios (get_bce_indicador_diario), contraloria (get_contraloria_informe), iess (get_iess_archivos), sut (get_sut_indicador_schema, query_sut_indicador).</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">List the catalog of one source that has no search filters. - arconel: ARCONEL electricity report types by section, years (1998 on) and company groups; run one with get_arconel_reporte. - bce_diarios: BCE daily/monthly indicator widgets outside BCEData (riesgo país daily since 2004, gold, WTI, bonds, payments, reserves, fiscal and external series); a `codigo` only means one thing within its `archivo`. Follow with get_bce_indicador_diario(archivo, codigo). - contraloria: Contraloría "Datos Abiertos" quarterly audit-report CSVs and annual control plans; follow with get_contraloria_informe. - iess: IESS document collections (statistical bulletins, actuarial studies, audit reports) with years and counts; follow with get_iess_archivos(coleccion, anio). - sut: Ministerio del Trabajo SUT Power BI dashboards (contracts since 2015, labor demand, gender policy); follow with get_sut_indicador_schema, then query_sut_indicador.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
-<tbody>
-
-<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>Catalog to list; see the list above.</td></tr>
-
-<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
