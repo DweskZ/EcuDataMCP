@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.11.0 — 2026-10-02
+
+Breaking: tool names changed. 90 → 82 tools in the default profile;
+World Bank, IRENA and XM Colombia series added.
 
 - **International series**: `get_serie_internacional(fuente)` covers World Bank
   WDI (1,400+ yearly indicators), IRENA electricity capacity/generation by
@@ -30,6 +33,9 @@
     current year), tolerates `null` catalog text and non-yearly periods.
   - Error messages of `get_bce_indicador_diario` and `get_arconel_reporte`
     point to `list_catalogo` instead of the removed tools.
+- **Geo proxy** (`ECUADOR_MCP_GEO_PROXY`): `www.gob.ec` and
+  `censoecuador.gob.ec` join the default proxied hosts, and the gob.ec client
+  and every `download_bytes` download (census, CKAN files...) now honor it.
 
 ## 0.10.0 — 2026-09-28
 
