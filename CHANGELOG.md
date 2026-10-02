@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- **International series**: `get_serie_internacional(fuente)` covers World Bank
+  WDI (1,400+ yearly indicators), IRENA electricity capacity/generation by
+  technology, and XM Colombia hourly Colombia-Ecuador flows since 2003. One
+  tool with a `fuente` selector, so 90 → 91 tools in the default profile.
+
 ## 0.10.0 — 2026-09-28
 
 Breaking: tool names changed. 109 → 90 tools in the default profile, every

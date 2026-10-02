@@ -5817,8 +5817,7 @@ de tools nuevas; el mismo cliente serviría a CELEC, EEQ e IIGE (abajo).
   en 24 tecnologías, on/off-grid. 2024: hidro 5.419,17 MW y 22.614,43 GWh,
   solar FV 84,27 MW, eólica 71,15 MW. Esfuerzo S.
 - **World Bank WDI** (`api.worldbank.org/v2/country/ECU/indicator/{id}?format=json`),
-  sin key, **aún no integrado en el proyecto** (también serviría fuera de
-  energía). Acceso a electricidad `EG.ELC.ACCS.ZS` 1995-2024 (98,5%, rural
+  sin key, **integrado el 2026-10-01** en `get_serie_internacional(fuente="wdi")` (sirve también fuera de energía). Acceso a electricidad `EG.ELC.ACCS.ZS` 1995-2024 (98,5%, rural
   95,9%), pérdidas T&D `EG.ELC.LOSS.ZS` 1990-2023 (17,0%), consumo per
   cápita `EG.USE.ELEC.KH.PC` (1.675,6 kWh en 2023), participación hidro
   `EG.ELC.HYRO.ZS` (71,7% en 2023). Esfuerzo S.

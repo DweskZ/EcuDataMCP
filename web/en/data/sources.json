@@ -762,6 +762,15 @@
             "coverage": "api-cepalstat.cepal.org",
             "url": "https://statistics.cepal.org/portal/cepalstat/",
             "status": "live"
+          },
+          {
+            "id": "series-internacionales",
+            "name": "International series (WDI, IRENA, XM)",
+            "tag": "International",
+            "description": "World Bank WDI, IRENA capacity and generation, and XM hourly Colombia-Ecuador flows since 2003; Ecuador by default",
+            "coverage": "api.worldbank.org, pxweb.irena.org, servapibi.xm.com.co",
+            "url": "https://databank.worldbank.org/source/world-development-indicators",
+            "status": "live"
           }
         ]
       },

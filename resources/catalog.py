@@ -394,6 +394,12 @@ def _fuentes_payload() -> dict:
                 "tools": ["search_cepalstat_indicadores", "get_cepalstat_indicador"],
             },
             {
+                "id": "series_internacionales",
+                "nombre": "Series internacionales con Ecuador: Banco Mundial WDI, IRENA, XM Colombia",
+                "base": "https://api.worldbank.org/v2",
+                "tools": ["get_serie_internacional"],
+            },
+            {
                 "id": "utilidades",
                 "nombre": "Utilidades transversales (búsqueda global, archivos, orientación)",
                 "tools": [

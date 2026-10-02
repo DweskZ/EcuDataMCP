@@ -2710,5 +2710,92 @@
       "page": "Page number (1-based, default: 1). Ignored when query is provided (all pages are searched automatically).",
       "format": "text | json"
     }
+  },
+  "get_serie_internacional": {
+    "file": "serie_internacional.py",
+    "params": [
+      {
+        "name": "fuente",
+        "type": "Fuente",
+        "default": null
+      },
+      {
+        "name": "indicador",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "pais",
+        "type": "str",
+        "default": "'ECU'"
+      },
+      {
+        "name": "desde",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "hasta",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "tecnologia",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "tipo",
+        "type": "Literal['ambos', 'generacion', 'capacidad']",
+        "default": "'ambos'"
+      },
+      {
+        "name": "conexion",
+        "type": "Literal['All', 'On-grid', 'Off-grid']",
+        "default": "'All'"
+      },
+      {
+        "name": "sentido",
+        "type": "Literal['exportaciones', 'importaciones']",
+        "default": "'exportaciones'"
+      },
+      {
+        "name": "agregacion",
+        "type": "Literal['dia', 'mes']",
+        "default": "'dia'"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": "30"
+      },
+      {
+        "name": "format",
+        "type": "Literal['text', 'json']",
+        "default": "'text'"
+      }
+    ],
+    "description": "World Bank WDI indicators (wdi: set indicador, or query to search the catalog), IRENA capacity/generation by technology (irena), or hourly Colombia-Ecuador electricity flows since 2003 (xm). Defaults to Ecuador.",
+    "summary": "Fetch a series from an international source, filtered to Ecuador. - wdi: World Bank World Development Indicators (1,400+ series, yearly). With `indicador` (e.g. EG.ELC.ACCS.ZS access to electricity, EG.ELC.LOSS.ZS grid losses, EG.USE.ELEC.KH.PC kWh per capita) returns the series; with only `query` (English) searches the catalog. Years without a value are dropped and counted. - irena: IRENASTAT electricity installed capacity (MW) and generation (GWh) by technology, 2000 to latest, on/off-grid. - xm: XM Colombia hourly energy on the Colombia-Ecuador interconnection, summed to days or months. Requires desde/hasta. Blank hours (no flow) count as zero. Shows the Oct-2024 suspension.",
+    "args_doc": {
+      "fuente": "wdi, irena or xm.",
+      "indicador": "wdi only: WDI code. Empty with `query` searches instead.",
+      "query": "wdi only: catalog search text, used when indicador is empty.",
+      "pais": "wdi/irena: ISO3 code (irena also accepts the English name). Ignored by xm. Default ECU.",
+      "desde": "Start: a year (AAAA) for wdi/irena, a date (AAAA-MM-DD) for xm.",
+      "hasta": "End, same format as desde. xm allows at most 366 days.",
+      "tecnologia": "irena only: technology label substring (solar, hydro, Total Renewable...). Empty returns all technologies.",
+      "tipo": "irena only: generacion (GWh), capacidad (MW) or ambos.",
+      "conexion": "irena only: All, On-grid or Off-grid.",
+      "sentido": "xm only: exportaciones (Colombia to Ecuador) or importaciones (Ecuador to Colombia).",
+      "agregacion": "xm only: dia or mes.",
+      "limit": "wdi catalog search only: maximum indicators (1-200).",
+      "format": "text | json"
+    }
   }
 }
