@@ -106,6 +106,7 @@ from tools.search_sgr_sitreps import register_search_sgr_sitreps_tool
 from tools.search_sismos import register_search_sismos_tool
 from tools.search_sri_ruc import register_search_sri_ruc_tool
 from tools.search_tramites import register_search_tramites_tool
+from tools.serie_internacional import register_serie_internacional_tools
 
 
 def register_tools(mcp: MCPServer) -> None:
@@ -214,6 +215,7 @@ def register_tools(mcp: MCPServer) -> None:
 
     register_search_cepalstat_indicadores_tool(mcp)
     register_get_cepalstat_indicador_tool(mcp)
+    register_serie_internacional_tools(mcp)
 
 
 
