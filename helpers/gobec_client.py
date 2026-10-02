@@ -7,6 +7,7 @@ from typing import Any
 import httpx
 
 from helpers import env_config
+from helpers.geo_proxy import proxy_for
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.text_utils import strip_accents as _strip
 
@@ -53,7 +54,9 @@ async def _fetch_json(
 ) -> Any:
     own = session is None
     if own:
-        transport = httpx.AsyncHTTPTransport(retries=2)
+        transport = httpx.AsyncHTTPTransport(
+            retries=2, proxy=proxy_for(env_config.get_base_url("gobec_site"))
+        )
         session = httpx.AsyncClient(
             headers=_HEADERS, transport=transport, follow_redirects=True
         )
@@ -145,7 +148,9 @@ async def find_institucion(
     """
     own = session is None
     if own:
-        transport = httpx.AsyncHTTPTransport(retries=2)
+        transport = httpx.AsyncHTTPTransport(
+            retries=2, proxy=proxy_for(env_config.get_base_url("gobec_site"))
+        )
         session = httpx.AsyncClient(
             headers=_HEADERS, transport=transport, follow_redirects=True
         )
@@ -222,7 +227,9 @@ async def find_regulaciones(
 
     own = session is None
     if own:
-        transport = httpx.AsyncHTTPTransport(retries=2)
+        transport = httpx.AsyncHTTPTransport(
+            retries=2, proxy=proxy_for(env_config.get_base_url("gobec_site"))
+        )
         session = httpx.AsyncClient(
             headers=_HEADERS, transport=transport, follow_redirects=True
         )
