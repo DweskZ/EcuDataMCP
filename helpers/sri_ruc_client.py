@@ -46,6 +46,7 @@ import httpx
 
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.text_utils import strip_accents as _strip
+from helpers.timeout_retry import SLOW_HOST_TIMEOUT, retry_on_timeout
 from helpers.tls import should_retry_insecure
 from helpers.user_agent import USER_AGENT
 
@@ -60,7 +61,6 @@ SRI_RUC_ESTABLECIMIENTOS_URL = (
     "ruc-establec.jspa"
 )
 SRI_CATASTRO_BASE = "https://srienlinea.sri.gob.ec/sri-catastro-sujeto-servicio-internet/rest/ConsolidadoContribuyente"
-_TIMEOUT = 30.0
 
 # The endpoint itself caps matches at 100; this is a further, agent-sized
 # cap on how many of those we fetch full detail for and return.
@@ -175,15 +175,18 @@ def _validate_ruc(ruc: str) -> str:
 
 
 async def _fetch_page(url: str, ruc: str, verify: bool = True) -> str:
-    async with httpx.AsyncClient(
-        headers={"User-Agent": USER_AGENT},
-        follow_redirects=True,
-        timeout=_TIMEOUT,
-        verify=verify,
-    ) as session:
-        response = await session.get(url, params={"ruc": ruc})
-        response.raise_for_status()
-        return response.text
+    async def attempt() -> str:
+        async with httpx.AsyncClient(
+            headers={"User-Agent": USER_AGENT},
+            follow_redirects=True,
+            timeout=SLOW_HOST_TIMEOUT,
+            verify=verify,
+        ) as session:
+            response = await session.get(url, params={"ruc": ruc})
+            response.raise_for_status()
+            return response.text
+
+    return await retry_on_timeout(attempt, url)
 
 
 async def _fetch_public_page(url: str, ruc: str) -> str:
@@ -225,23 +228,28 @@ async def get_ruc_info(
 
 async def _fetch_catastro_json(path: str, params: list[tuple[str, str]], verify: bool = True) -> Any:
     url = f"{SRI_CATASTRO_BASE}/{path}"
-    async with httpx.AsyncClient(
-        headers={"User-Agent": USER_AGENT},
-        follow_redirects=True,
-        timeout=_TIMEOUT,
-        verify=verify,
-    ) as session:
-        response = await session.get(url, params=params)
-        response.raise_for_status()
-        # numerosRucPorRazonSocialToken returns 204 with an empty body (not
-        # "[]") when razonSocial has zero matches -- confirmed live against
-        # a real zero-match query -- response.json() would otherwise raise
-        # json.JSONDecodeError on the empty body. Return None rather than a
-        # shape-specific default: callers of count endpoints need 0, list
-        # endpoints need [].
-        if not response.text.strip():
-            return None
-        return response.json()
+
+    async def attempt() -> httpx.Response:
+        async with httpx.AsyncClient(
+            headers={"User-Agent": USER_AGENT},
+            follow_redirects=True,
+            timeout=SLOW_HOST_TIMEOUT,
+            verify=verify,
+        ) as session:
+            response = await session.get(url, params=params)
+            response.raise_for_status()
+            return response
+
+    response = await retry_on_timeout(attempt, url)
+    # numerosRucPorRazonSocialToken returns 204 with an empty body (not
+    # "[]") when razonSocial has zero matches -- confirmed live against
+    # a real zero-match query -- response.json() would otherwise raise
+    # json.JSONDecodeError on the empty body. Return None rather than a
+    # shape-specific default: callers of count endpoints need 0, list
+    # endpoints need [].
+    if not response.text.strip():
+        return None
+    return response.json()
 
 
 async def _fetch_catastro_public(path: str, params: list[tuple[str, str]]) -> Any:

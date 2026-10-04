@@ -76,3 +76,18 @@ async def test_search_estadisticas_recaudacion_query_is_accent_insensitive(httpx
 
     assert result["total"] == 1
     assert result["archivos"][0]["format"] == "PDF"
+
+
+async def test_download_page_retries_after_read_timeout(httpx_mock, monkeypatch):
+    import httpx
+
+    from helpers import sri_client, timeout_retry
+
+    async def no_sleep(_seconds: float) -> None:
+        return None
+
+    monkeypatch.setattr(timeout_retry.asyncio, "sleep", no_sleep)
+    httpx_mock.add_exception(httpx.ReadTimeout("slow"))
+    httpx_mock.add_response(text="<html>ok</html>")
+
+    assert await sri_client._download_page(sri_client.SRI_DATASETS_URL) == "<html>ok</html>"

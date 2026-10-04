@@ -39,6 +39,7 @@ import httpx
 from helpers.cache import TtlCache
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.text_utils import strip_accents as _strip
+from helpers.timeout_retry import SLOW_HOST_TIMEOUT, retry_on_timeout
 from helpers.tls import should_retry_insecure
 from helpers.user_agent import USER_AGENT
 
@@ -46,7 +47,6 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 SRI_DATASETS_URL = "https://www.sri.gob.ec/datasets"
 SRI_ESTADISTICAS_URL = "https://www.sri.gob.ec/estadisticas-generales-de-recaudacion-sri"
-_DOWNLOAD_TIMEOUT = 30.0
 
 # The page is hand-maintained and rarely changes within a day; a few hours
 # balances staleness against re-fetching/re-parsing ~260 KB of HTML.
@@ -100,15 +100,18 @@ def _parse_files(html: str) -> list[dict[str, str]]:
 
 
 async def _download_page(url: str, verify: bool = True) -> str:
-    async with httpx.AsyncClient(
-        headers={"User-Agent": USER_AGENT},
-        follow_redirects=True,
-        timeout=_DOWNLOAD_TIMEOUT,
-        verify=verify,
-    ) as session:
-        resp = await session.get(url)
-        resp.raise_for_status()
-        return resp.text
+    async def attempt() -> str:
+        async with httpx.AsyncClient(
+            headers={"User-Agent": USER_AGENT},
+            follow_redirects=True,
+            timeout=SLOW_HOST_TIMEOUT,
+            verify=verify,
+        ) as session:
+            resp = await session.get(url)
+            resp.raise_for_status()
+            return resp.text
+
+    return await retry_on_timeout(attempt, url)
 
 
 async def _fetch_files() -> list[dict[str, str]]:
