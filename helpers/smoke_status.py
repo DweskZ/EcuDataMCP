@@ -75,6 +75,19 @@ _DEGRADED_SOURCES = (
     ),
 )
 
+# Sources blocked by country or datacenter IP. Without a LatAm egress
+# (ECUADOR_MCP_GEO_PROXY, see docs/GEOBLOCK_PLAN.md) these are expected to
+# fail, so the smoke run reports them as skipped rather than degraded.
+GEOBLOCKED_SOURCES = frozenset(
+    {
+        "datos_abiertos_ckan",
+        "sercop_compras_publicas",
+        "censo_ecuador_geoblock",
+        "anda_inec_geoblock",
+        "gobec_geoblock",
+    }
+)
+
 # httpx's own raise_for_status() message format (confirmed against
 # httpx._models.Response.raise_for_status): "Server error '503 Service
 # Unavailable' for url '<url>'". A 5xx is by definition the live source

@@ -9,7 +9,7 @@ import sys
 
 import httpx
 
-from helpers.smoke_status import assess_response
+from helpers.smoke_status import GEOBLOCKED_SOURCES, assess_response
 
 # Tool output routinely contains non-ASCII text (accents, →, ⚠...) from
 # real government sources; on Windows the console defaults to cp1252,
@@ -124,6 +124,8 @@ async def check_tool(
     assert assessment is not None
     if assessment.status == "ok":
         print(f"  OK       {name}")
+    elif is_geo_skipped(assessment.source):
+        print(f"  SKIPPED  {name} [{assessment.source}]: geo-blocked, no tunnel")
     elif assessment.status == "degraded":
         print(f"  DEGRADED {name} [{assessment.source}]: {assessment.detail[:160]}")
     else:
@@ -166,7 +168,14 @@ async def call_chain_step(
     return chain_step(text, required, is_error=is_error)
 
 
-def write_summary(total: int, failed: int, degraded: set[str]) -> None:
+def is_geo_skipped(source: str | None) -> bool:
+    """A geo-blocked source is expected to fail when no LatAm tunnel is set."""
+    return source in GEOBLOCKED_SOURCES and not os.getenv("ECUADOR_MCP_GEO_PROXY")
+
+
+def write_summary(
+    total: int, failed: int, degraded: set[str], skipped: set[str]
+) -> None:
     """Write a compact GitHub Actions summary while keeping local runs plain."""
     path = os.getenv("GITHUB_STEP_SUMMARY")
     if not path:
@@ -177,6 +186,7 @@ def write_summary(total: int, failed: int, degraded: set[str]) -> None:
         f"- Checks: {total}",
         f"- Hard failures: {failed}",
         f"- Degraded external sources: {', '.join(sorted(degraded)) or 'none'}",
+        f"- Skipped (geo-blocked, no tunnel): {', '.join(sorted(skipped)) or 'none'}",
     ]
     with open(path, "a", encoding="utf-8") as summary:
         summary.write("\n".join(lines) + "\n")
@@ -271,11 +281,12 @@ async def main() -> int:
         print("== tools ==")
         failed = 0
         degraded: set[str] = set()
+        skipped: set[str] = set()
         for name, args, must in checks:
             try:
                 status, source = await check_tool(client, name, args, must)
                 if status == "degraded" and source:
-                    degraded.add(source)
+                    (skipped if is_geo_skipped(source) else degraded).add(source)
             except Exception as exc:
                 failed += 1
                 print(f"  FAIL {name}: {exc}")
@@ -300,16 +311,20 @@ async def main() -> int:
                 await coro
                 print(f"  OK   {label}")
             except DegradedChain as exc:
-                degraded.add(exc.source)
-                print(f"  DEGRADED {label} [{exc.source}]: {str(exc)[:160]}")
+                if is_geo_skipped(exc.source):
+                    skipped.add(exc.source)
+                    print(f"  SKIPPED  {label} [{exc.source}]: geo-blocked, no tunnel")
+                else:
+                    degraded.add(exc.source)
+                    print(f"  DEGRADED {label} [{exc.source}]: {str(exc)[:160]}")
             except Exception as exc:
                 failed += 1
                 print(f"  FAIL {label}: {exc}")
 
         print("== done ==")
         total = len(checks) + chains
-        print(f"failed={failed}/{total}; degraded={len(degraded)}")
-        write_summary(total, failed, degraded)
+        print(f"failed={failed}/{total}; degraded={len(degraded)}; skipped={len(skipped)}")
+        write_summary(total, failed, degraded, skipped)
         return 1 if failed else 0
 
 
