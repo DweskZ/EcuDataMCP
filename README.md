@@ -5,7 +5,7 @@ Sitio: [https://dweskz.github.io/EcuDataMCP/](https://dweskz.github.io/EcuDataMC
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![MCP](https://img.shields.io/badge/MCP-compatible-green.svg)](https://modelcontextprotocol.io)
-[![M8ven Score](https://m8ven.ai/badge/mcp/dweskz/ecudatamcp)](https://m8ven.ai/mcp/dweskz/ecudatamcp)
+[![M8ven Score](https://m8ven.ai/badge/mcp/dweskz-ecudatamcp-17jahx?v=c8c29e44e138a60f6dea98c5659828a5)](https://m8ven.ai/mcp/dweskz-ecudatamcp-17jahx)
 
 <!-- mcp-name: io.github.DweskZ/ecudatamcp -->
 
