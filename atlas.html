@@ -230,7 +230,7 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-search_datasets" data-search="search_datasets buscar datasets por palabras clave. soporta filtro por categoría. busca datasets en el portal de datos abiertos de ecuador (www.datosabiertos.gob.ec). es el punto de partida para explorar datos de 98+ instituciones públicas. usa queries cortos y específicos en español para mejores resultados. flujo típico: search_datasets → list_dataset_resources → preview_resource_data. query palabras clave (ej. &quot;empleo&quot;, &quot;salud&quot;, &quot;presupuesto&quot;, &quot;sri recaudación&quot;) page número de página (base 1, default: 1) page_size resultados por página (default: 20, máx. 100) category filtro opcional por categoría (ej. &quot;sal&quot; para salud, &quot;edu&quot; para educación). usa list_categories para ver todas las categorías disponibles. sort `relevance` (default, ranking propio de ckan) o `recent` (más recientes primero por metadata_modified; sirve sin query para descubrir datasets nuevos o actualizados). source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-search_datasets" data-search="search_datasets buscar datasets por palabras clave. soporta filtro por categoría. busca datasets en el portal de datos abiertos de ecuador (www.datosabiertos.gob.ec). es el punto de partida para explorar datos de 98+ instituciones públicas. usa queries cortos y específicos en español para mejores resultados. flujo típico: search_datasets → list_dataset_resources → preview_resource_data. query palabras clave (ej. &quot;empleo&quot;, &quot;salud&quot;, &quot;presupuesto&quot;, &quot;sri recaudación&quot;) page número de página (base 1, default: 1) page_size resultados por página (default: 20, máx. 100) category filtro opcional por categoría (ej. &quot;sal&quot; para salud, &quot;edu&quot; para educación). usa list_categories para ver todas las categorías disponibles. sort `relevance` (default, ranking propio de ckan) o `recent` (más recientes primero por metadata_modified; sirve sin query para descubrir datasets nuevos o actualizados). source &quot;nacional&quot; (default, www.datosabiertos.gob.ec), &quot;cuenca&quot; (cuencaendatos.cuenca.gob.ec, portal municipal independiente), &quot;latacunga&quot; (datosabiertos.latacunga.gob.ec, portal municipal independiente) o &quot;iadb&quot; (data.iadb.org, portal de datos abiertos del bid — no es exclusivo de ecuador, es un catálogo regional/global: latin macro watch e indicadores del banco mundial/bid) compact shrink each dataset in the json output to id, name, title, metadata_modified, organization and its resources (id, name, format, size, url). full results can reach 100+ kb per page. fields comma-separated dataset keys to keep in the json output (e.g. &quot;name,title,metadata_modified&quot;); applied after compact. format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_datasets</code>
 <span class="atlas-tool-desc">Buscar datasets por palabras clave. Soporta filtro por categoría.</span>
@@ -253,6 +253,10 @@
 <tr><td><code>sort</code></td><td><code>Literal['relevance', 'recent']</code></td><td><code>relevance</code></td><td>`relevance` (default, ranking propio de CKAN) o `recent` (más recientes primero por metadata_modified; sirve sin query para descubrir datasets nuevos o actualizados).</td></tr>
 
 <tr><td><code>source</code></td><td><code>ckan_client.CkanSource</code></td><td><code>nacional</code></td><td>"nacional" (default, www.datosabiertos.gob.ec), "cuenca" (cuencaendatos.cuenca.gob.ec, portal municipal independiente), "latacunga" (datosabiertos.latacunga.gob.ec, portal municipal independiente) o "iadb" (data.iadb.org, portal de datos abiertos del BID — NO es exclusivo de Ecuador, es un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID)</td></tr>
+
+<tr><td><code>compact</code></td><td><code>bool</code></td><td><code>False</code></td><td>Shrink each dataset in the JSON output to id, name, title, metadata_modified, organization and its resources (id, name, format, size, url). Full results can reach 100+ KB per page.</td></tr>
+
+<tr><td><code>fields</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Comma-separated dataset keys to keep in the JSON output (e.g. "name,title,metadata_modified"); applied after compact.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -582,7 +586,7 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-search_anda" data-search="search_anda buscar encuestas y censos en el catálogo anda del inec (nada/ihsn). indica si cada encuesta tiene microdatos descargables. busca en el catálogo anda del inec (anda.inec.gob.ec) de encuestas y censos. anda corre sobre nada (banco mundial/ihsn), separado de datosabiertos.gob.ec. cataloga 437+ encuestas/censos del inec con metadata (título, año, entidad autora). no todas las entradas tienen microdatos descargables — muchas son publicaciones solo agregadas (ej. índices de precios); cada resultado lo indica. sigue con get_anda_survey_info(idno) para la metadata completa de una encuesta. query palabras clave (ej. &quot;empleo&quot;, &quot;reem&quot;, &quot;censo agropecuario&quot;) limit máximo de resultados (default: 10, máx. 50) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-search_anda" data-search="search_anda buscar encuestas y censos en el catálogo anda del inec (nada/ihsn). indica si cada encuesta tiene microdatos descargables. busca en el catálogo anda del inec (anda.inec.gob.ec) de encuestas y censos. anda corre sobre nada (banco mundial/ihsn), separado de datosabiertos.gob.ec. cataloga 437+ encuestas/censos del inec con metadata (título, año, entidad autora). no todas las entradas tienen microdatos descargables — muchas son publicaciones solo agregadas (ej. índices de precios); cada resultado lo indica. sigue con get_anda_survey_info(idno) para la metadata completa de una encuesta. query palabras clave (ej. &quot;empleo&quot;, &quot;reem&quot;, &quot;censo agropecuario&quot;) limit máximo de resultados (default: 10, máx. 50) page page of results, 1-based (default: 1); see total/total_pages format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_anda</code>
 <span class="atlas-tool-desc">Buscar encuestas y censos en el catálogo ANDA del INEC (NADA/IHSN). Indica si cada encuesta tiene microdatos descargables.</span>
@@ -597,6 +601,8 @@
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Palabras clave (ej. "empleo", "REEM", "censo agropecuario")</td></tr>
 
 <tr><td><code>limit</code></td><td><code>int</code></td><td><code>10</code></td><td>Máximo de resultados (default: 10, máx. 50)</td></tr>
+
+<tr><td><code>page</code></td><td><code>int</code></td><td><code>1</code></td><td>Page of results, 1-based (default: 1); see total/total_pages</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -1446,7 +1452,7 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-get_inec_estadistica_files" data-search="get_inec_estadistica_files lista los enlaces directos a archivos publicados en una página de tema estadístico del inec. lista los enlaces directos a archivos publicados en una página de tema estadístico del inec. obtén la url desde search_inec_estadisticas. devuelve boletines técnicos, metodología y series históricas como enlaces directos pdf/xlsx/csv/zip — no el contenido de los archivos. usa read_pdf en un enlace .pdf, o descárgalo tú mismo para los formatos tabulares. url a topic url from search_inec_estadisticas's &quot;url&quot; field (must be on ecuadorencifras.gob.ec) format text | json">
+<details class="atlas-tool" id="tool-get_inec_estadistica_files" data-search="get_inec_estadistica_files lista los enlaces directos a archivos publicados en una página de tema estadístico del inec. lista los enlaces directos a archivos publicados en una página de tema estadístico del inec. obtén la url desde search_inec_estadisticas. devuelve boletines técnicos, metodología y series históricas como enlaces directos pdf/xlsx/csv/zip — no el contenido de los archivos. usa read_pdf en un enlace .pdf, o descárgalo tú mismo para los formatos tabulares. url a topic url from search_inec_estadisticas's &quot;url&quot; field (must be on ecuadorencifras.gob.ec) year optional reference year; keeps only that year's files (each file carries a &quot;year&quot; parsed from its name or folder) format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_inec_estadistica_files</code>
 <span class="atlas-tool-desc">Lista los enlaces directos a archivos publicados en una página de tema estadístico del INEC.</span>
@@ -1459,6 +1465,8 @@
 <tbody>
 
 <tr><td><code>url</code></td><td><code>str</code></td><td><code>requerido</code></td><td>A topic URL from search_inec_estadisticas's "url" field (must be on ecuadorencifras.gob.ec)</td></tr>
+
+<tr><td><code>year</code></td><td><code>int | None</code></td><td><code>ninguno</code></td><td>Optional reference year; keeps only that year's files (each file carries a "year" parsed from its name or folder)</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
