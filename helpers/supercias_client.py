@@ -30,6 +30,15 @@ non-trivial amount of memory (roughly a few hundred MB) — acceptable since
 it's built lazily on first use, not at server startup, but worth knowing if
 this process runs somewhere memory-constrained.
 
+The download itself took ~90 s on 2026-10-07, longer than MCP clients wait
+for one tool call, so it runs as a background task (`_download_task`): a
+cold call waits `_INLINE_WAIT_SECONDS`, then asks the caller to retry while
+the download continues. Each good download is also saved to
+`data_dir()/supercias_directorio.xlsx`; a fresh copy there is parsed instead
+of re-downloaded (every stdio session is a new process), and a stale copy is
+served while a refresh runs, so a Supercías outage doesn't take the tools
+down with it.
+
 The same host also publishes a second, much smaller export: the registry of
 firms/individuals authorized to act as external auditors (~190 KB / 1,447
 rows). Same title-rows-before-header quirk, same parsing approach, but a
@@ -43,15 +52,20 @@ from __future__ import annotations
 import asyncio
 import io
 import logging
+import os
 import re
+import time
 import zipfile
+from pathlib import Path
 from typing import Any
 from xml.etree import ElementTree as ET
 
 import httpx
 
 from helpers.cache import TtlCache
+from helpers.geo_proxy import proxy_for, unreachable_hint
 from helpers.logging import MAIN_LOGGER_NAME
+from helpers.paths import data_dir
 from helpers.text_utils import strip_accents as _strip
 from helpers.tls import should_retry_insecure
 from helpers.user_agent import USER_AGENT
@@ -61,7 +75,16 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 _EXCEL_URL = (
     "https://mercadodevalores.supercias.gob.ec/reportes/excel/directorio_companias.xlsx"
 )
-_DOWNLOAD_TIMEOUT = 90.0
+# Connecting takes well under a second when the host is reachable; from a
+# network it drops (Render, 2026-10-07) only a timeout ends the attempt, so
+# keep that short instead of letting it run to the 90 s read timeout.
+_DOWNLOAD_TIMEOUT = httpx.Timeout(90.0, connect=15.0)
+# A cold call waits this long for the background download before asking the
+# caller to retry, staying under the ~60 s MCP clients allow a tool call.
+_INLINE_WAIT_SECONDS = 30.0
+# Supercías regenerates the export daily; past this age the saved copy is
+# still served, but a refresh is started.
+_DISK_MAX_AGE_SECONDS = 12 * 3600
 # The real file is ~35 MB; this is a safety ceiling, not the expected size.
 _MAX_DOWNLOAD_BYTES = 80 * 1024 * 1024
 _HEADER_SCAN_LIMIT = 20
@@ -73,8 +96,13 @@ _R_NS = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 # of re-downloading/re-parsing ~35 MB.
 _companias_cache = TtlCache(ttl_seconds=21600.0, max_entries=1)
 # Guards the cache-miss path so concurrent callers don't each independently
-# download+parse the full export (a ~30-40s, ~35 MB operation).
+# parse the saved export or start a second download.
 _fetch_lock = asyncio.Lock()
+_download_task: asyncio.Task | None = None
+
+
+class DirectorioEnDescarga(Exception):
+    """The directory export is still downloading in the background."""
 
 # Lazily-built RUC -> row index, invalidated whenever the cached row list is
 # replaced (compared by identity, not equality, so a cache refresh always
@@ -249,6 +277,7 @@ async def _download_once(url: str, verify: bool = True) -> bytes:
             follow_redirects=True,
             timeout=_DOWNLOAD_TIMEOUT,
             verify=verify,
+            proxy=proxy_for(url),
         ) as session,
         session.stream("GET", url) as resp,
     ):
@@ -285,12 +314,70 @@ async def _download_full(url: str) -> bytes:
     except httpx.RequestError as exc:
         # A bare ConnectTimeout stringifies to "", so the tool layer reported
         # an empty error. Name the host and failure kind; Supercías' export
-        # host has been seen dropping connections instead of answering.
+        # hosts drop connections from outside the region instead of answering.
         raise RuntimeError(
             f"No se pudo conectar a {httpx.URL(url).host} ({type(exc).__name__}). "
-            "El sitio de Supercías puede estar caído, lento o bloqueando la "
-            "conexión; reintenta en unos minutos."
+            + unreachable_hint(url)
         ) from exc
+
+
+def _directory_path() -> Path:
+    return data_dir() / "supercias_directorio.xlsx"
+
+
+async def _load_directory(raw: bytes) -> tuple[
+    tuple[str, ...], list[tuple[str, ...]], list[str], list[str], list[str]
+]:
+    """Parse the export, build the search columns and cache the bundle."""
+    # _parse_xlsx is CPU-bound (streaming XML parse over ~35 MB) and takes
+    # seconds; running it inline would block the event loop for every other
+    # concurrent request on this server for that whole window.
+    fields, rows = await asyncio.to_thread(_parse_xlsx, raw)
+
+    nombre_pos = fields.index("nombre")
+    provincia_pos = fields.index("provincia")
+    situacion_pos = fields.index("situacion_legal")
+    normalized_names = [_strip(row[nombre_pos]) for row in rows]
+    normalized_provincias = [_strip(row[provincia_pos]) for row in rows]
+    normalized_situaciones = [_strip(row[situacion_pos]) for row in rows]
+
+    bundle = (fields, rows, normalized_names, normalized_provincias, normalized_situaciones)
+    _companias_cache.set("companias", bundle)
+    logger.info("Directorio de Supercías cargado: %d compañías", len(rows))
+    return bundle
+
+
+async def _download_directory() -> tuple[
+    tuple[str, ...], list[tuple[str, ...]], list[str], list[str], list[str]
+]:
+    logger.info("Descargando el directorio de Supercías (~37 MB)")
+    raw = await _download_full(_EXCEL_URL)
+
+    # Parsed before saving, so a broken export never replaces a good copy.
+    bundle = await _load_directory(raw)
+    path = _directory_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    partial = path.with_name(path.name + ".part")
+    await asyncio.to_thread(partial.write_bytes, raw)
+    os.replace(partial, path)
+    return bundle
+
+
+def _log_download_outcome(task: asyncio.Task) -> None:
+    # Retrieving the exception here also keeps asyncio from warning that it
+    # was never retrieved when no caller is waiting any more.
+    if not task.cancelled() and task.exception() is not None:
+        logger.error(
+            "Fallo la descarga del directorio de Supercías: %s", task.exception()
+        )
+
+
+def _start_download() -> asyncio.Task:
+    global _download_task
+    if _download_task is None or _download_task.done():
+        _download_task = asyncio.create_task(_download_directory())
+        _download_task.add_done_callback(_log_download_outcome)
+    return _download_task
 
 
 async def _fetch_companias() -> tuple[
@@ -304,34 +391,37 @@ async def _fetch_companias() -> tuple[
 
     async with _fetch_lock:
         # Another coroutine may have populated the cache while this one was
-        # waiting for the lock; re-check before downloading again.
+        # waiting for the lock; re-check before parsing again.
         cached = _companias_cache.get("companias")
         if cached is not None:
             return cached
 
-        logger.info("Descargando y parseando el directorio de Supercías (~35 MB)")
-        try:
-            raw = await _download_full(_EXCEL_URL)
-            # _parse_xlsx is CPU-bound (streaming XML parse over ~35 MB) and
-            # takes seconds; running it inline would block the event loop for
-            # every other concurrent request on this server for that whole
-            # window, not just this one.
-            fields, rows = await asyncio.to_thread(_parse_xlsx, raw)
-        except Exception:
-            logger.exception("Fallo al descargar/parsear el directorio de Supercías")
-            raise
+        path = _directory_path()
+        if path.is_file():
+            if time.time() - path.stat().st_mtime > _DISK_MAX_AGE_SECONDS:
+                # The download task replaces this bundle in the cache once
+                # it finishes; until then the previous export is served.
+                _start_download()
+            try:
+                raw = await asyncio.to_thread(path.read_bytes)
+                return await _load_directory(raw)
+            except (OSError, ValueError, zipfile.BadZipFile, ET.ParseError):
+                logger.exception(
+                    "Copia guardada del directorio de Supercías ilegible; se descarta"
+                )
+                path.unlink(missing_ok=True)
 
-        nombre_pos = fields.index("nombre")
-        provincia_pos = fields.index("provincia")
-        situacion_pos = fields.index("situacion_legal")
-        normalized_names = [_strip(row[nombre_pos]) for row in rows]
-        normalized_provincias = [_strip(row[provincia_pos]) for row in rows]
-        normalized_situaciones = [_strip(row[situacion_pos]) for row in rows]
+        task = _start_download()
 
-        bundle = (fields, rows, normalized_names, normalized_provincias, normalized_situaciones)
-        _companias_cache.set("companias", bundle)
-        logger.info("Directorio de Supercías cargado: %d compañías", len(rows))
-        return bundle
+    # Waited outside the lock, so concurrent cold callers each wait at most
+    # _INLINE_WAIT_SECONDS instead of queueing behind one another.
+    done, _ = await asyncio.wait({task}, timeout=_INLINE_WAIT_SECONDS)
+    if not done:
+        raise DirectorioEnDescarga(
+            "El directorio de Supercías (~37 MB) se está descargando en segundo "
+            "plano; suele tardar 1-2 minutos. Reintenta la consulta en un momento."
+        )
+    return task.result()
 
 
 def _ruc_index_for(

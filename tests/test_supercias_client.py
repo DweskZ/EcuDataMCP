@@ -1,5 +1,8 @@
+import asyncio
 import io
+import os
 import ssl
+import time
 
 import httpx
 import openpyxl
@@ -7,6 +10,7 @@ import pytest
 
 from helpers import supercias_client
 from helpers.cache import TtlCache
+from helpers.geo_proxy import proxy_for
 
 _HEADER = (
     "No. FILA", "EXPEDIENTE", "RUC", "NOMBRE", "SITUACIÓN LEGAL",
@@ -105,9 +109,12 @@ def _build_auditores_xlsx() -> bytes:
 
 
 @pytest.fixture(autouse=True)
-def _reset_cache():
+def _reset_cache(tmp_path, monkeypatch):
+    monkeypatch.setenv("ECUADOR_MCP_DATA_DIR", str(tmp_path))
+    monkeypatch.delenv("ECUADOR_MCP_GEO_PROXY", raising=False)
     supercias_client._companias_cache = TtlCache(ttl_seconds=60)
     supercias_client._ruc_index_state = None
+    supercias_client._download_task = None
     supercias_client._auditores_cache = TtlCache(ttl_seconds=60)
     supercias_client._identificacion_index_state = None
     yield
@@ -294,6 +301,82 @@ async def test_download_full_names_host_on_bare_connect_timeout(monkeypatch):
 
     assert "mercadodevalores.supercias.gob.ec" in str(excinfo.value)
     assert "ConnectTimeout" in str(excinfo.value)
+    assert "ECUADOR_MCP_GEO_PROXY" in str(excinfo.value)
+
+
+def test_directory_download_goes_through_geo_proxy(monkeypatch):
+    monkeypatch.setenv("ECUADOR_MCP_GEO_PROXY", "socks5://127.0.0.1:1080")
+
+    assert proxy_for(supercias_client._EXCEL_URL) == "socks5://127.0.0.1:1080"
+
+
+async def test_download_is_saved_and_reused_after_restart(httpx_mock):
+    httpx_mock.add_response(url=supercias_client._EXCEL_URL, content=_build_xlsx())
+
+    await supercias_client.search_companias(query="aceria")
+    assert supercias_client._directory_path().read_bytes() == _build_xlsx()
+
+    # A new process starts with an empty memory cache; the saved copy must
+    # be parsed without another download (pytest-httpx fails on extra calls).
+    supercias_client._companias_cache = TtlCache(ttl_seconds=60)
+    result = await supercias_client.search_companias(query="aceria")
+
+    assert result["total"] == 1
+
+
+async def test_cold_call_returns_quickly_while_download_continues(monkeypatch):
+    release = asyncio.Event()
+
+    async def slow_download(url: str) -> bytes:
+        await release.wait()
+        return _build_xlsx()
+
+    monkeypatch.setattr(supercias_client, "_download_full", slow_download)
+    monkeypatch.setattr(supercias_client, "_INLINE_WAIT_SECONDS", 0.05)
+
+    with pytest.raises(supercias_client.DirectorioEnDescarga):
+        await supercias_client.search_companias(query="aceria")
+
+    release.set()
+    await supercias_client._download_task
+    result = await supercias_client.search_companias(query="aceria")
+
+    assert result["total"] == 1
+
+
+async def test_stale_copy_is_served_while_refreshing(monkeypatch):
+    path = supercias_client._directory_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(_build_xlsx())
+    old = time.time() - supercias_client._DISK_MAX_AGE_SECONDS - 60
+    os.utime(path, (old, old))
+    downloads: list[str] = []
+
+    async def failing_download(url: str) -> bytes:
+        downloads.append(url)
+        raise RuntimeError("No se pudo conectar")
+
+    monkeypatch.setattr(supercias_client, "_download_full", failing_download)
+
+    result = await supercias_client.search_companias(query="aceria")
+    with pytest.raises(RuntimeError):
+        await supercias_client._download_task
+
+    assert result["total"] == 1
+    assert downloads == [supercias_client._EXCEL_URL]
+    assert path.read_bytes() == _build_xlsx()
+
+
+async def test_unreadable_saved_copy_is_replaced(httpx_mock):
+    path = supercias_client._directory_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(b"not a zip")
+    httpx_mock.add_response(url=supercias_client._EXCEL_URL, content=_build_xlsx())
+
+    result = await supercias_client.search_companias(query="aceria")
+
+    assert result["total"] == 1
+    assert path.read_bytes() == _build_xlsx()
 
 
 def test_parse_xlsx_uses_identificacion_header_marker_for_auditores():

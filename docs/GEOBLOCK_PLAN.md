@@ -15,6 +15,7 @@ datacenter IPs (see `RESEARCH.md` and `helpers/smoke_status.py`):
 | `eerssa.gob.ec` (PDFs) | Apache 403 | country or rule (unconfirmed) |
 | `anda.inec.gob.ec`, `censoecuador.gob.ec` | 403 from GitHub runners | datacenter IP or bot filter |
 | `gob.ec` | HTTP 200 with empty body from runners | datacenter IP or bot filter |
+| `mercadodevalores.supercias.gob.ec`, `appscvsmovil.supercias.gob.ec` | TCP connect timeout from Render (2026-10-07); 0.15 s from a Canadian home IP | datacenter IP or country |
 
 Re-checked 2026-10-02 from a residential IP in Canada (not a datacenter):
 `datosabiertos`, `anda.inec`, `censoecuador` and `eerssa` answer Apache 403,
