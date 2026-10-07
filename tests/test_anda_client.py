@@ -127,3 +127,38 @@ async def test_list_microdata_files_no_csrf_token(httpx_mock):
     )
     files = await anda_client.list_microdata_files("1")
     assert files == []
+
+
+@pytest.mark.asyncio
+async def test_get_survey_by_numeric_id_uses_id_format(httpx_mock):
+    httpx_mock.add_response(
+        url="https://anda.inec.gob.ec/anda5/index.php/api/catalog/190?id_format=id",
+        json={"status": "success", "dataset": {"id": "190", "idno": "A B"}},
+    )
+    dataset = await anda_client.get_survey("190")
+    assert dataset["id"] == "190"
+
+
+@pytest.mark.asyncio
+async def test_get_survey_url_encodes_idno_with_spaces(httpx_mock):
+    httpx_mock.add_response(
+        url="https://anda.inec.gob.ec/anda5/index.php/api/catalog/ECU%20DEF%202007",
+        json={"status": "success", "dataset": {"id": "190"}},
+    )
+    dataset = await anda_client.get_survey("ECU DEF 2007")
+    assert dataset["id"] == "190"
+
+
+@pytest.mark.asyncio
+async def test_search_catalog_all_pages_until_found(httpx_mock):
+    base = "https://anda.inec.gob.ec/anda5/index.php/api/catalog"
+    httpx_mock.add_response(
+        url=f"{base}?ps=100&sk=x",
+        json={"result": {"found": "3", "rows": [{"id": "1"}, {"id": "2"}]}},
+    )
+    httpx_mock.add_response(
+        url=f"{base}?ps=100&page=2&sk=x",
+        json={"result": {"found": "3", "rows": [{"id": "3"}]}},
+    )
+    rows = await anda_client.search_catalog_all("x")
+    assert [r["id"] for r in rows] == ["1", "2", "3"]

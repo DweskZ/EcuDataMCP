@@ -1,6 +1,7 @@
 import logging
 import re
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 
@@ -32,9 +33,15 @@ def _anda_url(path: str) -> str:
     return f"{env_config.get_base_url('anda')}{path}"
 
 
+# The catalog endpoint accepts up to 100 rows per page; anything larger is
+# silently clamped by the server.
+MAX_PAGE_SIZE = 100
+
+
 async def search_catalog(
     query: str = "",
     limit: int = 10,
+    page: int = 1,
     session: httpx.AsyncClient | None = None,
 ) -> dict[str, Any]:
     """Search the ANDA (NADA) survey/census catalog.
@@ -51,7 +58,9 @@ async def search_catalog(
         )
     assert session is not None
     try:
-        params: dict[str, Any] = {"ps": min(limit, 50)}
+        params: dict[str, Any] = {"ps": min(limit, MAX_PAGE_SIZE)}
+        if page > 1:
+            params["page"] = page
         if query:
             params["sk"] = query
         logger.debug("ANDA GET catalog params=%s", params)
@@ -72,7 +81,13 @@ async def get_survey(
     idno: str,
     session: httpx.AsyncClient | None = None,
 ) -> dict[str, Any]:
-    """Fetch full DDI-style metadata for one survey by its idno (not its numeric id)."""
+    """Fetch full DDI-style metadata for one survey.
+
+    Accepts the idno or the numeric catalog id. The idno is not a safe key on
+    its own (some contain spaces, and several studies share a prefix), so an
+    all-digit value is looked up as the numeric id (`id_format=id`) and any
+    idno is URL-encoded.
+    """
     own = session is None
     if own:
         session = httpx.AsyncClient(
@@ -82,8 +97,12 @@ async def get_survey(
     assert session is not None
     try:
         logger.debug("ANDA GET catalog detail idno=%s", idno)
+        by_numeric_id = idno.strip().isdigit()
         resp = await session.get(
-            _anda_url(f"catalog/{idno}"), timeout=_TIMEOUT, follow_redirects=True
+            _anda_url(f"catalog/{quote(idno.strip(), safe='')}"),
+            params={"id_format": "id"} if by_numeric_id else None,
+            timeout=_TIMEOUT,
+            follow_redirects=True,
         )
         if resp.status_code == 400:
             try:
@@ -100,6 +119,24 @@ async def get_survey(
     finally:
         if own:
             await session.aclose()
+
+
+async def search_catalog_all(
+    query: str,
+    max_pages: int = 5,
+    session: httpx.AsyncClient | None = None,
+) -> list[dict[str, Any]]:
+    """Every catalog row matching `query`, paging through the whole result set."""
+    rows: list[dict[str, Any]] = []
+    for page in range(1, max_pages + 1):
+        result = await search_catalog(
+            query=query, limit=MAX_PAGE_SIZE, page=page, session=session
+        )
+        batch = result.get("rows", [])
+        rows.extend(batch)
+        if not batch or len(rows) >= int(result.get("found") or 0):
+            break
+    return rows
 
 
 async def list_microdata_files(

@@ -13,6 +13,11 @@ _DATA_DIR = Path(__file__).resolve().parent / "data"
 _PROVINCIAS_PATH = _DATA_DIR / "provincias.json"
 _CANTONES_PATH = _DATA_DIR / "cantones.json"
 _PARROQUIAS_PATH = _DATA_DIR / "parroquias.json"
+_PARROQUIAS_URBANAS_PATH = _DATA_DIR / "parroquias_urbanas.json"
+
+# Year of the INEC classifier (CODIFICACIÓN_2026.xlsx, sheet PARROQUIAS) that
+# parroquias_urbanas.json was built from.
+CLASIFICADOR_ANIO = 2026
 
 
 @lru_cache(maxsize=1)
@@ -31,6 +36,31 @@ def list_cantones() -> list[dict[str, Any]]:
 def list_parroquias() -> list[dict[str, Any]]:
     with _PARROQUIAS_PATH.open(encoding="utf-8") as fh:
         return list(json.load(fh))
+
+
+@lru_cache(maxsize=1)
+def list_parroquias_urbanas() -> list[dict[str, Any]]:
+    """Urban parishes (DPA_PARURB), each mapped to its head parish (DPA_PARROQ).
+
+    Death, police and ECU 911 records name these (e.g. Tarqui 090112), while
+    the head-parish list only has the city's head parish (Guayaquil 090150).
+    """
+    with _PARROQUIAS_URBANAS_PATH.open(encoding="utf-8") as fh:
+        rows = json.load(fh)
+    return [
+        {
+            "codigo_parroquia_urbana": r["codigo"],
+            "nombre": r["nombre"],
+            "codigo": r["parroquia_codigo"],
+            "parroquia": r["parroquia"],
+            "canton_codigo": r["canton_codigo"],
+            "canton": r["canton"],
+            "provincia_codigo": r["provincia_codigo"],
+            "provincia": r["provincia"],
+            "clasificador_anio": CLASIFICADOR_ANIO,
+        }
+        for r in rows
+    ]
 
 
 def find_provincias(query: str = "", region: str = "") -> list[dict[str, Any]]:
@@ -116,4 +146,32 @@ def find_parroquias(
         )
         if any(q == f or q in f for f in fields):
             out.append(row)
+    return out
+
+
+def find_parroquias_urbanas(
+    query: str = "",
+    canton: str = "",
+    provincia: str = "",
+) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    q = _strip(query)
+    c = _strip(canton)
+    p = _strip(provincia)
+    for row in list_parroquias_urbanas():
+        if p and p not in _strip(f"{row['provincia']} {row['provincia_codigo']}"):
+            continue
+        if c and c not in _strip(f"{row['canton']} {row['canton_codigo']}"):
+            continue
+        if q:
+            fields = (
+                _strip(row["codigo_parroquia_urbana"]),
+                _strip(row["nombre"]),
+                _strip(row["parroquia"]),
+                _strip(row["canton"]),
+                _strip(row["provincia"]),
+            )
+            if not any(q == f or q in f for f in fields):
+                continue
+        out.append(row)
     return out

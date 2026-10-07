@@ -49,6 +49,7 @@ import logging
 import re
 from html import unescape
 from typing import Any
+from urllib.parse import unquote
 
 import httpx
 
@@ -74,6 +75,7 @@ _SEED_PAGE_URLS = (
 # seed page every time. The geoportal micrositio hosts the official
 # Clasificador Geográfico Estadístico (DPA codes/shapefiles) for every year
 # 2001-2026; confirmed live it has no menu entry pointing to it anywhere.
+_SITE_PREFIX_EC = "https://www.ecuadorencifras.gob.ec/"
 _EXTRA_TOPICS = (
     {
         "nombre": "Geoportal / Clasificador Geográfico Estadístico (DPA)",
@@ -81,6 +83,24 @@ _EXTRA_TOPICS = (
             "https://www.ecuadorencifras.gob.ec/documentos/web-inec/"
             "Geografia_Estadistica/Micrositio_geoportal/index.html"
         ),
+    },
+    # Historical death-registry microdata: the menu only links the latest year
+    # (Defunciones Generales 2024), so earlier years are invisible without these.
+    {
+        "nombre": "Defunciones generales y fetales: bases de datos 1990-2015",
+        "url": _SITE_PREFIX_EC + "defunciones-generales-y-fetales-bases-de-datos/",
+    },
+    {
+        "nombre": "Nacimientos y defunciones 2017",
+        "url": _SITE_PREFIX_EC + "nacimientos-y-defunciones-2017/",
+    },
+    {
+        "nombre": "Nacimientos y defunciones 2018",
+        "url": _SITE_PREFIX_EC + "nacimientos-y-defunciones-2018/",
+    },
+    {
+        "nombre": "Defunciones generales 2019",
+        "url": _SITE_PREFIX_EC + "defunciones-generales-2019/",
     },
     {
         "nombre": "Laboratorio de Dinámica Laboral y Empresarial (LDLE)",
@@ -121,6 +141,17 @@ _FILE_LINK_RE = re.compile(
     re.IGNORECASE,
 )
 _TITLE_RE = re.compile(r"<title>(.*?)</title>", re.IGNORECASE | re.DOTALL)
+
+
+_YEAR_RE = re.compile(r"(?<!\d)(19[89]\d|20[0-3]\d)(?!\d)")
+
+
+def _year_from_url(url: str) -> int | None:
+    """Reference year from the file name, else from the folder path (None if absent)."""
+    path = unquote(url.split("://", 1)[-1])
+    name = path.rsplit("/", 1)[-1]
+    match = _YEAR_RE.search(name) or _YEAR_RE.search(path)
+    return int(match.group(1)) if match else None
 
 
 def _label_from_url(url: str) -> str:
@@ -217,30 +248,37 @@ def _parse_topic_files(html: str, topic_url: str) -> dict[str, Any]:
         seen.setdefault(url, ext.upper())
 
     files = [
-        {"label": _label_from_url(url), "url": url, "format": fmt} for url, fmt in seen.items()
+        {
+            "label": _label_from_url(url),
+            "url": url,
+            "format": fmt,
+            "year": _year_from_url(url),
+        }
+        for url, fmt in seen.items()
     ]
     return {"titulo": title, "url": topic_url, "archivos": files}
 
 
-async def get_topic_files(topic_url: str) -> dict[str, Any]:
+async def get_topic_files(topic_url: str, year: int | None = None) -> dict[str, Any]:
     """
     Fetch one topic page and extract its direct file links.
 
     Args:
         topic_url: A topic URL from search_topics's "url" field. Must be on
             ecuadorencifras.gob.ec.
+        year: Keep only files whose name or folder carries this year.
     """
     if not topic_url.startswith(_SITE_PREFIX):
         raise ValueError(f"URL fuera de ecuadorencifras.gob.ec: {topic_url}")
 
-    cached = _topic_files_cache.get(topic_url)
-    if cached is not None:
-        return cached
-
-    html = await _get_page(topic_url)
-    result = _parse_topic_files(html, topic_url)
-    _topic_files_cache.set(topic_url, result)
-    return result
+    result = _topic_files_cache.get(topic_url)
+    if result is None:
+        html = await _get_page(topic_url)
+        result = _parse_topic_files(html, topic_url)
+        _topic_files_cache.set(topic_url, result)
+    if year is None:
+        return result
+    return {**result, "archivos": [f for f in result["archivos"] if f.get("year") == year]}
 
 
 # -- WordPress REST API layer -------------------------------------------

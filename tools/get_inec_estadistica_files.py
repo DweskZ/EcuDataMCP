@@ -20,23 +20,27 @@ def register_get_inec_estadistica_files_tool(mcp: MCPServer) -> None:
     )
     @log_tool
     async def get_inec_estadistica_files(
-        url: str, format: Literal["text", "json"] = "text"
+        url: str, year: int | None = None, format: Literal["text", "json"] = "text"
     ) -> dict[str, Any]:
         """
         List the direct file links published on one INEC statistical topic page.
 
         Get the url from search_inec_estadisticas. Returns technical bulletins,
         methodology, and historical series as direct PDF/XLSX/CSV/ZIP links —
-        not the file contents. Use read_pdf on a .pdf link, or download it
+        not the file contents. Historical microdata pages (general deaths
+        1990-2015, 2017, 2018, 2019) are listed by search_inec_estadisticas
+        under "defunciones". Use read_pdf on a .pdf link, or download it
         yourself for tabular formats.
 
         Args:
             url: A topic URL from search_inec_estadisticas's "url" field
                 (must be on ecuadorencifras.gob.ec)
+            year: Optional reference year; keeps only that year's files (each
+                file carries a "year" parsed from its name or folder)
             format: text | json
         """
         try:
-            result = await inec_client.get_topic_files(url)
+            result = await inec_client.get_topic_files(url, year=year)
         except ValueError as e:
             raise ToolError(str(e)) from e
         except Exception as e:
@@ -50,7 +54,10 @@ def register_get_inec_estadistica_files_tool(mcp: MCPServer) -> None:
                 return "\n".join(parts)
             parts.append(f"{len(archivos)} archivo(s):")
             for i, f in enumerate(archivos, 1):
-                parts.append(f"{i}. {f.get('label')} [{f.get('format')}]")
+                parts.append(
+                    f"{i}. {f.get('label')} [{f.get('format')}]"
+                    + (f" {f['year']}" if f.get("year") else "")
+                )
                 parts.append(f"   {f.get('url')}")
             return "\n".join(parts)
 

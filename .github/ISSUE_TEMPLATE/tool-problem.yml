@@ -1,0 +1,52 @@
+name: Problema con un tool / Tool problem
+description: Un tool devolvió algo incorrecto, incompleto o confuso. / A tool returned something wrong, incomplete or confusing.
+title: "[tool] <nombre_del_tool>: <resumen corto>"
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por avisar, a los mantenedores les ayuda mucho. / Thanks for reporting; maintainers appreciate it.
+        Un asistente de IA puede rellenar este formulario por ti: revisa el texto antes de enviarlo.
+  - type: input
+    id: tool
+    attributes:
+      label: Tool afectado / Affected tool
+      placeholder: search_anda, lookup_ubicacion, ...
+    validations:
+      required: true
+  - type: textarea
+    id: call
+    attributes:
+      label: Llamada exacta / Exact call
+      description: Argumentos usados (ids, URLs, años, format).
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Qué pasó / What happened
+      description: Salida o mensaje de error textual (recórtalo si es muy largo).
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Qué se esperaba / What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidencia / Evidence
+      description: Enlace a la fuente oficial o comando (p. ej. curl) que muestra el dato correcto, y fecha de la prueba.
+  - type: textarea
+    id: fix
+    attributes:
+      label: Sugerencia de arreglo / Suggested fix (opcional)
+  - type: input
+    id: version
+    attributes:
+      label: Versión / Version
+      description: Versión del servidor (pyproject.toml / PyPI) y cliente MCP usado.
