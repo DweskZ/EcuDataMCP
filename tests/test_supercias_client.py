@@ -277,8 +277,23 @@ async def test_download_full_does_not_retry_non_cert_connect_errors(monkeypatch)
 
     monkeypatch.setattr(supercias_client, "_download_once", fake_download_once)
 
-    with pytest.raises(httpx.ConnectError):
+    with pytest.raises(RuntimeError, match="ConnectError"):
         await supercias_client._download_full(supercias_client._EXCEL_URL)
+
+
+async def test_download_full_names_host_on_bare_connect_timeout(monkeypatch):
+    # A bare ConnectTimeout stringifies to "", which used to reach the tool
+    # layer as an empty error message.
+    async def fake_download_once(url: str, verify: bool = True) -> bytes:
+        raise httpx.ConnectTimeout("")
+
+    monkeypatch.setattr(supercias_client, "_download_once", fake_download_once)
+
+    with pytest.raises(RuntimeError) as excinfo:
+        await supercias_client._download_full(supercias_client._EXCEL_URL)
+
+    assert "mercadodevalores.supercias.gob.ec" in str(excinfo.value)
+    assert "ConnectTimeout" in str(excinfo.value)
 
 
 def test_parse_xlsx_uses_identificacion_header_marker_for_auditores():
