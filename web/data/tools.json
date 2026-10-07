@@ -381,7 +381,7 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Busca trámites del gobierno ecuatoriano en el portal oficial gob.ec. Mejor enfoque: da un institution_id para obtener los trámites de esa institución. Agrega un query para filtrar resultados por palabra clave (filtra por nombre y descripción). Cuando se da query junto con institution_id, se recorren TODAS las páginas de trámites de esa institución y se filtran, así que siempre obtienes los resultados más relevantes. IDs de institución comunes: \"8\" = SRI (impuestos, RUC, facturación), \"23\" = Registro Civil (cédula, partidas de nacimiento), \"62\" = ANT (licencias de conducir, matriculación vehicular), \"16\" = Cancillería (pasaportes, apostilla), \"5\" = IESS (seguro social, pensiones, fondos de reserva). Usa list_instituciones para encontrar más IDs."
+        "long_description": "Busca trámites del gobierno ecuatoriano en el portal oficial gob.ec. Mejor enfoque: da un institution_id para obtener los trámites de esa institución. Agrega un query para filtrar resultados por palabra clave (filtra por nombre y descripción). Cuando se da query junto con institution_id, se recorren TODAS las páginas de trámites de esa institución y se filtran, así que siempre obtienes los resultados más relevantes. IDs de institución comunes: \"8\" = SRI (impuestos, RUC, facturación), \"23\" = Registro Civil (cédula, partidas de nacimiento), \"48\" = ANT (licencias de conducir, matriculación vehicular), \"6\" = Cancillería (pasaportes, apostilla), \"163\" = IESS (seguro social, pensiones, fondos de reserva). Usa list_instituciones para encontrar más IDs."
       },
       {
         "name": "get_tramite_info",
@@ -463,7 +463,7 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Información detallada de una institución pública registrada en gob.ec. Devuelve nombre, siglas, sector, descripción, sitio web y URL del portal. Obtén el institucion_id de list_instituciones. IDs comunes: SRI=8, IESS=5, Registro Civil=23, ANT=62, Cancillería=16."
+        "long_description": "Información detallada de una institución pública registrada en gob.ec. Devuelve nombre, siglas, sector, descripción, sitio web y URL del portal. Obtén el institucion_id de list_instituciones. IDs comunes: SRI=8, IESS=163, Registro Civil=23, ANT=48, Cancillería=6."
       }
     ]
   },

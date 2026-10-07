@@ -8,10 +8,10 @@ from helpers.logging import TOOL_DOCS
 
 _INSTITUCIONES_CLAVE = [
     {"id": "8", "nombre": "SRI", "uso": "impuestos, RUC, facturación"},
-    {"id": "5", "nombre": "IESS", "uso": "seguro social, pensiones"},
+    {"id": "163", "nombre": "IESS", "uso": "seguro social, pensiones"},
     {"id": "23", "nombre": "Registro Civil", "uso": "cédula, partidas"},
-    {"id": "62", "nombre": "ANT", "uso": "licencias, matriculación"},
-    {"id": "16", "nombre": "Cancillería", "uso": "pasaporte, apostilla, visas"},
+    {"id": "48", "nombre": "ANT", "uso": "licencias, matriculación"},
+    {"id": "6", "nombre": "Cancillería", "uso": "pasaporte, apostilla, visas"},
 ]
 
 _CKAN_TOOLS = [

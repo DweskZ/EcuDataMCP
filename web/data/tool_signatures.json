@@ -301,7 +301,7 @@
     "description": "Direct links to an ANDA survey's microdata files (accepts ANDA's research-use terms). Check get_anda_survey_info first; returns links to multi-MB ZIPs.",
     "summary": "Get direct download links for an ANDA survey's microdata files. Automates ANDA's one-click usage-terms step (research/statistical use only, no re-identifying respondents, cite the source — see get_anda_survey_info for the full text) to reveal the file list. Check get_anda_survey_info first: aggregate-only surveys (microdatos_disponibles false) have no files here. Returns direct URLs, not the file contents — the files are typically multi-MB ZIPs (SPSS .sav inside), too large to embed in a tool result. Download them with the returned URL.",
     "args_doc": {
-      "idno": "Survey identifier from search_anda (the \"idno\" field)",
+      "idno": "Survey idno or numeric id from search_anda (the \"idno\" or \"id\" field)",
       "format": "text | json"
     }
   },
@@ -440,9 +440,9 @@
       }
     ],
     "description": "Full metadata for one ANDA survey (string idno from search_anda): scope, variables, microdata availability and access terms.",
-    "summary": "Get full metadata for one ANDA (INEC) survey/census by its idno. Get the idno from search_anda results — it's the string identifier (e.g. \"IDD-ECU-INEC-CGTPE-DECON-ENESEM-2023-v1.3\"), not the numeric id. Returns scope/abstract, variable count, whether microdata is actually downloadable, confidentiality terms, and a contact email for requesting restricted data when it isn't.",
+    "summary": "Get full metadata for one ANDA (INEC) survey/census by its idno or numeric id. Get it from search_anda results: the string idno (e.g. \"IDD-ECU-INEC-CGTPE-DECON-ENESEM-2023-v1.3\") or the numeric id. Prefer the numeric id when idnos repeat across years or contain spaces. Returns scope/abstract, variable count, whether microdata is actually downloadable, confidentiality terms, and a contact email for requesting restricted data when it isn't.",
     "args_doc": {
-      "idno": "Survey identifier from search_anda (the \"idno\" field)",
+      "idno": "Survey idno or numeric id from search_anda (\"idno\" or \"id\" field)",
       "format": "text | json"
     }
   },
@@ -896,15 +896,21 @@
         "default": null
       },
       {
+        "name": "year",
+        "type": "int | None",
+        "default": "None"
+      },
+      {
         "name": "format",
         "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
     "description": "File links (bulletins, methodology, historical series) on one INEC topic page from search_inec_estadisticas.",
-    "summary": "List the direct file links published on one INEC statistical topic page. Get the url from search_inec_estadisticas. Returns technical bulletins, methodology, and historical series as direct PDF/XLSX/CSV/ZIP links — not the file contents. Use read_pdf on a .pdf link, or download it yourself for tabular formats.",
+    "summary": "List the direct file links published on one INEC statistical topic page. Get the url from search_inec_estadisticas. Returns technical bulletins, methodology, and historical series as direct PDF/XLSX/CSV/ZIP links — not the file contents. Historical microdata pages (general deaths 1990-2015, 2017, 2018, 2019) are listed by search_inec_estadisticas under \"defunciones\". Use read_pdf on a .pdf link, or download it yourself for tabular formats.",
     "args_doc": {
       "url": "A topic URL from search_inec_estadisticas's \"url\" field (must be on ecuadorencifras.gob.ec)",
+      "year": "Optional reference year; keeps only that year's files (each file carries a \"year\" parsed from its name or folder)",
       "format": "text | json"
     }
   },
@@ -988,8 +994,8 @@
         "default": "'text'"
       }
     ],
-    "description": "One gob.ec institution's acronym, sector, description and websites. Take institucion_id from list_instituciones (SRI=8, IESS=5, Registro Civil=23); for its procedures use search_tramites.",
-    "summary": "Get detailed information about a public institution registered on gob.ec. Returns name, acronym, sector, description, website and portal URL. Get the institucion_id from list_instituciones. Common IDs: SRI=8, IESS=5, Registro Civil=23, ANT=62, Cancillería=16.",
+    "description": "One gob.ec institution's acronym, sector, description and websites. Take institucion_id from list_instituciones (SRI=8, IESS=163, Registro Civil=23); for its procedures use search_tramites.",
+    "summary": "Get detailed information about a public institution registered on gob.ec. Returns name, acronym, sector, description, website and portal URL. Get the institucion_id from list_instituciones. Common IDs: SRI=8, IESS=163, Registro Civil=23, ANT=48, Cancillería=6.",
     "args_doc": {
       "institucion_id": "Institution ID (e.g. \"8\")",
       "format": "text | json"
@@ -1440,8 +1446,8 @@
         "default": "'text'"
       }
     ],
-    "description": "Look up Ecuador's provinces, cantons and parroquias with INEC codes, region and population. For parroquias, filter by canton and/or provincia.",
-    "summary": "Look up Ecuador DPA geography: provinces, cantons and parroquias (INEC codes). - nivel='provincia' | 'canton' | 'parroquia' | 'auto' - For parroquias, filter with canton= and/or provincia= (recommended)",
+    "description": "Look up Ecuador's provinces, cantons and parroquias (rural and urban) with INEC codes, region and population. For parroquias, filter by canton and/or provincia.",
+    "summary": "Look up Ecuador DPA geography: provinces, cantons and parroquias (INEC codes). - nivel='provincia' | 'canton' | 'parroquia' | 'auto' - For parroquias, filter with canton= and/or provincia= (recommended) - Parroquias also come back as parroquias_urbanas: the urban parishes (e.g. Tarqui 090112) with codigo_parroquia_urbana, each mapped to its head parish in `codigo` (090150). Source: INEC classifier clasificador_anio (CODIFICACIÓN, sheet PARROQUIAS).",
     "args_doc": {
       "query": "Name or code (e.g. \"Pichincha\", \"Cuenca\", \"Tumbaco\", \"170150\")",
       "region": "Optional natural region for provinces/cantons",
@@ -1621,16 +1627,22 @@
         "default": "10"
       },
       {
+        "name": "page",
+        "type": "int",
+        "default": "1"
+      },
+      {
         "name": "format",
         "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
     "description": "Search INEC's ANDA catalog of 437+ surveys and censuses; the broadest INEC index. Entries without microdata point to search_inec_estadisticas. Next: get_anda_survey_info.",
-    "summary": "Search INEC's ANDA catalog (anda.inec.gob.ec) of surveys and censuses. ANDA runs on NADA (World Bank/IHSN), separate from datosabiertos.gob.ec. It catalogs 437+ INEC surveys/censuses with metadata (title, year, authoring entity). Not every entry has downloadable microdata — many are aggregate-only publications (e.g. price indices); each result says so. Start any INEC search here — it's the broadest index. When a result shows microdatos_disponibles=false, the operation exists but its actual published data lives on ecuadorencifras.gob.ec instead: try search_inec_estadisticas with the same query. Follow up with get_anda_survey_info(idno) for full metadata on one survey.",
+    "summary": "Search INEC's ANDA catalog (anda.inec.gob.ec) of surveys and censuses. ANDA runs on NADA (World Bank/IHSN), separate from datosabiertos.gob.ec. It catalogs 437+ INEC surveys/censuses with metadata (title, year, authoring entity). Not every entry has downloadable microdata — many are aggregate-only publications (e.g. price indices); each result says so. Start any INEC search here — it's the broadest index. When a result shows microdatos_disponibles=false, the operation exists but its actual published data lives on ecuadorencifras.gob.ec instead: try search_inec_estadisticas with the same query. microdatos_disponibles=true means ANDA flags the study as having microdata, not that files are attached: some studies (e.g. general deaths 2012, 2017-2019) list none and host them on ecuadorencifras.gob.ec — see get_inec_estadistica_files. Follow up with get_anda_survey_info(idno) for full metadata on one survey. The numeric \"id\" also works as the identifier in the follow-up tools.",
     "args_doc": {
       "query": "Search keywords (e.g. \"empleo\", \"REEM\", \"censo agropecuario\")",
-      "limit": "Max results (default: 10, max: 50)",
+      "limit": "Results per page (default: 10, max: 50)",
+      "page": "Page of results, 1-based (default: 1); see total/total_pages",
       "format": "text | json"
     }
   },
@@ -1932,8 +1944,8 @@
         "default": "'text'"
       }
     ],
-    "description": "Search Supercías' registry of 226k+ companies by name or RUC: legal status, incorporation, representative, capital, CIIU, address. First call after 6h can take 30-40 s.",
-    "summary": "Search Ecuador's company registry (Superintendencia de Compañías). Covers 226k+ companies with legal status, incorporation date, legal representative, registered capital, economic activity (CIIU) and address. Source is a daily-refreshed government export, cached up to 6h server-side — the first call after the cache expires can take ~30-40s to download and parse (~35 MB, 226k rows).",
+    "description": "Search Supercías' registry of 226k+ companies by name or RUC: legal status, incorporation, representative, capital, CIIU, address. The first call may ask you to retry in 1-2 min while the export downloads.",
+    "summary": "Search Ecuador's company registry (Superintendencia de Compañías). Covers 226k+ companies with legal status, incorporation date, legal representative, registered capital, economic activity (CIIU) and address. Source is a daily-refreshed government export (~37 MB, 226k rows) saved server-side and refreshed every 12h. Downloading it takes 1-2 minutes, so a call with no saved copy yet returns an error asking to retry while the download continues in the background.",
     "args_doc": {
       "query": "Free text matched against company name or RUC (accent-insensitive)",
       "provincia": "Optional province filter, e.g. \"PICHINCHA\" (substring match)",
@@ -2022,6 +2034,16 @@
         "default": "'nacional'"
       },
       {
+        "name": "compact",
+        "type": "bool",
+        "default": "False"
+      },
+      {
+        "name": "fields",
+        "type": "str",
+        "default": "''"
+      },
+      {
         "name": "format",
         "type": "Literal['text', 'json']",
         "default": "'text'"
@@ -2036,6 +2058,8 @@
       "category": "Optional category filter (e.g. \"sal\" for Salud, \"edu\" for Educación). Use list_categories to see all available categories.",
       "sort": "\"relevance\" (default, CKAN's own ranking) or \"recent\" (sort by metadata_modified descending, to discover newly added or freshly refreshed datasets)",
       "source": "\"nacional\" (www.datosabiertos.gob.ec, default), \"cuenca\" (cuencaendatos.cuenca.gob.ec, the Cuenca municipal open-data portal), \"latacunga\" (datosabiertos.latacunga.gob.ec, the Latacunga municipal open-data portal) — separate, smaller CKAN catalogs — or \"iadb\" (data.iadb.org, the Inter-American Development Bank's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch macro/financial indicators for 26 LAC countries, the World Bank/IADB Database of Political Institutions for ~180 countries)",
+      "compact": "Shrink each dataset in the JSON output to id, name, title, metadata_modified, organization and its resources (id, name, format, size, url). Full results can reach 100+ KB per page.",
+      "fields": "Comma-separated dataset keys to keep in the JSON output (e.g. \"name,title,metadata_modified\"); applied after compact.",
       "format": "text | json"
     }
   },
@@ -2555,8 +2579,8 @@
         "default": "'text'"
       }
     ],
-    "description": "Search gob.ec government procedures (trámites). Pass institution_id (SRI=8, IESS=5, Registro Civil=23, ANT=62, Cancillería=16; others via list_instituciones) for relevant results.",
-    "summary": "Search for government procedures (trámites) on Ecuador's official portal gob.ec. Best approach: provide an institution_id to get that institution's trámites. Add a query to filter results by keyword (filters by name and description). When query is provided with institution_id, ALL pages of that institution's trámites are fetched and filtered, so you always get the most relevant results. Common institution IDs: - \"8\" = SRI (Servicio de Rentas Internas) — impuestos, RUC, facturación - \"23\" = Registro Civil — cédula, partidas de nacimiento - \"62\" = ANT — licencias de conducir, matriculación vehicular - \"16\" = Ministerio de Relaciones Exteriores — pasaportes, apostilla - \"5\" = IESS — seguro social, pensiones, fondos de reserva Use list_instituciones to find more institution IDs.",
+    "description": "Search gob.ec government procedures (trámites). Pass institution_id (SRI=8, IESS=163, Registro Civil=23, ANT=48, Cancillería=6; others via list_instituciones) for relevant results.",
+    "summary": "Search for government procedures (trámites) on Ecuador's official portal gob.ec. Best approach: provide an institution_id to get that institution's trámites. Add a query to filter results by keyword (filters by name and description). When query is provided with institution_id, ALL pages of that institution's trámites are fetched and filtered, so you always get the most relevant results. Common institution IDs (checked against gob.ec's /instituciones 2026-10-07): - \"8\" = SRI (Servicio de Rentas Internas) — impuestos, RUC, facturación - \"23\" = Registro Civil — cédula, partidas de nacimiento - \"48\" = ANT — licencias de conducir, matriculación vehicular - \"6\" = Ministerio de Relaciones Exteriores — pasaportes, apostilla - \"163\" = IESS — seguro social, pensiones, fondos de reserva Use list_instituciones to find more institution IDs.",
     "args_doc": {
       "query": "Keywords to filter results (e.g. \"RUC\", \"inscripción RUC persona natural\"). Each word must appear in the trámite name or description.",
       "institution_id": "Institution ID (strongly recommended for relevant results)",

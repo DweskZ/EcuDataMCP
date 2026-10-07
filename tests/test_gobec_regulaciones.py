@@ -1,3 +1,4 @@
+import httpx
 import pytest
 
 from helpers import gobec_client
@@ -94,3 +95,36 @@ async def test_list_regulaciones_raises_on_empty_body(httpx_mock):
     )
     with pytest.raises(RuntimeError, match="respuesta vacía o no válida"):
         await gobec_client.list_regulaciones(page=0)
+
+
+@pytest.fixture
+def _no_retry_sleep(monkeypatch):
+    async def instant(_seconds):
+        return None
+
+    monkeypatch.setattr(gobec_client.asyncio, "sleep", instant)
+
+
+@pytest.mark.asyncio
+async def test_tramites_retried_after_connection_dropped_mid_body(
+    httpx_mock, _no_retry_sleep
+):
+    # Seen from Render 2026-10-07: gob.ec answered 200 for the ~1.8 MB SRI
+    # page, then dropped the connection while the body was streaming.
+    url = "https://www.gob.ec/api/v1/tramites?page=0&institution=8"
+    httpx_mock.add_exception(httpx.ReadError(""), url=url)
+    httpx_mock.add_response(url=url, json=[{"tramite_id": "18009"}])
+
+    items = await gobec_client.search_tramites(institution_id="8", page=0)
+
+    assert items == [{"tramite_id": "18009"}]
+
+
+@pytest.mark.asyncio
+async def test_tramites_error_names_failure_after_retries(httpx_mock, _no_retry_sleep):
+    url = "https://www.gob.ec/api/v1/tramites?page=0&institution=8"
+    for _ in range(gobec_client._ATTEMPTS):
+        httpx_mock.add_exception(httpx.ReadError(""), url=url)
+
+    with pytest.raises(RuntimeError, match="ReadError"):
+        await gobec_client.search_tramites(institution_id="8", page=0)

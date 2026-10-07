@@ -31,7 +31,7 @@ def register_workflow_prompts(mcp: MCPServer) -> None:
         return (
             f"Necesito los requisitos para el trámite '{tramite}' en Ecuador.\n"
             "1) Usa search_tramites (con institution_id si lo conoces: "
-            "SRI=8, Registro Civil=23, ANT=62, Cancillería=16, IESS=5).\n"
+            "SRI=8, Registro Civil=23, ANT=48, Cancillería=6, IESS=163).\n"
             "2) Toma el tramite_id más relevante y llama get_tramite_info.\n"
             "3) Resume requisitos, costo, tiempo, canales y regulaciones vinculadas.\n"
             "Responde en español, claro y accionable para un ciudadano."
