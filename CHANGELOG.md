@@ -39,6 +39,15 @@ Fixes from a field report (paper-apagones, 2026-10-06/07).
   startup financials build. 82 → 73 tools; ignored when
   `ECUADOR_MCP_GEO_PROXY` is set. CKAN (only `source="nacional"` fails),
   gob.ec, SERCOP and ARCONEL answered from Render and stay.
+- **`search_tramites`** with a query failed on Render with an empty error:
+  gob.ec dropped the connection partway through the ~1.8 MB SRI page
+  (`httpx.ReadError`, which stringifies to ""). gob.ec GETs are now retried
+  up to 3 times on transport errors, and the final error names the failure.
+- **gob.ec institution IDs**: the shortcuts in `search_tramites`,
+  `get_institucion_info`, `consultar_tramite` and
+  `ecuador://instituciones-clave` were wrong for three of five. IESS is
+  163 (5 is the agriculture ministry), ANT 48 (not 62) and Cancillería 6
+  (not 16); SRI 8 and Registro Civil 23 were right.
 
 ## 0.11.0 — 2026-10-02
 

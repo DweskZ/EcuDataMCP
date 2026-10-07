@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import re
@@ -14,6 +15,11 @@ from helpers.text_utils import strip_accents as _strip
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 _TIMEOUT = 25.0
+# gob.ec dropped the connection partway through a ~1.8 MB /tramites page
+# from Render (httpx.ReadError, 2026-10-07) seconds after serving the same
+# URL fine. The transport's own retries only cover failed connects, so
+# these read-only GETs are retried here on any transport error.
+_ATTEMPTS = 3
 
 # Browser-like UA required — gob.ec rejects bot-style User-Agents
 _HEADERS = {
@@ -63,7 +69,24 @@ async def _fetch_json(
     assert session is not None
     try:
         logger.debug("GobEC GET %s params=%s", url, params)
-        resp = await session.get(url, params=params, timeout=_TIMEOUT)
+        for attempt in range(1, _ATTEMPTS + 1):
+            try:
+                resp = await session.get(url, params=params, timeout=_TIMEOUT)
+                break
+            except httpx.TransportError as exc:
+                if attempt == _ATTEMPTS:
+                    # ReadError and the timeouts stringify to "", which
+                    # reached the user as "Error al buscar trámites: ".
+                    raise RuntimeError(
+                        f"gob.ec cortó o no respondió la consulta "
+                        f"({type(exc).__name__}, {_ATTEMPTS} intentos); "
+                        "reintenta en unos minutos."
+                    ) from exc
+                logger.warning(
+                    "GobEC %s en %s (intento %d de %d); reintentando",
+                    type(exc).__name__, url, attempt, _ATTEMPTS,
+                )
+                await asyncio.sleep(attempt)
         resp.raise_for_status()
         try:
             return resp.json()

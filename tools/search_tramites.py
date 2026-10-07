@@ -28,7 +28,7 @@ def register_search_tramites_tool(mcp: MCPServer) -> None:
         title="Buscar trámites gubernamentales en gob.ec",
         description=(
             "Search gob.ec government procedures (trámites). Pass institution_id "
-            "(SRI=8, IESS=5, Registro Civil=23, ANT=62, Cancillería=16; others via "
+            "(SRI=8, IESS=163, Registro Civil=23, ANT=48, Cancillería=6; others via "
             "list_instituciones) for relevant results."
         ),
         annotations=READ_ONLY,
@@ -49,12 +49,13 @@ def register_search_tramites_tool(mcp: MCPServer) -> None:
         When query is provided with institution_id, ALL pages of that institution's
         trámites are fetched and filtered, so you always get the most relevant results.
 
-        Common institution IDs:
+        Common institution IDs (checked against gob.ec's /instituciones
+        2026-10-07):
         - "8" = SRI (Servicio de Rentas Internas) — impuestos, RUC, facturación
         - "23" = Registro Civil — cédula, partidas de nacimiento
-        - "62" = ANT — licencias de conducir, matriculación vehicular
-        - "16" = Ministerio de Relaciones Exteriores — pasaportes, apostilla
-        - "5" = IESS — seguro social, pensiones, fondos de reserva
+        - "48" = ANT — licencias de conducir, matriculación vehicular
+        - "6" = Ministerio de Relaciones Exteriores — pasaportes, apostilla
+        - "163" = IESS — seguro social, pensiones, fondos de reserva
 
         Use list_instituciones to find more institution IDs.
 
@@ -74,12 +75,12 @@ def register_search_tramites_tool(mcp: MCPServer) -> None:
                 "cedula": "23", "cédula": "23", "partida": "23",
                 "nacimiento": "23", "registro civil": "23", "defunción": "23",
                 "matrimonio": "23", "identidad": "23",
-                "licencia": "62", "conducir": "62", "matricula": "62",
-                "vehicul": "62", "ant": "62", "revision tecnica": "62",
-                "pasaporte": "16", "apostilla": "16", "visa": "16",
-                "consulado": "16", "legalizacion": "16",
-                "iess": "5", "seguro social": "5", "pensión": "5",
-                "fondo de reserva": "5", "afiliacion": "5", "cesantia": "5",
+                "licencia": "48", "conducir": "48", "matricula": "48",
+                "vehicul": "48", "ant": "48", "revision tecnica": "48",
+                "pasaporte": "6", "apostilla": "6", "visa": "6",
+                "consulado": "6", "legalizacion": "6",
+                "iess": "163", "seguro social": "163", "pensión": "163",
+                "fondo de reserva": "163", "afiliacion": "163", "cesantia": "163",
             }
             q_lower = query.lower()
             for keyword, inst_id in keyword_to_inst.items():
