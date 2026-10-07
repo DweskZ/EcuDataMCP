@@ -311,10 +311,13 @@ def test_directory_download_goes_through_geo_proxy(monkeypatch):
 
 
 async def test_download_is_saved_and_reused_after_restart(httpx_mock):
-    httpx_mock.add_response(url=supercias_client._EXCEL_URL, content=_build_xlsx())
+    # Built once: openpyxl stamps the current time into each file, so two
+    # builds differ whenever a second boundary falls between them.
+    export = _build_xlsx()
+    httpx_mock.add_response(url=supercias_client._EXCEL_URL, content=export)
 
     await supercias_client.search_companias(query="aceria")
-    assert supercias_client._directory_path().read_bytes() == _build_xlsx()
+    assert supercias_client._directory_path().read_bytes() == export
 
     # A new process starts with an empty memory cache; the saved copy must
     # be parsed without another download (pytest-httpx fails on extra calls).
@@ -345,9 +348,10 @@ async def test_cold_call_returns_quickly_while_download_continues(monkeypatch):
 
 
 async def test_stale_copy_is_served_while_refreshing(monkeypatch):
+    export = _build_xlsx()
     path = supercias_client._directory_path()
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(_build_xlsx())
+    path.write_bytes(export)
     old = time.time() - supercias_client._DISK_MAX_AGE_SECONDS - 60
     os.utime(path, (old, old))
     downloads: list[str] = []
@@ -364,19 +368,20 @@ async def test_stale_copy_is_served_while_refreshing(monkeypatch):
 
     assert result["total"] == 1
     assert downloads == [supercias_client._EXCEL_URL]
-    assert path.read_bytes() == _build_xlsx()
+    assert path.read_bytes() == export
 
 
 async def test_unreadable_saved_copy_is_replaced(httpx_mock):
     path = supercias_client._directory_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(b"not a zip")
-    httpx_mock.add_response(url=supercias_client._EXCEL_URL, content=_build_xlsx())
+    export = _build_xlsx()
+    httpx_mock.add_response(url=supercias_client._EXCEL_URL, content=export)
 
     result = await supercias_client.search_companias(query="aceria")
 
     assert result["total"] == 1
-    assert path.read_bytes() == _build_xlsx()
+    assert path.read_bytes() == export
 
 
 def test_parse_xlsx_uses_identificacion_header_marker_for_auditores():
