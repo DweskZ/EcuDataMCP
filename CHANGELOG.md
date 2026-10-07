@@ -31,6 +31,14 @@ Fixes from a field report (paper-apagones, 2026-10-06/07).
   list and route through `ECUADOR_MCP_GEO_PROXY`; connects give up after
   15 s instead of 90-300 s, and the error names the host and the geo-proxy
   setting instead of an empty message.
+- **`ECUADOR_MCP_HIDE_GEOBLOCKED=1`**: for hosts outside the region with no
+  geo proxy. Leaves out the 9 tools whose only source refuses them (ANDA:
+  403; Supercías directory, auditors, ranking and financials: dropped
+  connections, checked from Render 2026-10-07), removes them from
+  `ecuador://fuentes`, tells `buscar_inec` to skip ANDA and skips the
+  startup financials build. 82 → 73 tools; ignored when
+  `ECUADOR_MCP_GEO_PROXY` is set. CKAN (only `source="nacional"` fails),
+  gob.ec, SERCOP and ARCONEL answered from Render and stay.
 
 ## 0.11.0 — 2026-10-02
 

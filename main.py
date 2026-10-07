@@ -19,6 +19,7 @@ from helpers.env_config import (
     get_mcp_ssl_keyfile,
     get_transport,
 )
+from helpers.geo_proxy import hide_geoblocked
 from helpers.http_security import with_http_security
 from helpers.logging import MAIN_LOGGER_NAME, UVICORN_LOGGING_CONFIG, setup_logging
 from helpers.mcp_server import EcuadorMCPServer
@@ -187,8 +188,10 @@ def main(argv: list[str] | None = None) -> None:
     # `run -i` each start a fresh one), so starting a ~356 MB download there
     # on every launch wasted it on sessions that never ask for financials.
     # Over stdio the first financials query starts the build instead
-    # (supercias_financials._check_db_fresh).
-    ensure_financials_db_fresh()
+    # (supercias_financials._check_db_fresh). Skipped when the financials
+    # tools are hidden as geoblocked: the download could only fail there.
+    if not hide_geoblocked():
+        ensure_financials_db_fresh()
 
     host = args.host if args.host is not None else get_mcp_host()
     port = args.port if args.port is not None else get_mcp_port()

@@ -1,5 +1,7 @@
 from mcp.server.mcpserver import MCPServer
 
+from helpers.geo_proxy import hidden_tools
+
 
 def register_workflow_prompts(mcp: MCPServer) -> None:
     @mcp.prompt(
@@ -127,7 +129,14 @@ def register_workflow_prompts(mcp: MCPServer) -> None:
             "hay resultado ahí, el tool mismo indica cómo buscar directamente en "
             "aplicaciones3.ecuadorencifras.gob.ec/BIINEC-war/ — pásale esa instrucción "
             "al usuario en vez de asumir que el dato no existe.\n\n"
-            "Responde en español, indicando de cuál de las tres fuentes viene cada "
+            + (
+                "Este servidor no ofrece ANDA (anda.inec.gob.ec rechaza conexiones "
+                "desde fuera de la región): salta el paso 1, empieza en el 2 y "
+                "remite a https://anda.inec.gob.ec/anda5/ para microdatos.\n\n"
+                if "search_anda" in hidden_tools()
+                else ""
+            )
+            + "Responde en español, indicando de cuál de las tres fuentes viene cada "
             "dato."
         )
 
