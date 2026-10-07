@@ -14,8 +14,8 @@ def register_search_companias_tool(mcp: MCPServer) -> None:
         title="Buscar compañías en el registro de Supercías",
         description=(
             "Search Supercías' registry of 226k+ companies by name or RUC: legal "
-            "status, incorporation, representative, capital, CIIU, address. First "
-            "call after 6h can take 30-40 s."
+            "status, incorporation, representative, capital, CIIU, address. The "
+            "first call may ask you to retry in 1-2 min while the export downloads."
         ),
         annotations=READ_ONLY,
     )
@@ -33,9 +33,10 @@ def register_search_companias_tool(mcp: MCPServer) -> None:
 
         Covers 226k+ companies with legal status, incorporation date, legal
         representative, registered capital, economic activity (CIIU) and
-        address. Source is a daily-refreshed government export, cached up to
-        6h server-side — the first call after the cache expires can take
-        ~30-40s to download and parse (~35 MB, 226k rows).
+        address. Source is a daily-refreshed government export (~37 MB, 226k
+        rows) saved server-side and refreshed every 12h. Downloading it takes
+        1-2 minutes, so a call with no saved copy yet returns an error asking
+        to retry while the download continues in the background.
 
         Args:
             query: Free text matched against company name or RUC (accent-insensitive)

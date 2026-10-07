@@ -53,13 +53,16 @@ import httpx
 
 from helpers import supercias_financials
 from helpers.csv_reader import _EU_DECIMAL_RE, _convert_eu_decimal
+from helpers.geo_proxy import proxy_for, unreachable_hint
 from helpers.supercias_financials import BUILD_TIMEOUT_SECONDS, SCHEMA_VERSION
 from helpers.tls import legacy_cipher_context
 from helpers.user_agent import USER_AGENT
 
 DB_PATH = supercias_financials.DB_PATH
 _RESOURCES_BASE = "https://appscvsmovil.supercias.gob.ec/ranking/recursos/"
-_TIMEOUT = 300.0
+# Short connect timeout: a network the host drops (Render, 2026-10-07) only
+# fails by timing out, and 300 s of that just delays the error.
+_TIMEOUT = httpx.Timeout(300.0, connect=15.0)
 _YEARS_TO_KEEP = 5
 _BATCH_SIZE = 5000
 # A few malformed lines are tolerable; more means a truncated/corrupt file.
@@ -90,6 +93,7 @@ def _client() -> httpx.Client:
         verify=legacy_cipher_context(),
         timeout=_TIMEOUT,
         follow_redirects=True,
+        proxy=proxy_for(_RESOURCES_BASE),
     )
 
 
@@ -100,19 +104,26 @@ def _download_to(
     print(f"Descargando {name}...", flush=True)
     t0 = time.time()
     total = 0
-    with client.stream("GET", url) as resp:
-        resp.raise_for_status()
-        with open(dest, "wb") as f:
-            for chunk in resp.iter_bytes(chunk_size=1024 * 1024):
-                if time.time() > deadline:
-                    raise TimeoutError(
-                        f"Descarga de {name} excedió el plazo total "
-                        f"({_DOWNLOAD_DEADLINE_SECONDS // 60} min)"
-                    )
-                f.write(chunk)
-                total += len(chunk)
-                if total % (20 * 1024 * 1024) < len(chunk):
-                    print(f"  {total / (1024 * 1024):.0f} MB...", flush=True)
+    try:
+        with client.stream("GET", url) as resp:
+            resp.raise_for_status()
+            with open(dest, "wb") as f:
+                for chunk in resp.iter_bytes(chunk_size=1024 * 1024):
+                    if time.time() > deadline:
+                        raise TimeoutError(
+                            f"Descarga de {name} excedió el plazo total "
+                            f"({_DOWNLOAD_DEADLINE_SECONDS // 60} min)"
+                        )
+                    f.write(chunk)
+                    total += len(chunk)
+                    if total % (20 * 1024 * 1024) < len(chunk):
+                        print(f"  {total / (1024 * 1024):.0f} MB...", flush=True)
+    except (httpx.ConnectError, httpx.ConnectTimeout) as exc:
+        # Recorded as the build's ultimo_error, which get_financials shows.
+        raise RuntimeError(
+            f"No se pudo conectar a {httpx.URL(url).host} "
+            f"({type(exc).__name__}). " + unreachable_hint(url)
+        ) from exc
     print(f"  {name}: {total / (1024 * 1024):.1f} MB en {time.time() - t0:.0f}s", flush=True)
 
 

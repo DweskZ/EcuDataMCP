@@ -3,6 +3,7 @@ import json
 from mcp.server.mcpserver import MCPServer
 
 from helpers.geo_data import list_cantones, list_parroquias, list_provincias
+from helpers.geo_proxy import hidden_tools
 from helpers.logging import TOOL_DOCS
 
 _INSTITUCIONES_CLAVE = [
@@ -31,6 +32,21 @@ _CKAN_TOOLS = [
 
 
 def _fuentes_payload() -> dict:
+    payload = _all_fuentes()
+    hidden = hidden_tools()
+    if not hidden:
+        return payload
+
+    # Drop tools this deployment doesn't register, and sources left empty.
+    fuentes = []
+    for fuente in payload["fuentes"]:
+        tools = [tool for tool in fuente["tools"] if tool not in hidden]
+        if tools:
+            fuentes.append({**fuente, "tools": tools})
+    return {**payload, "fuentes": fuentes}
+
+
+def _all_fuentes() -> dict:
     return {
         "fuentes": [
             {

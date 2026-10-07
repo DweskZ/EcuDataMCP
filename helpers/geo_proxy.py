@@ -25,7 +25,41 @@ _DEFAULT_GEO_HOSTS = (
     "sisdatbi.arconel.gob.ec",
     "compraspublicas.gob.ec",
     "eerssa.gob.ec",
+    # Both Supercías export hosts drop the TCP handshake from Render
+    # ([Errno 110], 2026-10-07) while a Canadian home IP connects in 0.15 s.
+    "mercadodevalores.supercias.gob.ec",
+    "appscvsmovil.supercias.gob.ec",
 )
+
+
+# Tools whose only source refuses every request from Render (2026-10-07):
+# ANDA answers 403, both Supercías hosts drop the connection. Hidden as a
+# whole family so a search tool never outlives the get tool it points to.
+# CKAN, gob.ec, SERCOP and ARCONEL stay: from Render each either worked or
+# fails only for one `source`/endpoint while the rest of the tool works.
+GEOBLOCKED_TOOLS = frozenset(
+    {
+        "search_anda",
+        "get_anda_survey_info",
+        "download_anda_microdata",
+        "search_companias",
+        "get_compania_info",
+        "search_auditores",
+        "get_auditor_info",
+        "search_ranking",
+        "get_financials",
+    }
+)
+
+
+def hide_geoblocked() -> bool:
+    """True when ECUADOR_MCP_HIDE_GEOBLOCKED is on and no geo proxy is set."""
+    flag = os.getenv("ECUADOR_MCP_HIDE_GEOBLOCKED", "").strip().lower()
+    return flag in {"1", "true", "yes", "on"} and get_geo_proxy() is None
+
+
+def hidden_tools() -> frozenset[str]:
+    return GEOBLOCKED_TOOLS if hide_geoblocked() else frozenset()
 
 
 def get_geo_proxy() -> str | None:
@@ -50,3 +84,18 @@ def proxy_for(url: str) -> str | None:
         if host == listed or host.endswith("." + listed):
             return proxy
     return None
+
+
+def unreachable_hint(url: str) -> str:
+    """Advice to append when a connection to ``url`` could not be opened."""
+    if proxy_for(url) is not None:
+        return (
+            "Tampoco respondió a través de ECUADOR_MCP_GEO_PROXY; reintenta en "
+            "unos minutos."
+        )
+    return (
+        "Si el servidor corre fuera de Ecuador (por ejemplo en Render), el sitio "
+        "suele descartar esas conexiones: configura ECUADOR_MCP_GEO_PROXY con "
+        "una salida en la región (docs/GEOBLOCK_PLAN.md). Si no, reintenta en "
+        "unos minutos."
+    )

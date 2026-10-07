@@ -21,6 +21,24 @@ Fixes from a field report (paper-apagones, 2026-10-06/07).
   of "File is not a zip file".
 - **Reporting**: issue template `tool-problem.yml`; the server instructions
   tell assistants to offer to report odd tool behaviour to the maintainers.
+- **Supercías directory** (`search_companias`, `get_compania_info`): the
+  ~37 MB export took ~90 s, past the MCP client's timeout, so it now downloads
+  in the background and is saved to the data directory (refreshed every
+  12 h, stale copy served meanwhile). A cold call returns a "retry in 1-2
+  min" error after 30 s instead of timing out.
+- **Supercías from Render**: both Supercías hosts drop connections from
+  Render's network (`[Errno 110]`, 2026-10-07). They are now on the geo-proxy
+  list and route through `ECUADOR_MCP_GEO_PROXY`; connects give up after
+  15 s instead of 90-300 s, and the error names the host and the geo-proxy
+  setting instead of an empty message.
+- **`ECUADOR_MCP_HIDE_GEOBLOCKED=1`**: for hosts outside the region with no
+  geo proxy. Leaves out the 9 tools whose only source refuses them (ANDA:
+  403; Supercías directory, auditors, ranking and financials: dropped
+  connections, checked from Render 2026-10-07), removes them from
+  `ecuador://fuentes`, tells `buscar_inec` to skip ANDA and skips the
+  startup financials build. 82 → 73 tools; ignored when
+  `ECUADOR_MCP_GEO_PROXY` is set. CKAN (only `source="nacional"` fails),
+  gob.ec, SERCOP and ARCONEL answered from Render and stay.
 
 ## 0.11.0 — 2026-10-02
 

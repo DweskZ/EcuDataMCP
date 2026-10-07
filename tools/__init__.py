@@ -1,5 +1,6 @@
 from mcp.server.mcpserver import MCPServer
 
+from helpers.geo_proxy import hide_geoblocked
 from tools.archivo_secciones import register_archivo_secciones_tools
 from tools.arconel_reportes import (
     register_get_arconel_reporte_tool,
@@ -138,9 +139,13 @@ def register_tools(mcp: MCPServer) -> None:
     register_list_instituciones_tool(mcp)
     register_get_institucion_info_tool(mcp)
 
-    register_search_anda_tool(mcp)
-    register_get_anda_survey_info_tool(mcp)
-    register_download_anda_microdata_tool(mcp)
+    # Skipped on hosts outside the region that set ECUADOR_MCP_HIDE_GEOBLOCKED
+    # (helpers/geo_proxy.GEOBLOCKED_TOOLS), so clients aren't offered tools
+    # that can only fail there.
+    if not hide_geoblocked():
+        register_search_anda_tool(mcp)
+        register_get_anda_survey_info_tool(mcp)
+        register_download_anda_microdata_tool(mcp)
 
 
     register_search_inec_estadisticas_tool(mcp)
@@ -185,12 +190,13 @@ def register_tools(mcp: MCPServer) -> None:
     register_geoportal_tools(mcp)
     register_search_archivos_tool(mcp)
 
-    register_search_companias_tool(mcp)
-    register_get_compania_info_tool(mcp)
-    register_search_ranking_tool(mcp)
-    register_get_financials_tool(mcp)
-    register_search_auditores_tool(mcp)
-    register_get_auditor_info_tool(mcp)
+    if not hide_geoblocked():
+        register_search_companias_tool(mcp)
+        register_get_compania_info_tool(mcp)
+        register_search_ranking_tool(mcp)
+        register_get_financials_tool(mcp)
+        register_search_auditores_tool(mcp)
+        register_get_auditor_info_tool(mcp)
 
 
     register_search_cepalstat_indicadores_tool(mcp)

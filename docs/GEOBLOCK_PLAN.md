@@ -15,6 +15,7 @@ datacenter IPs (see `RESEARCH.md` and `helpers/smoke_status.py`):
 | `eerssa.gob.ec` (PDFs) | Apache 403 | country or rule (unconfirmed) |
 | `anda.inec.gob.ec`, `censoecuador.gob.ec` | 403 from GitHub runners | datacenter IP or bot filter |
 | `gob.ec` | HTTP 200 with empty body from runners | datacenter IP or bot filter |
+| `mercadodevalores.supercias.gob.ec`, `appscvsmovil.supercias.gob.ec` | TCP connect timeout from Render (2026-10-07); 0.15 s from a Canadian home IP | datacenter IP or country |
 
 Re-checked 2026-10-02 from a residential IP in Canada (not a datacenter):
 `datosabiertos`, `anda.inec`, `censoecuador` and `eerssa` answer Apache 403,
@@ -28,6 +29,16 @@ through `proxy_for`. INEC's main site is reachable and stays direct.
 
 The current workaround (a local VPN) does not help CI, PyPI/MCPB installs or
 anyone else. Goal: a free path that works away from one laptop.
+
+Until then, a host outside the region can set `ECUADOR_MCP_HIDE_GEOBLOCKED=1`
+so it doesn't offer tools that can only fail there
+(`helpers/geo_proxy.GEOBLOCKED_TOOLS`: ANDA and Supercías). Checked from
+Render on 2026-10-07: ANDA 403 and Supercías connect timeouts, while SERCOP,
+ARCONEL reportes, gob.ec regulaciones, Centrosur, SRI and the Cuenca CKAN
+portal answered. `datosabiertos.gob.ec` failed (403) but the CKAN tools
+also serve the municipal portals, so they stay. `search_tramites` failed
+with an empty error, unconfirmed as a block since gob.ec regulaciones on
+the same host worked, so it stays too.
 
 ## Constraints
 

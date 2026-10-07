@@ -1,6 +1,6 @@
 import pytest
 
-from helpers.geo_proxy import get_geo_hosts, proxy_for
+from helpers.geo_proxy import GEOBLOCKED_TOOLS, get_geo_hosts, hidden_tools, proxy_for
 
 
 @pytest.fixture(autouse=True)
@@ -38,3 +38,15 @@ def test_hosts_override(monkeypatch):
     assert get_geo_hosts() == ("example.ec", "other.ec")
     assert proxy_for("https://x.example.ec/") == "http://p:3128"
     assert proxy_for("https://www.datosabiertos.gob.ec/") is None
+
+
+def test_geoblocked_tools_hidden_only_when_flag_set_without_proxy(monkeypatch):
+    monkeypatch.delenv("ECUADOR_MCP_HIDE_GEOBLOCKED", raising=False)
+    assert hidden_tools() == frozenset()
+
+    monkeypatch.setenv("ECUADOR_MCP_HIDE_GEOBLOCKED", "1")
+    assert hidden_tools() == GEOBLOCKED_TOOLS
+
+    # With an egress in the region the sources work again.
+    monkeypatch.setenv("ECUADOR_MCP_GEO_PROXY", "socks5://127.0.0.1:1080")
+    assert hidden_tools() == frozenset()
