@@ -8,6 +8,25 @@ from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.tool_meta import READ_ONLY
 
+_COMPACT_RESOURCE_KEYS = ("id", "name", "format", "size", "url")
+
+
+def _compact_dataset(ds: dict[str, Any]) -> dict[str, Any]:
+    """Keep what's needed to pick a dataset and its files, dropping the bulk
+    (descriptions, organisation blocks, per-resource metadata)."""
+    org = ds.get("organization")
+    return {
+        "id": ds.get("id"),
+        "name": ds.get("name"),
+        "title": ds.get("title"),
+        "metadata_modified": ds.get("metadata_modified"),
+        "organization": org.get("title") if isinstance(org, dict) else None,
+        "resources": [
+            {k: r.get(k) for k in _COMPACT_RESOURCE_KEYS}
+            for r in ds.get("resources") or []
+        ],
+    }
+
 
 def register_search_datasets_tool(mcp: MCPServer) -> None:
     @mcp.tool(
@@ -28,6 +47,8 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
         category: str = "",
         sort: Literal["relevance", "recent"] = "relevance",
         source: ckan_client.CkanSource = "nacional",
+        compact: bool = False,
+        fields: str = "",
         format: Literal["text", "json"] = "text",
     ) -> dict[str, Any]:
         """
@@ -59,6 +80,12 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
                     macro/financial indicators for 26 LAC countries, the
                     World Bank/IADB Database of Political Institutions for
                     ~180 countries)
+            compact: Shrink each dataset in the JSON output to id, name, title,
+                     metadata_modified, organization and its resources (id,
+                     name, format, size, url). Full results can reach 100+ KB
+                     per page.
+            fields: Comma-separated dataset keys to keep in the JSON output
+                    (e.g. "name,title,metadata_modified"); applied after compact.
             format: text | json
         """
         page_size = min(max(page_size, 1), 100)
@@ -81,6 +108,12 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
         datasets = result.get("results", [])
         total = result.get("count", 0)
         site = ckan_client.site_url(source).rstrip("/")
+        text_datasets = datasets
+        if compact:
+            datasets = [_compact_dataset(ds) for ds in datasets]
+        keep = [f.strip() for f in fields.split(",") if f.strip()]
+        if keep:
+            datasets = [{k: ds[k] for k in keep if k in ds} for ds in datasets]
         payload = {
             "query": query,
             "recent": recent,
@@ -89,6 +122,9 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
             "results": datasets,
             "site": site,
         }
+        # The text view reads description, tags and organisation, which compact
+        # and fields may have dropped from the JSON payload.
+        text_payload = {**payload, "results": text_datasets}
 
         def to_text(data: dict) -> str:
             rows = data.get("results") or []
@@ -127,4 +163,6 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
                 parts.append("")
             return "\n".join(parts)
 
-        return render_structured(payload, format, text_builder=to_text)
+        return render_structured(
+            payload, format, text_builder=lambda _: to_text(text_payload)
+        )

@@ -498,6 +498,14 @@ async def preview_xlsx(
     raw, truncated = await download_bytes(
         url, session=session, max_bytes=_MAX_DECOMPRESSED_BYTES
     )
+    if truncated:
+        raise ValueError(
+            "El archivo .xlsx supera el límite de 20 MB de este preview, así "
+            "que se descargó incompleto y no se puede abrir (el índice del "
+            "contenedor ZIP interno vive al final del archivo). Usa "
+            "download_resource para bajarlo completo, o el enlace directo."
+        )
+
     wb = load_workbook(filename=io.BytesIO(raw), read_only=True, data_only=True)
     try:
         ws = wb.active
@@ -673,6 +681,14 @@ async def preview_ods(
     raw, truncated = await download_bytes(
         url, session=session, max_bytes=_MAX_DECOMPRESSED_BYTES
     )
+    if truncated:
+        raise ValueError(
+            "El archivo .ods supera el límite de 20 MB de este preview, así "
+            "que se descargó incompleto y no se puede abrir (el índice del "
+            "contenedor ZIP interno vive al final del archivo). Usa "
+            "download_resource para bajarlo completo, o el enlace directo."
+        )
+
     doc = load(io.BytesIO(raw))
     tables = doc.spreadsheet.getElementsByType(Table)
     empty = {

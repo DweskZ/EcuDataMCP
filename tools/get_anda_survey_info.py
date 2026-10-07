@@ -32,17 +32,18 @@ def register_get_anda_survey_info_tool(mcp: MCPServer) -> None:
         idno: str, format: Literal["text", "json"] = "text"
     ) -> dict[str, Any]:
         """
-        Get full metadata for one ANDA (INEC) survey/census by its idno.
+        Get full metadata for one ANDA (INEC) survey/census by its idno or numeric id.
 
-        Get the idno from search_anda results — it's the string identifier
-        (e.g. "IDD-ECU-INEC-CGTPE-DECON-ENESEM-2023-v1.3"), not the numeric id.
+        Get it from search_anda results: the string idno (e.g.
+        "IDD-ECU-INEC-CGTPE-DECON-ENESEM-2023-v1.3") or the numeric id. Prefer the
+        numeric id when idnos repeat across years or contain spaces.
 
         Returns scope/abstract, variable count, whether microdata is actually
         downloadable, confidentiality terms, and a contact email for requesting
         restricted data when it isn't.
 
         Args:
-            idno: Survey identifier from search_anda (the "idno" field)
+            idno: Survey idno or numeric id from search_anda ("idno" or "id" field)
             format: text | json
         """
         try:

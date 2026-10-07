@@ -337,3 +337,27 @@ async def test_get_api_json_raises_on_http_error(httpx_mock):
 
     with pytest.raises(ValueError, match="Parámetro inválido"):
         await inec_client.get_publicacion_files(1)
+
+
+@pytest.mark.asyncio
+async def test_get_topic_files_tags_year_and_filters(httpx_mock):
+    topic_url = "https://www.ecuadorencifras.gob.ec/defunciones-generales-y-fetales-bases-de-datos/"
+    base = "https://www.ecuadorencifras.gob.ec/documentos/datos/Poblacion_y_Demografia/"
+    httpx_mock.add_response(
+        url=topic_url,
+        html=(
+            "<title>Defunciones</title>"
+            f'<a href="{base}def_generales/spss/dbd_defunciones_generales_1990_spss.zip">a</a>'
+            f'<a href="{base}def_generales/spss/dbd_defunciones_generales_2015_spss.zip">b</a>'
+        ),
+    )
+    allf = await inec_client.get_topic_files(topic_url)
+    assert [f["year"] for f in allf["archivos"]] == [1990, 2015]
+    only = await inec_client.get_topic_files(topic_url, year=2015)
+    assert len(only["archivos"]) == 1
+    assert only["archivos"][0]["year"] == 2015
+
+
+def test_year_from_url_falls_back_to_folder():
+    url = "https://x.ec/documentos/web-inec/Nacimientos_Defunciones/2018/BDD_spss.zip"
+    assert inec_client._year_from_url(url) == 2018

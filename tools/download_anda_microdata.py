@@ -37,7 +37,7 @@ def register_download_anda_microdata_tool(mcp: MCPServer) -> None:
         Download them with the returned URL.
 
         Args:
-            idno: Survey identifier from search_anda (the "idno" field)
+            idno: Survey idno or numeric id from search_anda (the "idno" or "id" field)
             format: text | json
         """
         try:
@@ -66,12 +66,19 @@ def register_download_anda_microdata_tool(mcp: MCPServer) -> None:
             "total_archivos": len(files),
             "archivos": files,
         }
+        if not files:
+            payload["motivo"] = (
+                "ANDA no tiene archivos de datos adjuntos a este estudio: la página de "
+                "descarga solo muestra los términos de uso. Los microdatos pueden estar "
+                "alojados en ecuadorencifras.gob.ec; prueba get_inec_estadistica_files "
+                "o search_inec_estadisticas."
+            )
 
         def to_text(data: dict) -> str:
             if not data["archivos"]:
                 return (
-                    f"No se encontraron archivos de microdatos para '{data['titulo']}' "
-                    "(la página de descarga no devolvió links; puede necesitar revisión manual)."
+                    f"No se encontraron archivos de microdatos para '{data['titulo']}'. "
+                    f"{data['motivo']}"
                 )
             parts = [
                 f"Archivos de microdatos para: {data['titulo']}",

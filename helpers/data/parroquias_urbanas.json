@@ -1,0 +1,2712 @@
+[
+ {
+  "codigo": "010101",
+  "nombre": "Bellavista",
+  "parroquia_codigo": "010150",
+  "parroquia": "Cuenca",
+  "canton_codigo": "0101",
+  "canton": "Cuenca",
+  "provincia_codigo": "01",
+  "provincia": "Azuay"
+ },
+ {
+  "codigo": "010102",
+  "nombre": "Cañaribamba",
+  "parroquia_codigo": "010150",
+  "parroquia": "Cuenca",
+  "canton_codigo": "0101",
+  "canton": "Cuenca",
+  "provincia_codigo": "01",
+  "provincia": "Azuay"
+ },
+ {
+  "codigo": "010103",
+  "nombre": "El Batán",
+  "parroquia_codigo": "010150",
+  "parroquia": "Cuenca",
+  "canton_codigo": "0101",
+  "canton": "Cuenca",
+  "provincia_codigo": "01",
+  "provincia": "Azuay"
+ },
+ {
+  "codigo": "010104",
+  "nombre": "El Sagrario",
+  "parroquia_codigo": "010150",
+  "parroquia": "Cuenca",
+  "canton_codigo": "0101",
+  "canton": "Cuenca",
+  "provincia_codigo": "01",
+  "provincia": "Azuay"
+ },
+ {
+  "codigo": "010105",
+  "nombre": "El Vecino",
+  "parroquia_codigo": "010150",
+  "parroquia": "Cuenca",
+  "canton_codigo": "0101",
+  "canton": "Cuenca",
+  "provincia_codigo": "01",
+  "provincia": "Azuay"
+ },
+ {
+  "codigo": "010106",
+  "nombre": "Gil Ramírez Dávalos",
+  "parroquia_codigo": "010150",
+  "parroquia": "Cuenca",
+  "canton_codigo": "0101",
+  "canton": "Cuenca",
+  "provincia_codigo": "01",
+  "provincia": "Azuay"
+ },
+ {
+  "codigo": "010107",
+  "nombre": "Huaynacápac",
+  "parroquia_codigo": "010150",
+  "parroquia": "Cuenca",
+  "canton_codigo": "0101",
+  "canton": "Cuenca",
+  "provincia_codigo": "01",
+  "provincia": "Azuay"
+ },
+ {
+  "codigo": "010108",
+  "nombre": "Machángara",
+  "parroquia_codigo": "010150",
+  "parroquia": "Cuenca",
+  "canton_codigo": "0101",
+  "canton": "Cuenca",
+  "provincia_codigo": "01",
+  "provincia": "Azuay"
+ },
+ {
+  "codigo": "010109",
+  "nombre": "Monay",
+  "parroquia_codigo": "010150",
+  "parroquia": "Cuenca",
+  "canton_codigo": "0101",
+  "canton": "Cuenca",
+  "provincia_codigo": "01",
+  "provincia": "Azuay"
+ },
+ {
+  "codigo": "010110",
+  "nombre": "San Blas",
+  "parroquia_codigo": "010150",
+  "parroquia": "Cuenca",
+  "canton_codigo": "0101",
+  "canton": "Cuenca",
+  "provincia_codigo": "01",
+  "provincia": "Azuay"
+ },
+ {
+  "codigo": "010111",
+  "nombre": "San Sebastián",
+  "parroquia_codigo": "010150",
+  "parroquia": "Cuenca",
+  "canton_codigo": "0101",
+  "canton": "Cuenca",
+  "provincia_codigo": "01",
+  "provincia": "Azuay"
+ },
+ {
+  "codigo": "010112",
+  "nombre": "Sucre",
+  "parroquia_codigo": "010150",
+  "parroquia": "Cuenca",
+  "canton_codigo": "0101",
+  "canton": "Cuenca",
+  "provincia_codigo": "01",
+  "provincia": "Azuay"
+ },
+ {
+  "codigo": "010113",
+  "nombre": "Totoracocha",
+  "parroquia_codigo": "010150",
+  "parroquia": "Cuenca",
+  "canton_codigo": "0101",
+  "canton": "Cuenca",
+  "provincia_codigo": "01",
+  "provincia": "Azuay"
+ },
+ {
+  "codigo": "010114",
+  "nombre": "Yanuncay",
+  "parroquia_codigo": "010150",
+  "parroquia": "Cuenca",
+  "canton_codigo": "0101",
+  "canton": "Cuenca",
+  "provincia_codigo": "01",
+  "provincia": "Azuay"
+ },
+ {
+  "codigo": "010115",
+  "nombre": "Hermano Miguel",
+  "parroquia_codigo": "010150",
+  "parroquia": "Cuenca",
+  "canton_codigo": "0101",
+  "canton": "Cuenca",
+  "provincia_codigo": "01",
+  "provincia": "Azuay"
+ },
+ {
+  "codigo": "020101",
+  "nombre": "Ángel Polibio Cháves",
+  "parroquia_codigo": "020150",
+  "parroquia": "Guaranda",
+  "canton_codigo": "0201",
+  "canton": "Guaranda",
+  "provincia_codigo": "02",
+  "provincia": "Bolívar"
+ },
+ {
+  "codigo": "020102",
+  "nombre": "Gabriel Ignacio Veintimilla",
+  "parroquia_codigo": "020150",
+  "parroquia": "Guaranda",
+  "canton_codigo": "0201",
+  "canton": "Guaranda",
+  "provincia_codigo": "02",
+  "provincia": "Bolívar"
+ },
+ {
+  "codigo": "020103",
+  "nombre": "Guanujo",
+  "parroquia_codigo": "020150",
+  "parroquia": "Guaranda",
+  "canton_codigo": "0201",
+  "canton": "Guaranda",
+  "provincia_codigo": "02",
+  "provincia": "Bolívar"
+ },
+ {
+  "codigo": "020701",
+  "nombre": "Las Mercedes",
+  "parroquia_codigo": "020750",
+  "parroquia": "Las Naves",
+  "canton_codigo": "0207",
+  "canton": "Las Naves",
+  "provincia_codigo": "02",
+  "provincia": "Bolívar"
+ },
+ {
+  "codigo": "020702",
+  "nombre": "Las Naves",
+  "parroquia_codigo": "020750",
+  "parroquia": "Las Naves",
+  "canton_codigo": "0207",
+  "canton": "Las Naves",
+  "provincia_codigo": "02",
+  "provincia": "Bolívar"
+ },
+ {
+  "codigo": "030101",
+  "nombre": "Aurelio Bayas Martínez",
+  "parroquia_codigo": "030150",
+  "parroquia": "Azogues",
+  "canton_codigo": "0301",
+  "canton": "Azogues",
+  "provincia_codigo": "03",
+  "provincia": "Cañar"
+ },
+ {
+  "codigo": "030102",
+  "nombre": "Azogues",
+  "parroquia_codigo": "030150",
+  "parroquia": "Azogues",
+  "canton_codigo": "0301",
+  "canton": "Azogues",
+  "provincia_codigo": "03",
+  "provincia": "Cañar"
+ },
+ {
+  "codigo": "030103",
+  "nombre": "Borrero",
+  "parroquia_codigo": "030150",
+  "parroquia": "Azogues",
+  "canton_codigo": "0301",
+  "canton": "Azogues",
+  "provincia_codigo": "03",
+  "provincia": "Cañar"
+ },
+ {
+  "codigo": "030104",
+  "nombre": "San Francisco",
+  "parroquia_codigo": "030150",
+  "parroquia": "Azogues",
+  "canton_codigo": "0301",
+  "canton": "Azogues",
+  "provincia_codigo": "03",
+  "provincia": "Cañar"
+ },
+ {
+  "codigo": "040101",
+  "nombre": "González Suárez",
+  "parroquia_codigo": "040150",
+  "parroquia": "Tulcán",
+  "canton_codigo": "0401",
+  "canton": "Tulcán",
+  "provincia_codigo": "04",
+  "provincia": "Carchi"
+ },
+ {
+  "codigo": "040102",
+  "nombre": "Tulcán",
+  "parroquia_codigo": "040150",
+  "parroquia": "Tulcán",
+  "canton_codigo": "0401",
+  "canton": "Tulcán",
+  "provincia_codigo": "04",
+  "provincia": "Carchi"
+ },
+ {
+  "codigo": "040301",
+  "nombre": "El Ángel",
+  "parroquia_codigo": "040350",
+  "parroquia": "El Ángel",
+  "canton_codigo": "0403",
+  "canton": "Espejo",
+  "provincia_codigo": "04",
+  "provincia": "Carchi"
+ },
+ {
+  "codigo": "040302",
+  "nombre": "27 de Septiembre",
+  "parroquia_codigo": "040350",
+  "parroquia": "El Ángel",
+  "canton_codigo": "0403",
+  "canton": "Espejo",
+  "provincia_codigo": "04",
+  "provincia": "Carchi"
+ },
+ {
+  "codigo": "040501",
+  "nombre": "González Suárez",
+  "parroquia_codigo": "040550",
+  "parroquia": "San Gabriel",
+  "canton_codigo": "0405",
+  "canton": "Montúfar",
+  "provincia_codigo": "04",
+  "provincia": "Carchi"
+ },
+ {
+  "codigo": "040502",
+  "nombre": "San José",
+  "parroquia_codigo": "040550",
+  "parroquia": "San Gabriel",
+  "canton_codigo": "0405",
+  "canton": "Montúfar",
+  "provincia_codigo": "04",
+  "provincia": "Carchi"
+ },
+ {
+  "codigo": "050101",
+  "nombre": "Eloy Alfaro  (San Felipe)",
+  "parroquia_codigo": "050150",
+  "parroquia": "Latacunga",
+  "canton_codigo": "0501",
+  "canton": "Latacunga",
+  "provincia_codigo": "05",
+  "provincia": "Cotopaxi"
+ },
+ {
+  "codigo": "050102",
+  "nombre": "Ignacio Flores (Parque Flores)",
+  "parroquia_codigo": "050150",
+  "parroquia": "Latacunga",
+  "canton_codigo": "0501",
+  "canton": "Latacunga",
+  "provincia_codigo": "05",
+  "provincia": "Cotopaxi"
+ },
+ {
+  "codigo": "050103",
+  "nombre": "Juan Montalvo (San Sebastián)",
+  "parroquia_codigo": "050150",
+  "parroquia": "Latacunga",
+  "canton_codigo": "0501",
+  "canton": "Latacunga",
+  "provincia_codigo": "05",
+  "provincia": "Cotopaxi"
+ },
+ {
+  "codigo": "050104",
+  "nombre": "La Matriz",
+  "parroquia_codigo": "050150",
+  "parroquia": "Latacunga",
+  "canton_codigo": "0501",
+  "canton": "Latacunga",
+  "provincia_codigo": "05",
+  "provincia": "Cotopaxi"
+ },
+ {
+  "codigo": "050105",
+  "nombre": "San Buenaventura",
+  "parroquia_codigo": "050150",
+  "parroquia": "Latacunga",
+  "canton_codigo": "0501",
+  "canton": "Latacunga",
+  "provincia_codigo": "05",
+  "provincia": "Cotopaxi"
+ },
+ {
+  "codigo": "050201",
+  "nombre": "El Carmen",
+  "parroquia_codigo": "050250",
+  "parroquia": "La Maná",
+  "canton_codigo": "0502",
+  "canton": "La Maná",
+  "provincia_codigo": "05",
+  "provincia": "Cotopaxi"
+ },
+ {
+  "codigo": "050202",
+  "nombre": "La Maná",
+  "parroquia_codigo": "050250",
+  "parroquia": "La Maná",
+  "canton_codigo": "0502",
+  "canton": "La Maná",
+  "provincia_codigo": "05",
+  "provincia": "Cotopaxi"
+ },
+ {
+  "codigo": "050203",
+  "nombre": "El Triunfo",
+  "parroquia_codigo": "050250",
+  "parroquia": "La Maná",
+  "canton_codigo": "0502",
+  "canton": "La Maná",
+  "provincia_codigo": "05",
+  "provincia": "Cotopaxi"
+ },
+ {
+  "codigo": "060101",
+  "nombre": "Lizarzaburu",
+  "parroquia_codigo": "060150",
+  "parroquia": "Riobamba",
+  "canton_codigo": "0601",
+  "canton": "Riobamba",
+  "provincia_codigo": "06",
+  "provincia": "Chimborazo"
+ },
+ {
+  "codigo": "060102",
+  "nombre": "Maldonado",
+  "parroquia_codigo": "060150",
+  "parroquia": "Riobamba",
+  "canton_codigo": "0601",
+  "canton": "Riobamba",
+  "provincia_codigo": "06",
+  "provincia": "Chimborazo"
+ },
+ {
+  "codigo": "060103",
+  "nombre": "Velasco",
+  "parroquia_codigo": "060150",
+  "parroquia": "Riobamba",
+  "canton_codigo": "0601",
+  "canton": "Riobamba",
+  "provincia_codigo": "06",
+  "provincia": "Chimborazo"
+ },
+ {
+  "codigo": "060104",
+  "nombre": "Veloz",
+  "parroquia_codigo": "060150",
+  "parroquia": "Riobamba",
+  "canton_codigo": "0601",
+  "canton": "Riobamba",
+  "provincia_codigo": "06",
+  "provincia": "Chimborazo"
+ },
+ {
+  "codigo": "060105",
+  "nombre": "Yaruquíes",
+  "parroquia_codigo": "060150",
+  "parroquia": "Riobamba",
+  "canton_codigo": "0601",
+  "canton": "Riobamba",
+  "provincia_codigo": "06",
+  "provincia": "Chimborazo"
+ },
+ {
+  "codigo": "060301",
+  "nombre": "Cajabamba",
+  "parroquia_codigo": "060350",
+  "parroquia": "Villa la Unión",
+  "canton_codigo": "0603",
+  "canton": "Colta",
+  "provincia_codigo": "06",
+  "provincia": "Chimborazo"
+ },
+ {
+  "codigo": "060302",
+  "nombre": "Sicalpa",
+  "parroquia_codigo": "060350",
+  "parroquia": "Villa la Unión",
+  "canton_codigo": "0603",
+  "canton": "Colta",
+  "provincia_codigo": "06",
+  "provincia": "Chimborazo"
+ },
+ {
+  "codigo": "060701",
+  "nombre": "El Rosario",
+  "parroquia_codigo": "060750",
+  "parroquia": "Guano",
+  "canton_codigo": "0607",
+  "canton": "Guano",
+  "provincia_codigo": "06",
+  "provincia": "Chimborazo"
+ },
+ {
+  "codigo": "060702",
+  "nombre": "La Matriz",
+  "parroquia_codigo": "060750",
+  "parroquia": "Guano",
+  "canton_codigo": "0607",
+  "canton": "Guano",
+  "provincia_codigo": "06",
+  "provincia": "Chimborazo"
+ },
+ {
+  "codigo": "070101",
+  "nombre": "La Providencia",
+  "parroquia_codigo": "070150",
+  "parroquia": "Machala",
+  "canton_codigo": "0701",
+  "canton": "Machala",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "070102",
+  "nombre": "Machala",
+  "parroquia_codigo": "070150",
+  "parroquia": "Machala",
+  "canton_codigo": "0701",
+  "canton": "Machala",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "070103",
+  "nombre": "Puerto Bolívar",
+  "parroquia_codigo": "070150",
+  "parroquia": "Machala",
+  "canton_codigo": "0701",
+  "canton": "Machala",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "070104",
+  "nombre": "Nueve de Mayo",
+  "parroquia_codigo": "070150",
+  "parroquia": "Machala",
+  "canton_codigo": "0701",
+  "canton": "Machala",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "070105",
+  "nombre": "El Cambio",
+  "parroquia_codigo": "070150",
+  "parroquia": "Machala",
+  "canton_codigo": "0701",
+  "canton": "Machala",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "070701",
+  "nombre": "Ecuador",
+  "parroquia_codigo": "070750",
+  "parroquia": "Huaquillas",
+  "canton_codigo": "0707",
+  "canton": "Huaquillas",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "070702",
+  "nombre": "El Paraíso",
+  "parroquia_codigo": "070750",
+  "parroquia": "Huaquillas",
+  "canton_codigo": "0707",
+  "canton": "Huaquillas",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "070703",
+  "nombre": "Hualtaco",
+  "parroquia_codigo": "070750",
+  "parroquia": "Huaquillas",
+  "canton_codigo": "0707",
+  "canton": "Huaquillas",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "070704",
+  "nombre": "Milton Reyes",
+  "parroquia_codigo": "070750",
+  "parroquia": "Huaquillas",
+  "canton_codigo": "0707",
+  "canton": "Huaquillas",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "070705",
+  "nombre": "Unión Lojana",
+  "parroquia_codigo": "070750",
+  "parroquia": "Huaquillas",
+  "canton_codigo": "0707",
+  "canton": "Huaquillas",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "070901",
+  "nombre": "Bolívar",
+  "parroquia_codigo": "070950",
+  "parroquia": "Pasaje",
+  "canton_codigo": "0709",
+  "canton": "Pasaje",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "070902",
+  "nombre": "Loma de Franco",
+  "parroquia_codigo": "070950",
+  "parroquia": "Pasaje",
+  "canton_codigo": "0709",
+  "canton": "Pasaje",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "070903",
+  "nombre": "Ochoa León (Matriz)",
+  "parroquia_codigo": "070950",
+  "parroquia": "Pasaje",
+  "canton_codigo": "0709",
+  "canton": "Pasaje",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "070904",
+  "nombre": "Tres Cerritos",
+  "parroquia_codigo": "070950",
+  "parroquia": "Pasaje",
+  "canton_codigo": "0709",
+  "canton": "Pasaje",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "071001",
+  "nombre": "La Matriz",
+  "parroquia_codigo": "071050",
+  "parroquia": "Piñas",
+  "canton_codigo": "0710",
+  "canton": "Piñas",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "071002",
+  "nombre": "La Susaya",
+  "parroquia_codigo": "071050",
+  "parroquia": "Piñas",
+  "canton_codigo": "0710",
+  "canton": "Piñas",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "071003",
+  "nombre": "Piñas Grande",
+  "parroquia_codigo": "071050",
+  "parroquia": "Piñas",
+  "canton_codigo": "0710",
+  "canton": "Piñas",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "071201",
+  "nombre": "Santa Rosa",
+  "parroquia_codigo": "071250",
+  "parroquia": "Santa Rosa",
+  "canton_codigo": "0712",
+  "canton": "Santa Rosa",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "071202",
+  "nombre": "Puerto Jelí",
+  "parroquia_codigo": "071250",
+  "parroquia": "Santa Rosa",
+  "canton_codigo": "0712",
+  "canton": "Santa Rosa",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "071203",
+  "nombre": "Balneario Jambelí (Satélite)",
+  "parroquia_codigo": "071250",
+  "parroquia": "Santa Rosa",
+  "canton_codigo": "0712",
+  "canton": "Santa Rosa",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "071204",
+  "nombre": "Jumón (Satélite)",
+  "parroquia_codigo": "071250",
+  "parroquia": "Santa Rosa",
+  "canton_codigo": "0712",
+  "canton": "Santa Rosa",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "071205",
+  "nombre": "Nuevo Santa Rosa",
+  "parroquia_codigo": "071250",
+  "parroquia": "Santa Rosa",
+  "canton_codigo": "0712",
+  "canton": "Santa Rosa",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "071401",
+  "nombre": "La Victoria",
+  "parroquia_codigo": "071450",
+  "parroquia": "La Victoria",
+  "canton_codigo": "0714",
+  "canton": "Las Lajas",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "071402",
+  "nombre": "Platanillos",
+  "parroquia_codigo": "071450",
+  "parroquia": "La Victoria",
+  "canton_codigo": "0714",
+  "canton": "Las Lajas",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "071403",
+  "nombre": "Valle Hermoso",
+  "parroquia_codigo": "071450",
+  "parroquia": "La Victoria",
+  "canton_codigo": "0714",
+  "canton": "Las Lajas",
+  "provincia_codigo": "07",
+  "provincia": "El Oro"
+ },
+ {
+  "codigo": "080101",
+  "nombre": "Bartolomé Ruiz (César Franco Carrión)",
+  "parroquia_codigo": "080150",
+  "parroquia": "Esmeraldas",
+  "canton_codigo": "0801",
+  "canton": "Esmeraldas",
+  "provincia_codigo": "08",
+  "provincia": "Esmeraldas"
+ },
+ {
+  "codigo": "080102",
+  "nombre": "5 de Agosto",
+  "parroquia_codigo": "080150",
+  "parroquia": "Esmeraldas",
+  "canton_codigo": "0801",
+  "canton": "Esmeraldas",
+  "provincia_codigo": "08",
+  "provincia": "Esmeraldas"
+ },
+ {
+  "codigo": "080103",
+  "nombre": "Esmeraldas",
+  "parroquia_codigo": "080150",
+  "parroquia": "Esmeraldas",
+  "canton_codigo": "0801",
+  "canton": "Esmeraldas",
+  "provincia_codigo": "08",
+  "provincia": "Esmeraldas"
+ },
+ {
+  "codigo": "080104",
+  "nombre": "Luis Tello  (Las Palmas)",
+  "parroquia_codigo": "080150",
+  "parroquia": "Esmeraldas",
+  "canton_codigo": "0801",
+  "canton": "Esmeraldas",
+  "provincia_codigo": "08",
+  "provincia": "Esmeraldas"
+ },
+ {
+  "codigo": "080105",
+  "nombre": "Simón Plata Torres",
+  "parroquia_codigo": "080150",
+  "parroquia": "Esmeraldas",
+  "canton_codigo": "0801",
+  "canton": "Esmeraldas",
+  "provincia_codigo": "08",
+  "provincia": "Esmeraldas"
+ },
+ {
+  "codigo": "090101",
+  "nombre": "Ayacucho",
+  "parroquia_codigo": "090150",
+  "parroquia": "Guayaquil",
+  "canton_codigo": "0901",
+  "canton": "Guayaquil",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090102",
+  "nombre": "Bolívar  (Sagrario)",
+  "parroquia_codigo": "090150",
+  "parroquia": "Guayaquil",
+  "canton_codigo": "0901",
+  "canton": "Guayaquil",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090103",
+  "nombre": "Carbo (Concepción)",
+  "parroquia_codigo": "090150",
+  "parroquia": "Guayaquil",
+  "canton_codigo": "0901",
+  "canton": "Guayaquil",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090104",
+  "nombre": "Febres Cordero",
+  "parroquia_codigo": "090150",
+  "parroquia": "Guayaquil",
+  "canton_codigo": "0901",
+  "canton": "Guayaquil",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090105",
+  "nombre": "García Moreno",
+  "parroquia_codigo": "090150",
+  "parroquia": "Guayaquil",
+  "canton_codigo": "0901",
+  "canton": "Guayaquil",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090106",
+  "nombre": "Letamendi",
+  "parroquia_codigo": "090150",
+  "parroquia": "Guayaquil",
+  "canton_codigo": "0901",
+  "canton": "Guayaquil",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090107",
+  "nombre": "Nueve de Octubre",
+  "parroquia_codigo": "090150",
+  "parroquia": "Guayaquil",
+  "canton_codigo": "0901",
+  "canton": "Guayaquil",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090108",
+  "nombre": "Olmedo  (San Alejo)",
+  "parroquia_codigo": "090150",
+  "parroquia": "Guayaquil",
+  "canton_codigo": "0901",
+  "canton": "Guayaquil",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090109",
+  "nombre": "Roca",
+  "parroquia_codigo": "090150",
+  "parroquia": "Guayaquil",
+  "canton_codigo": "0901",
+  "canton": "Guayaquil",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090110",
+  "nombre": "Rocafuerte",
+  "parroquia_codigo": "090150",
+  "parroquia": "Guayaquil",
+  "canton_codigo": "0901",
+  "canton": "Guayaquil",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090111",
+  "nombre": "Sucre",
+  "parroquia_codigo": "090150",
+  "parroquia": "Guayaquil",
+  "canton_codigo": "0901",
+  "canton": "Guayaquil",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090112",
+  "nombre": "Tarqui",
+  "parroquia_codigo": "090150",
+  "parroquia": "Guayaquil",
+  "canton_codigo": "0901",
+  "canton": "Guayaquil",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090113",
+  "nombre": "Urdaneta",
+  "parroquia_codigo": "090150",
+  "parroquia": "Guayaquil",
+  "canton_codigo": "0901",
+  "canton": "Guayaquil",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090114",
+  "nombre": "Ximena",
+  "parroquia_codigo": "090150",
+  "parroquia": "Guayaquil",
+  "canton_codigo": "0901",
+  "canton": "Guayaquil",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090115",
+  "nombre": "Pascuales",
+  "parroquia_codigo": "090150",
+  "parroquia": "Guayaquil",
+  "canton_codigo": "0901",
+  "canton": "Guayaquil",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090601",
+  "nombre": "Daule",
+  "parroquia_codigo": "090650",
+  "parroquia": "Daule",
+  "canton_codigo": "0906",
+  "canton": "Daule",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090602",
+  "nombre": "La Aurora (Satélite)",
+  "parroquia_codigo": "090650",
+  "parroquia": "Daule",
+  "canton_codigo": "0906",
+  "canton": "Daule",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090603",
+  "nombre": "Banife",
+  "parroquia_codigo": "090650",
+  "parroquia": "Daule",
+  "canton_codigo": "0906",
+  "canton": "Daule",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090604",
+  "nombre": "Emiliano Caicedo Marcos",
+  "parroquia_codigo": "090650",
+  "parroquia": "Daule",
+  "canton_codigo": "0906",
+  "canton": "Daule",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090605",
+  "nombre": "Magro",
+  "parroquia_codigo": "090650",
+  "parroquia": "Daule",
+  "canton_codigo": "0906",
+  "canton": "Daule",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090606",
+  "nombre": "Padre Juan Bautista Aguirre",
+  "parroquia_codigo": "090650",
+  "parroquia": "Daule",
+  "canton_codigo": "0906",
+  "canton": "Daule",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090607",
+  "nombre": "Santa Clara",
+  "parroquia_codigo": "090650",
+  "parroquia": "Daule",
+  "canton_codigo": "0906",
+  "canton": "Daule",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090608",
+  "nombre": "Vicente Piedrahita",
+  "parroquia_codigo": "090650",
+  "parroquia": "Daule",
+  "canton_codigo": "0906",
+  "canton": "Daule",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090701",
+  "nombre": "Eloy Alfaro (Durán)",
+  "parroquia_codigo": "090750",
+  "parroquia": "Eloy Alfaro",
+  "canton_codigo": "0907",
+  "canton": "Durán",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090702",
+  "nombre": "El Recreo",
+  "parroquia_codigo": "090750",
+  "parroquia": "Eloy Alfaro",
+  "canton_codigo": "0907",
+  "canton": "Durán",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "090703",
+  "nombre": "Divino Niño",
+  "parroquia_codigo": "090750",
+  "parroquia": "Eloy Alfaro",
+  "canton_codigo": "0907",
+  "canton": "Durán",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "091001",
+  "nombre": "Camilo Andrade",
+  "parroquia_codigo": "091050",
+  "parroquia": "Milagro",
+  "canton_codigo": "0910",
+  "canton": "Milagro",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "091002",
+  "nombre": "Eloy Alfaro",
+  "parroquia_codigo": "091050",
+  "parroquia": "Milagro",
+  "canton_codigo": "0910",
+  "canton": "Milagro",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "091003",
+  "nombre": "Chirijos",
+  "parroquia_codigo": "091050",
+  "parroquia": "Milagro",
+  "canton_codigo": "0910",
+  "canton": "Milagro",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "091004",
+  "nombre": "Coronel Enrique Valdez",
+  "parroquia_codigo": "091050",
+  "parroquia": "Milagro",
+  "canton_codigo": "0910",
+  "canton": "Milagro",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "091005",
+  "nombre": "Rosa María",
+  "parroquia_codigo": "091050",
+  "parroquia": "Milagro",
+  "canton_codigo": "0910",
+  "canton": "Milagro",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "091006",
+  "nombre": "José María Velasco Ibarra",
+  "parroquia_codigo": "091050",
+  "parroquia": "Milagro",
+  "canton_codigo": "0910",
+  "canton": "Milagro",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "091007",
+  "nombre": "Vicente Rocafuerte",
+  "parroquia_codigo": "091050",
+  "parroquia": "Milagro",
+  "canton_codigo": "0910",
+  "canton": "Milagro",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "091008",
+  "nombre": "Ernesto Seminario",
+  "parroquia_codigo": "091050",
+  "parroquia": "Milagro",
+  "canton_codigo": "0910",
+  "canton": "Milagro",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "091009",
+  "nombre": "Las Piñas",
+  "parroquia_codigo": "091050",
+  "parroquia": "Milagro",
+  "canton_codigo": "0910",
+  "canton": "Milagro",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "091601",
+  "nombre": "Samborondón",
+  "parroquia_codigo": "091650",
+  "parroquia": "Samborondón",
+  "canton_codigo": "0916",
+  "canton": "Samborondón",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "091602",
+  "nombre": "La Puntilla (Satélite)",
+  "parroquia_codigo": "091650",
+  "parroquia": "Samborondón",
+  "canton_codigo": "0916",
+  "canton": "Samborondón",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "091901",
+  "nombre": "Bocana",
+  "parroquia_codigo": "091950",
+  "parroquia": "El Salitre",
+  "canton_codigo": "0919",
+  "canton": "Salitre",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "091902",
+  "nombre": "Candilejos",
+  "parroquia_codigo": "091950",
+  "parroquia": "El Salitre",
+  "canton_codigo": "0919",
+  "canton": "Salitre",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "091903",
+  "nombre": "Central",
+  "parroquia_codigo": "091950",
+  "parroquia": "El Salitre",
+  "canton_codigo": "0919",
+  "canton": "Salitre",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "091904",
+  "nombre": "Paraíso",
+  "parroquia_codigo": "091950",
+  "parroquia": "El Salitre",
+  "canton_codigo": "0919",
+  "canton": "Salitre",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "091905",
+  "nombre": "San Mateo",
+  "parroquia_codigo": "091950",
+  "parroquia": "El Salitre",
+  "canton_codigo": "0919",
+  "canton": "Salitre",
+  "provincia_codigo": "09",
+  "provincia": "Guayas"
+ },
+ {
+  "codigo": "100101",
+  "nombre": "Caranqui",
+  "parroquia_codigo": "100150",
+  "parroquia": "San Miguel de Ibarra",
+  "canton_codigo": "1001",
+  "canton": "Ibarra",
+  "provincia_codigo": "10",
+  "provincia": "Imbabura"
+ },
+ {
+  "codigo": "100102",
+  "nombre": "Guayaquil de Alpachaca",
+  "parroquia_codigo": "100150",
+  "parroquia": "San Miguel de Ibarra",
+  "canton_codigo": "1001",
+  "canton": "Ibarra",
+  "provincia_codigo": "10",
+  "provincia": "Imbabura"
+ },
+ {
+  "codigo": "100103",
+  "nombre": "Sagrario",
+  "parroquia_codigo": "100150",
+  "parroquia": "San Miguel de Ibarra",
+  "canton_codigo": "1001",
+  "canton": "Ibarra",
+  "provincia_codigo": "10",
+  "provincia": "Imbabura"
+ },
+ {
+  "codigo": "100104",
+  "nombre": "San Francisco",
+  "parroquia_codigo": "100150",
+  "parroquia": "San Miguel de Ibarra",
+  "canton_codigo": "1001",
+  "canton": "Ibarra",
+  "provincia_codigo": "10",
+  "provincia": "Imbabura"
+ },
+ {
+  "codigo": "100105",
+  "nombre": "La Dolorosa del Priorato",
+  "parroquia_codigo": "100150",
+  "parroquia": "San Miguel de Ibarra",
+  "canton_codigo": "1001",
+  "canton": "Ibarra",
+  "provincia_codigo": "10",
+  "provincia": "Imbabura"
+ },
+ {
+  "codigo": "100201",
+  "nombre": "Andrade Marín  (Lourdes)",
+  "parroquia_codigo": "100250",
+  "parroquia": "Atuntaqui",
+  "canton_codigo": "1002",
+  "canton": "Antonio Ante",
+  "provincia_codigo": "10",
+  "provincia": "Imbabura"
+ },
+ {
+  "codigo": "100202",
+  "nombre": "Atuntaqui",
+  "parroquia_codigo": "100250",
+  "parroquia": "Atuntaqui",
+  "canton_codigo": "1002",
+  "canton": "Antonio Ante",
+  "provincia_codigo": "10",
+  "provincia": "Imbabura"
+ },
+ {
+  "codigo": "100301",
+  "nombre": "Sagrario",
+  "parroquia_codigo": "100350",
+  "parroquia": "Cotacachi",
+  "canton_codigo": "1003",
+  "canton": "Cotacachi",
+  "provincia_codigo": "10",
+  "provincia": "Imbabura"
+ },
+ {
+  "codigo": "100302",
+  "nombre": "San Francisco",
+  "parroquia_codigo": "100350",
+  "parroquia": "Cotacachi",
+  "canton_codigo": "1003",
+  "canton": "Cotacachi",
+  "provincia_codigo": "10",
+  "provincia": "Imbabura"
+ },
+ {
+  "codigo": "100401",
+  "nombre": "Jordán",
+  "parroquia_codigo": "100450",
+  "parroquia": "Otavalo",
+  "canton_codigo": "1004",
+  "canton": "Otavalo",
+  "provincia_codigo": "10",
+  "provincia": "Imbabura"
+ },
+ {
+  "codigo": "100402",
+  "nombre": "San Luis",
+  "parroquia_codigo": "100450",
+  "parroquia": "Otavalo",
+  "canton_codigo": "1004",
+  "canton": "Otavalo",
+  "provincia_codigo": "10",
+  "provincia": "Imbabura"
+ },
+ {
+  "codigo": "110101",
+  "nombre": "El Sagrario",
+  "parroquia_codigo": "110150",
+  "parroquia": "Loja",
+  "canton_codigo": "1101",
+  "canton": "Loja",
+  "provincia_codigo": "11",
+  "provincia": "Loja"
+ },
+ {
+  "codigo": "110102",
+  "nombre": "San Sebastián",
+  "parroquia_codigo": "110150",
+  "parroquia": "Loja",
+  "canton_codigo": "1101",
+  "canton": "Loja",
+  "provincia_codigo": "11",
+  "provincia": "Loja"
+ },
+ {
+  "codigo": "110103",
+  "nombre": "Sucre",
+  "parroquia_codigo": "110150",
+  "parroquia": "Loja",
+  "canton_codigo": "1101",
+  "canton": "Loja",
+  "provincia_codigo": "11",
+  "provincia": "Loja"
+ },
+ {
+  "codigo": "110104",
+  "nombre": "Valle",
+  "parroquia_codigo": "110150",
+  "parroquia": "Loja",
+  "canton_codigo": "1101",
+  "canton": "Loja",
+  "provincia_codigo": "11",
+  "provincia": "Loja"
+ },
+ {
+  "codigo": "110105",
+  "nombre": "Carigán",
+  "parroquia_codigo": "110150",
+  "parroquia": "Loja",
+  "canton_codigo": "1101",
+  "canton": "Loja",
+  "provincia_codigo": "11",
+  "provincia": "Loja"
+ },
+ {
+  "codigo": "110106",
+  "nombre": "Punzara",
+  "parroquia_codigo": "110150",
+  "parroquia": "Loja",
+  "canton_codigo": "1101",
+  "canton": "Loja",
+  "provincia_codigo": "11",
+  "provincia": "Loja"
+ },
+ {
+  "codigo": "110201",
+  "nombre": "Cariamanga",
+  "parroquia_codigo": "110250",
+  "parroquia": "Cariamanga",
+  "canton_codigo": "1102",
+  "canton": "Calvas",
+  "provincia_codigo": "11",
+  "provincia": "Loja"
+ },
+ {
+  "codigo": "110202",
+  "nombre": "Chile",
+  "parroquia_codigo": "110250",
+  "parroquia": "Cariamanga",
+  "canton_codigo": "1102",
+  "canton": "Calvas",
+  "provincia_codigo": "11",
+  "provincia": "Loja"
+ },
+ {
+  "codigo": "110203",
+  "nombre": "San Vicente",
+  "parroquia_codigo": "110250",
+  "parroquia": "Cariamanga",
+  "canton_codigo": "1102",
+  "canton": "Calvas",
+  "provincia_codigo": "11",
+  "provincia": "Loja"
+ },
+ {
+  "codigo": "110301",
+  "nombre": "Catamayo",
+  "parroquia_codigo": "110350",
+  "parroquia": "Catamayo",
+  "canton_codigo": "1103",
+  "canton": "Catamayo",
+  "provincia_codigo": "11",
+  "provincia": "Loja"
+ },
+ {
+  "codigo": "110302",
+  "nombre": "San José",
+  "parroquia_codigo": "110350",
+  "parroquia": "Catamayo",
+  "canton_codigo": "1103",
+  "canton": "Catamayo",
+  "provincia_codigo": "11",
+  "provincia": "Loja"
+ },
+ {
+  "codigo": "110801",
+  "nombre": "General Eloy Alfaro (San Sebastián)",
+  "parroquia_codigo": "110850",
+  "parroquia": "Macará",
+  "canton_codigo": "1108",
+  "canton": "Macará",
+  "provincia_codigo": "11",
+  "provincia": "Loja"
+ },
+ {
+  "codigo": "110802",
+  "nombre": "Macará  (Manuel Enrique Rengel Suquilanda)",
+  "parroquia_codigo": "110850",
+  "parroquia": "Macará",
+  "canton_codigo": "1108",
+  "canton": "Macará",
+  "provincia_codigo": "11",
+  "provincia": "Loja"
+ },
+ {
+  "codigo": "110901",
+  "nombre": "Catacocha",
+  "parroquia_codigo": "110950",
+  "parroquia": "Catacocha",
+  "canton_codigo": "1109",
+  "canton": "Paltas",
+  "provincia_codigo": "11",
+  "provincia": "Loja"
+ },
+ {
+  "codigo": "110902",
+  "nombre": "Lourdes",
+  "parroquia_codigo": "110950",
+  "parroquia": "Catacocha",
+  "canton_codigo": "1109",
+  "canton": "Paltas",
+  "provincia_codigo": "11",
+  "provincia": "Loja"
+ },
+ {
+  "codigo": "120101",
+  "nombre": "Clemente Baquerizo",
+  "parroquia_codigo": "120150",
+  "parroquia": "Babahoyo",
+  "canton_codigo": "1201",
+  "canton": "Babahoyo",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120102",
+  "nombre": "Doctor Camilo Ponce",
+  "parroquia_codigo": "120150",
+  "parroquia": "Babahoyo",
+  "canton_codigo": "1201",
+  "canton": "Babahoyo",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120103",
+  "nombre": "Barreiro",
+  "parroquia_codigo": "120150",
+  "parroquia": "Babahoyo",
+  "canton_codigo": "1201",
+  "canton": "Babahoyo",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120104",
+  "nombre": "El Salto",
+  "parroquia_codigo": "120150",
+  "parroquia": "Babahoyo",
+  "canton_codigo": "1201",
+  "canton": "Babahoyo",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120501",
+  "nombre": "Quevedo",
+  "parroquia_codigo": "120550",
+  "parroquia": "Quevedo",
+  "canton_codigo": "1205",
+  "canton": "Quevedo",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120502",
+  "nombre": "San Camilo",
+  "parroquia_codigo": "120550",
+  "parroquia": "Quevedo",
+  "canton_codigo": "1205",
+  "canton": "Quevedo",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120504",
+  "nombre": "Guayacán",
+  "parroquia_codigo": "120550",
+  "parroquia": "Quevedo",
+  "canton_codigo": "1205",
+  "canton": "Quevedo",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120505",
+  "nombre": "Nicolás Infante Díaz",
+  "parroquia_codigo": "120550",
+  "parroquia": "Quevedo",
+  "canton_codigo": "1205",
+  "canton": "Quevedo",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120506",
+  "nombre": "San Cristóbal",
+  "parroquia_codigo": "120550",
+  "parroquia": "Quevedo",
+  "canton_codigo": "1205",
+  "canton": "Quevedo",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120507",
+  "nombre": "Siete de Octubre",
+  "parroquia_codigo": "120550",
+  "parroquia": "Quevedo",
+  "canton_codigo": "1205",
+  "canton": "Quevedo",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120508",
+  "nombre": "24 de Mayo",
+  "parroquia_codigo": "120550",
+  "parroquia": "Quevedo",
+  "canton_codigo": "1205",
+  "canton": "Quevedo",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120509",
+  "nombre": "Venus del Río Quevedo",
+  "parroquia_codigo": "120550",
+  "parroquia": "Quevedo",
+  "canton_codigo": "1205",
+  "canton": "Quevedo",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120510",
+  "nombre": "Viva Alfaro",
+  "parroquia_codigo": "120550",
+  "parroquia": "Quevedo",
+  "canton_codigo": "1205",
+  "canton": "Quevedo",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120701",
+  "nombre": "10 de Noviembre",
+  "parroquia_codigo": "120750",
+  "parroquia": "Ventanas",
+  "canton_codigo": "1207",
+  "canton": "Ventanas",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120702",
+  "nombre": "Ventanas",
+  "parroquia_codigo": "120750",
+  "parroquia": "Ventanas",
+  "canton_codigo": "1207",
+  "canton": "Ventanas",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120801",
+  "nombre": "Balzar de Vinces",
+  "parroquia_codigo": "120850",
+  "parroquia": "Vinces",
+  "canton_codigo": "1208",
+  "canton": "Vinces",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120802",
+  "nombre": "Vinces Central",
+  "parroquia_codigo": "120850",
+  "parroquia": "Vinces",
+  "canton_codigo": "1208",
+  "canton": "Vinces",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "120803",
+  "nombre": "San Lorenzo de Vinces",
+  "parroquia_codigo": "120850",
+  "parroquia": "Vinces",
+  "canton_codigo": "1208",
+  "canton": "Vinces",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "121001",
+  "nombre": "San Jacinto de Buena Fe",
+  "parroquia_codigo": "121050",
+  "parroquia": "San Jacinto de Buena Fe",
+  "canton_codigo": "1210",
+  "canton": "Buena Fe",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "121002",
+  "nombre": "7 de Agosto",
+  "parroquia_codigo": "121050",
+  "parroquia": "San Jacinto de Buena Fe",
+  "canton_codigo": "1210",
+  "canton": "Buena Fe",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "121003",
+  "nombre": "11 de Octubre",
+  "parroquia_codigo": "121050",
+  "parroquia": "San Jacinto de Buena Fe",
+  "canton_codigo": "1210",
+  "canton": "Buena Fe",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "121101",
+  "nombre": "Valencia",
+  "parroquia_codigo": "121150",
+  "parroquia": "Valencia",
+  "canton_codigo": "1211",
+  "canton": "Valencia",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "121102",
+  "nombre": "La Unión",
+  "parroquia_codigo": "121150",
+  "parroquia": "Valencia",
+  "canton_codigo": "1211",
+  "canton": "Valencia",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "121103",
+  "nombre": "La Nueva Unión",
+  "parroquia_codigo": "121150",
+  "parroquia": "Valencia",
+  "canton_codigo": "1211",
+  "canton": "Valencia",
+  "provincia_codigo": "12",
+  "provincia": "Los Ríos"
+ },
+ {
+  "codigo": "130101",
+  "nombre": "Portoviejo",
+  "parroquia_codigo": "130150",
+  "parroquia": "Portoviejo",
+  "canton_codigo": "1301",
+  "canton": "Portoviejo",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130102",
+  "nombre": "12 de Marzo",
+  "parroquia_codigo": "130150",
+  "parroquia": "Portoviejo",
+  "canton_codigo": "1301",
+  "canton": "Portoviejo",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130103",
+  "nombre": "Colón",
+  "parroquia_codigo": "130150",
+  "parroquia": "Portoviejo",
+  "canton_codigo": "1301",
+  "canton": "Portoviejo",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130104",
+  "nombre": "Picoazá",
+  "parroquia_codigo": "130150",
+  "parroquia": "Portoviejo",
+  "canton_codigo": "1301",
+  "canton": "Portoviejo",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130105",
+  "nombre": "San Pablo",
+  "parroquia_codigo": "130150",
+  "parroquia": "Portoviejo",
+  "canton_codigo": "1301",
+  "canton": "Portoviejo",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130106",
+  "nombre": "Andrés de Vera",
+  "parroquia_codigo": "130150",
+  "parroquia": "Portoviejo",
+  "canton_codigo": "1301",
+  "canton": "Portoviejo",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130107",
+  "nombre": "Francisco Pacheco",
+  "parroquia_codigo": "130150",
+  "parroquia": "Portoviejo",
+  "canton_codigo": "1301",
+  "canton": "Portoviejo",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130108",
+  "nombre": "18 de Octubre",
+  "parroquia_codigo": "130150",
+  "parroquia": "Portoviejo",
+  "canton_codigo": "1301",
+  "canton": "Portoviejo",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130109",
+  "nombre": "Simón Bolívar",
+  "parroquia_codigo": "130150",
+  "parroquia": "Portoviejo",
+  "canton_codigo": "1301",
+  "canton": "Portoviejo",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130301",
+  "nombre": "Chone",
+  "parroquia_codigo": "130350",
+  "parroquia": "Chone",
+  "canton_codigo": "1303",
+  "canton": "Chone",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130302",
+  "nombre": "Santa Rita",
+  "parroquia_codigo": "130350",
+  "parroquia": "Chone",
+  "canton_codigo": "1303",
+  "canton": "Chone",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130401",
+  "nombre": "El Carmen",
+  "parroquia_codigo": "130450",
+  "parroquia": "El Carmen",
+  "canton_codigo": "1304",
+  "canton": "El Carmen",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130402",
+  "nombre": "4 de Diciembre",
+  "parroquia_codigo": "130450",
+  "parroquia": "El Carmen",
+  "canton_codigo": "1304",
+  "canton": "El Carmen",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130601",
+  "nombre": "Doctor Miguel Morán Lucio",
+  "parroquia_codigo": "130650",
+  "parroquia": "Jipijapa",
+  "canton_codigo": "1306",
+  "canton": "Jipijapa",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130602",
+  "nombre": "Manuel Inocencio Parrales y Guale",
+  "parroquia_codigo": "130650",
+  "parroquia": "Jipijapa",
+  "canton_codigo": "1306",
+  "canton": "Jipijapa",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130603",
+  "nombre": "San Lorenzo de Jipijapa",
+  "parroquia_codigo": "130650",
+  "parroquia": "Jipijapa",
+  "canton_codigo": "1306",
+  "canton": "Jipijapa",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130801",
+  "nombre": "Los Esteros",
+  "parroquia_codigo": "130850",
+  "parroquia": "Manta",
+  "canton_codigo": "1308",
+  "canton": "Manta",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130802",
+  "nombre": "Manta",
+  "parroquia_codigo": "130850",
+  "parroquia": "Manta",
+  "canton_codigo": "1308",
+  "canton": "Manta",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130803",
+  "nombre": "San Mateo",
+  "parroquia_codigo": "130850",
+  "parroquia": "Manta",
+  "canton_codigo": "1308",
+  "canton": "Manta",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130804",
+  "nombre": "Tarqui",
+  "parroquia_codigo": "130850",
+  "parroquia": "Manta",
+  "canton_codigo": "1308",
+  "canton": "Manta",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130805",
+  "nombre": "Eloy Alfaro",
+  "parroquia_codigo": "130850",
+  "parroquia": "Manta",
+  "canton_codigo": "1308",
+  "canton": "Manta",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130806",
+  "nombre": "Urbimanta",
+  "parroquia_codigo": "130850",
+  "parroquia": "Manta",
+  "canton_codigo": "1308",
+  "canton": "Manta",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130901",
+  "nombre": "Aníbal San Andrés",
+  "parroquia_codigo": "130950",
+  "parroquia": "Montecristi",
+  "canton_codigo": "1309",
+  "canton": "Montecristi",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130902",
+  "nombre": "Montecristi",
+  "parroquia_codigo": "130950",
+  "parroquia": "Montecristi",
+  "canton_codigo": "1309",
+  "canton": "Montecristi",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130903",
+  "nombre": "El Colorado",
+  "parroquia_codigo": "130950",
+  "parroquia": "Montecristi",
+  "canton_codigo": "1309",
+  "canton": "Montecristi",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130904",
+  "nombre": "General Eloy Alfaro",
+  "parroquia_codigo": "130950",
+  "parroquia": "Montecristi",
+  "canton_codigo": "1309",
+  "canton": "Montecristi",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130905",
+  "nombre": "Leonidas Proaño",
+  "parroquia_codigo": "130950",
+  "parroquia": "Montecristi",
+  "canton_codigo": "1309",
+  "canton": "Montecristi",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "130906",
+  "nombre": "Isabel Muentes",
+  "parroquia_codigo": "130950",
+  "parroquia": "Montecristi",
+  "canton_codigo": "1309",
+  "canton": "Montecristi",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "131301",
+  "nombre": "Santa Ana",
+  "parroquia_codigo": "131350",
+  "parroquia": "Santa Ana de Vuelta Larga",
+  "canton_codigo": "1313",
+  "canton": "Santa Ana",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "131302",
+  "nombre": "Lodana",
+  "parroquia_codigo": "131350",
+  "parroquia": "Santa Ana de Vuelta Larga",
+  "canton_codigo": "1313",
+  "canton": "Santa Ana",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "131401",
+  "nombre": "Bahía de Caráquez",
+  "parroquia_codigo": "131450",
+  "parroquia": "Bahía de Caráquez",
+  "canton_codigo": "1314",
+  "canton": "Sucre",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "131402",
+  "nombre": "Leonidas Plaza Gutiérrez",
+  "parroquia_codigo": "131450",
+  "parroquia": "Bahía de Caráquez",
+  "canton_codigo": "1314",
+  "canton": "Sucre",
+  "provincia_codigo": "13",
+  "provincia": "Manabí"
+ },
+ {
+  "codigo": "140201",
+  "nombre": "Gualaquiza",
+  "parroquia_codigo": "140250",
+  "parroquia": "Gualaquiza",
+  "canton_codigo": "1402",
+  "canton": "Gualaquiza",
+  "provincia_codigo": "14",
+  "provincia": "Morona Santiago"
+ },
+ {
+  "codigo": "140202",
+  "nombre": "Mercedes Molina",
+  "parroquia_codigo": "140250",
+  "parroquia": "Gualaquiza",
+  "canton_codigo": "1402",
+  "canton": "Gualaquiza",
+  "provincia_codigo": "14",
+  "provincia": "Morona Santiago"
+ },
+ {
+  "codigo": "170101",
+  "nombre": "Belisario Quevedo",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170102",
+  "nombre": "Carcelén",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170103",
+  "nombre": "Centro Histórico",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170104",
+  "nombre": "Cochapamba",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170105",
+  "nombre": "Comité del Pueblo",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170106",
+  "nombre": "Cotocollao",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170107",
+  "nombre": "Chilibulo",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170108",
+  "nombre": "Chillogallo",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170109",
+  "nombre": "Chimbacalle",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170110",
+  "nombre": "El Condado",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170111",
+  "nombre": "Guamaní",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170112",
+  "nombre": "Iñaquito",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170113",
+  "nombre": "Itchimbia",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170114",
+  "nombre": "Jipijapa",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170115",
+  "nombre": "Kennedy",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170116",
+  "nombre": "La Argelia",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170117",
+  "nombre": "La Concepción",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170118",
+  "nombre": "La Ecuatoriana",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170119",
+  "nombre": "La Ferroviaria",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170120",
+  "nombre": "La Libertad",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170121",
+  "nombre": "La Magdalena",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170122",
+  "nombre": "La Mena",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170123",
+  "nombre": "Mariscal Sucre",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170124",
+  "nombre": "Ponceano",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170125",
+  "nombre": "Puengasí",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170126",
+  "nombre": "Quitumbe",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170127",
+  "nombre": "Rumipamba",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170128",
+  "nombre": "San Bartolo",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170129",
+  "nombre": "San Isidro del Inca",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170130",
+  "nombre": "San Juan",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170131",
+  "nombre": "Solanda",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170132",
+  "nombre": "Turubamba",
+  "parroquia_codigo": "170150",
+  "parroquia": "Quito",
+  "canton_codigo": "1701",
+  "canton": "Distrito Metropolitano de Quito",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": " ",
+  "nombre": "",
+  "parroquia_codigo": "170250",
+  "parroquia": "Cayambe",
+  "canton_codigo": "1702",
+  "canton": "Cayambe",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170501",
+  "nombre": "Sangolquí",
+  "parroquia_codigo": "170550",
+  "parroquia": "Sangolquí",
+  "canton_codigo": "1705",
+  "canton": "Rumiñahui",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170502",
+  "nombre": "San Pedro de Taboada",
+  "parroquia_codigo": "170550",
+  "parroquia": "Sangolquí",
+  "canton_codigo": "1705",
+  "canton": "Rumiñahui",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170503",
+  "nombre": "San Rafael",
+  "parroquia_codigo": "170550",
+  "parroquia": "Sangolquí",
+  "canton_codigo": "1705",
+  "canton": "Rumiñahui",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "170504",
+  "nombre": "Fajardo",
+  "parroquia_codigo": "170550",
+  "parroquia": "Sangolquí",
+  "canton_codigo": "1705",
+  "canton": "Rumiñahui",
+  "provincia_codigo": "17",
+  "provincia": "Pichincha"
+ },
+ {
+  "codigo": "180101",
+  "nombre": "Atocha – Ficoa",
+  "parroquia_codigo": "180150",
+  "parroquia": "Ambato",
+  "canton_codigo": "1801",
+  "canton": "Ambato",
+  "provincia_codigo": "18",
+  "provincia": "Tungurahua"
+ },
+ {
+  "codigo": "180102",
+  "nombre": "Celiano Monge",
+  "parroquia_codigo": "180150",
+  "parroquia": "Ambato",
+  "canton_codigo": "1801",
+  "canton": "Ambato",
+  "provincia_codigo": "18",
+  "provincia": "Tungurahua"
+ },
+ {
+  "codigo": "180103",
+  "nombre": "Huachi Chico",
+  "parroquia_codigo": "180150",
+  "parroquia": "Ambato",
+  "canton_codigo": "1801",
+  "canton": "Ambato",
+  "provincia_codigo": "18",
+  "provincia": "Tungurahua"
+ },
+ {
+  "codigo": "180104",
+  "nombre": "Huachi Loreto",
+  "parroquia_codigo": "180150",
+  "parroquia": "Ambato",
+  "canton_codigo": "1801",
+  "canton": "Ambato",
+  "provincia_codigo": "18",
+  "provincia": "Tungurahua"
+ },
+ {
+  "codigo": "180105",
+  "nombre": "La Merced",
+  "parroquia_codigo": "180150",
+  "parroquia": "Ambato",
+  "canton_codigo": "1801",
+  "canton": "Ambato",
+  "provincia_codigo": "18",
+  "provincia": "Tungurahua"
+ },
+ {
+  "codigo": "180106",
+  "nombre": "La Península",
+  "parroquia_codigo": "180150",
+  "parroquia": "Ambato",
+  "canton_codigo": "1801",
+  "canton": "Ambato",
+  "provincia_codigo": "18",
+  "provincia": "Tungurahua"
+ },
+ {
+  "codigo": "180107",
+  "nombre": "Matriz",
+  "parroquia_codigo": "180150",
+  "parroquia": "Ambato",
+  "canton_codigo": "1801",
+  "canton": "Ambato",
+  "provincia_codigo": "18",
+  "provincia": "Tungurahua"
+ },
+ {
+  "codigo": "180108",
+  "nombre": "Pishilata",
+  "parroquia_codigo": "180150",
+  "parroquia": "Ambato",
+  "canton_codigo": "1801",
+  "canton": "Ambato",
+  "provincia_codigo": "18",
+  "provincia": "Tungurahua"
+ },
+ {
+  "codigo": "180109",
+  "nombre": "San Francisco",
+  "parroquia_codigo": "180150",
+  "parroquia": "Ambato",
+  "canton_codigo": "1801",
+  "canton": "Ambato",
+  "provincia_codigo": "18",
+  "provincia": "Tungurahua"
+ },
+ {
+  "codigo": "180701",
+  "nombre": "Pelileo",
+  "parroquia_codigo": "180750",
+  "parroquia": "Pelileo",
+  "canton_codigo": "1807",
+  "canton": "San Pedro de Pelileo",
+  "provincia_codigo": "18",
+  "provincia": "Tungurahua"
+ },
+ {
+  "codigo": "180702",
+  "nombre": "Pelileo Grande",
+  "parroquia_codigo": "180750",
+  "parroquia": "Pelileo",
+  "canton_codigo": "1807",
+  "canton": "San Pedro de Pelileo",
+  "provincia_codigo": "18",
+  "provincia": "Tungurahua"
+ },
+ {
+  "codigo": "180801",
+  "nombre": "Ciudad Nueva",
+  "parroquia_codigo": "180850",
+  "parroquia": "Píllaro",
+  "canton_codigo": "1808",
+  "canton": "Santiago de Píllaro",
+  "provincia_codigo": "18",
+  "provincia": "Tungurahua"
+ },
+ {
+  "codigo": "180802",
+  "nombre": "Píllaro",
+  "parroquia_codigo": "180850",
+  "parroquia": "Píllaro",
+  "canton_codigo": "1808",
+  "canton": "Santiago de Píllaro",
+  "provincia_codigo": "18",
+  "provincia": "Tungurahua"
+ },
+ {
+  "codigo": "190101",
+  "nombre": "El Limón",
+  "parroquia_codigo": "190150",
+  "parroquia": "Zamora",
+  "canton_codigo": "1901",
+  "canton": "Zamora",
+  "provincia_codigo": "19",
+  "provincia": "Zamora Chinchipe"
+ },
+ {
+  "codigo": "190102",
+  "nombre": "Zamora",
+  "parroquia_codigo": "190150",
+  "parroquia": "Zamora",
+  "canton_codigo": "1901",
+  "canton": "Zamora",
+  "provincia_codigo": "19",
+  "provincia": "Zamora Chinchipe"
+ },
+ {
+  "codigo": " ",
+  "nombre": "",
+  "parroquia_codigo": "210355",
+  "parroquia": "Sansahuari",
+  "canton_codigo": "2103",
+  "canton": "Putumayo",
+  "provincia_codigo": "21",
+  "provincia": "Sucumbíos"
+ },
+ {
+  "codigo": "220201",
+  "nombre": "Nuevo Rocafuerte",
+  "parroquia_codigo": "220250",
+  "parroquia": "Nuevo Rocafuerte",
+  "canton_codigo": "2202",
+  "canton": "Aguarico",
+  "provincia_codigo": "22",
+  "provincia": "Orellana"
+ },
+ {
+  "codigo": "220202",
+  "nombre": "Tiputini",
+  "parroquia_codigo": "220250",
+  "parroquia": "Nuevo Rocafuerte",
+  "canton_codigo": "2202",
+  "canton": "Aguarico",
+  "provincia_codigo": "22",
+  "provincia": "Orellana"
+ },
+ {
+  "codigo": "230101",
+  "nombre": "Abraham Calazacón",
+  "parroquia_codigo": "230150",
+  "parroquia": "Santo Domingo de los Colorados",
+  "canton_codigo": "2301",
+  "canton": "Santo Domingo",
+  "provincia_codigo": "23",
+  "provincia": "Santo Domingo de los Tsáchilas"
+ },
+ {
+  "codigo": "230102",
+  "nombre": "Bombolí",
+  "parroquia_codigo": "230150",
+  "parroquia": "Santo Domingo de los Colorados",
+  "canton_codigo": "2301",
+  "canton": "Santo Domingo",
+  "provincia_codigo": "23",
+  "provincia": "Santo Domingo de los Tsáchilas"
+ },
+ {
+  "codigo": "230103",
+  "nombre": "Chiguilpe",
+  "parroquia_codigo": "230150",
+  "parroquia": "Santo Domingo de los Colorados",
+  "canton_codigo": "2301",
+  "canton": "Santo Domingo",
+  "provincia_codigo": "23",
+  "provincia": "Santo Domingo de los Tsáchilas"
+ },
+ {
+  "codigo": "230104",
+  "nombre": "Río Toachi",
+  "parroquia_codigo": "230150",
+  "parroquia": "Santo Domingo de los Colorados",
+  "canton_codigo": "2301",
+  "canton": "Santo Domingo",
+  "provincia_codigo": "23",
+  "provincia": "Santo Domingo de los Tsáchilas"
+ },
+ {
+  "codigo": "230105",
+  "nombre": "Río Verde",
+  "parroquia_codigo": "230150",
+  "parroquia": "Santo Domingo de los Colorados",
+  "canton_codigo": "2301",
+  "canton": "Santo Domingo",
+  "provincia_codigo": "23",
+  "provincia": "Santo Domingo de los Tsáchilas"
+ },
+ {
+  "codigo": "230106",
+  "nombre": "Santo Domingo de los Colorados",
+  "parroquia_codigo": "230150",
+  "parroquia": "Santo Domingo de los Colorados",
+  "canton_codigo": "2301",
+  "canton": "Santo Domingo",
+  "provincia_codigo": "23",
+  "provincia": "Santo Domingo de los Tsáchilas"
+ },
+ {
+  "codigo": "230107",
+  "nombre": "Zaracay",
+  "parroquia_codigo": "230150",
+  "parroquia": "Santo Domingo de los Colorados",
+  "canton_codigo": "2301",
+  "canton": "Santo Domingo",
+  "provincia_codigo": "23",
+  "provincia": "Santo Domingo de los Tsáchilas"
+ },
+ {
+  "codigo": "240101",
+  "nombre": "Ballenita",
+  "parroquia_codigo": "240150",
+  "parroquia": "Santa Elena",
+  "canton_codigo": "2401",
+  "canton": "Santa Elena",
+  "provincia_codigo": "24",
+  "provincia": "Santa Elena"
+ },
+ {
+  "codigo": "240102",
+  "nombre": "Santa Elena",
+  "parroquia_codigo": "240150",
+  "parroquia": "Santa Elena",
+  "canton_codigo": "2401",
+  "canton": "Santa Elena",
+  "provincia_codigo": "24",
+  "provincia": "Santa Elena"
+ },
+ {
+  "codigo": "240301",
+  "nombre": "Carlos Espinoza Larrea",
+  "parroquia_codigo": "240350",
+  "parroquia": "Salinas",
+  "canton_codigo": "2403",
+  "canton": "Salinas",
+  "provincia_codigo": "24",
+  "provincia": "Santa Elena"
+ },
+ {
+  "codigo": "240302",
+  "nombre": "General Alberto Enríquez Gallo",
+  "parroquia_codigo": "240350",
+  "parroquia": "Salinas",
+  "canton_codigo": "2403",
+  "canton": "Salinas",
+  "provincia_codigo": "24",
+  "provincia": "Santa Elena"
+ },
+ {
+  "codigo": "240303",
+  "nombre": "Vicente  Rocafuerte",
+  "parroquia_codigo": "240350",
+  "parroquia": "Salinas",
+  "canton_codigo": "2403",
+  "canton": "Salinas",
+  "provincia_codigo": "24",
+  "provincia": "Santa Elena"
+ },
+ {
+  "codigo": "240304",
+  "nombre": "Santa Rosa",
+  "parroquia_codigo": "240350",
+  "parroquia": "Salinas",
+  "canton_codigo": "2403",
+  "canton": "Salinas",
+  "provincia_codigo": "24",
+  "provincia": "Santa Elena"
+ }
+]

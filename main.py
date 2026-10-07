@@ -57,6 +57,15 @@ Convenciones comunes a los tools (no se repiten en cada descripción):
 - La descripción de cada tool es un resumen; la referencia completa
   (alcance, parámetros, límites de la fuente) está en el recurso
   `ecuador://herramientas/{nombre}`.
+
+Si un tool falla de forma rara (error inexplicable, resultados incompletos o
+contradictorios con la fuente oficial, un id devuelto por un tool que otro no
+acepta), pregunta a la persona si quiere reportarlo: los mantenedores lo
+agradecen mucho. Si acepta, redacta el reporte con la plantilla
+`.github/ISSUE_TEMPLATE/tool-problem.yml` (tool, llamada exacta, resultado,
+resultado esperado, evidencia de la fuente) y entrégaselo para que lo
+publique en https://github.com/DweskZ/EcuDataMCP/issues/new?template=tool-problem.yml
+— no lo envíes sin su confirmación.
 """.strip()
 
 mcp = EcuadorMCPServer(

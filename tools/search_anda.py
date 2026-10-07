@@ -12,9 +12,8 @@ from helpers.tool_meta import READ_ONLY
 
 # ANDA's own full-text search (`sk`) is loose — it ranks by relevance across
 # a broad blob of fields rather than requiring every query word to match, so
-# a search for "ENESEM" also surfaces REEM, price indices, etc. Fetch a wider
-# candidate batch and filter locally so results actually contain the query.
-_FETCH_SIZE = 100
+# a search for "ENESEM" also surfaces REEM, price indices, etc. Page through
+# every candidate and filter locally so results actually contain the query.
 
 _strip_accents = partial(strip_accents, lower=False)
 
@@ -39,7 +38,10 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
     )
     @log_tool
     async def search_anda(
-        query: str = "", limit: int = 10, format: Literal["text", "json"] = "text"
+        query: str = "",
+        limit: int = 10,
+        page: int = 1,
+        format: Literal["text", "json"] = "text",
     ) -> dict[str, Any]:
         """
         Search INEC's ANDA catalog (anda.inec.gob.ec) of surveys and censuses.
@@ -53,32 +55,46 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
         published data lives on ecuadorencifras.gob.ec instead: try
         search_inec_estadisticas with the same query.
 
+        microdatos_disponibles=true means ANDA flags the study as having
+        microdata, not that files are attached: some studies (e.g. general
+        deaths 2012, 2017-2019) list none and host them on ecuadorencifras.gob.ec
+        — see get_inec_estadistica_files.
+
         Follow up with get_anda_survey_info(idno) for full metadata on one survey.
+        The numeric "id" also works as the identifier in the follow-up tools.
 
         Args:
             query: Search keywords (e.g. "empleo", "REEM", "censo agropecuario")
-            limit: Max results (default: 10, max: 50)
+            limit: Results per page (default: 10, max: 50)
+            page: Page of results, 1-based (default: 1); see total/total_pages
             format: text | json
         """
         limit = min(max(limit, 1), 50)
+        page = max(page, 1)
         words = [_strip_accents(w.lower()) for w in query.split() if len(w) >= 2]
         try:
             if query:
-                result = await anda_client.search_catalog(query=query, limit=_FETCH_SIZE)
-                candidates = result.get("rows", [])
+                candidates = await anda_client.search_catalog_all(query=query)
                 matched = [r for r in candidates if _matches_query(r, words)]
                 total_scanned = len(candidates)
+                total_catalog = len(matched)
             else:
-                result = await anda_client.search_catalog(limit=limit)
+                result = await anda_client.search_catalog(limit=limit, page=page)
                 matched = result.get("rows", [])
                 total_scanned = len(matched)
+                total_catalog = int(result.get("found") or 0)
         except Exception as e:
             raise ToolError(f"Error al buscar en ANDA: {e}") from e
 
-        total = len(matched)
+        # With a query the match list is already complete, so slice it locally;
+        # without one the server paged it for us.
+        total = total_catalog
+        shown = matched[(page - 1) * limit : page * limit] if query else matched
         payload = {
             "query": query,
             "total": total,
+            "page": page,
+            "total_pages": max(-(-total // limit), 1),
             "total_scanned": total_scanned,
             "results": [
                 {
@@ -90,7 +106,7 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
                     "microdatos_disponibles": anda_client.has_microdata(r),
                     "url": r.get("url"),
                 }
-                for r in matched[:limit]
+                for r in shown
             ],
         }
 
@@ -100,7 +116,7 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
                 return f"No se encontraron encuestas en ANDA para: '{data['query']}'"
             parts = [
                 f"Se encontraron {data['total']} encuesta(s) en ANDA para: '{data['query']}'",
-                f"Mostrando {len(rows)} resultados:\n",
+                f"Página {data['page']} de {data['total_pages']} ({len(rows)} resultados):\n",
             ]
             for i, r in enumerate(rows, 1):
                 parts.append(f"{i}. {r.get('titulo', 'Sin título')} ({r.get('anio', '?')})")

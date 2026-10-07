@@ -5,8 +5,10 @@ from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers.format_out import render_structured
 from helpers.geo_data import (
+    CLASIFICADOR_ANIO,
     find_cantones,
     find_parroquias,
+    find_parroquias_urbanas,
     find_provincias,
     list_cantones,
     list_provincias,
@@ -19,9 +21,9 @@ def register_lookup_ubicacion_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Buscar división político-administrativa del Ecuador",
         description=(
-            "Look up Ecuador's provinces, cantons and parroquias with INEC codes, "
-            "region and population. For parroquias, filter by canton and/or "
-            "provincia."
+            "Look up Ecuador's provinces, cantons and parroquias (rural and urban) "
+            "with INEC codes, region and population. For parroquias, filter by "
+            "canton and/or provincia."
         ),
         annotations=READ_ONLY,
     )
@@ -39,6 +41,10 @@ def register_lookup_ubicacion_tool(mcp: MCPServer) -> None:
 
         - nivel='provincia' | 'canton' | 'parroquia' | 'auto'
         - For parroquias, filter with canton= and/or provincia= (recommended)
+        - Parroquias also come back as parroquias_urbanas: the urban parishes
+          (e.g. Tarqui 090112) with codigo_parroquia_urbana, each mapped to its
+          head parish in `codigo` (090150). Source: INEC classifier
+          clasificador_anio (CODIFICACIÓN, sheet PARROQUIAS).
 
         Args:
             query: Name or code (e.g. "Pichincha", "Cuenca", "Tumbaco", "170150")
@@ -55,6 +61,7 @@ def register_lookup_ubicacion_tool(mcp: MCPServer) -> None:
         provs: list[dict] = []
         cants: list[dict] = []
         parrs: list[dict] = []
+        urbanas: list[dict] = []
 
         if nivel_norm in {"auto", "provincia"}:
             if query.strip() or region.strip():
@@ -92,6 +99,11 @@ def register_lookup_ubicacion_tool(mcp: MCPServer) -> None:
                 canton=canton.strip(),
                 provincia=provincia.strip(),
             )
+            urbanas = find_parroquias_urbanas(
+                query=query.strip(),
+                canton=canton.strip(),
+                provincia=provincia.strip(),
+            )
 
         if (
             nivel_norm == "auto"
@@ -111,9 +123,12 @@ def register_lookup_ubicacion_tool(mcp: MCPServer) -> None:
             "cantones_total": len(cants),
             "parroquias": parrs[:50],
             "parroquias_total": len(parrs),
+            "parroquias_urbanas": urbanas[:100],
+            "parroquias_urbanas_total": len(urbanas),
+            "clasificador_anio": CLASIFICADOR_ANIO,
         }
 
-        if not provs and not cants and not parrs:
+        if not provs and not cants and not parrs and not urbanas:
             empty = {
                 "error": "sin_resultados",
                 "query": query,
@@ -181,6 +196,18 @@ def register_lookup_ubicacion_tool(mcp: MCPServer) -> None:
                     parts.append(
                         f"- {row['codigo']} {row['nombre']} "
                         f"({row.get('canton', '')}, {row.get('provincia', '')})"
+                    )
+            if data["parroquias_urbanas"]:
+                parts.append("")
+                parts.append(
+                    f"Parroquias urbanas ({data['parroquias_urbanas_total']}"
+                    f"; clasificador {data['clasificador_anio']}):"
+                )
+                for u in data["parroquias_urbanas"]:
+                    parts.append(
+                        f"- {u['codigo_parroquia_urbana']} {u['nombre']} "
+                        f"(parroquia {u['codigo']} {u['parroquia']}, {u['canton']}, "
+                        f"{u['provincia']})"
                     )
             parts.append("")
             parts.append(

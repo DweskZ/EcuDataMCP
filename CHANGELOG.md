@@ -1,5 +1,27 @@
 # Changelog
 
+## Unreleased
+
+Fixes from a field report (paper-apagones, 2026-10-06/07).
+
+- **ANDA**: `get_anda_survey_info` and `download_anda_microdata` accept the
+  numeric catalog id as well as the idno, and URL-encode idnos with spaces.
+  `search_anda` now pages the whole catalog (it was capped at 50 candidates)
+  and takes `page`; `download_anda_microdata` explains when a study has no
+  files attached and points to the INEC site.
+- **INEC historical microdata**: `search_inec_estadisticas` lists the death
+  registry pages (1990-2015 bases de datos, 2017, 2018, 2019);
+  `get_inec_estadistica_files` tags each file with its `year` and takes a
+  `year` filter.
+- **`lookup_ubicacion`** returns urban parishes (`parroquias_urbanas`, with
+  `codigo_parroquia_urbana`, head-parish `codigo` and `clasificador_anio`)
+  from INEC's CODIFICACIÓN_2026.
+- **`search_datasets`** takes `compact` and `fields` to shrink the JSON.
+- **`preview_resource_data`**: xlsx/ods larger than the cap now say so instead
+  of "File is not a zip file".
+- **Reporting**: issue template `tool-problem.yml`; the server instructions
+  tell assistants to offer to report odd tool behaviour to the maintainers.
+
 ## 0.11.0 — 2026-10-02
 
 Breaking: tool names changed. 90 → 82 tools in the default profile;

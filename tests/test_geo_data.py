@@ -1,3 +1,4 @@
+from helpers import geo_data
 from helpers.geo_data import (
     find_cantones,
     find_parroquias,
@@ -57,3 +58,11 @@ def test_parroquias_by_canton():
     rows = find_parroquias(canton="Quito")
     assert len(rows) >= 10
     assert all("quito" in r["canton"].lower() for r in rows)
+
+
+def test_urban_parishes_guayaquil_include_tarqui():
+    rows = geo_data.find_parroquias_urbanas(canton="Guayaquil", provincia="Guayas")
+    tarqui = next(r for r in rows if r["nombre"] == "Tarqui")
+    assert tarqui["codigo_parroquia_urbana"] == "090112"
+    assert tarqui["codigo"] == "090150"
+    assert tarqui["clasificador_anio"] == geo_data.CLASIFICADOR_ANIO
