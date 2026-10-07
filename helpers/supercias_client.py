@@ -268,16 +268,29 @@ async def _download_once(url: str, verify: bool = True) -> bytes:
 
 async def _download_full(url: str) -> bytes:
     try:
-        return await _download_once(url)
-    except httpx.ConnectError as exc:
-        if not should_retry_insecure(exc, url):
-            raise
-        logger.warning(
-            "Fallo la verificación TLS para %s (¿certificado de Supercías con "
-            "problemas?); reintentando sin verificación",
-            url,
-        )
-        return await _download_once(url, verify=False)
+        try:
+            return await _download_once(url)
+        except httpx.ConnectError as exc:
+            if not should_retry_insecure(exc, url):
+                raise
+            logger.warning(
+                "Fallo la verificación TLS para %s (¿certificado de Supercías con "
+                "problemas?); reintentando sin verificación",
+                url,
+            )
+            return await _download_once(url, verify=False)
+    except httpx.HTTPStatusError:
+        # Already actionable: the message carries the URL and status code.
+        raise
+    except httpx.RequestError as exc:
+        # A bare ConnectTimeout stringifies to "", so the tool layer reported
+        # an empty error. Name the host and failure kind; Supercías' export
+        # host has been seen dropping connections instead of answering.
+        raise RuntimeError(
+            f"No se pudo conectar a {httpx.URL(url).host} ({type(exc).__name__}). "
+            "El sitio de Supercías puede estar caído, lento o bloqueando la "
+            "conexión; reintenta en unos minutos."
+        ) from exc
 
 
 async def _fetch_companias() -> tuple[

@@ -258,7 +258,9 @@ def _record_outcome(started: float, error: BaseException | None) -> None:
     if error is None:
         state.update(ultimo_exito=now, ultimo_error=None, fallos_consecutivos=0)
     else:
-        state["ultimo_error"] = f"{type(error).__name__}: {error}"[:500]
+        # A bare httpx.ConnectTimeout stringifies to "", so fall back to repr.
+        detail = str(error) or repr(error)
+        state["ultimo_error"] = f"{type(error).__name__}: {detail}"[:500]
         state["fallos_consecutivos"] = int(state.get("fallos_consecutivos") or 0) + 1
     supercias_financials.write_build_state(state)
 
