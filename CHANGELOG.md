@@ -43,11 +43,25 @@ Fixes from a field report (paper-apagones, 2026-10-06/07).
   gob.ec dropped the connection partway through the ~1.8 MB SRI page
   (`httpx.ReadError`, which stringifies to ""). gob.ec GETs are now retried
   up to 3 times on transport errors, and the final error names the failure.
+- **`search_tramites`** keyword routing (no `institution_id`) matched inside
+  other words ("instrucciones" went to the SRI, "importante" to the ANT,
+  "revisar" to Cancillería). Keywords now match as word prefixes, the short
+  ones (`ruc`, `sri`, `ant`, `visa`, `iess`) as whole words, accent-insensitive
+  ("vehículos", "afiliación", "cesantía" now route). Query words also match
+  from the start of a word, so "RUC" no longer hits "construcción".
+- **gob.ec reads** are also capped at 60 s per attempt, so a trickling body
+  can't hold a call for minutes. Keyword routing picks the keyword that
+  appears first in the query ("pasaporte con cédula" → Cancillería), and
+  unscoped `search_tramites` queries say they only cover the first 1,250
+  trámites.
+- **`get_tramite_info`** and **`get_tramite_estadisticas`** reject a
+  non-numeric `tramite_id` with a clear message instead of gob.ec's raw 500.
 - **gob.ec institution IDs**: the shortcuts in `search_tramites`,
   `get_institucion_info`, `consultar_tramite` and
   `ecuador://instituciones-clave` were wrong for three of five. IESS is
   163 (5 is the agriculture ministry), ANT 48 (not 62) and Cancillería 6
-  (not 16); SRI 8 and Registro Civil 23 were right.
+  (not 16); SRI 8 and Registro Civil 23 were right. Also fixed in the
+  `list_instituciones` docs and the site's Atlas.
 
 ## 0.11.0 — 2026-10-02
 

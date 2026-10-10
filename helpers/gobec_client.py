@@ -18,8 +18,13 @@ _TIMEOUT = 25.0
 # gob.ec dropped the connection partway through a ~1.8 MB /tramites page
 # from Render (httpx.ReadError, 2026-10-07) seconds after serving the same
 # URL fine. The transport's own retries only cover failed connects, so
-# these read-only GETs are retried here on any transport error.
+# these read-only GETs are retried here on any transport error (HTTP error
+# statuses, including 5xx, are not retried).
 _ATTEMPTS = 3
+# Cap per attempt: _TIMEOUT is per read/connect, so a body trickling in just
+# under it (or transport-level connect retries) could otherwise hold one call
+# for minutes.
+_ATTEMPT_DEADLINE = 60.0
 
 # Browser-like UA required — gob.ec rejects bot-style User-Agents
 _HEADERS = {
@@ -71,10 +76,15 @@ async def _fetch_json(
         logger.debug("GobEC GET %s params=%s", url, params)
         for attempt in range(1, _ATTEMPTS + 1):
             try:
-                resp = await session.get(url, params=params, timeout=_TIMEOUT)
+                async with asyncio.timeout(_ATTEMPT_DEADLINE):
+                    resp = await session.get(url, params=params, timeout=_TIMEOUT)
                 break
-            except httpx.TransportError as exc:
+            except (httpx.TransportError, TimeoutError) as exc:
                 if attempt == _ATTEMPTS:
+                    logger.error(
+                        "GobEC gave up on %s after %d attempts: %r",
+                        url, _ATTEMPTS, exc,
+                    )
                     # ReadError and the timeouts stringify to "", which
                     # reached the user as "Error al buscar trámites: ".
                     raise RuntimeError(

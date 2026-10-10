@@ -444,7 +444,7 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Lista o busca instituciones públicas registradas en el portal gob.ec. Si se da un query, busca en todas las instituciones por nombre o siglas. Sin query, devuelve una lista paginada. Instituciones comunes: SRI (ID: 8), Registro Civil (ID: 23), ANT (ID: 62), Cancillería (ID: 16), IESS (ID: 5), Ministerio de Salud, INEC, BCE."
+        "long_description": "Lista o busca instituciones públicas registradas en el portal gob.ec. Si se da un query, busca en todas las instituciones por nombre o siglas. Sin query, devuelve una lista paginada. Instituciones comunes: SRI (ID: 8), Registro Civil (ID: 23), ANT (ID: 48), Cancillería (ID: 6), IESS (ID: 163), Ministerio de Salud, INEC, BCE."
       },
       {
         "name": "get_institucion_info",

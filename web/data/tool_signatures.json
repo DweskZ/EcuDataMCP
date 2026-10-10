@@ -1351,7 +1351,7 @@
       }
     ],
     "description": "List or search public institutions registered on gob.ec, with their IDs.",
-    "summary": "List or search public institutions registered on Ecuador's gob.ec portal. If a query is provided, searches across all institutions by name or acronym. Without a query, returns a paginated list. Common institutions: SRI (ID: 8), Registro Civil (ID: 23), ANT (ID: 62), Cancillería (ID: 16), IESS (ID: 5), Ministerio de Salud, INEC, BCE.",
+    "summary": "List or search public institutions registered on Ecuador's gob.ec portal. If a query is provided, searches across all institutions by name or acronym. Without a query, returns a paginated list. Common institutions: SRI (ID: 8), Registro Civil (ID: 23), ANT (ID: 48), Cancillería (ID: 6), IESS (ID: 163), Ministerio de Salud, INEC, BCE.",
     "args_doc": {
       "query": "Optional search term (e.g. \"SRI\", \"salud\", \"rentas\")",
       "page": "Page number (1-based, default: 1, only used without query)",

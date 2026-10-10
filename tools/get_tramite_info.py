@@ -33,6 +33,12 @@ def register_get_tramite_info_tool(mcp: MCPServer) -> None:
             tramite_id: The procedure ID (e.g. "18009")
             format: text | json
         """
+        if not tramite_id.isdigit():
+            raise ToolError(
+                f"ID de trámite inválido: '{tramite_id}'. Usa el ID numérico "
+                "que devuelve search_tramites."
+            )
+
         try:
             t = await gobec_client.get_tramite(tramite_id)
         except Exception as e:

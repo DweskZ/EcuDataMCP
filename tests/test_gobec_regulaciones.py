@@ -1,3 +1,5 @@
+import asyncio
+
 import httpx
 import pytest
 
@@ -99,10 +101,13 @@ async def test_list_regulaciones_raises_on_empty_body(httpx_mock):
 
 @pytest.fixture
 def _no_retry_sleep(monkeypatch):
-    async def instant(_seconds):
-        return None
+    sleeps = []
+
+    async def instant(seconds):
+        sleeps.append(seconds)
 
     monkeypatch.setattr(gobec_client.asyncio, "sleep", instant)
+    return sleeps
 
 
 @pytest.mark.asyncio
@@ -128,3 +133,45 @@ async def test_tramites_error_names_failure_after_retries(httpx_mock, _no_retry_
 
     with pytest.raises(RuntimeError, match="ReadError"):
         await gobec_client.search_tramites(institution_id="8", page=0)
+
+
+@pytest.mark.asyncio
+async def test_retry_backs_off_one_then_two_seconds(httpx_mock, _no_retry_sleep):
+    url = "https://www.gob.ec/api/v1/tramites?page=0&institution=8"
+    for _ in range(gobec_client._ATTEMPTS):
+        httpx_mock.add_exception(httpx.ReadTimeout(""), url=url)
+
+    with pytest.raises(RuntimeError, match="ReadTimeout"):
+        await gobec_client.search_tramites(institution_id="8", page=0)
+
+    assert _no_retry_sleep == [1, 2]
+
+
+@pytest.mark.asyncio
+async def test_slow_attempt_is_cut_off_and_retried(
+    httpx_mock, _no_retry_sleep, monkeypatch
+):
+    url = "https://www.gob.ec/api/v1/tramites?page=0&institution=8"
+    monkeypatch.setattr(gobec_client, "_ATTEMPT_DEADLINE", 0.05)
+
+    async def hang(request):
+        await asyncio.Event().wait()
+        return httpx.Response(200, json=[])
+
+    httpx_mock.add_callback(hang, url=url)
+    httpx_mock.add_response(url=url, json=[{"tramite_id": "1"}])
+
+    items = await gobec_client.search_tramites(institution_id="8", page=0)
+
+    assert items == [{"tramite_id": "1"}]
+
+
+@pytest.mark.asyncio
+async def test_http_error_status_is_not_retried(httpx_mock, _no_retry_sleep):
+    url = "https://www.gob.ec/api/v1/tramites?page=0&institution=8"
+    httpx_mock.add_response(url=url, status_code=500)
+
+    with pytest.raises(httpx.HTTPStatusError):
+        await gobec_client.search_tramites(institution_id="8", page=0)
+
+    assert _no_retry_sleep == []

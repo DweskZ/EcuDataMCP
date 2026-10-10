@@ -50,6 +50,12 @@ def register_get_tramite_estadisticas_tool(mcp: MCPServer) -> None:
             tramite_id: The procedure ID (e.g. "11752")
             format: text | json
         """
+        if not tramite_id.isdigit():
+            raise ToolError(
+                f"ID de trámite inválido: '{tramite_id}'. Usa el ID numérico "
+                "que devuelve search_tramites."
+            )
+
         try:
             rows = await gobec_client.get_tramite_estadisticas(tramite_id)
         except Exception as e:

@@ -1,3 +1,4 @@
+import re
 from functools import partial
 from typing import Any, Literal
 
@@ -14,13 +15,63 @@ from helpers.tool_meta import READ_ONLY
 _strip_accents = partial(strip_accents, lower=False)
 
 
+_KEYWORD_TO_INSTITUTION = {
+    "ruc": "8", "sri": "8", "impuesto": "8", "factura": "8",
+    "tributar": "8", "retención": "8", "retenciones": "8",
+    "declaracion": "8", "declaración": "8", "rimpe": "8",
+    "cedula": "23", "cédula": "23", "partida": "23",
+    "nacimiento": "23", "registro civil": "23", "defunción": "23",
+    "matrimonio": "23", "identidad": "23",
+    "licencia": "48", "conducir": "48", "matricula": "48",
+    "vehicul": "48", "ant": "48", "revision tecnica": "48",
+    "pasaporte": "6", "apostilla": "6", "visa": "6",
+    "consulado": "6", "legalizacion": "6",
+    "iess": "163", "seguro social": "163", "pensión": "163",
+    "fondo de reserva": "163", "fondos de reserva": "163", "afiliacion": "163", "cesantia": "163",
+}
+
+
+# Keywords are matched as word prefixes ("vehicul" covers "vehículo"), and the
+# short ones as whole words with the plural/derivation suffix listed here: a
+# plain substring test sent "instrucciones" to the SRI ("ruc"), "importante" to
+# the ANT ("ant") and "revisar" to Cancillería ("visa").
+_WHOLE_WORD_SUFFIX = {
+    "ruc": "s?",
+    "sri": "s?",
+    "visa": "(?:s|do)?",
+    "ant": "",
+    "iess": "",
+}
+
+
+def _guess_institution(query: str) -> str:
+    """Return the institution ID whose keyword appears in the query, or ""."""
+    q_plain = " ".join(_strip_accents(query.lower()).split())
+    # The keyword appearing first in the query wins, so "pasaporte con cédula"
+    # goes to Cancillería; dict order only breaks ties.
+    best_start, best_id = len(q_plain) + 1, ""
+    for keyword, inst_id in _KEYWORD_TO_INSTITUTION.items():
+        words = _strip_accents(keyword).split()
+        pattern = r"\b" + r"\s+".join(re.escape(w) for w in words)
+        if keyword in _WHOLE_WORD_SUFFIX:
+            pattern += _WHOLE_WORD_SUFFIX[keyword] + r"\b"
+        match = re.search(pattern, q_plain)
+        if match and match.start() < best_start:
+            best_start, best_id = match.start(), inst_id
+    return best_id
+
+
 def _matches_query(tramite: dict, words: list[str]) -> bool:
-    """Check if a trámite matches ALL query words in its name or description."""
+    """Check if a trámite matches ALL query words in its name or description.
+
+    Each word must start a word in the text ("ruc" matches "RUC" and
+    "rucs" but not "construcción").
+    """
     nombre = tramite.get("nombre", "").lower()
     codigo = tramite.get("codigo", "").lower()
     desc = _clean_html(tramite.get("descripcion", "")).lower()
     searchable = _strip_accents(f"{nombre} {codigo} {desc}")
-    return all(w in searchable for w in words)
+    return all(re.search(r"(?<!\w)" + re.escape(w), searchable) for w in words)
 
 
 def register_search_tramites_tool(mcp: MCPServer) -> None:
@@ -68,25 +119,7 @@ def register_search_tramites_tool(mcp: MCPServer) -> None:
             format: text | json
         """
         if query and not institution_id:
-            keyword_to_inst = {
-                "ruc": "8", "sri": "8", "impuesto": "8", "factura": "8",
-                "tributar": "8", "retención": "8", "retenciones": "8",
-                "declaracion": "8", "declaración": "8", "rimpe": "8",
-                "cedula": "23", "cédula": "23", "partida": "23",
-                "nacimiento": "23", "registro civil": "23", "defunción": "23",
-                "matrimonio": "23", "identidad": "23",
-                "licencia": "48", "conducir": "48", "matricula": "48",
-                "vehicul": "48", "ant": "48", "revision tecnica": "48",
-                "pasaporte": "6", "apostilla": "6", "visa": "6",
-                "consulado": "6", "legalizacion": "6",
-                "iess": "163", "seguro social": "163", "pensión": "163",
-                "fondo de reserva": "163", "afiliacion": "163", "cesantia": "163",
-            }
-            q_lower = query.lower()
-            for keyword, inst_id in keyword_to_inst.items():
-                if keyword in q_lower:
-                    institution_id = inst_id
-                    break
+            institution_id = _guess_institution(query)
 
         query_words = (
             [_strip_accents(w.lower()) for w in query.split() if len(w) >= 2]
@@ -174,7 +207,11 @@ def register_search_tramites_tool(mcp: MCPServer) -> None:
                 parts.append(f"Mostrando {len(rows)} resultados\n")
             elif data.get("query"):
                 parts.append(f"Trámites que coinciden con '{data['query']}':")
-                parts.append(f"Encontrados: {data['total']}\n")
+                parts.append(
+                    f"Encontrados: {data['total']} (búsqueda limitada a los "
+                    f"primeros {data['total_scanned']} trámites; indica "
+                    "institution_id para cubrir una institución completa)\n"
+                )
             else:
                 parts.append(f"Trámites (página {data['page']}):")
                 parts.append(f"Mostrando {len(rows)} resultados\n")

@@ -28,8 +28,8 @@ def register_list_instituciones_tool(mcp: MCPServer) -> None:
         If a query is provided, searches across all institutions by name or acronym.
         Without a query, returns a paginated list.
 
-        Common institutions: SRI (ID: 8), Registro Civil (ID: 23), ANT (ID: 62),
-        Cancillería (ID: 16), IESS (ID: 5), Ministerio de Salud, INEC, BCE.
+        Common institutions: SRI (ID: 8), Registro Civil (ID: 23), ANT (ID: 48),
+        Cancillería (ID: 6), IESS (ID: 163), Ministerio de Salud, INEC, BCE.
 
         Args:
             query: Optional search term (e.g. "SRI", "salud", "rentas")
