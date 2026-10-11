@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **CNE (electoral data)**: `list_archivo_secciones` / `get_archivo_seccion`
+  take `fuente="cne"`. One section per election process, 2002-2025 (19), each
+  listing dictionaries, political organizations, candidates, the electoral
+  roll by parish and the results by parish from
+  cne.gob.ec/estadisticas/bases-de-datos/ (SPSS `.sav`, up to 77 MB; the
+  Incapsula block seen on 2026-09-06 is gone, checked 2026-10-10). Returns
+  links with `grupo`, `descargas` and `tamano`; the files are not parsed.
+
 Fixes from a field report (paper-apagones, 2026-10-06/07).
 
 - **ANDA**: `get_anda_survey_info` and `download_anda_microdata` accept the

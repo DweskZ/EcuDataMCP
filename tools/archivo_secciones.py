@@ -15,6 +15,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import (
     arcsa_client,
+    cne_client,
     ineval_client,
     senescyt_biblioteca_client,
     seps_client,
@@ -26,7 +27,9 @@ from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.tool_meta import READ_ONLY
 
-Fuente = Literal["arcsa", "superbancos", "seps", "ineval", "sgr", "senescyt", "sipa"]
+Fuente = Literal[
+    "arcsa", "superbancos", "seps", "ineval", "sgr", "senescyt", "sipa", "cne"
+]
 
 _NOMBRES = {
     "arcsa": "ARCSA — Base de Registros Emitidos",
@@ -36,6 +39,7 @@ _NOMBRES = {
     "sgr": "SGR — Biblioteca",
     "senescyt": "Educación Superior — Biblioteca",
     "sipa": "SIPA (MAG) — estadísticas agropecuarias",
+    "cne": "CNE — bases de datos de procesos electorales",
 }
 
 # Sources whose list call scrapes a page and returns {"categorias": [...]}.
@@ -43,6 +47,7 @@ _CATEGORIA_LISTS = {
     "arcsa": arcsa_client.list_categorias,
     "sgr": sgr_publicaciones_client.list_biblioteca_categorias,
     "senescyt": senescyt_biblioteca_client.list_biblioteca_categorias,
+    "cne": cne_client.list_procesos,
 }
 # Sources with a fixed, in-code section list keyed by `id_key`.
 _STATIC_LISTS = {
@@ -59,14 +64,17 @@ _GETTERS = {
     "sgr": sgr_publicaciones_client.get_biblioteca_categoria_archivos,
     "senescyt": senescyt_biblioteca_client.get_biblioteca_categoria_archivos,
     "sipa": sipa_client.get_modulo_archivos,
+    "cne": cne_client.get_proceso_archivos,
 }
 
 
 async def _list_secciones(fuente: str) -> dict[str, Any]:
     if fuente in _CATEGORIA_LISTS:
         result = await _CATEGORIA_LISTS[fuente]()
+        # total_archivos is optional: CNE would need one crawl per process.
         secciones = [
-            {"id": c["id"], "nombre": c["nombre"], "total_archivos": c["total_archivos"]}
+            {"id": c["id"], "nombre": c["nombre"]}
+            | ({"total_archivos": c["total_archivos"]} if "total_archivos" in c else {})
             for c in result["categorias"]
         ]
         url_fuente = result.get("url_fuente")
@@ -110,8 +118,8 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
         description=(
             "List the sections of one institution's document archive: ARCSA "
             "sanitary registry, Superbancos and SEPS statistics, INEVAL "
-            "evaluation datasets, SGR and Educación Superior libraries, or SIPA "
-            "agricultural statistics. Next: get_archivo_seccion(fuente, seccion)."
+            "evaluation datasets, SGR and Educación Superior libraries, SIPA "
+            "agricultural statistics, or CNE electoral results and roll by parish. Next: get_archivo_seccion(fuente, seccion)."
         ),
         annotations=READ_ONLY,
     )
@@ -149,12 +157,18 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           17 categories (PAC, LOES/SNNA normativa, acuerdos, auditorías).
         - sipa: SIPA, Ministerio de Agricultura (4 modules: economico,
           productivo, social, censos). Distinct from MPCEIP.
+        - cne: CNE (Consejo Nacional Electoral) "Bases de datos",
+          cne.gob.ec/estadisticas/bases-de-datos/: one section per election
+          process, 2002-2025 (19: Elecciones Generales, Seccionales,
+          Referéndum y Consulta Popular, special parish/canton elections).
+          Each holds dictionaries, political organizations, candidates, the
+          electoral roll by parish and the results by parish.
 
         Returns each section's `id` (pass it to get_archivo_seccion),
         `nombre`, and either its page `url` or `total_archivos`.
 
         Args:
-            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa.
+            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa, cne.
             format: text | json
         """
         try:
@@ -210,12 +224,18 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           (formato DESCONOCIDO) that resolves to the same static files.
         - ineval: some ids 308-redirect to a static file; both work.
         - sipa: XLSX/XLS files, some over 40 MB.
+        - cne: `seccion` is a process id or name ("Elecciones Generales 2025",
+          a unique fragment works). Each file has `grupo` (Diccionarios,
+          Organizaciones Políticas, Registro Electoral, Resultados),
+          `descargas` and `tamano`. The files checked are SPSS .sav
+          (formato DESCONOCIDO: the listing does not say); primera vuelta
+          results run 10-77 MB, so download the URL directly.
 
         Files are often several MB: download the URL directly instead of
         using preview_resource_data or download_resource (5 MB cap).
 
         Args:
-            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa.
+            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa, cne.
             seccion: A section `id` from list_archivo_secciones.
             format: text | json
         """
@@ -249,7 +269,8 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
                     )
                     if p
                 )
-                parts.append(f"- {etiqueta} [{a.get('formato')}]")
+                tamano = f" ({a['tamano']})" if a.get("tamano") else ""
+                parts.append(f"- {etiqueta} [{a.get('formato')}]{tamano}")
                 if a.get("descripcion"):
                     parts.append(f"   {a['descripcion']}")
                 parts.append(f"   {a.get('url')}")

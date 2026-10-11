@@ -5975,6 +5975,52 @@ energético del IIGE (no existen).
 - **CELEC EP** (Decimoquinta pasada, descartado por LOTAIP): sigue sin dato
   sectorial en el sitio, pero su servidor ArcGIS sí tiene datos útiles.
 
+## Trigésimo sexta pasada — CNE desbloqueado y construido (2026-10-10)
+
+Pedido de Daniel: reintentar CNE (con VPN, headers de navegador) y, si hay
+descarga masiva real, integrarlo. **Hay**, y el bloqueo de la Decimonovena
+pasada ya no existe.
+
+**Qué cambió.** Con `httpx` y el User-Agent propio del proyecto (sin
+cookies ni headers especiales), `www.cne.gob.ec/` y
+`/estadisticas/bases-de-datos/` responden 200 con el HTML completo, el
+listado AJAX de WPDM responde 200 y las descargas también (un `.sav` de
+703 KB, SPSS `$FL2 ... IBM SPSS STATISTICS`). Las páginas aún cargan un
+script anti-bot (`/TSPD/`, ya no Incapsula), pero no bloquea. Puede
+volver: el cliente falla con error explícito si la página no trae la lista
+de procesos. `resultados.cne.gob.ec` sigue sin resolver
+(`getaddrinfo failed`) y `cne.gob.ec` sin `www` da `TLSV1_UNRECOGNIZED_NAME`:
+solo sirve `www.cne.gob.ec`. El CKAN nacional devolvió HTML (no JSON) a
+`package_search` desde este entorno, así que no se pudo comprobar si hay
+datasets del CNE ahí; no se usó.
+
+**Estructura confirmada (19 procesos, 2002-2025).** El acordeón de nivel
+superior se lee del HTML (`class="accord-handle" rel="<id>"`). Cada proceso
+es una categoría WPDM con subcategorías Diccionarios, Organizaciones
+Políticas (o "políticas"), Registro Electoral y Resultados. El listado es
+`GET /?wpdmactask=listsub&parent=<id>&showsub=1&linktpl=link-template-default-wdc
+&__wpdmacn=<nonce>`; el nonce está en un `<script>` de la página y un nonce
+inválido responde `-1` (el cliente recarga la página una vez). Cada llamada
+devuelve las subcategorías y los archivos de ese nivel; hacen falta 5
+llamadas por proceso. Excepción: Elecciones Generales 2002 trae además una
+"Resolución" (PDF) en el nivel raíz.
+
+**Archivos.** Comprobado por `Content-Disposition`/cabecera en 5 archivos
+de datos (registro electoral, resultados, diccionarios, de 2004, 2025 y
+Sevilla Don Bosco 2025): todos `.sav` SPSS; el listado no dice el formato,
+por eso `formato` es DESCONOCIDO. Tamaños: diccionarios 1-130 KB, registro
+electoral 120-460 KB, resultados desde 4 KB (elecciones parroquiales) hasta
+77 MB (constituyentes 2007), primera vuelta 2025 18 MB. El enlace de la
+página trae un `&refresh=<token>`; `?wpdmdl=<id>` solo descarga igual, así
+que el cliente lo quita. `HEAD` a la descarga corta la conexión: usar GET.
+
+**Dónde encaja.** `fuente="cne"` en `list_archivo_secciones` /
+`get_archivo_seccion` (mismo patrón que SGR/ARCSA: secciones = procesos,
+archivos con `grupo`, `descargas`, `tamano`). No se hizo una tool de
+búsqueda aparte: son 19 secciones fijas. No se parsean los `.sav`
+(`preview_resource_data` no lee SPSS y el tope es 5 MB); queda como idea
+abierta leerlos con `pyreadstat` si hay demanda, dependencia nueva.
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

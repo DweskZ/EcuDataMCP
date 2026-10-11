@@ -442,6 +442,20 @@
         ]
       },
       {
+        "name": "CNE",
+        "sources": [
+          {
+            "id": "cne-electoral",
+            "name": "Electoral data",
+            "tag": "CNE",
+            "description": "Results, electoral roll by parish, candidates and dictionaries for 19 election processes (SPSS)",
+            "coverage": "2002-2025",
+            "url": "https://www.cne.gob.ec/estadisticas/bases-de-datos/",
+            "status": "live"
+          }
+        ]
+      },
+      {
         "name": "SENESCYT",
         "sources": [
           {
