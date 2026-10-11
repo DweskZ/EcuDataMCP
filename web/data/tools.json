@@ -1494,7 +1494,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Lista los enlaces directos a archivos publicados en una página de tema estadístico del INEC. Obtén la url desde search_inec_estadisticas. Devuelve boletines técnicos, metodología y series históricas como enlaces directos PDF/XLSX/CSV/ZIP — no el contenido de los archivos. Usa read_pdf en un enlace .pdf, o descárgalo tú mismo para los formatos tabulares."
+        "long_description": "Lista los enlaces directos a archivos publicados en una página de tema estadístico del INEC. Obtén la url desde search_inec_estadisticas. Devuelve boletines técnicos, metodología y series históricas como enlaces directos PDF/XLSX/CSV/ZIP — no el contenido de los archivos. Usa read_pdf en un enlace .pdf, o descárgalo tú mismo para los formatos tabulares. Si la página no lista archivos propios (p. ej. ENDI), se incorporan los de las páginas de ronda enlazadas y se indican en paginas_relacionadas."
       },
       {
         "name": "get_inec_publicacion_archivos",

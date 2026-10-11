@@ -13,6 +13,10 @@ Fixes from a field report (paper-apagones, 2026-10-06/07).
   registry pages (1990-2015 bases de datos, 2017, 2018, 2019);
   `get_inec_estadistica_files` tags each file with its `year` and takes a
   `year` filter.
+- **INEC hub topics** (issue #55, e.g. ENDI): when a topic page lists no files
+  itself, `get_inec_estadistica_files` follows up to 3 related landing pages
+  (same non-generic slug words, menu links skipped) and merges their files;
+  the pages used come back as `paginas_relacionadas`.
 - **`lookup_ubicacion`** returns urban parishes (`parroquias_urbanas`, with
   `codigo_parroquia_urbana`, head-parish `codigo` and `clasificador_anio`)
   from INEC's CODIFICACIÓN_2026.

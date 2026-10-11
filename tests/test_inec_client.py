@@ -139,7 +139,8 @@ async def test_get_topic_files(httpx_mock):
     assert result["titulo"] == "Índice de Precios al Consumidor – IPC"
     urls = [f["url"] for f in result["archivos"]]
     assert (
-        "https://www.ecuadorencifras.gob.ec/documentos/web-inec/Boletin_Tecnico_2026.pdf" in urls
+        "https://www.ecuadorencifras.gob.ec/documentos/web-inec/Boletin_Tecnico_2026.pdf"
+        in urls
     )
     assert (
         "https://www.ecuadorencifras.gob.ec/documentos/web-inec/"
@@ -149,9 +150,12 @@ async def test_get_topic_files(httpx_mock):
     assert not any("gobiernoelectronico" in u for u in urls)
 
     formats = {f["url"]: f["format"] for f in result["archivos"]}
-    assert formats[
-        "https://www.ecuadorencifras.gob.ec/documentos/web-inec/Boletin_Tecnico_2026.pdf"
-    ] == "PDF"
+    assert (
+        formats[
+            "https://www.ecuadorencifras.gob.ec/documentos/web-inec/Boletin_Tecnico_2026.pdf"
+        ]
+        == "PDF"
+    )
 
 
 @pytest.mark.asyncio
@@ -172,6 +176,106 @@ async def test_get_topic_files_tolerates_doubled_slash_in_file_links(httpx_mock)
 
     assert len(result["archivos"]) == 1
     assert result["archivos"][0]["url"].endswith("2001/SHP.zip")
+
+
+@pytest.mark.asyncio
+async def test_get_topic_files_follows_related_landing_pages(httpx_mock):
+    # Issue #55: the ENDI topic page lists no files itself; its image buttons
+    # link to per-round landing pages (one with underscores in the slug) that
+    # hold the downloads. Menu links to other surveys must not be followed.
+    base = "https://www.ecuadorencifras.gob.ec/"
+    topic_url = base + "encuesta-nacional-sobre-desnutricion-infantil/"
+    round_url = base + "encuesta_nacional_desnutricion_infantil/"
+    topic_html = (
+        "<html><body>"
+        '<li class="menu-item"><a href="' + base + 'trabajo-infantil/">Trabajo</a></li>'
+        '<a href="' + base + 'encuesta-nacional-multiproposito-de-hogares/">ENEMDU</a>'
+        '<a href="' + base + 'wp-content/uploads/2024/09/Banner_ENDI_1.jpg"></a>'
+        '<a href="' + round_url + '"></a>'
+        "</body></html>"
+    )
+    round_html = (
+        '<html><body><a href="' + base + "documentos/web-inec/ENDI/R2/"
+        'BDD_ENDI_R2_dta.zip">Base DTA</a></body></html>'
+    )
+    httpx_mock.add_response(url=topic_url, html=topic_html)
+    httpx_mock.add_response(url=round_url, html=round_html)
+
+    result = await inec_client.get_topic_files(topic_url)
+
+    assert [f["url"].rsplit("/", 1)[-1] for f in result["archivos"]] == [
+        "BDD_ENDI_R2_dta.zip"
+    ]
+    assert result["paginas_relacionadas"] == [round_url]
+
+
+_BASE = "https://www.ecuadorencifras.gob.ec/"
+_HUB_URL = _BASE + "encuesta-nacional-sobre-desnutricion-infantil/"
+
+
+def _file_page(name: str) -> str:
+    return f'<html><body><a href="{_BASE}documentos/web-inec/ENDI/{name}">x</a></body></html>'
+
+
+def _hub_page(*slugs: str) -> str:
+    links = "".join(f'<a href="{_BASE}{s}/"></a>' for s in slugs)
+    return f"<html><body>{links}</body></html>"
+
+
+@pytest.mark.asyncio
+async def test_get_topic_files_related_pages_year_filter(httpx_mock):
+    r1 = _BASE + "endi_desnutricion_infantil_2023/"
+    r2 = _BASE + "endi_desnutricion_infantil_2024/"
+    httpx_mock.add_response(
+        url=_HUB_URL, html=_hub_page(r1.split("/")[-2], r2.split("/")[-2])
+    )
+    httpx_mock.add_response(url=r1, html=_file_page("BDD_2023.zip"))
+    httpx_mock.add_response(url=r2, html=_file_page("BDD_2024.zip"))
+
+    result = await inec_client.get_topic_files(_HUB_URL, year=2024)
+
+    assert [f["url"].rsplit("/", 1)[-1] for f in result["archivos"]] == ["BDD_2024.zip"]
+
+
+@pytest.mark.asyncio
+async def test_get_topic_files_related_page_failure_is_skipped(httpx_mock):
+    ok = _BASE + "endi_desnutricion_ok/"
+    bad = _BASE + "endi_desnutricion_bad/"
+    httpx_mock.add_response(
+        url=_HUB_URL, html=_hub_page("endi_desnutricion_ok", "endi_desnutricion_bad")
+    )
+    httpx_mock.add_response(url=ok, html=_file_page("OK.zip"))
+    httpx_mock.add_response(url=bad, status_code=500, content=b"boom")
+
+    result = await inec_client.get_topic_files(_HUB_URL)
+
+    assert [f["url"].rsplit("/", 1)[-1] for f in result["archivos"]] == ["OK.zip"]
+    assert result["paginas_relacionadas"] == [ok]
+
+
+@pytest.mark.asyncio
+async def test_get_topic_files_related_pages_are_capped(httpx_mock):
+    slugs = [f"endi_desnutricion_r{i}" for i in range(5)]
+    httpx_mock.add_response(url=_HUB_URL, html=_hub_page(*slugs))
+    for s in slugs[:3]:
+        httpx_mock.add_response(url=_BASE + s + "/", html=_file_page(f"{s}.zip"))
+
+    result = await inec_client.get_topic_files(_HUB_URL)
+
+    assert len(result["archivos"]) == 3
+
+
+@pytest.mark.asyncio
+async def test_get_topic_files_with_own_files_skips_related_pages(httpx_mock):
+    html = _file_page("OWN.zip").replace(
+        "</body>", f'<a href="{_BASE}endi_desnutricion_r1/"></a></body>'
+    )
+    httpx_mock.add_response(url=_HUB_URL, html=html)
+
+    result = await inec_client.get_topic_files(_HUB_URL)
+
+    assert "paginas_relacionadas" not in result
+    assert len(result["archivos"]) == 1
 
 
 @pytest.mark.asyncio
@@ -361,3 +465,15 @@ async def test_get_topic_files_tags_year_and_filters(httpx_mock):
 def test_year_from_url_falls_back_to_folder():
     url = "https://x.ec/documentos/web-inec/Nacimientos_Defunciones/2018/BDD_spss.zip"
     assert inec_client._year_from_url(url) == 2018
+
+
+@pytest.mark.asyncio
+async def test_get_topic_files_does_not_cache_failed_related_pages(httpx_mock):
+    bad = _BASE + "endi_desnutricion_bad/"
+    httpx_mock.add_response(url=_HUB_URL, html=_hub_page("endi_desnutricion_bad"))
+    httpx_mock.add_response(url=bad, status_code=500, content=b"boom")
+
+    first = await inec_client.get_topic_files(_HUB_URL)
+
+    assert first["archivos"] == []
+    assert inec_client._topic_files_cache.get(_HUB_URL) is None

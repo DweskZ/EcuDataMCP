@@ -1494,7 +1494,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List the direct file links published on one INEC statistical topic page. Get the url from search_inec_estadisticas. Returns technical bulletins, methodology, and historical series as direct PDF/XLSX/CSV/ZIP links — not the file contents. Use read_pdf on a .pdf link, or download it yourself for tabular formats."
+        "long_description": "List the direct file links published on one INEC statistical topic page. Get the url from search_inec_estadisticas. Returns technical bulletins, methodology, and historical series as direct PDF/XLSX/CSV/ZIP links — not the file contents. Use read_pdf on a .pdf link, or download it yourself for tabular formats. If the page lists no files itself (e.g. ENDI), files from the linked per-round landing pages are merged in and named in paginas_relacionadas."
       },
       {
         "name": "get_inec_publicacion_archivos",
