@@ -16,6 +16,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 from helpers import (
     arcsa_client,
     ineval_client,
+    ministerio_energia_client,
     petroecuador_client,
     senescyt_biblioteca_client,
     seps_client,
@@ -28,7 +29,15 @@ from helpers.logging import log_tool
 from helpers.tool_meta import READ_ONLY
 
 Fuente = Literal[
-    "arcsa", "superbancos", "seps", "ineval", "sgr", "senescyt", "sipa", "petroecuador"
+    "arcsa",
+    "superbancos",
+    "seps",
+    "ineval",
+    "sgr",
+    "senescyt",
+    "sipa",
+    "petroecuador",
+    "energia",
 ]
 
 _NOMBRES = {
@@ -40,6 +49,7 @@ _NOMBRES = {
     "senescyt": "Educación Superior — Biblioteca",
     "sipa": "SIPA (MAG) — estadísticas agropecuarias",
     "petroecuador": "EP Petroecuador — Cifras Institucionales",
+    "energia": "Ministerio de Ambiente y Energía — hidrocarburos, minería y BEN",
 }
 
 # Sources whose list call scrapes a page and returns {"categorias": [...]}.
@@ -48,6 +58,7 @@ _CATEGORIA_LISTS = {
     "sgr": sgr_publicaciones_client.list_biblioteca_categorias,
     "senescyt": senescyt_biblioteca_client.list_biblioteca_categorias,
     "petroecuador": petroecuador_client.list_categorias,
+    "energia": ministerio_energia_client.list_secciones,
 }
 # Sources with a fixed, in-code section list keyed by `id_key`.
 _STATIC_LISTS = {
@@ -63,6 +74,7 @@ _GETTERS = {
     "ineval": ineval_client.get_familia_archivos,
     "sgr": sgr_publicaciones_client.get_biblioteca_categoria_archivos,
     "senescyt": senescyt_biblioteca_client.get_biblioteca_categoria_archivos,
+    "energia": ministerio_energia_client.get_seccion_archivos,
     "sipa": sipa_client.get_modulo_archivos,
     "petroecuador": petroecuador_client.get_categoria_archivos,
 }
@@ -72,7 +84,11 @@ async def _list_secciones(fuente: str) -> dict[str, Any]:
     if fuente in _CATEGORIA_LISTS:
         result = await _CATEGORIA_LISTS[fuente]()
         secciones = [
-            {"id": c["id"], "nombre": c["nombre"], "total_archivos": c["total_archivos"]}
+            {
+                "id": c["id"],
+                "nombre": c["nombre"],
+                "total_archivos": c["total_archivos"],
+            }
             for c in result["categorias"]
         ]
         url_fuente = result.get("url_fuente")
@@ -114,11 +130,10 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Listar secciones de un archivo institucional",
         description=(
-            "List the sections of one institution's document archive: ARCSA "
-            "sanitary registry, Superbancos and SEPS statistics, INEVAL "
-            "evaluation datasets, SGR and Educación Superior libraries, or SIPA "
-            "agricultural statistics, or EP Petroecuador institutional figures "
-            "(statistical reports, production, prices). "
+            "List the sections of one institution's document archive (ARCSA, "
+            "Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, "
+            "Petroecuador, Energy Ministry). fuente values and sections are "
+            "in the docstring. "
             "Next: get_archivo_seccion(fuente, seccion)."
         ),
         annotations=READ_ONLY,
@@ -164,13 +179,20 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           nomenclature), comercialización (prices, subsidy value,
           dispatches), refinación, comercialización internacional (WTI),
           gestión de riesgos.
+        - energia: Ministerio de Ambiente y Energía (ambienteyenergia.gob.ec,
+          which absorbed Energía y Minas, MERNNR and Hidrocarburos), 4
+          sections read from its WordPress media library: hydrocarbon
+          statistics (crudo/derivados yearbooks 2002-2024), mining exports
+          and tax revenue, 2020-21 weekly mining reports, and the Balance
+          Energético Nacional. The old ARCERNNR and recursosyenergia hosts
+          are dead; electricity regulation is in get_arconel_reporte.
 
         Returns each section's `id` (pass it to get_archivo_seccion),
         `nombre`, and either its page `url` or `total_archivos`.
 
         Args:
             fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt,
-                sipa, petroecuador.
+                sipa, petroecuador, energia.
             format: text | json
         """
         try:
@@ -182,7 +204,9 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
             parts = [f"{data['nombre_fuente']} — {data['total']} sección(es):", ""]
             for s in data["secciones"]:
                 extra = (
-                    f" ({s['total_archivos']} archivo(s))" if "total_archivos" in s else ""
+                    f" ({s['total_archivos']} archivo(s))"
+                    if "total_archivos" in s
+                    else ""
                 )
                 parts.append(f"- {s['id']}: {s['nombre']}{extra}")
                 if s.get("url"):
@@ -237,7 +261,7 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
 
         Args:
             fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt,
-                sipa, petroecuador.
+                sipa, petroecuador, energia.
             seccion: A section `id` from list_archivo_secciones.
             format: text | json
         """
@@ -246,7 +270,9 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
         except ValueError as e:
             raise ToolError(f"Error: {e}") from e
         except Exception as e:
-            raise ToolError(f"Error al obtener la sección {seccion} de {fuente}: {e}") from e
+            raise ToolError(
+                f"Error al obtener la sección {seccion} de {fuente}: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             parts = [f"{data['nombre_fuente']} — {data['nombre']} ({data['id']})"]

@@ -7,6 +7,15 @@
   (financial statements, monthly and annual statistical reports 2006 onward,
   field production, prices, dispatches, refining, WTI, risk reports) with
   their PDF links. New `helpers/petroecuador_client.py`.
+- **Ministerio de Ambiente y Energía** (`list_archivo_secciones` /
+  `get_archivo_seccion`, `fuente="energia"`): four sections read from the
+  ministry's WordPress media library (`ambienteyenergia.gob.ec`): hydrocarbon
+  statistics (crudo/derivados yearbooks 2002-2024 with gaps, plus the 2024
+  field production matrix), mining exports and tax revenue, 2020-21 weekly
+  mining reports, and the Balance Energético Nacional 2018-2025. Links only.
+  The ARCERNNR host (`arcernnr.gob.ec`) and `recursosyenergia.gob.ec` do not
+  resolve and `controlrecursosyenergia.gob.ec` serves no content, so the
+  ministry's current site is the only source.
 
 Fixes from a field report (paper-apagones, 2026-10-06/07).
 

@@ -221,6 +221,19 @@ def _all_fuentes() -> dict:
                 ],
             },
             {
+                "id": "energia",
+                "nombre": (
+                    "Ministerio de Ambiente y Energía (estadística de "
+                    "hidrocarburos, minería y Balance Energético Nacional)"
+                ),
+                "base": "https://www.ambienteyenergia.gob.ec/",
+                "tools": [
+                    "list_archivo_secciones",
+                    "get_archivo_seccion",
+                    "read_pdf",
+                ],
+            },
+            {
                 "id": "contraloria",
                 "nombre": "Contraloría General del Estado (informes de auditoría)",
                 "base": "https://www.contraloria.gob.ec/Portal/24287",

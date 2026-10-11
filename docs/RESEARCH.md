@@ -5995,6 +5995,76 @@ energético del IIGE (no existen).
 - **CELEC EP** (Decimoquinta pasada, descartado por LOTAIP): sigue sin dato
   sectorial en el sitio, pero su servidor ArcGIS sí tiene datos útiles.
 
+## Trigésimo sexta pasada — hosts de ARCERNNR y del Ministerio de Energía y Minas, con VPN (2026-10-10)
+
+Pedido: reintentar `controlrecursosyenergia.gob.ec` y `recursosyenergia.gob.ec`
+(fallaban antes) para estadísticas de hidrocarburos, minería y electricidad,
+ahora con VPN y cabeceras de navegador. Todo verificado en vivo con curl y
+httpx.
+
+### Estado de los hosts
+
+- `recursosyenergia.gob.ec` (con y sin `www`, http y https): **NXDOMAIN**.
+  Tampoco resuelve `arcernnr.gob.ec`. No es un problema de red ni de VPN: el
+  dominio no existe en DNS.
+- `controlrecursosyenergia.gob.ec` (y `www.`): resuelve (190.11.14.61).
+  HTTPS rechaza la conexión; HTTP devuelve 200 con la página de prueba por
+  defecto de CentOS-WebPanel (5.069 bytes), sin contenido. `/estadisticas/`
+  da 404. No hay nada que integrar.
+- **El sitio vivo es `www.ambienteyenergia.gob.ec`** (WordPress, 200, certificado
+  válido). Corta la conexión a clientes sin User-Agent de navegador; con uno
+  de Chrome responde normal. El mismo sitio ya estaba anotado en la
+  Trigésimo quinta pasada para el BEN y el Plan Maestro.
+
+### Qué hay y cómo se enumera
+
+- No existe una página índice de estadísticas: `/estadisticas-hidrocarburiferas/`
+  (página 1583) es un cascarón legado con contenido vacío, y las páginas
+  `historico-*` solo enlazan sitios históricos muertos (`historico.mineria.gob.ec`).
+- Todos los archivos estadísticos están en la biblioteca de medios, y
+  `/wp-json/wp/v2/media?search=<término>&per_page=100` es público y
+  paginable. La búsqueda recorre toda la biblioteca (contratos, hojas de
+  vida, imágenes), así que cada sección del cliente combina varios términos
+  con un filtro por nombre de archivo.
+- Secciones construidas (`helpers/ministerio_energia_client.py`, expuestas
+  como `fuente="energia"` de `list_archivo_secciones`):
+  - `estadistica_hidrocarburos` (34 archivos): estadística hidrocarburífera
+    de crudo y derivados, resúmenes, 2002-2024 con huecos (no aparecen 2012,
+    2014 ni 2017; 2019 es primer semestre; 2024 es
+    `ESTADISTICAS-DE-HIDROCARBUROS-2024_8.12.2025.pdf`) más
+    `7.2.1-Matriz-Producción-Campo-Hidrocarburos-2024` en XLSX. Todo PDF,
+    sin versión tabular salvo esa matriz.
+  - `mineria_exportaciones_recaudacion` (9 documentos): informe y base XLS de
+    exportaciones mineras 2024 y de recaudación tributaria minera 2024,
+    fichas de indicadores, informes 2023. Las infografías PNG que comparten
+    nombre se descartan.
+  - `mineria_reportes_semanales` (43 PDF): "Semana N - Reporte Minería",
+    julio 2020 a julio 2021 con huecos. No hay publicación posterior en
+    medios.
+  - `balance_energetico` (44 PDF): BEN 2018, 2019, 2023, 2024 y 2025,
+    completo y por capítulos (el 2025 se presentó el 2026-09-23).
+- Cada resultado trae `periodo`, tomado del primer año del nombre del
+  archivo; queda vacío (p. ej. `BEN_24`, reportes semanales) en vez de
+  inferirlo de la fecha de subida, que no coincide (el anuario 2024 se
+  subió en diciembre de 2025).
+
+### No cubierto (y por qué)
+
+- Boletines estadísticos mensuales de hidrocarburos o minería del
+  Ministerio: no existen en el sitio. Los de producción petrolera diaria
+  son PNG de 2021-2022 (imágenes sin datos). La producción y precios
+  actuales de crudo son de Petroecuador/BCE (ver Petroecuador y el
+  paquete petrolero del BCE, arriba), no de este sitio.
+- Catastro minero y datos de ARCERNNR (`catastro_regulatorio_*.pdf` es el
+  catastro regulatorio de ARCERNNR por trimestre, no un boletín
+  estadístico; no se integró). El Sistema de Gestión Minera es una IP
+  (`181.211.37.232`), no verificado.
+- Electricidad: la estadística sectorial y los balances siguen en
+  `arconel.gob.ec` y `reportes.arconel.gob.ec` (ya integrados, ver
+  `get_arconel_reporte`); CENACE tiene su propio cliente. No se duplicó.
+- Archivos subidos directo al sistema de ficheros, sin pasar por la
+  biblioteca de medios, no se pueden enumerar.
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un
