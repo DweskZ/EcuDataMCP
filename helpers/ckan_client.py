@@ -201,6 +201,21 @@ async def search_datasets(
     )
 
 
+async def search_datasets_by_filter(
+    fq: str,
+    rows: int = 50,
+    source: str = "nacional",
+    session: httpx.AsyncClient | None = None,
+) -> dict[str, Any]:
+    """package_search with a raw Solr filter query (e.g. "organization:antec")
+    and no free-text `q`."""
+    return await _fetch_json(
+        _ckan_url("package_search", source),
+        params={"fq": fq, "rows": min(rows, 100)},
+        session=session,
+    )
+
+
 async def recent_datasets(
     rows: int = 20,
     start: int = 0,

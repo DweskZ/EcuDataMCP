@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **Internal robustness** (no behaviour change for callers): BVG, BVQ and CNE use
+  one lock per section/process instead of a global one, and a CNE sub-category
+  that fails is skipped with a warning and not cached; the Energy Ministry and
+  ANT clients run their requests concurrently under a bound of 4 (Energy now also
+  checks `source_url` hosts); `ckan_client.search_datasets_by_filter` replaces
+  the private CKAN calls in `ant_client`. More tests for `bolsas_common` and the
+  new `fuente` values.
+
 - **EP Petroecuador** (`fuente="petroecuador"` in `list_archivo_secciones` /
   `get_archivo_seccion`): the 8 sections of "Cifras Institucionales"
   (financial statements, monthly and annual statistical reports 2006 onward,

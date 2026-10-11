@@ -28,7 +28,7 @@ import html
 import logging
 import re
 from typing import Any
-from urllib.parse import unquote
+from urllib.parse import unquote, urlparse
 
 import httpx
 
@@ -39,6 +39,7 @@ from helpers.text_utils import strip_accents
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 _BASE = "https://www.ambienteyenergia.gob.ec"
+_HOST = "ambienteyenergia.gob.ec"
 _WP_MEDIA_URL = f"{_BASE}/wp-json/wp/v2/media"
 
 # The site closes the connection on non-browser User-Agents.
@@ -50,6 +51,8 @@ _TIMEOUT = 40.0
 _ATTEMPTS = 3
 _PAGE_SIZE = 100
 _MAX_PAGES = 5
+# Bounds simultaneous requests to the site (search terms and result pages).
+_CONCURRENCY = 4
 
 _SECCIONES: list[dict[str, Any]] = [
     {
@@ -124,6 +127,11 @@ _archivo_cache = TtlCache(ttl_seconds=21600.0, max_entries=1)
 _fetch_lock = asyncio.Lock()
 
 
+def _is_energia_url(url: str) -> bool:
+    host = (urlparse(url).hostname or "").lower()
+    return host == _HOST or host.endswith("." + _HOST)
+
+
 def _filename(url: str) -> str:
     return unquote(url.rsplit("/", 1)[-1])
 
@@ -184,6 +192,25 @@ async def _get_page(
     return resp.json(), int(resp.headers.get("X-WP-TotalPages", "1"))
 
 
+async def _term_items(
+    session: httpx.AsyncClient, sem: asyncio.Semaphore, term: str
+) -> list[dict[str, Any]]:
+    """All result items for one search term: page 1 first (it carries the page
+    count), then the remaining pages concurrently."""
+    logger.info("Buscando estadísticas del Ministerio de Energía: %s", term)
+    async with sem:
+        items, total_pages = await _get_page(session, term, 1)
+
+    async def rest(page: int) -> list[dict[str, Any]]:
+        async with sem:
+            return (await _get_page(session, term, page))[0]
+
+    pages = await asyncio.gather(*(rest(p) for p in range(2, min(total_pages, _MAX_PAGES) + 1)))
+    for page_items in pages:
+        items = items + page_items
+    return items
+
+
 async def _fetch_archivo() -> dict[str, list[dict[str, Any]]]:
     cached = _archivo_cache.get("archivo")
     if cached is not None:
@@ -196,37 +223,47 @@ async def _fetch_archivo() -> dict[str, list[dict[str, Any]]]:
 
         por_seccion: dict[str, list[dict[str, Any]]] = {s["id"]: [] for s in _SECCIONES}
         vistos: set[int] = set()
-        terminos = dict.fromkeys(t for s in _SECCIONES for t in s["terminos"])
+        terminos = list(dict.fromkeys(t for s in _SECCIONES for t in s["terminos"]))
+        sem = asyncio.Semaphore(_CONCURRENCY)
         async with httpx.AsyncClient(
             headers=_HEADERS, timeout=_TIMEOUT, follow_redirects=True
         ) as session:
-            for term in terminos:
-                logger.info("Buscando estadísticas del Ministerio de Energía: %s", term)
-                for page in range(1, _MAX_PAGES + 1):
-                    items, total_pages = await _get_page(session, term, page)
-                    for item in items:
-                        item_id = item.get("id")
-                        # Infographics and photos share the same filenames
-                        # as the real statistics; keep documents only.
-                        if (
-                            item_id in vistos
-                            or not item.get("source_url")
-                            or item.get("mime_type", "").startswith(
-                                ("image/", "video/")
-                            )
-                        ):
-                            continue
-                        vistos.add(item_id)
-                        seccion_id = _seccion_of(item["source_url"])
-                        if seccion_id is not None:
-                            por_seccion[seccion_id].append(_parse_item(item))
-                    if page >= total_pages:
-                        break
+            resultados = await asyncio.gather(
+                *(_term_items(session, sem, t) for t in terminos), return_exceptions=True
+            )
+
+        completo = True
+        for term, items in zip(terminos, resultados, strict=True):
+            if isinstance(items, asyncio.CancelledError):
+                raise items
+            if isinstance(items, BaseException):
+                logger.warning("Energía: falló la búsqueda '%s': %s", term, items)
+                completo = False
+                continue
+            for item in items:
+                item_id = item.get("id")
+                source_url = item.get("source_url")
+                # Infographics and photos share the same filenames as the real
+                # statistics; keep documents only, and only from the ministry's host.
+                if (
+                    item_id in vistos
+                    or not source_url
+                    or not _is_energia_url(source_url)
+                    or item.get("mime_type", "").startswith(("image/", "video/"))
+                ):
+                    continue
+                vistos.add(item_id)
+                seccion_id = _seccion_of(source_url)
+                if seccion_id is not None:
+                    por_seccion[seccion_id].append(_parse_item(item))
+        if not any(por_seccion.values()) and not completo:
+            raise ValueError("No se pudo consultar la biblioteca de medios del Ministerio.")
 
         for archivos in por_seccion.values():
             archivos.sort(key=lambda a: a["fecha_subida"] or "", reverse=True)
-        # Don't cache a fully empty result: it looks like a transient failure.
-        if any(por_seccion.values()):
+        # Don't cache a fully empty result (it looks like a transient failure)
+        # nor one where some search terms failed.
+        if completo and any(por_seccion.values()):
             _archivo_cache.set("archivo", por_seccion)
         return por_seccion
 

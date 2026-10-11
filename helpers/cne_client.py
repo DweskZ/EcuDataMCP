@@ -43,6 +43,7 @@ from html import unescape
 from typing import Any
 from urllib.parse import urlparse
 
+from helpers.bolsas_common import KeyedLocks
 from helpers.cache import TtlCache
 from helpers.csv_reader import download_bytes
 from helpers.logging import MAIN_LOGGER_NAME
@@ -64,7 +65,8 @@ _MAX_DEPTH = 3
 _index_cache = TtlCache(ttl_seconds=1800.0, max_entries=1)
 # One crawl per process is 5 requests; results change a few times a year.
 _files_cache = TtlCache(ttl_seconds=21600.0, max_entries=64)
-_fetch_lock = asyncio.Lock()
+# Per-process locks: crawling one process does not block the others.
+_proceso_locks = KeyedLocks()
 
 _TAG_RE = re.compile(r"<[^>]+>")
 _NONCE_RE = re.compile(r"__wpdmacn=([a-zA-Z0-9]+)")
@@ -156,22 +158,37 @@ async def _listsub(parent: str, nonce: str) -> str | None:
 
 async def _crawl(
     parent: str, nonce: str, grupo: str | None, depth: int
-) -> list[dict[str, Any]] | None:
+) -> tuple[list[dict[str, Any]], bool] | None:
+    """Files under one category and whether every sub-call succeeded.
+
+    None means the nonce was rejected. A sub-category whose call fails is
+    logged and skipped (the rest still come back) and the result is marked
+    incomplete so the caller does not cache it.
+    """
     html = await _listsub(parent, nonce)
     if html is None:
         return None
     archivos = [{**a, "grupo": grupo} for a in _parse_files(html)]
     if depth >= _MAX_DEPTH:
-        return archivos
+        return archivos, True
     subs = _parse_handles(html)
     results = await asyncio.gather(
-        *(_crawl(s["id"], nonce, s["nombre"], depth + 1) for s in subs)
+        *(_crawl(s["id"], nonce, s["nombre"], depth + 1) for s in subs),
+        return_exceptions=True,
     )
-    for sub_files in results:
-        if sub_files is None:
+    complete = True
+    for sub, sub_result in zip(subs, results, strict=True):
+        if isinstance(sub_result, asyncio.CancelledError):
+            raise sub_result
+        if isinstance(sub_result, BaseException):
+            logger.warning("CNE: falló la categoría %s: %s", sub["nombre"], sub_result)
+            complete = False
+        elif sub_result is None:
             return None
-        archivos.extend(sub_files)
-    return archivos
+        else:
+            archivos.extend(sub_result[0])
+            complete = complete and sub_result[1]
+    return archivos, complete
 
 
 def _normalize(text: str) -> str:
@@ -219,24 +236,26 @@ async def get_proceso_archivos(seccion: str) -> dict[str, Any]:
     if cached is not None:
         return cached
 
-    async with _fetch_lock:
+    async with _proceso_locks[proceso["id"]]:
         cached = _files_cache.get(proceso["id"])
         if cached is not None:
             return cached
         logger.info("Listando archivos del CNE: %s", proceso["nombre"])
-        archivos = await _crawl(proceso["id"], index["nonce"], None, 0)
-        if archivos is None:
+        crawled = await _crawl(proceso["id"], index["nonce"], None, 0)
+        if crawled is None:
             # Nonce rotated since the index was cached: reload once.
             index = await _load_index(force=True)
-            archivos = await _crawl(proceso["id"], index["nonce"], None, 0)
-        if archivos is None:
+            crawled = await _crawl(proceso["id"], index["nonce"], None, 0)
+        if crawled is None:
             raise ValueError("El CNE rechazó el token de la página (respuesta '-1').")
+        archivos, complete = crawled
         result = {
             "id": proceso["id"],
             "nombre": proceso["nombre"],
             "url": _PAGE_URL,
             "archivos": archivos,
         }
-        if archivos:
+        # A partial crawl (a failed sub-category) is likely transient: not cached.
+        if archivos and complete:
             _files_cache.set(proceso["id"], result)
         return result
