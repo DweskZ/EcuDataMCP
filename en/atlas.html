@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Reference – EcuDataMCP</title>
-<meta name="description" content="EcuDataMCP's 82 tools, with a full description and a direct link to each one.">
+<meta name="description" content="EcuDataMCP's 83 tools, with a full description and a direct link to each one.">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <meta property="og:title" content="Reference – EcuDataMCP">
-<meta property="og:description" content="EcuDataMCP's 82 tools, with a full description and a direct link to each one.">
+<meta property="og:description" content="EcuDataMCP's 83 tools, with a full description and a direct link to each one.">
 <meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
@@ -141,13 +141,13 @@
 <section class="landing hero">
 <div class="container-page">
 <p class="kicker">Reference</p>
-<h1>All <span class="accent">82 tools</span>, one by one.</h1>
+<h1>All <span class="accent">83 tools</span>, one by one.</h1>
 <p class="hero-sub">Find a tool by name, source, or task. Open only the group and detail you need.</p>
 <div class="atlas-filter-wrap">
 <input type="text" id="atlas-filter" class="atlas-filter" placeholder="Filter by name or keyword…" autocomplete="off">
 </div>
 <div class="atlas-toolbar" aria-live="polite">
-<p id="atlas-result-count">82 tools · open a group to see its details.</p>
+<p id="atlas-result-count">83 tools · open a group to see its details.</p>
 <div class="atlas-actions">
 <button type="button" data-atlas-action="open">Expand groups</button>
 <button type="button" data-atlas-action="close">Collapse groups</button>
@@ -1452,13 +1452,13 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-get_inec_estadistica_files" data-search="get_inec_estadistica_files list the direct file links published on one inec statistical topic page. list the direct file links published on one inec statistical topic page. get the url from search_inec_estadisticas. returns technical bulletins, methodology, and historical series as direct pdf/xlsx/csv/zip links — not the file contents. use read_pdf on a .pdf link, or download it yourself for tabular formats. url a topic url from search_inec_estadisticas's &quot;url&quot; field (must be on ecuadorencifras.gob.ec) year optional reference year; keeps only that year's files (each file carries a &quot;year&quot; parsed from its name or folder) format text | json">
+<details class="atlas-tool" id="tool-get_inec_estadistica_files" data-search="get_inec_estadistica_files list the direct file links published on one inec statistical topic page. list the direct file links published on one inec statistical topic page. get the url from search_inec_estadisticas. returns technical bulletins, methodology, and historical series as direct pdf/xlsx/csv/zip links — not the file contents. use read_pdf on a .pdf link, or download it yourself for tabular formats. if the page lists no files itself (e.g. endi), files from the linked per-round landing pages are merged in and named in paginas_relacionadas. url a topic url from search_inec_estadisticas's &quot;url&quot; field (must be on ecuadorencifras.gob.ec) year optional reference year; keeps only that year's files (each file carries a &quot;year&quot; parsed from its name or folder) format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_inec_estadistica_files</code>
 <span class="atlas-tool-desc">List the direct file links published on one INEC statistical topic page.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">List the direct file links published on one INEC statistical topic page. Get the url from search_inec_estadisticas. Returns technical bulletins, methodology, and historical series as direct PDF/XLSX/CSV/ZIP links — not the file contents. Use read_pdf on a .pdf link, or download it yourself for tabular formats.</p>
+<p class="atlas-tool-long">List the direct file links published on one INEC statistical topic page. Get the url from search_inec_estadisticas. Returns technical bulletins, methodology, and historical series as direct PDF/XLSX/CSV/ZIP links — not the file contents. Use read_pdf on a .pdf link, or download it yourself for tabular formats. If the page lists no files itself (e.g. ENDI), files from the linked per-round landing pages are merged in and named in paginas_relacionadas.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
@@ -2153,7 +2153,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">Additional sector sources<span class="tag">2</span></span>
+<span class="atlas-category-title">Additional sector sources<span class="tag">3</span></span>
 <span class="atlas-category-action">Show</span>
 </summary>
 <div class="atlas-category-tools">
@@ -2205,6 +2205,34 @@
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched (accent-insensitive) against the file's label, year, or URL.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-search_siniestros_ant" data-search="search_siniestros_ant ecuador road-crash (siniestros de tránsito) data from ant records: inec releases and ckan datasets. finds road-crash data for ecuador. ant.gob.ec is unreachable, so it combines inec's quarterly and annual releases (xlsx tabulations and microdata, built from ant records) with ckan datasets (sppat deaths, ant). if one source is down the other still answers and the failure appears in `avisos`. query optional words that must appear in the title (e.g. &quot;trimestre&quot;) anio year filter on the title (0 = all years) limit max items per source (default 10, max 30) con_archivos attach file links to this many newest inec releases (default 2, max 5; 0 = none) format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">search_siniestros_ant</code>
+<span class="atlas-tool-desc">Ecuador road-crash (siniestros de tránsito) data from ANT records: INEC releases and CKAN datasets.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Finds road-crash data for Ecuador. ant.gob.ec is unreachable, so it combines INEC's quarterly and annual releases (XLSX tabulations and microdata, built from ANT records) with CKAN datasets (SPPAT deaths, ANT). If one source is down the other still answers and the failure appears in `avisos`.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional words that must appear in the title (e.g. "trimestre")</td></tr>
+
+<tr><td><code>anio</code></td><td><code>int</code></td><td><code>0</code></td><td>Year filter on the title (0 = all years)</td></tr>
+
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>10</code></td><td>Max items per source (default 10, max 30)</td></tr>
+
+<tr><td><code>con_archivos</code></td><td><code>int</code></td><td><code>2</code></td><td>Attach file links to this many newest INEC releases (default 2, max 5; 0 = none)</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
 
 </tbody>
 </table>
@@ -2548,7 +2576,7 @@ window.SITE_SEARCH_EMPTY_LABEL = "No results.";
     var count = visibleTools().length;
     resultCount.textContent = query
       ? count + " tool" + (count === 1 ? "" : "s") + " match" + (count === 1 ? "es" : "") + "."
-      : "82 tools · open a group to see its details.";
+      : "83 tools · open a group to see its details.";
   }
 
   function applyFilter(query) {
