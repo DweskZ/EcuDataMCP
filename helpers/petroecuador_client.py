@@ -87,7 +87,12 @@ def _secciones(html: str) -> list[dict[str, Any]]:
     headers = list(_HEADER_RE.finditer(html))
     secciones: list[dict[str, Any]] = []
     for i, h in enumerate(headers):
-        end = headers[i + 1].start() if i + 1 < len(headers) else len(html)
+        if i + 1 < len(headers):
+            end = headers[i + 1].start()
+        else:
+            # The last block would otherwise run into the sidebar/footer links.
+            section_end = html.find("</section>", h.end())
+            end = section_end if section_end != -1 else len(html)
         nombre = _clean(h.group("name"))
         archivos: list[dict[str, Any]] = []
         seen: set[str] = set()
