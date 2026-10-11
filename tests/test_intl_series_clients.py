@@ -449,3 +449,66 @@ async def test_http_error_message_names_source(httpx_mock):
 
     with pytest.raises(ValueError, match=r"OMS respondió HTTP 400"):
         await who_client.search_indicadores("x")
+
+
+# ------------------------------------------------------- hardening follow-ups
+
+
+async def test_5xx_retry_ignores_seconds_text_in_body(httpx_mock, isolate):
+    httpx_mock.add_response(url=re.compile(r".*ghoapi.*"), status_code=503, text="back in 9 seconds")
+    httpx_mock.add_response(url=re.compile(r".*ghoapi.*"), json={"value": []})
+
+    await who_client.search_indicadores("x")
+
+    assert isolate == [2.0]  # backoff, not the 9 s quoted by the 5xx body
+
+
+async def test_connect_error_is_retried_then_named(httpx_mock, isolate):
+    import httpx
+
+    for _ in range(3):
+        httpx_mock.add_exception(httpx.ConnectError("boom"), url=re.compile(r".*ghoapi.*"))
+
+    with pytest.raises(ValueError, match=r"OMS no se pudo conectar \(ConnectError\)"):
+        await who_client.search_indicadores("x")
+
+    assert len(isolate) == 2
+
+
+async def test_imf_unknown_flow_and_bad_key_are_clear_errors(httpx_mock):
+    httpx_mock.add_response(url=re.compile(r".*/data/IMF\.STA,NOPE/.*"), status_code=404, text="No such dataflow")
+    httpx_mock.add_response(url=re.compile(r".*/data/IMF\.STA,CPI/XXX.*"), status_code=400, text="Jackson error")
+
+    with pytest.raises(ValueError, match="no tiene el flujo 'NOPE'"):
+        await imf_client.get_serie("NOPE")
+    with pytest.raises(ValueError, match="rechazó la clave 'XXX'"):
+        await imf_client.get_serie("CPI", clave="XXX")
+
+
+def test_sdmx_json_out_of_range_position_is_a_clear_error():
+    payload = {
+        "dataSets": [{"series": {"3": {"observations": {"0": [1]}}}}],
+        "structure": {
+            "dimensions": {
+                "series": [{"id": "D", "keyPosition": 0, "values": [{"id": "a", "name": "a"}]}],
+                "observation": [{"values": [{"id": "2024"}]}],
+            }
+        },
+    }
+
+    with pytest.raises(ValueError, match="inconsistente"):
+        sdmx_json.parse(payload)
+
+
+async def test_unhcr_flags_truncation_at_page_cap(httpx_mock):
+    for page in range(1, 11):
+        httpx_mock.add_response(
+            url=_UNHCR_URL,
+            json={"page": page, "maxPages": 12, "items": [_unhcr_item(2000 + page, "VEN", 1)]},
+        )
+
+    result = await unhcr_client.get_poblacion(origen="todos")
+
+    assert result["truncado"] is True
+    assert result["paginas_leidas"] == 10
+    assert "truncado" in tool._to_text({"fuente": "unhcr", **result})

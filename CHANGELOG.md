@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **International-series hardening**: `intl_http` retries connect/DNS/read errors
+  (not only timeouts) and names the source in the final error; the "try again in
+  N seconds" hint is honoured only on a 429; the IMF client maps an unknown flow
+  (404) and a rejected key (400) to clear errors; `sdmx_json` raises a clear error
+  on an inconsistent series key; UNHCR results carry `truncado` when the 10-page
+  cap cuts the data.
+
 - **Fixes from a code review**:
   - CSV/JSON previews no longer turn a whole file into mojibake when the 5 MB cap cuts a multibyte character (cp1252 is now tried before latin-1); European-decimal columns only convert cells that match the pattern; `__MACOSX` resource forks are skipped when picking an archive member.
   - `read_pdf` page ranges are clamped to the document; `.xlsx`/`.ods` files that expand past 200 MB are rejected; corrupt `.tar.gz` and unsafe URLs in `download_resource`/content sniffing give a clean error.

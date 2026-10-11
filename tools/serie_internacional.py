@@ -2,8 +2,9 @@
 
 World Bank WDI, IRENA's electricity statistics, XM Colombia's hourly
 interconnection flows, UN Comtrade, the IMF, WHO, ILOSTAT and UNHCR each
-answer "give me a series for Ecuador" but take different filters. One tool with a `fuente` selector keeps tools/list small
-(the same pattern as search_archivos); the per-source clients are separate.
+answer "give me a series for Ecuador" but take different filters. One tool
+with a `fuente` selector keeps tools/list small (the same pattern as
+search_archivos); the per-source clients are separate.
 """
 
 from typing import Any, Literal
@@ -224,8 +225,10 @@ def _to_text(data: dict) -> str:
                 f"ACNUR — población en {data['pais']}: {data['total_registros']} registro(s) "
                 f"({data['paginas_leidas']}/{data['paginas_totales']} páginas)"
             ),
-            "",
         ]
+        if data["truncado"]:
+            parts.append("Aviso: resultado truncado al tope de páginas; acota con desde/hasta o socio.")
+        parts.append("")
         parts += [
             f"- {r['anio']} | {r['origen']}: refugiados {r['refugiados']}, "
             f"solicitantes de asilo {r['solicitantes_asilo']}, "

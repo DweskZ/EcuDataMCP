@@ -21,7 +21,7 @@ from typing import Any
 
 from helpers import sdmx_json
 from helpers.cache import TtlCache
-from helpers.intl_http import get_json
+from helpers.intl_http import SourceHTTPError, get_json
 from helpers.text_utils import strip_accents as _strip
 
 _BASE = "https://api.imf.org/external/sdmx/2.1"
@@ -100,7 +100,23 @@ async def get_serie(
     cached = _data_cache.get(cache_key)
     if cached is not None:
         return cached
-    payload = await get_json(f"{_BASE}/data/{_AGENCY},{flujo}/{key}", fuente="FMI", params=params)
+    try:
+        payload = await get_json(
+            f"{_BASE}/data/{_AGENCY},{flujo}/{key}", fuente="FMI", params=params
+        )
+    except SourceHTTPError as e:
+        # Verified live: an unknown flow is a 404; a key naming a value the
+        # flow lacks is a 400 with an unrelated Jackson error message.
+        if e.status == 404:
+            raise ValueError(
+                f"El FMI no tiene el flujo {flujo!r}. Búscalo con `query`."
+            ) from e
+        if e.status == 400:
+            raise ValueError(
+                f"El FMI rechazó la clave {key!r} para {flujo} (valor inexistente o "
+                "demasiadas partes). Prueba solo el país o revisa `dimensiones`."
+            ) from e
+        raise
     if payload is None:
         raise ValueError(
             f"El FMI no devolvió datos para {flujo}/{key}. "
