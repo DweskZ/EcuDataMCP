@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **New tool `search_siniestros_ant`**: road-crash (siniestros de tránsito)
+  data from ANT records. `ant.gob.ec` and `ecu911.gob.ec` drop the TLS
+  handshake for every client, so the tool combines INEC's quarterly/annual
+  "Siniestros de Tránsito" releases (tabulados XLSX, open-data ZIP,
+  dictionary, technical note; file links for the newest ones) with CKAN
+  datasets (INEC ANET 2019, SPPAT road deaths 2016-2021, the ANT
+  organisation's licence and speed datasets). Each source fails
+  independently. Helper: `helpers/ant_client.py`.
+
 Fixes from a field report (paper-apagones, 2026-10-06/07).
 
 - **ANDA**: `get_anda_survey_info` and `download_anda_microdata` accept the

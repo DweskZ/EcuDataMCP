@@ -273,6 +273,7 @@ async def main() -> int:
             ("list_catalogo", {"fuente": "contraloria"}, ["Contraloría"]),
             ("search_anda", {"query": "empleo", "limit": 3}, []),
             ("search_biinec_extras", {"query": "ambiental"}, []),
+            ("search_siniestros_ant", {"anio": 2025, "con_archivos": 1}, []),
             ("search_archivos", {"fuente": "censo", "query": "poblacion", "limit": 3}, []),
             ("search_inec_estadisticas", {"query": "empleo", "limit": 3}, []),
             ("search_inec_publicaciones", {"query": "empleo", "limit": 3}, []),

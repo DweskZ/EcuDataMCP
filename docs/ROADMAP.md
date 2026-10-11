@@ -164,6 +164,7 @@ de cobertura que falta en cada una.
 | Fuente | Herramientas | Qué cubre |
 |---|---|---|
 | Páginas de tema + BIINEC exclusivos | `search_inec_estadisticas`, `get_inec_estadistica_files`, `search_biinec_extras` | ~91 temas (boletines + series históricas), incluyendo el Laboratorio de Dinámica Laboral y Empresarial (LDLE, añadido a `_EXTRA_TOPICS` por no estar linkeado en ningún menú); 3 registros BIINEC confirmados exclusivos (desechos peligrosos en salud, módulos ambientales ENEMDU/ECV) → RESEARCH.md § Ecuador en Cifras / portal BI del INEC |
+| Siniestros de tránsito (ANT) | `search_siniestros_ant` | Combina las publicaciones trimestrales/anuales "Siniestros de Tránsito" del INEC (registros administrativos de la ANT; tabulados, microdatos abiertos, diccionario, nota técnica) con datasets CKAN (ANET 2019, SPPAT fallecidos 2016-2021, org `antec`). `ant.gob.ec` y `ecu911.gob.ec` siguen inalcanzables (TLS cortado) → RESEARCH.md § ANT / siniestros de tránsito |
 | API REST de publicaciones (WordPress) | `search_inec_publicaciones`, `get_inec_publicacion_archivos` | Búsqueda de texto completo sobre 1.707 posts — cubre páginas que el menú mega-menu de una sola semilla no alcanza (ENEMDU anual, etc.) → RESEARCH.md § Novena pasada |
 | Censo (censoecuador.gob.ec) | `search_censo_recursos` | 36 archivos reales, solo metadata + URL → RESEARCH.md § Novena pasada |
 

@@ -175,6 +175,12 @@ def _all_fuentes() -> dict:
                 ],
             },
             {
+                "id": "ant-siniestros",
+                "nombre": "Siniestros de tránsito (registros de la ANT, vía INEC y CKAN)",
+                "base": "https://www.ecuadorencifras.gob.ec/",
+                "tools": ["search_siniestros_ant"],
+            },
+            {
                 "id": "inec-biinec",
                 "nombre": "BIINEC / INEC (registros exclusivos curados)",
                 "base": "https://aplicaciones3.ecuadorencifras.gob.ec/BIINEC-war/",
