@@ -442,6 +442,20 @@
         ]
       },
       {
+        "name": "CNE",
+        "sources": [
+          {
+            "id": "cne-electoral",
+            "name": "Datos electorales",
+            "tag": "CNE",
+            "description": "Resultados, registro electoral por parroquia, candidatos y diccionarios de 19 procesos electorales (SPSS)",
+            "coverage": "2002-2025",
+            "url": "https://www.cne.gob.ec/estadisticas/bases-de-datos/",
+            "status": "live"
+          }
+        ]
+      },
+      {
         "name": "SENESCYT",
         "sources": [
           {

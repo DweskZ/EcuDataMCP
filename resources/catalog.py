@@ -397,6 +397,12 @@ def _all_fuentes() -> dict:
                 "tools": ["list_archivo_secciones", "get_archivo_seccion"],
             },
             {
+                "id": "cne",
+                "nombre": "CNE (resultados y registro electoral por proceso, 2002-2025)",
+                "base": "https://www.cne.gob.ec/estadisticas/bases-de-datos/",
+                "tools": ["list_archivo_secciones", "get_archivo_seccion"],
+            },
+            {
                 "id": "infomies",
                 "nombre": "infoMIES (bases mensuales y boletines zonales del MIES)",
                 "base": "https://info.desarrollohumano.gob.ec/",

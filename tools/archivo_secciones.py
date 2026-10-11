@@ -15,6 +15,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import (
     arcsa_client,
+    cne_client,
     ineval_client,
     ministerio_energia_client,
     petroecuador_client,
@@ -38,6 +39,7 @@ Fuente = Literal[
     "sipa",
     "petroecuador",
     "energia",
+    "cne",
 ]
 
 _NOMBRES = {
@@ -50,6 +52,7 @@ _NOMBRES = {
     "sipa": "SIPA (MAG) — estadísticas agropecuarias",
     "petroecuador": "EP Petroecuador — Cifras Institucionales",
     "energia": "Ministerio de Ambiente y Energía — hidrocarburos, minería y BEN",
+    "cne": "CNE — bases de datos de procesos electorales",
 }
 
 # Sources whose list call scrapes a page and returns {"categorias": [...]}.
@@ -59,6 +62,7 @@ _CATEGORIA_LISTS = {
     "senescyt": senescyt_biblioteca_client.list_biblioteca_categorias,
     "petroecuador": petroecuador_client.list_categorias,
     "energia": ministerio_energia_client.list_secciones,
+    "cne": cne_client.list_procesos,
 }
 # Sources with a fixed, in-code section list keyed by `id_key`.
 _STATIC_LISTS = {
@@ -77,18 +81,17 @@ _GETTERS = {
     "energia": ministerio_energia_client.get_seccion_archivos,
     "sipa": sipa_client.get_modulo_archivos,
     "petroecuador": petroecuador_client.get_categoria_archivos,
+    "cne": cne_client.get_proceso_archivos,
 }
 
 
 async def _list_secciones(fuente: str) -> dict[str, Any]:
     if fuente in _CATEGORIA_LISTS:
         result = await _CATEGORIA_LISTS[fuente]()
+        # total_archivos is optional: CNE would need one crawl per process.
         secciones = [
-            {
-                "id": c["id"],
-                "nombre": c["nombre"],
-                "total_archivos": c["total_archivos"],
-            }
+            {"id": c["id"], "nombre": c["nombre"]}
+            | ({"total_archivos": c["total_archivos"]} if "total_archivos" in c else {})
             for c in result["categorias"]
         ]
         url_fuente = result.get("url_fuente")
@@ -132,7 +135,7 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
         description=(
             "List the sections of one institution's document archive (ARCSA, "
             "Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, "
-            "Petroecuador, Energy Ministry). fuente values and sections are "
+            "Petroecuador, Energy Ministry, CNE). fuente values and sections are "
             "in the docstring. "
             "Next: get_archivo_seccion(fuente, seccion)."
         ),
@@ -186,13 +189,19 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           and tax revenue, 2020-21 weekly mining reports, and the Balance
           Energético Nacional. The old ARCERNNR and recursosyenergia hosts
           are dead; electricity regulation is in get_arconel_reporte.
+        - cne: CNE (Consejo Nacional Electoral) "Bases de datos",
+          cne.gob.ec/estadisticas/bases-de-datos/: one section per election
+          process, 2002-2025 (19: Elecciones Generales, Seccionales,
+          Referéndum y Consulta Popular, special parish/canton elections).
+          Each holds dictionaries, political organizations, candidates, the
+          electoral roll by parish and the results by parish.
 
         Returns each section's `id` (pass it to get_archivo_seccion),
         `nombre`, and either its page `url` or `total_archivos`.
 
         Args:
             fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt,
-                sipa, petroecuador, energia.
+                sipa, petroecuador, energia, cne.
             format: text | json
         """
         try:
@@ -255,13 +264,19 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           DESCONOCIDO). The "Producción de Campo BPPD" title embeds the
           day's figure and effective date as the page publishes it.
           Reports are PDFs, not tables: read them with read_pdf.
+        - cne: `seccion` is a process id or name ("Elecciones Generales 2025",
+          a unique fragment works). Each file has `grupo` (Diccionarios,
+          Organizaciones Políticas, Registro Electoral, Resultados),
+          `descargas` and `tamano`. The files checked are SPSS .sav
+          (formato DESCONOCIDO: the listing does not say); primera vuelta
+          results run 10-77 MB, so download the URL directly.
 
         Files are often several MB: download the URL directly instead of
         using preview_resource_data or download_resource (5 MB cap).
 
         Args:
             fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt,
-                sipa, petroecuador, energia.
+                sipa, petroecuador, energia, cne.
             seccion: A section `id` from list_archivo_secciones.
             format: text | json
         """
@@ -297,7 +312,8 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
                     )
                     if p
                 )
-                parts.append(f"- {etiqueta} [{a.get('formato')}]")
+                tamano = f" ({a['tamano']})" if a.get("tamano") else ""
+                parts.append(f"- {etiqueta} [{a.get('formato')}]{tamano}")
                 if a.get("descripcion"):
                     parts.append(f"   {a['descripcion']}")
                 parts.append(f"   {a.get('url')}")

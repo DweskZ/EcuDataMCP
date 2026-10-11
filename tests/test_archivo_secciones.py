@@ -28,6 +28,18 @@ async def test_category_list_normalizes_to_secciones(monkeypatch):
     assert result["url_fuente"] == "https://example.gob.ec/biblioteca/"
 
 
+async def test_category_list_without_total_archivos_omits_it(monkeypatch):
+    async def fake_list():
+        return {
+            "url_fuente": "https://www.cne.gob.ec/estadisticas/bases-de-datos/",
+            "categorias": [{"id": "8325", "nombre": "Elecciones Generales 2025"}],
+        }
+
+    monkeypatch.setitem(archivo_secciones._CATEGORIA_LISTS, "cne", fake_list)
+    result = await archivo_secciones._list_secciones("cne")
+    assert result["secciones"] == [{"id": "8325", "nombre": "Elecciones Generales 2025"}]
+
+
 async def test_static_list_uses_the_source_key_as_id(monkeypatch):
     def fake_list():
         return [{"modulo": "economico", "nombre": "Económico", "url": "https://x"}]

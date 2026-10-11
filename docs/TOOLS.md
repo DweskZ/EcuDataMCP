@@ -189,6 +189,13 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `list_archivo_secciones` (`fuente="ineval"`) | Familias de evaluación del INEVAL con página de bases de datos. |
 | `get_archivo_seccion` (`fuente="ineval"`) | Enlaces de descarga de una familia de evaluación del INEVAL. |
 
+## CNE: datos electorales
+
+| Tool | Descripción |
+|------|-------------|
+| `list_archivo_secciones` (`fuente="cne"`) | Procesos electorales 2002-2025 con base de datos del CNE. |
+| `get_archivo_seccion` (`fuente="cne"`) | Enlaces de un proceso: diccionarios, organizaciones, candidatos, registro electoral y resultados por parroquia (SPSS `.sav`). |
+
 ## Aviación civil (DGAC)
 
 | Tool | Descripción |
