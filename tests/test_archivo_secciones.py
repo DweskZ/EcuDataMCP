@@ -1,4 +1,4 @@
-"""list_archivo_secciones/get_archivo_seccion normalize the seven archive clients."""
+"""list_archivo_secciones/get_archivo_seccion normalize the eight archive clients."""
 
 import typing
 

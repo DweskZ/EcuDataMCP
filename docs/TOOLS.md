@@ -137,8 +137,10 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | Tool | Descripción |
 |------|-------------|
 | `get_contraloria_informe` | Descarga y previsualiza un documento de la Contraloría (Datos Abiertos o Plan Anual de Control). |
+| `get_archivo_seccion` (`fuente="energia"`) | Lista los PDF/XLSX de una sección del Ministerio de Ambiente y Energía: estadística de hidrocarburos, minería o Balance Energético Nacional. |
 | `get_archivo_seccion` (`fuente="sipa"`) | Lista los enlaces de descarga directa publicados en un módulo de estadísticas de SIPA. |
 | `get_archivo_seccion` (`fuente="superbancos"`) | Lista los enlaces de descarga directa publicados en una sección de estadísticas de Superbancos. |
+| `list_archivo_secciones` (`fuente="energia"`) | Lista las 4 secciones estadísticas del Ministerio de Ambiente y Energía (ambienteyenergia.gob.ec). |
 | `list_archivo_secciones` (`fuente="sipa"`) | Lista los módulos de descarga de estadísticas de SIPA (sipa.agricultura.gob.ec). |
 | `list_archivo_secciones` (`fuente="superbancos"`) | Lista las secciones de estadísticas de la Superintendencia de Bancos (superbancos.gob.ec/estadisticas/portalestudios/). |
 | `get_sipa_resumen_indicadores` | PDF mensuales del "Resumen de Indicadores" de SIPA (Ministerio de Agricultura), por año. |

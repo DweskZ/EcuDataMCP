@@ -16,6 +16,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 from helpers import (
     arcsa_client,
     ineval_client,
+    ministerio_energia_client,
     senescyt_biblioteca_client,
     seps_client,
     sgr_publicaciones_client,
@@ -26,7 +27,9 @@ from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.tool_meta import READ_ONLY
 
-Fuente = Literal["arcsa", "superbancos", "seps", "ineval", "sgr", "senescyt", "sipa"]
+Fuente = Literal[
+    "arcsa", "superbancos", "seps", "ineval", "sgr", "senescyt", "sipa", "energia"
+]
 
 _NOMBRES = {
     "arcsa": "ARCSA — Base de Registros Emitidos",
@@ -36,6 +39,7 @@ _NOMBRES = {
     "sgr": "SGR — Biblioteca",
     "senescyt": "Educación Superior — Biblioteca",
     "sipa": "SIPA (MAG) — estadísticas agropecuarias",
+    "energia": "Ministerio de Ambiente y Energía — hidrocarburos, minería y BEN",
 }
 
 # Sources whose list call scrapes a page and returns {"categorias": [...]}.
@@ -43,6 +47,7 @@ _CATEGORIA_LISTS = {
     "arcsa": arcsa_client.list_categorias,
     "sgr": sgr_publicaciones_client.list_biblioteca_categorias,
     "senescyt": senescyt_biblioteca_client.list_biblioteca_categorias,
+    "energia": ministerio_energia_client.list_secciones,
 }
 # Sources with a fixed, in-code section list keyed by `id_key`.
 _STATIC_LISTS = {
@@ -58,6 +63,7 @@ _GETTERS = {
     "ineval": ineval_client.get_familia_archivos,
     "sgr": sgr_publicaciones_client.get_biblioteca_categoria_archivos,
     "senescyt": senescyt_biblioteca_client.get_biblioteca_categoria_archivos,
+    "energia": ministerio_energia_client.get_seccion_archivos,
     "sipa": sipa_client.get_modulo_archivos,
 }
 
@@ -110,8 +116,10 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
         description=(
             "List the sections of one institution's document archive: ARCSA "
             "sanitary registry, Superbancos and SEPS statistics, INEVAL "
-            "evaluation datasets, SGR and Educación Superior libraries, or SIPA "
-            "agricultural statistics. Next: get_archivo_seccion(fuente, seccion)."
+            "evaluation datasets, SGR and Educación Superior libraries, SIPA "
+            "agricultural statistics, or the Energy Ministry's hydrocarbon, "
+            "mining and energy-balance statistics. "
+            "Next: get_archivo_seccion(fuente, seccion)."
         ),
         annotations=READ_ONLY,
     )
@@ -149,12 +157,19 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           17 categories (PAC, LOES/SNNA normativa, acuerdos, auditorías).
         - sipa: SIPA, Ministerio de Agricultura (4 modules: economico,
           productivo, social, censos). Distinct from MPCEIP.
+        - energia: Ministerio de Ambiente y Energía (ambienteyenergia.gob.ec,
+          which absorbed Energía y Minas, MERNNR and Hidrocarburos), 4
+          sections read from its WordPress media library: hydrocarbon
+          statistics (crudo/derivados yearbooks 2002-2024), mining exports
+          and tax revenue, 2020-21 weekly mining reports, and the Balance
+          Energético Nacional. The old ARCERNNR and recursosyenergia hosts
+          are dead; electricity regulation is in get_arconel_reporte.
 
         Returns each section's `id` (pass it to get_archivo_seccion),
         `nombre`, and either its page `url` or `total_archivos`.
 
         Args:
-            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa.
+            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa, energia.
             format: text | json
         """
         try:
@@ -215,7 +230,7 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
         using preview_resource_data or download_resource (5 MB cap).
 
         Args:
-            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa.
+            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa, energia.
             seccion: A section `id` from list_archivo_secciones.
             format: text | json
         """
