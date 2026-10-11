@@ -3,9 +3,9 @@
 ARCSA, Superbancos, SEPS, INEVAL, the SGR and SENESCYT libraries, SIPA, EP
 Petroecuador, the Energy Ministry, the CNE and the Guayaquil and Quito stock
 exchanges (BVG, BVQ) each publish a fixed set of sections (categories,
-families, modules) whose pages list downloadable files. They used to be 14 tools, one list/get pair
-per institution, with the same two-step flow and the same file-listing
-shape; `fuente` now picks the institution instead (the same pattern as
+families, modules) whose pages list downloadable files. They used to be 14
+tools, one list/get pair per institution, with the same two-step flow and the
+same file-listing shape; `fuente` now picks the institution instead (the same pattern as
 `source=` on the CKAN tools). The per-source clients are unchanged.
 """
 
@@ -108,9 +108,7 @@ async def _list_secciones(fuente: str) -> dict[str, Any]:
         url_fuente = result.get("url_fuente")
     else:
         lister, id_key = _STATIC_LISTS[fuente]
-        secciones = [
-            {"id": s[id_key], "nombre": s["nombre"], "url": s["url"]} for s in lister()
-        ]
+        secciones = [{"id": s[id_key], "nombre": s["nombre"], "url": s["url"]} for s in lister()]
         url_fuente = None
     return {
         "fuente": fuente,
@@ -231,11 +229,7 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
         def to_text(data: dict) -> str:
             parts = [f"{data['nombre_fuente']} — {data['total']} sección(es):", ""]
             for s in data["secciones"]:
-                extra = (
-                    f" ({s['total_archivos']} archivo(s))"
-                    if "total_archivos" in s
-                    else ""
-                )
+                extra = f" ({s['total_archivos']} archivo(s))" if "total_archivos" in s else ""
                 parts.append(f"- {s['id']}: {s['nombre']}{extra}")
                 if s.get("url"):
                     parts.append(f"  {s['url']}")
@@ -312,9 +306,7 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
         except ValueError as e:
             raise ToolError(f"Error: {e}") from e
         except Exception as e:
-            raise ToolError(
-                f"Error al obtener la sección {seccion} de {fuente}: {e}"
-            ) from e
+            raise ToolError(f"Error al obtener la sección {seccion} de {fuente}: {e}") from e
 
         def to_text(data: dict) -> str:
             parts = [f"{data['nombre_fuente']} — {data['nombre']} ({data['id']})"]

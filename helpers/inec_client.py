@@ -216,9 +216,7 @@ async def _fetch_topics() -> list[dict[str, str]]:
         return topics
 
 
-async def search_topics(
-    query: str = "", limit: int = 30, offset: int = 0
-) -> dict[str, Any]:
+async def search_topics(query: str = "", limit: int = 30, offset: int = 0) -> dict[str, Any]:
     """
     Search INEC's statistical topic menu (ecuadorencifras.gob.ec) client-side.
 
@@ -412,8 +410,7 @@ async def _get_api_json(
             except Exception:
                 detail = None
             raise ValueError(
-                detail
-                or f"La API de Ecuador en Cifras devolvió HTTP {resp.status_code}"
+                detail or f"La API de Ecuador en Cifras devolvió HTTP {resp.status_code}"
             )
         return resp.json(), resp.headers
     finally:
@@ -459,15 +456,11 @@ def _summarize_post(post: dict[str, Any], categories: dict[int, str]) -> dict[st
         "url": post.get("link", ""),
         "fecha_publicacion": (post.get("date") or "")[:10],
         "fecha_modificacion": (post.get("modified") or "")[:10],
-        "categorias": [
-            categories.get(cid, str(cid)) for cid in post.get("categories", [])
-        ],
+        "categorias": [categories.get(cid, str(cid)) for cid in post.get("categories", [])],
     }
 
 
-async def search_publicaciones(
-    query: str = "", limit: int = 20, offset: int = 0
-) -> dict[str, Any]:
+async def search_publicaciones(query: str = "", limit: int = 20, offset: int = 0) -> dict[str, Any]:
     """
     Full-text search over every post INEC has ever published on Ecuador en
     Cifras, via its public WordPress REST API, newest first.
@@ -517,10 +510,7 @@ def _extract_files_from_html(html: str) -> list[dict[str, str]]:
     seen: dict[str, str] = {}
     for url, ext in _FILE_LINK_RE.findall(html):
         seen.setdefault(url, ext.upper())
-    return [
-        {"label": _label_from_url(url), "url": url, "format": fmt}
-        for url, fmt in seen.items()
-    ]
+    return [{"label": _label_from_url(url), "url": url, "format": fmt} for url, fmt in seen.items()]
 
 
 async def get_publicacion_files(post: int | str) -> dict[str, Any]:
@@ -550,18 +540,14 @@ async def get_publicacion_files(post: int | str) -> dict[str, Any]:
     async with httpx.AsyncClient(timeout=25.0) as session:
         matches, _ = await _get_api_json("posts", lookup, session=session)
         if not matches:
-            raise ValueError(
-                f"No se encontró la publicación '{post}' en Ecuador en Cifras"
-            )
+            raise ValueError(f"No se encontró la publicación '{post}' en Ecuador en Cifras")
         data = matches[0]
         categories = await _fetch_categories()
 
     summary = _summarize_post(data, categories)
     result = {
         **summary,
-        "archivos": _extract_files_from_html(
-            data.get("content", {}).get("rendered", "")
-        ),
+        "archivos": _extract_files_from_html(data.get("content", {}).get("rendered", "")),
     }
     _publicacion_files_cache.set(cache_key, result)
     return result
