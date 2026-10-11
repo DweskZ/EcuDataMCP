@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **EP Petroecuador** (`fuente="petroecuador"` in `list_archivo_secciones` /
+  `get_archivo_seccion`): the 8 sections of "Cifras Institucionales"
+  (financial statements, monthly and annual statistical reports 2006 onward,
+  field production, prices, dispatches, refining, WTI, risk reports) with
+  their PDF links. New `helpers/petroecuador_client.py`.
+
 Fixes from a field report (paper-apagones, 2026-10-06/07).
 
 - **ANDA**: `get_anda_survey_info` and `download_anda_microdata` accept the

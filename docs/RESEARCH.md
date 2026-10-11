@@ -5936,6 +5936,26 @@ Estadísticas de distribuidoras fuera de CKAN:
 - **Centrosur `estadisticas-centrosur`**: sigue con solo dos PDFs, sin
   serie detrás.
 
+### EP Petroecuador — Cifras Institucionales
+
+- Verificado en vivo 2026-10-10: `https://www.eppetroecuador.ec/?p=3721`
+  responde 200 con un User-Agent de navegador (HTML de ~80 KB, WordPress).
+- No usa la biblioteca download-monitor categorizada de SGR/ARCSA: son 8
+  bloques `div.Headerinfo` (Estados Financieros, Informes Estadísticos
+  Mensuales y Anuales, Exploración y Producción, Comercialización,
+  Refinación, Comercialización Internacional, Gestión de Riesgos y
+  Oportunidades), cada uno con un `<ul>` en `div.paleta`. Los `<a name>` se
+  repiten, así que el id de sección es el slug del título.
+- Enlaces mixtos: PDFs directos en `wp-content/uploads`, `download.php?id=N`
+  (302 al PDF vigente; absolutos y relativos, algunos con `&force=0`), una
+  página interna (`?p=8062`, precios de venta en terminales) y un PDF en el
+  subdominio `eppintranet`. Los datos son PDFs, no tablas.
+- Hay `<li>` sin enlace (costo de producción por barril, provisional); no se
+  listan. El título de "Producción de Campo BPPD" lleva la cifra del día y
+  su fecha efectiva tal como la publica el sitio.
+- Integrado como `fuente="petroecuador"`; no hay serie diaria
+  estructurada: el histórico de producción está dentro de los PDFs.
+
 ### Ranking de qué construir
 
 1. Cliente ArcGIS REST genérico con ARCONEL `ServDashboards` + resúmenes

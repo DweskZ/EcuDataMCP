@@ -84,6 +84,12 @@ de cobertura que falta en cada una.
 | `energia-ecuador.com` — portal agregador nacional del Ministerio (crisis 2024), recuperado vía Wayback Machine | `get_energia_ecuador_snapshot` | Sitio del Ministerio de Energía y Minas, hoy muerto (dominio expirado, parking desde 2025), recuperado como snapshot congelado del 2024-04-24 vía `archive.org/wayback/available`. Confirmaba 9 distribuidoras (vía su propio sitemap archivado), pero el rastreador de Wayback solo capturó completa 1 de las 9 antes del bloqueo Cloudflare del sitio: Empresa Eléctrica Quito, 40 filas provincia/cantón/sector/horario. Las otras 8 (Centrosur, CNEL, Emelnorte, EEASA, Azogues, Cotopaxi, Riobamba, EERSSA) están confirmadas-pero-no-recuperables — sin captura 200 en ningún momento → RESEARCH.md § Vigésimo octava pasada |
 | EEQ (Quito) — cortes de luz programados (crisis 2023 y 2024) | `search_eeq_cortes`, `get_eeq_cortes_horarios` | 26 PDFs en vivo en `eeq.com.ec/documents/d/empresa-electrica-quito/{slug}`: mediados de oct-dic 2024 enumerado en vivo desde la búsqueda del propio sitio (`/search?q=horarios`, artículos de contenido web "Horarios" con el slug del PDF en la tarjeta); oct-nov 2023, abril/junio 2024 y sep-inicios de oct 2024 como lista semilla fija recuperada por buscador (no indexados por el sitio). APIs de Liferay cerradas a invitados (headless 403, JSONWS `{}`) `get_eeq_cortes_horarios` convierte cada PDF en filas fecha × bloque horario × subestación × sectores, leyendo la posición del texto en la lámina (ambos diseños, 2023 y 2024): 2.150 filas en los 26 PDFs, ninguna sin subestación ni horario → RESEARCH.md § Trigésimo primera y Trigésimo tercera pasada |
 
+### EP Petroecuador
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Cifras Institucionales (`eppetroecuador.ec/?p=3721`) | `list_archivo_secciones(fuente="petroecuador")`, `get_archivo_seccion(fuente="petroecuador", …)` | 8 secciones (estados financieros 2015-2025, informes estadísticos mensuales y anuales 2006-presente, exploración y producción con la producción diaria de campo, comercialización, refinación, WTI, gestión de riesgos), enlaces a PDF; solo enlaces, el contenido se lee con `read_pdf` → RESEARCH.md § EP Petroecuador — Cifras Institucionales |
+
 ### CNT/ARCOTEL (telecomunicaciones)
 
 | Fuente | Herramientas | Qué cubre |
