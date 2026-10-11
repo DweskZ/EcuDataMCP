@@ -115,6 +115,13 @@ de cobertura que falta en cada una.
 |---|---|---|
 | Secciones estadísticas + widgets OneDrive | `list_archivo_secciones(fuente="superbancos")`, `get_archivo_seccion(fuente="superbancos", …)` | Boletines Financieros Mensuales (224 archivos, 1997-2026), Servicios Financieros (312 archivos vía 3 widgets OneDrive descifrados), Información Histórica, Calendario Estadístico → RESEARCH.md § Séptima, Décima y Duodécima pasada |
 
+### Bolsas de valores (BVG, BVQ)
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Bolsa de Valores de Guayaquil | `list_archivo_secciones(fuente="bvg")`, `get_archivo_seccion(fuente="bvg", …)` | 11 archivos en 4 secciones: negociaciones históricas desde 2019 (acciones, obligaciones, papel comercial, titularizaciones, bonos del Estado, notas de crédito, cetes), dividendos desde 2002, valores permitidos, ofertas públicas (en circulación y saldos). Con fecha de modificación por archivo → RESEARCH.md § Bolsas de valores |
+| Bolsa de Valores de Quito | `list_archivo_secciones(fuente="bvq")`, `get_archivo_seccion(fuente="bvq", …)` | ~45 archivos públicos en 10 secciones (cotizaciones históricas por instrumento, emisiones, renta variable, sector público, boletines, vectores de precios, curva spot, registro de emisores); sin login. El Infolab BVQ sí lo exige y queda fuera → RESEARCH.md § Bolsas de valores |
+
 ### MEF/SENAE
 
 | Fuente | Herramientas | Qué cubre |

@@ -269,6 +269,8 @@ async def main() -> int:
             ("search_ranking", {"limit": 3}, []),
             ("list_archivo_secciones", {"fuente": "sipa"}, ["SIPA", "economico"]),
             ("list_archivo_secciones", {"fuente": "superbancos"}, ["boletines_financieros"]),
+            ("get_archivo_seccion", {"fuente": "bvg", "seccion": "historicos"}, ["BVG_Acciones"]),
+            ("list_archivo_secciones", {"fuente": "bvq"}, ["cotizaciones_historicas"]),
             ("list_catalogo", {"fuente": "sut"}, ["indicador"]),
             ("list_catalogo", {"fuente": "contraloria"}, ["Contraloría"]),
             ("search_anda", {"query": "empleo", "limit": 3}, []),

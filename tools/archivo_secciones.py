@@ -1,7 +1,7 @@
 """Institutional document archives behind one list/get pair.
 
-ARCSA, Superbancos, SEPS, INEVAL, the SGR and SENESCYT libraries and SIPA
-each publish a fixed set of sections (categories, families, modules) whose
+ARCSA, Superbancos, SEPS, INEVAL, the SGR and SENESCYT libraries, SIPA and
+the Guayaquil and Quito stock exchanges (BVG, BVQ) each publish a fixed set of sections (categories, families, modules) whose
 pages list downloadable files. They used to be 14 tools, one list/get pair
 per institution, with the same two-step flow and the same file-listing
 shape; `fuente` now picks the institution instead (the same pattern as
@@ -15,6 +15,8 @@ from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import (
     arcsa_client,
+    bvg_client,
+    bvq_client,
     ineval_client,
     senescyt_biblioteca_client,
     seps_client,
@@ -26,7 +28,9 @@ from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.tool_meta import READ_ONLY
 
-Fuente = Literal["arcsa", "superbancos", "seps", "ineval", "sgr", "senescyt", "sipa"]
+Fuente = Literal[
+    "arcsa", "superbancos", "seps", "ineval", "sgr", "senescyt", "sipa", "bvg", "bvq"
+]
 
 _NOMBRES = {
     "arcsa": "ARCSA — Base de Registros Emitidos",
@@ -36,6 +40,8 @@ _NOMBRES = {
     "sgr": "SGR — Biblioteca",
     "senescyt": "Educación Superior — Biblioteca",
     "sipa": "SIPA (MAG) — estadísticas agropecuarias",
+    "bvg": "Bolsa de Valores de Guayaquil — estadísticas históricas",
+    "bvq": "Bolsa de Valores de Quito — estadísticas",
 }
 
 # Sources whose list call scrapes a page and returns {"categorias": [...]}.
@@ -50,6 +56,8 @@ _STATIC_LISTS = {
     "seps": (seps_client.list_secciones, "seccion"),
     "ineval": (ineval_client.list_familias, "familia"),
     "sipa": (sipa_client.list_modulos, "modulo"),
+    "bvg": (bvg_client.list_secciones, "seccion"),
+    "bvq": (bvq_client.list_secciones, "seccion"),
 }
 _GETTERS = {
     "arcsa": arcsa_client.get_categoria_archivos,
@@ -59,6 +67,8 @@ _GETTERS = {
     "sgr": sgr_publicaciones_client.get_biblioteca_categoria_archivos,
     "senescyt": senescyt_biblioteca_client.get_biblioteca_categoria_archivos,
     "sipa": sipa_client.get_modulo_archivos,
+    "bvg": bvg_client.get_seccion_archivos,
+    "bvq": bvq_client.get_seccion_archivos,
 }
 
 
@@ -110,8 +120,9 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
         description=(
             "List the sections of one institution's document archive: ARCSA "
             "sanitary registry, Superbancos and SEPS statistics, INEVAL "
-            "evaluation datasets, SGR and Educación Superior libraries, or SIPA "
-            "agricultural statistics. Next: get_archivo_seccion(fuente, seccion)."
+            "evaluation datasets, SGR and Educación Superior libraries, SIPA "
+            "agricultural statistics, or the Guayaquil (bvg) and Quito (bvq) "
+            "stock exchanges' historical trading files. Next: get_archivo_seccion(fuente, seccion)."
         ),
         annotations=READ_ONLY,
     )
@@ -149,12 +160,22 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           17 categories (PAC, LOES/SNNA normativa, acuerdos, auditorías).
         - sipa: SIPA, Ministerio de Agricultura (4 modules: economico,
           productivo, social, censos). Distinct from MPCEIP.
+        - bvg: Bolsa de Valores de Guayaquil (4 sections: historicos,
+          dividendos, valoracion, ofertas_publicas). Trade-by-trade
+          history since 2019 (acciones, obligaciones, papel comercial,
+          titularizaciones, bonos del Estado, notas de crédito, cetes),
+          dividends since 2002, repo-eligible securities, public offers.
+        - bvq: Bolsa de Valores de Quito (10 sections: cotizaciones
+          históricas, emisiones, renta variable, sector público, boletines
+          al cierre/semanales/por valor, valoración, emisores). Public
+          files only; the Infolab bulletins need a login.
 
         Returns each section's `id` (pass it to get_archivo_seccion),
         `nombre`, and either its page `url` or `total_archivos`.
 
         Args:
-            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa.
+            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa,
+                bvg, bvq.
             format: text | json
         """
         try:
@@ -210,12 +231,21 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           (formato DESCONOCIDO) that resolves to the same static files.
         - ineval: some ids 308-redirect to a static file; both work.
         - sipa: XLSX/XLS files, some over 40 MB.
+        - bvg, bvq: XLSX/XLS (a few PDFs on bvq). Each file adds `modificado`
+          (HTTP Last-Modified, ISO UTC) and `tamano_bytes`: the exchanges
+          overwrite the same URL, so check `modificado` for freshness (bvg
+          trading files and bvq cotizaciones are rebuilt each trading day;
+          dividends, bulletins and some emisiones files are older). bvq
+          titles come from file names (the page's buttons have no text).
+          bvg workbooks fail in preview_resource_data (invalid stylesheet
+          for openpyxl): download the URL instead.
 
         Files are often several MB: download the URL directly instead of
         using preview_resource_data or download_resource (5 MB cap).
 
         Args:
-            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa.
+            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa,
+                bvg, bvq.
             seccion: A section `id` from list_archivo_secciones.
             format: text | json
         """
@@ -249,7 +279,12 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
                     )
                     if p
                 )
-                parts.append(f"- {etiqueta} [{a.get('formato')}]")
+                detalle = [str(a.get("formato"))]
+                if a.get("tamano_bytes"):
+                    detalle.append(f"{a['tamano_bytes'] / 1_048_576:.1f} MB")
+                if a.get("modificado"):
+                    detalle.append(f"modificado {a['modificado'][:10]}")
+                parts.append(f"- {etiqueta} [{', '.join(detalle)}]")
                 if a.get("descripcion"):
                     parts.append(f"   {a['descripcion']}")
                 parts.append(f"   {a.get('url')}")

@@ -5975,6 +5975,56 @@ energético del IIGE (no existen).
 - **CELEC EP** (Decimoquinta pasada, descartado por LOTAIP): sigue sin dato
   sectorial en el sitio, pero su servidor ArcGIS sí tiene datos útiles.
 
+## Bolsas de valores: Guayaquil (BVG) y Quito (BVQ) (2026-10-10)
+
+Ambas publican sus estadísticas históricas como enlaces directos a XLS/XLSX,
+sin login ni CAPTCHA, y responden con el User-Agent del proyecto. Código:
+`helpers/bvg_client.py`, `helpers/bvq_client.py`, `helpers/bolsas_common.py`;
+expuestas como `fuente="bvg"` y `fuente="bvq"` en `list_archivo_secciones` /
+`get_archivo_seccion`.
+
+### BVG (bolsadevaloresguayaquil.com)
+
+- La home enlaza 11 archivos únicos: `/boletines/historicos/BVG_{Acciones,
+  Obligaciones,PapelComercial,Titularizaciones,BonosDelEstado,NotasDeCredito,
+  Cetes}.xlsx`, `dividendos-totales.xlsx`, `/boletines/valoracion/
+  valores-permitidos.xlsx`, y dos `.xls` en `/ofertas-publicas/files/`
+  (`vigente-en-circulacion`, `oferta-publica-saldos-vigentes`, datos de
+  Decevale). Titularizaciones aparece dos veces (etiqueta "VTC").
+- Estructura leída: los `BVG_*` son una hoja "Base" con una fila por
+  negociación (Acciones: ~31.900 filas desde 2019, 1,4 MB; Bonos: ~40.800),
+  fechas como serial de Excel. `dividendos-totales` tiene una hoja por emisor
+  (la primera dice "Al 31 Julio 2026"); `valores-permitidos` dice "VIGENTE
+  PARA OCTUBRE 2026"; los saldos dicen "AL 08/10/2026" y los vigentes en
+  circulación "31-08-2026".
+- Frescura (Last-Modified, 2026-10-10): los `BVG_*` 2026-10-08 20:35 UTC (la
+  última fila de Acciones es del 2026-10-08, serial 46303); dividendos
+  2026-08-05; valores permitidos 2026-10-01; saldos 2026-10-08; vigentes en
+  circulación 2026-09-15.
+- Problema: openpyxl rechaza la hoja de estilos de los `.xlsx` de BVG
+  ("Colors must be aRGB hex values"), así que `preview_resource_data` falla
+  sobre ellos. No se arregló aquí; se documenta en la tool.
+
+### BVQ (bolsadequito.com)
+
+- El 406 reportado para `curl` sin cabeceras no se reprodujo (2026-10-10:
+  200 a curl simple, a UA de navegador y al del proyecto, en páginas y
+  archivos; el sitio está tras Cloudflare). HEAD devuelve respuesta vacía, por
+  eso la frescura se lee con un GET de rango de 1 byte.
+- Sección Estadísticas (Joomla): ~45 archivos públicos bajo
+  `/uploads/estadisticas/...` y `/uploads/mercados/emisores/...`. Los botones
+  de descarga son iconos sin texto (las etiquetas son imágenes CSS), así que
+  el título sale del nombre del archivo.
+- Frescura: cotizaciones históricas, boletín diario, valoración diaria, sector
+  público y Ecuindex 2026-10-08; boletines por valor 2026-09-10; emisiones
+  renta fija 2026-10-05; `emisiones/facturas-comerciales.xls` 2024-09-10
+  (hojas hasta 2023). El vector de precios diario trae fecha de valoración
+  2026-10-08.
+- Descartado: "Infolab BVQ" (boletín mensual, informe bursátil: las páginas no
+  traen archivos; el contenido está en `bvqinfolab.com` con login) y las
+  pantallas en vivo de ofertas/demandas y operaciones cerradas (no son
+  descargas).
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un
