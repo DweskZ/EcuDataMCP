@@ -40,6 +40,9 @@ _CKAN_TITLE_RE = re.compile(
 _ANT_ORG = "antec"
 _YEAR_RE = re.compile(r"(?<!\d)(20\d{2}|19\d{2})(?!\d)")
 
+# Bounds simultaneous requests to INEC / CKAN within one search.
+_CONCURRENCY = 4
+
 _cache = TtlCache(ttl_seconds=3600.0, max_entries=64)
 
 NOTA = (
@@ -61,10 +64,32 @@ def _years(text: str) -> set[int]:
     return {int(y) for y in _YEAR_RE.findall(text)}
 
 
+async def _gather_bounded(coros: list[Any]) -> list[Any]:
+    """Run coroutines with at most _CONCURRENCY in flight; results stay in input
+    order and exceptions come back as values (callers decide what to do)."""
+    sem = asyncio.Semaphore(_CONCURRENCY)
+
+    async def run(coro: Any) -> Any:
+        async with sem:
+            return await coro
+
+    return await asyncio.gather(*(run(c) for c in coros), return_exceptions=True)
+
+
+def _raise_first(results: list[Any]) -> None:
+    """Fail the whole source on the first error, but let a cancellation through."""
+    for r in results:
+        if isinstance(r, BaseException):
+            raise r
+
+
 async def _inec_posts(query: str, anio: int, limit: int) -> list[dict[str, Any]]:
     posts: dict[int, dict[str, Any]] = {}
-    for base in _INEC_QUERIES:
-        result = await inec_client.search_publicaciones(base, limit=100)
+    results = await _gather_bounded(
+        [inec_client.search_publicaciones(base, limit=100) for base in _INEC_QUERIES]
+    )
+    _raise_first(results)
+    for result in results:
         for post in result["publicaciones"]:
             if _INEC_TITLE_RE.search(post["titulo"]):
                 posts.setdefault(post["id"], post)
@@ -80,19 +105,18 @@ async def _inec_posts(query: str, anio: int, limit: int) -> list[dict[str, Any]]
 async def _ckan_datasets(query: str, anio: int, limit: int) -> list[dict[str, Any]]:
     datasets: dict[str, dict[str, Any]] = {}
     queries = (
-        [f"{base} {query}".strip() for base in _CKAN_QUERIES]
-        if query
-        else (list(_CKAN_QUERIES))
+        [f"{base} {query}".strip() for base in _CKAN_QUERIES] if query else list(_CKAN_QUERIES)
     )
-    for q in queries:
-        result = await ckan_client.search_datasets(q, rows=30)
+    results = await _gather_bounded(
+        [ckan_client.search_datasets(q, rows=30) for q in queries]
+        + [ckan_client.search_datasets_by_filter(f"organization:{_ANT_ORG}", rows=50)]
+    )
+    _raise_first(results)
+    *search_results, org = results
+    for result in search_results:
         for pkg in result.get("results", []):
             if _CKAN_TITLE_RE.search(pkg.get("title", "")):
                 datasets.setdefault(pkg["name"], pkg)
-    org = await ckan_client._fetch_json(
-        ckan_client._ckan_url("package_search"),
-        params={"fq": f"organization:{_ANT_ORG}", "rows": 50},
-    )
     for pkg in org.get("results", []):
         datasets.setdefault(pkg["name"], pkg)
     found = list(datasets.values())
@@ -159,12 +183,17 @@ async def search_siniestros(
         datasets = ckan_res
 
     # Attach file links to the newest releases only, one request each.
-    for post in publicaciones[:con_archivos]:
-        try:
-            files = await inec_client.get_publicacion_files(post["id"])
+    attach = publicaciones[:con_archivos]
+    file_results = await _gather_bounded(
+        [inec_client.get_publicacion_files(post["id"]) for post in attach]
+    )
+    for post, files in zip(attach, file_results, strict=True):
+        if isinstance(files, asyncio.CancelledError):
+            raise files
+        if isinstance(files, BaseException):
+            avisos.append(f"Sin archivos para la publicación {post['id']}: {files}")
+        else:
             post["archivos"] = files.get("archivos", [])
-        except Exception as exc:
-            avisos.append(f"Sin archivos para la publicación {post['id']}: {exc}")
 
     result = {
         "query": query,

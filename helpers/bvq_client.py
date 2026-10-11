@@ -45,7 +45,12 @@ import re
 from typing import Any
 from urllib.parse import unquote, urlparse
 
-from helpers.bolsas_common import fetch_html, formato_from_url, probe_archivos
+from helpers.bolsas_common import (
+    KeyedLocks,
+    fetch_html,
+    formato_from_url,
+    probe_archivos,
+)
 from helpers.cache import TtlCache
 from helpers.logging import MAIN_LOGGER_NAME
 
@@ -117,7 +122,8 @@ _SECCIONES: list[dict[str, Any]] = [
 _SECCIONES_BY_KEY = {s["seccion"]: s for s in _SECCIONES}
 
 _seccion_cache = TtlCache(ttl_seconds=3600.0, max_entries=len(_SECCIONES))
-_fetch_lock = asyncio.Lock()
+# Per-section locks: a slow section does not block the others.
+_seccion_locks = KeyedLocks()
 
 # Hrefs are absolute on most pages and site-relative on the valoración and
 # emisores pages. Normativa and marketing PDFs live under other prefixes and
@@ -185,7 +191,7 @@ async def get_seccion_archivos(seccion: str) -> dict[str, Any]:
     if cached is not None:
         return cached
 
-    async with _fetch_lock:
+    async with _seccion_locks[seccion]:
         cached = _seccion_cache.get(seccion)
         if cached is not None:
             return cached

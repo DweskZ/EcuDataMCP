@@ -29,6 +29,17 @@ _KNOWN_FORMATS = {"XLSX", "XLS", "CSV", "PDF", "ZIP"}
 _PROBE_CONCURRENCY = 6
 
 
+class KeyedLocks:
+    """One asyncio.Lock per key, so a slow fill of one key does not block the
+    others while concurrent callers of the same key still share one fetch."""
+
+    def __init__(self) -> None:
+        self._locks: dict[str, asyncio.Lock] = {}
+
+    def __getitem__(self, key: str) -> asyncio.Lock:
+        return self._locks.setdefault(key, asyncio.Lock())
+
+
 def formato_from_url(url: str) -> str:
     name = url.split("?", 1)[0].rsplit("/", 1)[-1]
     ext = name.rsplit(".", 1)[-1].upper() if "." in name else ""

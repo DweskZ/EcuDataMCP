@@ -39,7 +39,12 @@ from html import unescape
 from typing import Any
 from urllib.parse import urlparse
 
-from helpers.bolsas_common import fetch_html, formato_from_url, probe_archivos
+from helpers.bolsas_common import (
+    KeyedLocks,
+    fetch_html,
+    formato_from_url,
+    probe_archivos,
+)
 from helpers.cache import TtlCache
 from helpers.logging import MAIN_LOGGER_NAME
 
@@ -80,7 +85,10 @@ _SECCIONES_BY_KEY = {s["seccion"]: s for s in _SECCIONES}
 # The files change at most daily; one cache slot per section plus the page.
 _page_cache = TtlCache(ttl_seconds=3600.0, max_entries=1)
 _seccion_cache = TtlCache(ttl_seconds=3600.0, max_entries=len(_SECCIONES))
-_fetch_lock = asyncio.Lock()
+# Per-section locks: a slow probe of one section does not block the others;
+# the home page (shared by all sections) has its own lock.
+_seccion_locks = KeyedLocks()
+_home_lock = asyncio.Lock()
 
 _TAG_RE = re.compile(r"<[^>]+>")
 _LINK_RE = re.compile(
@@ -126,12 +134,16 @@ async def _fetch_home() -> str:
     cached = _page_cache.get("html")
     if cached is not None:
         return cached
-    logger.info("Descargando la página de inicio de la BVG (%s)", _BASE)
-    html = await fetch_html(f"{_BASE}/")
-    if _LINK_RE.search(html):
-        # Don't cache a maintenance page that has no file links at all.
-        _page_cache.set("html", html)
-    return html
+    async with _home_lock:
+        cached = _page_cache.get("html")
+        if cached is not None:
+            return cached
+        logger.info("Descargando la página de inicio de la BVG (%s)", _BASE)
+        html = await fetch_html(f"{_BASE}/")
+        if _LINK_RE.search(html):
+            # Don't cache a maintenance page that has no file links at all.
+            _page_cache.set("html", html)
+        return html
 
 
 async def get_seccion_archivos(seccion: str) -> dict[str, Any]:
@@ -151,7 +163,7 @@ async def get_seccion_archivos(seccion: str) -> dict[str, Any]:
     if cached is not None:
         return cached
 
-    async with _fetch_lock:
+    async with _seccion_locks[seccion]:
         cached = _seccion_cache.get(seccion)
         if cached is not None:
             return cached
