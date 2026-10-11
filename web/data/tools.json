@@ -2360,37 +2360,37 @@
       },
       {
         "name": "get_serie_internacional",
-        "description": "Series internacionales con datos de Ecuador: indicadores WDI del Banco Mundial, capacidad y generación eléctrica de IRENA y flujos eléctricos Colombia-Ecuador de XM.",
+        "description": "Series internacionales con datos de Ecuador: Banco Mundial WDI, IRENA, flujos eléctricos de XM, comercio bilateral de UN Comtrade, series del FMI, salud de la OMS, empleo de la OIT y refugio del ACNUR.",
         "params": [
           {
             "name": "fuente",
             "type": "Fuente",
             "default": null,
-            "description": "wdi, irena o xm."
+            "description": "wdi, irena, xm, comtrade, imf, who, ilo o unhcr."
           },
           {
             "name": "indicador",
             "type": "str",
             "default": "''",
-            "description": "Solo wdi: código WDI. Vacío con query busca en el catálogo."
+            "description": "wdi/who: código del indicador. imf/ilo: id del flujo de datos. Vacío con query busca (wdi/who) o lista flujos (imf/ilo)."
           },
           {
             "name": "query",
             "type": "str",
             "default": "''",
-            "description": "Solo wdi: texto de búsqueda en el catálogo (en inglés), usado si indicador está vacío."
+            "description": "wdi/who/imf/ilo: texto de búsqueda en el catálogo (en inglés), usado si indicador está vacío."
           },
           {
             "name": "pais",
             "type": "str",
             "default": "'ECU'",
-            "description": "wdi/irena: código ISO3 (irena también acepta el nombre en inglés). xm lo ignora. Por defecto ECU."
+            "description": "wdi/irena/who/imf/ilo/unhcr: código ISO3 (irena también acepta el nombre en inglés). comtrade: ISO3 o código M49 numérico del reportante. xm lo ignora. Por defecto ECU."
           },
           {
             "name": "desde",
             "type": "str",
             "default": "''",
-            "description": "Inicio: un año (AAAA) para wdi/irena, una fecha (AAAA-MM-DD) para xm."
+            "description": "Inicio: un año (AAAA) para wdi/irena/who/unhcr, una fecha (AAAA-MM-DD) para xm, un período (AAAA, AAAA-MM) para imf/ilo."
           },
           {
             "name": "hasta",
@@ -2432,7 +2432,49 @@
             "name": "limit",
             "type": "int",
             "default": "30",
-            "description": "Solo búsqueda en el catálogo WDI: máximo de indicadores (1-200)."
+            "description": "Solo listados de catálogo o flujos: máximo de filas (1-200)."
+          },
+          {
+            "name": "periodo",
+            "type": "str",
+            "default": "''",
+            "description": "Solo comtrade: un único período, AAAA (frecuencia A) o AAAAMM (frecuencia M). Obligatorio."
+          },
+          {
+            "name": "socio",
+            "type": "str",
+            "default": "''",
+            "description": "comtrade: socio como ISO3 (USA, CHN, COL, PER, PAN, ESP, NLD, ITA...) o número M49; vacío = 0 (Mundo). unhcr: país de origen ISO3 o 'todos'."
+          },
+          {
+            "name": "cmd",
+            "type": "str",
+            "default": "'TOTAL'",
+            "description": "Solo comtrade: TOTAL o código HS de 2, 4 o 6 dígitos."
+          },
+          {
+            "name": "flujo",
+            "type": "str",
+            "default": "'ambos'",
+            "description": "Solo comtrade: X (exportaciones), M (importaciones) o ambos."
+          },
+          {
+            "name": "frecuencia",
+            "type": "Literal['A', 'M']",
+            "default": "'A'",
+            "description": "Solo comtrade: A (anual) o M (mensual)."
+          },
+          {
+            "name": "clave",
+            "type": "str",
+            "default": "''",
+            "description": "Solo imf/ilo: clave SDMX separada por puntos (ECU.CPI._T.IX.M). Vacío = pais."
+          },
+          {
+            "name": "ultimos",
+            "type": "int",
+            "default": "0",
+            "description": "Solo imf/ilo: últimas N observaciones por serie. Por defecto 5 (imf) / 3 (ilo) si no hay desde/hasta."
           },
           {
             "name": "format",
@@ -2441,7 +2483,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Trae una serie de una fuente internacional filtrada a Ecuador. wdi: World Development Indicators del Banco Mundial (más de 1.400 series anuales); con indicador (p. ej. EG.ELC.ACCS.ZS acceso a electricidad) devuelve la serie, con solo query (en inglés) busca en el catálogo; los años sin valor se omiten y se cuentan. irena: capacidad instalada (MW) y generación (GWh) por tecnología de IRENASTAT, desde 2000, conectada o no a la red. xm: energía horaria en la interconexión Colombia-Ecuador según XM, sumada por día o mes desde 2003; requiere desde y hasta (máximo 366 días); los días sin flujo aparecen con 0 GWh, así que la suspensión de octubre de 2024 se ve como ceros."
+        "long_description": "Trae una serie de una fuente internacional filtrada a Ecuador. wdi: World Development Indicators del Banco Mundial (más de 1.400 series anuales); con indicador (p. ej. EG.ELC.ACCS.ZS acceso a electricidad) devuelve la serie, con solo query (en inglés) busca en el catálogo; los años sin valor se omiten y se cuentan. irena: capacidad instalada (MW) y generación (GWh) por tecnología de IRENASTAT, desde 2000, conectada o no a la red. xm: energía horaria en la interconexión Colombia-Ecuador según XM, sumada por día o mes desde 2003; requiere desde y hasta (máximo 366 días); los días sin flujo aparecen con 0 GWh, así que la suspensión de octubre de 2024 se ve como ceros. comtrade: comercio de mercancías de Ecuador con un socio en USD (UN Comtrade, vista previa pública sin clave): un solo período por llamada (periodo), tope de 500 filas, un límite de ~1 llamada cada 2 s que se reintenta solo, y solo códigos (sin nombres); socio 0 = Mundo, cmd = TOTAL o código HS. imf: estadísticas del FMI vía SDMX (190 flujos: precios, balanza de pagos, tipo de cambio, finanzas públicas, dinero y banca); indicador es el id del flujo (vacío con query lista los flujos) y clave la clave SDMX, cuyo orden de dimensiones cambia por flujo y viene en la respuesta; sin clave trae todo el país, con las últimas observaciones. who: Global Health Observatory de la OMS (~3.000 indicadores anuales por sexo y edad, p. ej. WHOSIS_000001 esperanza de vida al nacer); vacío con query busca indicadores. ilo: estadísticas laborales de ILOSTAT (>1.200 flujos, p. ej. UNE_DEAP_SEX_AGE_RT desempleo por sexo y edad); las claves cortas se completan con comodines. unhcr: población refugiada y solicitante de asilo en Ecuador por año, desde desde/hasta; socio = país de origen (VEN) o 'todos' para una fila por origen."
       }
     ]
   },

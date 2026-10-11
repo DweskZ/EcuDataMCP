@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- **`get_serie_internacional` gains five `fuente` values** (no new tools; the
+  tool count is unchanged): `comtrade` (UN Comtrade public preview: bilateral
+  trade in USD for one period per call, capped at 500 rows, 429 retried
+  automatically), `imf` (IMF SDMX: CPI, exchange rates, balance of payments,
+  fiscal and monetary flows; a short key such as `ECU` is a country prefix),
+  `who` (WHO Global Health Observatory indicators by sex), `ilo` (ILOSTAT labour
+  statistics; short keys are padded with wildcards) and `unhcr` (refugees and
+  asylum seekers hosted in Ecuador, by year and origin). All keyless and
+  Ecuador by default; `wdi`, `irena` and `xm` are unchanged. `imf`/`ilo`/`who`
+  list their flows or indicators when `indicador` is empty. New clients
+  `helpers/{comtrade,imf,who,ilo,unhcr}_client.py` plus `helpers/intl_http.py`
+  (429/5xx retry) and `helpers/sdmx_json.py`.
+
 ## 0.12.0 — 2026-10-10
 
 - **Internal robustness** (no behaviour change for callers): BVG, BVQ and CNE use

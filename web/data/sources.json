@@ -849,10 +849,10 @@
           },
           {
             "id": "series-internacionales",
-            "name": "Series internacionales (WDI, IRENA, XM)",
+            "name": "Series internacionales (WDI, IRENA, XM, Comtrade, FMI, OMS, OIT, ACNUR)",
             "tag": "Internacional",
-            "description": "Banco Mundial WDI, capacidad y generación de IRENA, y flujos horarios Colombia-Ecuador de XM desde 2003; Ecuador por defecto",
-            "coverage": "api.worldbank.org, pxweb.irena.org, servapibi.xm.com.co",
+            "description": "Banco Mundial WDI, IRENA, flujos Colombia-Ecuador de XM, comercio bilateral de UN Comtrade, series del FMI, salud de la OMS, empleo de la OIT y refugio del ACNUR; Ecuador por defecto",
+            "coverage": "api.worldbank.org, pxweb.irena.org, servapibi.xm.com.co, comtradeapi.un.org, api.imf.org, ghoapi.azureedge.net, sdmx.ilo.org, api.unhcr.org",
             "url": "https://databank.worldbank.org/source/world-development-indicators",
             "status": "live"
           }
