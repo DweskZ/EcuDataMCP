@@ -339,6 +339,7 @@ async def _merge_related_pages(
             logger.warning("No se pudo cargar la página relacionada %s: %s", url, page)
             complete = False
             continue
+        # Only a CancelledError can reach here: it must propagate, not be skipped.
         if isinstance(page, BaseException):
             raise page
         found = _parse_topic_files(page, url)["archivos"]

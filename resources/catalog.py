@@ -227,6 +227,16 @@ def _all_fuentes() -> dict:
                 ],
             },
             {
+                "id": "petroecuador",
+                "nombre": "EP Petroecuador (Cifras Institucionales)",
+                "base": "https://www.eppetroecuador.ec/",
+                "tools": [
+                    "list_archivo_secciones",
+                    "get_archivo_seccion",
+                    "read_pdf",
+                ],
+            },
+            {
                 "id": "energia",
                 "nombre": (
                     "Ministerio de Ambiente y Energía (estadística de "

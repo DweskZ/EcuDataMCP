@@ -73,7 +73,7 @@ _HANDLE_RE = re.compile(
 )
 _FILE_RE = re.compile(
     r'<div class="wpdm-link-tpl[^"]*"[^>]*data-durl="(?P<url>[^"]+)"[^>]*>'
-    r'.*?<strong class="ptitle">(?P<title>.*?)</strong>',
+    r'(?:(?!wpdm-link-tpl).)*?<strong class="ptitle">(?P<title>.*?)</strong>',
     re.DOTALL,
 )
 _DESCARGAS_RE = re.compile(r"([\d.,]+)\s+descargas", re.IGNORECASE)

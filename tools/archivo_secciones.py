@@ -1,8 +1,9 @@
 """Institutional document archives behind one list/get pair.
 
-ARCSA, Superbancos, SEPS, INEVAL, the SGR and SENESCYT libraries, SIPA and
-the Guayaquil and Quito stock exchanges (BVG, BVQ) each publish a fixed set of sections (categories, families, modules) whose
-pages list downloadable files. They used to be 14 tools, one list/get pair
+ARCSA, Superbancos, SEPS, INEVAL, the SGR and SENESCYT libraries, SIPA, EP
+Petroecuador, the Energy Ministry, the CNE and the Guayaquil and Quito stock
+exchanges (BVG, BVQ) each publish a fixed set of sections (categories,
+families, modules) whose pages list downloadable files. They used to be 14 tools, one list/get pair
 per institution, with the same two-step flow and the same file-listing
 shape; `fuente` now picks the institution instead (the same pattern as
 `source=` on the CKAN tools). The per-source clients are unchanged.
@@ -145,8 +146,7 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
         description=(
             "List the sections of one institution's document archive (ARCSA, "
             "Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, "
-            "Petroecuador, Energy Ministry, CNE, Bolsas de Valores). fuente values and sections are "
-            "in the docstring. "
+            "Petroecuador, Energy Ministry, CNE, BVG, BVQ). "
             "Next: get_archivo_seccion(fuente, seccion)."
         ),
         annotations=READ_ONLY,

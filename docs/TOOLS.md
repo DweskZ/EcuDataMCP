@@ -137,6 +137,9 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | Tool | Descripción |
 |------|-------------|
 | `get_contraloria_informe` | Descarga y previsualiza un documento de la Contraloría (Datos Abiertos o Plan Anual de Control). |
+| `list_archivo_secciones` (`fuente="petroecuador"`) | Las 8 secciones de "Cifras Institucionales" de EP Petroecuador (informes estadísticos, producción, precios, refinación). |
+| `get_archivo_seccion` (`fuente="petroecuador"`) | Enlaces PDF de una sección de EP Petroecuador; el contenido se lee con `read_pdf`. |
+| `search_siniestros_ant` | Siniestros de tránsito (registros de la ANT): publicaciones trimestrales del INEC con microdatos y datasets CKAN. |
 | `get_archivo_seccion` (`fuente="energia"`) | Lista los PDF/XLSX de una sección del Ministerio de Ambiente y Energía: estadística de hidrocarburos, minería o Balance Energético Nacional. |
 | `get_archivo_seccion` (`fuente="sipa"`) | Lista los enlaces de descarga directa publicados en un módulo de estadísticas de SIPA. |
 | `get_archivo_seccion` (`fuente="superbancos"`) | Lista los enlaces de descarga directa publicados en una sección de estadísticas de Superbancos. |
