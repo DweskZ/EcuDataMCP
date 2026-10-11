@@ -1769,13 +1769,19 @@
       },
       {
         "name": "get_sut_indicador_schema",
-        "description": "Lista las columnas/medidas/niveles de fecha consultables de un tablero Power BI del SUT, descubiertos desde la definición propia del reporte (la consulta subyacente de cada visual), no por adivinanza.",
+        "description": "Lista las columnas/medidas/niveles de fecha consultables de un tablero Power BI del SUT o de la Judicatura (fuente), descubiertos desde la definición propia del reporte, no por adivinanza.",
         "params": [
           {
             "name": "indicador",
             "type": "str",
             "default": null,
-            "description": "Una clave de list_catalogo(fuente='sut')."
+            "description": "Una clave de list_catalogo(fuente=<fuente>)."
+          },
+          {
+            "name": "fuente",
+            "type": "Literal['sut', 'judicatura']",
+            "default": "'sut'",
+            "description": "sut (por defecto) | judicatura"
           },
           {
             "name": "format",
@@ -1784,17 +1790,17 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Lista las columnas/medidas/niveles de fecha consultables de un tablero Power BI del SUT, descubiertos desde la definición propia del reporte (la consulta subyacente de cada visual), no por adivinanza. Un campo como \"public contratos.nombre_padre_activ_econ_empresa\" es una columna plana usable en campos o filtros de query_sut_indicador; uno que termina en \"[medida]\" es una medida agregada (válida solo en campos, nunca en filtros); uno que termina en \"[Año]\"/\"[Mes]\" es un nivel de jerarquía de fecha. denuncias_publico y encuentra_empleo usan un formato de reporte más antiguo donde los visuales no exponen su consulta de esta manera — sus campos vienen de un conjunto pequeño capturado a mano (recuperado navegando el tablero en vivo y leyendo las consultas que realmente envía), no de este descubrimiento automático, pero aparecen aquí igual que cualquier otro campo."
+        "long_description": "Lista las columnas/medidas/niveles de fecha consultables de un tablero Power BI del SUT, descubiertos desde la definición propia del reporte (la consulta subyacente de cada visual), no por adivinanza. Un campo como \"public contratos.nombre_padre_activ_econ_empresa\" es una columna plana usable en campos o filtros de query_sut_indicador; uno que termina en \"[medida]\" es una medida agregada (válida solo en campos, nunca en filtros); uno que termina en \"[Año]\"/\"[Mes]\" es un nivel de jerarquía de fecha. denuncias_publico y encuentra_empleo usan un formato de reporte más antiguo donde los visuales no exponen su consulta de esta manera — sus campos vienen de un conjunto pequeño capturado a mano (recuperado navegando el tablero en vivo y leyendo las consultas que realmente envía), no de este descubrimiento automático, pero aparecen aquí igual que cualquier otro campo. Los tableros de la Judicatura (fuente=\"judicatura\") exponen agregados como \"[suma]\"/\"[promedio]\" (ej. \"CUB EST_CUB_AUDIENCIAS.Contador [suma]\"), válidos solo en campos, como los \"[medida]\"."
       },
       {
         "name": "query_sut_indicador",
-        "description": "Ejecuta una consulta en vivo contra el modelo de datos subyacente de un tablero Power BI del SUT — cualquier combinación de sus campos, ej. mes y provincia juntos.",
+        "description": "Ejecuta una consulta en vivo contra el modelo de datos subyacente de un tablero Power BI del SUT o de la Judicatura (fuente) — cualquier combinación de sus campos, ej. mes y provincia juntos.",
         "params": [
           {
             "name": "indicador",
             "type": "str",
             "default": null,
-            "description": "Una clave de list_catalogo(fuente='sut')."
+            "description": "Una clave de list_catalogo(fuente=<fuente>)."
           },
           {
             "name": "campos",
@@ -1815,13 +1821,19 @@
             "description": "Tope de filas aplicado del lado del servidor por la propia consulta."
           },
           {
+            "name": "fuente",
+            "type": "Literal['sut', 'judicatura']",
+            "default": "'sut'",
+            "description": "sut (por defecto) | judicatura"
+          },
+          {
             "name": "format",
             "type": "Literal['text', 'json']",
             "default": "'text'",
             "description": "text | json"
           }
         ],
-        "long_description": "Ejecuta una consulta en vivo contra el modelo de datos subyacente de un tablero Power BI del SUT — cualquier combinación de sus campos, ej. mes E industria juntos para \"contratos\" (una serie temporal mensual real desde 2015 por industria CIIU, provincia, género, estado del contrato — nada de esto está en los datasets CKAN de ministerio-del-trabajo, que son un solo conteo de stock actual sin dimensión de tiempo). Obtén los campos válidos desde get_sut_indicador_schema(indicador) primero — un nombre de campo no reconocido levanta un error que indica qué tool llamar en vez de adivinar. filtros solo acepta campos de columna plana (no campos \"[medida]\"/de jerarquía) y compara igualdad de texto exacta, ej. {\"public contratos.Estado contrato\": \"Vigente\"}. Las filas pueden llegar a los miles para un desglose amplio (ej. cada mes x cada industria) — acota con filtros o menos campos en vez de subir limite más de lo necesario; el formato \"json\" es exacto pero sigue sujeto al mismo tope de limite."
+        "long_description": "Ejecuta una consulta en vivo contra el modelo de datos subyacente de un tablero Power BI del SUT — cualquier combinación de sus campos, ej. mes E industria juntos para \"contratos\" (una serie temporal mensual real desde 2015 por industria CIIU, provincia, género, estado del contrato — nada de esto está en los datasets CKAN de ministerio-del-trabajo, que son un solo conteo de stock actual sin dimensión de tiempo). Obtén los campos válidos desde get_sut_indicador_schema(indicador) primero — un nombre de campo no reconocido levanta un error que indica qué tool llamar en vez de adivinar. filtros solo acepta campos de columna plana (no campos \"[medida]\"/de jerarquía) y compara igualdad de texto exacta, ej. {\"public contratos.Estado contrato\": \"Vigente\"}. Las filas pueden llegar a los miles para un desglose amplio (ej. cada mes x cada industria) — acota con filtros o menos campos en vez de subir limite más de lo necesario; el formato \"json\" es exacto pero sigue sujeto al mismo tope de limite. fuente=\"judicatura\" consulta los tableros del Consejo de la Judicatura (ej. audiencias por año y provincia: campos \"CUB EST_CUB_AUDIENCIAS.Periodo [Año]\" y \"CUB EST_CUB_AUDIENCIAS.Contador [suma]\")."
       },
       {
         "name": "search_informes_igepn",
@@ -2579,13 +2591,13 @@
       },
       {
         "name": "list_catalogo",
-        "description": "Lista el catálogo de una fuente sin filtros de búsqueda: ARCONEL, indicadores diarios del BCE, Contraloría, IESS o SUT.",
+        "description": "Lista el catálogo de una fuente sin filtros de búsqueda: ARCONEL, indicadores diarios del BCE, Contraloría, IESS, SUT o Consejo de la Judicatura.",
         "params": [
           {
             "name": "fuente",
             "type": "Fuente",
             "default": null,
-            "description": "Catálogo a listar: arconel, bce_diarios, contraloria, iess o sut."
+            "description": "Catálogo a listar: arconel, bce_diarios, contraloria, iess, sut o judicatura."
           },
           {
             "name": "format",
@@ -2594,7 +2606,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Lista el catálogo de una fuente que no tiene filtros, el paso previo a su tool get. arconel: tipos de reporte del sector eléctrico por sección, años (desde 1998) y grupos de empresas; sigue con get_arconel_reporte. bce_diarios: widgets de indicadores diarios/mensuales del BCE fuera de BCEData (riesgo país diario desde 2004, oro, WTI, bonos, pagos, reservas, series fiscales y externas); un codigo solo tiene sentido dentro de su archivo; sigue con get_bce_indicador_diario(archivo, codigo). contraloria: CSV trimestrales de informes de auditoría aprobados y planes anuales de control; sigue con get_contraloria_informe. iess: colecciones de documentos del IESS (boletines estadísticos, estudios actuariales, informes de auditoría) con años y conteos; sigue con get_iess_archivos(coleccion, anio). sut: tableros Power BI del Ministerio del Trabajo (contratos desde 2015, demanda laboral, política de género); sigue con get_sut_indicador_schema y query_sut_indicador."
+        "long_description": "Lista el catálogo de una fuente que no tiene filtros, el paso previo a su tool get. arconel: tipos de reporte del sector eléctrico por sección, años (desde 1998) y grupos de empresas; sigue con get_arconel_reporte. bce_diarios: widgets de indicadores diarios/mensuales del BCE fuera de BCEData (riesgo país diario desde 2004, oro, WTI, bonos, pagos, reservas, series fiscales y externas); un codigo solo tiene sentido dentro de su archivo; sigue con get_bce_indicador_diario(archivo, codigo). contraloria: CSV trimestrales de informes de auditoría aprobados y planes anuales de control; sigue con get_contraloria_informe. iess: colecciones de documentos del IESS (boletines estadísticos, estudios actuariales, informes de auditoría) con años y conteos; sigue con get_iess_archivos(coleccion, anio). sut: tableros Power BI del Ministerio del Trabajo (contratos desde 2015, demanda laboral, política de género); sigue con get_sut_indicador_schema y query_sut_indicador. judicatura: tableros Power BI del Portal de Estadística Judicial del Consejo de la Judicatura (audiencias, boletas, capacitaciones, destituciones, escritos, mediación, notarial, productividad de jueces, remates judiciales, SUPA pensiones alimenticias); sigue con get_sut_indicador_schema(indicador, fuente=\"judicatura\") y query_sut_indicador."
       }
     ]
   },

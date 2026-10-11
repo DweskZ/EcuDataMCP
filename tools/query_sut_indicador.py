@@ -13,8 +13,8 @@ _TEXT_ROW_CAP = 200
 
 def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Consultar datos de un indicador del SUT",
-        description="Live query of one SUT dashboard's data model: choose campos, optional equality filtros (plain columns only) and a row limite. Take the indicador from list_catalogo(fuente='sut') and its valid campos from get_sut_indicador_schema.",
+        title="Consultar datos de un indicador del SUT o la Judicatura",
+        description="Live query of one SUT or Consejo de la Judicatura dashboard's data model (fuente): choose campos, optional equality filtros (plain columns only) and a row limite. Take the indicador from list_catalogo(fuente) and its valid campos from get_sut_indicador_schema.",
         annotations=READ_ONLY,
     )
     @log_tool
@@ -23,6 +23,7 @@ def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
         campos: list[str],
         filtros: dict[str, str] | None = None,
         limite: int = 500,
+        fuente: Literal["sut", "judicatura"] = "sut",
         format: Literal["text", "json"] = "text",
     ) -> dict[str, Any]:
         """
@@ -33,6 +34,10 @@ def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
         none of this is in the ministerio-del-trabajo CKAN datasets,
         which are a single current-snapshot stock count with no time
         dimension).
+
+        fuente="judicatura" queries the Consejo de la Judicatura dashboards
+        (e.g. audiencias by year and province: campos "CUB EST_CUB_AUDIENCIAS.
+        Periodo [Año]" and "CUB EST_CUB_AUDIENCIAS.Contador [suma]").
 
         Get valid campos from get_sut_indicador_schema(indicador) first —
         an unrecognized field name raises an error naming the tool to
@@ -46,24 +51,25 @@ def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
         "json" is exact but still subject to the same limite cap.
 
         Args:
-            indicador: A key from list_catalogo(fuente='sut').
+            indicador: A key from list_catalogo(fuente=<fuente>).
             campos: Field labels exactly as returned by
                 get_sut_indicador_schema.
             filtros: Optional {campo: valor} equality filters, plain
                 columns only.
             limite: Row cap applied server-side by the query itself.
+            fuente: sut (default) | judicatura
             format: text | json
         """
         try:
             result = await sut_powerbi_client.query_indicador(
-                indicador, campos, filtros=filtros, limite=limite
+                indicador, campos, filtros=filtros, limite=limite, fuente=fuente
             )
         except ValueError as e:
             raise ToolError(str(e)) from e
 
         def to_text(data: dict) -> str:
             filas = data.get("filas") or []
-            parts = [f"Indicador SUT: {data.get('nombre')}", f"{len(filas)} fila(s)", ""]
+            parts = [f"Indicador {data.get('fuente', 'sut')}: {data.get('nombre')}", f"{len(filas)} fila(s)", ""]
             if not filas:
                 parts.append("Sin resultados para esta combinación de campos/filtros.")
                 return "\n".join(parts)

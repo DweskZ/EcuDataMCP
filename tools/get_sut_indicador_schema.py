@@ -11,16 +11,18 @@ from helpers.tool_meta import READ_ONLY
 
 def register_get_sut_indicador_schema_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Ver campos de un indicador del SUT",
+        title="Ver campos de un indicador del SUT o la Judicatura",
         description=(
-            "Queryable fields of one SUT dashboard: columns, measures ([medida]) "
-            "and date levels, for query_sut_indicador."
+            "Queryable fields of one SUT or Judicatura dashboard (fuente): columns, "
+            "measures ([medida]/[suma]/[promedio]) and date levels, for query_sut_indicador."
         ),
         annotations=READ_ONLY,
     )
     @log_tool
     async def get_sut_indicador_schema(
-        indicador: str, format: Literal["text", "json"] = "text"
+        indicador: str,
+        fuente: Literal["sut", "judicatura"] = "sut",
+        format: Literal["text", "json"] = "text",
     ) -> dict[str, Any]:
         """
         List the queryable columns/measures/date-levels for one SUT
@@ -40,18 +42,23 @@ def register_get_sut_indicador_schema_tool(mcp: MCPServer) -> None:
         sent), not from this automatic discovery, but they show up here
         the same as any other field.
 
+        Judicatura dashboards (fuente="judicatura") expose aggregate fields
+        as "[suma]"/"[promedio]" (e.g. "CUB EST_CUB_AUDIENCIAS.Contador
+        [suma]"); they are valid only in campos, like "[medida]" fields.
+
         Args:
-            indicador: A key from list_catalogo(fuente='sut').
+            indicador: A key from list_catalogo(fuente=<fuente>).
+            fuente: sut (default) | judicatura
             format: text | json
         """
         try:
-            result = await sut_powerbi_client.get_indicador_schema(indicador)
+            result = await sut_powerbi_client.get_indicador_schema(indicador, fuente)
         except ValueError as e:
             raise ToolError(str(e)) from e
 
         def to_text(data: dict) -> str:
             campos = data.get("campos") or []
-            parts = [f"Indicador SUT: {data.get('nombre')}", ""]
+            parts = [f"Indicador {data.get('fuente', 'sut')}: {data.get('nombre')}", ""]
             if not campos:
                 parts.append("No se encontraron campos para este indicador.")
                 return "\n".join(parts)

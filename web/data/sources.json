@@ -731,6 +731,27 @@
     ]
   },
   {
+    "id": "justicia",
+    "theme": "Justicia",
+    "lede": "Estadística judicial oficial, consultable en vivo.",
+    "institutions": [
+      {
+        "name": "Consejo de la Judicatura",
+        "sources": [
+          {
+            "id": "judicatura-estadistica",
+            "name": "Estadística Judicial",
+            "tag": "Justicia",
+            "description": "Diez tableros del Portal de Estadística Judicial (audiencias, mediación, notarial, productividad de jueces, SUPA, entre otros) consultables en vivo",
+            "coverage": "fsweb.funcionjudicial.gob.ec/estadisticas",
+            "url": "https://fsweb.funcionjudicial.gob.ec/estadisticas/",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "transporte-aviacion",
     "theme": "Transporte y aviación civil",
     "lede": "Aeródromos, meteorología aeronáutica y avisos a aviadores, directo de la DGAC.",

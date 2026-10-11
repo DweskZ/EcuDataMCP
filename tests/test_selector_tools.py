@@ -8,9 +8,17 @@ from mcp.server.mcpserver.exceptions import ToolError
 
 import tools.list_catalogo as list_catalogo_module
 import tools.search_archivos as sa
-from helpers import aviacion_client, irena_client, wdi_client, xm_client
+from helpers import (
+    aviacion_client,
+    irena_client,
+    sut_powerbi_client,
+    wdi_client,
+    xm_client,
+)
 from tools.aviso_aeronautico import register_aviso_aeronautico_tool
+from tools.get_sut_indicador_schema import register_get_sut_indicador_schema_tool
 from tools.list_catalogo import register_list_catalogo_tool
+from tools.query_sut_indicador import register_query_sut_indicador_tool
 from tools.serie_internacional import register_serie_internacional_tools
 
 
@@ -53,6 +61,53 @@ async def test_list_catalogo_wraps_source_errors(monkeypatch):
 
     with pytest.raises(ToolError, match="catálogo de arconel: portal caído"):
         await tool(fuente="arconel")
+
+
+async def test_list_catalogo_judicatura_lists_ten_dashboards_on_their_own_cluster():
+    tool = _tool(register_list_catalogo_tool, "list_catalogo")
+
+    result = await tool(fuente="judicatura")
+
+    rows = result.structured_content["indicadores"]
+    assert result.structured_content["total"] == 10
+    assert {"audiencias", "supa"} <= {r["indicador"] for r in rows}
+    assert "fuente='judicatura'" in _text(result)
+
+
+async def test_sut_tools_pass_fuente_through_and_default_to_sut(monkeypatch):
+    seen = []
+
+    async def fake_schema(indicador, fuente="sut"):
+        seen.append(("schema", indicador, fuente))
+        return {"indicador": indicador, "fuente": fuente, "nombre": "N", "campos": ["a.b"]}
+
+    async def fake_query(indicador, campos, filtros=None, limite=0, fuente="sut"):
+        seen.append(("query", indicador, fuente))
+        return {"indicador": indicador, "fuente": fuente, "nombre": "N", "campos": campos, "filas": [{"a.b": 1}]}
+
+    monkeypatch.setattr(sut_powerbi_client, "get_indicador_schema", fake_schema)
+    monkeypatch.setattr(sut_powerbi_client, "query_indicador", fake_query)
+    schema_tool = _tool(register_get_sut_indicador_schema_tool, "get_sut_indicador_schema")
+    query_tool = _tool(register_query_sut_indicador_tool, "query_sut_indicador")
+
+    await schema_tool(indicador="contratos")
+    schema = await schema_tool(indicador="audiencias", fuente="judicatura")
+    query = await query_tool(indicador="audiencias", campos=["a.b"], fuente="judicatura")
+
+    assert seen == [
+        ("schema", "contratos", "sut"),
+        ("schema", "audiencias", "judicatura"),
+        ("query", "audiencias", "judicatura"),
+    ]
+    assert "Indicador judicatura" in _text(schema)
+    assert "a.b=1" in _text(query)
+
+
+async def test_sut_tool_unknown_fuente_becomes_tool_error():
+    tool = _tool(register_get_sut_indicador_schema_tool, "get_sut_indicador_schema")
+
+    with pytest.raises(ToolError, match="no reconocido en la fuente 'judicatura'"):
+        await tool(indicador="contratos", fuente="judicatura")
 
 
 # -- get_aviso_aeronautico ---------------------------------------------------

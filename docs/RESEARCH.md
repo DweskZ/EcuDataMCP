@@ -6248,6 +6248,54 @@ necesitan protección internacional.
 publica SDMX 3.0, no probado; Comtrade con clave de suscripción (sin tope de
 500 filas ni de períodos) queda fuera por requerir key.
 
+## Judicatura Power BI — Portal de Estadística Judicial (2026-10-10)
+
+Se cierra el pendiente "Consejo de la Judicatura — Portal de Estadística Judicial"
+(ver Vigésimo tercera pasada) reutilizando el protocolo Power BI del SUT
+(`helpers/sut_powerbi_client.py`, Décima pasada).
+
+- Cada página `fsweb.funcionjudicial.gob.ec/estadisticas/<nombre>.html` incrusta un
+  `<iframe src="https://app.powerbi.com/view?r=<base64>">`; el base64 decodifica a
+  `{"k": resource_key, "t": tenant}`. Las diez páginas con reporte comparten el
+  tenant `a134599a-61d5-4dee-b39f-305311f215a9`: `audiencias`, `boletas`,
+  `capacitaciones`, `destituciones`, `escritos`, `mediacion`, `notarial`,
+  `productividadjueces`, `rematesjudiciales`, `supa`.
+- **Clúster distinto al del SUT.** Estas llaves solo resuelven en
+  `https://wabi-paas-1-scus-api.analysis.windows.net`; en el clúster del SUT
+  (`wabi-south-central-us-c-primary-api`) devuelven 401
+  `UnableToFindKeyInDBorCacheException`. Por eso el registro de indicadores
+  admite un `base` opcional por entrada (default: el del SUT).
+- `modelsAndExploration` y `querydata?synchronous=true` funcionan igual que en el
+  SUT (sin login, cabecera `X-PowerBI-ResourceKey`). Verificado en vivo con los
+  diez tableros: esquema y una consulta con filas reales en todos.
+- **Layouts nuevos.** `productividadjueces` y `supa` entregan los visuales
+  como documento PBIR (`exploration.explorationContent.explorationDocument`) y los
+  contenedores solo traen `objectName`; el resto tiene `config` pero sus consultas
+  incluyen `Aggregation` (sumas de `Contador`, etc.) que el parser original no
+  leía. `get_indicador_schema` ahora lee `Aggregation` como campos
+  `[suma]`/`[promedio]` y, si no encuentra nada, recorre el layout buscando
+  `Entity`/`Property` (Column/Measure/Aggregation), ignorando las tablas ocultas
+  `LocalDateTable_*`.
+- **Resultado de una sola columna.** Con un único campo, `querydata` no usa el
+  empaquetado `C`/`R`/`Ø` sino `{"G0": valor}` (el valor repetido omite la clave);
+  `_decode_dsr` lo maneja.
+- Campos útiles vistos: `CUB EST_CUB_AUDIENCIAS` (Provincia, Canton, Materia,
+  Tipo, Estado, Periodo [Año], Contador [suma]; 2017-2026, Pichincha ~95 mil por
+  año), `CUB EST_CUB_PRODUCTIVIDAD_NACIONAL_PORTAL` (Provincia, Canton, Materia,
+  Juez, Tramite, `Promedio` y `Tasa de Resolucion` como medidas),
+  `CUB EST_CUB_SUPA_*` (boletas, incidentes, recaudación, recaudación por IFI,
+  usuarios).
+- **Callejones sin salida.** `causas.html` es un stub vacío (8 KB, sin reporte ni
+  enlaces). `medidasdeproteccion.html` no usa iframe sino botones que enlazan un
+  reporte (`k=d740a133-…`) de **otro tenant** (`t=b720ecd0-…`, `c=4`); su llave
+  da 401 `UnableToFindKeyInDBorCacheException` en los clústeres alcanzables
+  (`wabi-south-central-us-c-primary`, `wabi-paas-1-scus`, `wabi-us-east2-b-primary`),
+  otros hosts no resuelven o cortan la conexión. No se registra hasta hallar su
+  clúster.
+- Códigos de `Aggregation.Function` vistos: 0 (suma) y 1 (promedio) se exponen;
+  3 y 5 aparecen sobre fechas/texto (`Corte`, `Entidad`) y se dejan como columna
+  plana.
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

@@ -22,6 +22,18 @@
   `helpers/{comtrade,imf,who,ilo,unhcr}_client.py` plus `helpers/intl_http.py`
   (429/5xx retry) and `helpers/sdmx_json.py`.
 
+- **Consejo de la Judicatura — Estadística Judicial** (`fuente="judicatura"` in
+  `list_catalogo`, `get_sut_indicador_schema` and `query_sut_indicador`; no new
+  tools): ten live Power BI dashboards of the Portal de Estadística Judicial
+  (audiencias, boletas, capacitaciones, destituciones, escritos, mediación,
+  notarial, productividad de jueces, remates judiciales, SUPA) through the SUT
+  Power BI client. Each indicator can now carry its own Power BI cluster
+  (`base`), schema discovery reads `Aggregation` fields (`[suma]`/`[promedio]`)
+  and falls back to scanning the report layout for newer report formats, and
+  one-column query results decode correctly. `medidasdeproteccion` (key does not
+  resolve) and `causas` (empty page) are not included. `fuente` defaults to
+  `sut`, so existing calls are unchanged.
+
 ## 0.12.0 — 2026-10-10
 
 - **Internal robustness** (no behaviour change for callers): BVG, BVQ and CNE use
