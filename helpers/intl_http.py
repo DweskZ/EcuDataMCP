@@ -38,7 +38,9 @@ async def _sleep(seconds: float) -> None:
 
 
 def _wait_seconds(resp: httpx.Response, attempt: int) -> float:
-    match = _RETRY_IN.search(resp.text[:500])
+    # Only a 429 body is a rate-limit message; a 5xx page that happens to
+    # contain "in N seconds" must not set the wait.
+    match = _RETRY_IN.search(resp.text[:500]) if resp.status_code == 429 else None
     if match:
         return min(float(match.group(1)) + 1.0, _MAX_WAIT_SECONDS)
     header = resp.headers.get("Retry-After", "")
@@ -65,9 +67,16 @@ async def get_json(
             logger.info("%s GET %s params=%s", fuente, url, params)
             try:
                 resp = await session.get(url, params=params)
-            except httpx.TimeoutException as e:
+            except httpx.TransportError as e:
+                # Timeouts plus connect/DNS/read failures: retry, then report
+                # them with the source's name instead of a raw httpx error.
                 if attempt == _MAX_ATTEMPTS:
-                    raise SourceHTTPError(0, f"{fuente} no respondió a tiempo.") from e
+                    reason = (
+                        "no respondió a tiempo"
+                        if isinstance(e, httpx.TimeoutException)
+                        else f"no se pudo conectar ({type(e).__name__})"
+                    )
+                    raise SourceHTTPError(0, f"{fuente} {reason}.") from e
                 await _sleep(2.0 * attempt)
                 continue
             if resp.status_code in empty_statuses:

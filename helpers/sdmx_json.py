@@ -45,6 +45,11 @@ def parse(payload: dict[str, Any], max_series: int = 100) -> dict[str, Any]:
         positions = [int(i) for i in key.split(":")]
         coded = []
         for dim, pos in zip(series_dims, positions, strict=False):
+            if pos >= len(dim["values"]):
+                raise ValueError(
+                    f"Respuesta SDMX inconsistente: la serie {key!r} apunta a un valor "
+                    f"inexistente de la dimensión {dim['id']}."
+                )
             value = dim["values"][pos]
             coded.append((dim["id"], value.get("id"), value.get("name") or value.get("id")))
         observations = [

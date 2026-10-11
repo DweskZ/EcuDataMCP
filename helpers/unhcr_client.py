@@ -102,6 +102,7 @@ async def get_poblacion(
         "total_registros": len(rows),
         "paginas_leidas": min(max_pages, _MAX_PAGES),
         "paginas_totales": max_pages,
+        "truncado": max_pages > _MAX_PAGES,
         "registros": rows,
         "source": "UNHCR — Refugee Data Finder",
         "url_fuente": f"https://www.unhcr.org/refugee-statistics/download/?url=&coa={pais.upper()}",
