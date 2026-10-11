@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 
 from helpers import bvq_client as client
@@ -132,3 +134,53 @@ async def test_empty_section_is_not_cached(httpx_mock):
 async def test_unknown_seccion_raises():
     with pytest.raises(ValueError, match="no reconocida"):
         await client.get_seccion_archivos("nope")
+
+
+@pytest.mark.asyncio
+async def test_slow_section_does_not_block_another(monkeypatch):
+    release = asyncio.Event()
+
+    async def fake_fetch(url):
+        if "cotizaciones-historicas" in url:
+            await release.wait()
+            return _COTIZACIONES
+        return _VECTOR_DIARIO
+
+    async def fake_probe(archivos):
+        return None
+
+    monkeypatch.setattr(client, "fetch_html", fake_fetch)
+    monkeypatch.setattr(client, "probe_archivos", fake_probe)
+
+    slow = asyncio.create_task(client.get_seccion_archivos("cotizaciones_historicas"))
+    await asyncio.sleep(0)
+    fast = await asyncio.wait_for(client.get_seccion_archivos("sector_publico"), timeout=2)
+
+    assert fast["total"] == 1
+    assert not slow.done()
+    release.set()
+    assert (await slow)["total"] == 2
+
+
+@pytest.mark.asyncio
+async def test_concurrent_calls_for_one_section_share_one_fill(monkeypatch):
+    fetched = []
+
+    async def fake_fetch(url):
+        fetched.append(url)
+        await asyncio.sleep(0.05)
+        return _COTIZACIONES
+
+    async def fake_probe(archivos):
+        return None
+
+    monkeypatch.setattr(client, "fetch_html", fake_fetch)
+    monkeypatch.setattr(client, "probe_archivos", fake_probe)
+
+    first, second = await asyncio.gather(
+        client.get_seccion_archivos("cotizaciones_historicas"),
+        client.get_seccion_archivos("cotizaciones_historicas"),
+    )
+
+    assert first is second
+    assert len(fetched) == 1

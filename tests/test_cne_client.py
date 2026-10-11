@@ -1,3 +1,4 @@
+import asyncio
 import re
 
 import pytest
@@ -182,3 +183,59 @@ def test_foreign_file_links_are_dropped():
     archivos = cne_client._parse_files(html)
 
     assert [a["titulo"] for a in archivos] == ["Bueno"]
+
+
+@pytest.mark.asyncio
+async def test_failing_subcategory_returns_partial_result_and_is_not_cached(httpx_mock):
+    httpx_mock.add_response(url=cne_client._PAGE_URL, html=_PAGE_HTML)
+    httpx_mock.add_response(url=_listsub("8325"), html=_PROCESO_HTML)
+    httpx_mock.add_response(url=_listsub("8328"), html=_REGISTRO_HTML)
+    httpx_mock.add_response(url=_listsub("8329"), status_code=500, is_reusable=True)
+
+    result = await cne_client.get_proceso_archivos("8325")
+
+    # Registro Electoral survives; Resultados failed and is skipped.
+    assert [a["grupo"] for a in result["archivos"]] == ["Registro Electoral"]
+    assert cne_client._files_cache.get("8325") is None
+
+    # A later call retries the crawl (index still cached) and, once
+    # complete, caches it.
+    httpx_mock.reset()
+    httpx_mock.add_response(url=_listsub("8325"), html=_PROCESO_HTML)
+    httpx_mock.add_response(url=_listsub("8328"), html=_REGISTRO_HTML)
+    httpx_mock.add_response(url=_listsub("8329"), html=_RESULTADOS_HTML)
+    retry = await cne_client.get_proceso_archivos("8325")
+
+    assert len(retry["archivos"]) == 3
+    assert cne_client._files_cache.get("8325") is retry
+
+
+@pytest.mark.asyncio
+async def test_slow_process_does_not_block_another(monkeypatch):
+    release = asyncio.Event()
+    cne_client._index_cache.set(
+        "index",
+        {
+            "nonce": "n",
+            "procesos": [
+                {"id": "1", "nombre": "Proceso A"},
+                {"id": "2", "nombre": "Proceso B"},
+            ],
+        },
+    )
+
+    async def fake_crawl(parent, nonce, grupo, depth):
+        if parent == "1":
+            await release.wait()
+        return [{"titulo": parent, "grupo": None}], True
+
+    monkeypatch.setattr(cne_client, "_crawl", fake_crawl)
+
+    slow = asyncio.create_task(cne_client.get_proceso_archivos("1"))
+    await asyncio.sleep(0)
+    fast = await asyncio.wait_for(cne_client.get_proceso_archivos("2"), timeout=2)
+
+    assert fast["archivos"][0]["titulo"] == "2"
+    assert not slow.done()
+    release.set()
+    assert (await slow)["archivos"][0]["titulo"] == "1"

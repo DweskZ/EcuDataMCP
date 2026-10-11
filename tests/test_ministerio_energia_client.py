@@ -1,3 +1,5 @@
+import asyncio
+
 import httpx
 import pytest
 
@@ -253,3 +255,71 @@ async def test_browser_user_agent_is_sent(httpx_mock):
 
     for request in httpx_mock.get_requests():
         assert request.headers["User-Agent"].startswith("Mozilla/5.0")
+
+
+def _fake_get_page(by_term, delay=0.0, failing=(), stats=None):
+    async def fake(session, term, page):
+        if stats is not None:
+            stats["now"] += 1
+            stats["max"] = max(stats["max"], stats["now"])
+        try:
+            await asyncio.sleep(delay)
+            if term in failing:
+                raise httpx.ConnectError("boom")
+            pages = by_term.get(term, [[]])
+            return (pages[page - 1] if page <= len(pages) else []), len(pages)
+        finally:
+            if stats is not None:
+                stats["now"] -= 1
+
+    return fake
+
+
+async def test_search_requests_are_concurrent_but_bounded(monkeypatch):
+    stats = {"now": 0, "max": 0}
+    monkeypatch.setattr(
+        client, "_get_page", _fake_get_page({"BEN_": [[_BEN_2025]]}, delay=0.02, stats=stats)
+    )
+
+    result = await client.get_seccion_archivos("balance_energetico")
+
+    assert len(result["archivos"]) == 1
+    assert 1 < stats["max"] <= client._CONCURRENCY
+
+
+async def test_extra_pages_are_fetched_and_merged(monkeypatch):
+    by_term = {"BEN_": [[_BEN_2025], [_BEN_24]]}
+    monkeypatch.setattr(client, "_get_page", _fake_get_page(by_term))
+
+    result = await client.get_seccion_archivos("balance_energetico")
+
+    assert [a["fecha_subida"][:4] for a in result["archivos"]] == ["2026", "2025"]
+
+
+async def test_failed_term_returns_partial_result_and_is_not_cached(monkeypatch):
+    by_term = {"BEN_": [[_BEN_2025]], "Reporte Mineria": [[_SEMANA]]}
+    monkeypatch.setattr(client, "_get_page", _fake_get_page(by_term, failing={"BEN_"}))
+
+    mineria = await client.get_seccion_archivos("mineria_reportes_semanales")
+
+    assert len(mineria["archivos"]) == 1
+    assert client._archivo_cache.get("archivo") is None
+
+
+async def test_all_terms_failing_raises(monkeypatch):
+    every_term = {t for s in client._SECCIONES for t in s["terminos"]}
+    monkeypatch.setattr(client, "_get_page", _fake_get_page({}, failing=every_term))
+
+    with pytest.raises(ValueError, match="biblioteca de medios"):
+        await client.get_seccion_archivos("balance_energetico")
+
+
+async def test_items_from_foreign_hosts_are_dropped(monkeypatch):
+    foreign = {**_BEN_2025, "id": 99, "source_url": "https://evil.example/2026/09/BEN_2025.pdf"}
+    monkeypatch.setattr(
+        client, "_get_page", _fake_get_page({"BEN_": [[foreign, _BEN_24]]})
+    )
+
+    result = await client.get_seccion_archivos("balance_energetico")
+
+    assert [a["url"] for a in result["archivos"]] == [_BEN_24["source_url"]]

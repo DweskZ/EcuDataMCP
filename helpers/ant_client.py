@@ -64,10 +64,9 @@ def _years(text: str) -> set[int]:
     return {int(y) for y in _YEAR_RE.findall(text)}
 
 
-async def _gather_bounded(coros: list[Any]) -> list[Any]:
-    """Run coroutines with at most _CONCURRENCY in flight; results stay in input
-    order and exceptions come back as values (callers decide what to do)."""
-    sem = asyncio.Semaphore(_CONCURRENCY)
+async def _gather_bounded(coros: list[Any], sem: asyncio.Semaphore) -> list[Any]:
+    """Run coroutines sharing `sem` (one bound per search); results stay in
+    input order and exceptions come back as values (callers decide)."""
 
     async def run(coro: Any) -> Any:
         async with sem:
@@ -83,10 +82,12 @@ def _raise_first(results: list[Any]) -> None:
             raise r
 
 
-async def _inec_posts(query: str, anio: int, limit: int) -> list[dict[str, Any]]:
+async def _inec_posts(
+    query: str, anio: int, limit: int, sem: asyncio.Semaphore
+) -> list[dict[str, Any]]:
     posts: dict[int, dict[str, Any]] = {}
     results = await _gather_bounded(
-        [inec_client.search_publicaciones(base, limit=100) for base in _INEC_QUERIES]
+        [inec_client.search_publicaciones(base, limit=100) for base in _INEC_QUERIES], sem
     )
     _raise_first(results)
     for result in results:
@@ -102,14 +103,17 @@ async def _inec_posts(query: str, anio: int, limit: int) -> list[dict[str, Any]]
     return found[:limit]
 
 
-async def _ckan_datasets(query: str, anio: int, limit: int) -> list[dict[str, Any]]:
+async def _ckan_datasets(
+    query: str, anio: int, limit: int, sem: asyncio.Semaphore
+) -> list[dict[str, Any]]:
     datasets: dict[str, dict[str, Any]] = {}
     queries = (
         [f"{base} {query}".strip() for base in _CKAN_QUERIES] if query else list(_CKAN_QUERIES)
     )
     results = await _gather_bounded(
         [ckan_client.search_datasets(q, rows=30) for q in queries]
-        + [ckan_client.search_datasets_by_filter(f"organization:{_ANT_ORG}", rows=50)]
+        + [ckan_client.search_datasets_by_filter(f"organization:{_ANT_ORG}", rows=50)],
+        sem,
     )
     _raise_first(results)
     *search_results, org = results
@@ -163,9 +167,10 @@ async def search_siniestros(
     if cached is not None:
         return cached
 
+    sem = asyncio.Semaphore(_CONCURRENCY)
     inec_res, ckan_res = await asyncio.gather(
-        _inec_posts(query, anio, limit),
-        _ckan_datasets(query, anio, limit),
+        _inec_posts(query, anio, limit, sem),
+        _ckan_datasets(query, anio, limit, sem),
         return_exceptions=True,
     )
     avisos: list[str] = []
@@ -185,7 +190,7 @@ async def search_siniestros(
     # Attach file links to the newest releases only, one request each.
     attach = publicaciones[:con_archivos]
     file_results = await _gather_bounded(
-        [inec_client.get_publicacion_files(post["id"]) for post in attach]
+        [inec_client.get_publicacion_files(post["id"]) for post in attach], sem
     )
     for post, files in zip(attach, file_results, strict=True):
         if isinstance(files, asyncio.CancelledError):

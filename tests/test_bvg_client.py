@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 
 from helpers import bvg_client as client
@@ -132,3 +134,46 @@ async def test_page_without_links_is_not_cached(httpx_mock):
     assert result["total"] == 0
     assert client._page_cache.get("html") is None
     assert client._seccion_cache.get("dividendos") is None
+
+
+@pytest.mark.asyncio
+async def test_slow_section_does_not_block_another(httpx_mock, monkeypatch):
+    httpx_mock.add_response(url=f"{client._BASE}/", html=_HOME_HTML, is_reusable=True)
+    release = asyncio.Event()
+
+    async def fake_probe(archivos):
+        # Only the historicos section is slow.
+        if any("/historicos/BVG_" in a["url"] for a in archivos):
+            await release.wait()
+
+    monkeypatch.setattr(client, "probe_archivos", fake_probe)
+
+    slow = asyncio.create_task(client.get_seccion_archivos("historicos"))
+    await asyncio.sleep(0)
+    fast = await asyncio.wait_for(client.get_seccion_archivos("valoracion"), timeout=2)
+
+    assert fast["total"] == 1
+    assert not slow.done()
+    release.set()
+    assert (await slow)["total"] == 4
+
+
+@pytest.mark.asyncio
+async def test_concurrent_calls_for_one_section_share_one_fill(httpx_mock, monkeypatch):
+    httpx_mock.add_response(url=f"{client._BASE}/", html=_HOME_HTML, is_reusable=True)
+    probes = []
+
+    async def fake_probe(archivos):
+        probes.append(len(archivos))
+        await asyncio.sleep(0.05)
+
+    monkeypatch.setattr(client, "probe_archivos", fake_probe)
+
+    first, second = await asyncio.gather(
+        client.get_seccion_archivos("historicos"), client.get_seccion_archivos("historicos")
+    )
+
+    assert first is second
+    assert probes == [4]
+    # The shared home page was fetched once as well.
+    assert len(httpx_mock.get_requests()) == 1
