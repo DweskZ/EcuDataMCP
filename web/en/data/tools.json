@@ -2259,6 +2259,43 @@
           }
         ],
         "long_description": "Lists infoMIES's zonal bulletin files. Two distinct series live under this name: modo=\"zonal\" (default), the original \"Boletín Zonal\" series (one .rar per zone per month), discontinued (2017-2021, nothing since); modo=\"consolidado\", the newer \"Reporte Boletines Zonales\" successor (one consolidated XLSX per year, 2021-2026, still being updated). Both return metadata and direct URLs only — the .rar files are additionally outside this project's supported-format list."
+      },
+      {
+        "name": "search_siniestros_ant",
+        "description": "Ecuador road-crash (siniestros de tránsito) data from ANT records: INEC releases and CKAN datasets.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Optional words that must appear in the title (e.g. \"trimestre\")"
+          },
+          {
+            "name": "anio",
+            "type": "int",
+            "default": "0",
+            "description": "Year filter on the title (0 = all years)"
+          },
+          {
+            "name": "limit",
+            "type": "int",
+            "default": "10",
+            "description": "Max items per source (default 10, max 30)"
+          },
+          {
+            "name": "con_archivos",
+            "type": "int",
+            "default": "2",
+            "description": "Attach file links to this many newest INEC releases (default 2, max 5; 0 = none)"
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "Output format: `text` (default) or `json`."
+          }
+        ],
+        "long_description": "Finds road-crash data for Ecuador. ant.gob.ec is unreachable, so it combines INEC's quarterly and annual releases (XLSX tabulations and microdata, built from ANT records) with CKAN datasets (SPPAT deaths, ANT). If one source is down the other still answers and the failure appears in `avisos`."
       }
     ]
   },
