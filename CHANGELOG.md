@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.12.0 — 2026-10-10
+
 - **Internal robustness** (no behaviour change for callers): BVG, BVQ and CNE use
   one lock per section/process instead of a global one, and a CNE sub-category
   that fails is skipped with a warning and not cached; the Energy Ministry and
