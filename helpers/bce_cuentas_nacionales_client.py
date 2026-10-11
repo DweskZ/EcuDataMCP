@@ -154,7 +154,6 @@ _PAGINAS = (
         "categoria": "imaec",
     },
 )
-_PAGINAS_BY_ID = {p["pagina_id"]: p for p in _PAGINAS}
 
 # The page set changes rarely; each page's own file list changes at most
 # quarterly (annual/regional packages) or monthly (IMAEC) -- same 6h TTL as

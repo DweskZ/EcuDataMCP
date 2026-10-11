@@ -41,7 +41,7 @@ TRANSLATIONS = {
     "es": {
         "search": "Buscar",
         "search_placeholder": "Buscar en el sitio…",
-        "toggle_nav": "Navegación de palanca",
+        "toggle_nav": "Mostrar u ocultar la navegación",
         "theme_to_light": "Cambiar a modo claro",
         "theme_to_dark": "Cambiar a modo oscuro",
         "copied": "¡Copiado!",
@@ -425,7 +425,8 @@ def write_seo_files():
     """robots.txt + sitemap.xml against the real deployed domain -- the old
     site build pointed both at a stale, seemingly-unused netlify.app URL."""
     (SITE / "robots.txt").write_text(
-        f"Sitemap: {SITE_URL}/sitemap.xml\n", encoding="utf-8"
+        f"User-agent: *\nAllow: /\n\nSitemap: {SITE_URL}/sitemap.xml\n",
+        encoding="utf-8",
     )
     now = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     urls = []
