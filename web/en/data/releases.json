@@ -1,5 +1,10 @@
 [
   {
+    "version": "0.12.0",
+    "date": "2026-10-10",
+    "summary": "New search_siniestros_ant tool (road crashes: INEC quarterly releases built from ANT records plus CKAN datasets) and five new sources inside list_archivo_secciones / get_archivo_seccion: EP Petroecuador (institutional figures), the Ministry of Environment and Energy (hydrocarbons, mining and the National Energy Balance), the CNE (19 election processes 2002-2025) and the Guayaquil and Quito stock exchanges. get_inec_estadistica_files now follows linked per-round pages when a topic lists no files itself (ENDI, #55). Field-report fixes: ANDA accepts the numeric id and pages the whole catalog, new INEC historical death microdata, urban parishes in lookup_ubicacion, search_datasets with compact and fields, and the background download of the Supercías directory. The default profile now has 83 tools."
+  },
+  {
     "version": "0.11.0",
     "date": "2026-10-02",
     "summary": "Breaking change in tool names: 90 down to 82 in the default profile. New get_serie_internacional(fuente) with World Bank WDI indicators, IRENA electricity capacity and generation, and XM's Colombia-Ecuador power flows since 2003. list_catalogo(fuente) replaces five listings (ARCONEL, BCE daily indicators, Contraloría, IESS and SUT); get_aviso_aeronautico(tipo) replaces get_metar, get_notam and get_sigmet; search_archivos absorbs BCE remittance, foreign-trade price and publication files and gains a formato filter. XM shows days without flow as 0 GWh, so the October 2024 suspension appears as zeros."
