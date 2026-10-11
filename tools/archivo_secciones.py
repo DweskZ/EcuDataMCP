@@ -16,6 +16,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 from helpers import (
     arcsa_client,
     ineval_client,
+    petroecuador_client,
     senescyt_biblioteca_client,
     seps_client,
     sgr_publicaciones_client,
@@ -26,7 +27,9 @@ from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.tool_meta import READ_ONLY
 
-Fuente = Literal["arcsa", "superbancos", "seps", "ineval", "sgr", "senescyt", "sipa"]
+Fuente = Literal[
+    "arcsa", "superbancos", "seps", "ineval", "sgr", "senescyt", "sipa", "petroecuador"
+]
 
 _NOMBRES = {
     "arcsa": "ARCSA — Base de Registros Emitidos",
@@ -36,6 +39,7 @@ _NOMBRES = {
     "sgr": "SGR — Biblioteca",
     "senescyt": "Educación Superior — Biblioteca",
     "sipa": "SIPA (MAG) — estadísticas agropecuarias",
+    "petroecuador": "EP Petroecuador — Cifras Institucionales",
 }
 
 # Sources whose list call scrapes a page and returns {"categorias": [...]}.
@@ -43,6 +47,7 @@ _CATEGORIA_LISTS = {
     "arcsa": arcsa_client.list_categorias,
     "sgr": sgr_publicaciones_client.list_biblioteca_categorias,
     "senescyt": senescyt_biblioteca_client.list_biblioteca_categorias,
+    "petroecuador": petroecuador_client.list_categorias,
 }
 # Sources with a fixed, in-code section list keyed by `id_key`.
 _STATIC_LISTS = {
@@ -59,6 +64,7 @@ _GETTERS = {
     "sgr": sgr_publicaciones_client.get_biblioteca_categoria_archivos,
     "senescyt": senescyt_biblioteca_client.get_biblioteca_categoria_archivos,
     "sipa": sipa_client.get_modulo_archivos,
+    "petroecuador": petroecuador_client.get_categoria_archivos,
 }
 
 
@@ -111,7 +117,9 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
             "List the sections of one institution's document archive: ARCSA "
             "sanitary registry, Superbancos and SEPS statistics, INEVAL "
             "evaluation datasets, SGR and Educación Superior libraries, or SIPA "
-            "agricultural statistics. Next: get_archivo_seccion(fuente, seccion)."
+            "agricultural statistics, or EP Petroecuador institutional figures "
+            "(statistical reports, production, prices). "
+            "Next: get_archivo_seccion(fuente, seccion)."
         ),
         annotations=READ_ONLY,
     )
@@ -149,12 +157,20 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           17 categories (PAC, LOES/SNNA normativa, acuerdos, auditorías).
         - sipa: SIPA, Ministerio de Agricultura (4 modules: economico,
           productivo, social, censos). Distinct from MPCEIP.
+        - petroecuador: EP Petroecuador "Cifras Institucionales"
+          (eppetroecuador.ec/?p=3721), 8 sections: estados financieros,
+          informes estadísticos mensuales y anuales (2006 onward, PDF),
+          exploración y producción (daily field production, well
+          nomenclature), comercialización (prices, subsidy value,
+          dispatches), refinación, comercialización internacional (WTI),
+          gestión de riesgos.
 
         Returns each section's `id` (pass it to get_archivo_seccion),
         `nombre`, and either its page `url` or `total_archivos`.
 
         Args:
-            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa.
+            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt,
+                sipa, petroecuador.
             format: text | json
         """
         try:
@@ -210,12 +226,18 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           (formato DESCONOCIDO) that resolves to the same static files.
         - ineval: some ids 308-redirect to a static file; both work.
         - sipa: XLSX/XLS files, some over 40 MB.
+        - petroecuador: `seccion` is the id or nombre. Mostly PDFs; links
+          through download.php redirect to the current PDF (formato
+          DESCONOCIDO). The "Producción de Campo BPPD" title embeds the
+          day's figure and effective date as the page publishes it.
+          Reports are PDFs, not tables: read them with read_pdf.
 
         Files are often several MB: download the URL directly instead of
         using preview_resource_data or download_resource (5 MB cap).
 
         Args:
-            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa.
+            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt,
+                sipa, petroecuador.
             seccion: A section `id` from list_archivo_secciones.
             format: text | json
         """
