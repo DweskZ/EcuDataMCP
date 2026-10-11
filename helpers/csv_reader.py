@@ -1,3 +1,4 @@
+import codecs
 import csv
 import io
 import json
@@ -13,7 +14,7 @@ import httpx
 
 from helpers.geo_proxy import proxy_for
 from helpers.logging import MAIN_LOGGER_NAME
-from helpers.safe_download import safe_stream
+from helpers.safe_download import UnsafeUrlError, safe_stream
 from helpers.tls import (
     os_trust_context,
     should_retry_insecure,
@@ -110,7 +111,9 @@ def normalize_eu_decimal_columns(
     idx_set = set(idxs)
     new_rows = [
         [
-            _convert_eu_decimal(cell) if i in idx_set and cell else cell
+            _convert_eu_decimal(cell)
+            if i in idx_set and cell and _EU_DECIMAL_RE.match(cell.strip())
+            else cell
             for i, cell in enumerate(row)
         ]
         for row in rows
@@ -279,27 +282,61 @@ async def sniff_content_type(
     """
     own = session is None
     if own:
-        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
+        session = httpx.AsyncClient(
+            headers={"User-Agent": USER_AGENT}, proxy=proxy_for(url)
+        )
     assert session is not None
     try:
         async with safe_stream(session, url, timeout=_TIMEOUT) as resp:
             return resp.headers.get("content-type")
-    except httpx.HTTPError:
+    except (httpx.HTTPError, UnsafeUrlError):
         return None
     finally:
         if own:
             await session.aclose()
 
 
-def _decode_text(raw: bytes) -> str:
+def _decode_text(raw: bytes, truncated: bool = False) -> str:
     if raw.startswith(b"\xef\xbb\xbf"):
         raw = raw[3:]
-    for encoding in ("utf-8", "latin-1", "cp1252"):
+    try:
+        # A download cut at the size cap can end inside a multibyte UTF-8
+        # character; final=False tolerates that instead of falling through
+        # to latin-1 and garbling every accent in the file.
+        return codecs.getincrementaldecoder("utf-8")().decode(raw, final=not truncated)
+    except UnicodeDecodeError:
+        pass
+    # cp1252 before latin-1: latin-1 never fails, and would leave Windows
+    # smart quotes and the euro sign as C1 control characters.
+    for encoding in ("cp1252", "latin-1"):
         try:
             return raw.decode(encoding)
-        except (UnicodeDecodeError, ValueError):
+        except UnicodeDecodeError:
             continue
     return raw.decode("utf-8", errors="replace")
+
+
+_MAX_CONTAINER_UNCOMPRESSED_BYTES = 200 * 1024 * 1024
+
+
+def _check_zip_container_size(raw: bytes, label: str) -> None:
+    """Reject a .xlsx/.ods whose parts expand far beyond the download cap.
+
+    The 20 MB limit applies to the compressed bytes; openpyxl and odfpy parse
+    shared strings / content.xml fully into memory, so a hostile file could
+    expand to gigabytes.
+    """
+    try:
+        with zipfile.ZipFile(io.BytesIO(raw)) as zf:
+            total = sum(info.file_size for info in zf.infolist())
+    except zipfile.BadZipFile:
+        return  # the real parser reports the corrupt container
+    if total > _MAX_CONTAINER_UNCOMPRESSED_BYTES:
+        raise ValueError(
+            f"El archivo {label} se expande a más de "
+            f"{_MAX_CONTAINER_UNCOMPRESSED_BYTES // (1024 * 1024)} MB al "
+            "descomprimirse; el preview lo rechaza. Usa download_resource."
+        )
 
 
 def _sniff_delimiter(sample: str) -> str:
@@ -327,7 +364,7 @@ def _sniff_delimiter(sample: str) -> str:
 
 
 def _parse_csv_bytes(raw: bytes, max_rows: int, truncated: bool = False) -> dict[str, Any]:
-    text = _decode_text(raw)
+    text = _decode_text(raw, truncated)
 
     sample = text[:2000]
     delimiter = _sniff_delimiter(sample)
@@ -394,7 +431,7 @@ async def preview_json(
 ) -> dict[str, Any]:
     """Preview JSON / GeoJSON as a tabular sample when possible."""
     raw, truncated = await download_bytes(url, session=session)
-    text = _decode_text(raw)
+    text = _decode_text(raw, truncated)
     data = json.loads(text)
 
     if isinstance(data, dict) and "features" in data and isinstance(data["features"], list):
@@ -506,6 +543,7 @@ async def preview_xlsx(
             "download_resource para bajarlo completo, o el enlace directo."
         )
 
+    _check_zip_container_size(raw, ".xlsx")
     wb = load_workbook(filename=io.BytesIO(raw), read_only=True, data_only=True)
     try:
         ws = wb.active
@@ -689,6 +727,7 @@ async def preview_ods(
             "download_resource para bajarlo completo, o el enlace directo."
         )
 
+    _check_zip_container_size(raw, ".ods")
     doc = load(io.BytesIO(raw))
     tables = doc.spreadsheet.getElementsByType(Table)
     empty = {
@@ -795,6 +834,12 @@ def _pick_member(names: list[str]) -> str | None:
     parser, which fails with a confusing raw csv.Error instead of a message
     that explains there's simply no tabular content in the archive.
     """
+    # __MACOSX/._data.csv resource forks end in .csv but are binary.
+    names = [
+        n
+        for n in names
+        if not n.startswith("__MACOSX/") and not n.rsplit("/", 1)[-1].startswith("._")
+    ]
     for ext in (".csv", ".tsv", ".txt"):
         match = next((n for n in names if n.lower().endswith(ext)), None)
         if match is not None:
@@ -832,7 +877,7 @@ async def preview_targz(
                 )
             extracted = tar.extractfile(members[member_name])
             inner_raw = extracted.read(MAX_DOWNLOAD_BYTES + 1) if extracted else b""
-    except tarfile.TarError as e:
+    except (tarfile.TarError, zlib.error) as e:
         if truncated:
             # Confirmed against a real 17MB .zip on the live portal (same
             # failure mode applies here): a real archive larger than the 5MB

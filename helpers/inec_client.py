@@ -57,6 +57,7 @@ from helpers.cache import TtlCache
 from helpers.csv_reader import download_bytes
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.text_utils import strip_accents as _strip_accents
+from helpers.user_agent import USER_AGENT
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
@@ -400,7 +401,7 @@ async def _get_api_json(
 ) -> tuple[Any, httpx.Headers]:
     own = session is None
     if own:
-        session = httpx.AsyncClient(timeout=25.0)
+        session = httpx.AsyncClient(timeout=25.0, headers={"User-Agent": USER_AGENT})
     assert session is not None
     try:
         resp = await session.get(f"{_API_BASE}/{path}", params=params)
@@ -434,9 +435,16 @@ async def _fetch_categories() -> dict[int, str]:
     async with httpx.AsyncClient(timeout=25.0) as session:
         page = 1
         while True:
-            batch, _ = await _get_api_json(
-                "categories", {"per_page": 100, "page": page}, session=session
-            )
+            try:
+                batch, _ = await _get_api_json(
+                    "categories", {"per_page": 100, "page": page}, session=session
+                )
+            except ValueError:
+                # WordPress answers 400 for a page past the end, which happens
+                # when the category count is an exact multiple of 100.
+                if page > 1:
+                    break
+                raise
             if not batch:
                 break
             for cat in batch:

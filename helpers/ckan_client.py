@@ -22,6 +22,12 @@ _TIMEOUT = 20.0
 CkanSource = Literal["nacional", "cuenca", "latacunga", "iadb"]
 
 
+def _solr_quote(value: str) -> str:
+    """Quote a Solr filter value so spaces, colons or parentheses in it cannot
+    change the query."""
+    return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
 async def _fetch_json(
     url: str,
     params: dict[str, Any] | None = None,
@@ -193,7 +199,7 @@ async def search_datasets(
         "start": start,
     }
     if category:
-        params["fq"] = f"groups:{category}"
+        params["fq"] = f"groups:{_solr_quote(category)}"
     if sort:
         params["sort"] = sort
     return await _fetch_json(
@@ -281,7 +287,7 @@ async def _list_organization_packages(
     result = await _fetch_json(
         _ckan_url("package_search", source),
         params={
-            "fq": f"organization:{org_id}",
+            "fq": f"organization:{_solr_quote(org_id)}",
             "rows": 1000,
             "sort": "metadata_modified desc",
         },

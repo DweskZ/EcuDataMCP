@@ -8,7 +8,9 @@ Git and each test receives a unique child that is removed afterwards.
 
 from __future__ import annotations
 
+import asyncio
 import shutil
+import sys
 from collections.abc import Iterator
 from pathlib import Path
 from uuid import uuid4
@@ -26,3 +28,27 @@ def tmp_path(request: pytest.FixtureRequest) -> Iterator[Path]:
         yield path
     finally:
         shutil.rmtree(path, ignore_errors=True)
+
+
+@pytest.fixture(autouse=True)
+def _fresh_module_locks() -> Iterator[None]:
+    """Give every helpers module fresh asyncio locks for each test.
+
+    An asyncio.Lock binds to the first event loop that has to wait on it; the
+    source clients keep module-level locks (and dicts of locks), and
+    pytest-asyncio runs each test in a new loop, so a lock contended in one
+    test raised "bound to a different event loop" in the next. Production has
+    a single loop, so this is a test-isolation concern only.
+    """
+    for name, module in list(sys.modules.items()):
+        if not name.startswith("helpers.") or module is None:
+            continue
+        for attr, value in list(vars(module).items()):
+            if isinstance(value, asyncio.Lock):
+                setattr(module, attr, asyncio.Lock())
+            elif isinstance(value, dict) and value and all(
+                isinstance(v, asyncio.Lock) for v in value.values()
+            ):
+                for key in value:
+                    value[key] = asyncio.Lock()
+    yield

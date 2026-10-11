@@ -49,9 +49,9 @@ def _parse_pages(pages: str, total_pages: int) -> tuple[list[int], bool]:
             end = int(match.group(2)) if match.group(2) else start
             if start < 1 or end < start:
                 raise ValueError(f"Rango de páginas inválido: {part!r}.")
-            for p in range(start, end + 1):
-                if 1 <= p <= total_pages:
-                    indices.add(p - 1)
+            # Clamp to the document: "1-99999999999" must not spin the loop.
+            for p in range(start, min(end, total_pages) + 1):
+                indices.add(p - 1)
         matched = sorted(indices)
 
     was_capped = len(matched) > MAX_PAGES_PER_CALL

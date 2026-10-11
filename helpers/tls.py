@@ -23,7 +23,8 @@ def insecure_tls_enabled() -> bool:
     if the portal's cert breaks again before the code is updated.
     """
     raw = os.getenv("CKAN_INSECURE_TLS", "0").strip().lower()
-    return raw not in {"0", "false", "no", "off"}
+    # Whitelist the opt-in: an empty value must not disable verification.
+    return raw in {"1", "true", "yes", "on"}
 
 
 def host_allows_insecure_tls(url: str) -> bool:
