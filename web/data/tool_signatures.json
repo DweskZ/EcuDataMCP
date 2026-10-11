@@ -1160,15 +1160,21 @@
         "default": null
       },
       {
+        "name": "fuente",
+        "type": "Literal['sut', 'judicatura']",
+        "default": "'sut'"
+      },
+      {
         "name": "format",
         "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
-    "description": "Queryable fields of one SUT dashboard: columns, measures ([medida]) and date levels, for query_sut_indicador.",
-    "summary": "List the queryable columns/measures/date-levels for one SUT Power BI dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing. A field like \"public contratos.nombre_padre_activ_econ_empresa\" is a plain column usable in query_sut_indicador's campos or filtros; one ending in \"[medida]\" is an aggregate measure (only valid in campos, never filtros); one ending in \"[Año]\"/\"[Mes]\" is a date-hierarchy level. denuncias_publico and encuentra_empleo use an older report layout where visuals don't expose their query this way at all — their fields come from a small manually-captured set instead (recovered by driving the live dashboard and reading the queries it actually sent), not from this automatic discovery, but they show up here the same as any other field.",
+    "description": "Queryable fields of one SUT or Judicatura dashboard (fuente): columns, measures ([medida]/[suma]/[promedio]) and date levels, for query_sut_indicador.",
+    "summary": "List the queryable columns/measures/date-levels for one SUT Power BI dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing. A field like \"public contratos.nombre_padre_activ_econ_empresa\" is a plain column usable in query_sut_indicador's campos or filtros; one ending in \"[medida]\" is an aggregate measure (only valid in campos, never filtros); one ending in \"[Año]\"/\"[Mes]\" is a date-hierarchy level. denuncias_publico and encuentra_empleo use an older report layout where visuals don't expose their query this way at all — their fields come from a small manually-captured set instead (recovered by driving the live dashboard and reading the queries it actually sent), not from this automatic discovery, but they show up here the same as any other field. Judicatura dashboards (fuente=\"judicatura\") expose aggregate fields as \"[suma]\"/\"[promedio]\" (e.g. \"CUB EST_CUB_AUDIENCIAS.Contador [suma]\"); they are valid only in campos, like \"[medida]\" fields.",
     "args_doc": {
-      "indicador": "A key from list_catalogo(fuente='sut').",
+      "indicador": "A key from list_catalogo(fuente=<fuente>).",
+      "fuente": "sut (default) | judicatura",
       "format": "text | json"
     }
   },
@@ -1276,8 +1282,8 @@
         "default": "'text'"
       }
     ],
-    "description": "List one source's catalog, the step before its get tool: arconel (get_arconel_reporte), bce_diarios (get_bce_indicador_diario), contraloria (get_contraloria_informe), iess (get_iess_archivos), sut (get_sut_indicador_schema, query_sut_indicador).",
-    "summary": "List the catalog of one source that has no search filters. - arconel: ARCONEL electricity report types by section, years (1998 on) and company groups; run one with get_arconel_reporte. - bce_diarios: BCE daily/monthly indicator widgets outside BCEData (riesgo país daily since 2004, gold, WTI, bonds, payments, reserves, fiscal and external series); a `codigo` only means one thing within its `archivo`. Follow with get_bce_indicador_diario(archivo, codigo). - contraloria: Contraloría \"Datos Abiertos\" quarterly audit-report CSVs and annual control plans; follow with get_contraloria_informe. - iess: IESS document collections (statistical bulletins, actuarial studies, audit reports) with years and counts; follow with get_iess_archivos(coleccion, anio). - sut: Ministerio del Trabajo SUT Power BI dashboards (contracts since 2015, labor demand, gender policy); follow with get_sut_indicador_schema, then query_sut_indicador.",
+    "description": "List one source's catalog, the step before its get tool: arconel (get_arconel_reporte), bce_diarios (get_bce_indicador_diario), contraloria (get_contraloria_informe), iess (get_iess_archivos), sut and judicatura (get_sut_indicador_schema, query_sut_indicador with the same fuente).",
+    "summary": "List the catalog of one source that has no search filters. - arconel: ARCONEL electricity report types by section, years (1998 on) and company groups; run one with get_arconel_reporte. - bce_diarios: BCE daily/monthly indicator widgets outside BCEData (riesgo país daily since 2004, gold, WTI, bonds, payments, reserves, fiscal and external series); a `codigo` only means one thing within its `archivo`. Follow with get_bce_indicador_diario(archivo, codigo). - contraloria: Contraloría \"Datos Abiertos\" quarterly audit-report CSVs and annual control plans; follow with get_contraloria_informe. - iess: IESS document collections (statistical bulletins, actuarial studies, audit reports) with years and counts; follow with get_iess_archivos(coleccion, anio). - sut: Ministerio del Trabajo SUT Power BI dashboards (contracts since 2015, labor demand, gender policy); follow with get_sut_indicador_schema, then query_sut_indicador. - judicatura: Consejo de la Judicatura statistics portal (audiencias, boletas, capacitaciones, destituciones, escritos, mediación, notarial, productividad de jueces, remates, SUPA pensiones alimenticias); follow with get_sut_indicador_schema(indicador, fuente=\"judicatura\"), then query_sut_indicador.",
     "args_doc": {
       "fuente": "Catalog to list; see the list above.",
       "format": "text | json"
@@ -1571,18 +1577,24 @@
         "default": "500"
       },
       {
+        "name": "fuente",
+        "type": "Literal['sut', 'judicatura']",
+        "default": "'sut'"
+      },
+      {
         "name": "format",
         "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
-    "description": "Live query of one SUT dashboard's data model: choose campos, optional equality filtros (plain columns only) and a row limite. Take the indicador from list_catalogo(fuente='sut') and its valid campos from get_sut_indicador_schema.",
-    "summary": "Run a live query against one SUT Power BI dashboard's underlying data model — any combination of its fields, e.g. month AND industry together for \"contratos\" (a real monthly time series since 2015 by CIIU industry, province, gender, contract status — none of this is in the ministerio-del-trabajo CKAN datasets, which are a single current-snapshot stock count with no time dimension). Get valid campos from get_sut_indicador_schema(indicador) first — an unrecognized field name raises an error naming the tool to call instead of guessing. filtros only accepts plain-column fields (not \"[medida]\"/hierarchy-level fields) and matches exact text equality, e.g. {\"public contratos.Estado contrato\": \"Vigente\"}. Rows can run into the thousands for a wide breakdown (e.g. every month x every industry) — narrow with filtros or fewer campos rather than raising limite past what's actually needed; format \"json\" is exact but still subject to the same limite cap.",
+    "description": "Live query of one SUT or Consejo de la Judicatura dashboard's data model (fuente): choose campos, optional equality filtros (plain columns only) and a row limite. Take the indicador from list_catalogo(fuente) and its valid campos from get_sut_indicador_schema.",
+    "summary": "Run a live query against one SUT Power BI dashboard's underlying data model — any combination of its fields, e.g. month AND industry together for \"contratos\" (a real monthly time series since 2015 by CIIU industry, province, gender, contract status — none of this is in the ministerio-del-trabajo CKAN datasets, which are a single current-snapshot stock count with no time dimension). fuente=\"judicatura\" queries the Consejo de la Judicatura dashboards (e.g. audiencias by year and province: campos \"CUB EST_CUB_AUDIENCIAS. Periodo [Año]\" and \"CUB EST_CUB_AUDIENCIAS.Contador [suma]\"). Get valid campos from get_sut_indicador_schema(indicador) first — an unrecognized field name raises an error naming the tool to call instead of guessing. filtros only accepts plain-column fields (not \"[medida]\"/hierarchy-level fields) and matches exact text equality, e.g. {\"public contratos.Estado contrato\": \"Vigente\"}. Rows can run into the thousands for a wide breakdown (e.g. every month x every industry) — narrow with filtros or fewer campos rather than raising limite past what's actually needed; format \"json\" is exact but still subject to the same limite cap.",
     "args_doc": {
-      "indicador": "A key from list_catalogo(fuente='sut').",
+      "indicador": "A key from list_catalogo(fuente=<fuente>).",
       "campos": "Field labels exactly as returned by get_sut_indicador_schema.",
       "filtros": "Optional {campo: valor} equality filters, plain columns only.",
       "limite": "Row cap applied server-side by the query itself.",
+      "fuente": "sut (default) | judicatura",
       "format": "text | json"
     }
   },

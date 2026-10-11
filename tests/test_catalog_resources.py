@@ -41,6 +41,7 @@ def test_fuentes_lists_every_integrated_source_family():
         "superbancos",
         "cenace",
         "sut",
+        "judicatura",
     } <= sources.keys()
     assert "search_biinec_extras" in sources["inec-biinec"]["tools"]
     assert "get_contraloria_informe" in sources["contraloria"]["tools"]

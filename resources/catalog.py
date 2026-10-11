@@ -352,6 +352,20 @@ def _all_fuentes() -> dict:
                 ],
             },
             {
+                "id": "judicatura",
+                "nombre": (
+                    "Consejo de la Judicatura (Portal de Estadística Judicial: "
+                    "tableros Power BI en vivo de audiencias, mediación, "
+                    "notarial, productividad de jueces, SUPA)"
+                ),
+                "base": "https://fsweb.funcionjudicial.gob.ec/estadisticas/",
+                "tools": [
+                    "list_catalogo",
+                    "get_sut_indicador_schema",
+                    "query_sut_indicador",
+                ],
+            },
+            {
                 "id": "arcotel",
                 "nombre": (
                     "ARCOTEL (estadísticas del sector de telecomunicaciones: "

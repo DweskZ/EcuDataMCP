@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from helpers import sut_powerbi_client as sut
@@ -391,3 +393,168 @@ async def test_query_indicador_encuentra_empleo_uses_aggregation_and_decodes_row
     request = httpx_mock.get_requests(url=f"{sut._BASE}/public/reports/querydata?synchronous=true")[0]
     sent = request.content.decode("utf-8")
     assert '"Function": 0' in sent or '"Function":0' in sent
+
+
+# --- Consejo de la Judicatura (second cluster, newer report layouts) -------
+
+_JUD_KEY = "789ae560-e736-437e-9aef-85564a353257"
+_JUD_BASE = sut._JUDICATURA_BASE
+_PBIR_DOC = (
+    '{"pages":{"pages":[{"content":{"visuals":[{"query":{"queryState":{"Rows":'
+    '{"projections":['
+    '{"field":{"Column":{"Expression":{"SourceRef":{"Entity":"CUB EST_PROD"}},"Property":"Juez"}}},'
+    '{"field":{"Measure":{"Expression":{"SourceRef":{"Entity":"CUB EST_PROD"}},"Property":"Promedio"}}},'
+    '{"field":{"Aggregation":{"Expression":{"Column":{"Expression":{"SourceRef":'
+    '{"Entity":"CUB EST_PROD"}},"Property":"Tramite"}},"Function":0}}},'
+    '{"field":{"Aggregation":{"Expression":{"Column":{"Expression":{"SourceRef":'
+    '{"Entity":"CUB EST_PROD"}},"Property":"Corte"}},"Function":3}}},'
+    '{"field":{"Column":{"Expression":{"SourceRef":{"Entity":"LocalDateTable_x"}},"Property":"Año"}}}'
+    "]}}}}]}}]}}"
+)
+_JUD_EXPLORATION = {
+    "models": [{"id": 4541304, "dbName": "f8d9cd7d-d1fb-4af6-8219-7ecd87a5d32c"}],
+    "exploration": {
+        "reportId": "4577594",
+        "sections": [{"visualContainers": [{"id": 1, "objectName": "abc"}]}],
+        "explorationContent": {"explorationDocument": _PBIR_DOC},
+    },
+}
+
+
+def test_list_indicadores_defaults_to_sut_and_filters_by_fuente():
+    assert len(sut.list_indicadores()) == 8
+    assert all(i["fuente"] == "sut" for i in sut.list_indicadores())
+    jud = sut.list_indicadores("judicatura")
+    assert len(jud) == 10
+    assert {"audiencias", "productividad_jueces", "supa"} <= {i["indicador"] for i in jud}
+    assert all(i["base"] == _JUD_BASE for i in jud)
+    with pytest.raises(ValueError, match="Fuente 'x'"):
+        sut.list_indicadores("x")
+
+
+@pytest.mark.asyncio
+async def test_judicatura_schema_uses_its_own_cluster_and_falls_back_to_entity_walk(httpx_mock):
+    httpx_mock.add_response(
+        url=f"{_JUD_BASE}/public/reports/{_JUD_KEY}/modelsAndExploration",
+        json=_JUD_EXPLORATION,
+    )
+
+    result = await sut.get_indicador_schema("productividad_jueces", "judicatura")
+
+    assert result["fuente"] == "judicatura"
+    # An aggregated column also stays queryable as a plain column (filters);
+    # unsupported aggregation codes (Corte, Function 3) and hidden
+    # LocalDateTable_ entities add nothing beyond that plain column.
+    assert result["campos"] == [
+        "CUB EST_PROD.Corte",
+        "CUB EST_PROD.Juez",
+        "CUB EST_PROD.Promedio [medida]",
+        "CUB EST_PROD.Tramite",
+        "CUB EST_PROD.Tramite [suma]",
+    ]
+
+
+@pytest.mark.asyncio
+async def test_indicador_is_scoped_to_its_fuente():
+    with pytest.raises(ValueError, match="no reconocido en la fuente 'sut'"):
+        await sut.get_indicador_schema("audiencias")
+    with pytest.raises(ValueError, match="no reconocido en la fuente 'judicatura'"):
+        await sut.get_indicador_schema("contratos", "judicatura")
+
+
+@pytest.mark.asyncio
+async def test_judicatura_query_posts_to_its_cluster_with_aggregation_and_filter(httpx_mock):
+    httpx_mock.add_response(
+        url=f"{_JUD_BASE}/public/reports/{_JUD_KEY}/modelsAndExploration",
+        json=_JUD_EXPLORATION,
+    )
+    httpx_mock.add_response(
+        method="POST",
+        url=f"{_JUD_BASE}/public/reports/querydata?synchronous=true",
+        json={
+            "results": [
+                {
+                    "result": {
+                        "data": {
+                            "descriptor": {
+                                "Select": [
+                                    {"Value": "G0", "Name": "CUB EST_PROD.Juez"},
+                                    {"Value": "M0", "Name": "suma(CUB EST_PROD.Tramite)"},
+                                ]
+                            },
+                            "dsr": {
+                                "DS": [
+                                    {
+                                        "PH": [
+                                            {
+                                                "DM0": [
+                                                    {
+                                                        "S": [{"N": "G0", "T": 1}, {"N": "M0", "T": 4}],
+                                                        "C": ["ANA", 12],
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                        }
+                    }
+                }
+            ]
+        },
+    )
+
+    result = await sut.query_indicador(
+        "productividad_jueces",
+        ["CUB EST_PROD.Juez", "CUB EST_PROD.Tramite [suma]"],
+        filtros={"CUB EST_PROD.Juez": "ANA"},
+        fuente="judicatura",
+    )
+
+    assert result["filas"] == [{"CUB EST_PROD.Juez": "ANA", "suma(CUB EST_PROD.Tramite)": 12}]
+    request = httpx_mock.get_requests(url=f"{_JUD_BASE}/public/reports/querydata?synchronous=true")[0]
+    assert request.headers["x-powerbi-resourcekey"] == _JUD_KEY
+    select = json.loads(request.content)["queries"][0]["Query"]["Commands"][0][
+        "SemanticQueryDataShapeCommand"
+    ]["Query"]["Select"]
+    assert select[1]["Aggregation"]["Function"] == 0
+
+
+def test_decode_dsr_single_column_group_entries():
+    data = {
+        "descriptor": {"Select": [{"Value": "G0", "Name": "t.Canton"}]},
+        "dsr": {
+            "DS": [
+                {
+                    "PH": [
+                        {
+                            "DM0": [
+                                {"S": [{"N": "G0", "T": 1}], "G0": "A"},
+                                {"G0": "B"},
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+    }
+
+    assert sut._decode_dsr(data) == [{"t.Canton": "A"}, {"t.Canton": "B"}]
+
+
+def test_select_item_aggregation_becomes_suma_field():
+    spec = sut._spec_from_select_item(
+        {
+            "Aggregation": {
+                "Expression": {"Column": {"Expression": {"SourceRef": {"Source": "a"}}, "Property": "Contador"}},
+                "Function": 0,
+            }
+        },
+        {"a": "CUB EST_CUB_AUDIENCIAS"},
+    )
+
+    assert spec["kind"] == "aggregation"
+    assert sut._field_label(spec["entity"], spec["property"], spec["kind"], None, spec["function"]) == (
+        "CUB EST_CUB_AUDIENCIAS.Contador [suma]"
+    )

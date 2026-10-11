@@ -76,6 +76,19 @@ _BASE = "https://wabi-south-central-us-c-primary-api.analysis.windows.net"
 _TIMEOUT = 30.0
 _DEFAULT_ROW_LIMIT = 20000
 
+# Consejo de la Judicatura's Portal de Estadística Judicial
+# (fsweb.funcionjudicial.gob.ec/estadisticas/*.html) embeds Power BI
+# "publish to web" reports that live on a different cluster than the SUT
+# ones. The resource key only resolves on its own cluster (wrong cluster =>
+# 401 UnableToFindKeyInDBorCacheException), so each registry entry may carry
+# its own `base`; entries without one use _BASE.
+_JUDICATURA_BASE = "https://wabi-paas-1-scus-api.analysis.windows.net"
+_FUENTES = ("sut", "judicatura")
+
+# Power BI AggregateFunction codes seen live on the Judicatura dashboards and
+# worth exposing as fields; other codes (min/max/count) are skipped.
+_AGG_LABELS = {0: "suma", 1: "promedio"}
+
 _INDICADORES: list[dict[str, str]] = [
     {
         "indicador": "contratos",
@@ -121,7 +134,66 @@ _INDICADORES: list[dict[str, str]] = [
         "resource_key": "5b212c21-2363-4f5b-84c6-bb4f5a439c77",
     },
 ]
-_INDICADORES_BY_KEY = {i["indicador"]: i for i in _INDICADORES}
+_JUDICATURA_INDICADORES: list[dict[str, str]] = [
+    {
+        "indicador": "audiencias",
+        "nombre": "Audiencias judiciales (programadas, realizadas, fallidas)",
+        "resource_key": "fe27a4d9-983c-45b1-8e89-2d212b47b0ce",
+    },
+    {
+        "indicador": "boletas",
+        "nombre": "Boletas de apremio y de encarcelamiento",
+        "resource_key": "e2884a27-b6d0-42eb-ab3f-7ffc2a0a230f",
+    },
+    {
+        "indicador": "capacitaciones",
+        "nombre": "Capacitaciones de la Escuela de la Función Judicial",
+        "resource_key": "bfa7ccf9-5dfe-4deb-9d54-89a359a47367",
+    },
+    {
+        "indicador": "destituciones",
+        "nombre": "Destituciones de servidores judiciales",
+        "resource_key": "09d997b3-c75b-40fb-b818-039cc624750b",
+    },
+    {
+        "indicador": "escritos",
+        "nombre": "Escritos y trámites ingresados",
+        "resource_key": "753fcfb9-057d-4707-b52d-5ceeb9784c07",
+    },
+    {
+        "indicador": "mediacion",
+        "nombre": "Mediación (actas, mediadores, tiempos)",
+        "resource_key": "9d6e0ecf-6776-471c-9d97-9cb56e749927",
+    },
+    {
+        "indicador": "notarial",
+        "nombre": "Servicio notarial (actos, notarías, recaudación, sorteos)",
+        "resource_key": "23dd94b9-e402-4a8a-8c8a-72cf6b1088ae",
+    },
+    {
+        "indicador": "productividad_jueces",
+        "nombre": "Productividad de jueces (trámites, tasa de resolución)",
+        "resource_key": "789ae560-e736-437e-9aef-85564a353257",
+    },
+    {
+        "indicador": "remates_judiciales",
+        "nombre": "Remates judiciales",
+        "resource_key": "979b6b41-4fa3-492a-a463-03d2d307e377",
+    },
+    {
+        "indicador": "supa",
+        "nombre": "SUPA — pensiones alimenticias (recaudación, incidentes, boletas de apremio)",
+        "resource_key": "6a820389-fb8b-44c1-b93d-d1d29bbe58af",
+    },
+]
+for _entry in _INDICADORES:
+    _entry["fuente"] = "sut"
+for _entry in _JUDICATURA_INDICADORES:
+    _entry["fuente"] = "judicatura"
+    _entry["base"] = _JUDICATURA_BASE
+_INDICADORES.extend(_JUDICATURA_INDICADORES)
+_INDICADORES_BY_KEY = {i["indicador"]: i for i in _INDICADORES if i["fuente"] == "sut"}
+_INDICADORES_BY_FUENTE_KEY = {(i["fuente"], i["indicador"]): i for i in _INDICADORES}
 
 # denuncias_publico and encuentra_empleo ship an older/compressed report
 # layout: modelsAndExploration still returns reportId/modelId/dataset id
@@ -282,16 +354,33 @@ _schema_cache = TtlCache(ttl_seconds=21600.0, max_entries=len(_INDICADORES))
 _fetch_lock = asyncio.Lock()
 
 
-def list_indicadores() -> list[dict[str, str]]:
-    """The eight fixed SUT Power BI dashboards."""
-    return [dict(i) for i in _INDICADORES]
+def list_indicadores(fuente: str = "sut") -> list[dict[str, str]]:
+    """The fixed Power BI dashboards of one fuente (default: the eight SUT ones)."""
+    _check_fuente(fuente)
+    return [dict(i) for i in _INDICADORES if i["fuente"] == fuente]
 
 
-def _field_label(entity: str, prop: str, kind: str, level: str | None = None) -> str:
+def _check_fuente(fuente: str) -> None:
+    if fuente not in _FUENTES:
+        raise ValueError(f"Fuente '{fuente}' no reconocida. Válidas: {', '.join(_FUENTES)}")
+
+
+def _lookup(indicador: str, fuente: str) -> dict[str, str]:
+    _check_fuente(fuente)
+    info = _INDICADORES_BY_FUENTE_KEY.get((fuente, indicador))
+    if info is None:
+        valid = ", ".join(sorted(k for f, k in _INDICADORES_BY_FUENTE_KEY if f == fuente))
+        raise ValueError(f"Indicador '{indicador}' no reconocido en la fuente '{fuente}'. Válidos: {valid}")
+    return info
+
+
+def _field_label(entity: str, prop: str, kind: str, level: str | None = None, func: int | None = None) -> str:
     if kind == "measure":
         return f"{entity}.{prop} [medida]"
     if kind == "hierarchy":
         return f"{entity}.{prop} [{level}]"
+    if kind == "aggregation":
+        return f"{entity}.{prop} [{_AGG_LABELS[func]}]"
     return f"{entity}.{prop}"
 
 
@@ -314,6 +403,21 @@ def _spec_from_select_item(item: dict[str, Any], alias_to_entity: dict[str, str]
             return None
         prop = m["Property"]
         return {"entity": entity, "property": prop, "kind": "measure", "query_name": f"{entity}.{prop}"}
+    if "Aggregation" in item:
+        a = item["Aggregation"]
+        func = a.get("Function")
+        column = (a.get("Expression") or {}).get("Column") or {}
+        entity = alias_to_entity.get(column["Expression"]["SourceRef"]["Source"])
+        if entity is None or func not in _AGG_LABELS:
+            return None
+        prop = column["Property"]
+        return {
+            "entity": entity,
+            "property": prop,
+            "kind": "aggregation",
+            "function": func,
+            "query_name": f"{_AGG_LABELS[func]}({entity}.{prop})",
+        }
     if "HierarchyLevel" in item:
         hl = item["HierarchyLevel"]
         h = hl["Expression"]["Hierarchy"]
@@ -365,12 +469,64 @@ def _collect_fields(exploration: dict[str, Any]) -> dict[str, dict[str, Any]]:
                     spec = None
                 if spec is None:
                     continue
-                label = _field_label(spec["entity"], spec["property"], spec["kind"], spec.get("level"))
+                label = _field_label(spec["entity"], spec["property"], spec["kind"], spec.get("level"), spec.get("function"))
                 campos.setdefault(label, spec)
     return campos
 
 
-async def _get_bootstrap(resource_key: str, indicador: str) -> dict[str, Any]:
+def _walk_entity_fields(node: Any, found: dict[str, dict[str, Any]]) -> None:
+    """Recursively collect Entity/Property references (Column, Measure,
+    Aggregation) anywhere in a report layout, descending into JSON strings.
+
+    Newer reports (confirmed live on the Judicatura dashboards) ship their
+    visuals as a PBIR document under exploration.explorationContent -- or as
+    configs whose prototypeQuery has no usable From/Select -- so
+    _collect_fields finds nothing. The Entity/Property pairs are still there
+    in plain JSON, which is all a query needs."""
+    if isinstance(node, dict):
+        for kind in ("Column", "Measure"):
+            body = node.get(kind)
+            if isinstance(body, dict) and "Property" in body:
+                entity = ((body.get("Expression") or {}).get("SourceRef") or {}).get("Entity")
+                if entity and not entity.startswith("LocalDateTable_"):
+                    prop = body["Property"]
+                    spec_kind = "measure" if kind == "Measure" else "column"
+                    label = _field_label(entity, prop, spec_kind)
+                    found.setdefault(
+                        label,
+                        {"entity": entity, "property": prop, "kind": spec_kind, "query_name": f"{entity}.{prop}"},
+                    )
+        agg = node.get("Aggregation")
+        if isinstance(agg, dict):
+            column = (agg.get("Expression") or {}).get("Column") or {}
+            entity = ((column.get("Expression") or {}).get("SourceRef") or {}).get("Entity")
+            func = agg.get("Function")
+            if entity and column.get("Property") and func in _AGG_LABELS and not entity.startswith("LocalDateTable_"):
+                prop = column["Property"]
+                label = f"{entity}.{prop} [{_AGG_LABELS[func]}]"
+                found.setdefault(
+                    label,
+                    {
+                        "entity": entity,
+                        "property": prop,
+                        "kind": "aggregation",
+                        "function": func,
+                        "query_name": f"{_AGG_LABELS[func]}({entity}.{prop})",
+                    },
+                )
+        for value in node.values():
+            _walk_entity_fields(value, found)
+    elif isinstance(node, list):
+        for value in node:
+            _walk_entity_fields(value, found)
+    elif isinstance(node, str) and node[:1] in ("{", "["):
+        try:
+            _walk_entity_fields(json.loads(node), found)
+        except ValueError:
+            pass
+
+
+async def _get_bootstrap(resource_key: str, indicador: str, base: str = _BASE) -> dict[str, Any]:
     cached = _schema_cache.get(resource_key)
     if cached is not None:
         return cached
@@ -381,7 +537,7 @@ async def _get_bootstrap(resource_key: str, indicador: str) -> dict[str, Any]:
             return cached
 
         logger.info("Descargando esquema (modelsAndExploration) SUT Power BI: %s", resource_key)
-        url = f"{_BASE}/public/reports/{resource_key}/modelsAndExploration"
+        url = f"{base}/public/reports/{resource_key}/modelsAndExploration"
         async with httpx.AsyncClient(
             headers={"User-Agent": USER_AGENT, "X-PowerBI-ResourceKey": resource_key}
         ) as session:
@@ -393,6 +549,8 @@ async def _get_bootstrap(resource_key: str, indicador: str) -> dict[str, Any]:
         model = models[0] if models else {}
         exploration = data.get("exploration") or {}
         campos = _collect_fields(exploration)
+        if not campos:
+            _walk_entity_fields(exploration, campos)
         campos.update(_MANUAL_CAMPOS.get(indicador, {}))
         result = {
             "report_id": exploration.get("reportId"),
@@ -404,7 +562,7 @@ async def _get_bootstrap(resource_key: str, indicador: str) -> dict[str, Any]:
         return result
 
 
-async def get_indicador_schema(indicador: str) -> dict[str, Any]:
+async def get_indicador_schema(indicador: str, fuente: str = "sut") -> dict[str, Any]:
     """
     List every column/measure/date-level findable in one SUT dashboard's
     visuals, discovered from the report's own layout definition (not by
@@ -413,16 +571,15 @@ async def get_indicador_schema(indicador: str) -> dict[str, Any]:
     queries this way (see _MANUAL_CAMPOS).
 
     Args:
-        indicador: A key from list_indicadores().
+        indicador: A key from list_indicadores(fuente).
+        fuente: "sut" (default) or "judicatura".
     """
-    info = _INDICADORES_BY_KEY.get(indicador)
-    if info is None:
-        valid = ", ".join(sorted(_INDICADORES_BY_KEY))
-        raise ValueError(f"Indicador '{indicador}' no reconocido. Válidos: {valid}")
+    info = _lookup(indicador, fuente)
 
-    bootstrap = await _get_bootstrap(info["resource_key"], indicador)
+    bootstrap = await _get_bootstrap(info["resource_key"], indicador, info.get("base", _BASE))
     return {
         "indicador": indicador,
+        "fuente": fuente,
         "nombre": info["nombre"],
         "campos": sorted(bootstrap["campos"]),
     }
@@ -435,7 +592,7 @@ def _build_select_item(spec: dict[str, Any], alias: str) -> dict[str, Any]:
             "Name": spec["query_name"],
             "NativeReferenceName": spec["property"],
         }
-    if spec["kind"] == "aggregated_sum":
+    if spec["kind"] in ("aggregated_sum", "aggregation"):
         # A plain column that visuals aggregate with SUM() at query time,
         # rather than a pre-built DAX measure -- e.g. encuentra_empleo's
         # "Número de Personas". Function 0 is Sum in Power BI's
@@ -444,7 +601,7 @@ def _build_select_item(spec: dict[str, Any], alias: str) -> dict[str, Any]:
         return {
             "Aggregation": {
                 "Expression": {"Column": {"Expression": {"SourceRef": {"Source": alias}}, "Property": spec["property"]}},
-                "Function": 0,
+                "Function": spec.get("function", 0),
             },
             "Name": spec["query_name"],
             "NativeReferenceName": spec["property"],
@@ -492,6 +649,22 @@ def _decode_dsr(data: dict[str, Any]) -> list[dict[str, Any]]:
         if "S" in entry:
             schema = entry["S"]
             prev = [None] * len(schema)
+        if "C" not in entry and schema and "R" not in entry and "Ø" not in entry:
+            # A one-column result is sent as {"G0": value} (key = the schema
+            # column's own name) instead of the C/R/Ø packing; a repeated value
+            # simply omits the key (confirmed live on the Judicatura reports).
+            cur = list(prev)
+            for i, col in enumerate(schema):
+                if col["N"] in entry:
+                    cur[i] = entry[col["N"]]
+            prev = cur
+            row = {}
+            for col, val in zip(schema, cur):
+                if val is not None and "DN" in col and isinstance(val, int):
+                    val = value_dicts[col["DN"]][val]
+                row[descriptor_name_by_value.get(col["N"], col["N"])] = val
+            rows.append(row)
+            continue
         c_vals = entry.get("C", [])
         r_mask = entry.get("R", 0)
         o_mask = entry.get("Ø", 0)
@@ -523,6 +696,7 @@ async def query_indicador(
     campos: list[str],
     filtros: dict[str, str] | None = None,
     limite: int = _DEFAULT_ROW_LIMIT,
+    fuente: str = "sut",
 ) -> dict[str, Any]:
     """
     Run a live query against one SUT dashboard's semantic model -- any
@@ -532,7 +706,7 @@ async def query_indicador(
     single chart in the dashboard shows it broken down that way).
 
     Args:
-        indicador: A key from list_indicadores().
+        indicador: A key from list_indicadores(fuente).
         campos: Field labels exactly as returned by get_indicador_schema
             (e.g. "public contratos.nombre_padre_activ_econ_empresa",
             "Medidas.Cantidad de Contratos [medida]").
@@ -540,15 +714,14 @@ async def query_indicador(
             campo, not a measure/hierarchy). Values are matched as text.
         limite: Row cap (server-side, via the query's own DataReduction
             window) -- keep well under the platform's context budget.
+        fuente: "sut" (default) or "judicatura".
     """
-    info = _INDICADORES_BY_KEY.get(indicador)
-    if info is None:
-        valid = ", ".join(sorted(_INDICADORES_BY_KEY))
-        raise ValueError(f"Indicador '{indicador}' no reconocido. Válidos: {valid}")
+    info = _lookup(indicador, fuente)
+    base = info.get("base", _BASE)
     if not campos:
         raise ValueError("Se requiere al menos un campo en 'campos'.")
 
-    bootstrap = await _get_bootstrap(info["resource_key"], indicador)
+    bootstrap = await _get_bootstrap(info["resource_key"], indicador, base)
     campos_by_label = bootstrap["campos"]
 
     def resolve(label: str) -> dict[str, Any]:
@@ -635,7 +808,7 @@ async def query_indicador(
             "X-PowerBI-ResourceKey": info["resource_key"],
         }
     ) as session:
-        resp = await session.post(f"{_BASE}/public/reports/querydata?synchronous=true", json=body, timeout=_TIMEOUT)
+        resp = await session.post(f"{base}/public/reports/querydata?synchronous=true", json=body, timeout=_TIMEOUT)
         resp.raise_for_status()
         payload = resp.json()
 
@@ -645,4 +818,4 @@ async def query_indicador(
     else:
         filas = _decode_dsr(result["data"])
 
-    return {"indicador": indicador, "nombre": info["nombre"], "campos": campos, "filas": filas}
+    return {"indicador": indicador, "fuente": fuente, "nombre": info["nombre"], "campos": campos, "filas": filas}

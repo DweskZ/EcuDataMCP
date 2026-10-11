@@ -731,6 +731,27 @@
     ]
   },
   {
+    "id": "justice",
+    "theme": "Justice",
+    "lede": "Official judicial statistics, queryable live.",
+    "institutions": [
+      {
+        "name": "Judiciary Council (Consejo de la Judicatura)",
+        "sources": [
+          {
+            "id": "judicatura-estadistica",
+            "name": "Judicial statistics",
+            "tag": "Justice",
+            "description": "Ten dashboards from the Portal de Estadística Judicial (hearings, mediation, notaries, judge productivity, SUPA, and more), queryable live",
+            "coverage": "fsweb.funcionjudicial.gob.ec/estadisticas",
+            "url": "https://fsweb.funcionjudicial.gob.ec/estadisticas/",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "transport-aviation",
     "theme": "Transport & civil aviation",
     "lede": "Aerodromes, aeronautical weather, and notices to airmen, straight from DGAC.",
