@@ -2360,37 +2360,37 @@
       },
       {
         "name": "get_serie_internacional",
-        "description": "International series with Ecuador data: World Bank WDI indicators, IRENA electricity capacity and generation, and XM's Colombia-Ecuador power flows.",
+        "description": "International series with Ecuador data: World Bank WDI, IRENA, XM power flows, UN Comtrade bilateral trade, IMF series, WHO health, ILO labour and UNHCR displacement.",
         "params": [
           {
             "name": "fuente",
             "type": "Fuente",
             "default": null,
-            "description": "wdi, irena or xm."
+            "description": "wdi, irena, xm, comtrade, imf, who, ilo or unhcr."
           },
           {
             "name": "indicador",
             "type": "str",
             "default": "''",
-            "description": "wdi only: WDI code. Empty with query searches the catalog."
+            "description": "wdi/who: indicator code. imf/ilo: dataflow id. Empty with query searches (wdi/who) or lists flows (imf/ilo)."
           },
           {
             "name": "query",
             "type": "str",
             "default": "''",
-            "description": "wdi only: catalog search text (English), used when indicador is empty."
+            "description": "wdi/who/imf/ilo: catalog search text (English), used when indicador is empty."
           },
           {
             "name": "pais",
             "type": "str",
             "default": "'ECU'",
-            "description": "wdi/irena: ISO3 code (irena also accepts the English name). Ignored by xm. Default ECU."
+            "description": "wdi/irena/who/imf/ilo/unhcr: ISO3 code (irena also accepts the English name). comtrade: ISO3 or numeric M49 reporter. Ignored by xm. Default ECU."
           },
           {
             "name": "desde",
             "type": "str",
             "default": "''",
-            "description": "Start: a year (YYYY) for wdi/irena, a date (YYYY-MM-DD) for xm."
+            "description": "Start: a year (YYYY) for wdi/irena/who/unhcr, a date (YYYY-MM-DD) for xm, a period (YYYY, YYYY-MM) for imf/ilo."
           },
           {
             "name": "hasta",
@@ -2432,7 +2432,49 @@
             "name": "limit",
             "type": "int",
             "default": "30",
-            "description": "WDI catalog search only: maximum indicators (1-200)."
+            "description": "Catalog or flow listings only: maximum rows (1-200)."
+          },
+          {
+            "name": "periodo",
+            "type": "str",
+            "default": "''",
+            "description": "comtrade only: a single period, YYYY (frecuencia A) or YYYYMM (frecuencia M). Required."
+          },
+          {
+            "name": "socio",
+            "type": "str",
+            "default": "''",
+            "description": "comtrade: partner as ISO3 (USA, CHN, COL, PER, PAN, ESP, NLD, ITA...) or M49 number; empty = 0 (World). unhcr: origin ISO3 or 'todos'."
+          },
+          {
+            "name": "cmd",
+            "type": "str",
+            "default": "'TOTAL'",
+            "description": "comtrade only: TOTAL or an HS code of 2, 4 or 6 digits."
+          },
+          {
+            "name": "flujo",
+            "type": "str",
+            "default": "'ambos'",
+            "description": "comtrade only: X (exports), M (imports) or ambos."
+          },
+          {
+            "name": "frecuencia",
+            "type": "Literal['A', 'M']",
+            "default": "'A'",
+            "description": "comtrade only: A (annual) or M (monthly)."
+          },
+          {
+            "name": "clave",
+            "type": "str",
+            "default": "''",
+            "description": "imf/ilo only: dot-separated SDMX key (ECU.CPI._T.IX.M). Empty = pais."
+          },
+          {
+            "name": "ultimos",
+            "type": "int",
+            "default": "0",
+            "description": "imf/ilo only: last N observations per series. Default 5 (imf) / 3 (ilo) when no desde/hasta."
           },
           {
             "name": "format",
@@ -2441,7 +2483,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Fetches a series from an international source, filtered to Ecuador. wdi: World Bank World Development Indicators (1,400+ yearly series); with indicador (e.g. EG.ELC.ACCS.ZS access to electricity) returns the series, with only query (English) searches the catalog; years without a value are dropped and counted. irena: IRENASTAT installed capacity (MW) and generation (GWh) by technology, 2000 on, on/off-grid. xm: XM's hourly energy on the Colombia-Ecuador interconnection, summed by day or month since 2003; needs desde and hasta (at most 366 days); days without flow show as 0 GWh, so the October 2024 suspension appears as zeros."
+        "long_description": "Fetches a series from an international source, filtered to Ecuador. wdi: World Bank World Development Indicators (1,400+ yearly series); with indicador (e.g. EG.ELC.ACCS.ZS access to electricity) returns the series, with only query (English) searches the catalog; years without a value are dropped and counted. irena: IRENASTAT installed capacity (MW) and generation (GWh) by technology, 2000 on, on/off-grid. xm: XM's hourly energy on the Colombia-Ecuador interconnection, summed by day or month since 2003; needs desde and hasta (at most 366 days); days without flow show as 0 GWh, so the October 2024 suspension appears as zeros. comtrade: Ecuador's merchandise trade with one partner in USD (UN Comtrade public preview, no key): one period per call (periodo), capped at 500 rows, a ~1 call per 2 s rate limit that is retried automatically, and codes only (no names); socio 0 = World, cmd = TOTAL or an HS code. imf: IMF statistics via SDMX (190 flows: prices, balance of payments, exchange rates, fiscal, monetary and banking); indicador is the flow id (empty with query lists flows) and clave the SDMX key, whose dimension order differs per flow and is returned in the response; without clave it returns the whole country, latest observations. who: WHO Global Health Observatory (~3,000 yearly indicators by sex and age, e.g. WHOSIS_000001 life expectancy at birth); empty with query searches indicators. ilo: ILOSTAT labour statistics (1,200+ flows, e.g. UNE_DEAP_SEX_AGE_RT unemployment by sex and age); short keys are padded with wildcards. unhcr: refugees and asylum seekers hosted in Ecuador by year, from desde/hasta; socio = origin country (VEN) or 'todos' for one row per origin."
       }
     ]
   },

@@ -453,7 +453,7 @@ def _all_fuentes() -> dict:
             },
             {
                 "id": "series_internacionales",
-                "nombre": "Series internacionales con Ecuador: Banco Mundial WDI, IRENA, XM Colombia",
+                "nombre": "Series internacionales con Ecuador: Banco Mundial WDI, IRENA, XM Colombia, UN Comtrade, FMI, OMS, OIT, ACNUR",
                 "base": "https://api.worldbank.org/v2",
                 "tools": ["get_serie_internacional"],
             },

@@ -2691,26 +2691,68 @@
         "default": "30"
       },
       {
+        "name": "periodo",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "socio",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "cmd",
+        "type": "str",
+        "default": "'TOTAL'"
+      },
+      {
+        "name": "flujo",
+        "type": "str",
+        "default": "'ambos'"
+      },
+      {
+        "name": "frecuencia",
+        "type": "Literal['A', 'M']",
+        "default": "'A'"
+      },
+      {
+        "name": "clave",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "ultimos",
+        "type": "int",
+        "default": "0"
+      },
+      {
         "name": "format",
         "type": "Literal['text', 'json']",
         "default": "'text'"
       }
     ],
-    "description": "World Bank WDI indicators (wdi: set indicador, or query to search the catalog), IRENA capacity/generation by technology (irena), or hourly Colombia-Ecuador electricity flows since 2003 (xm). Defaults to Ecuador.",
-    "summary": "Fetch a series from an international source, filtered to Ecuador. - wdi: World Bank World Development Indicators (1,400+ series, yearly). With `indicador` (e.g. EG.ELC.ACCS.ZS access to electricity, EG.ELC.LOSS.ZS grid losses, EG.USE.ELEC.KH.PC kWh per capita) returns the series; with only `query` (English) searches the catalog. Years without a value are dropped and counted. - irena: IRENASTAT electricity installed capacity (MW) and generation (GWh) by technology, 2000 to latest, on/off-grid. - xm: XM Colombia hourly energy on the Colombia-Ecuador interconnection, summed to days or months. Requires desde/hasta. Blank hours (no flow) count as zero. Shows the Oct-2024 suspension.",
+    "description": "International series for Ecuador via `fuente`: wdi (World Bank), irena (electricity), xm (Colombia-Ecuador power flows), comtrade (UN bilateral trade), imf (IMF SDMX), who (health), ilo (ILOSTAT labour), unhcr (refugees/asylum). Without indicador/flow, wdi/who/imf/ilo list their catalog (set query).",
+    "summary": "Fetch a series from an international source, filtered to Ecuador. - wdi: World Bank World Development Indicators (1,400+ series, yearly). With `indicador` (e.g. EG.ELC.ACCS.ZS access to electricity, EG.ELC.LOSS.ZS grid losses, EG.USE.ELEC.KH.PC kWh per capita) returns the series; with only `query` (English) searches the catalog. Years without a value are dropped and counted. - irena: IRENASTAT electricity installed capacity (MW) and generation (GWh) by technology, 2000 to latest, on/off-grid. - xm: XM Colombia hourly energy on the Colombia-Ecuador interconnection, summed to days or months. Requires desde/hasta. Blank hours (no flow) count as zero. Shows the Oct-2024 suspension. - comtrade: UN Comtrade merchandise trade (USD) of Ecuador with a partner, ONE period per call (`periodo`), public preview capped at 500 rows and ~1 request/2 s (retried automatically). Codes only, no names. Partner `socio` 0 = World (default). - imf: IMF SDMX (190 flows: CPI, balance of payments, fiscal, monetary...). `indicador` = flow id (empty + `query` lists flows). `clave` = SDMX key; dimension order differs per flow and the response lists it (`dimensiones`). Empty clave = whole country (prefix ECU), last `ultimos` observations (default 5). - who: WHO Global Health Observatory (~2,000 indicators, yearly, by sex/age). `indicador` e.g. WHOSIS_000001 (life expectancy at birth); empty + `query` (English) searches the catalog. - ilo: ILOSTAT labour statistics, same pattern as imf. `indicador` is a flow id (DF_ prefix optional, e.g. UNE_DEAP_SEX_AGE_RT unemployment by sex and age). Short keys are padded with wildcards. Empty `indicador` + `query` lists flows. - unhcr: UNHCR refugees and asylum seekers hosted in Ecuador per year (Venezuelans are the largest group), from `desde`/`hasta`. `socio` = origin ISO3 (VEN) or `todos` for a row per origin; empty = totals.",
     "args_doc": {
-      "fuente": "wdi, irena or xm.",
-      "indicador": "wdi only: WDI code. Empty with `query` searches instead.",
-      "query": "wdi only: catalog search text, used when indicador is empty.",
-      "pais": "wdi/irena: ISO3 code (irena also accepts the English name). Ignored by xm. Default ECU.",
-      "desde": "Start: a year (AAAA) for wdi/irena, a date (AAAA-MM-DD) for xm.",
+      "fuente": "wdi, irena, xm, comtrade, imf, who, ilo or unhcr.",
+      "indicador": "wdi/who: indicator code. imf/ilo: dataflow id. Empty with `query` searches (wdi/who) or lists flows (imf/ilo).",
+      "query": "wdi/who/imf/ilo: catalog search text, used when indicador is empty.",
+      "pais": "wdi/irena/who/imf/ilo/unhcr: ISO3 code (irena also accepts the English name). comtrade: ISO3 or numeric M49 reporter. Ignored by xm. Default ECU.",
+      "desde": "Start: a year (AAAA) for wdi/irena/who/unhcr, a date (AAAA-MM-DD) for xm, a period (AAAA, AAAA-MM) for imf/ilo.",
       "hasta": "End, same format as desde. xm allows at most 366 days.",
       "tecnologia": "irena only: technology label substring (solar, hydro, Total Renewable...). Empty returns all technologies.",
       "tipo": "irena only: generacion (GWh), capacidad (MW) or ambos.",
       "conexion": "irena only: All, On-grid or Off-grid.",
       "sentido": "xm only: exportaciones (Colombia to Ecuador) or importaciones (Ecuador to Colombia).",
       "agregacion": "xm only: dia or mes.",
-      "limit": "wdi catalog search only: maximum indicators (1-200).",
+      "limit": "catalog/flow listings only: maximum rows (1-200).",
+      "periodo": "comtrade only: one period, AAAA (frecuencia A) or AAAAMM (frecuencia M). Required.",
+      "socio": "comtrade: partner as ISO3 (USA, CHN, COL, PER, PAN, ESP, NLD, ITA...) or M49 number; empty = 0 (World). unhcr: origin.",
+      "cmd": "comtrade only: TOTAL or an HS code of 2, 4 or 6 digits.",
+      "flujo": "comtrade only: X (exports), M (imports) or ambos.",
+      "frecuencia": "comtrade only: A (annual) or M (monthly).",
+      "clave": "imf/ilo only: SDMX key, dot-separated (ECU.CPI._T.IX.M). Empty = pais.",
+      "ultimos": "imf/ilo only: last N observations per series. Default 5 (imf) / 3 (ilo) when no desde/hasta.",
       "format": "text | json"
     }
   }
