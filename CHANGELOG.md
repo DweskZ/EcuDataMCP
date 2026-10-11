@@ -31,6 +31,20 @@
   cne.gob.ec/estadisticas/bases-de-datos/ (SPSS `.sav`, up to 77 MB; the
   Incapsula block seen on 2026-09-06 is gone, checked 2026-10-10). Returns
   links with `grupo`, `descargas` and `tamano`; the files are not parsed.
+- **Bolsas de valores** (`list_archivo_secciones`, `get_archivo_seccion`):
+  two new `fuente` values. `bvg` is the Bolsa de Valores de Guayaquil (4
+  sections: trade-by-trade history since 2019 for acciones, obligaciones,
+  papel comercial, titularizaciones, bonos del Estado, notas de crédito and
+  cetes; dividendos since 2002; valores permitidos; ofertas públicas). `bvq`
+  is the Bolsa de Valores de Quito's public statistics (10 sections, ~45
+  XLS/XLSX/PDF files: cotizaciones históricas, emisiones, renta variable,
+  sector público, boletines, vectores de precios, emisores). Both lists carry
+  `modificado` (HTTP Last-Modified) and `tamano_bytes` per file, because the
+  exchanges overwrite the same URL (checked 2026-10-10: trading files rebuilt
+  on 2026-10-08; BVG dividends 2026-08-05; BVQ facturas comerciales
+  emisiones 2024-09-10). Links only; BVG's workbooks fail in
+  `preview_resource_data` (stylesheet openpyxl rejects), so download them. BVQ's
+  Infolab bulletins are behind a login and are not listed.
 
 Fixes from a field report (paper-apagones, 2026-10-06/07).
 

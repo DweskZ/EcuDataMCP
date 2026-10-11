@@ -216,6 +216,13 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `list_archivo_secciones` (`fuente="arcsa"`) | Categorías del registro sanitario de ARCSA (Base de Registros Emitidos). |
 | `get_archivo_seccion` (`fuente="arcsa"`) | Documentos de una categoría del registro sanitario de ARCSA. |
 
+## Bolsas de valores: Guayaquil y Quito
+
+| Tool | Descripción |
+|------|-------------|
+| `list_archivo_secciones` (`fuente="bvg"|"bvq"`) | Secciones de archivos públicos de la Bolsa de Valores de Guayaquil (histórico de negociaciones, dividendos, valores permitidos, ofertas públicas) o de Quito (cotizaciones, emisiones, boletines, valoración, emisores). |
+| `get_archivo_seccion` (`fuente="bvg"|"bvq"`) | Enlaces XLSX/XLS de una sección, con fecha de última modificación y tamaño de cada archivo. |
+
 ## Fuentes sectoriales adicionales
 
 | Tool | Descripción |

@@ -240,6 +240,18 @@ def _all_fuentes() -> dict:
                 ],
             },
             {
+                "id": "bvg",
+                "nombre": "Bolsa de Valores de Guayaquil (estadísticas históricas)",
+                "base": "https://www.bolsadevaloresguayaquil.com/",
+                "tools": ["list_archivo_secciones", "get_archivo_seccion"],
+            },
+            {
+                "id": "bvq",
+                "nombre": "Bolsa de Valores de Quito (estadísticas)",
+                "base": "https://www.bolsadequito.com/index.php/estadisticas",
+                "tools": ["list_archivo_secciones", "get_archivo_seccion"],
+            },
+            {
                 "id": "contraloria",
                 "nombre": "Contraloría General del Estado (informes de auditoría)",
                 "base": "https://www.contraloria.gob.ec/Portal/24287",

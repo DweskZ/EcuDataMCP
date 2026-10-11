@@ -1,7 +1,7 @@
 """Institutional document archives behind one list/get pair.
 
-ARCSA, Superbancos, SEPS, INEVAL, the SGR and SENESCYT libraries and SIPA
-each publish a fixed set of sections (categories, families, modules) whose
+ARCSA, Superbancos, SEPS, INEVAL, the SGR and SENESCYT libraries, SIPA and
+the Guayaquil and Quito stock exchanges (BVG, BVQ) each publish a fixed set of sections (categories, families, modules) whose
 pages list downloadable files. They used to be 14 tools, one list/get pair
 per institution, with the same two-step flow and the same file-listing
 shape; `fuente` now picks the institution instead (the same pattern as
@@ -15,6 +15,8 @@ from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import (
     arcsa_client,
+    bvg_client,
+    bvq_client,
     cne_client,
     ineval_client,
     ministerio_energia_client,
@@ -40,6 +42,8 @@ Fuente = Literal[
     "petroecuador",
     "energia",
     "cne",
+    "bvg",
+    "bvq",
 ]
 
 _NOMBRES = {
@@ -53,6 +57,8 @@ _NOMBRES = {
     "petroecuador": "EP Petroecuador — Cifras Institucionales",
     "energia": "Ministerio de Ambiente y Energía — hidrocarburos, minería y BEN",
     "cne": "CNE — bases de datos de procesos electorales",
+    "bvg": "Bolsa de Valores de Guayaquil — estadísticas históricas",
+    "bvq": "Bolsa de Valores de Quito — estadísticas",
 }
 
 # Sources whose list call scrapes a page and returns {"categorias": [...]}.
@@ -70,6 +76,8 @@ _STATIC_LISTS = {
     "seps": (seps_client.list_secciones, "seccion"),
     "ineval": (ineval_client.list_familias, "familia"),
     "sipa": (sipa_client.list_modulos, "modulo"),
+    "bvg": (bvg_client.list_secciones, "seccion"),
+    "bvq": (bvq_client.list_secciones, "seccion"),
 }
 _GETTERS = {
     "arcsa": arcsa_client.get_categoria_archivos,
@@ -82,6 +90,8 @@ _GETTERS = {
     "sipa": sipa_client.get_modulo_archivos,
     "petroecuador": petroecuador_client.get_categoria_archivos,
     "cne": cne_client.get_proceso_archivos,
+    "bvg": bvg_client.get_seccion_archivos,
+    "bvq": bvq_client.get_seccion_archivos,
 }
 
 
@@ -135,7 +145,7 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
         description=(
             "List the sections of one institution's document archive (ARCSA, "
             "Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, "
-            "Petroecuador, Energy Ministry, CNE). fuente values and sections are "
+            "Petroecuador, Energy Ministry, CNE, Bolsas de Valores). fuente values and sections are "
             "in the docstring. "
             "Next: get_archivo_seccion(fuente, seccion)."
         ),
@@ -195,13 +205,22 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           Referéndum y Consulta Popular, special parish/canton elections).
           Each holds dictionaries, political organizations, candidates, the
           electoral roll by parish and the results by parish.
+        - bvg: Bolsa de Valores de Guayaquil (4 sections: historicos,
+          dividendos, valoracion, ofertas_publicas). Trade-by-trade
+          history since 2019 (acciones, obligaciones, papel comercial,
+          titularizaciones, bonos del Estado, notas de crédito, cetes),
+          dividends since 2002, repo-eligible securities, public offers.
+        - bvq: Bolsa de Valores de Quito (10 sections: cotizaciones
+          históricas, emisiones, renta variable, sector público, boletines
+          al cierre/semanales/por valor, valoración, emisores). Public
+          files only; the Infolab bulletins need a login.
 
         Returns each section's `id` (pass it to get_archivo_seccion),
         `nombre`, and either its page `url` or `total_archivos`.
 
         Args:
             fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt,
-                sipa, petroecuador, energia, cne.
+                sipa, petroecuador, energia, cne, bvg, bvq.
             format: text | json
         """
         try:
@@ -270,13 +289,21 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           `descargas` and `tamano`. The files checked are SPSS .sav
           (formato DESCONOCIDO: the listing does not say); primera vuelta
           results run 10-77 MB, so download the URL directly.
+        - bvg, bvq: XLSX/XLS (a few PDFs on bvq). Each file adds `modificado`
+          (HTTP Last-Modified, ISO UTC) and `tamano_bytes`: the exchanges
+          overwrite the same URL, so check `modificado` for freshness (bvg
+          trading files and bvq cotizaciones are rebuilt each trading day;
+          dividends, bulletins and some emisiones files are older). bvq
+          titles come from file names (the page's buttons have no text).
+          bvg workbooks fail in preview_resource_data (invalid stylesheet
+          for openpyxl): download the URL instead.
 
         Files are often several MB: download the URL directly instead of
         using preview_resource_data or download_resource (5 MB cap).
 
         Args:
             fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt,
-                sipa, petroecuador, energia, cne.
+                sipa, petroecuador, energia, cne, bvg, bvq.
             seccion: A section `id` from list_archivo_secciones.
             format: text | json
         """
@@ -312,8 +339,14 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
                     )
                     if p
                 )
-                tamano = f" ({a['tamano']})" if a.get("tamano") else ""
-                parts.append(f"- {etiqueta} [{a.get('formato')}]{tamano}")
+                detalle = [str(a.get("formato"))]
+                if a.get("tamano"):
+                    detalle.append(str(a["tamano"]))
+                if a.get("tamano_bytes"):
+                    detalle.append(f"{a['tamano_bytes'] / 1_048_576:.1f} MB")
+                if a.get("modificado"):
+                    detalle.append(f"modificado {a['modificado'][:10]}")
+                parts.append(f"- {etiqueta} [{', '.join(detalle)}]")
                 if a.get("descripcion"):
                     parts.append(f"   {a['descripcion']}")
                 parts.append(f"   {a.get('url')}")
