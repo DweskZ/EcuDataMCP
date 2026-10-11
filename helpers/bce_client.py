@@ -349,7 +349,10 @@ async def _fetch_catalog_snapshot() -> dict[str, Any]:
         "errores": errors,
         "revision_fuente": _revision_summary(),
     }
-    _catalog_cache.set("catalog", snapshot)
+    # A partial snapshot (a transient bundle failure) must not stick for the
+    # whole TTL; the next call retries instead.
+    if not errors:
+        _catalog_cache.set("catalog", snapshot)
     return snapshot
 
 

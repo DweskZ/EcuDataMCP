@@ -34,7 +34,18 @@ async def _get_json(url: str, params: dict[str, Any] | None = None) -> Any:
         logger.debug("SGR GET %s params=%s", url, params)
         resp = await session.get(url, params=params)
         resp.raise_for_status()
-        return resp.json()
+        data = resp.json()
+        # ArcGIS reports query errors as HTTP 200 with an "error" object.
+        if isinstance(data, dict) and "error" in data:
+            raise RuntimeError(f"SGR (ArcGIS) devolvió un error: {data['error']}")
+        return data
+
+
+def _object_id(item: dict[str, Any]) -> int:
+    try:
+        return int(item.get("OBJECTID") or 0)
+    except (TypeError, ValueError):
+        return 0
 
 
 async def _coe2_layer_url() -> str:
@@ -118,13 +129,12 @@ async def list_risk_events(
             continue
         matched.append(attrs)
 
-    # Prefer active/follow-up events first
-    def sort_key(item: dict[str, Any]) -> tuple:
-        estado_val = _strip(str(item.get("EstadoDelEvento", "")))
-        active = 0 if "seguimiento" in estado_val else 1
-        return (active, str(item.get("FechaDelEvento", "")), str(item.get("OBJECTID", 0)))
-
-    matched.sort(key=sort_key)
+    # Newest first (OBJECTID numeric, not string-sorted), then stable-sort
+    # active/follow-up events to the front.
+    matched.sort(
+        key=lambda a: (str(a.get("FechaDelEvento", "")), _object_id(a)), reverse=True
+    )
+    matched.sort(key=lambda a: 0 if "seguimiento" in _strip(str(a.get("EstadoDelEvento", ""))) else 1)
     limit = min(max(limit, 1), 100)
     return {
         "total": len(matched),

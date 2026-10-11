@@ -26,6 +26,7 @@ than silently implied as covered.
 
 from __future__ import annotations
 
+import asyncio
 import ipaddress
 import socket
 from collections.abc import AsyncIterator
@@ -43,8 +44,18 @@ class UnsafeUrlError(ValueError):
     a non-public target IP, or too many redirects."""
 
 
+_NAT64 = ipaddress.ip_network("64:ff9b::/96")
+
+
 def _is_public_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
-    return not (
+    if isinstance(ip, ipaddress.IPv6Address):
+        if ip.ipv4_mapped:
+            ip = ip.ipv4_mapped
+        elif ip in _NAT64:
+            return False
+    # is_global also excludes shared address space (100.64.0.0/10, used by
+    # carrier NAT and tailnets), which the individual is_* flags let through.
+    return ip.is_global and not (
         ip.is_private
         or ip.is_loopback
         or ip.is_link_local
@@ -97,7 +108,8 @@ async def safe_stream(
     """
     current = url
     for hop in range(max_redirects + 1):
-        assert_public_url(current)
+        # getaddrinfo blocks; a slow resolver must not freeze other requests.
+        await asyncio.to_thread(assert_public_url, current)
         async with session.stream(
             "GET", current, follow_redirects=False, **kwargs
         ) as resp:

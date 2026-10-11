@@ -69,7 +69,7 @@ def register_download_resource_tool(mcp: MCPServer) -> None:
 
         try:
             content, truncated = await download_bytes(url)
-        except httpx.HTTPError as e:
+        except (httpx.HTTPError, ValueError) as e:
             raise ToolError(f"Error al descargar el archivo: download_failed: {e}") from e
 
         if truncated:

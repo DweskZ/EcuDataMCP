@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **Fixes from a code review**:
+  - CSV/JSON previews no longer turn a whole file into mojibake when the 5 MB cap cuts a multibyte character (cp1252 is now tried before latin-1); European-decimal columns only convert cells that match the pattern; `__MACOSX` resource forks are skipped when picking an archive member.
+  - `read_pdf` page ranges are clamped to the document; `.xlsx`/`.ods` files that expand past 200 MB are rejected; corrupt `.tar.gz` and unsafe URLs in `download_resource`/content sniffing give a clean error.
+  - SSRF guard: CGNAT (`100.64.0.0/10`) and NAT64 targets are refused and DNS resolution no longer blocks the event loop; an empty `CKAN_INSECURE_TLS` no longer disables TLS verification; CKAN `groups`/`organization` filters are quoted.
+  - `list_risk_events` returns the newest events first (OBJECTID sorted numerically) and ArcGIS error bodies raise instead of caching an empty list; the BCE catalog snapshot is not cached when a bundle failed; SERCOP's default year uses Ecuador time; INEC category pagination tolerates a page past the end and sends a User-Agent.
+  - Tests: module-level asyncio locks are refreshed per test (they bound to the first event loop that contended them).
+
 ## 0.12.0 — 2026-10-10
 
 - **Internal robustness** (no behaviour change for callers): BVG, BVQ and CNE use

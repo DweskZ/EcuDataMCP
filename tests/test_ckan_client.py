@@ -51,7 +51,7 @@ async def test_get_organization_fetches_full_package_list_via_search(httpx_mock)
     httpx_mock.add_response(
         url=(
             "https://www.datosabiertos.gob.ec/api/3/action/package_search"
-            "?fq=organization%3Atest-org&rows=1000&sort=metadata_modified+desc"
+            "?fq=organization%3A%22test-org%22&rows=1000&sort=metadata_modified+desc"
         ),
         json={
             "success": True,

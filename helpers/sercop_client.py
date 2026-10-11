@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
-from datetime import UTC, datetime
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import httpx
@@ -15,6 +15,10 @@ from helpers.cache import TtlCache, sercop_search_cache
 from helpers.geo_proxy import proxy_for
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.user_agent import USER_AGENT
+
+# Ecuador mainland is UTC-5 year-round (no DST); UTC would flip the default
+# year at 19:00 local time on 31 Dec.
+_ECUADOR_TZ = timezone(timedelta(hours=-5))
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
@@ -148,7 +152,7 @@ async def search_contracts(
     if len(search) < 3:
         raise ValueError("search debe tener al menos 3 caracteres")
 
-    start_year = year or datetime.now(UTC).year
+    start_year = year or datetime.now(_ECUADOR_TZ).year
     years = [start_year]
     if fallback_years > 0:
         years.extend(start_year - i for i in range(1, fallback_years + 1))
