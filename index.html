@@ -6,8 +6,14 @@
 <title>Datos abiertos de Ecuador para tu asistente de IA – EcuDataMCP</title>
 <meta name="description" content="Servidor MCP de código abierto para explorar datos abiertos del gobierno de Ecuador desde tu asistente de IA.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://dweskz.github.io/EcuDataMCP/index.html">
+<link rel="alternate" hreflang="es" href="https://dweskz.github.io/EcuDataMCP/index.html">
+<link rel="alternate" hreflang="en" href="https://dweskz.github.io/EcuDataMCP/en/index.html">
+<link rel="alternate" hreflang="x-default" href="https://dweskz.github.io/EcuDataMCP/index.html">
 <meta property="og:title" content="Datos abiertos de Ecuador para tu asistente de IA – EcuDataMCP">
 <meta property="og:description" content="Servidor MCP de código abierto para explorar datos abiertos del gobierno de Ecuador desde tu asistente de IA.">
+<meta property="og:url" content="https://dweskz.github.io/EcuDataMCP/index.html">
+<meta property="og:type" content="website">
 <meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
@@ -22,12 +28,16 @@
   }
 })();
 </script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="assets/styles.css">
 <link rel="stylesheet" href="assets/site.css">
 
-<style>html { scroll-behavior: smooth; }</style>
+<style>@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }</style>
 </head>
 <body>
+<a class="skip-link" href="#main">Saltar al contenido</a>
 <div class="ecu-flag-stripe" aria-hidden="true"></div>
 <nav class="navbar navbar-expand-lg site-navbar" data-bs-theme="dark">
   <div class="navbar-container container-fluid">
@@ -40,10 +50,10 @@
         <span class="navbar-title">EcuDataMCP</span>
       </a>
     </div>
-    <button class="site-search-toggle" type="button" title="Buscar" aria-label="Buscar">
+    <button class="site-search-toggle" type="button" title="Buscar" aria-label="Buscar" aria-expanded="false" aria-controls="siteSearchPanel">
       <svg class="icon-search" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.75"/><line x1="10.2" y1="10.2" x2="14" y2="14"/></svg>
     </button>
-    <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Navegación de palanca" data-nav-toggle="navbarCollapse">
+    <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Mostrar u ocultar la navegación" data-nav-toggle="navbarCollapse">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -131,12 +141,12 @@
 
 <div class="site-search-panel" id="siteSearchPanel" hidden>
   <div class="site-search-panel-inner">
-    <input type="text" id="siteSearchInput" class="site-search-input" placeholder="Buscar en el sitio…" autocomplete="off">
+    <input type="text" id="siteSearchInput" class="site-search-input" aria-label="Buscar" placeholder="Buscar en el sitio…" autocomplete="off">
     <div id="siteSearchResults" class="site-search-results"></div>
   </div>
 </div>
 
-<main>
+<main id="main">
 
 <section class="landing hero">
 <div class="container-page hero-layout">
@@ -186,21 +196,21 @@ pasaporte anterior, si sigue vigente</pre>
     "label": "Riesgo país",
     "turns": [
       {"role": "user", "text": "¿En cuánto cerró el riesgo país de Ecuador?"},
-      {"role": "assistant", "tool": "get_bce_indicador_diario", "text": "El 25 de septiembre de 2026 el EMBI cerró en 477.16 puntos básicos.", "html": "El 25 de septiembre de 2026 el EMBI cerró en <strong>477.16</strong> puntos básicos.", "code": "2026-09-23  432.14\n2026-09-24  445.93\n2026-09-25  477.16", "cite": "fuente · contenido.bce.fin.ec"}
+      {"role": "assistant", "tool": "get_bce_indicador_diario", "text": "El 25 de septiembre de 2026 el EMBI cerró en 477,16 puntos básicos.", "html": "El 25 de septiembre de 2026 el EMBI cerró en <strong>477,16</strong> puntos básicos.", "code": "2026-09-23  432.14\n2026-09-24  445.93\n2026-09-25  477.16", "cite": "fuente · contenido.bce.fin.ec"}
     ]
   },
   {
     "label": "Quito",
     "turns": [
       {"role": "user", "text": "¿Cuál es el código INEC y la población de Quito?"},
-      {"role": "assistant", "tool": "lookup_ubicacion", "text": "Quito es el cantón 1701 de Pichincha. El registro INEC marca 2,853,320 habitantes.", "html": "Quito es el cantón <strong>1701</strong> de Pichincha. El registro INEC marca <strong>2,853,320</strong> habitantes.", "code": "código 1701\nprovincia Pichincha (17)\npoblación 2,853,320", "cite": "fuente · INEC, división político-administrativa"}
+      {"role": "assistant", "tool": "lookup_ubicacion", "text": "Quito es el cantón 1701 de Pichincha. El registro INEC marca 2.853.320 habitantes.", "html": "Quito es el cantón <strong>1701</strong> de Pichincha. El registro INEC marca <strong>2.853.320</strong> habitantes.", "code": "código 1701\nprovincia Pichincha (17)\npoblación 2,853,320", "cite": "fuente · INEC, división político-administrativa"}
     ]
   },
   {
     "label": "Remesas",
     "turns": [
       {"role": "user", "text": "¿Cuánto recibió Ecuador por remesas en el primer trimestre de 2026?"},
-      {"role": "assistant", "tool": "get_bce_indicador_diario", "text": "La serie trimestral del BCE marca USD 1,856.7 millones al 31 de marzo de 2026.", "html": "La serie trimestral del BCE marca <strong>USD 1,856.7 millones</strong> al 31 de marzo de 2026.", "code": "2025-T4  2,015.5\n2026-T1  1,856.7\nunidad: millones de USD", "cite": "fuente · contenido.bce.fin.ec"}
+      {"role": "assistant", "tool": "get_bce_indicador_diario", "text": "La serie trimestral del BCE marca USD 1.856,7 millones al 31 de marzo de 2026.", "html": "La serie trimestral del BCE marca <strong>USD 1.856,7 millones</strong> al 31 de marzo de 2026.", "code": "2025-T4  2,015.5\n2026-T1  1,856.7\nunidad: millones de USD", "cite": "fuente · contenido.bce.fin.ec"}
     ]
   }
 ]
@@ -230,7 +240,7 @@ pasaporte anterior, si sigue vigente</pre>
 </div>
 <div class="hero-stats">
 <div class="hero-stat"><span class="num">83</span><span class="label">tools MCP</span></div>
-<div class="hero-stat"><span class="num">66</span><span class="label">fuentes oficiales</span></div>
+<div class="hero-stat"><span class="num">67</span><span class="label">fuentes oficiales</span></div>
 <div class="hero-stat"><span class="num">0</span><span class="label">API keys de fuentes</span></div>
 </div>
 <div class="source-cloud" aria-label="Instituciones conectadas">
@@ -291,7 +301,7 @@ pasaporte anterior, si sigue vigente</pre>
 <div class="container-page">
 <p class="kicker">¿Qué puedes preguntar?</p>
 <h2 class="section-title">Pregunta en lenguaje natural, sin buscar portal por portal.</h2>
-<p class="section-lede">66 fuentes oficiales, en una sola conversación.</p>
+<p class="section-lede">67 fuentes oficiales, en una sola conversación.</p>
 <div class="questions-grid">
 
 <div class="question-card">&ldquo;¿Qué datos tiene el SRI sobre recaudación tributaria?&rdquo;</div>
@@ -318,11 +328,11 @@ pasaporte anterior, si sigue vigente</pre>
 <div class="container-page" id="fuentes">
 <p class="kicker">Fuentes</p>
 <h2 class="section-title">Datos oficiales, siempre citados.</h2>
-<p class="section-lede">EcuDataMCP no copia ni almacena estos catálogos: cada consulta va en vivo contra el portal de origen. 66 fuentes agrupadas por tema — Banco Central, SRI, INEC, Supercías, Superbancos y más — cada una con su institución de origen.</p>
+<p class="section-lede">EcuDataMCP no copia ni almacena estos catálogos: cada consulta va en vivo contra el portal de origen. 67 fuentes agrupadas por tema — Banco Central, SRI, INEC, Supercías, Superbancos y más — cada una con su institución de origen.</p>
 <div class="tools-summary">
-<span class="tool-chip">Catálogos de datos abiertos</span><span class="tool-chip">Trámites, regulaciones y contratación pública</span><span class="tool-chip">Riesgos y desastres naturales</span><span class="tool-chip">Economía y finanzas</span><span class="tool-chip">Estadísticas y demografía</span><span class="tool-chip">Agricultura</span><span class="tool-chip">Energía</span><span class="tool-chip">Trabajo y empleo</span><span class="tool-chip">Control y transparencia</span><span class="tool-chip">Transporte y aviación civil</span><span class="tool-chip">Salud</span><span class="tool-chip">Telecomunicaciones</span><span class="tool-chip">Fuentes internacionales con foco Ecuador</span>
+<span class="tool-chip">Catálogos de datos abiertos</span><span class="tool-chip">Trámites, regulaciones y contratación pública</span><span class="tool-chip">Riesgos y desastres naturales</span><span class="tool-chip">Economía y finanzas</span><span class="tool-chip">Estadísticas y demografía</span><span class="tool-chip">Agricultura</span><span class="tool-chip">Energía</span><span class="tool-chip">Trabajo y empleo</span><span class="tool-chip">Control y transparencia</span><span class="tool-chip">Justicia</span><span class="tool-chip">Transporte y aviación civil</span><span class="tool-chip">Salud</span><span class="tool-chip">Telecomunicaciones</span><span class="tool-chip">Fuentes internacionales con foco Ecuador</span>
 </div>
-<a class="btn-cta secondary" href="fuentes.html">Ver las 66 fuentes agrupadas &rarr;</a>
+<a class="btn-cta secondary" href="fuentes.html">Ver las 67 fuentes agrupadas &rarr;</a>
 </div>
 </section>
 
@@ -434,7 +444,7 @@ y regístralo como servidor MCP en mi cliente usando modo stdio con
 `uv run --directory &lt;ruta-del-clon&gt; python main.py --transport stdio`.
 Verifica que el servidor responda antes de darlo por terminado.</code></pre>
 </div>
-<p class="client-intro">Revisa siempre lo que tu asistente cambie (archivos de configuración, comandos ejecutados) antes de confirmar. Esta opción solo funciona con asistentes que pueden ejecutar comandos por su cuenta: hoy eso es <strong>Claude Code</strong>, <strong>Codex</strong>, <strong>Cursor</strong> y <strong>Windsurf</strong> en modo agente. Con ChatGPT, Claude.ai de solo-chat u otros clientes sin terminal, usa la configuración manual de abajo.</p>
+<p class="client-intro">Revisa siempre lo que tu asistente cambie (archivos de configuración, comandos ejecutados) antes de confirmar. Esta opción solo funciona con asistentes que pueden ejecutar comandos por su cuenta: hoy eso es <strong>Claude Code</strong>, <strong>Codex</strong>, <strong>Cursor</strong> y <strong>Windsurf</strong> en modo agente. Con ChatGPT, Claude.ai en modo solo chat u otros clientes sin terminal, usa la configuración manual de abajo.</p>
 </div>
 <ul class="nav nav-tabs" id="client-tabs" role="tablist">
 

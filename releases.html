@@ -6,8 +6,14 @@
 <title>Releases – EcuDataMCP</title>
 <meta name="description" content="Historial de versiones de EcuDataMCP y el ritmo real de los releases.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://dweskz.github.io/EcuDataMCP/releases.html">
+<link rel="alternate" hreflang="es" href="https://dweskz.github.io/EcuDataMCP/releases.html">
+<link rel="alternate" hreflang="en" href="https://dweskz.github.io/EcuDataMCP/en/releases.html">
+<link rel="alternate" hreflang="x-default" href="https://dweskz.github.io/EcuDataMCP/releases.html">
 <meta property="og:title" content="Releases – EcuDataMCP">
 <meta property="og:description" content="Historial de versiones de EcuDataMCP y el ritmo real de los releases.">
+<meta property="og:url" content="https://dweskz.github.io/EcuDataMCP/releases.html">
+<meta property="og:type" content="website">
 <meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
@@ -22,12 +28,16 @@
   }
 })();
 </script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="assets/styles.css">
 <link rel="stylesheet" href="assets/site.css">
 
-<style>html { scroll-behavior: smooth; }</style>
+<style>@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }</style>
 </head>
 <body>
+<a class="skip-link" href="#main">Saltar al contenido</a>
 <div class="ecu-flag-stripe" aria-hidden="true"></div>
 <nav class="navbar navbar-expand-lg site-navbar" data-bs-theme="dark">
   <div class="navbar-container container-fluid">
@@ -40,10 +50,10 @@
         <span class="navbar-title">EcuDataMCP</span>
       </a>
     </div>
-    <button class="site-search-toggle" type="button" title="Buscar" aria-label="Buscar">
+    <button class="site-search-toggle" type="button" title="Buscar" aria-label="Buscar" aria-expanded="false" aria-controls="siteSearchPanel">
       <svg class="icon-search" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.75"/><line x1="10.2" y1="10.2" x2="14" y2="14"/></svg>
     </button>
-    <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Navegación de palanca" data-nav-toggle="navbarCollapse">
+    <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Mostrar u ocultar la navegación" data-nav-toggle="navbarCollapse">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -131,12 +141,12 @@
 
 <div class="site-search-panel" id="siteSearchPanel" hidden>
   <div class="site-search-panel-inner">
-    <input type="text" id="siteSearchInput" class="site-search-input" placeholder="Buscar en el sitio…" autocomplete="off">
+    <input type="text" id="siteSearchInput" class="site-search-input" aria-label="Buscar" placeholder="Buscar en el sitio…" autocomplete="off">
     <div id="siteSearchResults" class="site-search-results"></div>
   </div>
 </div>
 
-<main>
+<main id="main">
 
 <section class="landing hero">
 <div class="container-page">
@@ -151,17 +161,17 @@
 
 <div class="release-row">
 <div class="release-meta"><span class="release-version">v0.12.0</span><span class="release-date">2026-10-10</span></div>
-<p class="release-summary">Nueva tool search_siniestros_ant (siniestros de tránsito: publicaciones trimestrales del INEC con registros de la ANT más datasets CKAN) y cinco fuentes nuevas dentro de list_archivo_secciones / get_archivo_seccion: EP Petroecuador (cifras institucionales), Ministerio de Ambiente y Energía (hidrocarburos, minería y Balance Energético Nacional), CNE (19 procesos electorales 2002-2025) y las bolsas de valores de Guayaquil y Quito. get_inec_estadistica_files sigue ahora las páginas de ronda enlazadas cuando un tema no lista archivos propios (ENDI, #55). Correcciones de la ronda de campo: ANDA acepta el id numérico y pagina todo el catálogo, nuevos microdatos históricos de defunciones del INEC, parroquias urbanas en lookup_ubicacion, search_datasets con compact y fields, y la descarga en segundo plano del directorio de Supercías. Ahora son 83 tools en el perfil por defecto.</p>
+<p class="release-summary">Nuevo tool search_siniestros_ant (siniestros de tránsito: publicaciones trimestrales del INEC con registros de la ANT más datasets CKAN) y cinco fuentes nuevas dentro de list_archivo_secciones / get_archivo_seccion: EP Petroecuador (cifras institucionales), Ministerio de Ambiente y Energía (hidrocarburos, minería y Balance Energético Nacional), CNE (19 procesos electorales 2002-2025) y las bolsas de valores de Guayaquil y Quito. get_inec_estadistica_files sigue ahora las páginas de ronda enlazadas cuando un tema no lista archivos propios (ENDI, #55). Correcciones de la ronda de campo: ANDA acepta el id numérico y pagina todo el catálogo, nuevos microdatos históricos de defunciones del INEC, parroquias urbanas en lookup_ubicacion, search_datasets con compact y fields, y la descarga en segundo plano del directorio de Supercías. Ahora son 83 tools en el perfil por defecto.</p>
 </div>
 
 <div class="release-row">
 <div class="release-meta"><span class="release-version">v0.11.0</span><span class="release-date">2026-10-02</span></div>
-<p class="release-summary">Cambio incompatible en los nombres de las tools: de 90 a 82 en el perfil por defecto. Nueva get_serie_internacional(fuente) con indicadores WDI del Banco Mundial, capacidad y generación eléctrica de IRENA y los flujos eléctricos Colombia-Ecuador de XM desde 2003. list_catalogo(fuente) reemplaza a cinco listados (ARCONEL, indicadores diarios del BCE, Contraloría, IESS y SUT); get_aviso_aeronautico(tipo) reemplaza a get_metar, get_notam y get_sigmet; search_archivos absorbe los archivos de remesas, precios de comercio exterior y publicaciones del BCE, y gana un filtro formato. XM muestra con 0 GWh los días sin flujo, así que la suspensión de octubre de 2024 se ve como ceros.</p>
+<p class="release-summary">Cambio incompatible en los nombres de los tools: de 90 a 82 en el perfil por defecto. Nuevo get_serie_internacional(fuente) con indicadores WDI del Banco Mundial, capacidad y generación eléctrica de IRENA y los flujos eléctricos Colombia-Ecuador de XM desde 2003. list_catalogo(fuente) reemplaza a cinco listados (ARCONEL, indicadores diarios del BCE, Contraloría, IESS y SUT); get_aviso_aeronautico(tipo) reemplaza a get_metar, get_notam y get_sigmet; search_archivos absorbe los archivos de remesas, precios de comercio exterior y publicaciones del BCE, y gana un filtro formato. XM muestra con 0 GWh los días sin flujo, así que la suspensión de octubre de 2024 se ve como ceros.</p>
 </div>
 
 <div class="release-row">
 <div class="release-meta"><span class="release-version">v0.10.0</span><span class="release-date">2026-09-28</span></div>
-<p class="release-summary">Cambio incompatible en los nombres de las tools: de 109 a 90 en el perfil por defecto. Cada parámetro tiene ahora una descripción en el esquema. Varias tools se fusionan detrás de un selector: search_archivos(fuente) reemplaza a 11 buscadores de archivos (SRI, MEF, Censo, MINEDEC, SENESCYT, ARCOTEL y otros); search_cortes y get_cortes_horarios cubren EEQ y Centrosur; search_capas_geo y get_capa_geo_datos cubren los geoportales de INAMHI y MAG; search_bce_paginas y get_bce_pagina_archivos cubren índices y cuentas nacionales del BCE. El perfil MCP_PROFILE por defecto es public: las dos tools de mantenimiento ya no aparecen en los clientes.</p>
+<p class="release-summary">Cambio incompatible en los nombres de los tools: de 109 a 90 en el perfil por defecto. Cada parámetro tiene ahora una descripción en el esquema. Varios tools se fusionan detrás de un selector: search_archivos(fuente) reemplaza a 11 buscadores de archivos (SRI, MEF, Censo, MINEDEC, SENESCYT, ARCOTEL y otros); search_cortes y get_cortes_horarios cubren EEQ y Centrosur; search_capas_geo y get_capa_geo_datos cubren los geoportales de INAMHI y MAG; search_bce_paginas y get_bce_pagina_archivos cubren índices y cuentas nacionales del BCE. El perfil MCP_PROFILE por defecto es public: las dos tools de mantenimiento ya no aparecen en los clientes.</p>
 </div>
 
 <div class="release-row">
@@ -186,7 +196,7 @@
 
 <div class="release-row">
 <div class="release-meta"><span class="release-version">v0.8.11</span><span class="release-date">2026-09-27</span></div>
-<p class="release-summary">Cortes de luz programados de la EEQ y de Centrosur convertidos en filas (fecha, horario, subestación, sectores), y los reportes de ARCONEL (28 tipos, desde 1998). Empaquetado en PyPI y registro oficial de MCP. La base de Supercías desactualizada se sigue sirviendo, marcada, mientras se refresca; y ecuador://fuentes y list_capabilities ya listan todas las tools registradas.</p>
+<p class="release-summary">Cortes de luz programados de la EEQ y de Centrosur convertidos en filas (fecha, horario, subestación, sectores), y los reportes de ARCONEL (28 tipos, desde 1998). Empaquetado en PyPI y registro oficial de MCP. La base de Supercías desactualizada se sigue sirviendo, marcada, mientras se refresca; y ecuador://fuentes y list_capabilities ya listan todas los tools registradas.</p>
 </div>
 
 <div class="release-row">
@@ -196,7 +206,7 @@
 
 <div class="release-row">
 <div class="release-meta"><span class="release-version">v0.8.9</span><span class="release-date">2026-09-14</span></div>
-<p class="release-summary">Limpieza de la arquitectura MCP: se eliminan tools duplicadas (list_recent_datasets pasa a search_datasets(sort="recent")) y el par de ARCOTEL se unifica en search_arcotel(tipo=...); nuevo MCP_PROFILE para separar las tools de mantenimiento; todas las tools declaran título en español, anotaciones MCP y structuredContent nativo. La base financiera de Supercías (search_ranking/get_financials) ahora se construye y refresca sola en segundo plano.</p>
+<p class="release-summary">Limpieza de la arquitectura MCP: se eliminan tools duplicados (list_recent_datasets pasa a search_datasets(sort="recent")) y el par de ARCOTEL se unifica en search_arcotel(tipo=...); nuevo MCP_PROFILE para separar los tools de mantenimiento; todas los tools declaran título en español, anotaciones MCP y structuredContent nativo. La base financiera de Supercías (search_ranking/get_financials) ahora se construye y refresca sola en segundo plano.</p>
 </div>
 
 <div class="release-row">
@@ -206,7 +216,7 @@
 
 <div class="release-row">
 <div class="release-meta"><span class="release-version">v0.8.7</span><span class="release-date">2026-09-07</span></div>
-<p class="release-summary">Fichas AIP de aeródromos y helipuertos ecuatorianos (DGAC) y el registro sanitario vigente de ARCSA por categoría, soporte de previsualización .xlsb, y un tope de descarga elevado a 20 MB para XLSX/XLSB/ODS. Se retiran las tools de SRI Saiku (endpoint confirmado inalcanzable en verificación en vivo).</p>
+<p class="release-summary">Fichas AIP de aeródromos y helipuertos ecuatorianos (DGAC) y el registro sanitario vigente de ARCSA por categoría, soporte de previsualización .xlsb, y un tope de descarga elevado a 20 MB para XLSX/XLSB/ODS. Se retiran los tools de SRI Saiku (endpoint confirmado inalcanzable en verificación en vivo).</p>
 </div>
 
 <div class="release-row">

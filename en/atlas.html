@@ -6,8 +6,14 @@
 <title>Reference – EcuDataMCP</title>
 <meta name="description" content="EcuDataMCP's 83 tools, with a full description and a direct link to each one.">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://dweskz.github.io/EcuDataMCP/en/atlas.html">
+<link rel="alternate" hreflang="es" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
+<link rel="alternate" hreflang="en" href="https://dweskz.github.io/EcuDataMCP/en/atlas.html">
+<link rel="alternate" hreflang="x-default" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <meta property="og:title" content="Reference – EcuDataMCP">
 <meta property="og:description" content="EcuDataMCP's 83 tools, with a full description and a direct link to each one.">
+<meta property="og:url" content="https://dweskz.github.io/EcuDataMCP/en/atlas.html">
+<meta property="og:type" content="website">
 <meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
@@ -22,12 +28,16 @@
   }
 })();
 </script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/styles.css">
 <link rel="stylesheet" href="../assets/site.css">
 <link rel="stylesheet" href="../assets/atlas.css">
-<style>html { scroll-behavior: smooth; }</style>
+<style>@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }</style>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <div class="ecu-flag-stripe" aria-hidden="true"></div>
 <nav class="navbar navbar-expand-lg site-navbar" data-bs-theme="dark">
   <div class="navbar-container container-fluid">
@@ -40,7 +50,7 @@
         <span class="navbar-title">EcuDataMCP</span>
       </a>
     </div>
-    <button class="site-search-toggle" type="button" title="Search" aria-label="Search">
+    <button class="site-search-toggle" type="button" title="Search" aria-label="Search" aria-expanded="false" aria-controls="siteSearchPanel">
       <svg class="icon-search" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.75"/><line x1="10.2" y1="10.2" x2="14" y2="14"/></svg>
     </button>
     <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" data-nav-toggle="navbarCollapse">
@@ -131,12 +141,12 @@
 
 <div class="site-search-panel" id="siteSearchPanel" hidden>
   <div class="site-search-panel-inner">
-    <input type="text" id="siteSearchInput" class="site-search-input" placeholder="Search the site…" autocomplete="off">
+    <input type="text" id="siteSearchInput" class="site-search-input" aria-label="Search" placeholder="Search the site…" autocomplete="off">
     <div id="siteSearchResults" class="site-search-results"></div>
   </div>
 </div>
 
-<main>
+<main id="main">
 
 <section class="landing hero">
 <div class="container-page">
@@ -1748,19 +1758,21 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_sut_indicador_schema" data-search="get_sut_indicador_schema list the queryable columns/measures/date-levels for one sut power bi dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing. list the queryable columns/measures/date-levels for one sut power bi dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing. a field like &quot;public contratos.nombre_padre_activ_econ_empresa&quot; is a plain column usable in query_sut_indicador's campos or filtros; one ending in &quot;[medida]&quot; is an aggregate measure (only valid in campos, never filtros); one ending in &quot;[año]&quot;/&quot;[mes]&quot; is a date-hierarchy level. denuncias_publico and encuentra_empleo use an older report layout where visuals don't expose their query this way at all — their fields come from a small manually-captured set instead (recovered by driving the live dashboard and reading the queries it actually sent), not from this automatic discovery, but they show up here the same as any other field. indicador a key from list_catalogo(fuente='sut'). format text | json">
+<details class="atlas-tool" id="tool-get_sut_indicador_schema" data-search="get_sut_indicador_schema list the queryable columns/measures/date-levels for one sut or judicatura power bi dashboard (fuente), discovered from the report's own layout definition, not by guessing. list the queryable columns/measures/date-levels for one sut power bi dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing. a field like &quot;public contratos.nombre_padre_activ_econ_empresa&quot; is a plain column usable in query_sut_indicador's campos or filtros; one ending in &quot;[medida]&quot; is an aggregate measure (only valid in campos, never filtros); one ending in &quot;[año]&quot;/&quot;[mes]&quot; is a date-hierarchy level. denuncias_publico and encuentra_empleo use an older report layout where visuals don't expose their query this way at all — their fields come from a small manually-captured set instead (recovered by driving the live dashboard and reading the queries it actually sent), not from this automatic discovery, but they show up here the same as any other field. judicatura dashboards (fuente=&quot;judicatura&quot;) expose aggregate fields as &quot;[suma]&quot;/&quot;[promedio]&quot; (e.g. &quot;cub est_cub_audiencias.contador [suma]&quot;), valid only in campos, like &quot;[medida]&quot; fields. indicador a key from list_catalogo(fuente=<fuente>). fuente sut (default) | judicatura format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_sut_indicador_schema</code>
-<span class="atlas-tool-desc">List the queryable columns/measures/date-levels for one SUT Power BI dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing.</span>
+<span class="atlas-tool-desc">List the queryable columns/measures/date-levels for one SUT or Judicatura Power BI dashboard (fuente), discovered from the report's own layout definition, not by guessing.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">List the queryable columns/measures/date-levels for one SUT Power BI dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing. A field like "public contratos.nombre_padre_activ_econ_empresa" is a plain column usable in query_sut_indicador's campos or filtros; one ending in "[medida]" is an aggregate measure (only valid in campos, never filtros); one ending in "[Año]"/"[Mes]" is a date-hierarchy level. denuncias_publico and encuentra_empleo use an older report layout where visuals don't expose their query this way at all — their fields come from a small manually-captured set instead (recovered by driving the live dashboard and reading the queries it actually sent), not from this automatic discovery, but they show up here the same as any other field.</p>
+<p class="atlas-tool-long">List the queryable columns/measures/date-levels for one SUT Power BI dashboard, discovered from the report's own layout definition (every visual's underlying query), not by guessing. A field like "public contratos.nombre_padre_activ_econ_empresa" is a plain column usable in query_sut_indicador's campos or filtros; one ending in "[medida]" is an aggregate measure (only valid in campos, never filtros); one ending in "[Año]"/"[Mes]" is a date-hierarchy level. denuncias_publico and encuentra_empleo use an older report layout where visuals don't expose their query this way at all — their fields come from a small manually-captured set instead (recovered by driving the live dashboard and reading the queries it actually sent), not from this automatic discovery, but they show up here the same as any other field. Judicatura dashboards (fuente="judicatura") expose aggregate fields as "[suma]"/"[promedio]" (e.g. "CUB EST_CUB_AUDIENCIAS.Contador [suma]"), valid only in campos, like "[medida]" fields.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>indicador</code></td><td><code>str</code></td><td><code>required</code></td><td>A key from list_catalogo(fuente='sut').</td></tr>
+<tr><td><code>indicador</code></td><td><code>str</code></td><td><code>required</code></td><td>A key from list_catalogo(fuente=<fuente>).</td></tr>
+
+<tr><td><code>fuente</code></td><td><code>Literal['sut', 'judicatura']</code></td><td><code>sut</code></td><td>sut (default) | judicatura</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
@@ -1770,25 +1782,27 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-query_sut_indicador" data-search="query_sut_indicador run a live query against one sut power bi dashboard's underlying data model — any combination of its fields, e.g. month and industry together. run a live query against one sut power bi dashboard's underlying data model — any combination of its fields, e.g. month and industry together for &quot;contratos&quot; (a real monthly time series since 2015 by ciiu industry, province, gender, contract status — none of this is in the ministerio-del-trabajo ckan datasets, which are a single current-snapshot stock count with no time dimension). get valid campos from get_sut_indicador_schema(indicador) first — an unrecognized field name raises an error naming the tool to call instead of guessing. filtros only accepts plain-column fields (not &quot;[medida]&quot;/hierarchy-level fields) and matches exact text equality, e.g. {&quot;public contratos.estado contrato&quot;: &quot;vigente&quot;}. rows can run into the thousands for a wide breakdown (e.g. every month x every industry) — narrow with filtros or fewer campos rather than raising limite past what's actually needed; format &quot;json&quot; is exact but still subject to the same limite cap. indicador a key from list_catalogo(fuente='sut'). campos field labels exactly as returned by get_sut_indicador_schema. filtros optional {campo: valor} equality filters, plain columns only. limite row cap applied server-side by the query itself. format text | json">
+<details class="atlas-tool" id="tool-query_sut_indicador" data-search="query_sut_indicador run a live query against one sut or judicatura power bi dashboard's underlying data model (fuente) — any combination of its fields, e.g. month and industry together. run a live query against one sut power bi dashboard's underlying data model — any combination of its fields, e.g. month and industry together for &quot;contratos&quot; (a real monthly time series since 2015 by ciiu industry, province, gender, contract status — none of this is in the ministerio-del-trabajo ckan datasets, which are a single current-snapshot stock count with no time dimension). get valid campos from get_sut_indicador_schema(indicador) first — an unrecognized field name raises an error naming the tool to call instead of guessing. filtros only accepts plain-column fields (not &quot;[medida]&quot;/hierarchy-level fields) and matches exact text equality, e.g. {&quot;public contratos.estado contrato&quot;: &quot;vigente&quot;}. rows can run into the thousands for a wide breakdown (e.g. every month x every industry) — narrow with filtros or fewer campos rather than raising limite past what's actually needed; format &quot;json&quot; is exact but still subject to the same limite cap. fuente=&quot;judicatura&quot; queries the consejo de la judicatura dashboards (e.g. hearings by year and province: campos &quot;cub est_cub_audiencias.periodo [año]&quot; and &quot;cub est_cub_audiencias.contador [suma]&quot;). indicador a key from list_catalogo(fuente=<fuente>). campos field labels exactly as returned by get_sut_indicador_schema. filtros optional {campo: valor} equality filters, plain columns only. limite row cap applied server-side by the query itself. fuente sut (default) | judicatura format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">query_sut_indicador</code>
-<span class="atlas-tool-desc">Run a live query against one SUT Power BI dashboard's underlying data model — any combination of its fields, e.g. month and industry together.</span>
+<span class="atlas-tool-desc">Run a live query against one SUT or Judicatura Power BI dashboard's underlying data model (fuente) — any combination of its fields, e.g. month and industry together.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Run a live query against one SUT Power BI dashboard's underlying data model — any combination of its fields, e.g. month AND industry together for "contratos" (a real monthly time series since 2015 by CIIU industry, province, gender, contract status — none of this is in the ministerio-del-trabajo CKAN datasets, which are a single current-snapshot stock count with no time dimension). Get valid campos from get_sut_indicador_schema(indicador) first — an unrecognized field name raises an error naming the tool to call instead of guessing. filtros only accepts plain-column fields (not "[medida]"/hierarchy-level fields) and matches exact text equality, e.g. {"public contratos.Estado contrato": "Vigente"}. Rows can run into the thousands for a wide breakdown (e.g. every month x every industry) — narrow with filtros or fewer campos rather than raising limite past what's actually needed; format "json" is exact but still subject to the same limite cap.</p>
+<p class="atlas-tool-long">Run a live query against one SUT Power BI dashboard's underlying data model — any combination of its fields, e.g. month AND industry together for "contratos" (a real monthly time series since 2015 by CIIU industry, province, gender, contract status — none of this is in the ministerio-del-trabajo CKAN datasets, which are a single current-snapshot stock count with no time dimension). Get valid campos from get_sut_indicador_schema(indicador) first — an unrecognized field name raises an error naming the tool to call instead of guessing. filtros only accepts plain-column fields (not "[medida]"/hierarchy-level fields) and matches exact text equality, e.g. {"public contratos.Estado contrato": "Vigente"}. Rows can run into the thousands for a wide breakdown (e.g. every month x every industry) — narrow with filtros or fewer campos rather than raising limite past what's actually needed; format "json" is exact but still subject to the same limite cap. fuente="judicatura" queries the Consejo de la Judicatura dashboards (e.g. hearings by year and province: campos "CUB EST_CUB_AUDIENCIAS.Periodo [Año]" and "CUB EST_CUB_AUDIENCIAS.Contador [suma]").</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>indicador</code></td><td><code>str</code></td><td><code>required</code></td><td>A key from list_catalogo(fuente='sut').</td></tr>
+<tr><td><code>indicador</code></td><td><code>str</code></td><td><code>required</code></td><td>A key from list_catalogo(fuente=<fuente>).</td></tr>
 
 <tr><td><code>campos</code></td><td><code>list[str]</code></td><td><code>required</code></td><td>Field labels exactly as returned by get_sut_indicador_schema.</td></tr>
 
 <tr><td><code>filtros</code></td><td><code>dict[str, str] | None</code></td><td><code>none</code></td><td>Optional {campo: valor} equality filters, plain columns only.</td></tr>
 
 <tr><td><code>limite</code></td><td><code>int</code></td><td><code>500</code></td><td>Row cap applied server-side by the query itself.</td></tr>
+
+<tr><td><code>fuente</code></td><td><code>Literal['sut', 'judicatura']</code></td><td><code>sut</code></td><td>sut (default) | judicatura</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
@@ -2300,27 +2314,27 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_serie_internacional" data-search="get_serie_internacional international series with ecuador data: world bank wdi indicators, irena electricity capacity and generation, and xm's colombia-ecuador power flows. fetches a series from an international source, filtered to ecuador. wdi: world bank world development indicators (1,400+ yearly series); with indicador (e.g. eg.elc.accs.zs access to electricity) returns the series, with only query (english) searches the catalog; years without a value are dropped and counted. irena: irenastat installed capacity (mw) and generation (gwh) by technology, 2000 on, on/off-grid. xm: xm's hourly energy on the colombia-ecuador interconnection, summed by day or month since 2003; needs desde and hasta (at most 366 days); days without flow show as 0 gwh, so the october 2024 suspension appears as zeros. fuente wdi, irena or xm. indicador wdi only: wdi code. empty with query searches the catalog. query wdi only: catalog search text (english), used when indicador is empty. pais wdi/irena: iso3 code (irena also accepts the english name). ignored by xm. default ecu. desde start: a year (yyyy) for wdi/irena, a date (yyyy-mm-dd) for xm. hasta end, same format as desde. xm allows at most 366 days. tecnologia irena only: technology label substring (solar, hydro, total renewable...). empty returns all. tipo irena only: generacion (gwh), capacidad (mw) or ambos. conexion irena only: all, on-grid or off-grid. sentido xm only: exportaciones (colombia to ecuador) or importaciones (ecuador to colombia). agregacion xm only: dia or mes. limit wdi catalog search only: maximum indicators (1-200). format text | json">
+<details class="atlas-tool" id="tool-get_serie_internacional" data-search="get_serie_internacional international series with ecuador data: world bank wdi, irena, xm power flows, un comtrade bilateral trade, imf series, who health, ilo labour and unhcr displacement. fetches a series from an international source, filtered to ecuador. wdi: world bank world development indicators (1,400+ yearly series); with indicador (e.g. eg.elc.accs.zs access to electricity) returns the series, with only query (english) searches the catalog; years without a value are dropped and counted. irena: irenastat installed capacity (mw) and generation (gwh) by technology, 2000 on, on/off-grid. xm: xm's hourly energy on the colombia-ecuador interconnection, summed by day or month since 2003; needs desde and hasta (at most 366 days); days without flow show as 0 gwh, so the october 2024 suspension appears as zeros. comtrade: ecuador's merchandise trade with one partner in usd (un comtrade public preview, no key): one period per call (periodo), capped at 500 rows, a ~1 call per 2 s rate limit that is retried automatically, and codes only (no names); socio 0 = world, cmd = total or an hs code. imf: imf statistics via sdmx (190 flows: prices, balance of payments, exchange rates, fiscal, monetary and banking); indicador is the flow id (empty with query lists flows) and clave the sdmx key, whose dimension order differs per flow and is returned in the response; without clave it returns the whole country, latest observations. who: who global health observatory (~3,000 yearly indicators by sex and age, e.g. whosis_000001 life expectancy at birth); empty with query searches indicators. ilo: ilostat labour statistics (1,200+ flows, e.g. une_deap_sex_age_rt unemployment by sex and age); short keys are padded with wildcards. unhcr: refugees and asylum seekers hosted in ecuador by year, from desde/hasta; socio = origin country (ven) or 'todos' for one row per origin. fuente wdi, irena, xm, comtrade, imf, who, ilo or unhcr. indicador wdi/who: indicator code. imf/ilo: dataflow id. empty with query searches (wdi/who) or lists flows (imf/ilo). query wdi/who/imf/ilo: catalog search text (english), used when indicador is empty. pais wdi/irena/who/imf/ilo/unhcr: iso3 code (irena also accepts the english name). comtrade: iso3 or numeric m49 reporter. ignored by xm. default ecu. desde start: a year (yyyy) for wdi/irena/who/unhcr, a date (yyyy-mm-dd) for xm, a period (yyyy, yyyy-mm) for imf/ilo. hasta end, same format as desde. xm allows at most 366 days. tecnologia irena only: technology label substring (solar, hydro, total renewable...). empty returns all. tipo irena only: generacion (gwh), capacidad (mw) or ambos. conexion irena only: all, on-grid or off-grid. sentido xm only: exportaciones (colombia to ecuador) or importaciones (ecuador to colombia). agregacion xm only: dia or mes. limit catalog or flow listings only: maximum rows (1-200). periodo comtrade only: a single period, yyyy (frecuencia a) or yyyymm (frecuencia m). required. socio comtrade: partner as iso3 (usa, chn, col, per, pan, esp, nld, ita...) or m49 number; empty = 0 (world). unhcr: origin iso3 or 'todos'. cmd comtrade only: total or an hs code of 2, 4 or 6 digits. flujo comtrade only: x (exports), m (imports) or ambos. frecuencia comtrade only: a (annual) or m (monthly). clave imf/ilo only: dot-separated sdmx key (ecu.cpi._t.ix.m). empty = pais. ultimos imf/ilo only: last n observations per series. default 5 (imf) / 3 (ilo) when no desde/hasta. format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_serie_internacional</code>
-<span class="atlas-tool-desc">International series with Ecuador data: World Bank WDI indicators, IRENA electricity capacity and generation, and XM's Colombia-Ecuador power flows.</span>
+<span class="atlas-tool-desc">International series with Ecuador data: World Bank WDI, IRENA, XM power flows, UN Comtrade bilateral trade, IMF series, WHO health, ILO labour and UNHCR displacement.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Fetches a series from an international source, filtered to Ecuador. wdi: World Bank World Development Indicators (1,400+ yearly series); with indicador (e.g. EG.ELC.ACCS.ZS access to electricity) returns the series, with only query (English) searches the catalog; years without a value are dropped and counted. irena: IRENASTAT installed capacity (MW) and generation (GWh) by technology, 2000 on, on/off-grid. xm: XM's hourly energy on the Colombia-Ecuador interconnection, summed by day or month since 2003; needs desde and hasta (at most 366 days); days without flow show as 0 GWh, so the October 2024 suspension appears as zeros.</p>
+<p class="atlas-tool-long">Fetches a series from an international source, filtered to Ecuador. wdi: World Bank World Development Indicators (1,400+ yearly series); with indicador (e.g. EG.ELC.ACCS.ZS access to electricity) returns the series, with only query (English) searches the catalog; years without a value are dropped and counted. irena: IRENASTAT installed capacity (MW) and generation (GWh) by technology, 2000 on, on/off-grid. xm: XM's hourly energy on the Colombia-Ecuador interconnection, summed by day or month since 2003; needs desde and hasta (at most 366 days); days without flow show as 0 GWh, so the October 2024 suspension appears as zeros. comtrade: Ecuador's merchandise trade with one partner in USD (UN Comtrade public preview, no key): one period per call (periodo), capped at 500 rows, a ~1 call per 2 s rate limit that is retried automatically, and codes only (no names); socio 0 = World, cmd = TOTAL or an HS code. imf: IMF statistics via SDMX (190 flows: prices, balance of payments, exchange rates, fiscal, monetary and banking); indicador is the flow id (empty with query lists flows) and clave the SDMX key, whose dimension order differs per flow and is returned in the response; without clave it returns the whole country, latest observations. who: WHO Global Health Observatory (~3,000 yearly indicators by sex and age, e.g. WHOSIS_000001 life expectancy at birth); empty with query searches indicators. ilo: ILOSTAT labour statistics (1,200+ flows, e.g. UNE_DEAP_SEX_AGE_RT unemployment by sex and age); short keys are padded with wildcards. unhcr: refugees and asylum seekers hosted in Ecuador by year, from desde/hasta; socio = origin country (VEN) or 'todos' for one row per origin.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>wdi, irena or xm.</td></tr>
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>wdi, irena, xm, comtrade, imf, who, ilo or unhcr.</td></tr>
 
-<tr><td><code>indicador</code></td><td><code>str</code></td><td><code>empty</code></td><td>wdi only: WDI code. Empty with query searches the catalog.</td></tr>
+<tr><td><code>indicador</code></td><td><code>str</code></td><td><code>empty</code></td><td>wdi/who: indicator code. imf/ilo: dataflow id. Empty with query searches (wdi/who) or lists flows (imf/ilo).</td></tr>
 
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>wdi only: catalog search text (English), used when indicador is empty.</td></tr>
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>wdi/who/imf/ilo: catalog search text (English), used when indicador is empty.</td></tr>
 
-<tr><td><code>pais</code></td><td><code>str</code></td><td><code>ECU</code></td><td>wdi/irena: ISO3 code (irena also accepts the English name). Ignored by xm. Default ECU.</td></tr>
+<tr><td><code>pais</code></td><td><code>str</code></td><td><code>ECU</code></td><td>wdi/irena/who/imf/ilo/unhcr: ISO3 code (irena also accepts the English name). comtrade: ISO3 or numeric M49 reporter. Ignored by xm. Default ECU.</td></tr>
 
-<tr><td><code>desde</code></td><td><code>str</code></td><td><code>empty</code></td><td>Start: a year (YYYY) for wdi/irena, a date (YYYY-MM-DD) for xm.</td></tr>
+<tr><td><code>desde</code></td><td><code>str</code></td><td><code>empty</code></td><td>Start: a year (YYYY) for wdi/irena/who/unhcr, a date (YYYY-MM-DD) for xm, a period (YYYY, YYYY-MM) for imf/ilo.</td></tr>
 
 <tr><td><code>hasta</code></td><td><code>str</code></td><td><code>empty</code></td><td>End, same format as desde. xm allows at most 366 days.</td></tr>
 
@@ -2334,7 +2348,21 @@
 
 <tr><td><code>agregacion</code></td><td><code>Literal['dia', 'mes']</code></td><td><code>dia</code></td><td>xm only: dia or mes.</td></tr>
 
-<tr><td><code>limit</code></td><td><code>int</code></td><td><code>30</code></td><td>WDI catalog search only: maximum indicators (1-200).</td></tr>
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>30</code></td><td>Catalog or flow listings only: maximum rows (1-200).</td></tr>
+
+<tr><td><code>periodo</code></td><td><code>str</code></td><td><code>empty</code></td><td>comtrade only: a single period, YYYY (frecuencia A) or YYYYMM (frecuencia M). Required.</td></tr>
+
+<tr><td><code>socio</code></td><td><code>str</code></td><td><code>empty</code></td><td>comtrade: partner as ISO3 (USA, CHN, COL, PER, PAN, ESP, NLD, ITA...) or M49 number; empty = 0 (World). unhcr: origin ISO3 or 'todos'.</td></tr>
+
+<tr><td><code>cmd</code></td><td><code>str</code></td><td><code>TOTAL</code></td><td>comtrade only: TOTAL or an HS code of 2, 4 or 6 digits.</td></tr>
+
+<tr><td><code>flujo</code></td><td><code>str</code></td><td><code>ambos</code></td><td>comtrade only: X (exports), M (imports) or ambos.</td></tr>
+
+<tr><td><code>frecuencia</code></td><td><code>Literal['A', 'M']</code></td><td><code>A</code></td><td>comtrade only: A (annual) or M (monthly).</td></tr>
+
+<tr><td><code>clave</code></td><td><code>str</code></td><td><code>empty</code></td><td>imf/ilo only: dot-separated SDMX key (ECU.CPI._T.IX.M). Empty = pais.</td></tr>
+
+<tr><td><code>ultimos</code></td><td><code>int</code></td><td><code>0</code></td><td>imf/ilo only: last N observations per series. Default 5 (imf) / 3 (ilo) when no desde/hasta.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 
@@ -2430,19 +2458,19 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-list_catalogo" data-search="list_catalogo list one source's catalog that has no search filters: arconel, bce daily indicators, contraloría, iess or sut. list the catalog of one source that has no filters, the step before its get tool. arconel: electricity report types by section, years (1998 on) and company groups; then get_arconel_reporte. bce_diarios: bce daily/monthly indicator widgets outside bcedata (daily riesgo país since 2004, gold, wti, bonds, payments, reserves, fiscal and external series); a codigo only means one thing within its archivo; then get_bce_indicador_diario(archivo, codigo). contraloria: quarterly csvs of approved audit reports and annual control plans; then get_contraloria_informe. iess: iess document collections (statistical bulletins, actuarial studies, audit reports) with years and counts; then get_iess_archivos(coleccion, anio). sut: ministerio del trabajo power bi dashboards (contracts since 2015, labor demand, gender policy); then get_sut_indicador_schema and query_sut_indicador. fuente catalog to list: arconel, bce_diarios, contraloria, iess or sut. format text | json">
+<details class="atlas-tool" id="tool-list_catalogo" data-search="list_catalogo list one source's catalog that has no search filters: arconel, bce daily indicators, contraloría, iess, sut or consejo de la judicatura. list the catalog of one source that has no filters, the step before its get tool. arconel: electricity report types by section, years (1998 on) and company groups; then get_arconel_reporte. bce_diarios: bce daily/monthly indicator widgets outside bcedata (daily riesgo país since 2004, gold, wti, bonds, payments, reserves, fiscal and external series); a codigo only means one thing within its archivo; then get_bce_indicador_diario(archivo, codigo). contraloria: quarterly csvs of approved audit reports and annual control plans; then get_contraloria_informe. iess: iess document collections (statistical bulletins, actuarial studies, audit reports) with years and counts; then get_iess_archivos(coleccion, anio). sut: ministerio del trabajo power bi dashboards (contracts since 2015, labor demand, gender policy); then get_sut_indicador_schema and query_sut_indicador. judicatura: power bi dashboards of the consejo de la judicatura's portal de estadística judicial (hearings, arrest warrants, training, dismissals, filings, mediation, notaries, judge productivity, judicial auctions, supa child-support); then get_sut_indicador_schema(indicador, fuente=&quot;judicatura&quot;) and query_sut_indicador. fuente catalog to list: arconel, bce_diarios, contraloria, iess, sut or judicatura. format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">list_catalogo</code>
-<span class="atlas-tool-desc">List one source's catalog that has no search filters: ARCONEL, BCE daily indicators, Contraloría, IESS or SUT.</span>
+<span class="atlas-tool-desc">List one source's catalog that has no search filters: ARCONEL, BCE daily indicators, Contraloría, IESS, SUT or Consejo de la Judicatura.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">List the catalog of one source that has no filters, the step before its get tool. arconel: electricity report types by section, years (1998 on) and company groups; then get_arconel_reporte. bce_diarios: BCE daily/monthly indicator widgets outside BCEData (daily riesgo país since 2004, gold, WTI, bonds, payments, reserves, fiscal and external series); a codigo only means one thing within its archivo; then get_bce_indicador_diario(archivo, codigo). contraloria: quarterly CSVs of approved audit reports and annual control plans; then get_contraloria_informe. iess: IESS document collections (statistical bulletins, actuarial studies, audit reports) with years and counts; then get_iess_archivos(coleccion, anio). sut: Ministerio del Trabajo Power BI dashboards (contracts since 2015, labor demand, gender policy); then get_sut_indicador_schema and query_sut_indicador.</p>
+<p class="atlas-tool-long">List the catalog of one source that has no filters, the step before its get tool. arconel: electricity report types by section, years (1998 on) and company groups; then get_arconel_reporte. bce_diarios: BCE daily/monthly indicator widgets outside BCEData (daily riesgo país since 2004, gold, WTI, bonds, payments, reserves, fiscal and external series); a codigo only means one thing within its archivo; then get_bce_indicador_diario(archivo, codigo). contraloria: quarterly CSVs of approved audit reports and annual control plans; then get_contraloria_informe. iess: IESS document collections (statistical bulletins, actuarial studies, audit reports) with years and counts; then get_iess_archivos(coleccion, anio). sut: Ministerio del Trabajo Power BI dashboards (contracts since 2015, labor demand, gender policy); then get_sut_indicador_schema and query_sut_indicador. judicatura: Power BI dashboards of the Consejo de la Judicatura's Portal de Estadística Judicial (hearings, arrest warrants, training, dismissals, filings, mediation, notaries, judge productivity, judicial auctions, SUPA child-support); then get_sut_indicador_schema(indicador, fuente="judicatura") and query_sut_indicador.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>Catalog to list: arconel, bce_diarios, contraloria, iess or sut.</td></tr>
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>Catalog to list: arconel, bce_diarios, contraloria, iess, sut or judicatura.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal['text', 'json']</code></td><td><code>text</code></td><td>text | json</td></tr>
 

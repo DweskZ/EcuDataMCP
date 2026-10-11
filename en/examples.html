@@ -6,8 +6,14 @@
 <title>Examples – EcuDataMCP</title>
 <meta name="description" content="Ten real questions, answered with EcuDataMCP: no invented data about Ecuador.">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://dweskz.github.io/EcuDataMCP/en/examples.html">
+<link rel="alternate" hreflang="es" href="https://dweskz.github.io/EcuDataMCP/examples.html">
+<link rel="alternate" hreflang="en" href="https://dweskz.github.io/EcuDataMCP/en/examples.html">
+<link rel="alternate" hreflang="x-default" href="https://dweskz.github.io/EcuDataMCP/examples.html">
 <meta property="og:title" content="Examples – EcuDataMCP">
 <meta property="og:description" content="Ten real questions, answered with EcuDataMCP: no invented data about Ecuador.">
+<meta property="og:url" content="https://dweskz.github.io/EcuDataMCP/en/examples.html">
+<meta property="og:type" content="website">
 <meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
@@ -22,12 +28,16 @@
   }
 })();
 </script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/styles.css">
 <link rel="stylesheet" href="../assets/site.css">
 
-<style>html { scroll-behavior: smooth; }</style>
+<style>@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }</style>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <div class="ecu-flag-stripe" aria-hidden="true"></div>
 <nav class="navbar navbar-expand-lg site-navbar" data-bs-theme="dark">
   <div class="navbar-container container-fluid">
@@ -40,7 +50,7 @@
         <span class="navbar-title">EcuDataMCP</span>
       </a>
     </div>
-    <button class="site-search-toggle" type="button" title="Search" aria-label="Search">
+    <button class="site-search-toggle" type="button" title="Search" aria-label="Search" aria-expanded="false" aria-controls="siteSearchPanel">
       <svg class="icon-search" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.75"/><line x1="10.2" y1="10.2" x2="14" y2="14"/></svg>
     </button>
     <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" data-nav-toggle="navbarCollapse">
@@ -131,12 +141,12 @@
 
 <div class="site-search-panel" id="siteSearchPanel" hidden>
   <div class="site-search-panel-inner">
-    <input type="text" id="siteSearchInput" class="site-search-input" placeholder="Search the site…" autocomplete="off">
+    <input type="text" id="siteSearchInput" class="site-search-input" aria-label="Search" placeholder="Search the site…" autocomplete="off">
     <div id="siteSearchResults" class="site-search-results"></div>
   </div>
 </div>
 
-<main>
+<main id="main">
 
 <section class="landing hero">
 <div class="container-page">
@@ -180,7 +190,7 @@
 <div class="example-mini">
 <p class="example-question">&ldquo;What's the WTI oil price right now, per the Central Bank?&rdquo;</p>
 <p class="example-flow"><span class="tool-chip">get_bce_indicador_diario</span></p>
-<p class="example-result">USD <strong>99.12</strong> per barrel as of September 27, 2026 — the Central Bank's daily series (history back to 2015).</p>
+<p class="example-result">USD <strong>99.12</strong> per barrel as of 27 September 2026 — the Central Bank's daily series (history back to 2015).</p>
 <a class="example-source" href="https://contenido.bce.fin.ec" target="_blank" rel="noopener">contenido.bce.fin.ec &#8599;</a>
 </div>
 

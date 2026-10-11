@@ -6,8 +6,14 @@
 <title>Ecuador open data for your AI assistant – EcuDataMCP</title>
 <meta name="description" content="Open-source MCP server for exploring Ecuador's open government data from your AI assistant.">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://dweskz.github.io/EcuDataMCP/en/index.html">
+<link rel="alternate" hreflang="es" href="https://dweskz.github.io/EcuDataMCP/index.html">
+<link rel="alternate" hreflang="en" href="https://dweskz.github.io/EcuDataMCP/en/index.html">
+<link rel="alternate" hreflang="x-default" href="https://dweskz.github.io/EcuDataMCP/index.html">
 <meta property="og:title" content="Ecuador open data for your AI assistant – EcuDataMCP">
 <meta property="og:description" content="Open-source MCP server for exploring Ecuador's open government data from your AI assistant.">
+<meta property="og:url" content="https://dweskz.github.io/EcuDataMCP/en/index.html">
+<meta property="og:type" content="website">
 <meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
@@ -22,12 +28,16 @@
   }
 })();
 </script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/styles.css">
 <link rel="stylesheet" href="../assets/site.css">
 
-<style>html { scroll-behavior: smooth; }</style>
+<style>@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }</style>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <div class="ecu-flag-stripe" aria-hidden="true"></div>
 <nav class="navbar navbar-expand-lg site-navbar" data-bs-theme="dark">
   <div class="navbar-container container-fluid">
@@ -40,7 +50,7 @@
         <span class="navbar-title">EcuDataMCP</span>
       </a>
     </div>
-    <button class="site-search-toggle" type="button" title="Search" aria-label="Search">
+    <button class="site-search-toggle" type="button" title="Search" aria-label="Search" aria-expanded="false" aria-controls="siteSearchPanel">
       <svg class="icon-search" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.75"/><line x1="10.2" y1="10.2" x2="14" y2="14"/></svg>
     </button>
     <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" data-nav-toggle="navbarCollapse">
@@ -131,12 +141,12 @@
 
 <div class="site-search-panel" id="siteSearchPanel" hidden>
   <div class="site-search-panel-inner">
-    <input type="text" id="siteSearchInput" class="site-search-input" placeholder="Search the site…" autocomplete="off">
+    <input type="text" id="siteSearchInput" class="site-search-input" aria-label="Search" placeholder="Search the site…" autocomplete="off">
     <div id="siteSearchResults" class="site-search-results"></div>
   </div>
 </div>
 
-<main>
+<main id="main">
 
 <section class="landing hero">
 <div class="container-page hero-layout">
@@ -230,7 +240,7 @@ previous passport, if it is still valid</pre>
 </div>
 <div class="hero-stats">
 <div class="hero-stat"><span class="num">83</span><span class="label">MCP tools</span></div>
-<div class="hero-stat"><span class="num">66</span><span class="label">official sources</span></div>
+<div class="hero-stat"><span class="num">67</span><span class="label">official sources</span></div>
 <div class="hero-stat"><span class="num">0</span><span class="label">source API keys</span></div>
 </div>
 <div class="source-cloud" aria-label="Connected institutions">
@@ -238,7 +248,7 @@ previous passport, if it is still valid</pre>
 <span class="source-pill">SRI</span>
 <span class="source-pill">INEC</span>
 <span class="source-pill">SERCOP</span>
-<span class="source-pill">Supercias</span>
+<span class="source-pill">Supercías</span>
 <span class="source-pill">IG-EPN</span>
 <span class="source-pill">gob.ec</span>
 <span class="source-pill">Open Data</span>
@@ -291,7 +301,7 @@ previous passport, if it is still valid</pre>
 <div class="container-page">
 <p class="kicker">What can you ask?</p>
 <h2 class="section-title">Ask in plain language, without searching portal by portal.</h2>
-<p class="section-lede">66 official sources, in a single conversation.</p>
+<p class="section-lede">67 official sources, in a single conversation.</p>
 <div class="questions-grid">
 
 <div class="question-card">&ldquo;What data does the SRI have on tax collection?&rdquo;</div>
@@ -318,11 +328,11 @@ previous passport, if it is still valid</pre>
 <div class="container-page" id="sources">
 <p class="kicker">Sources</p>
 <h2 class="section-title">Official data, always cited.</h2>
-<p class="section-lede">EcuDataMCP never copies or stores these catalogs: every query goes live against the source portal. 66 sources grouped by theme — Central Bank, SRI, INEC, Supercías, Superbancos and more — each tied to its own institution.</p>
+<p class="section-lede">EcuDataMCP never copies or stores these catalogs: every query goes live against the source portal. 67 sources grouped by theme — Central Bank, SRI, INEC, Supercías, Superbancos and more — each tied to its own institution.</p>
 <div class="tools-summary">
-<span class="tool-chip">Open data catalogs</span><span class="tool-chip">Procedures, regulations & public procurement</span><span class="tool-chip">Risk & natural hazards</span><span class="tool-chip">Economy & finance</span><span class="tool-chip">Statistics & demographics</span><span class="tool-chip">Agriculture</span><span class="tool-chip">Energy</span><span class="tool-chip">Labour & employment</span><span class="tool-chip">Oversight & transparency</span><span class="tool-chip">Transport & civil aviation</span><span class="tool-chip">Health</span><span class="tool-chip">Telecommunications</span><span class="tool-chip">International sources with an Ecuador angle</span>
+<span class="tool-chip">Open data catalogs</span><span class="tool-chip">Procedures, regulations & public procurement</span><span class="tool-chip">Risk & natural hazards</span><span class="tool-chip">Economy & finance</span><span class="tool-chip">Statistics & demographics</span><span class="tool-chip">Agriculture</span><span class="tool-chip">Energy</span><span class="tool-chip">Labor & employment</span><span class="tool-chip">Oversight & transparency</span><span class="tool-chip">Justice</span><span class="tool-chip">Transport & civil aviation</span><span class="tool-chip">Health</span><span class="tool-chip">Telecommunications</span><span class="tool-chip">International sources with an Ecuador angle</span>
 </div>
-<a class="btn-cta secondary" href="fuentes.html">See the 66 sources, grouped &rarr;</a>
+<a class="btn-cta secondary" href="fuentes.html">See the 67 sources, grouped &rarr;</a>
 </div>
 </section>
 
@@ -416,7 +426,7 @@ previous passport, if it is still valid</pre>
 <div class="container-page">
 <p class="kicker">Connect your assistant</p>
 <h2 class="section-title">Copy your client's configuration.</h2>
-<p class="section-lede">Run the server locally (Docker or <code>uv run</code>, see the <a href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">README</a>) and point your MCP client at <code>http://localhost:8000/mcp</code>. The Docker compose file requires a token: set <code>MCP_AUTH_TOKEN</code> (or <code>MCP_REQUIRE_AUTH=0</code> for local use only). For a local stdio client, the simplest option is <code>uvx ecuador-mcp --transport stdio</code>.</p>
+<p class="section-lede">Run the server locally (Docker or <code>uv run</code>, see the <a href="https://github.com/DweskZ/EcuDataMCP#ejecutar-localmente" target="_blank" rel="noopener">README</a>) and point your MCP client at <code>http://localhost:8000/mcp</code>. The Docker compose file requires a token: set <code>MCP_AUTH_TOKEN</code> (or <code>MCP_REQUIRE_AUTH=0</code> for local use only). For a local stdio client, the simplest option is <code>uvx ecuador-mcp --transport stdio</code>.</p>
 <div class="install-bar">
 <span class="install-label">Quick start</span>
 <div class="code-block install-code">
@@ -615,7 +625,7 @@ Verify the server responds before calling it done.</code></pre>
 <section class="landing">
 <div class="container-page">
 <p class="kicker">No friction</p>
-<h2 class="section-title">Ready to use, no setup of your own.</h2>
+<h2 class="section-title">Ready to use, no sign-ups.</h2>
 <ul class="friction-list">
 <li><strong>No API key</strong>All sources are public data, no authentication. (The HTTP endpoint can be protected with your own token, <code>MCP_AUTH_TOKEN</code>.)</li>
 <li><strong>No account</strong>There is no sign-up or user account to create.</li>
