@@ -175,6 +175,12 @@ def _all_fuentes() -> dict:
                 ],
             },
             {
+                "id": "ant-siniestros",
+                "nombre": "Siniestros de tránsito (registros de la ANT, vía INEC y CKAN)",
+                "base": "https://www.ecuadorencifras.gob.ec/",
+                "tools": ["search_siniestros_ant"],
+            },
+            {
                 "id": "inec-biinec",
                 "nombre": "BIINEC / INEC (registros exclusivos curados)",
                 "base": "https://aplicaciones3.ecuadorencifras.gob.ec/BIINEC-war/",
@@ -219,6 +225,41 @@ def _all_fuentes() -> dict:
                     "search_capas_geo",
                     "get_capa_geo_datos",
                 ],
+            },
+            {
+                "id": "petroecuador",
+                "nombre": "EP Petroecuador (Cifras Institucionales)",
+                "base": "https://www.eppetroecuador.ec/",
+                "tools": [
+                    "list_archivo_secciones",
+                    "get_archivo_seccion",
+                    "read_pdf",
+                ],
+            },
+            {
+                "id": "energia",
+                "nombre": (
+                    "Ministerio de Ambiente y Energía (estadística de "
+                    "hidrocarburos, minería y Balance Energético Nacional)"
+                ),
+                "base": "https://www.ambienteyenergia.gob.ec/",
+                "tools": [
+                    "list_archivo_secciones",
+                    "get_archivo_seccion",
+                    "read_pdf",
+                ],
+            },
+            {
+                "id": "bvg",
+                "nombre": "Bolsa de Valores de Guayaquil (estadísticas históricas)",
+                "base": "https://www.bolsadevaloresguayaquil.com/",
+                "tools": ["list_archivo_secciones", "get_archivo_seccion"],
+            },
+            {
+                "id": "bvq",
+                "nombre": "Bolsa de Valores de Quito (estadísticas)",
+                "base": "https://www.bolsadequito.com/index.php/estadisticas",
+                "tools": ["list_archivo_secciones", "get_archivo_seccion"],
             },
             {
                 "id": "contraloria",
@@ -375,6 +416,12 @@ def _all_fuentes() -> dict:
                 "id": "ineval",
                 "nombre": "INEVAL (resultados de evaluaciones educativas)",
                 "base": "https://evaluaciones.evaluacion.gob.ec/BI",
+                "tools": ["list_archivo_secciones", "get_archivo_seccion"],
+            },
+            {
+                "id": "cne",
+                "nombre": "CNE (resultados y registro electoral por proceso, 2002-2025)",
+                "base": "https://www.cne.gob.ec/estadisticas/bases-de-datos/",
                 "tools": ["list_archivo_secciones", "get_archivo_seccion"],
             },
             {

@@ -13,10 +13,10 @@
         "default": "'text'"
       }
     ],
-    "description": "List the sections of one institution's document archive: ARCSA sanitary registry, Superbancos and SEPS statistics, INEVAL evaluation datasets, SGR and Educación Superior libraries, or SIPA agricultural statistics. Next: get_archivo_seccion(fuente, seccion).",
-    "summary": "List the sections of one institution's document archive. Sources (`fuente`): - arcsa: ARCSA \"Base de Registros Emitidos\" (controlsanitario.gob.ec/base-de-datos/), the live sanitary registry (food, medicines, cosmetics, medical devices...), 27 categories. Different from the ARCSA CKAN datasets, which only cover suspended/cancelled records. - superbancos: Superintendencia de Bancos statistics (4 sections: boletines_financieros, servicios_financieros, informacion_historica, calendario_estadistico). No CKAN organization exists. boletines_financieros and servicios_financieros add the page's OneDrive folders to the static tables. - seps: SEPS statistics (estadisticas.seps.gob.ec), 22 SFPS sections (cooperatives: financial statements, deposits, credit, rates, risk ratings) plus 4 EPS sections. seps.gob.ec itself blocks automated access. - ineval: INEVAL evaluation datasets, 9 families (ser_bachiller, ser_estudiante and variants, ser_maestro, ser_profesional, llece). Only these keys have real download pages. - sgr: SGR Biblioteca (gestionderiesgos.gob.ec/biblioteca/), ~1,660 documents in 19 categories (resolutions, contingency plans, threat maps). Not event reports: see search_sgr_sitreps. - senescyt: Educación Superior Biblioteca (educacion.gob.ec/edusuperior/biblioteca/), ~1,259 documents in 17 categories (PAC, LOES/SNNA normativa, acuerdos, auditorías). - sipa: SIPA, Ministerio de Agricultura (4 modules: economico, productivo, social, censos). Distinct from MPCEIP. Returns each section's `id` (pass it to get_archivo_seccion), `nombre`, and either its page `url` or `total_archivos`.",
+    "description": "List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ). Next: get_archivo_seccion(fuente, seccion).",
+    "summary": "List the sections of one institution's document archive. Sources (`fuente`): - arcsa: ARCSA \"Base de Registros Emitidos\" (controlsanitario.gob.ec/base-de-datos/), the live sanitary registry (food, medicines, cosmetics, medical devices...), 27 categories. Different from the ARCSA CKAN datasets, which only cover suspended/cancelled records. - superbancos: Superintendencia de Bancos statistics (4 sections: boletines_financieros, servicios_financieros, informacion_historica, calendario_estadistico). No CKAN organization exists. boletines_financieros and servicios_financieros add the page's OneDrive folders to the static tables. - seps: SEPS statistics (estadisticas.seps.gob.ec), 22 SFPS sections (cooperatives: financial statements, deposits, credit, rates, risk ratings) plus 4 EPS sections. seps.gob.ec itself blocks automated access. - ineval: INEVAL evaluation datasets, 9 families (ser_bachiller, ser_estudiante and variants, ser_maestro, ser_profesional, llece). Only these keys have real download pages. - sgr: SGR Biblioteca (gestionderiesgos.gob.ec/biblioteca/), ~1,660 documents in 19 categories (resolutions, contingency plans, threat maps). Not event reports: see search_sgr_sitreps. - senescyt: Educación Superior Biblioteca (educacion.gob.ec/edusuperior/biblioteca/), ~1,259 documents in 17 categories (PAC, LOES/SNNA normativa, acuerdos, auditorías). - sipa: SIPA, Ministerio de Agricultura (4 modules: economico, productivo, social, censos). Distinct from MPCEIP. - petroecuador: EP Petroecuador \"Cifras Institucionales\" (eppetroecuador.ec/?p=3721), 8 sections: estados financieros, informes estadísticos mensuales y anuales (2006 onward, PDF), exploración y producción (daily field production, well nomenclature), comercialización (prices, subsidy value, dispatches), refinación, comercialización internacional (WTI), gestión de riesgos. - energia: Ministerio de Ambiente y Energía (ambienteyenergia.gob.ec, which absorbed Energía y Minas, MERNNR and Hidrocarburos), 4 sections read from its WordPress media library: hydrocarbon statistics (crudo/derivados yearbooks 2002-2024), mining exports and tax revenue, 2020-21 weekly mining reports, and the Balance Energético Nacional. The old ARCERNNR and recursosyenergia hosts are dead; electricity regulation is in get_arconel_reporte. - cne: CNE (Consejo Nacional Electoral) \"Bases de datos\", cne.gob.ec/estadisticas/bases-de-datos/: one section per election process, 2002-2025 (19: Elecciones Generales, Seccionales, Referéndum y Consulta Popular, special parish/canton elections). Each holds dictionaries, political organizations, candidates, the electoral roll by parish and the results by parish. - bvg: Bolsa de Valores de Guayaquil (4 sections: historicos, dividendos, valoracion, ofertas_publicas). Trade-by-trade history since 2019 (acciones, obligaciones, papel comercial, titularizaciones, bonos del Estado, notas de crédito, cetes), dividends since 2002, repo-eligible securities, public offers. - bvq: Bolsa de Valores de Quito (10 sections: cotizaciones históricas, emisiones, renta variable, sector público, boletines al cierre/semanales/por valor, valoración, emisores). Public files only; the Infolab bulletins need a login. Returns each section's `id` (pass it to get_archivo_seccion), `nombre`, and either its page `url` or `total_archivos`.",
     "args_doc": {
-      "fuente": "One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa.",
+      "fuente": "One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa, petroecuador, energia, cne, bvg, bvq.",
       "format": "text | json"
     }
   },
@@ -40,9 +40,9 @@
       }
     ],
     "description": "List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).",
-    "summary": "List the files published in one section of an institutional archive. Each file has `titulo`, `url` and `formato`, plus source-specific context when the page provides it: `grupo`/`periodo` (Superbancos, SEPS, INEVAL tables and accordions), `subgrupo` (nested categories in ARCSA and the SGR/SENESCYT libraries), `descripcion` and `numero` (SIPA). Returns links, not contents. Per-source caveats: - arcsa, sgr, senescyt: `seccion` may be the category id or its nombre (accent/case-insensitive). Links carry no extension, so formato is DESCONOCIDO. A real share of SGR links 404; treat the SGR listing as a catalog, not a guarantee. - superbancos: coverage is whatever the portal uploaded (static tables plus OneDrive folders), not a guaranteed monthly series. - seps: some links go through a download-monitor redirect (formato DESCONOCIDO) that resolves to the same static files. - ineval: some ids 308-redirect to a static file; both work. - sipa: XLSX/XLS files, some over 40 MB. Files are often several MB: download the URL directly instead of using preview_resource_data or download_resource (5 MB cap).",
+    "summary": "List the files published in one section of an institutional archive. Each file has `titulo`, `url` and `formato`, plus source-specific context when the page provides it: `grupo`/`periodo` (Superbancos, SEPS, INEVAL tables and accordions), `subgrupo` (nested categories in ARCSA and the SGR/SENESCYT libraries), `descripcion` and `numero` (SIPA). Returns links, not contents. Per-source caveats: - arcsa, sgr, senescyt: `seccion` may be the category id or its nombre (accent/case-insensitive). Links carry no extension, so formato is DESCONOCIDO. A real share of SGR links 404; treat the SGR listing as a catalog, not a guarantee. - superbancos: coverage is whatever the portal uploaded (static tables plus OneDrive folders), not a guaranteed monthly series. - seps: some links go through a download-monitor redirect (formato DESCONOCIDO) that resolves to the same static files. - ineval: some ids 308-redirect to a static file; both work. - sipa: XLSX/XLS files, some over 40 MB. - petroecuador: `seccion` is the id or nombre. Mostly PDFs; links through download.php redirect to the current PDF (formato DESCONOCIDO). The \"Producción de Campo BPPD\" title embeds the day's figure and effective date as the page publishes it. Reports are PDFs, not tables: read them with read_pdf. - cne: `seccion` is a process id or name (\"Elecciones Generales 2025\", a unique fragment works). Each file has `grupo` (Diccionarios, Organizaciones Políticas, Registro Electoral, Resultados), `descargas` and `tamano`. The files checked are SPSS .sav (formato DESCONOCIDO: the listing does not say); primera vuelta results run 10-77 MB, so download the URL directly. - bvg, bvq: XLSX/XLS (a few PDFs on bvq). Each file adds `modificado` (HTTP Last-Modified, ISO UTC) and `tamano_bytes`: the exchanges overwrite the same URL, so check `modificado` for freshness (bvg trading files and bvq cotizaciones are rebuilt each trading day; dividends, bulletins and some emisiones files are older). bvq titles come from file names (the page's buttons have no text). bvg workbooks fail in preview_resource_data (invalid stylesheet for openpyxl): download the URL instead. Files are often several MB: download the URL directly instead of using preview_resource_data or download_resource (5 MB cap).",
     "args_doc": {
-      "fuente": "One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa.",
+      "fuente": "One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa, petroecuador, energia, cne, bvg, bvq.",
       "seccion": "A section `id` from list_archivo_secciones.",
       "format": "text | json"
     }
@@ -907,7 +907,7 @@
       }
     ],
     "description": "File links (bulletins, methodology, historical series) on one INEC topic page from search_inec_estadisticas.",
-    "summary": "List the direct file links published on one INEC statistical topic page. Get the url from search_inec_estadisticas. Returns technical bulletins, methodology, and historical series as direct PDF/XLSX/CSV/ZIP links — not the file contents. Historical microdata pages (general deaths 1990-2015, 2017, 2018, 2019) are listed by search_inec_estadisticas under \"defunciones\". Use read_pdf on a .pdf link, or download it yourself for tabular formats.",
+    "summary": "List the direct file links published on one INEC statistical topic page. Get the url from search_inec_estadisticas. Returns technical bulletins, methodology, and historical series as direct PDF/XLSX/CSV/ZIP links — not the file contents. Historical microdata pages (general deaths 1990-2015, 2017, 2018, 2019) are listed by search_inec_estadisticas under \"defunciones\". Use read_pdf on a .pdf link, or download it yourself for tabular formats. When a topic page lists no files itself (e.g. ENDI), the files of the per-round landing pages it links to are merged in and those pages are named in \"paginas_relacionadas\".",
     "args_doc": {
       "url": "A topic URL from search_inec_estadisticas's \"url\" field (must be on ecuadorencifras.gob.ec)",
       "year": "Optional reference year; keeps only that year's files (each file carries a \"year\" parsed from its name or folder)",
@@ -2486,6 +2486,45 @@
     "summary": "List SGR's SITREP (\"Informes de Situación\") archive of adverse-event dossiers (gestionderiesgos.gob.ec), 2016-2026. This is a DIFFERENT source from search_eventos_riesgo, which reads SGR's live ArcGIS COE2 snapshot (current/in-progress events only, no history). This tool instead lists ~54 multi-year dossiers — earthquakes, forest-fire seasons, rainy seasons, landslides, volcanic activity — each a real event with a status (EN CURSO / CERRADO / EN OBSERVACIÓN) and its own page. Follow up with get_sgr_sitrep_archivos(url) on one event's \"url\" to get its actual SITREP PDF report links.",
     "args_doc": {
       "query": "Free text matched (accent-insensitive) against the event's titulo, estado, or descripcion, e.g. \"terremoto\", \"en curso\", \"manabi\". Empty returns all events.",
+      "format": "text | json"
+    }
+  },
+  "search_siniestros_ant": {
+    "file": "search_siniestros_ant.py",
+    "params": [
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "anio",
+        "type": "int",
+        "default": "0"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": "10"
+      },
+      {
+        "name": "con_archivos",
+        "type": "int",
+        "default": "2"
+      },
+      {
+        "name": "format",
+        "type": "Literal['text', 'json']",
+        "default": "'text'"
+      }
+    ],
+    "description": "Find Ecuador road-crash (siniestros de tránsito) data from ANT records: INEC quarterly/annual releases with XLSX/CSV microdata plus CKAN datasets (SPPAT deaths, ANT). ant.gob.ec is unreachable.",
+    "summary": "Search siniestros de tránsito (road crashes, deaths, injuries) whose source is the Agencia Nacional de Tránsito. ant.gob.ec itself does not accept connections from this server, so results come from INEC (\"Siniestros de Tránsito\" trimestral/anual, built on ANT records, with tabulados, open-data ZIP, dictionary and technical note) and from the CKAN portal (INEC ANET 2019, SPPAT fallecidos 2016-2021, ANT's own datasets). Next: download_resource / preview_resource_data / read_pdf on a file URL, or get_inec_publicacion_archivos with a publication id.",
+    "args_doc": {
+      "query": "Optional words that must appear in the title (e.g. \"trimestre\")",
+      "anio": "Year filter on the title (0 = all years)",
+      "limit": "Max items per source (default 10, max 30)",
+      "con_archivos": "Attach file links to this many newest INEC releases (default 2, max 5; 0 = none)",
       "format": "text | json"
     }
   },

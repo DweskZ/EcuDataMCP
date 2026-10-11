@@ -93,6 +93,7 @@ from tools.search_organizations import register_search_organizations_tool
 from tools.search_ranking import register_search_ranking_tool
 from tools.search_regulaciones import register_search_regulaciones_tool
 from tools.search_sgr_sitreps import register_search_sgr_sitreps_tool
+from tools.search_siniestros_ant import register_search_siniestros_ant_tool
 from tools.search_sismos import register_search_sismos_tool
 from tools.search_sri_ruc import register_search_sri_ruc_tool
 from tools.search_tramites import register_search_tramites_tool
@@ -153,6 +154,7 @@ def register_tools(mcp: MCPServer) -> None:
     register_search_inec_publicaciones_tool(mcp)
     register_get_inec_publicacion_archivos_tool(mcp)
     register_search_biinec_extras_tool(mcp)
+    register_search_siniestros_ant_tool(mcp)
     register_search_infomies_bases_mensuales_tool(mcp)
     register_search_infomies_boletines_zonales_tool(mcp)
 

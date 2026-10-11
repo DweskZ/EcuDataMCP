@@ -1494,7 +1494,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Lista los enlaces directos a archivos publicados en una página de tema estadístico del INEC. Obtén la url desde search_inec_estadisticas. Devuelve boletines técnicos, metodología y series históricas como enlaces directos PDF/XLSX/CSV/ZIP — no el contenido de los archivos. Usa read_pdf en un enlace .pdf, o descárgalo tú mismo para los formatos tabulares."
+        "long_description": "Lista los enlaces directos a archivos publicados en una página de tema estadístico del INEC. Obtén la url desde search_inec_estadisticas. Devuelve boletines técnicos, metodología y series históricas como enlaces directos PDF/XLSX/CSV/ZIP — no el contenido de los archivos. Usa read_pdf en un enlace .pdf, o descárgalo tú mismo para los formatos tabulares. Si la página no lista archivos propios (p. ej. ENDI), se incorporan los de las páginas de ronda enlazadas y se indican en paginas_relacionadas."
       },
       {
         "name": "get_inec_publicacion_archivos",
@@ -2259,6 +2259,43 @@
           }
         ],
         "long_description": "Lista los archivos de boletines zonales de infoMIES. Hay dos series distintas bajo este nombre: \"zonal\" (default), la serie original \"Boletín Zonal\" (un .rar por zona y mes), DESCONTINUADA (2017-2021, nada desde entonces); \"consolidado\", el sucesor \"Reporte Boletines Zonales\" (un XLSX consolidado por año, 2021-2026, sigue actualizándose). Ambas series devuelven metadatos y URLs directas, nunca contenido — los .rar quedan además fuera del soporte de formatos de este proyecto."
+      },
+      {
+        "name": "search_siniestros_ant",
+        "description": "Datos de siniestros de tránsito en Ecuador (registros de la ANT): publicaciones del INEC y datasets CKAN.",
+        "params": [
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Palabras que deben aparecer en el título (ej. \"trimestre\")"
+          },
+          {
+            "name": "anio",
+            "type": "int",
+            "default": "0",
+            "description": "Filtro de año en el título (0 = todos)"
+          },
+          {
+            "name": "limit",
+            "type": "int",
+            "default": "10",
+            "description": "Máximo de ítems por fuente (default 10, máx. 30)"
+          },
+          {
+            "name": "con_archivos",
+            "type": "int",
+            "default": "2",
+            "description": "Adjunta enlaces de archivos a las N publicaciones INEC más recientes (default 2, máx. 5; 0 = ninguna)"
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "Formato de salida: `text` (default) o `json`."
+          }
+        ],
+        "long_description": "Busca datos de siniestros de tránsito en Ecuador. ant.gob.ec no es accesible, así que combina las publicaciones trimestrales y anuales del INEC (tabulados XLSX y microdatos, construidas con registros de la ANT) con datasets CKAN (fallecidos SPPAT, ANT). Si una fuente falla, la otra responde y el fallo aparece en `avisos`."
       }
     ]
   },

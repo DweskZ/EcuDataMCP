@@ -332,6 +332,34 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Bolsa de Valores de Guayaquil",
+        "sources": [
+          {
+            "id": "bvg",
+            "name": "Estadísticas históricas",
+            "tag": "BVG",
+            "description": "Negociaciones de acciones, obligaciones, papel comercial, titularizaciones y bonos del Estado desde 2019, dividendos desde 2002 y ofertas públicas (XLSX)",
+            "coverage": "bolsadevaloresguayaquil.com",
+            "url": "https://www.bolsadevaloresguayaquil.com",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Bolsa de Valores de Quito",
+        "sources": [
+          {
+            "id": "bvq",
+            "name": "Estadísticas bursátiles",
+            "tag": "BVQ",
+            "description": "Cotizaciones históricas, emisiones, renta variable, sector público y boletines al cierre y semanales (XLS/XLSX/PDF); las páginas Infolab requieren login y no se incluyen",
+            "coverage": "bolsadequito.com",
+            "url": "https://www.bolsadequito.com/index.php/estadisticas",
+            "status": "live"
+          }
+        ]
       }
     ]
   },
@@ -437,6 +465,20 @@
             "description": "Bases de datos de Ser Bachiller, Ser Estudiante, Ser Maestro, Ser Profesional y Llece",
             "coverage": "evaluaciones.evaluacion.gob.ec",
             "url": "https://evaluaciones.evaluacion.gob.ec/BI/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "CNE",
+        "sources": [
+          {
+            "id": "cne-electoral",
+            "name": "Datos electorales",
+            "tag": "CNE",
+            "description": "Resultados, registro electoral por parroquia, candidatos y diccionarios de 19 procesos electorales (SPSS)",
+            "coverage": "2002-2025",
+            "url": "https://www.cne.gob.ec/estadisticas/bases-de-datos/",
             "status": "live"
           }
         ]
@@ -557,6 +599,34 @@
             "description": "Generador público de estadísticas eléctricas: 28 tipos de reporte (balance de energía, pérdidas, facturación, infraestructura), desde 1998",
             "coverage": "reportes.arconel.gob.ec",
             "url": "https://reportes.arconel.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Ministerio de Ambiente y Energía",
+        "sources": [
+          {
+            "id": "mae-energia",
+            "name": "Estadística de hidrocarburos, minería y balance energético",
+            "tag": "Energía",
+            "description": "Anuarios de crudo y derivados 2002-2024, exportaciones y recaudación minera, reportes mineros semanales 2020-21 y Balance Energético Nacional 2018-2025 (PDF/XLS)",
+            "coverage": "ambienteyenergia.gob.ec",
+            "url": "https://www.ambienteyenergia.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "EP Petroecuador",
+        "sources": [
+          {
+            "id": "petroecuador-cifras",
+            "name": "Cifras institucionales",
+            "tag": "Petróleo",
+            "description": "Informes estadísticos mensuales y anuales desde 2006, producción diaria de campo, precios y subsidios de combustibles, despachos y refinación (PDF)",
+            "coverage": "eppetroecuador.ec",
+            "url": "https://www.eppetroecuador.ec/?p=3721",
             "status": "live"
           }
         ]
@@ -684,6 +754,20 @@
             "description": "Reportes meteorológicos y avisos a aviadores en tiempo real",
             "coverage": "ais.aviacioncivil.gob.ec",
             "url": "https://www.ais.aviacioncivil.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "ANT / INEC (siniestros de tránsito)",
+        "sources": [
+          {
+            "id": "ant-siniestros",
+            "name": "Siniestros de tránsito",
+            "tag": "ANT",
+            "description": "Publicaciones trimestrales del INEC sobre registros de la ANT (I 2022 a IV 2025) con tabulados y microdatos, más datasets CKAN de fallecidos SPPAT; ant.gob.ec no es accesible",
+            "coverage": "INEC y datosabiertos.gob.ec",
+            "url": "https://www.ecuadorencifras.gob.ec",
             "status": "live"
           }
         ]

@@ -332,6 +332,34 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Guayaquil Stock Exchange (BVG)",
+        "sources": [
+          {
+            "id": "bvg",
+            "name": "Historical statistics",
+            "tag": "BVG",
+            "description": "Trades in shares, bonds, commercial paper, securitizations and government bonds since 2019, dividends since 2002 and public offers (XLSX)",
+            "coverage": "bolsadevaloresguayaquil.com",
+            "url": "https://www.bolsadevaloresguayaquil.com",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Quito Stock Exchange (BVQ)",
+        "sources": [
+          {
+            "id": "bvq",
+            "name": "Market statistics",
+            "tag": "BVQ",
+            "description": "Historical quotes, issues, equities, public sector and closing and weekly bulletins (XLS/XLSX/PDF); Infolab pages need a login and are not included",
+            "coverage": "bolsadequito.com",
+            "url": "https://www.bolsadequito.com/index.php/estadisticas",
+            "status": "live"
+          }
+        ]
       }
     ]
   },
@@ -437,6 +465,20 @@
             "description": "Databases for Ser Bachiller, Ser Estudiante, Ser Maestro, Ser Profesional, and Llece",
             "coverage": "evaluaciones.evaluacion.gob.ec",
             "url": "https://evaluaciones.evaluacion.gob.ec/BI/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "CNE",
+        "sources": [
+          {
+            "id": "cne-electoral",
+            "name": "Electoral data",
+            "tag": "CNE",
+            "description": "Results, electoral roll by parish, candidates and dictionaries for 19 election processes (SPSS)",
+            "coverage": "2002-2025",
+            "url": "https://www.cne.gob.ec/estadisticas/bases-de-datos/",
             "status": "live"
           }
         ]
@@ -557,6 +599,34 @@
             "description": "Public electricity statistics builder: 28 report types (energy balance, losses, billing, infrastructure), 1998 on",
             "coverage": "reportes.arconel.gob.ec",
             "url": "https://reportes.arconel.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Ministry of Environment and Energy",
+        "sources": [
+          {
+            "id": "mae-energia",
+            "name": "Hydrocarbon, mining and energy-balance statistics",
+            "tag": "Energy",
+            "description": "Crude and derivatives yearbooks 2002-2024, mining exports and tax revenue, 2020-21 weekly mining reports and the National Energy Balance 2018-2025 (PDF/XLS)",
+            "coverage": "ambienteyenergia.gob.ec",
+            "url": "https://www.ambienteyenergia.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "EP Petroecuador",
+        "sources": [
+          {
+            "id": "petroecuador-cifras",
+            "name": "Institutional figures",
+            "tag": "Oil",
+            "description": "Monthly and annual statistical reports since 2006, daily field production, fuel prices and subsidies, dispatches and refining (PDF)",
+            "coverage": "eppetroecuador.ec",
+            "url": "https://www.eppetroecuador.ec/?p=3721",
             "status": "live"
           }
         ]
@@ -684,6 +754,20 @@
             "description": "Real-time weather reports and notices to airmen",
             "coverage": "ais.aviacioncivil.gob.ec",
             "url": "https://www.ais.aviacioncivil.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "ANT / INEC (road crashes)",
+        "sources": [
+          {
+            "id": "ant-siniestros",
+            "name": "Road crashes",
+            "tag": "ANT",
+            "description": "INEC quarterly releases built from ANT records (Q1 2022 to Q4 2025) with tabulations and microdata, plus CKAN datasets on SPPAT road deaths; ant.gob.ec is unreachable",
+            "coverage": "INEC and datosabiertos.gob.ec",
+            "url": "https://www.ecuadorencifras.gob.ec",
             "status": "live"
           }
         ]

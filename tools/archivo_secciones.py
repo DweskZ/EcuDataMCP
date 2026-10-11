@@ -1,8 +1,9 @@
 """Institutional document archives behind one list/get pair.
 
-ARCSA, Superbancos, SEPS, INEVAL, the SGR and SENESCYT libraries and SIPA
-each publish a fixed set of sections (categories, families, modules) whose
-pages list downloadable files. They used to be 14 tools, one list/get pair
+ARCSA, Superbancos, SEPS, INEVAL, the SGR and SENESCYT libraries, SIPA, EP
+Petroecuador, the Energy Ministry, the CNE and the Guayaquil and Quito stock
+exchanges (BVG, BVQ) each publish a fixed set of sections (categories,
+families, modules) whose pages list downloadable files. They used to be 14 tools, one list/get pair
 per institution, with the same two-step flow and the same file-listing
 shape; `fuente` now picks the institution instead (the same pattern as
 `source=` on the CKAN tools). The per-source clients are unchanged.
@@ -15,7 +16,12 @@ from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import (
     arcsa_client,
+    bvg_client,
+    bvq_client,
+    cne_client,
     ineval_client,
+    ministerio_energia_client,
+    petroecuador_client,
     senescyt_biblioteca_client,
     seps_client,
     sgr_publicaciones_client,
@@ -26,7 +32,20 @@ from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.tool_meta import READ_ONLY
 
-Fuente = Literal["arcsa", "superbancos", "seps", "ineval", "sgr", "senescyt", "sipa"]
+Fuente = Literal[
+    "arcsa",
+    "superbancos",
+    "seps",
+    "ineval",
+    "sgr",
+    "senescyt",
+    "sipa",
+    "petroecuador",
+    "energia",
+    "cne",
+    "bvg",
+    "bvq",
+]
 
 _NOMBRES = {
     "arcsa": "ARCSA — Base de Registros Emitidos",
@@ -36,6 +55,11 @@ _NOMBRES = {
     "sgr": "SGR — Biblioteca",
     "senescyt": "Educación Superior — Biblioteca",
     "sipa": "SIPA (MAG) — estadísticas agropecuarias",
+    "petroecuador": "EP Petroecuador — Cifras Institucionales",
+    "energia": "Ministerio de Ambiente y Energía — hidrocarburos, minería y BEN",
+    "cne": "CNE — bases de datos de procesos electorales",
+    "bvg": "Bolsa de Valores de Guayaquil — estadísticas históricas",
+    "bvq": "Bolsa de Valores de Quito — estadísticas",
 }
 
 # Sources whose list call scrapes a page and returns {"categorias": [...]}.
@@ -43,6 +67,9 @@ _CATEGORIA_LISTS = {
     "arcsa": arcsa_client.list_categorias,
     "sgr": sgr_publicaciones_client.list_biblioteca_categorias,
     "senescyt": senescyt_biblioteca_client.list_biblioteca_categorias,
+    "petroecuador": petroecuador_client.list_categorias,
+    "energia": ministerio_energia_client.list_secciones,
+    "cne": cne_client.list_procesos,
 }
 # Sources with a fixed, in-code section list keyed by `id_key`.
 _STATIC_LISTS = {
@@ -50,6 +77,8 @@ _STATIC_LISTS = {
     "seps": (seps_client.list_secciones, "seccion"),
     "ineval": (ineval_client.list_familias, "familia"),
     "sipa": (sipa_client.list_modulos, "modulo"),
+    "bvg": (bvg_client.list_secciones, "seccion"),
+    "bvq": (bvq_client.list_secciones, "seccion"),
 }
 _GETTERS = {
     "arcsa": arcsa_client.get_categoria_archivos,
@@ -58,15 +87,22 @@ _GETTERS = {
     "ineval": ineval_client.get_familia_archivos,
     "sgr": sgr_publicaciones_client.get_biblioteca_categoria_archivos,
     "senescyt": senescyt_biblioteca_client.get_biblioteca_categoria_archivos,
+    "energia": ministerio_energia_client.get_seccion_archivos,
     "sipa": sipa_client.get_modulo_archivos,
+    "petroecuador": petroecuador_client.get_categoria_archivos,
+    "cne": cne_client.get_proceso_archivos,
+    "bvg": bvg_client.get_seccion_archivos,
+    "bvq": bvq_client.get_seccion_archivos,
 }
 
 
 async def _list_secciones(fuente: str) -> dict[str, Any]:
     if fuente in _CATEGORIA_LISTS:
         result = await _CATEGORIA_LISTS[fuente]()
+        # total_archivos is optional: CNE would need one crawl per process.
         secciones = [
-            {"id": c["id"], "nombre": c["nombre"], "total_archivos": c["total_archivos"]}
+            {"id": c["id"], "nombre": c["nombre"]}
+            | ({"total_archivos": c["total_archivos"]} if "total_archivos" in c else {})
             for c in result["categorias"]
         ]
         url_fuente = result.get("url_fuente")
@@ -108,10 +144,10 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Listar secciones de un archivo institucional",
         description=(
-            "List the sections of one institution's document archive: ARCSA "
-            "sanitary registry, Superbancos and SEPS statistics, INEVAL "
-            "evaluation datasets, SGR and Educación Superior libraries, or SIPA "
-            "agricultural statistics. Next: get_archivo_seccion(fuente, seccion)."
+            "List the sections of one institution's document archive (ARCSA, "
+            "Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, "
+            "Petroecuador, Energy Ministry, CNE, BVG, BVQ). "
+            "Next: get_archivo_seccion(fuente, seccion)."
         ),
         annotations=READ_ONLY,
     )
@@ -149,12 +185,42 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           17 categories (PAC, LOES/SNNA normativa, acuerdos, auditorías).
         - sipa: SIPA, Ministerio de Agricultura (4 modules: economico,
           productivo, social, censos). Distinct from MPCEIP.
+        - petroecuador: EP Petroecuador "Cifras Institucionales"
+          (eppetroecuador.ec/?p=3721), 8 sections: estados financieros,
+          informes estadísticos mensuales y anuales (2006 onward, PDF),
+          exploración y producción (daily field production, well
+          nomenclature), comercialización (prices, subsidy value,
+          dispatches), refinación, comercialización internacional (WTI),
+          gestión de riesgos.
+        - energia: Ministerio de Ambiente y Energía (ambienteyenergia.gob.ec,
+          which absorbed Energía y Minas, MERNNR and Hidrocarburos), 4
+          sections read from its WordPress media library: hydrocarbon
+          statistics (crudo/derivados yearbooks 2002-2024), mining exports
+          and tax revenue, 2020-21 weekly mining reports, and the Balance
+          Energético Nacional. The old ARCERNNR and recursosyenergia hosts
+          are dead; electricity regulation is in get_arconel_reporte.
+        - cne: CNE (Consejo Nacional Electoral) "Bases de datos",
+          cne.gob.ec/estadisticas/bases-de-datos/: one section per election
+          process, 2002-2025 (19: Elecciones Generales, Seccionales,
+          Referéndum y Consulta Popular, special parish/canton elections).
+          Each holds dictionaries, political organizations, candidates, the
+          electoral roll by parish and the results by parish.
+        - bvg: Bolsa de Valores de Guayaquil (4 sections: historicos,
+          dividendos, valoracion, ofertas_publicas). Trade-by-trade
+          history since 2019 (acciones, obligaciones, papel comercial,
+          titularizaciones, bonos del Estado, notas de crédito, cetes),
+          dividends since 2002, repo-eligible securities, public offers.
+        - bvq: Bolsa de Valores de Quito (10 sections: cotizaciones
+          históricas, emisiones, renta variable, sector público, boletines
+          al cierre/semanales/por valor, valoración, emisores). Public
+          files only; the Infolab bulletins need a login.
 
         Returns each section's `id` (pass it to get_archivo_seccion),
         `nombre`, and either its page `url` or `total_archivos`.
 
         Args:
-            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa.
+            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt,
+                sipa, petroecuador, energia, cne, bvg, bvq.
             format: text | json
         """
         try:
@@ -166,7 +232,9 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
             parts = [f"{data['nombre_fuente']} — {data['total']} sección(es):", ""]
             for s in data["secciones"]:
                 extra = (
-                    f" ({s['total_archivos']} archivo(s))" if "total_archivos" in s else ""
+                    f" ({s['total_archivos']} archivo(s))"
+                    if "total_archivos" in s
+                    else ""
                 )
                 parts.append(f"- {s['id']}: {s['nombre']}{extra}")
                 if s.get("url"):
@@ -210,12 +278,32 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           (formato DESCONOCIDO) that resolves to the same static files.
         - ineval: some ids 308-redirect to a static file; both work.
         - sipa: XLSX/XLS files, some over 40 MB.
+        - petroecuador: `seccion` is the id or nombre. Mostly PDFs; links
+          through download.php redirect to the current PDF (formato
+          DESCONOCIDO). The "Producción de Campo BPPD" title embeds the
+          day's figure and effective date as the page publishes it.
+          Reports are PDFs, not tables: read them with read_pdf.
+        - cne: `seccion` is a process id or name ("Elecciones Generales 2025",
+          a unique fragment works). Each file has `grupo` (Diccionarios,
+          Organizaciones Políticas, Registro Electoral, Resultados),
+          `descargas` and `tamano`. The files checked are SPSS .sav
+          (formato DESCONOCIDO: the listing does not say); primera vuelta
+          results run 10-77 MB, so download the URL directly.
+        - bvg, bvq: XLSX/XLS (a few PDFs on bvq). Each file adds `modificado`
+          (HTTP Last-Modified, ISO UTC) and `tamano_bytes`: the exchanges
+          overwrite the same URL, so check `modificado` for freshness (bvg
+          trading files and bvq cotizaciones are rebuilt each trading day;
+          dividends, bulletins and some emisiones files are older). bvq
+          titles come from file names (the page's buttons have no text).
+          bvg workbooks fail in preview_resource_data (invalid stylesheet
+          for openpyxl): download the URL instead.
 
         Files are often several MB: download the URL directly instead of
         using preview_resource_data or download_resource (5 MB cap).
 
         Args:
-            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa.
+            fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt,
+                sipa, petroecuador, energia, cne, bvg, bvq.
             seccion: A section `id` from list_archivo_secciones.
             format: text | json
         """
@@ -224,7 +312,9 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
         except ValueError as e:
             raise ToolError(f"Error: {e}") from e
         except Exception as e:
-            raise ToolError(f"Error al obtener la sección {seccion} de {fuente}: {e}") from e
+            raise ToolError(
+                f"Error al obtener la sección {seccion} de {fuente}: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             parts = [f"{data['nombre_fuente']} — {data['nombre']} ({data['id']})"]
@@ -249,7 +339,14 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
                     )
                     if p
                 )
-                parts.append(f"- {etiqueta} [{a.get('formato')}]")
+                detalle = [str(a.get("formato"))]
+                if a.get("tamano"):
+                    detalle.append(str(a["tamano"]))
+                if a.get("tamano_bytes"):
+                    detalle.append(f"{a['tamano_bytes'] / 1_048_576:.1f} MB")
+                if a.get("modificado"):
+                    detalle.append(f"modificado {a['modificado'][:10]}")
+                parts.append(f"- {etiqueta} [{', '.join(detalle)}]")
                 if a.get("descripcion"):
                     parts.append(f"   {a['descripcion']}")
                 parts.append(f"   {a.get('url')}")

@@ -216,7 +216,9 @@ async def _fetch_topics() -> list[dict[str, str]]:
         return topics
 
 
-async def search_topics(query: str = "", limit: int = 30, offset: int = 0) -> dict[str, Any]:
+async def search_topics(
+    query: str = "", limit: int = 30, offset: int = 0
+) -> dict[str, Any]:
     """
     Search INEC's statistical topic menu (ecuadorencifras.gob.ec) client-side.
 
@@ -259,6 +261,100 @@ def _parse_topic_files(html: str, topic_url: str) -> dict[str, Any]:
     return {"titulo": title, "url": topic_url, "archivos": files}
 
 
+# Related-page following: any on-site link, plus slug words too common to prove
+# that a link belongs to the same survey as the topic page.
+_ANY_LINK_RE = re.compile(r'href="(https://www\.ecuadorencifras\.gob\.ec/[^"#?]+)"')
+_GENERIC_SLUG_WORDS = frozenset(
+    {
+        "encuesta",
+        "nacional",
+        "de",
+        "del",
+        "la",
+        "el",
+        "los",
+        "las",
+        "y",
+        "en",
+        "sobre",
+        "para",
+        "estadisticas",
+        "estadistica",
+        "web",
+        "inec",
+    }
+)
+
+# Bounds the extra requests per uncached topic; hubs seen so far have 1-2 rounds.
+_MAX_RELATED_PAGES = 3
+_IMAGE_EXTS = (".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp")
+
+
+def _slug_words(url: str) -> set[str]:
+    """Non-generic, non-numeric words of a URL's last path segment."""
+    slug = url.rstrip("/").rsplit("/", 1)[-1].lower()
+    words = set(re.split(r"[-_]+", slug)) - _GENERIC_SLUG_WORDS
+    return {w for w in words if w and not w.isdigit()}
+
+
+def _related_pages(html: str, topic_url: str) -> list[str]:
+    """Landing pages the topic page links to that share a topic word with it.
+
+    Some topics (ENDI) are a hub whose downloads live on per-round landing
+    pages linked by image buttons, e.g. ".../encuesta-nacional-sobre-
+    desnutricion-infantil/" -> ".../encuesta_nacional_desnutricion_infantil/".
+    The site menu also links to every other survey, so menu entries are skipped
+    and a link only counts when its slug shares a non-generic word with the
+    topic's own slug.
+    """
+    topic_words = _slug_words(topic_url)
+    menu = {u for u, _ in _TOPIC_LINK_RE.findall(html) + _SUBMENU_LINK_RE.findall(html)}
+    related: list[str] = []
+    for url in _ANY_LINK_RE.findall(html):
+        if url.rstrip("/") == topic_url.rstrip("/") or url in related or url in menu:
+            continue
+        if "/documentos/" in url or "/wp-content/" in url:
+            continue
+        if url.lower().endswith(_IMAGE_EXTS) or not topic_words & _slug_words(url):
+            continue
+        related.append(url)
+    return related
+
+
+async def _merge_related_pages(
+    result: dict[str, Any], urls: list[str]
+) -> tuple[dict[str, Any], bool]:
+    """Add the files of related landing pages to a topic that lists none itself.
+
+    Returns the merged result and whether every page loaded, so a partial or
+    empty result caused by a transient failure is not cached.
+    """
+    kept = urls[:_MAX_RELATED_PAGES]
+    pages = await asyncio.gather(*(_get_page(u) for u in kept), return_exceptions=True)
+    files: dict[str, dict[str, Any]] = {}
+    used: list[str] = []
+    complete = True
+    for url, page in zip(kept, pages, strict=True):
+        if isinstance(page, Exception):
+            logger.warning("No se pudo cargar la página relacionada %s: %s", url, page)
+            complete = False
+            continue
+        # Only a CancelledError can reach here: it must propagate, not be skipped.
+        if isinstance(page, BaseException):
+            raise page
+        found = _parse_topic_files(page, url)["archivos"]
+        if found:
+            used.append(url)
+        for f in found:
+            files.setdefault(f["url"], f)
+    if not files:
+        return result, complete
+    merged = {**result, "archivos": list(files.values()), "paginas_relacionadas": used}
+    if len(urls) > len(kept):
+        merged["paginas_omitidas"] = len(urls) - len(kept)
+    return merged, complete
+
+
 async def get_topic_files(topic_url: str, year: int | None = None) -> dict[str, Any]:
     """
     Fetch one topic page and extract its direct file links.
@@ -275,10 +371,21 @@ async def get_topic_files(topic_url: str, year: int | None = None) -> dict[str, 
     if result is None:
         html = await _get_page(topic_url)
         result = _parse_topic_files(html, topic_url)
-        _topic_files_cache.set(topic_url, result)
+        complete = True
+        if not result["archivos"]:
+            # Hub topics (ENDI) keep their downloads on linked landing pages.
+            related = _related_pages(html, topic_url)
+            result, complete = await _merge_related_pages(result, related)
+        # An empty or partial result after a failed fetch is likely transient,
+        # so it is not cached for the full TTL.
+        if result["archivos"] and complete:
+            _topic_files_cache.set(topic_url, result)
     if year is None:
         return result
-    return {**result, "archivos": [f for f in result["archivos"] if f.get("year") == year]}
+    return {
+        **result,
+        "archivos": [f for f in result["archivos"] if f.get("year") == year],
+    }
 
 
 # -- WordPress REST API layer -------------------------------------------
@@ -305,7 +412,8 @@ async def _get_api_json(
             except Exception:
                 detail = None
             raise ValueError(
-                detail or f"La API de Ecuador en Cifras devolvió HTTP {resp.status_code}"
+                detail
+                or f"La API de Ecuador en Cifras devolvió HTTP {resp.status_code}"
             )
         return resp.json(), resp.headers
     finally:
@@ -351,7 +459,9 @@ def _summarize_post(post: dict[str, Any], categories: dict[int, str]) -> dict[st
         "url": post.get("link", ""),
         "fecha_publicacion": (post.get("date") or "")[:10],
         "fecha_modificacion": (post.get("modified") or "")[:10],
-        "categorias": [categories.get(cid, str(cid)) for cid in post.get("categories", [])],
+        "categorias": [
+            categories.get(cid, str(cid)) for cid in post.get("categories", [])
+        ],
     }
 
 
@@ -407,7 +517,10 @@ def _extract_files_from_html(html: str) -> list[dict[str, str]]:
     seen: dict[str, str] = {}
     for url, ext in _FILE_LINK_RE.findall(html):
         seen.setdefault(url, ext.upper())
-    return [{"label": _label_from_url(url), "url": url, "format": fmt} for url, fmt in seen.items()]
+    return [
+        {"label": _label_from_url(url), "url": url, "format": fmt}
+        for url, fmt in seen.items()
+    ]
 
 
 async def get_publicacion_files(post: int | str) -> dict[str, Any]:
@@ -437,14 +550,18 @@ async def get_publicacion_files(post: int | str) -> dict[str, Any]:
     async with httpx.AsyncClient(timeout=25.0) as session:
         matches, _ = await _get_api_json("posts", lookup, session=session)
         if not matches:
-            raise ValueError(f"No se encontró la publicación '{post}' en Ecuador en Cifras")
+            raise ValueError(
+                f"No se encontró la publicación '{post}' en Ecuador en Cifras"
+            )
         data = matches[0]
         categories = await _fetch_categories()
 
     summary = _summarize_post(data, categories)
     result = {
         **summary,
-        "archivos": _extract_files_from_html(data.get("content", {}).get("rendered", "")),
+        "archivos": _extract_files_from_html(
+            data.get("content", {}).get("rendered", "")
+        ),
     }
     _publicacion_files_cache.set(cache_key, result)
     return result

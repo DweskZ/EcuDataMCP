@@ -29,6 +29,12 @@ def test_fuentes_lists_every_integrated_source_family():
         "inec-censo",
         "bce",
         "sipa",
+        "bvg",
+        "bvq",
+        "petroecuador",
+        "energia",
+        "cne",
+        "ant-siniestros",
         "contraloria",
         "supercias",
         "supercias-financials",
@@ -43,6 +49,7 @@ def test_fuentes_lists_every_integrated_source_family():
     assert "get_sri_ruc_info" in sources["sri"]["tools"]
     assert "list_catalogo" in sources["bce"]["tools"]
     assert "get_archivo_seccion" in sources["superbancos"]["tools"]
+    assert "get_archivo_seccion" in sources["bvg"]["tools"]
     assert "get_cenace_tablero" in sources["cenace"]["tools"]
     assert "query_sut_indicador" in sources["sut"]["tools"]
     assert json.loads(json.dumps(payload, ensure_ascii=False))["fuentes"]

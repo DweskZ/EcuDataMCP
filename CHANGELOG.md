@@ -2,6 +2,50 @@
 
 ## Unreleased
 
+- **EP Petroecuador** (`fuente="petroecuador"` in `list_archivo_secciones` /
+  `get_archivo_seccion`): the 8 sections of "Cifras Institucionales"
+  (financial statements, monthly and annual statistical reports 2006 onward,
+  field production, prices, dispatches, refining, WTI, risk reports) with
+  their PDF links. New `helpers/petroecuador_client.py`.
+- **Ministerio de Ambiente y Energía** (`list_archivo_secciones` /
+  `get_archivo_seccion`, `fuente="energia"`): four sections read from the
+  ministry's WordPress media library (`ambienteyenergia.gob.ec`): hydrocarbon
+  statistics (crudo/derivados yearbooks 2002-2024 with gaps, plus the 2024
+  field production matrix), mining exports and tax revenue, 2020-21 weekly
+  mining reports, and the Balance Energético Nacional 2018-2025. Links only.
+  The ARCERNNR host (`arcernnr.gob.ec`) and `recursosyenergia.gob.ec` do not
+  resolve and `controlrecursosyenergia.gob.ec` serves no content, so the
+  ministry's current site is the only source.
+- **New tool `search_siniestros_ant`**: road-crash (siniestros de tránsito)
+  data from ANT records. `ant.gob.ec` and `ecu911.gob.ec` drop the TLS
+  handshake for every client, so the tool combines INEC's quarterly/annual
+  "Siniestros de Tránsito" releases (tabulados XLSX, open-data ZIP,
+  dictionary, technical note; file links for the newest ones) with CKAN
+  datasets (INEC ANET 2019, SPPAT road deaths 2016-2021, the ANT
+  organisation's licence and speed datasets). Each source fails
+  independently. Helper: `helpers/ant_client.py`.
+- **CNE (electoral data)**: `list_archivo_secciones` / `get_archivo_seccion`
+  take `fuente="cne"`. One section per election process, 2002-2025 (19), each
+  listing dictionaries, political organizations, candidates, the electoral
+  roll by parish and the results by parish from
+  cne.gob.ec/estadisticas/bases-de-datos/ (SPSS `.sav`, up to 77 MB; the
+  Incapsula block seen on 2026-09-06 is gone, checked 2026-10-10). Returns
+  links with `grupo`, `descargas` and `tamano`; the files are not parsed.
+- **Bolsas de valores** (`list_archivo_secciones`, `get_archivo_seccion`):
+  two new `fuente` values. `bvg` is the Bolsa de Valores de Guayaquil (4
+  sections: trade-by-trade history since 2019 for acciones, obligaciones,
+  papel comercial, titularizaciones, bonos del Estado, notas de crédito and
+  cetes; dividendos since 2002; valores permitidos; ofertas públicas). `bvq`
+  is the Bolsa de Valores de Quito's public statistics (10 sections, ~45
+  XLS/XLSX/PDF files: cotizaciones históricas, emisiones, renta variable,
+  sector público, boletines, vectores de precios, emisores). Both lists carry
+  `modificado` (HTTP Last-Modified) and `tamano_bytes` per file, because the
+  exchanges overwrite the same URL (checked 2026-10-10: trading files rebuilt
+  on 2026-10-08; BVG dividends 2026-08-05; BVQ facturas comerciales
+  emisiones 2024-09-10). Links only; BVG's workbooks fail in
+  `preview_resource_data` (stylesheet openpyxl rejects), so download them. BVQ's
+  Infolab bulletins are behind a login and are not listed.
+
 Fixes from a field report (paper-apagones, 2026-10-06/07).
 
 - **ANDA**: `get_anda_survey_info` and `download_anda_microdata` accept the
@@ -13,6 +57,10 @@ Fixes from a field report (paper-apagones, 2026-10-06/07).
   registry pages (1990-2015 bases de datos, 2017, 2018, 2019);
   `get_inec_estadistica_files` tags each file with its `year` and takes a
   `year` filter.
+- **INEC hub topics** (issue #55, e.g. ENDI): when a topic page lists no files
+  itself, `get_inec_estadistica_files` follows up to 3 related landing pages
+  (same non-generic slug words, menu links skipped) and merges their files;
+  the pages used come back as `paginas_relacionadas`.
 - **`lookup_ubicacion`** returns urban parishes (`parroquias_urbanas`, with
   `codigo_parroquia_urbana`, head-parish `codigo` and `clasificador_anio`)
   from INEC's CODIFICACIÓN_2026.

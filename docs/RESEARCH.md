@@ -5936,6 +5936,26 @@ Estadísticas de distribuidoras fuera de CKAN:
 - **Centrosur `estadisticas-centrosur`**: sigue con solo dos PDFs, sin
   serie detrás.
 
+### EP Petroecuador — Cifras Institucionales
+
+- Verificado en vivo 2026-10-10: `https://www.eppetroecuador.ec/?p=3721`
+  responde 200 con un User-Agent de navegador (HTML de ~80 KB, WordPress).
+- No usa la biblioteca download-monitor categorizada de SGR/ARCSA: son 8
+  bloques `div.Headerinfo` (Estados Financieros, Informes Estadísticos
+  Mensuales y Anuales, Exploración y Producción, Comercialización,
+  Refinación, Comercialización Internacional, Gestión de Riesgos y
+  Oportunidades), cada uno con un `<ul>` en `div.paleta`. Los `<a name>` se
+  repiten, así que el id de sección es el slug del título.
+- Enlaces mixtos: PDFs directos en `wp-content/uploads`, `download.php?id=N`
+  (302 al PDF vigente; absolutos y relativos, algunos con `&force=0`), una
+  página interna (`?p=8062`, precios de venta en terminales) y un PDF en el
+  subdominio `eppintranet`. Los datos son PDFs, no tablas.
+- Hay `<li>` sin enlace (costo de producción por barril, provisional); no se
+  listan. El título de "Producción de Campo BPPD" lleva la cifra del día y
+  su fecha efectiva tal como la publica el sitio.
+- Integrado como `fuente="petroecuador"`; no hay serie diaria
+  estructurada: el histórico de producción está dentro de los PDFs.
+
 ### Ranking de qué construir
 
 1. Cliente ArcGIS REST genérico con ARCONEL `ServDashboards` + resúmenes
@@ -5974,6 +5994,197 @@ energético del IIGE (no existen).
 - **CNEL**: el tag 337 "corte-de-energia" bajó a 0 posts (antes solo 2026).
 - **CELEC EP** (Decimoquinta pasada, descartado por LOTAIP): sigue sin dato
   sectorial en el sitio, pero su servidor ArcGIS sí tiene datos útiles.
+
+## Trigésimo sexta pasada — hosts de ARCERNNR y del Ministerio de Energía y Minas, con VPN (2026-10-10)
+
+Pedido: reintentar `controlrecursosyenergia.gob.ec` y `recursosyenergia.gob.ec`
+(fallaban antes) para estadísticas de hidrocarburos, minería y electricidad,
+ahora con VPN y cabeceras de navegador. Todo verificado en vivo con curl y
+httpx.
+
+### Estado de los hosts
+
+- `recursosyenergia.gob.ec` (con y sin `www`, http y https): **NXDOMAIN**.
+  Tampoco resuelve `arcernnr.gob.ec`. No es un problema de red ni de VPN: el
+  dominio no existe en DNS.
+- `controlrecursosyenergia.gob.ec` (y `www.`): resuelve (190.11.14.61).
+  HTTPS rechaza la conexión; HTTP devuelve 200 con la página de prueba por
+  defecto de CentOS-WebPanel (5.069 bytes), sin contenido. `/estadisticas/`
+  da 404. No hay nada que integrar.
+- **El sitio vivo es `www.ambienteyenergia.gob.ec`** (WordPress, 200, certificado
+  válido). Corta la conexión a clientes sin User-Agent de navegador; con uno
+  de Chrome responde normal. El mismo sitio ya estaba anotado en la
+  Trigésimo quinta pasada para el BEN y el Plan Maestro.
+
+### Qué hay y cómo se enumera
+
+- No existe una página índice de estadísticas: `/estadisticas-hidrocarburiferas/`
+  (página 1583) es un cascarón legado con contenido vacío, y las páginas
+  `historico-*` solo enlazan sitios históricos muertos (`historico.mineria.gob.ec`).
+- Todos los archivos estadísticos están en la biblioteca de medios, y
+  `/wp-json/wp/v2/media?search=<término>&per_page=100` es público y
+  paginable. La búsqueda recorre toda la biblioteca (contratos, hojas de
+  vida, imágenes), así que cada sección del cliente combina varios términos
+  con un filtro por nombre de archivo.
+- Secciones construidas (`helpers/ministerio_energia_client.py`, expuestas
+  como `fuente="energia"` de `list_archivo_secciones`):
+  - `estadistica_hidrocarburos` (34 archivos): estadística hidrocarburífera
+    de crudo y derivados, resúmenes, 2002-2024 con huecos (no aparecen 2012,
+    2014 ni 2017; 2019 es primer semestre; 2024 es
+    `ESTADISTICAS-DE-HIDROCARBUROS-2024_8.12.2025.pdf`) más
+    `7.2.1-Matriz-Producción-Campo-Hidrocarburos-2024` en XLSX. Todo PDF,
+    sin versión tabular salvo esa matriz.
+  - `mineria_exportaciones_recaudacion` (9 documentos): informe y base XLS de
+    exportaciones mineras 2024 y de recaudación tributaria minera 2024,
+    fichas de indicadores, informes 2023. Las infografías PNG que comparten
+    nombre se descartan.
+  - `mineria_reportes_semanales` (43 PDF): "Semana N - Reporte Minería",
+    julio 2020 a julio 2021 con huecos. No hay publicación posterior en
+    medios.
+  - `balance_energetico` (44 PDF): BEN 2018, 2019, 2023, 2024 y 2025,
+    completo y por capítulos (el 2025 se presentó el 2026-09-23).
+- Cada resultado trae `periodo`, tomado del primer año del nombre del
+  archivo; queda vacío (p. ej. `BEN_24`, reportes semanales) en vez de
+  inferirlo de la fecha de subida, que no coincide (el anuario 2024 se
+  subió en diciembre de 2025).
+
+### No cubierto (y por qué)
+
+- Boletines estadísticos mensuales de hidrocarburos o minería del
+  Ministerio: no existen en el sitio. Los de producción petrolera diaria
+  son PNG de 2021-2022 (imágenes sin datos). La producción y precios
+  actuales de crudo son de Petroecuador/BCE (ver Petroecuador y el
+  paquete petrolero del BCE, arriba), no de este sitio.
+- Catastro minero y datos de ARCERNNR (`catastro_regulatorio_*.pdf` es el
+  catastro regulatorio de ARCERNNR por trimestre, no un boletín
+  estadístico; no se integró). El Sistema de Gestión Minera es una IP
+  (`181.211.37.232`), no verificado.
+- Electricidad: la estadística sectorial y los balances siguen en
+  `arconel.gob.ec` y `reportes.arconel.gob.ec` (ya integrados, ver
+  `get_arconel_reporte`); CENACE tiene su propio cliente. No se duplicó.
+- Archivos subidos directo al sistema de ficheros, sin pasar por la
+  biblioteca de medios, no se pueden enumerar.
+### ANT / siniestros de tránsito (2026-10-10)
+
+Objetivo: datos abiertos de siniestros de la Agencia Nacional de Tránsito.
+
+- **`www.ant.gob.ec` / `ant.gob.ec`: callejón sin salida.** DNS resuelve
+  (200.107.61.30) pero el servidor corta el handshake TLS
+  (`UNEXPECTED_EOF_WHILE_READING` en httpx; `schannel: failed to receive
+  handshake` en curl; HTTP plano: "Empty reply"). Probado con cabeceras de
+  navegador, TLS 1.2 máximo y `SECLEVEL=0`, también con el usuario en VPN.
+  Mismo resultado para `www.ecu911.gob.ec`. No se inventó ninguna URL.
+- **CKAN (`www.datosabiertos.gob.ec`)**: la org de la ANT es `antec` (4
+  datasets: licencias de conducir emitidas, excesos de velocidad; ninguno
+  de siniestros). Siniestros en CKAN: `anuario-estadisticas-transporte-siniestros-2019`
+  (INEC, CSV/ODS) y `fallecidos-por-accidentes-de-transito-registradas-por-el-sppat`
+  (SPPAT, 2016-2021, CSV + diccionario). Búsquedas "siniestralidad vial" y
+  "causas siniestros" devuelven 0.
+- **INEC / Ecuador en Cifras (ruta fiable)**: publica los siniestros con base
+  en registros administrativos de la ANT, vía la API WordPress: "Siniestros
+  de Tránsito" trimestral (I trim 2022 a IV trim 2025, el último publicado
+  2026-05-28), "Información Histórica – Siniestros de Tránsito" y los
+  anuarios "Estadísticas de Transporte" 2017-2023. Cada entrada trae
+  resultados y nota técnica (PDF), tabulados (XLSX), CSV (ZIP), microdatos
+  SPSS (ZIP), datos abiertos (ZIP), diccionario (XLSX) y sintaxis.
+- Implementado en `helpers/ant_client.py` + `tools/search_siniestros_ant.py`:
+  reutiliza `inec_client` y `ckan_client`, sin scraping nuevo. Si la ANT
+  vuelve a ser accesible, valdría añadir su visor/estadísticas como tercera
+  fuente.
+## Trigésimo sexta pasada — CNE desbloqueado y construido (2026-10-10)
+
+Pedido de Daniel: reintentar CNE (con VPN, headers de navegador) y, si hay
+descarga masiva real, integrarlo. **Hay**, y el bloqueo de la Decimonovena
+pasada ya no existe.
+
+**Qué cambió.** Con `httpx` y el User-Agent propio del proyecto (sin
+cookies ni headers especiales), `www.cne.gob.ec/` y
+`/estadisticas/bases-de-datos/` responden 200 con el HTML completo, el
+listado AJAX de WPDM responde 200 y las descargas también (un `.sav` de
+703 KB, SPSS `$FL2 ... IBM SPSS STATISTICS`). Las páginas aún cargan un
+script anti-bot (`/TSPD/`, ya no Incapsula), pero no bloquea. Puede
+volver: el cliente falla con error explícito si la página no trae la lista
+de procesos. `resultados.cne.gob.ec` sigue sin resolver
+(`getaddrinfo failed`) y `cne.gob.ec` sin `www` da `TLSV1_UNRECOGNIZED_NAME`:
+solo sirve `www.cne.gob.ec`. El CKAN nacional devolvió HTML (no JSON) a
+`package_search` desde este entorno, así que no se pudo comprobar si hay
+datasets del CNE ahí; no se usó.
+
+**Estructura confirmada (19 procesos, 2002-2025).** El acordeón de nivel
+superior se lee del HTML (`class="accord-handle" rel="<id>"`). Cada proceso
+es una categoría WPDM con subcategorías Diccionarios, Organizaciones
+Políticas (o "políticas"), Registro Electoral y Resultados. El listado es
+`GET /?wpdmactask=listsub&parent=<id>&showsub=1&linktpl=link-template-default-wdc
+&__wpdmacn=<nonce>`; el nonce está en un `<script>` de la página y un nonce
+inválido responde `-1` (el cliente recarga la página una vez). Cada llamada
+devuelve las subcategorías y los archivos de ese nivel; hacen falta 5
+llamadas por proceso. Excepción: Elecciones Generales 2002 trae además una
+"Resolución" (PDF) en el nivel raíz.
+
+**Archivos.** Comprobado por `Content-Disposition`/cabecera en 5 archivos
+de datos (registro electoral, resultados, diccionarios, de 2004, 2025 y
+Sevilla Don Bosco 2025): todos `.sav` SPSS; el listado no dice el formato,
+por eso `formato` es DESCONOCIDO. Tamaños: diccionarios 1-130 KB, registro
+electoral 120-460 KB, resultados desde 4 KB (elecciones parroquiales) hasta
+77 MB (constituyentes 2007), primera vuelta 2025 18 MB. El enlace de la
+página trae un `&refresh=<token>`; `?wpdmdl=<id>` solo descarga igual, así
+que el cliente lo quita. `HEAD` a la descarga corta la conexión: usar GET.
+
+**Dónde encaja.** `fuente="cne"` en `list_archivo_secciones` /
+`get_archivo_seccion` (mismo patrón que SGR/ARCSA: secciones = procesos,
+archivos con `grupo`, `descargas`, `tamano`). No se hizo una tool de
+búsqueda aparte: son 19 secciones fijas. No se parsean los `.sav`
+(`preview_resource_data` no lee SPSS y el tope es 5 MB); queda como idea
+abierta leerlos con `pyreadstat` si hay demanda, dependencia nueva.
+## Bolsas de valores: Guayaquil (BVG) y Quito (BVQ) (2026-10-10)
+
+Ambas publican sus estadísticas históricas como enlaces directos a XLS/XLSX,
+sin login ni CAPTCHA, y responden con el User-Agent del proyecto. Código:
+`helpers/bvg_client.py`, `helpers/bvq_client.py`, `helpers/bolsas_common.py`;
+expuestas como `fuente="bvg"` y `fuente="bvq"` en `list_archivo_secciones` /
+`get_archivo_seccion`.
+
+### BVG (bolsadevaloresguayaquil.com)
+
+- La home enlaza 11 archivos únicos: `/boletines/historicos/BVG_{Acciones,
+  Obligaciones,PapelComercial,Titularizaciones,BonosDelEstado,NotasDeCredito,
+  Cetes}.xlsx`, `dividendos-totales.xlsx`, `/boletines/valoracion/
+  valores-permitidos.xlsx`, y dos `.xls` en `/ofertas-publicas/files/`
+  (`vigente-en-circulacion`, `oferta-publica-saldos-vigentes`, datos de
+  Decevale). Titularizaciones aparece dos veces (etiqueta "VTC").
+- Estructura leída: los `BVG_*` son una hoja "Base" con una fila por
+  negociación (Acciones: ~31.900 filas desde 2019, 1,4 MB; Bonos: ~40.800),
+  fechas como serial de Excel. `dividendos-totales` tiene una hoja por emisor
+  (la primera dice "Al 31 Julio 2026"); `valores-permitidos` dice "VIGENTE
+  PARA OCTUBRE 2026"; los saldos dicen "AL 08/10/2026" y los vigentes en
+  circulación "31-08-2026".
+- Frescura (Last-Modified, 2026-10-10): los `BVG_*` 2026-10-08 20:35 UTC (la
+  última fila de Acciones es del 2026-10-08, serial 46303); dividendos
+  2026-08-05; valores permitidos 2026-10-01; saldos 2026-10-08; vigentes en
+  circulación 2026-09-15.
+- Problema: openpyxl rechaza la hoja de estilos de los `.xlsx` de BVG
+  ("Colors must be aRGB hex values"), así que `preview_resource_data` falla
+  sobre ellos. No se arregló aquí; se documenta en la tool.
+
+### BVQ (bolsadequito.com)
+
+- El 406 reportado para `curl` sin cabeceras no se reprodujo (2026-10-10:
+  200 a curl simple, a UA de navegador y al del proyecto, en páginas y
+  archivos; el sitio está tras Cloudflare). HEAD devuelve respuesta vacía, por
+  eso la frescura se lee con un GET de rango de 1 byte.
+- Sección Estadísticas (Joomla): ~45 archivos públicos bajo
+  `/uploads/estadisticas/...` y `/uploads/mercados/emisores/...`. Los botones
+  de descarga son iconos sin texto (las etiquetas son imágenes CSS), así que
+  el título sale del nombre del archivo.
+- Frescura: cotizaciones históricas, boletín diario, valoración diaria, sector
+  público y Ecuindex 2026-10-08; boletines por valor 2026-09-10; emisiones
+  renta fija 2026-10-05; `emisiones/facturas-comerciales.xls` 2024-09-10
+  (hojas hasta 2023). El vector de precios diario trae fecha de valoración
+  2026-10-08.
+- Descartado: "Infolab BVQ" (boletín mensual, informe bursátil: las páginas no
+  traen archivos; el contenido está en `bvqinfolab.com` con login) y las
+  pantallas en vivo de ofertas/demandas y operaciones cerradas (no son
+  descargas).
 
 ## Notas históricas
 

@@ -137,8 +137,13 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | Tool | Descripción |
 |------|-------------|
 | `get_contraloria_informe` | Descarga y previsualiza un documento de la Contraloría (Datos Abiertos o Plan Anual de Control). |
+| `list_archivo_secciones` (`fuente="petroecuador"`) | Las 8 secciones de "Cifras Institucionales" de EP Petroecuador (informes estadísticos, producción, precios, refinación). |
+| `get_archivo_seccion` (`fuente="petroecuador"`) | Enlaces PDF de una sección de EP Petroecuador; el contenido se lee con `read_pdf`. |
+| `search_siniestros_ant` | Siniestros de tránsito (registros de la ANT): publicaciones trimestrales del INEC con microdatos y datasets CKAN. |
+| `get_archivo_seccion` (`fuente="energia"`) | Lista los PDF/XLSX de una sección del Ministerio de Ambiente y Energía: estadística de hidrocarburos, minería o Balance Energético Nacional. |
 | `get_archivo_seccion` (`fuente="sipa"`) | Lista los enlaces de descarga directa publicados en un módulo de estadísticas de SIPA. |
 | `get_archivo_seccion` (`fuente="superbancos"`) | Lista los enlaces de descarga directa publicados en una sección de estadísticas de Superbancos. |
+| `list_archivo_secciones` (`fuente="energia"`) | Lista las 4 secciones estadísticas del Ministerio de Ambiente y Energía (ambienteyenergia.gob.ec). |
 | `list_archivo_secciones` (`fuente="sipa"`) | Lista los módulos de descarga de estadísticas de SIPA (sipa.agricultura.gob.ec). |
 | `list_archivo_secciones` (`fuente="superbancos"`) | Lista las secciones de estadísticas de la Superintendencia de Bancos (superbancos.gob.ec/estadisticas/portalestudios/). |
 | `get_sipa_resumen_indicadores` | PDF mensuales del "Resumen de Indicadores" de SIPA (Ministerio de Agricultura), por año. |
@@ -187,6 +192,13 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `list_archivo_secciones` (`fuente="ineval"`) | Familias de evaluación del INEVAL con página de bases de datos. |
 | `get_archivo_seccion` (`fuente="ineval"`) | Enlaces de descarga de una familia de evaluación del INEVAL. |
 
+## CNE: datos electorales
+
+| Tool | Descripción |
+|------|-------------|
+| `list_archivo_secciones` (`fuente="cne"`) | Procesos electorales 2002-2025 con base de datos del CNE. |
+| `get_archivo_seccion` (`fuente="cne"`) | Enlaces de un proceso: diccionarios, organizaciones, candidatos, registro electoral y resultados por parroquia (SPSS `.sav`). |
+
 ## Aviación civil (DGAC)
 
 | Tool | Descripción |
@@ -206,6 +218,13 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 |------|-------------|
 | `list_archivo_secciones` (`fuente="arcsa"`) | Categorías del registro sanitario de ARCSA (Base de Registros Emitidos). |
 | `get_archivo_seccion` (`fuente="arcsa"`) | Documentos de una categoría del registro sanitario de ARCSA. |
+
+## Bolsas de valores: Guayaquil y Quito
+
+| Tool | Descripción |
+|------|-------------|
+| `list_archivo_secciones` (`fuente="bvg"|"bvq"`) | Secciones de archivos públicos de la Bolsa de Valores de Guayaquil (histórico de negociaciones, dividendos, valores permitidos, ofertas públicas) o de Quito (cotizaciones, emisiones, boletines, valoración, emisores). |
+| `get_archivo_seccion` (`fuente="bvg"|"bvq"`) | Enlaces XLSX/XLS de una sección, con fecha de última modificación y tamaño de cada archivo. |
 
 ## Fuentes sectoriales adicionales
 

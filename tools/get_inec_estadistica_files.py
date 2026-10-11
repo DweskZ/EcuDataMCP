@@ -30,7 +30,9 @@ def register_get_inec_estadistica_files_tool(mcp: MCPServer) -> None:
         not the file contents. Historical microdata pages (general deaths
         1990-2015, 2017, 2018, 2019) are listed by search_inec_estadisticas
         under "defunciones". Use read_pdf on a .pdf link, or download it
-        yourself for tabular formats.
+        yourself for tabular formats. When a topic page lists no files itself
+        (e.g. ENDI), the files of the per-round landing pages it links to are
+        merged in and those pages are named in "paginas_relacionadas".
 
         Args:
             url: A topic URL from search_inec_estadisticas's "url" field
@@ -52,6 +54,11 @@ def register_get_inec_estadistica_files_tool(mcp: MCPServer) -> None:
             if not archivos:
                 parts.append("No se encontraron archivos descargables en esta página.")
                 return "\n".join(parts)
+            related = data.get("paginas_relacionadas") or []
+            if related:
+                parts.append("Archivos tomados de páginas relacionadas:")
+                parts.extend(f"- {u}" for u in related)
+                parts.append("")
             parts.append(f"{len(archivos)} archivo(s):")
             for i, f in enumerate(archivos, 1):
                 parts.append(
