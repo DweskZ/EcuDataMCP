@@ -6064,6 +6064,33 @@ httpx.
   `get_arconel_reporte`); CENACE tiene su propio cliente. No se duplicó.
 - Archivos subidos directo al sistema de ficheros, sin pasar por la
   biblioteca de medios, no se pueden enumerar.
+### ANT / siniestros de tránsito (2026-10-10)
+
+Objetivo: datos abiertos de siniestros de la Agencia Nacional de Tránsito.
+
+- **`www.ant.gob.ec` / `ant.gob.ec`: callejón sin salida.** DNS resuelve
+  (200.107.61.30) pero el servidor corta el handshake TLS
+  (`UNEXPECTED_EOF_WHILE_READING` en httpx; `schannel: failed to receive
+  handshake` en curl; HTTP plano: "Empty reply"). Probado con cabeceras de
+  navegador, TLS 1.2 máximo y `SECLEVEL=0`, también con el usuario en VPN.
+  Mismo resultado para `www.ecu911.gob.ec`. No se inventó ninguna URL.
+- **CKAN (`www.datosabiertos.gob.ec`)**: la org de la ANT es `antec` (4
+  datasets: licencias de conducir emitidas, excesos de velocidad; ninguno
+  de siniestros). Siniestros en CKAN: `anuario-estadisticas-transporte-siniestros-2019`
+  (INEC, CSV/ODS) y `fallecidos-por-accidentes-de-transito-registradas-por-el-sppat`
+  (SPPAT, 2016-2021, CSV + diccionario). Búsquedas "siniestralidad vial" y
+  "causas siniestros" devuelven 0.
+- **INEC / Ecuador en Cifras (ruta fiable)**: publica los siniestros con base
+  en registros administrativos de la ANT, vía la API WordPress: "Siniestros
+  de Tránsito" trimestral (I trim 2022 a IV trim 2025, el último publicado
+  2026-05-28), "Información Histórica – Siniestros de Tránsito" y los
+  anuarios "Estadísticas de Transporte" 2017-2023. Cada entrada trae
+  resultados y nota técnica (PDF), tabulados (XLSX), CSV (ZIP), microdatos
+  SPSS (ZIP), datos abiertos (ZIP), diccionario (XLSX) y sintaxis.
+- Implementado en `helpers/ant_client.py` + `tools/search_siniestros_ant.py`:
+  reutiliza `inec_client` y `ckan_client`, sin scraping nuevo. Si la ANT
+  vuelve a ser accesible, valdría añadir su visor/estadísticas como tercera
+  fuente.
 
 ## Notas históricas
 
