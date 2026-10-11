@@ -1146,8 +1146,8 @@
     "description": "Public SRI record for one 13-digit RUC: name, status, type, activity, dates and registered establishments. No tax amounts.",
     "summary": "Consultar la información pública de un contribuyente por RUC en el SRI. Devuelve razón social, estado, tipo, actividad económica, fechas de registro y establecimientos públicos registrados. No devuelve declaraciones ni montos tributarios individuales.",
     "args_doc": {
-      "ruc": "RUC ecuatoriano exacto de 13 dígitos",
-      "include_establecimientos": "incluir establecimientos registrados",
+      "ruc": "Exact 13-digit Ecuadorian RUC",
+      "include_establecimientos": "Include registered establishments",
       "format": "text | json"
     }
   },
@@ -2589,8 +2589,8 @@
     "description": "Find SRI taxpayers by partial razón social or trade name (min 4 characters) when the RUC is unknown. SRI caps results at 100.",
     "summary": "Buscar contribuyentes en el RUC del SRI por razón social o nombre comercial (texto parcial), sin necesitar el RUC exacto de antemano. Complementa get_sri_ruc_info (que requiere el RUC exacto) para el caso \"conozco el nombre de la empresa, no su RUC\". Cada resultado incluye estado, tipo de contribuyente, régimen, actividad económica, representantes legales, y si es agente de retención/contribuyente especial/fantasma — no declaraciones ni montos tributarios individuales. El SRI limita esta búsqueda a 100 coincidencias por consulta; si total_reportado sale en 100, puede haber más contribuyentes de los que realmente se están devolviendo — usa un texto más específico para acotar.",
     "args_doc": {
-      "razon_social": "Texto a buscar (mínimo 4 caracteres), ej. \"BANANERA\"",
-      "max_resultados": "Cuántos resultados con detalle completo devolver (máx 100)",
+      "razon_social": "Text to search (min 4 characters), e.g. \"BANANERA\"",
+      "max_resultados": "How many results to return with full detail (max 100)",
       "format": "text | json"
     }
   },

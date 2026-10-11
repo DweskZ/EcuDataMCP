@@ -48,21 +48,21 @@ pasaporte anterior, si sigue vigente</pre>
     "label": "Riesgo país",
     "turns": [
       {"role": "user", "text": "¿En cuánto cerró el riesgo país de Ecuador?"},
-      {"role": "assistant", "tool": "get_bce_indicador_diario", "text": "El 25 de septiembre de 2026 el EMBI cerró en 477.16 puntos básicos.", "html": "El 25 de septiembre de 2026 el EMBI cerró en <strong>477.16</strong> puntos básicos.", "code": "2026-09-23  432.14\n2026-09-24  445.93\n2026-09-25  477.16", "cite": "fuente · contenido.bce.fin.ec"}
+      {"role": "assistant", "tool": "get_bce_indicador_diario", "text": "El 25 de septiembre de 2026 el EMBI cerró en 477,16 puntos básicos.", "html": "El 25 de septiembre de 2026 el EMBI cerró en <strong>477,16</strong> puntos básicos.", "code": "2026-09-23  432.14\n2026-09-24  445.93\n2026-09-25  477.16", "cite": "fuente · contenido.bce.fin.ec"}
     ]
   },
   {
     "label": "Quito",
     "turns": [
       {"role": "user", "text": "¿Cuál es el código INEC y la población de Quito?"},
-      {"role": "assistant", "tool": "lookup_ubicacion", "text": "Quito es el cantón 1701 de Pichincha. El registro INEC marca 2,853,320 habitantes.", "html": "Quito es el cantón <strong>1701</strong> de Pichincha. El registro INEC marca <strong>2,853,320</strong> habitantes.", "code": "código 1701\nprovincia Pichincha (17)\npoblación 2,853,320", "cite": "fuente · INEC, división político-administrativa"}
+      {"role": "assistant", "tool": "lookup_ubicacion", "text": "Quito es el cantón 1701 de Pichincha. El registro INEC marca 2.853.320 habitantes.", "html": "Quito es el cantón <strong>1701</strong> de Pichincha. El registro INEC marca <strong>2.853.320</strong> habitantes.", "code": "código 1701\nprovincia Pichincha (17)\npoblación 2,853,320", "cite": "fuente · INEC, división político-administrativa"}
     ]
   },
   {
     "label": "Remesas",
     "turns": [
       {"role": "user", "text": "¿Cuánto recibió Ecuador por remesas en el primer trimestre de 2026?"},
-      {"role": "assistant", "tool": "get_bce_indicador_diario", "text": "La serie trimestral del BCE marca USD 1,856.7 millones al 31 de marzo de 2026.", "html": "La serie trimestral del BCE marca <strong>USD 1,856.7 millones</strong> al 31 de marzo de 2026.", "code": "2025-T4  2,015.5\n2026-T1  1,856.7\nunidad: millones de USD", "cite": "fuente · contenido.bce.fin.ec"}
+      {"role": "assistant", "tool": "get_bce_indicador_diario", "text": "La serie trimestral del BCE marca USD 1.856,7 millones al 31 de marzo de 2026.", "html": "La serie trimestral del BCE marca <strong>USD 1.856,7 millones</strong> al 31 de marzo de 2026.", "code": "2025-T4  2,015.5\n2026-T1  1,856.7\nunidad: millones de USD", "cite": "fuente · contenido.bce.fin.ec"}
     ]
   }
 ]
@@ -217,7 +217,7 @@ y regístralo como servidor MCP en mi cliente usando modo stdio con
 `uv run --directory &lt;ruta-del-clon&gt; python main.py --transport stdio`.
 Verifica que el servidor responda antes de darlo por terminado.</code></pre>
 </div>
-<p class="client-intro">Revisa siempre lo que tu asistente cambie (archivos de configuración, comandos ejecutados) antes de confirmar. Esta opción solo funciona con asistentes que pueden ejecutar comandos por su cuenta: hoy eso es <strong>Claude Code</strong>, <strong>Codex</strong>, <strong>Cursor</strong> y <strong>Windsurf</strong> en modo agente. Con ChatGPT, Claude.ai de solo-chat u otros clientes sin terminal, usa la configuración manual de abajo.</p>
+<p class="client-intro">Revisa siempre lo que tu asistente cambie (archivos de configuración, comandos ejecutados) antes de confirmar. Esta opción solo funciona con asistentes que pueden ejecutar comandos por su cuenta: hoy eso es <strong>Claude Code</strong>, <strong>Codex</strong>, <strong>Cursor</strong> y <strong>Windsurf</strong> en modo agente. Con ChatGPT, Claude.ai en modo solo chat u otros clientes sin terminal, usa la configuración manual de abajo.</p>
 </div>
 <ul class="nav nav-tabs" id="client-tabs" role="tablist">
 {% for cl in clients %}

@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- **Docs and site fixes** (no behaviour change for callers): `docs/TOOLS.md` now
+  states the real count (83 public tools, plus the 2 maintenance tools) and lists
+  `get_certificado_cumplimiento_patronal`; the server instructions mention the
+  `explorar_tema` prompt; the SRI RUC tool argument docs are in English. Site:
+  Spanish copy uses the masculine "tool" and Spanish number formatting, English
+  copy uses American spelling and translated institution names; Google Fonts load
+  through `<link>` (no render-blocking `@import`); canonical, hreflang and
+  `og:url` tags; skip link, labelled search input and visible search focus ring;
+  smooth scrolling respects `prefers-reduced-motion`; the sitemap no longer
+  carries a build-time `<lastmod>`; `web/README.md` describes the real Pages
+  setup (`gh-pages` branch) and CSS sources.
+
 ## 0.12.0 — 2026-10-10
 
 - **Internal robustness** (no behaviour change for callers): BVG, BVQ and CNE use

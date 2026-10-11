@@ -146,6 +146,7 @@ function copyCode(btn) {
 
   function open() {
     panel.hidden = false;
+    toggle.setAttribute("aria-expanded", "true");
     ensureIndex().then(function () {
       input.focus();
     });
@@ -153,6 +154,7 @@ function copyCode(btn) {
 
   function close() {
     panel.hidden = true;
+    toggle.setAttribute("aria-expanded", "false");
     input.value = "";
     results.innerHTML = "";
   }

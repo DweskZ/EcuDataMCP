@@ -540,8 +540,9 @@ html[data-theme="light"] .theme-toggle .icon-moon {
   color: var(--ecu-text);
 }
 
-.site-search-input:focus {
-  outline: none;
+.site-search-input:focus-visible {
+  outline: 2px solid var(--ecu-accent-text);
+  outline-offset: 2px;
   border-color: var(--ecu-accent-text);
 }
 
@@ -1804,4 +1805,21 @@ code a:any-link {
   .org-carousel-viewport {
     scroll-behavior: auto;
   }
+}
+
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -4rem;
+  z-index: 2000;
+  padding: 0.5rem 0.9rem;
+  background: var(--ecu-accent-text);
+  color: #16130a;
+  border-radius: 4px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 0.75rem;
 }
