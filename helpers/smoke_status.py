@@ -37,6 +37,13 @@ _DEGRADED_SOURCES = (
         "bloqueo geográfico",
     ),
     (
+        # Seen 2026-10-08 and 2026-10-10: the ~37 MB directory download on a
+        # cold runner outlasts search_companias's inline wait.
+        "supercias_directory_cold_start",
+        "directorio de supercías",
+        "segundo plano",
+    ),
+    (
         "supercias_financials_cold_start",
         "base de datos financiera de supercías",
         "automáticamente en segundo plano",

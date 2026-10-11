@@ -16,6 +16,15 @@ def test_classifies_ckan_regional_block_as_degraded():
     assert assessment.source == "datos_abiertos_ckan"
 
 
+def test_classifies_supercias_directory_cold_start_as_degraded():
+    text = (
+        "Error al consultar el directorio de Supercías: El directorio de "
+        "Supercías (~37 MB) se está descargando en segundo plano. Reintenta."
+    )
+
+    assert degraded_source(text) == "supercias_directory_cold_start"
+
+
 def test_classifies_cenace_certificate_problem_as_degraded():
     text = (
         "Error executing tool get_cenace_tablero: "
