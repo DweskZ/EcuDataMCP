@@ -32,8 +32,8 @@ def register_get_sri_ruc_info_tool(mcp: MCPServer) -> None:
         declaraciones ni montos tributarios individuales.
 
         Args:
-            ruc: RUC ecuatoriano exacto de 13 dígitos
-            include_establecimientos: incluir establecimientos registrados
+            ruc: Exact 13-digit Ecuadorian RUC
+            include_establecimientos: Include registered establishments
             format: text | json
         """
         try:

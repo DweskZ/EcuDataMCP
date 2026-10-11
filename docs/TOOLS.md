@@ -1,6 +1,8 @@
 # Herramientas disponibles
 
-Referencia detallada de las 113 herramientas MCP de EcuDataMCP. Casi todas
+Referencia detallada de las 83 herramientas MCP del perfil público (por defecto)
+de EcuDataMCP, más 2 herramientas de mantenimiento (`audit_bce_catalog` y
+`compare_bce_sources`) que solo se registran con otro `MCP_PROFILE`. Casi todas
 aceptan `format="json"` además de texto.
 
 ## Entrada unificada
@@ -98,8 +100,8 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 
 | Tool | Descripción |
 |------|-------------|
-| `audit_bce_catalog` | Audita en vivo el catálogo BCEData y reporta su cobertura. |
-| `compare_bce_sources` | Construye un mapa cauteloso de equivalencias candidatas entre BCEData e IEM. |
+| `audit_bce_catalog` (mantenimiento) | Audita en vivo el catálogo BCEData y reporta su cobertura. |
+| `compare_bce_sources` (mantenimiento) | Construye un mapa cauteloso de equivalencias candidatas entre BCEData e IEM. |
 | `get_bce_iem_table` | Inspecciona una tabla XLSX oficial del boletín IEM más reciente del BCE. |
 | `get_bce_indicador_diario` | Obtiene la serie temporal de un indicador diario/mensual del BCE (ej. Riesgo País). |
 | `list_catalogo` (`fuente="bce_diarios"|"arconel"|"contraloria"|"iess"|"sut"|"judicatura"`) | Catálogo previo al `get_*` de cada fuente: widgets diarios/mensuales del BCE (Riesgo País desde 2004), reportes de ARCONEL, informes de Contraloría, colecciones del IESS, tableros del SUT y tableros del Consejo de la Judicatura. |
@@ -184,6 +186,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | Tool | Descripción |
 |------|-------------|
 | `get_iess_archivos` | Documentos de una colección del IESS. |
+| `get_certificado_cumplimiento_patronal` | Verifica si un empleador (RUC) o una persona (cédula) está al día en sus aportes al IESS (certificado de cumplimiento de obligaciones patronales). No es un conteo de empleados. |
 
 ## INEVAL: evaluación educativa
 

@@ -306,7 +306,7 @@
         ]
       },
       {
-        "name": "Superintendencia de Economía Popular y Solidaria (SEPS)",
+        "name": "Superintendency of Popular and Solidarity Economy (SEPS)",
         "sources": [
           {
             "id": "seps-estadisticas",
@@ -320,7 +320,7 @@
         ]
       },
       {
-        "name": "Ministerio de Economía y Finanzas (MEF)",
+        "name": "Ministry of Economy and Finance (MEF)",
         "sources": [
           {
             "id": "mef-fiscal",
@@ -541,7 +541,7 @@
   {
     "id": "energy",
     "theme": "Energy",
-    "lede": "The national electrical grid's pulse, live.",
+    "lede": "A live pulse of the national electrical grid.",
     "institutions": [
       {
         "name": "CENACE",
@@ -635,17 +635,17 @@
   },
   {
     "id": "labour-employment",
-    "theme": "Labour & employment",
-    "lede": "Labour indicators decoded straight from the official dashboards.",
+    "theme": "Labor & employment",
+    "lede": "Labor indicators decoded straight from the official dashboards.",
     "institutions": [
       {
-        "name": "Ministry of Labour",
+        "name": "Ministry of Labor",
         "sources": [
           {
             "id": "sut",
             "name": "SUT",
-            "tag": "Labour",
-            "description": "Public Ministry of Labour indicators through its statistical dashboards (Power BI)",
+            "tag": "Labor",
+            "description": "Public Ministry of Labor indicators through its statistical dashboards (Power BI)",
             "coverage": "sut.trabajo.gob.ec",
             "url": "https://sut.trabajo.gob.ec",
             "status": "live"
@@ -653,7 +653,7 @@
           {
             "id": "salarios-sectoriales",
             "name": "Sectoral wages",
-            "tag": "Labour",
+            "tag": "Labor",
             "description": "Sectoral minimum wage tables, 2020-2025",
             "coverage": "trabajo.gob.ec/biblioteca",
             "url": "https://www.trabajo.gob.ec/biblioteca/",
@@ -661,8 +661,8 @@
           },
           {
             "id": "boletin-laboral-anual",
-            "name": "Annual labour bulletin",
-            "tag": "Labour",
+            "name": "Annual labor bulletin",
+            "tag": "Labor",
             "description": "Annual statistical bulletin on the Ecuadorian labor market (known editions 2020-2022)",
             "coverage": "trabajo.gob.ec",
             "url": "https://www.trabajo.gob.ec",
@@ -757,7 +757,7 @@
     "lede": "Aerodromes, aeronautical weather, and notices to airmen, straight from DGAC.",
     "institutions": [
       {
-        "name": "Dirección General de Aviación Civil (DGAC)",
+        "name": "Directorate General of Civil Aviation (DGAC)",
         "sources": [
           {
             "id": "dgac-aip",

@@ -12,7 +12,6 @@ Usage: uv run python build.py
 import json
 import re
 import shutil
-from datetime import UTC, datetime
 from pathlib import Path
 
 import jinja2
@@ -49,6 +48,7 @@ TRANSLATIONS = {
         "default_none": "ninguno",
         "default_empty": "vacío",
         "search_no_results": "Sin resultados.",
+        "skip_to_content": "Saltar al contenido",
     },
     "en": {
         "search": "Search",
@@ -61,6 +61,7 @@ TRANSLATIONS = {
         "default_none": "none",
         "default_empty": "empty",
         "search_no_results": "No results.",
+        "skip_to_content": "Skip to content",
     },
 }
 
@@ -370,6 +371,17 @@ def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
         # language's homepage instead of linking a 404.
         has_counterpart = page in PAGES or page in EXTRA_PAGES[other_lang]
         other_page = page if has_counterpart else "index"
+        # Absolute canonical URL for this page; hreflang alternates are only
+        # emitted when the counterpart page really exists in the other language.
+        own_prefix = "" if lang == "es" else "en/"
+        canonical_url = f"{SITE_URL}/{own_prefix}{page}.html"
+        alternate_urls = []
+        if has_counterpart:
+            alternate_urls = [
+                ("es", f"{SITE_URL}/{page}.html"),
+                ("en", f"{SITE_URL}/en/{page}.html"),
+                ("x-default", f"{SITE_URL}/{page}.html"),
+            ]
         html = template.render(
             lang=lang,
             root=root,
@@ -382,6 +394,8 @@ def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
             page_title=title,
             page_description=description,
             og_image=OG_IMAGE,
+            canonical_url=canonical_url,
+            alternate_urls=alternate_urls,
             sources=sources,
             source_themes=source_themes,
             clients=clients,
@@ -428,14 +442,13 @@ def write_seo_files():
         f"User-agent: *\nAllow: /\n\nSitemap: {SITE_URL}/sitemap.xml\n",
         encoding="utf-8",
     )
-    now = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     urls = []
     for page in PAGES + EXTRA_PAGES["es"]:
         urls.append(f"{SITE_URL}/{page}.html")
     for page in PAGES + EXTRA_PAGES["en"]:
         urls.append(f"{SITE_URL}/en/{page}.html")
     entries = "\n".join(
-        f"  <url>\n    <loc>{u}</loc>\n    <lastmod>{now}</lastmod>\n  </url>"
+        f"  <url>\n    <loc>{u}</loc>\n  </url>"
         for u in urls
     )
     sitemap = (

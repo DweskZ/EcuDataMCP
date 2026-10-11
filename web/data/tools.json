@@ -2587,7 +2587,7 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Lista los archivos de una sección obtenida con list_archivo_secciones. Cada archivo trae título, URL y formato, más contexto propio de la fuente (grupo, período, subgrupo, descripción). Devuelve enlaces, no contenido; descarga los archivos grandes directamente (las tools de vista previa y descarga tienen un tope de 5 MB)."
+        "long_description": "Lista los archivos de una sección obtenida con list_archivo_secciones. Cada archivo trae título, URL y formato, más contexto propio de la fuente (grupo, período, subgrupo, descripción). Devuelve enlaces, no contenido; descarga los archivos grandes directamente (los tools de vista previa y descarga tienen un tope de 5 MB)."
       },
       {
         "name": "list_catalogo",

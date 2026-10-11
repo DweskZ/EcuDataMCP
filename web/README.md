@@ -15,14 +15,16 @@ para que un solo PR pueda actualizar el README del servidor y el sitio a la vez.
 - `data/*.json` / `en/data/*.json` — fuentes, clientes MCP, tools, preguntas de ejemplo y releases.
   Editar estos archivos no requiere saber Python — es solo JSON.
 - `data/tool_signatures.json` — extracción cruda en inglés (nombre, parámetros con tipo/default,
-  descripción del decorador y docstring) de todas las tools públicas registradas en `../tools/*.py`
+  descripción del decorador y docstring) de todos los tools públicos registrados en `../tools/*.py`
   (no incluye las de mantenimiento), generada por `scripts/extract_tool_signatures.py` (un script `ast`,
   no a mano; el workflow de Pages lo corre en cada build). Es la fuente de verdad de qué tools existen y
-  qué parámetros tienen: `build.py` descarta de `tools.json` las tools que ya no existen, sincroniza sus
-  parámetros con el código y muestra las tools nuevas en una categoría aparte, en inglés, hasta que se
+  qué parámetros tienen: `build.py` descarta de `tools.json` los tools que ya no existen, sincroniza sus
+  parámetros con el código y muestra los tools nuevos en una categoría aparte, en inglés, hasta que se
   traduzcan a mano `description`/`long_description`/`params` en `data/tools.json` y `en/data/tools.json`.
-- `assets/styles.css` — el CSS del sitio, en texto plano; es la única fuente (no hay SCSS que recompilar).
-  Edítalo directamente.
+- `assets/site.css` y `assets/atlas.css` — el CSS propio del sitio (`atlas.css` solo se carga en la página
+  del Atlas), en texto plano; edítalos directamente. `assets/styles.css` es la base compilada (estilos tipo
+  Bootstrap): no se recompila desde ningún SCSS del repo, así que los cambios de diseño van en `site.css`.
+  Las fuentes de Google Fonts se cargan con un `<link>` en `templates/base.html`, no con `@import`.
 - `assets/` — CSS compilado, `site.js` (toggle de navbar móvil, tabs de clientes MCP, panel de búsqueda,
   botón de copiar), `fuse.min.js` (vendored, motor de la búsqueda), favicon, imagen OG. El ícono de
   búsqueda del navbar es un SVG inline en `templates/base.html`, no una fuente de íconos.
@@ -47,8 +49,9 @@ publica en GitHub Pages en cada push a `main` que toque `web/` (también se pued
 
 URL del sitio: <https://dweskz.github.io/EcuDataMCP/>
 
-En el repo: **Settings → Pages → Source → GitHub Actions** (una sola vez). Mientras eso no esté
-activado, también se puede servir desde la rama `gh-pages` (contenido de `_site/` en la raíz).
+El workflow no usa el despliegue de "GitHub Actions" de Pages: publica el contenido de `_site/` en la rama
+`gh-pages` y Pages la sirve con **Settings → Pages → Source → Deploy from a branch** (`gh-pages`, raíz).
+No borres la rama `gh-pages`.
 
 ## Búsqueda
 

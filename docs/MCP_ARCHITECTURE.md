@@ -25,7 +25,7 @@ reescriben retroactivamente cuando el total sube después.
 de `source=` a `"iadb"` en los tools CKAN genéricos existentes, y el nuevo
 parámetro `query` en `get_organization_info` (en vez de tools nuevos
 por-organización para SRI/MEF genéricos) — ver docs/RESEARCH.md § Vigésimo
-sexta pasada. Es exactamente la recomendación de "preferir una tool
+sexta pasada. Es exactamente la recomendación de "preferir un tool
 parametrizada sobre duplicar la superficie pública" ya aplicada dos veces.
 
 ## Conclusión corta
@@ -34,7 +34,7 @@ El número bruto no es, por sí solo, un problema de MCP: `tools/list` admite
 paginación y la especificación no fija un máximo pequeño. El problema real es
 la forma de describir y devolver esas tools — todas aceptan `format: str` y
 devuelven `str`, sin `title`, sin anotaciones, sin schema de entrada
-tipado, y sin distinguir una tool de solo-lectura de una que escribe
+tipado, y sin distinguir un tool de solo-lectura de una que escribe
 artefactos locales.
 
 **Sobre si 115 es demasiado (pregunta directa de Daniel, 2026-09-11):**
@@ -164,7 +164,7 @@ search_datasets(query="", sort="recent")
 La respuesta debería tener el mismo formato en ambos casos. Esto elimina una
 duplicación real, no solo dos nombres parecidos.
 
-### 3. Separar las tools de mantenimiento
+### 3. Separar los tools de mantenimiento
 
 Mover `audit_bce_catalog` y `compare_bce_sources` a la instancia de
 mantenimiento. Siguen disponibles en el repositorio y para el operador, pero
@@ -178,7 +178,7 @@ Estos pares suelen representar un flujo lógico de dos pasos:
 list_sipa_modulos() → get_sipa_modulo_archivos("economico")
 ```
 
-Fusionarlos normalmente produce una tool con argumentos opcionales, respuestas
+Fusionarlos normalmente produce un tool con argumentos opcionales, respuestas
 de varios tipos y reglas difíciles de explicar. Se mantienen separados, en
 particular para SIPA, Superbancos, Contraloría y BCEData/IEM.
 
@@ -190,7 +190,7 @@ firma exacta, no porque haya evidencia de fusión previa. A diferencia de la
 regla 4, esto no es un flujo de dos pasos — es la misma pregunta
 ("dame el reporte de tipo X") repetida tres o dos veces. Evaluar caso por
 caso si el nombre específico (ej. `get_metar`, término estándar de aviación
-que un modelo reconoce sin ayuda) vale más que el ahorro de una tool.
+que un modelo reconoce sin ayuda) vale más que el ahorro de un tool.
 
 ## Armonización de nombres
 
@@ -207,11 +207,11 @@ download → obtener un archivo
 audit    → revisar el estado del sistema
 ```
 
-También conviene definir una convención para tools nuevas, preferiblemente con
+También conviene definir una convención para tools nuevos, preferiblemente con
 la fuente primero, como `bce.search_indicators` o `sri.search_ruc`. No se debe
 renombrar toda la API actual en un solo cambio.
 
-Cada tool nueva debería tener un `title` legible en español y una descripción
+Cada tool nuevo debería tener un `title` legible en español y una descripción
 que indique qué hace, cuándo usarla, qué no devuelve y cuáles son sus límites.
 
 ## Esquemas de entrada
@@ -247,8 +247,8 @@ consulta, fecha de corte, frescura, cobertura, límites y nombre del esquema.
 
 ## Anotaciones MCP y errores
 
-Las tools de consulta pública deberían indicar que son de solo lectura y, en
-general, trabajan sobre catálogos cerrados. Las tools que guardan snapshots o
+Los tools de consulta pública deberían indicar que son de solo lectura y, en
+general, trabajan sobre catálogos cerrados. Los tools que guardan snapshots o
 colas de revisión deben tener un tratamiento distinto y permanecer en el perfil
 de mantenimiento. Las anotaciones son pistas para el cliente, no sustituyen la
 seguridad.
@@ -328,9 +328,9 @@ No requiere tocar lógica de negocio — solo las firmas y docstrings de
    (y equivalentes para cualquier otro parámetro con un conjunto cerrado de
    valores) sin cambiar el comportamiento en runtime.
 3. Agregar anotaciones MCP (solo-lectura vs. escribe artefactos) — todas
-   las tools públicas son solo-lectura salvo que se documente lo contrario.
+   los tools públicos son solo-lectura salvo que se documente lo contrario.
 4. Verificación: `tools/list` expone `title` y anotaciones para el 100% de
-   las tools públicas; test de regresión que falla si una tool nueva no
+   los tools públicos; test de regresión que falla si un tool nuevo no
    declara `title`.
 
 ### Fase 3 — Contrato de respuesta estructurado (varias sesiones, la más grande)
@@ -490,7 +490,7 @@ tamaño de `tools/list`, no el número.
 3. **Fase 8 (telemetría).** `log_tool` registra nombre, resultado y
    duración de cada llamada (nunca argumentos): `/usage` en HTTP, y
    `usage.jsonl` con `ECUADOR_MCP_USAGE_LOG=1`, resumido por
-   `scripts/usage_report.py` (incluye las tools nunca llamadas). Es la
+   `scripts/usage_report.py` (incluye los tools nunca llamados). Es la
    evidencia que esta revisión exige antes de retirar más tools o de
    definir perfiles por dominio (resto de la fase 4).
 

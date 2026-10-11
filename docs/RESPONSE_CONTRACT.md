@@ -51,8 +51,8 @@ resultados", no entre "hubo datos" y "no hubo datos". Ver
 convirtió a `ToolError` en cada tool y qué se dejó como resultado legítimo.
 
 El contrato `metadatos` en sí (fuente, url_fuente, fechas, frescura,
-esquema) sigue presente solo en las tools que ya lo tenían antes de esta
-fase — no se agregó a las demás. Una tool sin `metadatos` todavía tiene
+esquema) sigue presente solo en los tools que ya lo tenían antes de esta
+fase — no se agregó a las demás. Un tool sin `metadatos` todavía tiene
 `structuredContent` (el payload que ya construía), solo que sin ese
 envoltorio de procedencia; enriquecerlo caso por caso queda como trabajo
 futuro opcional.

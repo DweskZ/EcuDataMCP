@@ -500,7 +500,7 @@ def register_catalog_resources(mcp: MCPServer) -> None:
         name="referencia_herramienta",
         title="Referencia completa de una herramienta",
         description=(
-            "Documentación completa de una tool (alcance, parámetros, límites de "
+            "Documentación completa de un tool (alcance, parámetros, límites de "
             "la fuente); tools/list solo lleva un resumen."
         ),
         mime_type="text/plain",

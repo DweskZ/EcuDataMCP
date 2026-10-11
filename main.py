@@ -44,7 +44,7 @@ actualizado de fuentes y sus tools).
 
 Entrada recomendada cuando no se sabe qué tool usar: `search_ecuador`, o los
 prompts `explorar_datos` / `consultar_tramite` / `investigar_contrato` /
-`buscar_regulacion` / `buscar_inec` / `monitorear_riesgos`.
+`buscar_regulacion` / `buscar_inec` / `monitorear_riesgos` / `explorar_tema`.
 
 Convenciones comunes a los tools (no se repiten en cada descripción):
 - `format="json"` devuelve el resultado estructurado; `format="text"`

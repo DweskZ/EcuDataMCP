@@ -41,8 +41,8 @@ def register_search_sri_ruc_tool(mcp: MCPServer) -> None:
         para acotar.
 
         Args:
-            razon_social: Texto a buscar (mínimo 4 caracteres), ej. "BANANERA"
-            max_resultados: Cuántos resultados con detalle completo devolver (máx 100)
+            razon_social: Text to search (min 4 characters), e.g. "BANANERA"
+            max_resultados: How many results to return with full detail (max 100)
             format: text | json
         """
         try:
