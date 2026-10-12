@@ -89,6 +89,13 @@ _DEGRADED_SOURCES = (
         "superbancos",
         "certificate has expired",
     ),
+    (
+        # Same host, same missing intermediate; the runner's trust store
+        # reports it as an unknown issuer on some runs instead of expired.
+        "superbancos_tls_chain",
+        "superbancos",
+        "unable to get local issuer certificate",
+    ),
 )
 
 # Sources blocked by country or datacenter IP. Without a LatAm egress
