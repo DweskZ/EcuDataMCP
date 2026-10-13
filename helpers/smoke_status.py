@@ -80,6 +80,22 @@ _DEGRADED_SOURCES = (
         "censo ecuador",
         "certificate has expired",
     ),
+    (
+        # Seen 2026-10-11 on the runner: www.superbancos.gob.ec serves a leaf
+        # valid until 2027-04 but omits its intermediate, and the verification
+        # chain the runner builds ends in an expired certificate. An upstream
+        # TLS chain problem, not a regression here.
+        "superbancos_tls_chain",
+        "superbancos",
+        "certificate has expired",
+    ),
+    (
+        # Same host, same missing intermediate; the runner's trust store
+        # reports it as an unknown issuer on some runs instead of expired.
+        "superbancos_tls_chain",
+        "superbancos",
+        "unable to get local issuer certificate",
+    ),
 )
 
 # Sources blocked by country or datacenter IP. Without a LatAm egress
