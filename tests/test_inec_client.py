@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 
 from helpers import inec_client
@@ -118,6 +120,33 @@ async def test_fetch_topics_tolerates_one_seed_failing(httpx_mock):
 
     # The working seed's topics still come through.
     assert any(t["url"].endswith("pobreza2/") for t in topics)
+
+
+@pytest.mark.asyncio
+async def test_fetch_topics_does_not_cache_partial_scrape(httpx_mock):
+    httpx_mock.add_response(url=_IPC_SEED, html=_MENU_HTML)
+    httpx_mock.add_response(url=_ENEMDU_SEED, status_code=500, content=b"boom")
+    await inec_client._fetch_topics()
+
+    httpx_mock.add_response(url=_IPC_SEED, html=_MENU_HTML)
+    httpx_mock.add_response(url=_ENEMDU_SEED, html=_ENEMDU_MENU_HTML)
+    topics = await inec_client._fetch_topics()
+
+    assert any(t["url"].endswith("enemdu-anual/") for t in topics)
+
+
+@pytest.mark.asyncio
+async def test_fetch_topics_reraises_cancelled_error(monkeypatch):
+    async def fake_get_page(url):
+        if url == _ENEMDU_SEED:
+            raise asyncio.CancelledError()
+        return _MENU_HTML
+
+    monkeypatch.setattr(inec_client, "_get_page", fake_get_page)
+
+    with pytest.raises(asyncio.CancelledError):
+        await inec_client._fetch_topics()
+    assert inec_client._topics_cache.get("topics") is None
 
 
 @pytest.mark.asyncio
