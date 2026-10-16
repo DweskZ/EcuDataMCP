@@ -35,11 +35,12 @@ from __future__ import annotations
 
 import csv
 import io
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from typing import Any
 
 from helpers.cache import TtlCache
 from helpers.csv_reader import download_bytes
+from helpers.ecuador_time import today_ecuador
 from helpers.text_utils import strip_accents as _strip
 
 _CSV_URL = "https://contenido.bce.fin.ec/documentos/CalendarioEstadistico/calendario_publicaciones.csv"
@@ -81,6 +82,20 @@ def _parse_fecha(raw: str) -> str | None:
         return datetime.strptime(raw, "%d/%m/%Y").replace(tzinfo=UTC).date().isoformat()
     except ValueError:
         return None
+
+
+def _validate_fecha(raw: str, nombre: str) -> str:
+    """Return `raw` normalised to YYYY-MM-DD ("" stays ""), or raise ValueError."""
+    raw = (raw or "").strip()
+    if not raw:
+        return ""
+    try:
+        return date.fromisoformat(raw).isoformat()
+    except ValueError:
+        raise ValueError(
+            f"Error: {nombre} debe ser una fecha válida en formato YYYY-MM-DD "
+            f"(recibido: {raw!r})."
+        ) from None
 
 
 def _parse_row(row: dict[str, str]) -> dict[str, Any] | None:
@@ -143,8 +158,9 @@ async def search_calendario(
         desde: Restrict to fecha >= this date (YYYY-MM-DD).
         hasta: Restrict to fecha <= this date (YYYY-MM-DD).
         solo_proximas: If true, only entries whose fecha is today or later
-            (ignores desde/hasta if also given, applying its own today-based
-            lower bound in addition to hasta).
+            (Ecuador local date). The lower bound is the later of desde and
+            today, so an earlier desde cannot reintroduce past entries;
+            hasta still applies.
         limit: Max results (1-200, default 50).
         offset: Pagination offset over the matched set.
     """
@@ -152,8 +168,10 @@ async def search_calendario(
     q = _strip(query)
     cat = _strip(categoria)
     per = _strip(periodicidad)
+    desde = _validate_fecha(desde, "desde")
+    hasta = _validate_fecha(hasta, "hasta")
     if solo_proximas:
-        desde = desde or datetime.now(UTC).date().isoformat()
+        desde = max(desde, today_ecuador().isoformat())
 
     def matches(entry: dict[str, Any]) -> bool:
         if q and q not in _strip(entry["nombre"]) and q not in _strip(entry["observaciones"]):

@@ -1,8 +1,9 @@
-from datetime import UTC, datetime, timedelta
+from datetime import timedelta
 
 import pytest
 
 from helpers import bce_calendario_client
+from helpers.ecuador_time import today_ecuador
 
 # Real header/row shape confirmed live 2026-09-09 from
 # https://contenido.bce.fin.ec/documentos/CalendarioEstadistico/calendario_publicaciones.csv
@@ -17,7 +18,7 @@ _HEADER = (
     "CALENDARIO INEC;Categoría de Publicaciones;Enlace"
 )
 
-_TODAY = datetime.now(UTC).date()
+_TODAY = today_ecuador()
 _YESTERDAY = (_TODAY - timedelta(days=1)).strftime("%d/%m/%Y")
 _TOMORROW = (_TODAY + timedelta(days=1)).strftime("%d/%m/%Y")
 
@@ -138,3 +139,36 @@ async def test_empty_csv_result_is_not_cached(httpx_mock):
 
     second = await bce_calendario_client.search_calendario()
     assert second["total_calendario"] == 3
+
+
+@pytest.mark.asyncio
+async def test_solo_proximas_is_not_widened_by_earlier_desde(httpx_mock):
+    httpx_mock.add_response(url=bce_calendario_client._CSV_URL, content=_CSV_BYTES)
+
+    result = await bce_calendario_client.search_calendario(
+        solo_proximas=True, desde="2000-01-01"
+    )
+
+    assert result["total"] == 2
+    assert all(p["fecha"] >= _TODAY.isoformat() for p in result["publicaciones"])
+
+
+@pytest.mark.asyncio
+async def test_solo_proximas_respects_later_desde(httpx_mock):
+    httpx_mock.add_response(url=bce_calendario_client._CSV_URL, content=_CSV_BYTES)
+
+    result = await bce_calendario_client.search_calendario(
+        solo_proximas=True, desde="2026-12-01"
+    )
+
+    assert [p["fecha"] for p in result["publicaciones"]] == ["2026-12-31"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("campo", ["desde", "hasta"])
+@pytest.mark.parametrize("valor", ["2026-03", "31/12/2026", "mañana"])
+async def test_invalid_dates_raise_clear_spanish_error(httpx_mock, campo, valor):
+    httpx_mock.add_response(url=bce_calendario_client._CSV_URL, content=_CSV_BYTES)
+
+    with pytest.raises(ValueError, match=f"{campo} debe ser una fecha válida"):
+        await bce_calendario_client.search_calendario(**{campo: valor})
