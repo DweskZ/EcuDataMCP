@@ -21,6 +21,7 @@ para que un solo PR pueda actualizar el README del servidor y el sitio a la vez.
   qué parámetros tienen: `build.py` descarta de `tools.json` los tools que ya no existen, sincroniza sus
   parámetros con el código y muestra los tools nuevos en una categoría aparte, en inglés, hasta que se
   traduzcan a mano `description`/`long_description`/`params` en `data/tools.json` y `en/data/tools.json`.
+- `assets/og-image.png` — imagen social, regenerada con los conteos de `data/` por `scripts/make_og_image.py` (`uv run --with pillow python scripts/make_og_image.py`).
 - `assets/site.css` y `assets/atlas.css` — el CSS propio del sitio (`atlas.css` solo se carga en la página
   del Atlas), en texto plano; edítalos directamente. `assets/styles.css` es la base compilada (estilos tipo
   Bootstrap): no se recompila desde ningún SCSS del repo, así que los cambios de diseño van en `site.css`.
