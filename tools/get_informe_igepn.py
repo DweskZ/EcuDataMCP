@@ -1,3 +1,4 @@
+import asyncio
 from typing import Any, Literal
 
 import httpx
@@ -56,7 +57,7 @@ def register_get_informe_igepn_tool(mcp: MCPServer) -> None:
             raise ToolError(f"Error al descargar el informe: {e}") from e
 
         try:
-            result = extract_text_from_bytes(raw, pages=pages)
+            result = await asyncio.to_thread(extract_text_from_bytes, raw, pages=pages)
         except ValueError as e:
             raise ToolError(f"Error al leer el PDF: {e}") from e
 
