@@ -2,10 +2,10 @@
   {
     "id": "claude-desktop",
     "name": "Claude Desktop",
-    "intro": "Agrega esto a tu archivo de configuración (`~/Library/Application Support/Claude/claude_desktop_config.json` en macOS, `%APPDATA%\\Claude\\claude_desktop_config.json` en Windows):",
+    "intro": "La forma más simple no necesita levantar ningún servidor: Claude Desktop ejecuta el paquete de PyPI con `uv`, así que puedes usar `\"command\": \"uvx\", \"args\": [\"ecuador-mcp\", \"--transport\", \"stdio\"]` o instalar el archivo `.mcpb` adjunto a cada release de GitHub como extensión de Claude Desktop. Agrega esto a tu archivo de configuración (`~/Library/Application Support/Claude/claude_desktop_config.json` en macOS, `%APPDATA%\\Claude\\claude_desktop_config.json` en Windows):",
     "steps": [],
     "lang": "json",
-    "code": "{\n  \"mcpServers\": {\n    \"ecuador-datos\": {\n      \"command\": \"npx\",\n      \"args\": [\n        \"mcp-remote\",\n        \"http://localhost:8000/mcp\"\n      ]\n    }\n  }\n}"
+    "code": "{\n  \"mcpServers\": {\n    \"ecuador-datos\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"mcp-remote\", \"http://localhost:8000/mcp\"]\n    }\n  }\n}"
   },
   {
     "id": "cursor",
