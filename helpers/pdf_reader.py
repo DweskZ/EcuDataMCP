@@ -1,3 +1,4 @@
+import asyncio
 import io
 import re
 from typing import Any
@@ -150,4 +151,4 @@ async def read_pdf(
             "enlace directo."
         )
 
-    return extract_text_from_bytes(raw, pages=pages)
+    return await asyncio.to_thread(extract_text_from_bytes, raw, pages=pages)

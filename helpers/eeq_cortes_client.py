@@ -67,6 +67,10 @@ _fetch_lock = asyncio.Lock()
 
 # Parsed schedules never change once published; one entry per PDF.
 _horarios_cache = TtlCache(ttl_seconds=86400.0, max_entries=64)
+# In-flight dedupe: concurrent misses for the same slug share one download +
+# parse. Locks are popped once the fill finishes, so the dict stays bounded
+# by the number of requests in flight.
+_fill_locks: dict[str, asyncio.Lock] = {}
 
 # Largest PDF in the archive is ~3.7 MB (`25-27`); the project default cap
 # (5 MB) would leave little headroom, and a truncated PDF can't be parsed.
@@ -268,6 +272,29 @@ async def search_eeq_cortes(query: str = "") -> dict[str, Any]:
     }
 
 
+async def _load_horarios(slug: str, url: str) -> dict[str, Any]:
+    parsed = _horarios_cache.get(slug)
+    if parsed is not None:
+        return parsed
+    lock = _fill_locks.setdefault(slug, asyncio.Lock())
+    try:
+        async with lock:
+            parsed = _horarios_cache.get(slug)
+            if parsed is None:
+                logger.info("Descargando y procesando horario de cortes de EEQ: %s", slug)
+                raw, truncated = await download_bytes(url, max_bytes=_MAX_PDF_BYTES)
+                if truncated:
+                    raise ValueError(f"el PDF {slug!r} supera {_MAX_PDF_BYTES // 2**20} MB")
+                if not raw.startswith(b"%PDF"):
+                    raise ValueError(f"{url} no devolvió un PDF")
+                parsed = await asyncio.to_thread(parse_pdf, raw)
+                _horarios_cache.set(slug, parsed)
+            return parsed
+    finally:
+        if _fill_locks.get(slug) is lock:
+            _fill_locks.pop(slug, None)
+
+
 async def get_eeq_cortes_horarios(slug: str, query: str = "") -> dict[str, Any]:
     """
     Parse one EEQ schedule PDF into rows of time block × substation ×
@@ -284,16 +311,7 @@ async def get_eeq_cortes_horarios(slug: str, query: str = "") -> dict[str, Any]:
         raise ValueError(f"slug inválido: {slug!r}")
     url = f"{_DOC_BASE}/{slug}"
 
-    parsed = _horarios_cache.get(slug)
-    if parsed is None:
-        logger.info("Descargando y procesando horario de cortes de EEQ: %s", slug)
-        raw, truncated = await download_bytes(url, max_bytes=_MAX_PDF_BYTES)
-        if truncated:
-            raise ValueError(f"el PDF {slug!r} supera {_MAX_PDF_BYTES // 2**20} MB")
-        if not raw.startswith(b"%PDF"):
-            raise ValueError(f"{url} no devolvió un PDF")
-        parsed = parse_pdf(raw)
-        _horarios_cache.set(slug, parsed)
+    parsed = await _load_horarios(slug, url)
 
     q = _strip(query)
     filas = [

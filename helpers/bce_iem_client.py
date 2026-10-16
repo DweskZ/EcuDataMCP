@@ -1260,6 +1260,58 @@ class _XlsSheetAdapter:
             yield tuple(row)
 
 
+# Decompression-bomb bounds (same 200 MB container figure as csv_reader's
+# xlsx/ods check; kept local so this client stays import-free of private
+# csv_reader names). A single legacy member is capped lower than the total.
+_MAX_ZIP_MEMBER_BYTES = 50 * 1024 * 1024
+_MAX_CONTAINER_UNCOMPRESSED_BYTES = 200 * 1024 * 1024
+
+
+def _read_zip_member_capped(zip_raw: bytes, member: str) -> bytes:
+    """Read one ZIP member after checking its declared size against the caps."""
+    try:
+        with zipfile.ZipFile(io.BytesIO(zip_raw)) as zf:
+            try:
+                info = zf.getinfo(member)
+            except KeyError as exc:
+                raise ValueError(
+                    f"El miembro '{member}' ya no está en el ZIP del boletín IEM"
+                ) from exc
+            total = sum(i.file_size for i in zf.infolist())
+            if (
+                info.file_size > _MAX_ZIP_MEMBER_BYTES
+                or total > _MAX_CONTAINER_UNCOMPRESSED_BYTES
+            ):
+                raise ValueError(
+                    "El ZIP del boletín IEM se expande por encima del límite "
+                    f"seguro ({_MAX_ZIP_MEMBER_BYTES // 2**20} MB por archivo, "
+                    f"{_MAX_CONTAINER_UNCOMPRESSED_BYTES // 2**20} MB en total); "
+                    "se rechaza para evitar una bomba de descompresión."
+                )
+            raw = zf.read(member)
+    except zipfile.BadZipFile as exc:
+        raise ValueError("El ZIP del boletín IEM está dañado") from exc
+    _check_xlsx_container_size(raw)
+    return raw
+
+
+def _check_xlsx_container_size(raw: bytes) -> None:
+    """Reject an XLSX whose parts expand far beyond the download cap."""
+    if not raw.startswith(b"PK"):
+        return
+    try:
+        with zipfile.ZipFile(io.BytesIO(raw)) as zf:
+            total = sum(i.file_size for i in zf.infolist())
+    except zipfile.BadZipFile:
+        return  # the real parser reports the corrupt container
+    if total > _MAX_CONTAINER_UNCOMPRESSED_BYTES:
+        raise ValueError(
+            "La tabla IEM se expande a más de "
+            f"{_MAX_CONTAINER_UNCOMPRESSED_BYTES // 2**20} MB al descomprimirse; "
+            "se rechaza para evitar una bomba de descompresión."
+        )
+
+
 def _open_legacy_zip_member(raw: bytes) -> tuple[Any, bool]:
     """Open a ZIP-member table named ``*.xls`` as its real format.
 
@@ -1371,27 +1423,27 @@ async def get_table(
         # Pre-Oct-2016 bulletin: no individual XLSX URL, read one member
         # out of the bulk ZIP instead (see _fetch_legacy_zip_tables).
         zip_raw = await _download_zip_cached(table["url"])
-        try:
-            raw = zipfile.ZipFile(io.BytesIO(zip_raw)).read(table["zip_member"])
-        except KeyError as exc:
-            raise ValueError(
-                f"El miembro '{table['zip_member']}' ya no está en el ZIP del boletín IEM"
-            ) from exc
-        legacy_book, is_xlsx = _open_legacy_zip_member(raw)
-        try:
-            worksheet = (
-                legacy_book.active
-                if is_xlsx
-                else _XlsSheetAdapter(legacy_book.sheet_by_index(0), legacy_book)
-            )
-            structured = _extract_wide_series(worksheet, desde, hasta, max_rows)
-            if structured is None:
-                structured = _extract_long_table(worksheet, desde, hasta, max_rows)
-            if structured is None:
-                structured = _extract_matrix_series(worksheet, desde, hasta, max_rows)
-        finally:
-            if is_xlsx:
-                legacy_book.close()
+        raw = _read_zip_member_capped(zip_raw, table["zip_member"])
+
+        def _parse_legacy() -> dict[str, Any] | None:
+            legacy_book, is_xlsx = _open_legacy_zip_member(raw)
+            try:
+                worksheet = (
+                    legacy_book.active
+                    if is_xlsx
+                    else _XlsSheetAdapter(legacy_book.sheet_by_index(0), legacy_book)
+                )
+                found = _extract_wide_series(worksheet, desde, hasta, max_rows)
+                if found is None:
+                    found = _extract_long_table(worksheet, desde, hasta, max_rows)
+                if found is None:
+                    found = _extract_matrix_series(worksheet, desde, hasta, max_rows)
+                return found
+            finally:
+                if is_xlsx:
+                    legacy_book.close()
+
+        structured = await asyncio.to_thread(_parse_legacy)
     elif table.get("formato_origen") == "html_frameset":
         # Pre-Aug-2006 bulletin: the table is a raw HTML <TABLE> on its own
         # section page, not a downloadable file (see
@@ -1407,15 +1459,21 @@ async def get_table(
             raise ValueError("La tabla IEM supera el límite seguro de descarga")
         if not raw.startswith(b"PK"):
             raise ValueError("La URL de la tabla IEM no devolvió un archivo XLSX válido")
-        workbook = load_workbook(io.BytesIO(raw), read_only=True, data_only=True)
-        try:
-            structured = _extract_wide_series(workbook.active, desde, hasta, max_rows)
-            if structured is None:
-                structured = _extract_long_table(workbook.active, desde, hasta, max_rows)
-            if structured is None:
-                structured = _extract_matrix_series(workbook.active, desde, hasta, max_rows)
-        finally:
-            workbook.close()
+        _check_xlsx_container_size(raw)
+
+        def _parse_xlsx() -> dict[str, Any] | None:
+            workbook = load_workbook(io.BytesIO(raw), read_only=True, data_only=True)
+            try:
+                found = _extract_wide_series(workbook.active, desde, hasta, max_rows)
+                if found is None:
+                    found = _extract_long_table(workbook.active, desde, hasta, max_rows)
+                if found is None:
+                    found = _extract_matrix_series(workbook.active, desde, hasta, max_rows)
+                return found
+            finally:
+                workbook.close()
+
+        structured = await asyncio.to_thread(_parse_xlsx)
 
     result = {
         "source": _SOURCE_NAME,
