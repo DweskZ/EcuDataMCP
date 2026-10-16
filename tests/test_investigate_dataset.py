@@ -1,7 +1,7 @@
 from mcp.server.mcpserver import MCPServer
 
-import tools.investigate_dataset as investigate_dataset_module
 from helpers import ckan_client
+from helpers.preview_dispatch import PREVIEW_DISPATCH
 from tools.investigate_dataset import register_investigate_dataset_tool
 
 
@@ -57,9 +57,7 @@ async def test_investigate_dataset_previews_first_csv_resource(monkeypatch):
 
     monkeypatch.setattr(ckan_client, "search_datasets", fake_search_datasets)
     monkeypatch.setattr(ckan_client, "get_dataset", fake_get_dataset)
-    monkeypatch.setitem(
-        investigate_dataset_module._PREVIEW_DISPATCH, "CSV", fake_preview_csv
-    )
+    monkeypatch.setitem(PREVIEW_DISPATCH, "CSV", fake_preview_csv)
 
     fn = _make_tool()
     result = await fn(query="cacao", format="json")

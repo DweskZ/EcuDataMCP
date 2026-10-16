@@ -6,20 +6,14 @@ from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import ckan_client
-from helpers.csv_reader import (
-    preview_csv,
-    preview_json,
-    preview_targz,
-    preview_xls,
-    preview_xlsb,
-    preview_xlsx,
-    preview_zip,
-    sniff_content_type,
-)
+from helpers.csv_reader import sniff_content_type
 from helpers.format_out import render_structured
+from helpers.geo_proxy import proxy_for
 from helpers.logging import log_tool
+from helpers.preview_dispatch import preview_by_kind
 from helpers.text_utils import strip_accents
 from helpers.tool_meta import READ_ONLY
+from helpers.user_agent import USER_AGENT
 from tools.list_dataset_resources import detect_periodic_series, period_sort_key
 from tools.preview_resource_data import (
     classify_from_content_type,
@@ -139,7 +133,7 @@ def _period_keys(headers: list[str], rows: list[list[str]]) -> tuple[set[str], l
     return keys, [headers[i] for i in idxs]
 
 
-async def _fetch_table(res: dict, session: httpx.AsyncClient) -> dict:
+async def _fetch_table(res: dict) -> dict:
     """Download and parse a resource the same way preview_resource_data does.
 
     Raises ValueError with a message safe to surface to the caller when the
@@ -153,7 +147,7 @@ async def _fetch_table(res: dict, session: httpx.AsyncClient) -> dict:
     fmt = (res.get("format") or "").upper()
     kind = classify_resource_format(fmt, url)
     if kind == "UNKNOWN":
-        content_type = await sniff_content_type(url, session=session)
+        content_type = await sniff_content_type(url)
         kind = classify_from_content_type(content_type)
 
     if kind == "RAR":
@@ -161,23 +155,7 @@ async def _fetch_table(res: dict, session: httpx.AsyncClient) -> dict:
     if kind == "UNKNOWN":
         raise ValueError(f"formato no soportado ('{fmt or 'desconocido'}')")
 
-    dispatch = {
-        "TARGZ": preview_targz,
-        "ZIP": preview_zip,
-        "XLS": preview_xls,
-        "XLSB": preview_xlsb,
-        "XLSX": preview_xlsx,
-        "JSON": preview_json,
-        "CSV": preview_csv,
-    }
-    if kind not in dispatch:
-        # classify_resource_format/classify_from_content_type recognize a
-        # few kinds (ODS today) that this function has never dispatched --
-        # a real, pre-existing gap, not something introduced here. Fail
-        # with the same clean message as an actually-unknown format rather
-        # than a raw KeyError.
-        raise ValueError(f"formato '{kind}' reconocido pero no soportado aquí")
-    return await dispatch[kind](url, max_rows=_ANALYZE_MAX_ROWS, session=session)
+    return await preview_by_kind(kind, url, _ANALYZE_MAX_ROWS)
 
 
 def _pick_pair(resources: list[dict]) -> tuple[dict, dict] | None:
@@ -251,7 +229,13 @@ def register_detect_series_pattern_tool(mcp: MCPServer) -> None:
                 "ninguno de los dos (para autodetectar el par)."
             )
 
-        session = httpx.AsyncClient()
+        # The shared session only serves CKAN metadata calls; resource files
+        # live on other hosts, so sniffing and previews build their own
+        # per-URL clients (User-Agent + geo proxy for that host).
+        session = httpx.AsyncClient(
+            headers={"User-Agent": USER_AGENT},
+            proxy=proxy_for(ckan_client.site_url(source)),
+        )
         try:
             if resource_id_new and resource_id_old:
                 try:
@@ -288,11 +272,11 @@ def register_detect_series_pattern_tool(mcp: MCPServer) -> None:
                 res_new, res_old = pair
 
             try:
-                table_new = await _fetch_table(res_new, session)
+                table_new = await _fetch_table(res_new)
             except (ValueError, httpx.HTTPError) as e:
                 raise ToolError(f"Error: recurso más reciente recurso_nuevo_no_legible: {e}") from e
             try:
-                table_old = await _fetch_table(res_old, session)
+                table_old = await _fetch_table(res_old)
             except (ValueError, httpx.HTTPError) as e:
                 raise ToolError(f"Error: recurso más antiguo recurso_viejo_no_legible: {e}") from e
         finally:
