@@ -174,7 +174,7 @@ async def test_classifies_acumulado_when_newer_file_covers_older_periods(monkeyp
     async def fake_get_resource(resource_id, source="nacional", session=None):
         return res_new if resource_id == "pagos_junio.csv" else res_old
 
-    async def fake_fetch_table(res, session):
+    async def fake_fetch_table(res):
         if res is res_new:
             return {
                 "headers": ["Mes", "Monto"],
@@ -212,7 +212,7 @@ async def test_classifies_incremental_when_periods_dont_overlap(monkeypatch):
     async def fake_get_resource(resource_id, source="nacional", session=None):
         return res_new if resource_id == "semana_26.csv" else res_old
 
-    async def fake_fetch_table(res, session):
+    async def fake_fetch_table(res):
         if res is res_new:
             return {
                 "headers": ["Semana", "Precio"],
@@ -248,7 +248,7 @@ async def test_classifies_indeterminado_without_period_column(monkeypatch):
     async def fake_get_resource(resource_id, source="nacional", session=None):
         return res_new if resource_id == "a.csv" else res_old
 
-    async def fake_fetch_table(res, session):
+    async def fake_fetch_table(res):
         return {
             "headers": ["Provincia", "Monto"],
             "rows": [["Pichincha", "100"]],
@@ -280,7 +280,7 @@ async def test_flags_schema_mismatch_instead_of_misreading_as_incremental(monkey
     async def fake_get_resource(resource_id, source="nacional", session=None):
         return res_new if resource_id == "pagos_junio.csv" else res_old
 
-    async def fake_fetch_table(res, session):
+    async def fake_fetch_table(res):
         if res is res_new:
             return {
                 "headers": ["Mes", "Monto pagado", "Numero de Beneficiarios"],
@@ -351,7 +351,7 @@ async def test_autodetects_pair_from_dataset_when_no_ids_given(monkeypatch):
     async def fake_get_dataset(dataset_id, source="nacional", session=None):
         return {"resources": resources}
 
-    async def fake_fetch_table(res, session):
+    async def fake_fetch_table(res):
         return {
             "headers": ["Semana", "Precio"],
             "rows": [[res["id"], "1"]],
@@ -385,12 +385,40 @@ async def test_no_series_detected_without_ids(monkeypatch):
 # -- _fetch_table --------------------------------------------------------
 
 
-async def test_fetch_table_recognized_but_undispatched_format_gives_clear_error():
-    # ODS is recognized by classify_resource_format but was never added to
-    # this function's own dispatch table -- a real, pre-existing gap. This
-    # confirms it now fails with a clear message instead of a raw KeyError,
-    # the same guard that keeps a newly-recognized format (e.g. a future
-    # one) from crashing here before its parser is wired in.
+async def test_fetch_table_dispatches_ods(monkeypatch):
+    from helpers import preview_dispatch
+
+    seen = {}
+
+    async def fake_preview_ods(url, max_rows=20, session=None):
+        seen["url"] = url
+        seen["max_rows"] = max_rows
+        return {"headers": ["Mes"], "rows": [["Enero"]], "truncated": False}
+
+    monkeypatch.setitem(preview_dispatch.PREVIEW_DISPATCH, "ODS", fake_preview_ods)
     res = {"url": "https://x/reporte.ods", "format": "ODS"}
-    with pytest.raises(ValueError, match="reconocido pero no soportado"):
-        await _fetch_table(res, session=None)
+    table = await _fetch_table(res)
+    assert table["headers"] == ["Mes"]
+    assert seen["url"] == "https://x/reporte.ods"
+
+
+async def test_fetch_table_rar_gives_clear_error():
+    with pytest.raises(ValueError, match="rar"):
+        await _fetch_table({"url": "https://x/a.rar", "format": "RAR"})
+
+
+async def test_tool_session_carries_user_agent_and_geo_proxy(monkeypatch):
+    from helpers.user_agent import USER_AGENT
+
+    monkeypatch.setenv("ECUADOR_MCP_GEO_PROXY", "http://proxy.test:8080")
+    seen = {}
+
+    async def fake_get_dataset(dataset_id, source="nacional", session=None):
+        seen["ua"] = session.headers["User-Agent"]
+        seen["proxy"] = session._mounts and True
+        return {"resources": []}
+
+    monkeypatch.setattr(ckan_client, "get_dataset", fake_get_dataset)
+    await _make_tool()(dataset_id="d1", format="json")
+    assert seen["ua"] == USER_AGENT
+    assert seen["proxy"]
