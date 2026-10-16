@@ -558,3 +558,61 @@ def test_select_item_aggregation_becomes_suma_field():
     assert sut._field_label(spec["entity"], spec["property"], spec["kind"], None, spec["function"]) == (
         "CUB EST_CUB_AUDIENCIAS.Contador [suma]"
     )
+
+
+def test_literal_value_quotes_and_types():
+    assert sut._literal_value("O'Brien") == "'O''Brien'"
+    assert sut._literal_value("2024") == "'2024'"
+    assert sut._literal_value("2024", "int") == "2024L"
+    assert sut._literal_value("1.5", "decimal") == "1.5D"
+    assert sut._literal_value("TRUE", "bool") == "true"
+    assert sut._literal_value("2024-01-01", "datetime") == "datetime'2024-01-01'"
+    assert sut._literal_value("abc", "int") == "'abc'"
+
+
+def test_spec_from_select_item_reads_named_data_type_when_present():
+    col = {"Expression": {"SourceRef": {"Source": "a"}}, "Property": "Anio"}
+    typed = {"Column": {**col, "DataType": "Int64"}}
+    assert sut._spec_from_select_item(typed, {"a": "E"})["data_type"] == "int"
+    assert "data_type" not in sut._spec_from_select_item({"Column": col}, {"a": "E"})
+
+
+def _where_literal(httpx_mock):
+    sent = json.loads(httpx_mock.get_requests()[-1].content)
+    query = sent["queries"][0]["Query"]["Commands"][0]["SemanticQueryDataShapeCommand"]["Query"]
+    return query["Where"][0]["Condition"]["In"]["Values"][0][0]["Literal"]["Value"]
+
+
+def _setup_empty_query(httpx_mock):
+    httpx_mock.add_response(
+        url=f"{sut._BASE}/public/reports/{_RESOURCE_KEY}/modelsAndExploration",
+        json=_EXPLORATION_RESPONSE,
+    )
+    httpx_mock.add_response(
+        method="POST",
+        url=f"{sut._BASE}/public/reports/querydata?synchronous=true",
+        json={"results": [{"result": {}}]},
+    )
+
+
+@pytest.mark.asyncio
+async def test_untyped_numeric_filter_with_no_rows_adds_hint(httpx_mock):
+    _setup_empty_query(httpx_mock)
+
+    result = await sut.query_indicador("contratos", campos=["Calendario_.Mes"], filtros={"Calendario_.Mes": "2024"})
+
+    assert result["filas"] == []
+    assert "numérica" in result["aviso"]
+    assert _where_literal(httpx_mock) == "'2024'"
+
+
+@pytest.mark.asyncio
+async def test_typed_filter_emits_typed_literal_and_no_hint(httpx_mock):
+    _setup_empty_query(httpx_mock)
+    boot = await sut._get_bootstrap(_RESOURCE_KEY, "contratos")
+    boot["campos"]["Calendario_.Mes"]["data_type"] = "int"
+
+    result = await sut.query_indicador("contratos", campos=["Calendario_.Mes"], filtros={"Calendario_.Mes": "2024"})
+
+    assert "aviso" not in result
+    assert _where_literal(httpx_mock) == "2024L"
