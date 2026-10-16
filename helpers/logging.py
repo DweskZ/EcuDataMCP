@@ -59,6 +59,15 @@ def _elapsed_ms(started: float) -> float:
     return (time.perf_counter() - started) * 1000
 
 
+_SENSITIVE_KEYS = frozenset(
+    {"identificacion", "ruc", "cedula", "query", "q", "token", "supplier", "buyer"}
+)
+
+
+def _redact(params: dict[str, Any]) -> dict[str, Any]:
+    return {k: "***" if k.lower() in _SENSITIVE_KEYS else v for k, v in params.items()}
+
+
 def log_tool(func: Callable[..., Any]) -> Callable[..., Any]:
     """Decorator to log MCP tool invocations and record their usage."""
     TOOL_DOCS[func.__name__] = inspect.cleandoc(func.__doc__ or "")
@@ -66,7 +75,12 @@ def log_tool(func: Callable[..., Any]) -> Callable[..., Any]:
     @wraps(func)
     async def wrapper(*args: Any, **kwargs: Any) -> Any:
         tool_name = func.__name__
-        logger.info("Tool called: %s | params: %s", tool_name, kwargs or args)
+        # Argument values can be RUCs/cédulas (see helpers/usage.py): INFO
+        # carries only the tool and argument names; values are DEBUG-only
+        # and redacted for sensitive keys.
+        logger.info("Tool called: %s | args: %s", tool_name, sorted(kwargs))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("Tool %s params: %s", tool_name, _redact(kwargs))
         started = time.perf_counter()
         try:
             result = await func(*args, **kwargs)
