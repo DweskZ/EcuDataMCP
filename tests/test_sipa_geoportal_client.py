@@ -442,3 +442,23 @@ async def test_empty_catalog_is_not_cached(httpx_mock):
     _mock_all_endpoints(httpx_mock)
     second = await sipa_geoportal_client.search_capas()
     assert second["total_en_catalogo"] == 7
+
+
+@pytest.mark.asyncio
+async def test_partial_catalog_is_returned_but_not_cached(httpx_mock):
+    httpx_mock.add_response(url=_URLS[("registros", "E50k", "wms")], text=_WMS_E50K_XML)
+    httpx_mock.add_response(url=_URLS[("registros", "E50k", "wfs")], text=_WFS_E50K_XML)
+    httpx_mock.add_response(url=_URLS[("tematicas", "Rraster", "wms")], status_code=500)
+    httpx_mock.add_response(
+        url=_URLS[("sigtierras", "catastro_rural", "wms")], text=_WMS_CATASTRO_RURAL_XML
+    )
+    httpx_mock.add_response(
+        url=_URLS[("sigtierras", "catastro_rural", "wfs")], text=_WFS_DISABLED_EXCEPTION_XML
+    )
+
+    first = await sipa_geoportal_client.search_capas()
+    assert first["total_en_catalogo"] == 3 + 2  # Rraster failed
+
+    _mock_all_endpoints(httpx_mock)
+    second = await sipa_geoportal_client.search_capas()
+    assert second["total_en_catalogo"] == 7

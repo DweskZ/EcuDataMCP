@@ -201,6 +201,8 @@ async def _fetch_topics() -> list[dict[str, str]]:
         loaded = 0
         for url, page in zip(_SEED_PAGE_URLS, pages, strict=True):
             if isinstance(page, BaseException):
+                if not isinstance(page, Exception):
+                    raise page  # CancelledError etc. must propagate
                 logger.warning("No se pudo cargar el menú desde %s: %s", url, page)
                 continue
             loaded += 1
@@ -212,7 +214,8 @@ async def _fetch_topics() -> list[dict[str, str]]:
             seen.setdefault(topic["url"], topic["nombre"])
 
         topics = [{"nombre": name, "url": url} for url, name in seen.items()]
-        _topics_cache.set("topics", topics)
+        if loaded == len(_SEED_PAGE_URLS):
+            _topics_cache.set("topics", topics)
         logger.info("Menú de temas de Ecuador en Cifras cargado: %d temas", len(topics))
         return topics
 
