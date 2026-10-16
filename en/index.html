@@ -14,6 +14,8 @@
 <meta property="og:description" content="Open-source MCP server for exploring Ecuador's open government data from your AI assistant.">
 <meta property="og:url" content="https://dweskz.github.io/EcuDataMCP/en/index.html">
 <meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="es_EC">
 <meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
@@ -182,6 +184,7 @@ previous passport, if it is still valid</pre>
 <button type="button" class="chat-nav-btn" data-chat-prev aria-label="Previous example">‹</button>
 <span class="chat-nav-label" data-chat-label>Passport · 1 / 4</span>
 <button type="button" class="chat-nav-btn" data-chat-next aria-label="Next example">›</button>
+<button type="button" class="chat-nav-btn" data-chat-toggle data-label-pause="Pause examples" data-label-play="Play examples" aria-label="Pause examples" aria-pressed="false">&#10074;&#10074;</button>
 </div>
 <script type="application/json" data-chat-examples>
 [
@@ -417,6 +420,7 @@ previous passport, if it is still valid</pre>
 
 </div>
 <button type="button" class="org-carousel-btn" data-org-next aria-label="Next institution">›</button>
+<button type="button" class="org-carousel-btn" data-org-toggle data-label-pause="Pause carousel" data-label-play="Play carousel" aria-label="Pause carousel" aria-pressed="false">&#10074;&#10074;</button>
 </div>
 <a class="btn-cta secondary" href="atlas.html">See the 83 tools in the Reference &rarr;</a>
 </div>
@@ -448,46 +452,43 @@ Verify the server responds before calling it done.</code></pre>
 </div>
 <ul class="nav nav-tabs" id="client-tabs" role="tablist">
 
-<li class="nav-item" role="presentation"><button class="nav-link active" id="claude-desktop-tab" data-tab-target="claude-desktop-pane" type="button" role="tab">Claude Desktop</button></li>
+<li class="nav-item" role="presentation"><button class="nav-link active" id="claude-desktop-tab" data-tab-target="claude-desktop-pane" type="button" role="tab" aria-selected="true" aria-controls="claude-desktop-pane">Claude Desktop</button></li>
 
-<li class="nav-item" role="presentation"><button class="nav-link" id="cursor-tab" data-tab-target="cursor-pane" type="button" role="tab">Cursor</button></li>
+<li class="nav-item" role="presentation"><button class="nav-link" id="cursor-tab" data-tab-target="cursor-pane" type="button" role="tab" aria-selected="false" aria-controls="cursor-pane" tabindex="-1">Cursor</button></li>
 
-<li class="nav-item" role="presentation"><button class="nav-link" id="vscode-tab" data-tab-target="vscode-pane" type="button" role="tab">VS Code</button></li>
+<li class="nav-item" role="presentation"><button class="nav-link" id="vscode-tab" data-tab-target="vscode-pane" type="button" role="tab" aria-selected="false" aria-controls="vscode-pane" tabindex="-1">VS Code</button></li>
 
-<li class="nav-item" role="presentation"><button class="nav-link" id="chatgpt-tab" data-tab-target="chatgpt-pane" type="button" role="tab">ChatGPT</button></li>
+<li class="nav-item" role="presentation"><button class="nav-link" id="chatgpt-tab" data-tab-target="chatgpt-pane" type="button" role="tab" aria-selected="false" aria-controls="chatgpt-pane" tabindex="-1">ChatGPT</button></li>
 
-<li class="nav-item" role="presentation"><button class="nav-link" id="claude-code-tab" data-tab-target="claude-code-pane" type="button" role="tab">Claude Code</button></li>
+<li class="nav-item" role="presentation"><button class="nav-link" id="claude-code-tab" data-tab-target="claude-code-pane" type="button" role="tab" aria-selected="false" aria-controls="claude-code-pane" tabindex="-1">Claude Code</button></li>
 
-<li class="nav-item" role="presentation"><button class="nav-link" id="codex-tab" data-tab-target="codex-pane" type="button" role="tab">Codex</button></li>
+<li class="nav-item" role="presentation"><button class="nav-link" id="codex-tab" data-tab-target="codex-pane" type="button" role="tab" aria-selected="false" aria-controls="codex-pane" tabindex="-1">Codex</button></li>
 
-<li class="nav-item" role="presentation"><button class="nav-link" id="gemini-cli-tab" data-tab-target="gemini-cli-pane" type="button" role="tab">Gemini CLI</button></li>
+<li class="nav-item" role="presentation"><button class="nav-link" id="gemini-cli-tab" data-tab-target="gemini-cli-pane" type="button" role="tab" aria-selected="false" aria-controls="gemini-cli-pane" tabindex="-1">Gemini CLI</button></li>
 
-<li class="nav-item" role="presentation"><button class="nav-link" id="le-chat-tab" data-tab-target="le-chat-pane" type="button" role="tab">Le Chat (Mistral)</button></li>
+<li class="nav-item" role="presentation"><button class="nav-link" id="le-chat-tab" data-tab-target="le-chat-pane" type="button" role="tab" aria-selected="false" aria-controls="le-chat-pane" tabindex="-1">Le Chat (Mistral)</button></li>
 
-<li class="nav-item" role="presentation"><button class="nav-link" id="windsurf-tab" data-tab-target="windsurf-pane" type="button" role="tab">Windsurf</button></li>
+<li class="nav-item" role="presentation"><button class="nav-link" id="windsurf-tab" data-tab-target="windsurf-pane" type="button" role="tab" aria-selected="false" aria-controls="windsurf-pane" tabindex="-1">Windsurf</button></li>
 
-<li class="nav-item" role="presentation"><button class="nav-link" id="huggingchat-tab" data-tab-target="huggingchat-pane" type="button" role="tab">HuggingChat</button></li>
+<li class="nav-item" role="presentation"><button class="nav-link" id="huggingchat-tab" data-tab-target="huggingchat-pane" type="button" role="tab" aria-selected="false" aria-controls="huggingchat-pane" tabindex="-1">HuggingChat</button></li>
 
 </ul>
 <div class="tab-content" id="client-tabs-content">
 
-<div class="tab-pane fade show active" id="claude-desktop-pane" role="tabpanel">
-<p class="client-intro">Add this to your Claude Desktop config file (<code>~/Library/Application Support/Claude/claude_desktop_config.json</code> on macOS, <code>%APPDATA%\Claude\claude_desktop_config.json</code> on Windows):</p>
+<div class="tab-pane fade show active" id="claude-desktop-pane" role="tabpanel" aria-labelledby="claude-desktop-tab">
+<p class="client-intro">The simplest option needs no local server: Claude Desktop runs the PyPI package with <code>uv</code>, so you can use <code>"command": "uvx", "args": ["ecuador-mcp", "--transport", "stdio"]</code> or install the <code>.mcpb</code> file attached to each GitHub release as a Claude Desktop extension. Add this to your Claude Desktop config file (<code>~/Library/Application Support/Claude/claude_desktop_config.json</code> on macOS, <code>%APPDATA%\Claude\claude_desktop_config.json</code> on Windows):</p>
 
 <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
   "mcpServers": {
     "ecuador-datos": {
       "command": "npx",
-      "args": [
-        "mcp-remote",
-        "http://localhost:8000/mcp"
-      ]
+      "args": ["-y", "mcp-remote", "http://localhost:8000/mcp"]
     }
   }
 }</code></pre></div>
 </div>
 
-<div class="tab-pane fade" id="cursor-pane" role="tabpanel">
+<div class="tab-pane fade" id="cursor-pane" role="tabpanel" aria-labelledby="cursor-tab">
 
 <ol class="client-steps"><li>Open Cursor Settings</li><li>Search for "MCP"</li><li>Add a new MCP server:</li></ol>
 <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
@@ -500,7 +501,7 @@ Verify the server responds before calling it done.</code></pre>
 }</code></pre></div>
 </div>
 
-<div class="tab-pane fade" id="vscode-pane" role="tabpanel">
+<div class="tab-pane fade" id="vscode-pane" role="tabpanel" aria-labelledby="vscode-tab">
 <p class="client-intro">Add to your <code>mcp.json</code> file (run <strong>MCP: Open User Configuration</strong> from the command palette):</p>
 
 <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
@@ -513,25 +514,25 @@ Verify the server responds before calling it done.</code></pre>
 }</code></pre></div>
 </div>
 
-<div class="tab-pane fade" id="chatgpt-pane" role="tabpanel">
+<div class="tab-pane fade" id="chatgpt-pane" role="tabpanel" aria-labelledby="chatgpt-tab">
 <p class="client-intro">*Available on paid plans (Plus, Pro, Team, Enterprise).*</p>
 <ol class="client-steps"><li>Go to <code>Settings</code> > <code>Apps and connectors</code></li><li>Open <code>Advanced settings</code> and enable <strong>Developer mode</strong></li><li>In <code>Settings</code> > <code>Connectors</code> > <code>Browse connectors</code>, click <strong>Add a new connector</strong></li><li>Set the URL: <code>http://localhost:8000/mcp</code></li></ol>
 
 </div>
 
-<div class="tab-pane fade" id="claude-code-pane" role="tabpanel">
+<div class="tab-pane fade" id="claude-code-pane" role="tabpanel" aria-labelledby="claude-code-tab">
 
 
 <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>claude mcp add --transport http ecuador-datos http://localhost:8000/mcp</code></pre></div>
 </div>
 
-<div class="tab-pane fade" id="codex-pane" role="tabpanel">
+<div class="tab-pane fade" id="codex-pane" role="tabpanel" aria-labelledby="codex-tab">
 <p class="client-intro">Saves the configuration to <code>~/.codex/config.toml</code> (an <code>[mcp_servers.ecuador-datos]</code> block with <code>url</code>). To use the server over stdio instead of HTTP: <code>codex mcp add ecuador-datos -- uvx ecuador-mcp --transport stdio</code>.</p>
 
 <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>codex mcp add ecuador-datos --url http://localhost:8000/mcp</code></pre></div>
 </div>
 
-<div class="tab-pane fade" id="gemini-cli-pane" role="tabpanel">
+<div class="tab-pane fade" id="gemini-cli-pane" role="tabpanel" aria-labelledby="gemini-cli-tab">
 <p class="client-intro">Add to <code>~/.gemini/settings.json</code>:</p>
 
 <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
@@ -543,13 +544,13 @@ Verify the server responds before calling it done.</code></pre>
 }</code></pre></div>
 </div>
 
-<div class="tab-pane fade" id="le-chat-pane" role="tabpanel">
+<div class="tab-pane fade" id="le-chat-pane" role="tabpanel" aria-labelledby="le-chat-tab">
 
 <ol class="client-steps"><li>Go to <code>Intelligence</code> > <code>Connectors</code></li><li><code>Add connector</code> > <code>Custom MCP Connector</code></li><li>Name: "Ecuador Datos" / URL: <code>http://localhost:8000/mcp</code></li></ol>
 
 </div>
 
-<div class="tab-pane fade" id="windsurf-pane" role="tabpanel">
+<div class="tab-pane fade" id="windsurf-pane" role="tabpanel" aria-labelledby="windsurf-tab">
 <p class="client-intro">Add to <code>~/.codeium/windsurf/mcp_config.json</code>:</p>
 
 <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><code>{
@@ -562,7 +563,7 @@ Verify the server responds before calling it done.</code></pre>
 }</code></pre></div>
 </div>
 
-<div class="tab-pane fade" id="huggingchat-pane" role="tabpanel">
+<div class="tab-pane fade" id="huggingchat-pane" role="tabpanel" aria-labelledby="huggingchat-tab">
 
 <ol class="client-steps"><li>In the chat, click the <code>+</code> icon > <code>MCP Servers</code> > <code>Manage MCP Servers</code></li><li><code>Add Server</code> with name "Ecuador Datos" and URL <code>http://localhost:8000/mcp</code></li></ol>
 
