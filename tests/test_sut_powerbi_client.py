@@ -558,3 +558,16 @@ def test_select_item_aggregation_becomes_suma_field():
     assert sut._field_label(spec["entity"], spec["property"], spec["kind"], None, spec["function"]) == (
         "CUB EST_CUB_AUDIENCIAS.Contador [suma]"
     )
+
+
+def test_literal_value_escapes_single_quotes_and_defaults_to_string():
+    assert sut._literal_value({"kind": "column"}, "O'Brien") == "'O''Brien'"
+    assert sut._literal_value({"kind": "column"}, "2024") == "'2024'"
+
+
+def test_literal_value_emits_typed_literals_from_data_type():
+    assert sut._literal_value({"data_type": "int"}, "2024") == "2024L"
+    assert sut._literal_value({"data_type": "decimal"}, "1.5") == "1.5D"
+    assert sut._literal_value({"data_type": "bool"}, "True") == "true"
+    # unparsable value for a numeric column falls back to a safe string
+    assert sut._literal_value({"data_type": "int"}, "abc'") == "'abc" + "''" + "'"

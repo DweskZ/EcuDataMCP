@@ -507,3 +507,19 @@ async def test_list_aip_aerodromos_is_cached_across_calls(httpx_mock):
 
     assert first == second
     assert len(httpx_mock.get_requests()) == 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("fn", ["get_metar", "get_notam", "get_aip_aerodromo"])
+@pytest.mark.parametrize("bad", ["SE QM", "SEQ", "SEQMX", "../x", "SE/M"])
+async def test_designador_invalid_rejected_before_any_request(fn, bad):
+    with pytest.raises(ValueError, match="inválido"):
+        await getattr(aviacion_client, fn)(bad)
+
+
+def test_lock_pool_is_bounded():
+    store: dict = {}
+    for i in range(500):
+        aviacion_client._lock_for(store, f"K{i}")
+    assert len(store) <= aviacion_client._LOCK_POOL_SIZE
+    assert aviacion_client._lock_for(store, "SEQM") is aviacion_client._lock_for(store, "SEQM")

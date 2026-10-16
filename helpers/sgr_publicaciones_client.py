@@ -86,6 +86,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
+import zlib
 from html import unescape
 from typing import Any
 from urllib.parse import urlparse
@@ -115,6 +116,18 @@ _sitrep_event_cache = TtlCache(ttl_seconds=3600.0, max_entries=64)
 _index_lock = asyncio.Lock()
 _biblioteca_lock = asyncio.Lock()
 _event_locks: dict[str, asyncio.Lock] = {}
+_EVENT_LOCK_POOL_SIZE = 32
+
+
+def _event_lock_for(evento_url: str) -> asyncio.Lock:
+    """Fixed-size lock pool keyed by URL hash (bounded memory)."""
+    slot = str(zlib.crc32(evento_url.encode("utf-8")) % _EVENT_LOCK_POOL_SIZE)
+    lock = _event_locks.get(slot)
+    if lock is None:
+        lock = asyncio.Lock()
+        _event_locks[slot] = lock
+    return lock
+
 
 _TAG_RE = re.compile(r"<[^>]+>")
 _WS_RE = re.compile(r"\s+")
@@ -126,7 +139,15 @@ def _clean(text: str) -> str:
 
 
 def _is_gestionderiesgos_url(url: str) -> bool:
-    host = (urlparse(url).hostname or "").lower()
+    try:
+        parsed = urlparse(url)
+        host = (parsed.hostname or "").lower()
+    except ValueError:
+        return False
+    if parsed.scheme not in ("http", "https") or parsed.username or parsed.password:
+        return False
+    if any(c.isspace() or ord(c) < 32 for c in url):
+        return False
     return host == "gestionderiesgos.gob.ec" or host.endswith(".gestionderiesgos.gob.ec")
 
 
@@ -285,7 +306,7 @@ async def get_sitrep_archivos(evento_url: str) -> dict[str, Any]:
     if cached is not None:
         return cached
 
-    lock = _event_locks.setdefault(evento_url, asyncio.Lock())
+    lock = _event_lock_for(evento_url)
     async with lock:
         cached = _sitrep_event_cache.get(evento_url)
         if cached is not None:

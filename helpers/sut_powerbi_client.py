@@ -633,6 +633,28 @@ def _build_select_item(spec: dict[str, Any], alias: str) -> dict[str, Any]:
     }
 
 
+def _literal_value(spec: dict[str, Any], valor: Any) -> str:
+    """Power BI literal text for a filter value.
+
+    Strings are single-quoted with embedded quotes doubled. When the column's
+    discovered `data_type` is numeric/boolean (int/integer/long -> 123L,
+    decimal/double/float -> 1.5D, bool/boolean -> true/false) the value is
+    emitted as a typed literal; if the type is unknown or the value does not
+    parse, the string behavior is kept."""
+    kind = str(spec.get("data_type") or "").lower()
+    text = str(valor).strip()
+    try:
+        if kind in ("int", "integer", "int64", "long"):
+            return f"{int(text)}L"
+        if kind in ("decimal", "double", "float", "number", "numeric"):
+            return f"{float(text)!r}D"
+        if kind in ("bool", "boolean") and text.lower() in ("true", "false"):
+            return text.lower()
+    except ValueError:
+        pass
+    return "'" + str(valor).replace("'", "''") + "'"
+
+
 def _decode_dsr(data: dict[str, Any]) -> list[dict[str, Any]]:
     """Decode a querydata response's data['dsr'] into full rows, keyed by
     the query_name each Select item was sent with (see module docstring
@@ -761,7 +783,7 @@ async def query_indicador(
                         "Expressions": [
                             {"Column": {"Expression": {"SourceRef": {"Source": alias}}, "Property": fspec["property"]}}
                         ],
-                        "Values": [[{"Literal": {"Value": f"'{valor}'"}}]],
+                        "Values": [[{"Literal": {"Value": _literal_value(fspec, valor)}}]],
                     }
                 }
             }
