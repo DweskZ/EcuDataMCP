@@ -12,6 +12,7 @@ from collections.abc import Awaitable, Callable
 ASGIApp = Callable[[dict, Callable, Callable], Awaitable[None]]
 _MCP_PATHS = {"/mcp", "/mcp/"}
 _QUEUE_TIMEOUT_SECONDS = 0.05
+_RATE_PRUNE_THRESHOLD = 1024
 
 
 def _header(scope: dict, name: bytes) -> str | None:
@@ -78,7 +79,9 @@ def with_http_security(
         if auth_token:
             authorization = _header(scope, b"authorization") or ""
             scheme, _, token = authorization.partition(" ")
-            valid = scheme.lower() == "bearer" and hmac.compare_digest(token, auth_token)
+            valid = scheme.lower() == "bearer" and hmac.compare_digest(
+                token.encode("utf-8"), auth_token.encode("utf-8")
+            )
             if not valid:
                 await _json_response(
                     send,
@@ -90,8 +93,16 @@ def with_http_security(
 
         if rate_limit_requests:
             now = time.monotonic()
+            # The limiter keys on scope["client"]; X-Forwarded-For is not trusted.
             client_key = _client_key(scope)
             async with rate_lock:
+                if len(rate_hits) > _RATE_PRUNE_THRESHOLD:
+                    for key in [
+                        key
+                        for key, stamps in rate_hits.items()
+                        if not stamps or now - stamps[-1] >= rate_limit_window_seconds
+                    ]:
+                        del rate_hits[key]
                 hits = [
                     hit
                     for hit in rate_hits.get(client_key, [])
