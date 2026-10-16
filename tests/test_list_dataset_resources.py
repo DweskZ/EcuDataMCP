@@ -1,4 +1,4 @@
-from tools.list_dataset_resources import detect_periodic_series
+from tools.list_dataset_resources import detect_periodic_series, period_sort_key
 
 
 def test_detect_periodic_series_finds_matching_group():
@@ -76,3 +76,22 @@ def test_detect_periodic_series_does_not_match_month_substrings():
         "indice_generosidad_2022.csv",
         "indice_generosidad_2023.csv",
     ]
+
+
+def test_period_sort_key_orders_day_first_dates_chronologically():
+    names = ["ventas_15-01-2026.csv", "ventas_03-02-2026.csv", "ventas_28-12-2025.csv"]
+    assert sorted(names, key=period_sort_key) == [
+        "ventas_28-12-2025.csv",
+        "ventas_15-01-2026.csv",
+        "ventas_03-02-2026.csv",
+    ]
+
+
+def test_period_sort_key_handles_iso_and_compact_dates():
+    assert period_sort_key("x_2026-02-03.csv") == period_sort_key("x_20260203.csv")
+    assert period_sort_key("x_2026-02-03.csv") == period_sort_key("x_03-02-2026.csv")
+    assert period_sort_key("x_20260115.csv") < period_sort_key("x_20260203.csv")
+
+
+def test_period_sort_key_keeps_month_word_fallback():
+    assert period_sort_key("cacao_2023_agosto.csv") < period_sort_key("cacao_2023_septiembre.csv")

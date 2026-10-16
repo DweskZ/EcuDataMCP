@@ -239,12 +239,14 @@ def _parse_wfs_type_names(xml_bytes: bytes) -> dict[str, str]:
 
 async def _fetch_endpoint(
     session: httpx.AsyncClient, semaphore: asyncio.Semaphore, categoria: str, store: str
-) -> list[dict[str, Any]]:
+) -> tuple[list[dict[str, Any]], bool]:
     """Fetch + merge WMS/WFS capabilities for one (categoria, store) pair.
 
     Failures are per-endpoint, not fatal to the whole catalog fetch -- one
     broken store (e.g. a future geosigtierras/accesibilidad-style timeout)
-    shouldn't take down the other 23.
+    shouldn't take down the other 23. Returns ``(entries, completo)``;
+    ``completo`` is False when the endpoint failed or was truncated, so the
+    caller can avoid caching a partial catalog.
     """
     wms_url = f"{_BASE_URL}/{categoria}/{store}/wms?" + urlencode(
         {"service": "WMS", "version": "1.3.0", "request": "GetCapabilities"}
@@ -257,17 +259,17 @@ async def _fetch_endpoint(
             wms_bytes, wms_truncated = await download_bytes(wms_url, session=session)
         if wms_truncated:
             logger.warning("GetCapabilities de WMS truncado para %s/%s, se omite", categoria, store)
-            return []
+            return [], False
         wms_layers = _parse_wms_layers(wms_bytes)
         if not wms_layers:
-            return []
+            return [], True
 
         async with semaphore:
             wfs_bytes, wfs_truncated = await download_bytes(wfs_url, session=session)
         wfs_by_bare = {} if wfs_truncated else _parse_wfs_type_names(wfs_bytes)
     except Exception:
         logger.warning("No se pudo consultar el endpoint %s/%s del geoportal MAG", categoria, store, exc_info=True)
-        return []
+        return [], False
 
     entries = []
     for layer in wms_layers:
@@ -286,7 +288,7 @@ async def _fetch_endpoint(
                 "wfs_typename": wfs_typename,
             }
         )
-    return entries
+    return entries, not wfs_truncated
 
 
 async def _fetch_catalog() -> list[dict[str, Any]]:
@@ -313,12 +315,14 @@ async def _fetch_catalog() -> list[dict[str, Any]]:
             )
 
         catalog = sorted(
-            (entry for endpoint_entries in results for entry in endpoint_entries),
+            (entry for endpoint_entries, _ in results for entry in endpoint_entries),
             key=lambda entry: entry["id"],
         )
-        if catalog:
+        completo = all(ok for _, ok in results)
+        if catalog and completo:
             # Same "don't cache an apparently-broken/empty scrape" rationale
-            # as helpers/inamhi_client.py / helpers/bce_remesas_client.py.
+            # as helpers/inamhi_client.py / helpers/bce_remesas_client.py; a
+            # partial scrape (some endpoint failed) is returned but not cached.
             _catalog_cache.set("catalog", catalog)
         return catalog
 

@@ -1,3 +1,4 @@
+import asyncio
 import codecs
 import csv
 import io
@@ -16,6 +17,7 @@ from helpers.geo_proxy import proxy_for
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.safe_download import UnsafeUrlError, safe_stream
 from helpers.tls import (
+    host_allows_insecure_tls,
     os_trust_context,
     should_retry_insecure,
     should_retry_with_os_trust,
@@ -39,8 +41,12 @@ _WKT_PREFIXES = (
     "GEOMETRYCOLLECTION",
 )
 
-# "7.760,2" (thousands dot, decimal comma) or plain "168,15".
-_EU_DECIMAL_RE = re.compile(r"^-?(?:\d{1,3}(?:\.\d{3})+|\d+),\d+$")
+# "7.760,2" (thousands dot, decimal comma) or plain "168,15". A lone comma
+# followed by exactly 3 digits ("1,500", "23,000") is NOT matched: it is the
+# US thousands format as often as a 3-decimal European value, and guessing
+# wrong is a 1000x error, so such columns are left untouched.
+_EU_DECIMAL_RE = re.compile(r"^-?(?:\d{1,3}(?:\.\d{3})+,\d+|\d+,\d{1,2}|\d+,\d{4,})$")
+_EU_AMBIGUOUS_RE = re.compile(r"^-?\d{1,3},\d{3}$")
 
 
 def _looks_like_wkt(value: str) -> bool:
@@ -99,10 +105,17 @@ def normalize_eu_decimal_columns(
     if not headers or not rows:
         return rows, []
 
+    def all_cells(i: int) -> list[str]:
+        return [row[i] for row in rows if i < len(row) and row[i]]
+
     idxs: list[int] = []
     for i in range(len(headers)):
         sample = [row[i] for row in rows[:5] if i < len(row) and row[i]]
-        if sample and all(_EU_DECIMAL_RE.match(v.strip()) for v in sample):
+        if (
+            sample
+            and all(_EU_DECIMAL_RE.match(v.strip()) for v in sample)
+            and not any(_EU_AMBIGUOUS_RE.match(c.strip()) for c in all_cells(i))
+        ):
             idxs.append(i)
 
     if not idxs:
@@ -119,6 +132,30 @@ def normalize_eu_decimal_columns(
         for row in rows
     ]
     return new_rows, [headers[i] for i in idxs]
+
+
+def _insecure_client(url: str) -> httpx.AsyncClient:
+    """Cliente sin verificación TLS, limitado a hosts de la lista permitida.
+
+    El reintento inseguro se decide sobre la URL original, pero safe_stream()
+    sigue las redirecciones salto a salto; sin este hook un redirect a otro
+    host heredaría verify=False. El hook corre en cada petición y rechaza
+    cualquier host fuera de la lista.
+    """
+
+    async def _only_allowed_hosts(request: httpx.Request) -> None:
+        if not host_allows_insecure_tls(str(request.url)):
+            raise UnsafeUrlError(
+                f"Redirección a '{request.url.host}' rechazada: no se permite "
+                "TLS sin verificar fuera de los hosts permitidos"
+            )
+
+    return httpx.AsyncClient(
+        headers={"User-Agent": USER_AGENT},
+        verify=False,
+        proxy=proxy_for(url),
+        event_hooks={"request": [_only_allowed_hosts]},
+    )
 
 
 def _should_raise(resp: httpx.Response, raise_for_status: bool | frozenset[int]) -> bool:
@@ -225,11 +262,7 @@ async def download_bytes(
                 "retrying without verification",
                 url,
             )
-            async with httpx.AsyncClient(
-                headers={"User-Agent": USER_AGENT},
-                verify=False,
-                proxy=proxy_for(url),
-            ) as insecure_session:
+            async with _insecure_client(url) as insecure_session:
                 return await _download(
                     insecure_session,
                     url,
@@ -431,6 +464,12 @@ async def preview_json(
 ) -> dict[str, Any]:
     """Preview JSON / GeoJSON as a tabular sample when possible."""
     raw, truncated = await download_bytes(url, session=session)
+    if truncated:
+        raise ValueError(
+            "El archivo JSON supera el límite de 5 MB de este preview, así que "
+            "se descargó incompleto y no se puede interpretar. Usa "
+            "download_resource para bajarlo completo, o el enlace directo."
+        )
     text = _decode_text(raw, truncated)
     data = json.loads(text)
 
@@ -519,29 +558,8 @@ async def preview_json(
     }
 
 
-async def preview_xlsx(
-    url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
-) -> dict[str, Any]:
-    """Preview the first sheet of an Excel workbook.
-
-    .xlsx is a ZIP container whose central directory lives at the end of
-    the file, so a download truncated at the default cap can't open at all
-    (not a degraded-but-useful partial read the way a truncated CSV is) --
-    see download_bytes' max_bytes docstring. Worth the larger cap since the
-    alternative is a guaranteed failure, not a safety margin.
-    """
+def _parse_xlsx_bytes(raw: bytes, max_rows: int, truncated: bool) -> dict[str, Any]:
     from openpyxl import load_workbook
-
-    raw, truncated = await download_bytes(
-        url, session=session, max_bytes=_MAX_DECOMPRESSED_BYTES
-    )
-    if truncated:
-        raise ValueError(
-            "El archivo .xlsx supera el límite de 20 MB de este preview, así "
-            "que se descargó incompleto y no se puede abrir (el índice del "
-            "contenedor ZIP interno vive al final del archivo). Usa "
-            "download_resource para bajarlo completo, o el enlace directo."
-        )
 
     _check_zip_container_size(raw, ".xlsx")
     wb = load_workbook(filename=io.BytesIO(raw), read_only=True, data_only=True)
@@ -585,13 +603,9 @@ async def preview_xlsx(
         wb.close()
 
 
-async def preview_xls(
-    url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
-) -> dict[str, Any]:
-    """Preview the first sheet of a legacy Excel (.xls) workbook."""
+def _parse_xls_bytes(raw: bytes, max_rows: int, truncated: bool) -> dict[str, Any]:
     import xlrd
 
-    raw, truncated = await download_bytes(url, session=session)
     wb = xlrd.open_workbook(file_contents=raw)
     ws = wb.sheet_by_index(0)
 
@@ -625,35 +639,10 @@ async def preview_xls(
     }
 
 
-async def preview_xlsb(
-    url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
-) -> dict[str, Any]:
-    """Preview the first sheet of an Excel Binary Workbook (.xlsb)."""
+def _parse_xlsb_bytes(raw: bytes, max_rows: int, truncated: bool) -> dict[str, Any]:
     from pyxlsb import open_workbook
 
-    raw, truncated = await download_bytes(
-        url, session=session, max_bytes=_MAX_DECOMPRESSED_BYTES
-    )
-    if truncated:
-        # .xlsb is a ZIP container (BIFF12 records instead of XLSX's XML),
-        # so it fails the exact same way a truncated .zip does: the central
-        # directory lives at the end of the file, a download cut off before
-        # the end is missing it, and zipfile can't open it at all -- same
-        # reasoning as preview_xlsx/preview_ods, so this uses the same
-        # raised _MAX_DECOMPRESSED_BYTES cap (20 MB) rather than the default
-        # MAX_DOWNLOAD_BYTES (5 MB). Confirmed live against a real 9.3 MB
-        # resource (Registro Civil's "Defunciones Generales", now well
-        # inside the 20 MB cap) that a truncated read fails outright with
-        # "File is not a zip file", not a partial/degraded one -- skip the
-        # doomed parse attempt and say what actually happened, same as
-        # preview_zip.
-        raise ValueError(
-            "El archivo .xlsb supera el límite de 20 MB de este preview, así "
-            "que se descargó incompleto y no se puede abrir (el índice del "
-            "contenedor ZIP interno vive al final del archivo). Usa "
-            "download_resource para bajarlo completo, o el enlace directo."
-        )
-
+    _check_zip_container_size(raw, ".xlsb")
     wb = open_workbook(io.BytesIO(raw))
     try:
         if not wb.sheets:
@@ -702,30 +691,10 @@ async def preview_xlsb(
         wb.close()
 
 
-async def preview_ods(
-    url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
-) -> dict[str, Any]:
-    """Preview the first sheet of an OpenDocument Spreadsheet (.ods).
-
-    .ods is a ZIP container like .xlsx/.xlsb (see download_bytes' max_bytes
-    docstring) -- same higher cap, same reasoning: a truncated download
-    can't open at all, so there's no safety benefit to stopping early at
-    the default cap, only a guaranteed failure.
-    """
+def _parse_ods_bytes(raw: bytes, max_rows: int, truncated: bool) -> dict[str, Any]:
     from odf.opendocument import load
     from odf.table import Table, TableCell, TableRow
     from odf.teletype import extractText
-
-    raw, truncated = await download_bytes(
-        url, session=session, max_bytes=_MAX_DECOMPRESSED_BYTES
-    )
-    if truncated:
-        raise ValueError(
-            "El archivo .ods supera el límite de 20 MB de este preview, así "
-            "que se descargó incompleto y no se puede abrir (el índice del "
-            "contenedor ZIP interno vive al final del archivo). Usa "
-            "download_resource para bajarlo completo, o el enlace directo."
-        )
 
     _check_zip_container_size(raw, ".ods")
     doc = load(io.BytesIO(raw))
@@ -782,6 +751,102 @@ async def preview_ods(
         "format": "ods",
         "sheet": sheet.getAttribute("name"),
     }
+
+
+async def preview_xlsx(
+    url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
+) -> dict[str, Any]:
+    """Preview the first sheet of an Excel workbook.
+
+    .xlsx is a ZIP container whose central directory lives at the end of
+    the file, so a download truncated at the default cap can't open at all
+    (not a degraded-but-useful partial read the way a truncated CSV is) --
+    see download_bytes' max_bytes docstring. Worth the larger cap since the
+    alternative is a guaranteed failure, not a safety margin.
+    """
+    raw, truncated = await download_bytes(
+        url, session=session, max_bytes=_MAX_DECOMPRESSED_BYTES
+    )
+    if truncated:
+        raise ValueError(
+            "El archivo .xlsx supera el límite de 20 MB de este preview, así "
+            "que se descargó incompleto y no se puede abrir (el índice del "
+            "contenedor ZIP interno vive al final del archivo). Usa "
+            "download_resource para bajarlo completo, o el enlace directo."
+        )
+
+    return await asyncio.to_thread(_parse_xlsx_bytes, raw, max_rows, truncated)
+
+
+async def preview_xls(
+    url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
+) -> dict[str, Any]:
+    """Preview the first sheet of a legacy Excel (.xls) workbook."""
+    raw, truncated = await download_bytes(
+        url, session=session, max_bytes=_MAX_DECOMPRESSED_BYTES
+    )
+    if truncated:
+        raise ValueError(
+            "El archivo .xls supera el límite de 20 MB de este preview, así "
+            "que se descargó incompleto y no se puede abrir. Usa "
+            "download_resource para bajarlo completo, o el enlace directo."
+        )
+    return await asyncio.to_thread(_parse_xls_bytes, raw, max_rows, truncated)
+
+
+async def preview_xlsb(
+    url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
+) -> dict[str, Any]:
+    """Preview the first sheet of an Excel Binary Workbook (.xlsb)."""
+    raw, truncated = await download_bytes(
+        url, session=session, max_bytes=_MAX_DECOMPRESSED_BYTES
+    )
+    if truncated:
+        # .xlsb is a ZIP container (BIFF12 records instead of XLSX's XML),
+        # so it fails the exact same way a truncated .zip does: the central
+        # directory lives at the end of the file, a download cut off before
+        # the end is missing it, and zipfile can't open it at all -- same
+        # reasoning as preview_xlsx/preview_ods, so this uses the same
+        # raised _MAX_DECOMPRESSED_BYTES cap (20 MB) rather than the default
+        # MAX_DOWNLOAD_BYTES (5 MB). Confirmed live against a real 9.3 MB
+        # resource (Registro Civil's "Defunciones Generales", now well
+        # inside the 20 MB cap) that a truncated read fails outright with
+        # "File is not a zip file", not a partial/degraded one -- skip the
+        # doomed parse attempt and say what actually happened, same as
+        # preview_zip.
+        raise ValueError(
+            "El archivo .xlsb supera el límite de 20 MB de este preview, así "
+            "que se descargó incompleto y no se puede abrir (el índice del "
+            "contenedor ZIP interno vive al final del archivo). Usa "
+            "download_resource para bajarlo completo, o el enlace directo."
+        )
+
+    return await asyncio.to_thread(_parse_xlsb_bytes, raw, max_rows, truncated)
+
+
+async def preview_ods(
+    url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
+) -> dict[str, Any]:
+    """Preview the first sheet of an OpenDocument Spreadsheet (.ods).
+
+    .ods is a ZIP container like .xlsx/.xlsb (see download_bytes' max_bytes
+    docstring) -- same higher cap, same reasoning: a truncated download
+    can't open at all, so there's no safety benefit to stopping early at
+    the default cap, only a guaranteed failure.
+    """
+
+    raw, truncated = await download_bytes(
+        url, session=session, max_bytes=_MAX_DECOMPRESSED_BYTES
+    )
+    if truncated:
+        raise ValueError(
+            "El archivo .ods supera el límite de 20 MB de este preview, así "
+            "que se descargó incompleto y no se puede abrir (el índice del "
+            "contenedor ZIP interno vive al final del archivo). Usa "
+            "download_resource para bajarlo completo, o el enlace directo."
+        )
+
+    return await asyncio.to_thread(_parse_ods_bytes, raw, max_rows, truncated)
 
 
 def _gunzip_capped(raw: bytes, cap: int = _MAX_DECOMPRESSED_BYTES) -> tuple[bytes, bool]:
@@ -1009,7 +1074,9 @@ async def _fetch_range(
 
     own = session is None
     if own:
-        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
+        session = httpx.AsyncClient(
+            headers={"User-Agent": USER_AGENT}, proxy=proxy_for(url)
+        )
     assert session is not None
     try:
         try:
@@ -1023,7 +1090,9 @@ async def _fetch_range(
                     url,
                 )
                 async with httpx.AsyncClient(
-                    headers={"User-Agent": USER_AGENT}, verify=os_trust_context()
+                    headers={"User-Agent": USER_AGENT},
+                    verify=os_trust_context(),
+                    proxy=proxy_for(url),
                 ) as os_trust_session:
                     return await _do(os_trust_session)
             if not should_retry_insecure(exc, url):
@@ -1033,9 +1102,7 @@ async def _fetch_range(
                 "retrying without verification",
                 url,
             )
-            async with httpx.AsyncClient(
-                headers={"User-Agent": USER_AGENT}, verify=False
-            ) as insecure_session:
+            async with _insecure_client(url) as insecure_session:
                 return await _do(insecure_session)
     finally:
         if own:

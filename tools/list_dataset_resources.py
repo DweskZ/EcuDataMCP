@@ -36,6 +36,34 @@ def _name_template(name: str) -> str:
     return _MONTH_RE.sub("#", normalized)
 
 
+_SEP = r"[-/._]"
+_YMD_RE = re.compile(
+    rf"(?<!\d)((?:19|20)\d{{2}}){_SEP}(0?[1-9]|1[0-2]){_SEP}(0?[1-9]|[12]\d|3[01])(?!\d)"
+)
+_DMY_RE = re.compile(
+    rf"(?<!\d)(0?[1-9]|[12]\d|3[01]){_SEP}(0?[1-9]|1[0-2]){_SEP}((?:19|20)\d{{2}})(?!\d)"
+)
+_COMPACT_RE = re.compile(
+    r"(?<!\d)((?:19|20)\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])(?!\d)"
+)
+
+
+def _explicit_date(lowered: str) -> tuple[int, int, int] | None:
+    """(year, month, day) from a yyyy-mm-dd, dd-mm-yyyy or yyyymmdd date.
+
+    Day-first names ("15-01-2026" vs "03-02-2026") otherwise tie-break on
+    the raw digit tuple after the year, which puts the 15th of January
+    ahead of the 3rd of February.
+    """
+    if m := _YMD_RE.search(lowered):
+        return int(m[1]), int(m[2]), int(m[3])
+    if m := _DMY_RE.search(lowered):
+        return int(m[3]), int(m[2]), int(m[1])
+    if m := _COMPACT_RE.search(lowered):
+        return int(m[1]), int(m[2]), int(m[3])
+    return None
+
+
 def period_sort_key(name: str) -> tuple[int, int, tuple[int, ...]]:
     """Best-effort chronological key for a periodic resource name.
 
@@ -50,6 +78,10 @@ def period_sort_key(name: str) -> tuple[int, int, tuple[int, ...]]:
     case a caller should fall back to a timestamp-based tiebreaker.
     """
     lowered = name.strip().lower()
+    date = _explicit_date(lowered)
+    if date is not None:
+        year, month, day = date
+        return (year, month, (year, month, day))
     digits = tuple(int(d) for d in _DIGIT_RE.findall(lowered))
     month_match = _MONTH_RE.search(lowered)
     month_num = _MONTH_NUMBERS[month_match.group()] if month_match else 0

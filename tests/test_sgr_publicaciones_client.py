@@ -274,3 +274,26 @@ async def test_empty_biblioteca_scrape_is_not_cached(httpx_mock):
 
     second = await client.list_biblioteca_categorias()
     assert second["total"] == 2
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "bad",
+    [
+        "javascript:alert(1)",
+        "https://evil.com/?https://gestionderiesgos.gob.ec/",
+        "https://user@gestionderiesgos.gob.ec/x/",
+        "ftp://gestionderiesgos.gob.ec/x/",
+        "algo cualquiera",
+    ],
+)
+async def test_get_sitrep_archivos_rejects_arbitrary_input(bad):
+    with pytest.raises(ValueError):
+        await client.get_sitrep_archivos(bad)
+
+
+def test_event_lock_pool_is_bounded():
+    client._event_locks.clear()
+    for i in range(500):
+        client._event_lock_for(f"https://gestionderiesgos.gob.ec/e{i}/")
+    assert len(client._event_locks) <= client._EVENT_LOCK_POOL_SIZE

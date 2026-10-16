@@ -374,6 +374,41 @@ def _lookup(indicador: str, fuente: str) -> dict[str, str]:
     return info
 
 
+_TYPE_NAMES = {
+    "int": "int", "int32": "int", "int64": "int", "integer": "int", "whole": "int", "long": "int",
+    "double": "decimal", "decimal": "decimal", "float": "decimal", "number": "decimal", "currency": "decimal",
+    "boolean": "bool", "bool": "bool", "logical": "bool",
+    "datetime": "datetime", "date": "datetime", "time": "datetime",
+    "text": "string", "string": "string",
+}
+
+
+def _normalize_data_type(raw: Any) -> str | None:
+    """Map a Power BI type name (DataType / ConceptualDataType, when the
+    response spells it out) to int|decimal|bool|datetime|string, else None.
+    Bare numeric codes are deliberately ignored: their meaning differs
+    between the conceptual schema and the DSR and was never verified."""
+    if isinstance(raw, str):
+        return _TYPE_NAMES.get(raw.strip().lower())
+    return None
+
+
+def _type_from_node(body: dict[str, Any]) -> str | None:
+    for key in ("DataType", "ConceptualDataType", "dataType"):
+        found = _normalize_data_type(body.get(key))
+        if found:
+            return found
+    return None
+
+
+def _looks_numeric(valor: Any) -> bool:
+    try:
+        float(str(valor).strip())
+    except ValueError:
+        return False
+    return True
+
+
 def _field_label(entity: str, prop: str, kind: str, level: str | None = None, func: int | None = None) -> str:
     if kind == "measure":
         return f"{entity}.{prop} [medida]"
@@ -395,7 +430,11 @@ def _spec_from_select_item(item: dict[str, Any], alias_to_entity: dict[str, str]
         if entity is None:
             return None
         prop = c["Property"]
-        return {"entity": entity, "property": prop, "kind": "column", "query_name": f"{entity}.{prop}"}
+        spec = {"entity": entity, "property": prop, "kind": "column", "query_name": f"{entity}.{prop}"}
+        dtype = _type_from_node(c) or _type_from_node(item)
+        if dtype:
+            spec["data_type"] = dtype
+        return spec
     if "Measure" in item:
         m = item["Measure"]
         entity = alias_to_entity.get(m["Expression"]["SourceRef"]["Source"])
@@ -492,10 +531,11 @@ def _walk_entity_fields(node: Any, found: dict[str, dict[str, Any]]) -> None:
                     prop = body["Property"]
                     spec_kind = "measure" if kind == "Measure" else "column"
                     label = _field_label(entity, prop, spec_kind)
-                    found.setdefault(
-                        label,
-                        {"entity": entity, "property": prop, "kind": spec_kind, "query_name": f"{entity}.{prop}"},
-                    )
+                    spec = {"entity": entity, "property": prop, "kind": spec_kind, "query_name": f"{entity}.{prop}"}
+                    dtype = _type_from_node(body)
+                    if dtype and spec_kind == "column":
+                        spec["data_type"] = dtype
+                    found.setdefault(label, spec)
         agg = node.get("Aggregation")
         if isinstance(agg, dict):
             column = (agg.get("Expression") or {}).get("Column") or {}
@@ -633,6 +673,28 @@ def _build_select_item(spec: dict[str, Any], alias: str) -> dict[str, Any]:
     }
 
 
+def _literal_value(spec: dict[str, Any], valor: Any) -> str:
+    """Power BI literal text for a filter value.
+
+    Strings are single-quoted with embedded quotes doubled. When the column's
+    discovered `data_type` is numeric/boolean (int/integer/long -> 123L,
+    decimal/double/float -> 1.5D, bool/boolean -> true/false) the value is
+    emitted as a typed literal; if the type is unknown or the value does not
+    parse, the string behavior is kept."""
+    kind = str(spec.get("data_type") or "").lower()
+    text = str(valor).strip()
+    try:
+        if kind in ("int", "integer", "int64", "long"):
+            return f"{int(text)}L"
+        if kind in ("decimal", "double", "float", "number", "numeric"):
+            return f"{float(text)!r}D"
+        if kind in ("bool", "boolean") and text.lower() in ("true", "false"):
+            return text.lower()
+    except ValueError:
+        pass
+    return "'" + str(valor).replace("'", "''") + "'"
+
+
 def _decode_dsr(data: dict[str, Any]) -> list[dict[str, Any]]:
     """Decode a querydata response's data['dsr'] into full rows, keyed by
     the query_name each Select item was sent with (see module docstring
@@ -749,10 +811,13 @@ async def query_indicador(
     select_items = [_build_select_item(spec, alias_for(spec["entity"])) for spec in select_specs]
 
     where: list[dict[str, Any]] = []
+    untyped_numeric: list[str] = []
     for label, valor in (filtros or {}).items():
         fspec = resolve(label)
         if fspec["kind"] != "column":
             raise ValueError(f"El filtro '{label}' debe ser una columna, no una medida/jerarquía.")
+        if not fspec.get("data_type") and _looks_numeric(valor):
+            untyped_numeric.append(label)
         alias = alias_for(fspec["entity"])
         where.append(
             {
@@ -761,7 +826,7 @@ async def query_indicador(
                         "Expressions": [
                             {"Column": {"Expression": {"SourceRef": {"Source": alias}}, "Property": fspec["property"]}}
                         ],
-                        "Values": [[{"Literal": {"Value": f"'{valor}'"}}]],
+                        "Values": [[{"Literal": {"Value": _literal_value(fspec, valor)}}]],
                     }
                 }
             }
@@ -818,4 +883,18 @@ async def query_indicador(
     else:
         filas = _decode_dsr(result["data"])
 
-    return {"indicador": indicador, "fuente": fuente, "nombre": info["nombre"], "campos": campos, "filas": filas}
+    out: dict[str, Any] = {
+        "indicador": indicador,
+        "fuente": fuente,
+        "nombre": info["nombre"],
+        "campos": campos,
+        "filas": filas,
+    }
+    if not filas and untyped_numeric:
+        out["aviso"] = (
+            "Sin filas: el filtro numérico sobre "
+            + ", ".join(f"'{c}'" for c in untyped_numeric)
+            + " se envió como texto porque no se pudo determinar el tipo de la columna; "
+            "si la columna es numérica (p. ej. un año) no coincidirá con ningún valor."
+        )
+    return out

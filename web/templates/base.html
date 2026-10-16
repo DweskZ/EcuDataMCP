@@ -12,6 +12,8 @@
 <meta property="og:description" content="{{ page_description }}">
 <meta property="og:url" content="{{ canonical_url }}">
 <meta property="og:type" content="website">
+<meta property="og:locale" content="{{ 'es_EC' if lang == 'es' else 'en_US' }}">
+<meta property="og:locale:alternate" content="{{ 'en_US' if lang == 'es' else 'es_EC' }}">
 <meta property="og:image" content="{{ og_image }}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="{{ og_image }}">

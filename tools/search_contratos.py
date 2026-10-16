@@ -1,10 +1,10 @@
-from datetime import UTC, datetime
 from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import sercop_client
+from helpers.ecuador_time import today_ecuador
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.sercop_client import SercopRateLimitError
@@ -54,7 +54,7 @@ def register_search_contratos_tool(mcp: MCPServer) -> None:
 
         page = max(page, 1)
         pinned_year = year > 0
-        year_arg = year if pinned_year else datetime.now(UTC).year
+        year_arg = year if pinned_year else today_ecuador().year
         fallback = 0 if pinned_year else 2
 
         try:

@@ -1004,6 +1004,16 @@ html[data-theme="light"] .closing-cta p {
   cursor: pointer;
 }
 
+[data-org-toggle],
+[data-chat-toggle] {
+  font-size: 0.7rem;
+}
+
+[data-org-toggle][hidden],
+[data-chat-toggle][hidden] {
+  display: none;
+}
+
 .org-carousel-btn:hover {
   border-color: var(--ecu-accent-text);
   color: var(--ecu-accent-text);

@@ -1,13 +1,35 @@
 function copyCode(btn) {
   const code = btn.parentElement.querySelector("code").textContent;
 
-  navigator.clipboard.writeText(code).then(() => {
+  function done() {
     const original = btn.textContent;
     btn.textContent = window.COPY_LABEL_COPIED || "Copied!";
     setTimeout(() => {
       btn.textContent = original;
     }, 1500);
-  });
+  }
+
+  function fallback() {
+    const ta = document.createElement("textarea");
+    ta.value = code;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try {
+      ok = document.execCommand("copy");
+    } catch (e) {}
+    document.body.removeChild(ta);
+    if (ok) done();
+  }
+
+  if (!navigator.clipboard || !navigator.clipboard.writeText) {
+    fallback();
+    return;
+  }
+  navigator.clipboard.writeText(code).then(done, fallback);
 }
 
 // ---- theme toggle (light / dark) ----------------------------------------
@@ -70,22 +92,41 @@ function copyCode(btn) {
   var tabButtons = Array.from(document.querySelectorAll("[data-tab-target]"));
   if (tabButtons.length === 0) return;
 
+  function activate(btn, focus) {
+    var tabList = btn.closest(".nav-tabs");
+    var tabContent = tabList.parentElement.querySelector(".tab-content");
+
+    tabList.querySelectorAll(".nav-link").forEach(function (l) {
+      l.classList.remove("active");
+      l.setAttribute("aria-selected", "false");
+      l.setAttribute("tabindex", "-1");
+    });
+    btn.classList.add("active");
+    btn.setAttribute("aria-selected", "true");
+    btn.removeAttribute("tabindex");
+    if (focus) btn.focus();
+
+    tabContent.querySelectorAll(".tab-pane").forEach(function (pane) {
+      pane.classList.remove("show", "active");
+    });
+    var targetPane = document.getElementById(btn.getAttribute("data-tab-target"));
+    if (targetPane) targetPane.classList.add("show", "active");
+  }
+
   tabButtons.forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var targetId = btn.getAttribute("data-tab-target");
-      var tabList = btn.closest(".nav-tabs");
-      var tabContent = tabList.parentElement.querySelector(".tab-content");
-
-      tabList.querySelectorAll(".nav-link").forEach(function (l) {
-        l.classList.remove("active");
-      });
-      btn.classList.add("active");
-
-      tabContent.querySelectorAll(".tab-pane").forEach(function (pane) {
-        pane.classList.remove("show", "active");
-      });
-      var targetPane = document.getElementById(targetId);
-      if (targetPane) targetPane.classList.add("show", "active");
+    btn.addEventListener("click", function () { activate(btn, false); });
+    btn.addEventListener("keydown", function (e) {
+      var siblings = Array.from(btn.closest(".nav-tabs").querySelectorAll("[data-tab-target]"));
+      var i = siblings.indexOf(btn);
+      var n = siblings.length;
+      var to;
+      if (e.key === "ArrowRight") to = (i + 1) % n;
+      else if (e.key === "ArrowLeft") to = (i - 1 + n) % n;
+      else if (e.key === "Home") to = 0;
+      else if (e.key === "End") to = n - 1;
+      else return;
+      e.preventDefault();
+      activate(siblings[to], true);
     });
   });
 })();
@@ -105,7 +146,10 @@ function copyCode(btn) {
   function ensureIndex() {
     if (indexPromise) return indexPromise;
     indexPromise = fetch(window.SITE_SEARCH_INDEX_URL)
-      .then(function (r) { return r.json(); })
+      .then(function (r) {
+        if (!r.ok) throw new Error("search index " + r.status);
+        return r.json();
+      })
       .then(function (data) {
         fuse = new Fuse(data, {
           keys: [
@@ -115,6 +159,10 @@ function copyCode(btn) {
           threshold: 0.35,
           ignoreLocation: true,
         });
+      })
+      .catch(function (err) {
+        indexPromise = null;
+        throw err;
       });
     return indexPromise;
   }
@@ -147,9 +195,13 @@ function copyCode(btn) {
   function open() {
     panel.hidden = false;
     toggle.setAttribute("aria-expanded", "true");
-    ensureIndex().then(function () {
-      input.focus();
-    });
+    ensureIndex().then(
+      function () { input.focus(); },
+      function () {
+        input.focus();
+        results.innerHTML = '<p class="site-search-empty">' + (window.SITE_SEARCH_EMPTY_LABEL || "No results.") + "</p>";
+      }
+    );
   }
 
   function close() {
@@ -211,6 +263,8 @@ function copyCode(btn) {
   var remaining = DWELL;
   var swapping = false;
   var pending = 0;
+  var held = false;
+  var toggleBtn = root.querySelector("[data-chat-toggle]");
 
   var progress = document.createElement("div");
   progress.className = "chat-progress";
@@ -282,7 +336,7 @@ function copyCode(btn) {
     if (reduce) return;
     restartBar();
     root.classList.add("is-playing");
-    if (paused || document.hidden) {
+    if (paused || held || document.hidden) {
       root.classList.add("is-paused");
       return;
     }
@@ -300,7 +354,7 @@ function copyCode(btn) {
   }
 
   function resume() {
-    if (!paused) return;
+    if (!paused || held) return;
     paused = false;
     if (reduce || document.hidden) return;
     root.classList.remove("is-paused");
@@ -348,6 +402,21 @@ function copyCode(btn) {
 
   prevBtn.addEventListener("click", function () { go(-1); });
   nextBtn.addEventListener("click", function () { go(1); });
+  if (toggleBtn) {
+    if (reduce) {
+      toggleBtn.hidden = true;
+    } else {
+      toggleBtn.addEventListener("click", function () {
+        held = !held;
+        toggleBtn.setAttribute("aria-pressed", held ? "true" : "false");
+        var label = toggleBtn.getAttribute(held ? "data-label-play" : "data-label-pause");
+        if (label) toggleBtn.setAttribute("aria-label", label);
+        toggleBtn.innerHTML = held ? "&#9654;" : "&#10074;&#10074;";
+        if (held) pause();
+        else resume();
+      });
+    }
+  }
   root.addEventListener("pointerenter", pause);
   root.addEventListener("pointerleave", resume);
   root.addEventListener("focusin", pause);
@@ -360,7 +429,7 @@ function copyCode(btn) {
       window.clearTimeout(timer);
       if (deadline) remaining = Math.max(400, deadline - Date.now());
       root.classList.add("is-paused");
-    } else if (!paused && !swapping) {
+    } else if (!paused && !held && !swapping) {
       root.classList.remove("is-paused");
       schedule(remaining);
     }
@@ -434,7 +503,11 @@ function copyCode(btn) {
 
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var paused = false;
+  var held = false;
+  var visible = true;
+  var raf = 0;
   var last = 0;
+  var toggleBtn = root.querySelector("[data-org-toggle]");
   var speed = 36;
 
   Array.prototype.forEach.call(viewport.children, function (node) {
@@ -470,28 +543,62 @@ function copyCode(btn) {
     wrap();
   }
 
+  function running() {
+    return !reduce && !paused && !held && visible && !document.hidden;
+  }
+
   function frame(now) {
+    raf = 0;
+    if (!running()) {
+      last = 0;
+      return;
+    }
     if (!last) last = now;
     var dt = Math.min(0.05, (now - last) / 1000);
     last = now;
-    if (!reduce && !paused && !document.hidden) {
-      viewport.scrollLeft += speed * dt;
-      wrap();
+    viewport.scrollLeft += speed * dt;
+    wrap();
+    raf = window.requestAnimationFrame(frame);
+  }
+
+  function kick() {
+    if (!raf && running()) {
+      last = 0;
+      raf = window.requestAnimationFrame(frame);
     }
-    window.requestAnimationFrame(frame);
   }
 
   prev.addEventListener("click", function () { go(-1); });
   next.addEventListener("click", function () { go(1); });
+  if (toggleBtn) {
+    if (reduce) {
+      toggleBtn.hidden = true;
+    } else {
+      toggleBtn.addEventListener("click", function () {
+        held = !held;
+        toggleBtn.setAttribute("aria-pressed", held ? "true" : "false");
+        var label = toggleBtn.getAttribute(held ? "data-label-play" : "data-label-pause");
+        if (label) toggleBtn.setAttribute("aria-label", label);
+        toggleBtn.innerHTML = held ? "&#9654;" : "&#10074;&#10074;";
+        kick();
+      });
+    }
+  }
   root.addEventListener("pointerenter", function () { paused = true; });
-  root.addEventListener("pointerleave", function () { paused = false; last = 0; });
+  root.addEventListener("pointerleave", function () { paused = false; kick(); });
   root.addEventListener("focusin", function () { paused = true; });
   root.addEventListener("focusout", function (event) {
     if (!root.contains(event.relatedTarget)) {
       paused = false;
-      last = 0;
+      kick();
     }
   });
-  document.addEventListener("visibilitychange", function () { last = 0; });
-  if (!reduce) window.requestAnimationFrame(frame);
+  document.addEventListener("visibilitychange", kick);
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (entries) {
+      visible = entries[entries.length - 1].isIntersecting;
+      kick();
+    }).observe(root);
+  }
+  kick();
 })();

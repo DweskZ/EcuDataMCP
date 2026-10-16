@@ -700,3 +700,118 @@ async def test_preview_ods_empty_sheet(httpx_mock, monkeypatch):
 
     assert result["headers"] == []
     assert result["rows"] == []
+
+
+def test_normalize_eu_decimal_leaves_us_thousands_untouched():
+    headers = ["monto"]
+    rows = [["1,500"], ["23,000"]]
+
+    new_rows, converted = normalize_eu_decimal_columns(headers, rows)
+
+    assert converted == []
+    assert new_rows == rows
+
+
+def test_normalize_eu_decimal_skips_column_mixing_ambiguous_value_after_sample():
+    headers = ["monto"]
+    rows = [["168,15"], ["7,5"], ["1,25"], ["3,10"], ["9,99"], ["1,500"]]
+
+    new_rows, converted = normalize_eu_decimal_columns(headers, rows)
+
+    assert converted == []
+    assert new_rows == rows
+
+
+def test_normalize_eu_decimal_still_converts_dot_thousands():
+    new_rows, converted = normalize_eu_decimal_columns(
+        ["v"], [["7.760,2"], ["1.500,000"], ["168,15"]]
+    )
+
+    assert converted == ["v"]
+    assert new_rows == [["7760.2"], ["1500.000"], ["168.15"]]
+
+
+async def test_insecure_client_rejects_cross_host_requests(monkeypatch):
+    monkeypatch.setenv("CKAN_INSECURE_TLS", "1")
+    client = csv_reader_module._insecure_client("https://datosabiertos.gob.ec/a")
+    hook = client.event_hooks["request"][0]
+    try:
+        await hook(httpx.Request("GET", "https://datosabiertos.gob.ec/b"))
+        with pytest.raises(csv_reader_module.UnsafeUrlError):
+            await hook(httpx.Request("GET", "https://evil.example.com/x"))
+    finally:
+        await client.aclose()
+
+
+async def test_preview_json_truncated_raises_actionable_error(httpx_mock, monkeypatch):
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+    url = "https://example.com/grande.json"
+    httpx_mock.add_response(url=url, content=b"[" + b"1," * MAX_DOWNLOAD_BYTES)
+
+    with pytest.raises(ValueError, match="supera el límite de 5 MB"):
+        await csv_reader_module.preview_json(url)
+
+
+async def test_preview_xls_over_20mb_raises_actionable_error(httpx_mock, monkeypatch):
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+    url = "https://example.com/grande.xls"
+    httpx_mock.add_response(url=url, content=b"0" * (_MAX_DECOMPRESSED_BYTES + 10))
+
+    with pytest.raises(ValueError, match="supera el límite de 20 MB"):
+        await csv_reader_module.preview_xls(url)
+
+
+async def test_preview_xlsb_checks_zip_container_size(httpx_mock, monkeypatch):
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+    seen = []
+    monkeypatch.setattr(
+        csv_reader_module,
+        "_check_zip_container_size",
+        lambda raw, label: seen.append(label) or (_ for _ in ()).throw(ValueError("stop")),
+    )
+    url = "https://example.com/a.xlsb"
+    httpx_mock.add_response(url=url, content=b"PK")
+
+    with pytest.raises(ValueError, match="stop"):
+        await preview_xlsb(url)
+    assert seen == [".xlsb"]
+
+
+async def test_fetch_range_own_client_uses_proxy_and_user_agent(monkeypatch):
+    captured = {}
+
+    class _FakeClient:
+        def __init__(self, **kwargs):
+            captured.update(kwargs)
+
+        async def aclose(self):
+            pass
+
+    monkeypatch.setattr(csv_reader_module.httpx, "AsyncClient", _FakeClient)
+    monkeypatch.setattr(csv_reader_module, "proxy_for", lambda url: "http://proxy:1")
+
+    async def _boom(*a, **k):
+        raise RuntimeError("stop")
+
+    class _CM:
+        async def __aenter__(self):
+            await _boom()
+
+        async def __aexit__(self, *a):
+            return False
+
+    monkeypatch.setattr(csv_reader_module, "safe_stream", lambda *a, **k: _CM())
+
+    with pytest.raises(RuntimeError):
+        await csv_reader_module._fetch_range("https://example.com/x", "bytes=0-1", 10)
+    assert captured["proxy"] == "http://proxy:1"
+    assert "User-Agent" in captured["headers"]
