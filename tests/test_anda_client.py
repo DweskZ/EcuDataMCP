@@ -125,8 +125,9 @@ async def test_list_microdata_files_no_csrf_token(httpx_mock):
         url="https://anda.inec.gob.ec/anda5/index.php/catalog/1/get-microdata",
         html="<p>no form here</p>",
     )
-    files = await anda_client.list_microdata_files("1")
-    assert files == []
+    # A blocked or redesigned page must not read as "this survey has no files".
+    with pytest.raises(ValueError, match="token CSRF"):
+        await anda_client.list_microdata_files("1")
 
 
 @pytest.mark.asyncio

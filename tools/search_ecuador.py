@@ -1,10 +1,12 @@
 import asyncio
+from collections.abc import Coroutine
 from datetime import UTC, datetime
 from functools import partial
 from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import ckan_client, gobec_client, sercop_client, sgr_client
 from helpers.format_out import render_structured
@@ -14,6 +16,20 @@ from helpers.text_utils import strip_accents
 from helpers.tool_meta import READ_ONLY
 
 _strip_accents = partial(strip_accents, lower=False)
+
+# Per-source deadline for the fan-out below: gob.ec alone can take 3x60 s on
+# a bad day, and one slow source must not hold up the whole unified search.
+_SOURCE_TIMEOUT_SECONDS = 20
+
+
+async def _with_deadline(coro: Coroutine[Any, Any, Any]) -> Any:
+    """Await one source; a timeout becomes that section's error like any other."""
+    try:
+        return await asyncio.wait_for(coro, timeout=_SOURCE_TIMEOUT_SECONDS)
+    except TimeoutError:
+        return TimeoutError(
+            f"la fuente no respondió en {_SOURCE_TIMEOUT_SECONDS} s"
+        )
 
 
 def register_search_ecuador_tool(mcp: MCPServer) -> None:
@@ -25,7 +41,7 @@ def register_search_ecuador_tool(mcp: MCPServer) -> None:
     @log_tool
     async def search_ecuador(
         query: str, limit: int = 5, format: Literal["text", "json"] = "text"
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Unified search across Ecuador open data, trámites, regulations, contracts
         and risk events.
@@ -77,7 +93,8 @@ def register_search_ecuador_tool(mcp: MCPServer) -> None:
 
         async def _regulaciones() -> list | Exception:
             try:
-                return await gobec_client.find_regulaciones(query, max_pages=2)
+                busqueda = await gobec_client.find_regulaciones(query, max_pages=2)
+                return busqueda["resultados"]
             except Exception as e:
                 return e
 
@@ -101,12 +118,12 @@ def register_search_ecuador_tool(mcp: MCPServer) -> None:
                 return e
 
         datasets_r, orgs_r, tramites_r, regs_r, contratos_r, riesgos_r = await asyncio.gather(
-            _datasets(),
-            _orgs(),
-            _tramites(),
-            _regulaciones(),
-            _contratos(),
-            _riesgos(),
+            _with_deadline(_datasets()),
+            _with_deadline(_orgs()),
+            _with_deadline(_tramites()),
+            _with_deadline(_regulaciones()),
+            _with_deadline(_contratos()),
+            _with_deadline(_riesgos()),
         )
 
         def _trim_datasets(value: dict | Exception) -> dict:

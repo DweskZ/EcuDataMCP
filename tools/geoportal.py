@@ -11,6 +11,7 @@ from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import inamhi_client, sipa_geoportal_client
 from helpers.format_out import render_structured
@@ -59,7 +60,7 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
         solo_wfs: bool = False,
         categoria: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Search one geoportal's layer catalog (WMS/WFS).
 
@@ -132,7 +133,7 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
         capa: str,
         count: int = 5,
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Fetch a small sample of one geoportal layer's feature attributes.
 

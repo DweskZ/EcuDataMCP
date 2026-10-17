@@ -330,16 +330,20 @@ async def get_familia_archivos(familia: str) -> dict[str, Any]:
         html = content.decode("utf-8", errors="replace")
 
         archivos = _parse_familia_archivos(html, familia)
+        # Every family page publishes at least one file, so an empty parse
+        # is a maintenance page, a stripped accordion or a redesign: raise
+        # (same as helpers/censo_client.py) instead of returning a
+        # success-shaped empty list, and never cache it for 6h.
+        if not archivos:
+            raise ValueError(
+                f"La página de Bases de Datos de Ineval para la familia '{familia}' "
+                "no trae archivos (puede haber cambiado de estructura o estar bloqueada)."
+            )
         result = {
             "familia": familia,
             "nombre": info["nombre"],
             "url": info["url"],
             "archivos": archivos,
         }
-        if archivos:
-            # Don't cache an apparently-empty result for 6h -- it's
-            # indistinguishable from a transient failure (maintenance page,
-            # stripped accordion) that would otherwise self-correct on the
-            # next call.
-            _files_cache.set(familia, result)
+        _files_cache.set(familia, result)
         return result

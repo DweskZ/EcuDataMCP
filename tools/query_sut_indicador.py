@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import sut_powerbi_client
 from helpers.format_out import render_structured
@@ -25,7 +26,7 @@ def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
         limite: int = 500,
         fuente: Literal["sut", "judicatura"] = "sut",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Run a live query against one SUT Power BI dashboard's underlying
         data model — any combination of its fields, e.g. month AND

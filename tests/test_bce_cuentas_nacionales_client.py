@@ -162,3 +162,28 @@ async def test_one_page_failing_still_returns_the_other(httpx_mock):
 
     assert result["total_paginas"] == 1
     assert result["paginas"][0]["pagina_id"] == "matriz-de-empleo-e-ingresos-mei"
+    assert result["paginas_fallidas"] == [_CNA_URL]
+
+
+@pytest.mark.asyncio
+async def test_partial_catalog_is_not_cached(httpx_mock):
+    httpx_mock.add_exception(url=_CNA_URL, exception=Exception("boom"))
+    httpx_mock.add_response(url=_MEI_URL, html=_MEI_HTML)
+    httpx_mock.add_response(url=_CNA_URL, html=_CNA_HTML)
+    httpx_mock.add_response(url=_MEI_URL, html=_MEI_HTML)
+
+    first = await bce_cuentas_nacionales_client.search_cuentas_nacionales()
+    assert first["total_paginas"] == 1
+
+    second = await bce_cuentas_nacionales_client.search_cuentas_nacionales()
+    assert second["total_paginas"] == 2
+    assert second["paginas_fallidas"] == []
+
+
+@pytest.mark.asyncio
+async def test_get_archivo_not_found_mentions_incomplete_catalog(httpx_mock):
+    httpx_mock.add_exception(url=_CNA_URL, exception=Exception("boom"))
+    httpx_mock.add_response(url=_MEI_URL, html=_MEI_HTML)
+
+    with pytest.raises(ValueError, match="catálogo quedó incompleto"):
+        await bce_cuentas_nacionales_client.get_archivo(_CNA_PAGE["pagina_id"])

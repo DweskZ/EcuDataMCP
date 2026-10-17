@@ -1,14 +1,27 @@
+import ipaddress
 import socket
 
 import httpx
 import pytest
 
-from helpers.safe_download import UnsafeUrlError, assert_public_url, safe_stream
+from helpers.safe_download import (
+    UnsafeUrlError,
+    _is_public_ip,
+    assert_public_url,
+    safe_stream,
+)
 
 
 def _fake_getaddrinfo(ip: str):
     def _inner(host, port, *args, **kwargs):
         return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", (ip, 0))]
+
+    return _inner
+
+
+def _fake_getaddrinfo6(ip: str):
+    def _inner(host, port, *args, **kwargs):
+        return [(socket.AF_INET6, socket.SOCK_STREAM, 6, "", (ip, 0, 0, 0))]
 
     return _inner
 
@@ -108,3 +121,29 @@ async def test_safe_stream_caps_redirect_count(monkeypatch, httpx_mock):
                 session, "https://example.com/hop0", max_redirects=3
             ) as resp:
                 await resp.aread()
+
+
+@pytest.mark.parametrize(
+    "ip",
+    [
+        "::1",  # IPv6 loopback
+        "::ffff:10.0.0.1",  # IPv4-mapped RFC1918 address
+        "::ffff:127.0.0.1",  # IPv4-mapped loopback
+        "64:ff9b::a00:1",  # NAT64 well-known prefix wrapping 10.0.0.1
+        "fe80::1",  # link-local
+        "fc00::1",  # unique local (private)
+        "::",  # unspecified
+    ],
+)
+def test_assert_public_url_rejects_non_public_ipv6(monkeypatch, ip):
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo6(ip))
+    assert not _is_public_ip(ipaddress.ip_address(ip))
+    with pytest.raises(UnsafeUrlError):
+        assert_public_url("https://attacker-controlled.example/x")
+
+
+def test_assert_public_url_accepts_public_ipv6(monkeypatch):
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo6("2606:4700::1111"))
+    assert _is_public_ip(ipaddress.ip_address("2606:4700::1111"))
+    assert _is_public_ip(ipaddress.ip_address("::ffff:93.184.216.34"))
+    assert_public_url("https://example.com/file.csv")  # must not raise

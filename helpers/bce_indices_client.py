@@ -309,44 +309,58 @@ async def _discover_paginas() -> list[dict[str, str]]:
     return candidatos
 
 
-async def _fetch_catalog() -> list[dict[str, Any]]:
+async def _fetch_catalog() -> tuple[list[dict[str, Any]], list[str]]:
+    """The catalog plus the URLs of pages that failed to download.
+
+    A page without a recognized widget is a valid "not an índice page"
+    outcome, not a failure; a download error or a truncated body is.
+    """
     cached = _catalog_cache.get("catalog")
     if cached is not None:
-        return cached
+        return cached, []
 
     async with _fetch_lock:
         cached = _catalog_cache.get("catalog")
         if cached is not None:
-            return cached
+            return cached, []
 
         logger.info("Descubriendo páginas de índices de publicaciones del BCE")
         candidatos = await _discover_paginas()
         semaphore = asyncio.Semaphore(_PAGE_FETCH_CONCURRENCY)
 
-        async def fetch_one(candidato: dict[str, str]) -> dict[str, Any] | None:
+        async def fetch_one(
+            candidato: dict[str, str],
+        ) -> tuple[dict[str, Any] | None, str | None]:
             async with semaphore:
                 try:
                     content, truncated = await download_bytes(candidato["url"])
                     if truncated:
-                        return None
+                        logger.warning(
+                            "La página de índice %s superó el límite de descarga",
+                            candidato["url"],
+                        )
+                        return None, candidato["url"]
                     html = content.decode("utf-8", errors="replace")
                     parsed = _parse_pagina(candidato["url"], html)
                     if parsed is not None:
                         parsed["actualizado_sitemap"] = candidato["lastmod"]
-                    return parsed
+                    return parsed, None
                 except Exception as exc:
                     logger.warning(
                         "No se pudo leer la página de índice %s: %s", candidato["url"], exc
                     )
-                    return None
+                    return None, candidato["url"]
 
         results = await asyncio.gather(*(fetch_one(c) for c in candidatos))
-        catalog = [entry for entry in results if entry is not None]
-        if catalog:
-            # Same "don't cache an apparently-broken/empty scrape" rationale
-            # as helpers/bce_remesas_client.py and helpers/bce_publicaciones_client.py.
+        catalog = [entry for entry, _ in results if entry is not None]
+        paginas_fallidas = [url for _, url in results if url is not None]
+        # Same "don't cache an apparently-broken/empty scrape" rationale as
+        # helpers/bce_remesas_client.py and helpers/bce_publicaciones_client.py;
+        # a partial catalog (one page failed) must not stick for the whole TTL
+        # either (see helpers/bce_client.py), so the next call retries it.
+        if catalog and not paginas_fallidas:
             _catalog_cache.set("catalog", catalog)
-        return catalog
+        return catalog, paginas_fallidas
 
 
 def clear_cache() -> None:
@@ -356,6 +370,15 @@ def clear_cache() -> None:
 
 def _resumen(entry: dict[str, Any]) -> dict[str, Any]:
     return {k: v for k, v in entry.items() if k != "archivos"}
+
+
+def _nota_catalogo_incompleto(paginas_fallidas: list[str]) -> str:
+    if not paginas_fallidas:
+        return ""
+    return (
+        f". El catálogo quedó incompleto: no se pudieron leer {len(paginas_fallidas)} "
+        f"página(s) del BCE ({', '.join(paginas_fallidas[:3])}); reintenta en unos minutos"
+    )
 
 
 async def search_indices(query: str = "") -> dict[str, Any]:
@@ -373,7 +396,7 @@ async def search_indices(query: str = "") -> dict[str, Any]:
         query: Free text matched (accent-insensitive) against the page's
             title or URL. Empty returns all discovered pages.
     """
-    catalog = await _fetch_catalog()
+    catalog, paginas_fallidas = await _fetch_catalog()
     q = _strip(query)
     matched = [
         entry
@@ -383,6 +406,7 @@ async def search_indices(query: str = "") -> dict[str, Any]:
     return {
         "total": len(matched),
         "total_paginas": len(catalog),
+        "paginas_fallidas": paginas_fallidas,
         "source": _SOURCE_NAME,
         "paginas": [_resumen(entry) for entry in matched],
     }
@@ -403,10 +427,13 @@ async def get_archivo(pagina_id: str, anio: int = 0, max_archivos: int = _DEFAUL
         max_archivos: Cap on returned files (most recent years first),
             1-200. Use `anio` to reach further back than the cap allows.
     """
-    catalog = await _fetch_catalog()
+    catalog, paginas_fallidas = await _fetch_catalog()
     entry = next((e for e in catalog if e["pagina_id"] == pagina_id.strip()), None)
     if entry is None:
-        raise ValueError(f"Página de índice '{pagina_id}' no encontrada")
+        raise ValueError(
+            f"Página de índice '{pagina_id}' no encontrada"
+            + _nota_catalogo_incompleto(paginas_fallidas)
+        )
 
     archivos = entry["archivos"]
     if anio:

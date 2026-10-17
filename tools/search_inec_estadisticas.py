@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import inec_client
 from helpers.format_out import render_structured
@@ -25,7 +26,7 @@ def register_search_inec_estadisticas_tool(mcp: MCPServer) -> None:
         limit: int = 30,
         offset: int = 0,
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Search INEC's statistical topic pages (ecuadorencifras.gob.ec).
 

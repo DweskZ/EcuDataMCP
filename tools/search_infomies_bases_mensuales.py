@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import infomies_client
 from helpers.format_out import render_structured
@@ -25,7 +26,7 @@ def register_search_infomies_bases_mensuales_tool(mcp: MCPServer) -> None:
         anio: int | None = None,
         query: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         List infoMIES's (info.desarrollohumano.gob.ec, the statistics portal
         of what used to be MIES) monthly BDD (base de datos) files for one

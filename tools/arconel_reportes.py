@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import arconel_reportes_client
 from helpers.format_out import render_structured
@@ -29,7 +30,7 @@ def register_get_arconel_reporte_tool(mcp: MCPServer) -> None:
         mes: int | None = None,
         max_paginas: int = 10,
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Run one report from ARCONEL's public statistics builder
         (reportes.arconel.gob.ec) and return its rows, e.g. "Balance

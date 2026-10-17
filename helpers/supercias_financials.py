@@ -153,6 +153,10 @@ def _in_backoff(state: dict[str, Any]) -> bool:
 
 
 def _build_in_progress() -> bool:
+    """True while this process's own build subprocess is still running.
+
+    Mutates `_build_process`: the caller must hold `_build_lock`.
+    """
     global _build_process
     if _build_process is None or _build_process.poll() is not None:
         return False
@@ -167,6 +171,14 @@ def _build_in_progress() -> bool:
             _build_process.pid, BUILD_TIMEOUT_SECONDS // 60,
         )
         _build_process.kill()
+        # Reap it, or a killed POSIX child lingers as a zombie until exit.
+        try:
+            _build_process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            logger.warning(
+                "Build de Supercías (PID %d) no terminó tras kill()",
+                _build_process.pid,
+            )
         _build_process = None
         return False
     return True
@@ -192,9 +204,11 @@ def _trigger_background_build() -> None:
         # stream: an inherited stdout would let the build's print() progress
         # lines corrupt it and make the client drop the connection. Same for
         # stdin, which carries the client's requests.
+        # Truncated per build: only the latest run's output is useful for
+        # diagnosing a failure, and appending forever was never rotated.
         log_path = DB_PATH.parent / "supercias_build.log"
         log_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(log_path, "ab") as log_file:
+        with open(log_path, "wb") as log_file:
             _build_process = subprocess.Popen(
                 [sys.executable, "-m", _BUILD_MODULE],
                 cwd=_PACKAGE_ROOT,
@@ -273,13 +287,15 @@ def financials_status(path: Path | None = None) -> dict[str, Any]:
     if path is None:
         path = DB_PATH
     state = read_build_state()
+    with _build_lock:
+        in_progress = _build_in_progress()
     status: dict[str, Any] = {
         "disponible": False,
         "construida_en": None,
         "antiguedad_dias": None,
         "desactualizada": None,
         "anios": None,
-        "construccion_en_curso": _build_in_progress() or _lock_is_held(),
+        "construccion_en_curso": in_progress or _lock_is_held(),
         "ultimo_intento": state.get("ultimo_intento"),
         "ultimo_error": state.get("ultimo_error"),
     }

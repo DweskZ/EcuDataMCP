@@ -13,6 +13,7 @@ from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import centrosur_cortes_client, eeq_cortes_client
 from helpers.format_out import render_structured
@@ -65,7 +66,7 @@ def register_cortes_tools(mcp: MCPServer) -> None:
         distribuidora: Distribuidora,
         query: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         List one electricity distributor's archive of scheduled power-cut PDFs.
 
@@ -138,7 +139,7 @@ def register_cortes_tools(mcp: MCPServer) -> None:
         archivo: str,
         query: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Parse one scheduled power-cut PDF into rows.
 

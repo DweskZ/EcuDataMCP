@@ -163,7 +163,47 @@ async def test_get_indicador_accent_insensitive_country_match(httpx_mock):
 
     result = await client.get_indicador(4788, pais="peru")
 
-    assert result["pais_filtrado"] == "peru"
+    # Labelled with CEPALSTAT's own member name, not the user's spelling.
+    assert result["pais_filtrado"] == "Perú"
+
+
+async def test_get_indicador_ambiguous_partial_country_match_raises(httpx_mock):
+    dimensions = {
+        "header": {},
+        "body": {
+            "dimensions": [
+                {
+                    "id": 208,
+                    "name": "País__ESTANDAR",
+                    "members": [
+                        {"name": "Guinea", "id": 1},
+                        {"name": "Guinea Ecuatorial", "id": 2},
+                        {"name": "Ecuador", "id": 229},
+                    ],
+                }
+            ]
+        },
+        "footer": {},
+    }
+    httpx_mock.add_response(
+        url=client._build_url("/indicator/4788/dimensions", lang="es"), json=dimensions
+    )
+
+    with pytest.raises(ValueError, match="Guinea, Guinea Ecuatorial"):
+        await client.get_indicador(4788, pais="guin")
+
+
+def test_find_pais_member_prefers_exact_match_over_partial_ones():
+    dimensions = [
+        {
+            "name": "País",
+            "members": [{"name": "Guinea", "id": 1}, {"name": "Guinea Ecuatorial", "id": 2}],
+        }
+    ]
+
+    assert client._find_pais_member(dimensions, "Guinea")["id"] == 1
+    assert client._find_pais_member(dimensions, "ecuatorial")["id"] == 2
+    assert client._find_pais_member(dimensions, "Narnia") is None
 
 
 async def test_get_indicador_unknown_country_raises(httpx_mock):

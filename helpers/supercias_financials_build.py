@@ -44,6 +44,7 @@ from __future__ import annotations
 
 import csv
 import os
+import shutil
 import sqlite3
 import time
 from datetime import UTC, datetime
@@ -97,6 +98,14 @@ def _client() -> httpx.Client:
     )
 
 
+# The whole export is ~356 MB today (bi_ranking.csv is most of it); a file
+# past this is not the export but a redirect to an error page or a runaway
+# response, and must not be allowed to fill the data volume.
+_MAX_FILE_BYTES = 1024 * 1024 * 1024
+# Room for the CSVs plus the SQLite file built from them, with headroom.
+_MIN_FREE_BYTES = 2 * 1024 * 1024 * 1024
+
+
 def _download_to(
     client: httpx.Client, name: str, dest: Path, deadline: float
 ) -> None:
@@ -114,8 +123,13 @@ def _download_to(
                             f"Descarga de {name} excedió el plazo total "
                             f"({_DOWNLOAD_DEADLINE_SECONDS // 60} min)"
                         )
-                    f.write(chunk)
                     total += len(chunk)
+                    if total > _MAX_FILE_BYTES:
+                        raise RuntimeError(
+                            f"Descarga de {name} superó {_MAX_FILE_BYTES // (1024 * 1024)} MB; "
+                            "no parece ser la exportación de Supercías"
+                        )
+                    f.write(chunk)
                     if total % (20 * 1024 * 1024) < len(chunk):
                         print(f"  {total / (1024 * 1024):.0f} MB...", flush=True)
     except (httpx.ConnectError, httpx.ConnectTimeout) as exc:
@@ -348,21 +362,34 @@ def _build() -> None:
     # cross-filesystem copy that could itself fail partway through.
     build_path = DB_PATH.parent / f"{DB_PATH.name}.building"
 
+    free = shutil.disk_usage(DB_PATH.parent).free
+    if free < _MIN_FREE_BYTES:
+        raise RuntimeError(
+            f"Espacio insuficiente en {DB_PATH.parent}: {free // (1024 * 1024)} MB libres, "
+            f"se necesitan al menos {_MIN_FREE_BYTES // (1024 * 1024)} MB para el build"
+        )
+
+    ranking_csv = tmp_dir / "bi_ranking.csv"
+    compania_csv = tmp_dir / "bi_compania.csv"
+    segmento_csv = tmp_dir / "bi_segmento.csv"
+    ciiu_csv = tmp_dir / "bi_ciiu.csv"
+    sector_csv = tmp_dir / "indicadores_sector.csv"
     deadline = time.time() + _DOWNLOAD_DEADLINE_SECONDS
-    with _client() as client:
-        ranking_csv = tmp_dir / "bi_ranking.csv"
-        compania_csv = tmp_dir / "bi_compania.csv"
-        segmento_csv = tmp_dir / "bi_segmento.csv"
-        ciiu_csv = tmp_dir / "bi_ciiu.csv"
-        sector_csv = tmp_dir / "indicadores_sector.csv"
-        for name, dest in (
-            ("bi_ranking.csv", ranking_csv),
-            ("bi_compania.csv", compania_csv),
-            ("bi_segmento.csv", segmento_csv),
-            ("bi_ciiu.csv", ciiu_csv),
-            ("indicadores_sector.csv", sector_csv),
-        ):
-            _download_to(client, name, dest, deadline)
+    try:
+        with _client() as client:
+            for name, dest in (
+                ("bi_ranking.csv", ranking_csv),
+                ("bi_compania.csv", compania_csv),
+                ("bi_segmento.csv", segmento_csv),
+                ("bi_ciiu.csv", ciiu_csv),
+                ("indicadores_sector.csv", sector_csv),
+            ):
+                _download_to(client, name, dest, deadline)
+    except BaseException:
+        # A failed or interrupted download must not leave hundreds of MB of
+        # partial CSVs behind on the data volume.
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+        raise
 
     build_path.unlink(missing_ok=True)
     conn = sqlite3.connect(build_path)

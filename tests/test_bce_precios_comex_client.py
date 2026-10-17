@@ -131,3 +131,19 @@ async def test_one_page_failing_still_returns_the_other(httpx_mock):
 
     assert result["total_en_paginas"] == 1
     assert result["archivos"][0]["pagina_id"] == "indices-de-precios-de-exportacion"
+    assert result["paginas_fallidas"] == [_IMPORTACION_URL]
+
+
+@pytest.mark.asyncio
+async def test_partial_file_list_is_not_cached(httpx_mock):
+    httpx_mock.add_exception(url=_IMPORTACION_URL, exception=Exception("boom"))
+    httpx_mock.add_response(url=_EXPORTACION_URL, html=_EXPORTACION_HTML)
+    httpx_mock.add_response(url=_IMPORTACION_URL, html=_IMPORTACION_HTML)
+    httpx_mock.add_response(url=_EXPORTACION_URL, html=_EXPORTACION_HTML)
+
+    first = await bce_precios_comex_client.search_archivos()
+    assert first["total_en_paginas"] == 1
+
+    second = await bce_precios_comex_client.search_archivos()
+    assert second["total_en_paginas"] == 2
+    assert second["paginas_fallidas"] == []

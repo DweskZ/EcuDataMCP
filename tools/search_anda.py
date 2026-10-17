@@ -1,8 +1,9 @@
 from functools import partial
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import anda_client
 from helpers.format_out import render_structured
@@ -42,7 +43,7 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
         limit: int = 10,
         page: int = 1,
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Search INEC's ANDA catalog (anda.inec.gob.ec) of surveys and censuses.
 

@@ -52,11 +52,19 @@ def parse(payload: dict[str, Any], max_series: int = 100) -> dict[str, Any]:
                 )
             value = dim["values"][pos]
             coded.append((dim["id"], value.get("id"), value.get("name") or value.get("id")))
-        observations = [
-            {"periodo": periods[int(i)], "valor": _number(obs[0])}
-            for i, obs in sorted(body.get("observations", {}).items(), key=lambda kv: int(kv[0]))
-            if obs and int(i) < len(periods)
-        ]
+        observations = []
+        for i, obs in sorted(body.get("observations", {}).items(), key=lambda kv: int(kv[0])):
+            if not obs:
+                continue
+            # Same contract as the series-dimension check above: an index
+            # the structure block doesn't list is a broken message, not a
+            # row to drop quietly.
+            if int(i) >= len(periods):
+                raise ValueError(
+                    f"Respuesta SDMX inconsistente: la serie {key!r} apunta a un "
+                    f"período inexistente (posición {i} de {len(periods)})."
+                )
+            observations.append({"periodo": periods[int(i)], "valor": _number(obs[0])})
         series.append(
             {
                 "clave": ".".join(str(code) for _, code, _ in coded),

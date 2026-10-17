@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import cepalstat_client
 from helpers.format_out import render_structured
@@ -24,7 +25,7 @@ def register_search_cepalstat_indicadores_tool(mcp: MCPServer) -> None:
         query: str = "",
         lang: Literal["es", "en"] = "es",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Search CEPALSTAT (CEPAL/ECLAC's public statistics API,
         api-cepalstat.cepal.org) for an indicator by name — 2,059

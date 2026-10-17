@@ -278,8 +278,8 @@ async def test_empty_parse_result_is_not_cached(httpx_mock):
     httpx_mock.add_response(url=url, html=_EMPTY_HTML)
     httpx_mock.add_response(url=url, html=_FAMILIA_HTML)
 
-    first = await ineval_client.get_familia_archivos("ser_estudiante")
-    assert first["archivos"] == []
+    with pytest.raises(ValueError, match="Ineval"):
+        await ineval_client.get_familia_archivos("ser_estudiante")
 
     # A second call must re-fetch rather than serve the cached empty result.
     second = await ineval_client.get_familia_archivos("ser_estudiante")

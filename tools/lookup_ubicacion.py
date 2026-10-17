@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers.format_out import render_structured
 from helpers.geo_data import (
@@ -35,7 +36,7 @@ def register_lookup_ubicacion_tool(mcp: MCPServer) -> None:
         canton: str = "",
         nivel: Literal["auto", "provincia", "canton", "parroquia"] = "auto",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Look up Ecuador DPA geography: provinces, cantons and parroquias (INEC codes).
 
@@ -58,52 +59,57 @@ def register_lookup_ubicacion_tool(mcp: MCPServer) -> None:
         if nivel_norm not in {"auto", "provincia", "canton", "parroquia"}:
             nivel_norm = "auto"
 
-        provs: list[dict] = []
-        cants: list[dict] = []
-        parrs: list[dict] = []
-        urbanas: list[dict] = []
+        try:
+            provs: list[dict] = []
+            cants: list[dict] = []
+            parrs: list[dict] = []
+            urbanas: list[dict] = []
 
-        if nivel_norm in {"auto", "provincia"}:
-            if query.strip() or region.strip():
-                provs = find_provincias(query=query.strip(), region=region.strip())
-            elif nivel_norm == "provincia":
-                provs = list_provincias()
+            if nivel_norm in {"auto", "provincia"}:
+                if query.strip() or region.strip():
+                    provs = find_provincias(query=query.strip(), region=region.strip())
+                elif nivel_norm == "provincia":
+                    provs = list_provincias()
 
-        if nivel_norm in {"auto", "canton"}:
-            if query.strip() or provincia.strip() or region.strip():
-                cants = find_cantones(
+            if nivel_norm in {"auto", "canton"}:
+                if query.strip() or provincia.strip() or region.strip():
+                    cants = find_cantones(
+                        query=query.strip(),
+                        provincia=provincia.strip(),
+                        region=region.strip(),
+                    )
+                elif nivel_norm == "canton":
+                    cants = list_cantones()
+
+            # Avoid dumping all 1000+ parroquias unless filtered.
+            wants_parroquias = nivel_norm in {"auto", "parroquia"} and (
+                query.strip()
+                or canton.strip()
+                or provincia.strip()
+                or nivel_norm == "parroquia"
+            )
+            if wants_parroquias:
+                if nivel_norm == "parroquia" and not (
+                    query.strip() or canton.strip() or provincia.strip()
+                ):
+                    raise ToolError(
+                        "Para parroquias indica query, canton= o provincia=. "
+                        "Ej: query='Tumbaco', canton='Quito', provincia='Pichincha'."
+                    )
+                parrs = find_parroquias(
                     query=query.strip(),
+                    canton=canton.strip(),
                     provincia=provincia.strip(),
-                    region=region.strip(),
                 )
-            elif nivel_norm == "canton":
-                cants = list_cantones()
-
-        # Avoid dumping all 1000+ parroquias unless filtered.
-        wants_parroquias = nivel_norm in {"auto", "parroquia"} and (
-            query.strip()
-            or canton.strip()
-            or provincia.strip()
-            or nivel_norm == "parroquia"
-        )
-        if wants_parroquias:
-            if nivel_norm == "parroquia" and not (
-                query.strip() or canton.strip() or provincia.strip()
-            ):
-                raise ToolError(
-                    "Para parroquias indica query, canton= o provincia=. "
-                    "Ej: query='Tumbaco', canton='Quito', provincia='Pichincha'."
+                urbanas = find_parroquias_urbanas(
+                    query=query.strip(),
+                    canton=canton.strip(),
+                    provincia=provincia.strip(),
                 )
-            parrs = find_parroquias(
-                query=query.strip(),
-                canton=canton.strip(),
-                provincia=provincia.strip(),
-            )
-            urbanas = find_parroquias_urbanas(
-                query=query.strip(),
-                canton=canton.strip(),
-                provincia=provincia.strip(),
-            )
+        except ToolError:
+            raise
+        except Exception as e:
+            raise ToolError(f"Error al consultar la geografía DPA: {e}") from e
 
         if (
             nivel_norm == "auto"

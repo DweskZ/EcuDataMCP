@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import gobec_client
 from helpers.format_out import render_structured
@@ -21,7 +22,7 @@ def register_list_instituciones_tool(mcp: MCPServer) -> None:
     @log_tool
     async def list_instituciones(
         query: str = "", page: int = 1, format: Literal["text", "json"] = "text"
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         List or search public institutions registered on Ecuador's gob.ec portal.
 
@@ -36,9 +37,12 @@ def register_list_instituciones_tool(mcp: MCPServer) -> None:
             page: Page number (1-based, default: 1, only used without query)
             format: text | json
         """
+        hay_mas = False
         try:
             if query:
-                instituciones = await gobec_client.find_institucion(query)
+                busqueda = await gobec_client.find_institucion(query)
+                instituciones = busqueda["resultados"]
+                hay_mas = busqueda["hay_mas"]
             else:
                 api_page = max(page - 1, 0)
                 instituciones = await gobec_client.list_instituciones(page=api_page)
@@ -51,6 +55,7 @@ def register_list_instituciones_tool(mcp: MCPServer) -> None:
             "page": page,
             "total": len(instituciones),
             "showing": len(rows),
+            "hay_mas": hay_mas,
             "results": [
                 {
                     "institucion_id": inst.get("institucion_id"),
@@ -71,6 +76,12 @@ def register_list_instituciones_tool(mcp: MCPServer) -> None:
                 text_builder=lambda d: (
                     "No se encontraron instituciones"
                     + (f" para: '{d['query']}'" if d.get("query") else "")
+                    + (
+                        " en las primeras páginas del listado (puede haber más; "
+                        "prueba con las siglas o un término más específico)"
+                        if d.get("hay_mas")
+                        else ""
+                    )
                 ),
             )
 
@@ -83,6 +94,11 @@ def register_list_instituciones_tool(mcp: MCPServer) -> None:
                     f"Instituciones públicas del Ecuador (página {data['page']}):"
                 )
             parts.append(f"Mostrando {data['showing']} resultados\n")
+            if data.get("hay_mas"):
+                parts.append(
+                    "Nota: solo se revisaron las primeras páginas del listado; "
+                    "puede haber más coincidencias.\n"
+                )
             for i, inst in enumerate(data["results"], 1):
                 nombre = inst["nombre"]
                 siglas = inst.get("siglas")

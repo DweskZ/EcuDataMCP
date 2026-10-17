@@ -41,6 +41,7 @@ to fetch one. Every field returned here is only ever "as of now".
 from __future__ import annotations
 
 import re
+from html import unescape
 from typing import Any
 
 from helpers.cache import TtlCache
@@ -90,7 +91,10 @@ async def _fetch_sections() -> dict[str, str]:
         raise ValueError("La página de CENACE superó el límite de descarga.")
     html = content.decode("utf-8", errors="replace")
     sections = _split_sections(html)
-    _cache.set("sections", sections)
+    # No <h2> at all means a maintenance/anti-bot page or a redesign; don't
+    # pin that empty parse for the TTL, let the next call retry.
+    if sections:
+        _cache.set("sections", sections)
     return sections
 
 
@@ -124,7 +128,10 @@ async def get_tablero(tablero: str) -> dict[str, Any]:
         raise ValueError(f"No se encontró la sección '{h2_title}' en la página de CENACE.")
 
     period_match = _PERIOD_RE.search(block)
-    resumen = {label.strip(): _to_number(value) for label, value in _RESUMEN_BOX_RE.findall(block)}
+    resumen = {
+        unescape(label).strip(): _to_number(value)
+        for label, value in _RESUMEN_BOX_RE.findall(block)
+    }
 
     result: dict[str, Any] = {
         "tablero": tablero,
@@ -134,6 +141,7 @@ async def get_tablero(tablero: str) -> dict[str, Any]:
     }
     if tablero == "demanda_tiempo_real":
         result["por_distribuidora_mw"] = {
-            name.strip(): _to_number(mw) for name, mw in _DISTRIBUIDORA_RE.findall(block)
+            unescape(name).strip(): _to_number(mw)
+            for name, mw in _DISTRIBUIDORA_RE.findall(block)
         }
     return result

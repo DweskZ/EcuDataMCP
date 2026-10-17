@@ -11,6 +11,7 @@ from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import bce_cuentas_nacionales_client, bce_indices_client
 from helpers.format_out import render_structured
@@ -70,7 +71,7 @@ def register_bce_paginas_tools(mcp: MCPServer) -> None:
         catalogo: Catalogo,
         query: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         List the BCE's page-based publication archives of one catalog.
 
@@ -141,7 +142,7 @@ def register_bce_paginas_tools(mcp: MCPServer) -> None:
         anio: int = 0,
         max_archivos: int = 30,
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Read one BCE publication page's file list.
 

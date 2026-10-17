@@ -286,3 +286,51 @@ async def test_get_archivo_caches_and_dedupes_concurrent_calls(httpx_mock):
 
     assert all(r["rango_completo"]["n_datos"] in (3, 1) for r in results)
     assert len(httpx_mock.get_requests()) == 1
+
+
+def _daily_rows(n: int) -> list[dict]:
+    from datetime import date, timedelta
+
+    start = date(2020, 1, 1)
+    return [
+        {
+            "Indicador": "Riesgo País",
+            "Código Variable Dinámica": "val_ind_0003",
+            "Fecha": (start + timedelta(days=d)).isoformat(),
+            "Carga": "2026-08-29",
+            "Periodicidad": "D",
+            "Valor": str(d),
+            "Medida": "Puntos Básicos",
+            "Segmento": "Indicadores Económicos",
+        }
+        for d in range(n)
+    ]
+
+
+@pytest.mark.asyncio
+async def test_get_indicador_diario_flags_truncated_date_range(httpx_mock):
+    httpx_mock.add_response(
+        url=_FORMULARIO_URL, json={"view_ind_formulario": _daily_rows(400)}
+    )
+
+    result = await bce.get_indicador_diario(
+        "datos_formulario.json", "val_ind_0003", desde="2020-01-01", hasta="2021-12-31"
+    )
+
+    assert result["truncado"] is True
+    assert result["observaciones_en_rango"] == 400
+    assert len(result["datos"]) == bce._MAX_VENTANA
+    # The cut keeps the most recent rows of the range.
+    assert result["datos"][-1]["fecha"] == "2021-02-03"
+
+
+@pytest.mark.asyncio
+async def test_get_indicador_diario_small_range_is_not_truncated(httpx_mock):
+    httpx_mock.add_response(url=_FORMULARIO_URL, json=_FORMULARIO_JSON)
+
+    result = await bce.get_indicador_diario(
+        "datos_formulario.json", "val_ind_0003", desde="2026-08-27", hasta="2026-08-28"
+    )
+
+    assert result["truncado"] is False
+    assert result["observaciones_en_rango"] == 2

@@ -44,8 +44,13 @@ _DEGRADED_SOURCES = (
         "segundo plano",
     ),
     (
+        # "no existe todavía" is the first-build wording. The schema-version
+        # mismatch message shares the "segundo plano" suffix but is a
+        # regression signal (a stale DB that needs rebuilding), not a
+        # cold start.
         "supercias_financials_cold_start",
         "base de datos financiera de supercías",
+        "no existe todavía",
         "automáticamente en segundo plano",
     ),
     (
@@ -113,16 +118,33 @@ GEOBLOCKED_SOURCES = frozenset(
 
 # httpx's own raise_for_status() message format (confirmed against
 # httpx._models.Response.raise_for_status): "Server error '503 Service
-# Unavailable' for url '<url>'". A 5xx is by definition the live source
-# itself misbehaving (down, overloaded, restarting) -- never something our
-# request shape caused -- so this is a generic, host-agnostic degradation
-# check rather than one more hardcoded tuple per source. Confirmed live:
+# Unavailable' for url '<url>'". A 5xx from a known-flaky live source is
+# that source misbehaving (down, overloaded, restarting). Confirmed live:
 # anda.inec.gob.ec 503'd on 2026-09-18's scheduled run and was unreachable/
 # inconsistent (timeout, then 403) minutes later -- a flaky host, not a
 # regression in this repo.
 _HTTPX_SERVER_ERROR_RE = re.compile(
     r"Server error '5\d\d[^']*' for url 'https?://([^/']+)"
 )
+
+# Only hosts already named by a known-degradation entry above get the 5xx
+# pass. A 5xx from any other host can be a changed endpoint or a request
+# this repo builds wrongly (a 500 on a malformed query), so it stays a
+# failure until it is understood and added to _DEGRADED_SOURCES.
+_HOST_MARKER_RE = re.compile(r"[a-z0-9-]+(\.[a-z0-9-]+)+")
+_UPSTREAM_5XX_HOSTS = frozenset(
+    marker
+    for _name, *markers in _DEGRADED_SOURCES
+    for marker in markers
+    if _HOST_MARKER_RE.fullmatch(marker)
+)
+
+
+def _known_5xx_host(host: str) -> bool:
+    host = host.casefold().rsplit(":", 1)[0]
+    return any(
+        host == known or host.endswith(f".{known}") for known in _UPSTREAM_5XX_HOSTS
+    )
 
 
 def degraded_source(text: str) -> str | None:
@@ -132,7 +154,7 @@ def degraded_source(text: str) -> str | None:
         if all(marker.casefold() in normalized for marker in markers):
             return name
     match = _HTTPX_SERVER_ERROR_RE.search(text)
-    if match:
+    if match and _known_5xx_host(match.group(1)):
         return f"upstream_5xx:{match.group(1)}"
     return None
 

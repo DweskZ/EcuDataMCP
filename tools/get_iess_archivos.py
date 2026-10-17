@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import iess_client
 from helpers.format_out import render_structured
@@ -26,7 +27,7 @@ def register_get_iess_archivos_tool(mcp: MCPServer) -> None:
         anio: int | None = None,
         query: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         List one IESS (Instituto Ecuatoriano de Seguridad Social) document
         collection's actual documents, each resolved to a direct download
@@ -73,8 +74,12 @@ def register_get_iess_archivos_tool(mcp: MCPServer) -> None:
                     anio=anio, query=query
                 )
                 items_key = "documentos"
+        except ToolError:
+            raise
         except ValueError as e:
             raise ToolError(f"Error: {e}") from e
+        except Exception as e:
+            raise ToolError(f"Error al consultar los archivos del IESS: {e}") from e
 
         def to_text(data: dict) -> str:
             items = data.get(items_key) or []

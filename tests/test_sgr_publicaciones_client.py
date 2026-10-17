@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 
 from helpers import sgr_publicaciones_client as client
@@ -274,3 +276,22 @@ async def test_empty_biblioteca_scrape_is_not_cached(httpx_mock):
 
     second = await client.list_biblioteca_categorias()
     assert second["total"] == 2
+
+
+@pytest.mark.asyncio
+async def test_event_locks_are_bounded(httpx_mock):
+    client._event_locks.clear()
+    for i in range(client._MAX_EVENT_LOCKS):
+        client._event_locks[f"https://www.gestionderiesgos.gob.ec/evento-{i}/"] = (
+            asyncio.Lock()
+        )
+    evento_url = "https://www.gestionderiesgos.gob.ec/algun-evento/"
+    httpx_mock.add_response(url=evento_url, html=_SITREP_EVENT_HTML)
+
+    try:
+        result = await client.get_sitrep_archivos(evento_url)
+        assert result["total"] == 3
+        assert evento_url in client._event_locks
+        assert len(client._event_locks) <= client._MAX_EVENT_LOCKS
+    finally:
+        client._event_locks.clear()

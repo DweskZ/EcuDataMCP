@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import ckan_client
 from helpers.format_out import render_structured
@@ -24,7 +25,7 @@ def register_get_category_info_tool(mcp: MCPServer) -> None:
         include_datasets: bool = True,
         source: ckan_client.CkanSource = "nacional",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Get details for a thematic category (CKAN group) on Ecuador's open data portal.
 

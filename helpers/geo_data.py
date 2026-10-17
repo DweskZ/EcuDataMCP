@@ -63,6 +63,18 @@ def list_parroquias_urbanas() -> list[dict[str, Any]]:
     ]
 
 
+def _matches_filter(value: str, nombre: str, codigo: str) -> bool:
+    """Match a provincia/canton filter by name substring or by exact code.
+
+    An all-digit filter is compared to the zero-padded code, never as a
+    substring: "1" would otherwise match provinces 01, 10-19 and 21 alike.
+    `value` is already accent-stripped/lowercased.
+    """
+    if value.isdigit():
+        return value.zfill(len(codigo)) == codigo
+    return value in _strip(f"{nombre} {codigo}")
+
+
 def find_provincias(query: str = "", region: str = "") -> list[dict[str, Any]]:
     items = list_provincias()
     q = _strip(query)
@@ -97,10 +109,10 @@ def find_cantones(
     for c in items:
         if r and r not in _strip(c.get("region", "")):
             continue
-        if p:
-            prov_blob = _strip(f"{c.get('provincia', '')} {c.get('provincia_codigo', '')}")
-            if p not in prov_blob:
-                continue
+        if p and not _matches_filter(
+            p, c.get("provincia", ""), c.get("provincia_codigo", "")
+        ):
+            continue
         if not q:
             out.append(c)
             continue
@@ -125,16 +137,14 @@ def find_parroquias(
     p = _strip(provincia)
     out: list[dict[str, Any]] = []
     for row in items:
-        if p:
-            prov_blob = _strip(
-                f"{row.get('provincia', '')} {row.get('provincia_codigo', '')}"
-            )
-            if p not in prov_blob:
-                continue
-        if c:
-            can_blob = _strip(f"{row.get('canton', '')} {row.get('canton_codigo', '')}")
-            if c not in can_blob:
-                continue
+        if p and not _matches_filter(
+            p, row.get("provincia", ""), row.get("provincia_codigo", "")
+        ):
+            continue
+        if c and not _matches_filter(
+            c, row.get("canton", ""), row.get("canton_codigo", "")
+        ):
+            continue
         if not q:
             out.append(row)
             continue
@@ -159,9 +169,9 @@ def find_parroquias_urbanas(
     c = _strip(canton)
     p = _strip(provincia)
     for row in list_parroquias_urbanas():
-        if p and p not in _strip(f"{row['provincia']} {row['provincia_codigo']}"):
+        if p and not _matches_filter(p, row["provincia"], row["provincia_codigo"]):
             continue
-        if c and c not in _strip(f"{row['canton']} {row['canton_codigo']}"):
+        if c and not _matches_filter(c, row["canton"], row["canton_codigo"]):
             continue
         if q:
             fields = (

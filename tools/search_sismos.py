@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import igepn_client
 from helpers.format_out import render_structured
@@ -32,7 +33,7 @@ def register_search_sismos_tool(mcp: MCPServer) -> None:
         dias: int = 0,
         limit: int = 15,
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Search recent earthquakes in Ecuador from the Instituto Geofísico (IG-EPN).
 

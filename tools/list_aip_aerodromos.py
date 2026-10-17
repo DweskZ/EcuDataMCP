@@ -1,6 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import aviacion_client
 from helpers.format_out import render_structured
@@ -18,7 +20,7 @@ def register_list_aip_aerodromos_tool(mcp: MCPServer) -> None:
         annotations=READ_ONLY,
     )
     @log_tool
-    async def list_aip_aerodromos(format: Literal["text", "json"] = "text") -> dict[str, Any]:
+    async def list_aip_aerodromos(format: Literal["text", "json"] = "text") -> CallToolResult:
         """
         List the ICAO designators and names of every aerodrome/helipad with
         a published AIP AD 2.x page, from DGAC's public eAIP
@@ -31,7 +33,10 @@ def register_list_aip_aerodromos_tool(mcp: MCPServer) -> None:
         Args:
             format: text | json
         """
-        result = await aviacion_client.list_aip_aerodromos()
+        try:
+            result = await aviacion_client.list_aip_aerodromos()
+        except Exception as e:
+            raise ToolError(f"Error al consultar el AIP de la DGAC: {e}") from e
 
         def to_text(data: dict) -> str:
             aerodromos = data.get("aerodromos") or []

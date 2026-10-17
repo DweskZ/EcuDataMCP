@@ -1,8 +1,9 @@
 import logging
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import bce_client
 from helpers.format_out import render_structured
@@ -28,7 +29,7 @@ def register_search_indicadores_bce_tool(mcp: MCPServer) -> None:
         limit: int = 20,
         offset: int = 0,
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Search the Banco Central del Ecuador (BCE) statistical catalog.
 

@@ -1,3 +1,4 @@
+import asyncio
 import codecs
 import csv
 import io
@@ -8,7 +9,8 @@ import struct
 import tarfile
 import zipfile
 import zlib
-from typing import Any
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 import httpx
 
@@ -27,6 +29,25 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 MAX_DOWNLOAD_BYTES = 5 * 1024 * 1024  # 5 MB
 _MAX_DECOMPRESSED_BYTES = 20 * 1024 * 1024  # 20 MB
 _TIMEOUT = 30.0
+# Synchronous parsers (openpyxl, xlrd, pyxlsb, odfpy, pypdf) run in a worker
+# thread with this bound, so a huge or pathological file never stalls every
+# other request on the event loop.
+PARSE_TIMEOUT_SECONDS = 60.0
+
+T = TypeVar("T")
+
+
+async def run_parser_off_loop(fn: Callable[..., T], *args: Any) -> T:
+    """Run a blocking parser in a thread, failing with a clear message on timeout."""
+    try:
+        return await asyncio.wait_for(
+            asyncio.to_thread(fn, *args), timeout=PARSE_TIMEOUT_SECONDS
+        )
+    except TimeoutError as e:
+        raise ValueError(
+            f"El archivo tardó más de {int(PARSE_TIMEOUT_SECONDS)} s en analizarse; "
+            "es demasiado grande o está dañado para previsualizarlo aquí."
+        ) from e
 
 _GEOM_COLUMN_NAMES = {"geom", "geometry", "the_geom", "wkt", "wkt_geom", "shape"}
 _WKT_PREFIXES = (
@@ -166,10 +187,9 @@ async def _download(
         if _should_raise(resp, raise_for_status):
             resp.raise_for_status()
 
-        content_length = resp.headers.get("content-length")
-        if content_length and int(content_length) > max_bytes:
-            truncated = True
-
+        # Content-Length is advisory only: a server can overstate it (and a
+        # fully received file must not be refused for it) or send garbage;
+        # the byte counter below is what decides `truncated`.
         chunks: list[bytes] = []
         total = 0
         async for chunk in resp.aiter_bytes(chunk_size=64 * 1024):
@@ -554,8 +574,6 @@ async def preview_xlsx(
     see download_bytes' max_bytes docstring. Worth the larger cap since the
     alternative is a guaranteed failure, not a safety margin.
     """
-    from openpyxl import load_workbook
-
     raw, truncated = await download_bytes(
         url, session=session, max_bytes=_MAX_DECOMPRESSED_BYTES
     )
@@ -568,6 +586,12 @@ async def preview_xlsx(
         )
 
     _check_zip_container_size(raw, ".xlsx")
+    return await run_parser_off_loop(_parse_xlsx_bytes, raw, truncated, max_rows)
+
+
+def _parse_xlsx_bytes(raw: bytes, truncated: bool, max_rows: int) -> dict[str, Any]:
+    from openpyxl import load_workbook
+
     wb = load_workbook(filename=io.BytesIO(raw), read_only=True, data_only=True)
     try:
         ws = wb.active
@@ -613,9 +637,21 @@ async def preview_xls(
     url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
 ) -> dict[str, Any]:
     """Preview the first sheet of a legacy Excel (.xls) workbook."""
+    raw, truncated = await download_bytes(url, session=session)
+    if truncated:
+        # xlrd needs the whole BIFF stream; a cut-off file fails with an
+        # opaque xlrd error, so say what actually happened instead.
+        raise ValueError(
+            "El archivo .xls supera el límite de 5 MB de este preview, así que "
+            "se descargó incompleto y no se puede abrir. Usa download_resource "
+            "para bajarlo completo, o el enlace directo."
+        )
+    return await run_parser_off_loop(_parse_xls_bytes, raw, truncated, max_rows)
+
+
+def _parse_xls_bytes(raw: bytes, truncated: bool, max_rows: int) -> dict[str, Any]:
     import xlrd
 
-    raw, truncated = await download_bytes(url, session=session)
     wb = xlrd.open_workbook(file_contents=raw)
     ws = wb.sheet_by_index(0)
 
@@ -653,8 +689,6 @@ async def preview_xlsb(
     url: str, max_rows: int = 20, session: httpx.AsyncClient | None = None
 ) -> dict[str, Any]:
     """Preview the first sheet of an Excel Binary Workbook (.xlsb)."""
-    from pyxlsb import open_workbook
-
     raw, truncated = await download_bytes(
         url, session=session, max_bytes=_MAX_DECOMPRESSED_BYTES
     )
@@ -679,6 +713,11 @@ async def preview_xlsb(
         )
 
     _check_zip_container_size(raw, ".xlsb")
+    return await run_parser_off_loop(_parse_xlsb_bytes, raw, truncated, max_rows)
+
+
+def _parse_xlsb_bytes(raw: bytes, truncated: bool, max_rows: int) -> dict[str, Any]:
+    from pyxlsb import open_workbook
 
     wb = open_workbook(io.BytesIO(raw))
     try:
@@ -738,10 +777,6 @@ async def preview_ods(
     can't open at all, so there's no safety benefit to stopping early at
     the default cap, only a guaranteed failure.
     """
-    from odf.opendocument import load
-    from odf.table import Table, TableCell, TableRow
-    from odf.teletype import extractText
-
     raw, truncated = await download_bytes(
         url, session=session, max_bytes=_MAX_DECOMPRESSED_BYTES
     )
@@ -754,6 +789,14 @@ async def preview_ods(
         )
 
     _check_zip_container_size(raw, ".ods")
+    return await run_parser_off_loop(_parse_ods_bytes, raw, truncated, max_rows)
+
+
+def _parse_ods_bytes(raw: bytes, truncated: bool, max_rows: int) -> dict[str, Any]:
+    from odf.opendocument import load
+    from odf.table import Table, TableCell, TableRow
+    from odf.teletype import extractText
+
     doc = load(io.BytesIO(raw))
     tables = doc.spreadsheet.getElementsByType(Table)
     empty = {
@@ -1115,7 +1158,9 @@ def _parse_central_directory(data: bytes, expected_entries: int) -> list[dict[st
     members: list[dict[str, Any]] = []
     pos = 0
     while pos < len(data) and len(members) < expected_entries:
-        if data[pos : pos + 4] != _CD_HEADER_SIGNATURE:
+        # A short or hostile central directory must end the listing, not
+        # surface as a struct.error from unpack_from.
+        if pos + 46 > len(data) or data[pos : pos + 4] != _CD_HEADER_SIGNATURE:
             break
         (
             _sig,

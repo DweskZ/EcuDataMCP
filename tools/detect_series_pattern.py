@@ -1,9 +1,10 @@
 from functools import partial
-from typing import Any, Literal
+from typing import Literal
 
 import httpx
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import ckan_client
 from helpers.csv_reader import (
@@ -220,7 +221,7 @@ def register_detect_series_pattern_tool(mcp: MCPServer) -> None:
         resource_id_old: str | None = None,
         source: ckan_client.CkanSource = "nacional",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Tell whether a dataset's periodic files (one per week/month/etc) replace
         each other (cumulative -- only the newest file matters) or complement

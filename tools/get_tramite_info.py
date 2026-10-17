@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import gobec_client
 from helpers.format_out import render_structured
@@ -22,7 +23,7 @@ def register_get_tramite_info_tool(mcp: MCPServer) -> None:
     @log_tool
     async def get_tramite_info(
         tramite_id: str, format: Literal["text", "json"] = "text"
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Get detailed information about a specific government procedure (trámite).
 

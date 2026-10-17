@@ -77,6 +77,9 @@ _bundle_cache = TtlCache(ttl_seconds=86400.0, max_entries=256)
 # bundle fetches, not worth repeating per search.
 _catalog_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
 _revision_observations: list[dict[str, Any]] = []
+# Every BCEData response appends one entry; between catalog rebuilds (which
+# clear it) that is unbounded, so keep only the most recent ones.
+_MAX_REVISION_OBSERVATIONS = 500
 
 _SOURCE_NAME = "Banco Central del Ecuador — BCEData"
 _TREE_URL = f"{_BASE_URL}/tree"
@@ -218,6 +221,7 @@ def _record_revision_observation(
                 if _REVISION_KEY_RE.search(str(key)) and value not in (None, ""):
                     candidates.append({"campo": str(key), "valor": str(value)})
     _revision_observations.append({"endpoint": endpoint, "candidatos": candidates})
+    del _revision_observations[:-_MAX_REVISION_OBSERVATIONS]
 
 
 def _revision_summary() -> dict[str, Any]:

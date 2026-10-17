@@ -1,8 +1,11 @@
-from typing import Any, Literal
+import logging
+from typing import Literal
+from urllib.parse import urlsplit
 
 import httpx
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import ckan_client
 from helpers.csv_reader import (
@@ -19,7 +22,10 @@ from helpers.csv_reader import (
 )
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.safe_download import UnsafeUrlError
 from helpers.tool_meta import READ_ONLY
+
+logger = logging.getLogger(__name__)
 
 _CSV_FORMATS = {"CSV", "TSV", "TXT", ""}
 _JSON_FORMATS = {"JSON", "GEOJSON"}
@@ -33,8 +39,11 @@ def classify_resource_format(fmt: str, url: str) -> str:
     file tagged "CSV" by whoever published it), so a recognizable URL
     extension always wins over a conflicting declared format. Only when
     the extension itself is not diagnostic do we fall back to `fmt`.
+
+    Only the URL path is inspected: a query string or fragment
+    (`archivo.zip?token=x`) must not hide the extension.
     """
-    url_lower = url.lower()
+    url_lower = urlsplit(url).path.lower()
     if url_lower.endswith(".rar"):
         return "RAR"
     if url_lower.endswith((".tar.gz", ".tgz")):
@@ -119,7 +128,7 @@ def register_preview_resource_data_tool(mcp: MCPServer) -> None:
         rows: int = 20,
         source: ckan_client.CkanSource = "nacional",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Download and preview a resource from Ecuador's open data portal.
 
@@ -222,6 +231,13 @@ def register_preview_resource_data_tool(mcp: MCPServer) -> None:
                 )
         except httpx.HTTPError as e:
             raise ToolError(f"Error al descargar el archivo: download_failed: {e}") from e
+        except UnsafeUrlError as e:
+            # The guard's message names the resolved private IP: keep that
+            # detail in the server log, never in the client-facing error.
+            logger.warning("preview_resource_data rechazó la URL %s: %s", url, e)
+            raise ToolError(
+                "URL rechazada por seguridad: el destino no es público"
+            ) from e
         except Exception as e:
             raise ToolError(f"Error al procesar el archivo: {e}") from e
 

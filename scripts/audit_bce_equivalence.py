@@ -11,6 +11,9 @@ import argparse
 import asyncio
 import json
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from helpers import bce_client, bce_equivalence, bce_equivalence_store, bce_iem_client
 

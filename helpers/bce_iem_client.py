@@ -57,6 +57,8 @@ _DEFAULT_CATALOG_DIR = data_dir() / "iem_catalog_snapshots"
 
 _catalog_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
 _bulletins_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
+# Bulletin sources that failed on the most recent reconciliation.
+_last_bulletin_failures: list[str] = []
 _bulletin_tables_cache = TtlCache(ttl_seconds=86400.0, max_entries=512)
 # Legacy bulletin ZIPs (pre-Oct-2016) are fetched whole -- both to list their
 # members (building the table catalog) and later to read one member's bytes.
@@ -170,6 +172,9 @@ def _bulletin_diagnostics(bulletins: list[dict[str, Any]]) -> dict[str, Any]:
         "primer_boletin": numbers[0] if numbers else None,
         "ultimo_boletin": numbers[-1] if numbers else None,
         "numeros_faltantes": gaps,
+        # Sources that failed while reconciling the bulletin list (see
+        # _fetch_bulletins); non-empty means the newest bulletin may be missing.
+        "fuentes_fallidas": list(_last_bulletin_failures),
     }
 
 
@@ -270,6 +275,7 @@ async def _fetch_bulletins() -> list[dict[str, Any]]:
         )
         latest_bulletins: list[dict[str, Any]] = []
         archive_bulletins: list[dict[str, Any]] = []
+        failed_sources: list[str] = []
         try:
             raw_latest, latest_truncated = await download_bytes(
                 IEM_LATEST_PUBLICATIONS_URL
@@ -281,6 +287,7 @@ async def _fetch_bulletins() -> list[dict[str, Any]]:
         except Exception as exc:
             # Keep the historical index as a safe fallback if the publications
             # page is temporarily unavailable or changes its markup.
+            failed_sources.append("ultimas_publicaciones")
             logger.warning(
                 "No se pudo reconciliar Últimas publicaciones del BCE: %s", exc
             )
@@ -293,13 +300,20 @@ async def _fetch_bulletins() -> list[dict[str, Any]]:
         except Exception as exc:
             # The older archive is supplementary: preserve the current index
             # when it is temporarily unavailable or its WordPress markup moves.
+            failed_sources.append("archivo_historico")
             logger.warning("No se pudo cargar el archivo histórico IEM del BCE: %s", exc)
         bulletins = _merge_bulletins(
             latest_bulletins, index_bulletins, archive_bulletins
         )
         if not bulletins:
             raise ValueError("No se encontraron boletines IEM en el índice del BCE")
-        _bulletins_cache.set("bulletins", bulletins)
+        global _last_bulletin_failures
+        _last_bulletin_failures = failed_sources
+        # A list reconciled without one of its sources may be missing the
+        # newest bulletin: serve it now, but don't pin it for 24 h -- the
+        # next call retries the failed source.
+        if not failed_sources:
+            _bulletins_cache.set("bulletins", bulletins)
         return bulletins
 
 

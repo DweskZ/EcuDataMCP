@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import sgr_client
 from helpers.format_out import render_structured
@@ -29,7 +30,7 @@ def register_search_eventos_riesgo_tool(mcp: MCPServer) -> None:
         estado: str = "",
         limit: int = 15,
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Search emergency/risk events from Ecuador's SGR COE (Gestión de Riesgos).
 

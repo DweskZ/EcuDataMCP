@@ -147,3 +147,25 @@ async def test_get_tablero_caches_page_across_calls(httpx_mock):
     await cenace.get_tablero("acumulada_anual")
 
     assert len(httpx_mock.get_requests()) == 1
+
+
+@pytest.mark.asyncio
+async def test_page_without_sections_is_not_cached(httpx_mock):
+    httpx_mock.add_response(url=cenace._URL, text="<html><body>Mantenimiento</body></html>")
+    httpx_mock.add_response(url=cenace._URL, text=_PAGE)
+
+    with pytest.raises(ValueError, match="No se encontró la sección"):
+        await cenace.get_tablero("produccion_tiempo_real")
+
+    result = await cenace.get_tablero("produccion_tiempo_real")
+    assert result["resumen"]["PRODUCCIÓN TOTAL"] == 97995
+
+
+@pytest.mark.asyncio
+async def test_resumen_labels_are_html_unescaped(httpx_mock):
+    page = _PAGE.replace("R. NO CONVENCIONAL", "R. NO CONVENCIONAL &amp; OTRAS")
+    httpx_mock.add_response(url=cenace._URL, text=page)
+
+    result = await cenace.get_tablero("produccion_tiempo_real")
+
+    assert result["resumen"]["R. NO CONVENCIONAL & OTRAS"] == 596

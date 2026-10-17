@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import contraloria_client
 from helpers.csv_reader import format_table
@@ -22,7 +23,7 @@ def register_get_contraloria_informe_tool(mcp: MCPServer) -> None:
     @log_tool
     async def get_contraloria_informe(
         informe_id: str, rows: int = 50, format: Literal["text", "json"] = "text"
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Download and preview one Contraloría document (Datos Abiertos or
         Plan Anual de Control).

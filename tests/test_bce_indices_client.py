@@ -139,8 +139,9 @@ async def test_fetch_catalog_discovers_from_sitemap_and_skips_pages_without_widg
         url="https://contenido.bce.fin.ec/memoria-anual-indice/", html=_NO_WIDGET_HTML
     )
 
-    catalog = await bce_indices_client._fetch_catalog()
+    catalog, paginas_fallidas = await bce_indices_client._fetch_catalog()
 
+    assert paginas_fallidas == []
     # estadisticas-de-coyuntura/ doesn't match the -indice(s) slug filter, so
     # it's never fetched; memoria-anual-indice/ is fetched but has no widget.
     ids = {e["pagina_id"] for e in catalog}
@@ -291,3 +292,47 @@ async def test_discover_paginas_skips_extra_slug_absent_from_sitemap(monkeypatch
     candidatos = await bce_indices_client._discover_paginas()
 
     assert not any("no-existe-todavia" in c["url"] for c in candidatos)
+
+
+@pytest.mark.asyncio
+async def test_failed_page_is_reported_and_partial_catalog_is_not_cached(httpx_mock):
+    weekly_url = "https://contenido.bce.fin.ec/boletin-monetario-semanal-indices/"
+    petroleo_url = "https://contenido.bce.fin.ec/boletin-analitico-del-sector-petrolero-indice/"
+    memoria_url = "https://contenido.bce.fin.ec/memoria-anual-indice/"
+    httpx_mock.add_response(url=bce_indices_client._SITEMAP_URL, html=_SITEMAP_XML)
+    httpx_mock.add_exception(url=petroleo_url, exception=Exception("boom"))
+    httpx_mock.add_response(url=weekly_url, html=_GI_WEEKLY_PAGE_HTML)
+    httpx_mock.add_response(url=memoria_url, html=_NO_WIDGET_HTML)
+    httpx_mock.add_response(url=bce_indices_client._SITEMAP_URL, html=_SITEMAP_XML)
+    httpx_mock.add_response(url=petroleo_url, html=_GI_PAGE_HTML)
+    httpx_mock.add_response(url=weekly_url, html=_GI_WEEKLY_PAGE_HTML)
+    httpx_mock.add_response(url=memoria_url, html=_NO_WIDGET_HTML)
+
+    first = await bce_indices_client.search_indices()
+    assert first["total_paginas"] == 1
+    assert first["paginas_fallidas"] == [petroleo_url]
+
+    # The partial catalog was not cached, so the second call re-fetches and
+    # now finds the page that failed before.
+    second = await bce_indices_client.search_indices()
+    assert second["total_paginas"] == 2
+    assert second["paginas_fallidas"] == []
+
+
+@pytest.mark.asyncio
+async def test_get_archivo_not_found_mentions_incomplete_catalog(httpx_mock):
+    httpx_mock.add_response(url=bce_indices_client._SITEMAP_URL, html=_SITEMAP_XML)
+    httpx_mock.add_exception(
+        url="https://contenido.bce.fin.ec/boletin-analitico-del-sector-petrolero-indice/",
+        exception=Exception("boom"),
+    )
+    httpx_mock.add_response(
+        url="https://contenido.bce.fin.ec/boletin-monetario-semanal-indices/",
+        html=_GI_WEEKLY_PAGE_HTML,
+    )
+    httpx_mock.add_response(
+        url="https://contenido.bce.fin.ec/memoria-anual-indice/", html=_NO_WIDGET_HTML
+    )
+
+    with pytest.raises(ValueError, match="catálogo quedó incompleto"):
+        await bce_indices_client.get_archivo("boletin-analitico-del-sector-petrolero-indice")

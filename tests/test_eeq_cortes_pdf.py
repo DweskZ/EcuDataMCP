@@ -1,6 +1,7 @@
+import pytest
 from fpdf import FPDF
 
-from helpers import eeq_cortes_client
+from helpers import eeq_cortes_client, eeq_cortes_pdf
 from helpers.eeq_cortes_pdf import parse_horario, parse_pdf
 
 # Synthetic PDFs that reproduce the positions and font sizes measured on
@@ -151,3 +152,15 @@ async def test_get_eeq_cortes_horarios_rejects_bad_slug():
 
     with pytest.raises(ValueError, match="slug"):
         await eeq_cortes_client.get_eeq_cortes_horarios("vsd?x=1")
+
+
+def test_pdf_over_page_cap_is_rejected(monkeypatch):
+    monkeypatch.setattr(eeq_cortes_pdf, "_MAX_PAGES", 2)
+
+    with pytest.raises(ValueError, match="máximo procesable"):
+        parse_pdf(_pdf([[], [], []]))
+
+
+def test_unreadable_pdf_is_a_value_error():
+    with pytest.raises(ValueError, match="no se pudo leer"):
+        parse_pdf(b"%PDF-1.4 garbage")

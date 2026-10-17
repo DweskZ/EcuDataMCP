@@ -137,3 +137,34 @@ async def test_api_error_payload_raises(httpx_mock):
 async def test_input_validation(kwargs, match):
     with pytest.raises(ValueError, match=match):
         await client.get_indicador(**kwargs)
+
+
+async def test_get_indicador_reads_every_page(httpx_mock):
+    page_one = [
+        {**_SERIES[0], "pages": 2, "total": 4},
+        [_SERIES[1][0], _SERIES[1][2]],
+    ]
+    page_two = [
+        {**_SERIES[0], "page": 2, "pages": 2, "total": 4},
+        [
+            {**_SERIES[1][0], "date": "2021", "value": 97.0},
+            {**_SERIES[1][0], "date": "2020", "value": 96.5},
+        ],
+    ]
+    httpx_mock.add_response(url=f"{_SERIES_URL}?format=json&per_page=1000", json=page_one)
+    httpx_mock.add_response(
+        url=f"{_SERIES_URL}?format=json&per_page=1000&page=2", json=page_two
+    )
+
+    result = await client.get_indicador("EG.ELC.ACCS.ZS")
+
+    assert [r["anio"] for r in result["serie"]] == [2020, 2021, 2022, 2024]
+    assert result["total_registros"] == 4
+
+
+async def test_get_indicador_refuses_absurd_page_count(httpx_mock):
+    payload = [{**_SERIES[0], "pages": client._MAX_PAGES + 1, "total": 99999}, _SERIES[1]]
+    httpx_mock.add_response(url=f"{_SERIES_URL}?format=json&per_page=1000", json=payload)
+
+    with pytest.raises(ValueError, match="acota el rango"):
+        await client.get_indicador("EG.ELC.ACCS.ZS")

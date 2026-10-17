@@ -54,11 +54,10 @@ def test_keeps_unknown_errors_as_failures():
     assert assessment.status == "failed"
 
 
-def test_classifies_any_upstream_5xx_as_degraded():
+def test_classifies_known_host_upstream_5xx_as_degraded():
     # Confirmed live 2026-09-18: anda.inec.gob.ec 503'd on the scheduled
-    # run. A 5xx is the live source's own server failing, generically, not
-    # something specific to ANDA -- so this must not need a hardcoded
-    # per-host tuple the way the 403/geoblock cases do.
+    # run. The host is already named by a known-degradation entry, so its
+    # 5xx is that flaky source failing, not a regression here.
     text = (
         "Error al buscar en ANDA: Server error '503 Service Unavailable' "
         "for url 'https://anda.inec.gob.ec/anda5/index.php/api/catalog"
@@ -197,3 +196,49 @@ def test_chain_step_degrades_on_plain_text_tool_error_via_is_error_flag():
         chain_step(text, is_error=True)
 
     assert excinfo.value.source == "datos_abiertos_ckan"
+
+
+def test_upstream_5xx_from_unknown_host_stays_a_failure():
+    # A 500 from a host no known-degradation entry names can be a changed
+    # endpoint or a request this repo builds wrongly; it must not be masked.
+    text = (
+        "Error al consultar: Server error '500 Internal Server Error' "
+        "for url 'https://api.otra-fuente.gob.ec/v1/datos'"
+    )
+
+    assert degraded_source(text) is None
+    assert assess_response(text, [], is_error=True).status == "failed"
+
+
+def test_upstream_5xx_matches_subdomains_of_known_hosts():
+    text = (
+        "Server error '502 Bad Gateway' for url "
+        "'https://www.datosabiertos.gob.ec/api/3/action/package_search'"
+    )
+
+    assert degraded_source(text) == "upstream_5xx:www.datosabiertos.gob.ec"
+
+
+def test_classifies_supercias_financials_cold_start_as_degraded():
+    text = (
+        "Error: La base de datos financiera de Supercías no existe todavía "
+        "(descarga ~356 MB, 15-20 minutos la primera vez). Se está "
+        "construyendo automáticamente en segundo plano -- vuelve a intentar "
+        "en unos minutos."
+    )
+
+    assert degraded_source(text) == "supercias_financials_cold_start"
+
+
+def test_supercias_schema_mismatch_is_not_a_cold_start():
+    # Same "segundo plano" suffix, but a DB built with an old schema version
+    # is a regression signal (the build didn't refresh it), not a first run.
+    text = (
+        "Error: La base de datos financiera de Supercías fue construida con "
+        "una versión anterior del esquema (1, se requiere 2). Se está "
+        "construyendo automáticamente en segundo plano -- vuelve a intentar "
+        "en unos minutos."
+    )
+
+    assert degraded_source(text) is None
+    assert assess_response(text, [], is_error=True).status == "failed"

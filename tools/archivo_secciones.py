@@ -13,6 +13,7 @@ from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import (
     arcsa_client,
@@ -152,7 +153,7 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
     @log_tool
     async def list_archivo_secciones(
         fuente: Fuente, format: Literal["text", "json"] = "text"
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         List the sections of one institution's document archive.
 
@@ -251,7 +252,7 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
     @log_tool
     async def get_archivo_seccion(
         fuente: Fuente, seccion: str, format: Literal["text", "json"] = "text"
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         List the files published in one section of an institutional archive.
 

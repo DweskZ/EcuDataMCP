@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import energia_ecuador_snapshot_client
 from helpers.format_out import render_structured
@@ -18,7 +19,7 @@ def register_get_energia_ecuador_snapshot_tool(mcp: MCPServer) -> None:
     @log_tool
     async def get_energia_ecuador_snapshot(
         query: str = "", format: Literal["text", "json"] = "text"
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Recover, via the Wayback Machine, the national blackout-schedule
         aggregator the Ministry of Energy and Mines briefly ran during the

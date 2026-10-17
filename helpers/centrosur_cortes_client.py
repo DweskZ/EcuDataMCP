@@ -48,6 +48,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
+from html import unescape
 from typing import Any
 from urllib.parse import unquote
 
@@ -85,13 +86,17 @@ _PDF_URL_RE = re.compile(
 # The Sep 2024 file is a 22 MB scan; a bigger cap than the project's 5 MB
 # default lets the parser report "no text layer" instead of a truncation.
 _MAX_PDF_BYTES = 25 * 1024 * 1024
+# pypdf is CPU-bound and runs off the event loop; a pathological file must
+# not stall every concurrent request on the HTTP transport.
+_PARSE_TIMEOUT = 60.0
 _horarios_cache = TtlCache(ttl_seconds=86400.0, max_entries=16)
 
 
 def _parse_item(item: dict[str, Any]) -> dict[str, Any]:
     url = item.get("source_url", "")
     upload_m = _UPLOAD_PATH_RE.search(url)
-    titulo = (item.get("title") or {}).get("rendered") or ""
+    # WordPress serves "rendered" titles HTML-escaped (&#8211;, &amp;).
+    titulo = unescape((item.get("title") or {}).get("rendered") or "")
     if not titulo:
         titulo = unquote(url.rsplit("/", 1)[-1]).rsplit(".", 1)[0]
     return {
@@ -207,7 +212,9 @@ async def get_centrosur_cortes_horarios(url: str, query: str = "") -> dict[str, 
             raise ValueError(f"el PDF supera {_MAX_PDF_BYTES // 2**20} MB")
         if not raw.startswith(b"%PDF"):
             raise ValueError(f"{url} no devolvió un PDF")
-        parsed = parse_pdf(raw)
+        parsed = await asyncio.wait_for(
+            asyncio.to_thread(parse_pdf, raw), timeout=_PARSE_TIMEOUT
+        )
         _horarios_cache.set(url, parsed)
 
     q = _strip(query)

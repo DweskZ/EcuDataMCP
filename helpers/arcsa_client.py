@@ -214,10 +214,16 @@ async def _fetch_base_datos_html() -> str:
                 f"La página de {_BASE_DATOS_URL} superó el límite de descarga."
             )
         html = content.decode("utf-8", errors="replace")
-        if _ROOT_UL_RE.search(html):
-            # Same "don't cache an apparently-broken/empty scrape" rationale
-            # as helpers/sgr_publicaciones_client.py.
-            _page_cache.set("html", html)
+        # Without the root <ul class="ul-downloads"> the page is a
+        # maintenance/anti-bot page or was redesigned: raise (same as
+        # helpers/censo_client.py) rather than return a success-shaped
+        # empty listing, and never cache it.
+        if not _ROOT_UL_RE.search(html):
+            raise ValueError(
+                "La página Base de Registros Emitidos de ARCSA no trae la lista de "
+                "categorías (puede haber cambiado de estructura o estar bloqueada)."
+            )
+        _page_cache.set("html", html)
         return html
 
 

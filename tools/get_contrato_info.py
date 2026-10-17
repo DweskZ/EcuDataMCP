@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import sercop_client
 from helpers.env_config import get_base_url
@@ -31,7 +32,7 @@ def register_get_contrato_info_tool(mcp: MCPServer) -> None:
     @log_tool
     async def get_contrato_info(
         ocid: str, format: Literal["text", "json"] = "text"
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Get the full OCDS record for a public procurement procedure (SERCOP).
 

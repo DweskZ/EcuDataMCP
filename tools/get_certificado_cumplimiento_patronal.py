@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import iess_certificado_patronal_client
 from helpers.format_out import render_structured
@@ -22,7 +23,7 @@ def register_get_certificado_cumplimiento_patronal_tool(mcp: MCPServer) -> None:
     @log_tool
     async def get_certificado_cumplimiento_patronal(
         identificacion: str, format: Literal["text", "json"] = "text"
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Check whether an employer (13-digit RUC) or individual (10-digit
         cédula) is current on Seguro Social (IESS) contributions, via the

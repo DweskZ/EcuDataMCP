@@ -12,6 +12,7 @@ from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import (
     arconel_reportes_client,
@@ -195,7 +196,7 @@ def register_list_catalogo_tool(mcp: MCPServer) -> None:
     async def list_catalogo(
         fuente: Fuente,
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         List the catalog of one source that has no search filters.
 

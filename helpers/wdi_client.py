@@ -108,6 +108,9 @@ async def search_indicadores(query: str = "", limit: int = 30) -> dict[str, Any]
     }
 
 
+_MAX_PAGES = 10  # 10,000 observations: far beyond any WDI series for one country
+
+
 async def get_indicador(
     indicador: str, pais: str = "ECU", desde: int | None = None, hasta: int | None = None
 ) -> dict[str, Any]:
@@ -133,10 +136,20 @@ async def get_indicador(
     if cached is not None:
         return cached
 
-    payload = _check_api_error(
-        await _fetch_json(f"/country/{pais.upper()}/indicator/{indicador}", **params)
-    )
-    meta, rows = payload[0], payload[1] or []
+    path = f"/country/{pais.upper()}/indicator/{indicador}"
+    payload = _check_api_error(await _fetch_json(path, **params))
+    meta, rows = payload[0], list(payload[1] or [])
+    # A yearly series fits in one page of 1000, but a sub-annual one may
+    # not; read the remaining pages rather than returning a silent prefix.
+    pages = int(meta.get("pages") or 1)
+    if pages > _MAX_PAGES:
+        raise ValueError(
+            f"La serie {indicador} para {pais.upper()} tiene {meta.get('total')} "
+            f"observaciones en {pages} páginas; acota el rango con desde/hasta."
+        )
+    for page in range(2, pages + 1):
+        extra = _check_api_error(await _fetch_json(path, **params, page=page))
+        rows.extend(extra[1] or [])
     # Almost every WDI series is yearly; a quarterly/monthly one ("2020Q1")
     # keeps its period label instead of failing the int() conversion.
     serie = [

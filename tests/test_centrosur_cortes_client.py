@@ -157,3 +157,13 @@ async def test_empty_archive_is_not_cached(httpx_mock):
 
     second = await client._fetch_archivos()
     assert len(second) == 4
+
+
+def test_parse_item_unescapes_wordpress_rendered_title():
+    item = {
+        "title": {"rendered": "Cortes &#8211; 23 al 29 de septiembre &amp; octubre"},
+        "source_url": "https://www.centrosur.gob.ec/wp-content/uploads/2024/09/Cortes.pdf",
+        "date": "2024-09-22T18:58:21",
+    }
+
+    assert client._parse_item(item)["titulo"] == "Cortes – 23 al 29 de septiembre & octubre"

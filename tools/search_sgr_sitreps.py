@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import sgr_publicaciones_client
 from helpers.format_out import render_structured
@@ -22,7 +23,7 @@ def register_search_sgr_sitreps_tool(mcp: MCPServer) -> None:
     @log_tool
     async def search_sgr_sitreps(
         query: str = "", format: Literal["text", "json"] = "text"
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         List SGR's SITREP ("Informes de Situación") archive of adverse-event
         dossiers (gestionderiesgos.gob.ec), 2016-2026.

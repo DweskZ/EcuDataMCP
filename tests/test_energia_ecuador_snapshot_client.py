@@ -123,3 +123,9 @@ async def test_missing_snapshot_raises(httpx_mock):
 
     with pytest.raises(ValueError, match="Wayback"):
         await client._fetch_snapshot()
+
+
+def test_clean_cell_unescapes_html_entities():
+    cell = "<b>Quito &amp; Rumi&ntilde;ahui</b>&nbsp;Norte"
+
+    assert client._clean_cell(cell) == "Quito & Rumiñahui Norte"

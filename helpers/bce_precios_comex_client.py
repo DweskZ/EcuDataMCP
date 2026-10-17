@@ -151,7 +151,8 @@ def _parse_download_list(html: str) -> list[dict[str, str]]:
     return archivos
 
 
-async def _fetch_pagina(pagina: dict[str, str]) -> list[dict[str, str]]:
+async def _fetch_pagina(pagina: dict[str, str]) -> list[dict[str, str]] | str:
+    """The page's file links, or its URL when it could not be downloaded."""
     try:
         content, truncated = await download_bytes(pagina["url"])
         if truncated:
@@ -159,7 +160,7 @@ async def _fetch_pagina(pagina: dict[str, str]) -> list[dict[str, str]]:
                 "La página de precios de comercio exterior %s superó el límite de descarga",
                 pagina["url"],
             )
-            return []
+            return pagina["url"]
         html = content.decode("utf-8", errors="replace")
     except Exception as exc:
         logger.warning(
@@ -167,7 +168,7 @@ async def _fetch_pagina(pagina: dict[str, str]) -> list[dict[str, str]]:
             pagina["url"],
             exc,
         )
-        return []
+        return pagina["url"]
 
     return [
         {
@@ -180,24 +181,33 @@ async def _fetch_pagina(pagina: dict[str, str]) -> list[dict[str, str]]:
     ]
 
 
-async def _fetch_files() -> list[dict[str, str]]:
+async def _fetch_files() -> tuple[list[dict[str, str]], list[str]]:
+    """The file links plus the URLs of pages that failed to download."""
     cached = _files_cache.get("files")
     if cached is not None:
-        return cached
+        return cached, []
 
     async with _fetch_lock:
         cached = _files_cache.get("files")
         if cached is not None:
-            return cached
+            return cached, []
 
         logger.info("Descargando páginas de índices de precios de comercio exterior del BCE")
         results = await asyncio.gather(*(_fetch_pagina(p) for p in _PAGINAS))
-        files = [archivo for pagina_files in results for archivo in pagina_files]
-        if files:
-            # Same "don't cache an apparently-broken/empty scrape" rationale
-            # as helpers/bce_remesas_client.py and helpers/bce_indices_client.py.
+        files = [
+            archivo
+            for pagina_files in results
+            if isinstance(pagina_files, list)
+            for archivo in pagina_files
+        ]
+        paginas_fallidas = [entry for entry in results if isinstance(entry, str)]
+        # Same "don't cache an apparently-broken/empty scrape" rationale as
+        # helpers/bce_remesas_client.py and helpers/bce_indices_client.py; a
+        # partial list (one page failed) must not stick for the whole TTL
+        # either (see helpers/bce_client.py), so the next call retries it.
+        if files and not paginas_fallidas:
             _files_cache.set("files", files)
-        return files
+        return files, paginas_fallidas
 
 
 def clear_cache() -> None:
@@ -218,7 +228,7 @@ async def search_archivos(query: str = "") -> dict[str, Any]:
         query: Free text matched (accent-insensitive) against the file's
             label, its page title, or its page id. Empty returns all files.
     """
-    files = await _fetch_files()
+    files, paginas_fallidas = await _fetch_files()
     q = _strip(query)
     matched = [
         f
@@ -231,6 +241,7 @@ async def search_archivos(query: str = "") -> dict[str, Any]:
     return {
         "total": len(matched),
         "total_en_paginas": len(files),
+        "paginas_fallidas": paginas_fallidas,
         "source": _SOURCE_NAME,
         "paginas": [dict(p) for p in _PAGINAS],
         "archivos": matched,

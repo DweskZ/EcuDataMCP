@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import inec_client
 from helpers.format_out import render_structured
@@ -21,7 +22,7 @@ def register_get_inec_publicacion_archivos_tool(mcp: MCPServer) -> None:
     @log_tool
     async def get_inec_publicacion_archivos(
         post: str, format: Literal["text", "json"] = "text"
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         List the direct file links (PDF/XLSX/CSV/ZIP) embedded in one INEC
         publication found via search_inec_publicaciones.

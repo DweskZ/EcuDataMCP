@@ -1,6 +1,7 @@
 import pytest
 
 from helpers import inec_client
+from helpers.user_agent import USER_AGENT
 
 _SEED_URLS = inec_client._SEED_PAGE_URLS
 _IPC_SEED, _ENEMDU_SEED = _SEED_URLS
@@ -477,3 +478,16 @@ async def test_get_topic_files_does_not_cache_failed_related_pages(httpx_mock):
 
     assert first["archivos"] == []
     assert inec_client._topic_files_cache.get(_HUB_URL) is None
+
+
+@pytest.mark.asyncio
+async def test_fetch_categories_sends_project_user_agent(httpx_mock):
+    httpx_mock.add_response(
+        url=f"{_API_BASE}/categories?per_page=100&page=1",
+        json=_CATEGORIES_PAGE_2,
+        match_headers={"User-Agent": USER_AGENT},
+    )
+
+    categories = await inec_client._fetch_categories()
+
+    assert categories == {200: "Economía Laboral"}

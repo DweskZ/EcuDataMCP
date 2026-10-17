@@ -2350,16 +2350,6 @@
   "provincia": "Pichincha"
  },
  {
-  "codigo": " ",
-  "nombre": "",
-  "parroquia_codigo": "170250",
-  "parroquia": "Cayambe",
-  "canton_codigo": "1702",
-  "canton": "Cayambe",
-  "provincia_codigo": "17",
-  "provincia": "Pichincha"
- },
- {
   "codigo": "170501",
   "nombre": "Sangolquí",
   "parroquia_codigo": "170550",
@@ -2548,16 +2538,6 @@
   "canton": "Zamora",
   "provincia_codigo": "19",
   "provincia": "Zamora Chinchipe"
- },
- {
-  "codigo": " ",
-  "nombre": "",
-  "parroquia_codigo": "210355",
-  "parroquia": "Sansahuari",
-  "canton_codigo": "2103",
-  "canton": "Putumayo",
-  "provincia_codigo": "21",
-  "provincia": "Sucumbíos"
  },
  {
   "codigo": "220201",

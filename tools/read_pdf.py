@@ -1,8 +1,9 @@
-from typing import Any, Literal
+from typing import Literal
 
 import httpx
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
@@ -25,7 +26,7 @@ def register_read_pdf_tool(mcp: MCPServer) -> None:
         url: str,
         pages: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Extract text from a PDF document at a direct URL.
 

@@ -1,10 +1,12 @@
-from typing import Any, Literal
+from typing import Literal
 
 import httpx
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import igepn_informes_client
+from helpers.csv_reader import run_parser_off_loop
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.pdf_reader import MAX_PAGES_PER_CALL, extract_text_from_bytes
@@ -29,7 +31,7 @@ def register_get_informe_igepn_tool(mcp: MCPServer) -> None:
         anio: int = 0,
         pages: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Download and extract text from one IG-EPN report found via
         search_informes_igepn. IG-EPN has no stable per-report URL (each
@@ -54,10 +56,14 @@ def register_get_informe_igepn_tool(mcp: MCPServer) -> None:
             raise ToolError(str(e)) from e
         except httpx.HTTPError as e:
             raise ToolError(f"Error al descargar el informe: {e}") from e
+        except Exception as e:
+            raise ToolError(f"Error al consultar el informe del IG-EPN: {e}") from e
 
+        # pypdf is synchronous; off the event loop and bounded (ValueError on
+        # timeout) so one slow PDF doesn't stall every concurrent request.
         try:
-            result = extract_text_from_bytes(raw, pages=pages)
-        except ValueError as e:
+            result = await run_parser_off_loop(extract_text_from_bytes, raw, pages)
+        except Exception as e:
             raise ToolError(f"Error al leer el PDF: {e}") from e
 
         if result["total_pages"] == 0 or not any(p["text"] for p in result["pages"]):

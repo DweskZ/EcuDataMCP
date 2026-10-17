@@ -259,9 +259,15 @@ async def get_indicador_diario(
         )
     matching.sort(key=lambda r: r["Fecha"])
 
+    truncado = False
+    observaciones_en_rango: int | None = None
     if desde or hasta:
         ventana = [r for r in matching if (not desde or r["Fecha"] >= desde) and (not hasta or r["Fecha"] <= hasta)]
+        observaciones_en_rango = len(ventana)
+        # The range is cut to its most recent _MAX_VENTANA rows; say so, or a
+        # 3-year window silently comes back as one year.
         if len(ventana) > _MAX_VENTANA:
+            truncado = True
             ventana = ventana[-_MAX_VENTANA:]
     else:
         n = max(1, min(ultimos_n, _MAX_VENTANA))
@@ -275,5 +281,7 @@ async def get_indicador_diario(
         "periodicidad": first.get("Periodicidad"),
         "unidad": first.get("Medida"),
         "rango_completo": {"desde": first["Fecha"], "hasta": last["Fecha"], "n_datos": len(matching)},
+        "observaciones_en_rango": observaciones_en_rango,
+        "truncado": truncado,
         "datos": [_datapoint(r) for r in ventana],
     }

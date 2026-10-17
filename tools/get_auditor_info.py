@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import supercias_client
 from helpers.format_out import render_structured
@@ -21,7 +22,7 @@ def register_get_auditor_info_tool(mcp: MCPServer) -> None:
     @log_tool
     async def get_auditor_info(
         identificacion: str, format: Literal["text", "json"] = "text"
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Get full registry details for an authorized external auditor by identificación (Superintendencia de Compañías).
 

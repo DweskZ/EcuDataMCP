@@ -13,12 +13,17 @@ on:
     - cron: "17 9 * * *" # once a day; avoids the top-of-hour cron stampede
   workflow_dispatch: {}
 
+# The job only reads the checkout; the default token would also be able to
+# write to the repository.
+permissions:
+  contents: read
+
 jobs:
   smoke:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
         with:
           python-version: "3.12"
       - name: Install
@@ -26,7 +31,10 @@ jobs:
       # Runners sit outside LatAm, so datosabiertos.gob.ec and similar hosts
       # answer 403. With a LatAm SSH egress (docs/GEOBLOCK_PLAN.md, 2a) we open
       # a SOCKS tunnel; without the secrets (forks, not yet provisioned) the
-      # step is skipped and those checks stay degraded.
+      # step is skipped and those checks stay degraded. The tunnel carries
+      # every geo-fenced request, so the host key is always pinned
+      # (GEO_SSH_KNOWN_HOSTS, a `ssh-keyscan` line): never accept-new, which
+      # would trust whatever key answers first.
       - name: Open geo tunnel
         env:
           GEO_SSH_KEY: ${{ secrets.GEO_SSH_KEY }}
@@ -37,17 +45,18 @@ jobs:
             echo "GEO_SSH_KEY/GEO_SSH_HOST not set; skipping geo tunnel."
             exit 0
           fi
+          if [ -z "$GEO_SSH_KNOWN_HOSTS" ]; then
+            echo "::error::GEO_SSH_KNOWN_HOSTS is not set. Add the tunnel host's known_hosts line (ssh-keyscan <host>) as a repository secret; the tunnel is never opened against an unverified host key."
+            exit 1
+          fi
           install -m 700 -d ~/.ssh
           printf '%s\n' "$GEO_SSH_KEY" > ~/.ssh/geo_key
           chmod 600 ~/.ssh/geo_key
-          if [ -n "$GEO_SSH_KNOWN_HOSTS" ]; then
-            printf '%s\n' "$GEO_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
-            host_check=yes
-          else
-            host_check=accept-new
-          fi
+          printf '%s\n' "$GEO_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
           ssh -f -N -D 127.0.0.1:1080 -i ~/.ssh/geo_key \
-            -o StrictHostKeyChecking=$host_check \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile=~/.ssh/known_hosts \
             -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 \
             "$GEO_SSH_HOST"
           echo "ECUADOR_MCP_GEO_PROXY=socks5://127.0.0.1:1080" >> "$GITHUB_ENV"

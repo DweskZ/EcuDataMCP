@@ -512,3 +512,39 @@ async def test_unhcr_flags_truncation_at_page_cap(httpx_mock):
     assert result["truncado"] is True
     assert result["paginas_leidas"] == 10
     assert "truncado" in tool._to_text({"fuente": "unhcr", **result})
+
+
+def test_retry_after_http_date_is_honoured_and_clamped():
+    from datetime import UTC, datetime, timedelta
+    from email.utils import format_datetime
+
+    import httpx
+
+    soon = format_datetime(datetime.now(UTC) + timedelta(seconds=6), usegmt=True)
+    far = format_datetime(datetime.now(UTC) + timedelta(hours=1), usegmt=True)
+    past = format_datetime(datetime.now(UTC) - timedelta(seconds=30), usegmt=True)
+
+    wait_soon = intl_http._wait_seconds(httpx.Response(429, headers={"Retry-After": soon}), 1)
+    wait_far = intl_http._wait_seconds(httpx.Response(429, headers={"Retry-After": far}), 1)
+    wait_past = intl_http._wait_seconds(httpx.Response(429, headers={"Retry-After": past}), 1)
+    wait_junk = intl_http._wait_seconds(httpx.Response(429, headers={"Retry-After": "soon"}), 1)
+
+    assert 4.0 < wait_soon <= 6.0
+    assert wait_far == intl_http._MAX_WAIT_SECONDS
+    assert wait_past == 2.0  # backoff, not a negative or zero wait
+    assert wait_junk == 2.0
+
+
+def test_sdmx_json_observation_outside_period_list_is_a_clear_error():
+    payload = {
+        "dataSets": [{"series": {"0": {"observations": {"0": [1], "5": [2]}}}}],
+        "structure": {
+            "dimensions": {
+                "series": [{"id": "D", "keyPosition": 0, "values": [{"id": "a", "name": "a"}]}],
+                "observation": [{"values": [{"id": "2024"}]}],
+            }
+        },
+    }
+
+    with pytest.raises(ValueError, match="período inexistente"):
+        sdmx_json.parse(payload)

@@ -128,8 +128,16 @@ async def _fetch_files() -> list[dict[str, str]]:
         html = await _download_page(SRI_DATASETS_URL)
 
         files = _parse_files(html)
-        _files_cache.set("files", files)
-        logger.info("Página de datasets del SRI cargada: %d archivos", len(files))
+        # Don't pin an empty parse for 6h: it is indistinguishable from a
+        # maintenance page or a redesign that the next call would recover from.
+        if files:
+            _files_cache.set("files", files)
+            logger.info("Página de datasets del SRI cargada: %d archivos", len(files))
+        else:
+            logger.warning(
+                "La página de datasets del SRI no trae enlaces de archivos "
+                "(¿cambio de estructura?); no se guarda en caché."
+            )
         return files
 
 
@@ -200,11 +208,18 @@ async def _fetch_estadisticas_files() -> list[dict[str, str]]:
         html = await _download_page(SRI_ESTADISTICAS_URL)
 
         files = _parse_estadisticas_files(html)
-        _estadisticas_cache.set("files", files)
-        logger.info(
-            "Página de Estadísticas de Recaudación del SRI cargada: %d archivos",
-            len(files),
-        )
+        # Same rationale as _fetch_files: never cache an empty parse.
+        if files:
+            _estadisticas_cache.set("files", files)
+            logger.info(
+                "Página de Estadísticas de Recaudación del SRI cargada: %d archivos",
+                len(files),
+            )
+        else:
+            logger.warning(
+                "La página de Estadísticas de Recaudación del SRI no trae enlaces "
+                "de archivos (¿cambio de estructura?); no se guarda en caché."
+            )
         return files
 
 

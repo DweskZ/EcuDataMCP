@@ -2,9 +2,11 @@ from helpers import geo_data
 from helpers.geo_data import (
     find_cantones,
     find_parroquias,
+    find_parroquias_urbanas,
     find_provincias,
     list_cantones,
     list_parroquias,
+    list_parroquias_urbanas,
     list_provincias,
 )
 
@@ -66,3 +68,35 @@ def test_urban_parishes_guayaquil_include_tarqui():
     assert tarqui["codigo_parroquia_urbana"] == "090112"
     assert tarqui["codigo"] == "090150"
     assert tarqui["clasificador_anio"] == geo_data.CLASIFICADOR_ANIO
+
+
+def test_urban_parishes_have_numeric_codes_and_names():
+    # Two rows of the INEC classifier export (Cayambe 170250, Sansahuari
+    # 210355) came through with codigo " " and an empty nombre; the data
+    # file must only carry real urban parishes.
+    for row in list_parroquias_urbanas():
+        assert row["codigo_parroquia_urbana"].isdigit(), row
+        assert len(row["codigo_parroquia_urbana"]) == 6, row
+        assert row["nombre"].strip(), row
+        assert row["codigo"].isdigit() and row["canton_codigo"].isdigit(), row
+
+
+def test_numeric_province_filter_matches_code_exactly():
+    # "1" used to substring-match provinces 01, 10-19 and 21 (127 cantons).
+    azuay = find_cantones(provincia="01")
+    assert len(azuay) == 15
+    assert find_cantones(provincia="1") == azuay
+    assert all(c["provincia_codigo"] == "01" for c in find_cantones(provincia="1"))
+    assert find_cantones(provincia="Azuay") == azuay
+
+
+def test_numeric_canton_and_province_filters_for_parroquias():
+    quito = find_parroquias(canton="1701")
+    assert quito
+    assert all(r["canton_codigo"] == "1701" for r in quito)
+    # The name filter stays a substring match ("Quito" also hits Puerto Quito).
+    assert set(map(str, quito)) < set(map(str, find_parroquias(canton="Quito")))
+    assert find_parroquias(provincia="17") == find_parroquias(provincia="Pichincha")
+    assert {r["provincia_codigo"] for r in find_parroquias(provincia="9")} == {"09"}
+    urbanas = find_parroquias_urbanas(canton="901")
+    assert urbanas and all(r["canton_codigo"] == "0901" for r in urbanas)

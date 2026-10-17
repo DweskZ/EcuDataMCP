@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import sri_ruc_client
 from helpers.format_out import render_structured
@@ -23,7 +24,7 @@ def register_search_sri_ruc_tool(mcp: MCPServer) -> None:
         razon_social: str,
         max_resultados: int = 25,
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Buscar contribuyentes en el RUC del SRI por razón social o nombre
         comercial (texto parcial), sin necesitar el RUC exacto de antemano.
@@ -51,6 +52,8 @@ def register_search_sri_ruc_tool(mcp: MCPServer) -> None:
             )
         except ValueError as e:
             raise ToolError(f"Error: {e}") from e
+        except Exception as e:
+            raise ToolError(f"Error al consultar el RUC en el SRI: {e}") from e
 
         def to_text(data: dict) -> str:
             parts = [

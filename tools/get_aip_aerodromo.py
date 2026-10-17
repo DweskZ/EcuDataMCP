@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import aviacion_client
 from helpers.format_out import render_structured
@@ -21,7 +22,7 @@ def register_get_aip_aerodromo_tool(mcp: MCPServer) -> None:
     @log_tool
     async def get_aip_aerodromo(
         designador: str, format: Literal["text", "json"] = "text"
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Fetch the published AIP AD 2.x data sheet for an Ecuadorian
         aerodrome or helipad, from DGAC's public eAIP

@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import gobec_client
 from helpers.format_out import render_structured
@@ -22,7 +23,7 @@ def register_search_regulaciones_tool(mcp: MCPServer) -> None:
     @log_tool
     async def search_regulaciones(
         query: str = "", page: int = 1, format: Literal["text", "json"] = "text"
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Search or list regulations published on Ecuador's gob.ec portal.
 
@@ -35,9 +36,14 @@ def register_search_regulaciones_tool(mcp: MCPServer) -> None:
             page: Page number when query is empty (1-based)
             format: text | json
         """
+        hay_mas = False
+        paginas_leidas = 0
         try:
             if query.strip():
-                regs = await gobec_client.find_regulaciones(query.strip(), max_pages=6)
+                busqueda = await gobec_client.find_regulaciones(query.strip(), max_pages=6)
+                regs = busqueda["resultados"]
+                hay_mas = busqueda["hay_mas"]
+                paginas_leidas = busqueda["paginas_leidas"]
             else:
                 api_page = max(page - 1, 0)
                 regs = await gobec_client.list_regulaciones(page=api_page)
@@ -48,6 +54,8 @@ def register_search_regulaciones_tool(mcp: MCPServer) -> None:
             "query": query,
             "page": page,
             "total": len(regs),
+            "paginas_leidas": paginas_leidas,
+            "hay_mas": hay_mas,
             "results": [
                 {
                     "regulacion_id": reg.get("regulacion_id"),
@@ -68,13 +76,25 @@ def register_search_regulaciones_tool(mcp: MCPServer) -> None:
                 msg = "No se encontraron regulaciones"
                 if data.get("query"):
                     msg += f" para '{data['query']}'"
+                if data.get("hay_mas"):
+                    msg += (
+                        f" en las primeras {data['paginas_leidas']} páginas del listado "
+                        "(puede haber más en páginas no revisadas)"
+                    )
                 return msg + "."
 
             parts: list[str] = []
             if data.get("query"):
                 parts.append(f"Regulaciones que coinciden con '{data['query']}':")
                 parts.append(
-                    f"Encontradas: {data['total']} (máx. páginas escaneadas)\n"
+                    f"Encontradas: {data['total']} en {data['paginas_leidas']} página(s) "
+                    "revisada(s)"
+                    + (
+                        "; el listado continúa y puede haber más coincidencias"
+                        if data.get("hay_mas")
+                        else ""
+                    )
+                    + "\n"
                 )
             else:
                 parts.append(f"Regulaciones en gob.ec (página {data['page']}):")

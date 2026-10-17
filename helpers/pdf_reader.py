@@ -9,7 +9,7 @@ import httpx
 # TLS-fallback, size-capped) despite living in csv_reader.py -- every other
 # non-tabular download in this project (xls/xlsx/ods/zip/tar.gz previews)
 # reuses them the same way rather than duplicating the download logic here.
-from helpers.csv_reader import download_bytes, sniff_content_type
+from helpers.csv_reader import download_bytes, run_parser_off_loop, sniff_content_type
 
 MAX_PAGES_PER_CALL = 20
 
@@ -150,4 +150,6 @@ async def read_pdf(
             "enlace directo."
         )
 
-    return extract_text_from_bytes(raw, pages=pages)
+    # pypdf is synchronous and unbounded on a hostile PDF (deep content
+    # streams); keep it off the event loop and under the shared time bound.
+    return await run_parser_off_loop(extract_text_from_bytes, raw, pages)

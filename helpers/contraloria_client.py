@@ -98,12 +98,16 @@ async def _fetch_informes() -> list[dict[str, str]]:
                         "url": f"{_BASE}/WFDescarga.aspx?id={id_}&tipo={tipo}&op=d",
                     }
                 )
-        if informes:
-            # Same "don't cache an apparently-broken/empty scrape" rationale
-            # as helpers/sipa_client.py — an empty result here likely means
-            # the page structure changed, not that the list is genuinely
-            # empty, and shouldn't be pinned for 6 hours.
-            _informes_cache.set("informes", informes)
+        # An empty result here means the page structure changed or the
+        # request was blocked, not that the list is genuinely empty: raise
+        # (same as helpers/censo_client.py) instead of returning a
+        # success-shaped empty list, and never pin it for 6 hours.
+        if not informes:
+            raise ValueError(
+                "La página de Datos Abiertos de la Contraloría no trae la lista "
+                "de informes (puede haber cambiado de estructura o estar bloqueada)."
+            )
+        _informes_cache.set("informes", informes)
         return informes
 
 

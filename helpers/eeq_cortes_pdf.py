@@ -30,6 +30,7 @@ from itertools import pairwise
 from typing import Any
 
 from pypdf import PdfReader
+from pypdf.errors import PdfReadError
 
 _TIME_RE = re.compile(
     r"(\d{1,2})\s*[:h]\s*(\d{2})\s*(?:[-\u2010\u2013\u2014]|a)\s*(\d{1,2})\s*[:h]\s*(\d{2})"
@@ -52,8 +53,12 @@ _BODY_FONT = 20.0
 _LEFT_COLUMN_X = 400.0
 _TIME_COLUMN_X = 200.0
 _SECTOR_MAX_X = 1800.0
+# Real schedules run 1-30 pages; anything beyond this is not a schedule
+# and would only burn CPU (pypdf text extraction is synchronous). Shared
+# with helpers/centrosur_cortes_pdf.py.
+_MAX_PAGES = 200
 
-Chunk = tuple[float, float, float, str]  # x, y, font size, text
+Chunk =tuple[float, float, float, str]  # x, y, font size, text
 
 
 def _chunks(page: Any) -> list[Chunk]:
@@ -216,13 +221,21 @@ def parse_page(page: Any) -> list[dict[str, Any]]:
 
 
 def parse_pdf(raw: bytes) -> dict[str, Any]:
-    reader = PdfReader(io.BytesIO(raw))
     filas: list[dict[str, Any]] = []
-    for n, page in enumerate(reader.pages, 1):
-        for fila in parse_page(page):
-            filas.append({"pagina": n, **fila})
+    try:
+        reader = PdfReader(io.BytesIO(raw))
+        n_pages = len(reader.pages)
+        if n_pages > _MAX_PAGES:
+            raise ValueError(
+                f"el PDF tiene {n_pages} páginas; el máximo procesable es {_MAX_PAGES}"
+            )
+        for n, page in enumerate(reader.pages, 1):
+            for fila in parse_page(page):
+                filas.append({"pagina": n, **fila})
+    except PdfReadError as exc:
+        raise ValueError(f"el PDF no se pudo leer ({exc})") from exc
     return {
-        "paginas": len(reader.pages),
+        "paginas": n_pages,
         "filas": filas,
         "filas_sin_subestacion": sum(1 for f in filas if not f["subestacion"]),
         "filas_sin_horario": sum(1 for f in filas if not f["horario"]),

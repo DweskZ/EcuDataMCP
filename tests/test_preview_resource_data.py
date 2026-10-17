@@ -5,6 +5,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 
 import tools.preview_resource_data as preview_resource_data_module
 from helpers import ckan_client
+from helpers.safe_download import UnsafeUrlError
 from tools.preview_resource_data import (
     classify_from_content_type,
     classify_resource_format,
@@ -50,6 +51,13 @@ def test_classify_falls_back_to_declared_format_without_recognizable_extension()
 
 def test_classify_zip_by_extension_even_if_declared_csv():
     assert classify_resource_format("CSV", "https://x/archivo.zip") == "ZIP"
+
+
+def test_classify_ignores_query_string_and_fragment():
+    # Only the path carries the extension; `.zip?token=x` used to miss.
+    assert classify_resource_format("CSV", "https://x/archivo.zip?token=x") == "ZIP"
+    assert classify_resource_format("", "https://x/datos.xlsx?download=1#hoja") == "XLSX"
+    assert classify_resource_format("CSV", "https://x/d?file=archivo.zip") == "CSV"
 
 
 def test_classify_plain_csv():
@@ -409,3 +417,26 @@ async def test_extensionless_resource_falls_back_when_sniff_is_inconclusive(monk
     result = await tool(resource_id="abc123", format="json")
     payload = result.structured_content
     assert payload["error"] == "formato_no_soportado"
+
+
+async def test_unsafe_url_error_hides_resolved_ip_from_client(monkeypatch):
+    # The SSRF guard's own message names the private IP the host resolved
+    # to; that belongs in the server log, not in the tool error.
+    async def fake_get_resource(resource_id, source="nacional", session=None):
+        return {"url": "https://interno.example/datos.csv", "format": "CSV", "name": "x"}
+
+    async def fake_preview_csv(url, max_rows=20, session=None):
+        raise UnsafeUrlError(
+            "El host 'interno.example' resuelve a una IP no pública (10.0.0.7); "
+            "descarga rechazada"
+        )
+
+    monkeypatch.setattr(ckan_client, "get_resource", fake_get_resource)
+    monkeypatch.setattr(preview_resource_data_module, "preview_csv", fake_preview_csv)
+
+    tool = _make_tool()
+    with pytest.raises(ToolError) as excinfo:
+        await tool(resource_id="abc123", format="json")
+
+    assert str(excinfo.value) == "URL rechazada por seguridad: el destino no es público"
+    assert "10.0.0.7" not in str(excinfo.value)

@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import igepn_informes_client
 from helpers.format_out import render_structured
@@ -26,7 +27,7 @@ def register_search_informes_igepn_tool(mcp: MCPServer) -> None:
         anio: int = 0,
         limit: int = 15,
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Search the IG-EPN PDF report archive (Instituto Geofísico):
         daily/weekly/monthly/special seismic bulletins, volcanic "IG Al

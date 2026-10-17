@@ -1,8 +1,9 @@
-from typing import Any, Literal
+from typing import Literal
 
 import httpx
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import ckan_client
 from helpers.format_out import render_structured
@@ -21,7 +22,7 @@ def register_get_dataset_info_tool(mcp: MCPServer) -> None:
         dataset_id: str,
         source: ckan_client.CkanSource = "nacional",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Get detailed metadata about a specific dataset from Ecuador's open data portal.
 

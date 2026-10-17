@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import ckan_client
 from helpers.format_out import render_structured
@@ -24,7 +25,7 @@ def register_get_organization_info_tool(mcp: MCPServer) -> None:
         query: str = "",
         source: ckan_client.CkanSource = "nacional",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Get detailed information about a public institution and its published
         datasets — the main way to browse a CKAN organization's full package

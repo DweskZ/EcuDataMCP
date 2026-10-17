@@ -38,8 +38,9 @@ from itertools import pairwise
 from typing import Any
 
 from pypdf import PdfReader
+from pypdf.errors import PdfReadError
 
-from helpers.eeq_cortes_pdf import parse_horario
+from helpers.eeq_cortes_pdf import _MAX_PAGES, parse_horario
 from helpers.eeq_cortes_pdf import parse_pdf as parse_eeq_pdf
 from helpers.geo_data import list_cantones, list_provincias
 from helpers.text_utils import strip_accents as _strip
@@ -313,7 +314,13 @@ def _parse_section(
 
 
 def parse_page(page: Any) -> list[dict[str, Any]]:
-    chunks = _assemble(_chunks(page))
+    return _parse_page_chunks(_chunks(page))
+
+
+def _parse_page_chunks(raw_chunks: list[Chunk]) -> list[dict[str, Any]]:
+    """parse_page on text already extracted with _chunks, so parse_pdf
+    extracts each page exactly once."""
+    chunks = _assemble(raw_chunks)
     time_labels = sorted(
         (c for c in chunks if c[2] >= _TIME_FONT_MIN and parse_horario(c[3])),
         key=lambda c: -c[1],
@@ -362,8 +369,19 @@ def parse_page(page: Any) -> list[dict[str, Any]]:
 
 
 def parse_pdf(raw: bytes) -> dict[str, Any]:
-    reader = PdfReader(io.BytesIO(raw))
-    first_text = reader.pages[0].extract_text() or "" if reader.pages else ""
+    # Extract every page once, up front: the text-layer check, the EEQ
+    # detection and the row parser all work off these positioned chunks.
+    try:
+        reader = PdfReader(io.BytesIO(raw))
+        n_pages = len(reader.pages)
+        if n_pages > _MAX_PAGES:
+            raise ValueError(
+                f"el PDF tiene {n_pages} páginas; el máximo procesable es {_MAX_PAGES}"
+            )
+        page_chunks = [_chunks(page) for page in reader.pages]
+    except PdfReadError as exc:
+        raise ValueError(f"el PDF no se pudo leer ({exc})") from exc
+    first_text = " ".join(c[3] for c in page_chunks[0]) if page_chunks else ""
 
     if "Subestaciones" in first_text:
         eeq = parse_eeq_pdf(raw)
@@ -378,9 +396,9 @@ def parse_pdf(raw: bytes) -> dict[str, Any]:
             "filas_sin_horario": eeq["filas_sin_horario"],
         }
 
-    if not any((p.extract_text() or "").strip() for p in reader.pages):
+    if not any(page_chunks):
         return {
-            "paginas": len(reader.pages),
+            "paginas": n_pages,
             "formato": "imagen",
             "nota": (
                 "El PDF no tiene capa de texto (solo imágenes escaneadas); "
@@ -391,19 +409,24 @@ def parse_pdf(raw: bytes) -> dict[str, Any]:
         }
 
     filas: list[dict[str, Any]] = []
-    for n, page in enumerate(reader.pages, 1):
-        for fila in parse_page(page):
+    for n, raw_chunks in enumerate(page_chunks, 1):
+        for fila in _parse_page_chunks(raw_chunks):
             filas.append({"pagina": n, **fila})
 
-    # Tables spanning pages print the time block only on the first one.
+    # Tables spanning pages print the time block only on their first page,
+    # so an unlabelled page belongs to the nearest preceding labelled one:
+    # carry the last horario/fecha seen forward in page order. A page
+    # before any labelled one falls back to the first label in the file.
     horario = next((f["horario"] for f in filas if f["horario"]), [])
     fecha = next((f["fecha_texto"] for f in filas if f["fecha_texto"]), "")
     for f in filas:
-        f["horario"] = f["horario"] or horario
-        f["fecha_texto"] = f["fecha_texto"] or fecha
+        horario = f["horario"] or horario
+        fecha = f["fecha_texto"] or fecha
+        f["horario"] = horario
+        f["fecha_texto"] = fecha
 
     return {
-        "paginas": len(reader.pages),
+        "paginas": n_pages,
         "formato": "tabla",
         "nota": None,
         "filas": filas,

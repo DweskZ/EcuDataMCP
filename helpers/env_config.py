@@ -54,7 +54,9 @@ def get_base_url(api_name: str) -> str:
             f"Valid values are: {', '.join(_API_URLS.keys())}"
         )
     env_key = _ENV_OVERRIDES[api_name]
-    return os.getenv(env_key, _API_URLS[api_name])
+    # `or`, not a getenv default: a present-but-empty override (e.g. an
+    # unset compose variable rendered as "") must fall back to the default.
+    return os.getenv(env_key) or _API_URLS[api_name]
 
 
 def get_mcp_host() -> str:

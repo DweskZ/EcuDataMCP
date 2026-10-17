@@ -54,6 +54,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
+from html import unescape
 from typing import Any
 
 import httpx
@@ -94,7 +95,8 @@ _COLUMNS = (
 
 
 def _clean_cell(raw: str) -> str:
-    return _TAG_RE.sub("", raw).replace("\xa0", " ").strip()
+    # Unescape before the NBSP swap so "&nbsp;" also becomes a plain space.
+    return unescape(_TAG_RE.sub("", raw)).replace("\xa0", " ").strip()
 
 
 def _parse_rows(html: str) -> list[dict[str, Any]]:

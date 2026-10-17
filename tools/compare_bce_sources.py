@@ -1,8 +1,9 @@
 import logging
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import bce_client, bce_equivalence, bce_equivalence_store, bce_iem_client
 from helpers.format_out import render_structured
@@ -30,7 +31,7 @@ def register_compare_bce_sources_tool(mcp: MCPServer) -> None:
         historico: bool = False,
         guardar_revision: bool = False,
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """Build a cautious BCEData ↔ IEM candidate-equivalence map.
 
         Matching uses normalized group/series/table labels. It reports

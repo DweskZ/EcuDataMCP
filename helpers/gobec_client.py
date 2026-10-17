@@ -172,12 +172,20 @@ async def list_instituciones(
     return []
 
 
+_MAX_PAGINAS_INSTITUCIONES = 3  # ~1500 institutions
+
+
 async def find_institucion(
     query: str, session: httpx.AsyncClient | None = None
-) -> list[dict[str, Any]]:
+) -> dict[str, Any]:
     """
-    Find institutions matching a query by searching through all pages.
-    Searches in name, siglas (acronym), and description.
+    Find institutions matching a query by searching through the first
+    pages of the listing. Searches in name, siglas (acronym), and
+    description.
+
+    Returns {"resultados": [...], "paginas_leidas": n, "hay_mas": bool};
+    `hay_mas` is True when the page cap was reached with every page still
+    full, i.e. unread pages may hold more matches.
     """
     own = session is None
     if own:
@@ -191,17 +199,23 @@ async def find_institucion(
     try:
         query_lower = _strip(query).lower()
         matches: list[dict[str, Any]] = []
-        for page in range(3):  # Max 3 pages (~1500 institutions)
+        paginas_leidas = 0
+        for page in range(_MAX_PAGINAS_INSTITUCIONES):
             items = await list_instituciones(page=page, session=session)
             if not items:
                 break
+            paginas_leidas += 1
             for inst in items:
                 name = _strip(inst.get("institucion", "")).lower()
                 siglas = _strip(inst.get("siglas", "")).lower()
                 desc = _strip(inst.get("descripcion", "")).lower()
                 if query_lower in name or query_lower in siglas or query_lower in desc:
                     matches.append(inst)
-        return matches
+        else:
+            # Never saw an empty page: the listing may continue past the cap.
+            hay_mas = True
+            return {"resultados": matches, "paginas_leidas": paginas_leidas, "hay_mas": hay_mas}
+        return {"resultados": matches, "paginas_leidas": paginas_leidas, "hay_mas": False}
     finally:
         if own:
             await session.aclose()
@@ -252,11 +266,16 @@ async def find_regulaciones(
     query: str,
     max_pages: int = 5,
     session: httpx.AsyncClient | None = None,
-) -> list[dict[str, Any]]:
-    """Client-side search across regulation pages (gob.ec has no search param)."""
+) -> dict[str, Any]:
+    """Client-side search across regulation pages (gob.ec has no search param).
+
+    Returns {"resultados": [...], "paginas_leidas": n, "hay_mas": bool};
+    `hay_mas` is True when `max_pages` was reached with every page still
+    full, i.e. unread pages may hold more matches.
+    """
     words = [_strip(w) for w in query.split() if len(w) >= 2]
     if not words:
-        return []
+        return {"resultados": [], "paginas_leidas": 0, "hay_mas": False}
 
     own = session is None
     if own:
@@ -269,10 +288,12 @@ async def find_regulaciones(
     assert session is not None
     try:
         matches: list[dict[str, Any]] = []
+        paginas_leidas = 0
         for page in range(max(max_pages, 1)):
             items = await list_regulaciones(page=page, session=session)
             if not items:
                 break
+            paginas_leidas += 1
             for reg in items:
                 blob = _strip(
                     f"{reg.get('regulacion', '')} {reg.get('descripcion', '')} "
@@ -281,7 +302,10 @@ async def find_regulaciones(
                 )
                 if all(w in blob for w in words):
                     matches.append(reg)
-        return matches
+        else:
+            # Never saw an empty page: the listing may continue past the cap.
+            return {"resultados": matches, "paginas_leidas": paginas_leidas, "hay_mas": True}
+        return {"resultados": matches, "paginas_leidas": paginas_leidas, "hay_mas": False}
     finally:
         if own:
             await session.aclose()

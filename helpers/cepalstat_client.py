@@ -167,7 +167,11 @@ async def _fetch_dimensions(indicator_id: int, lang: str) -> list[dict[str, Any]
     return dimensions
 
 
-def _find_pais_member_id(dimensions: list[dict[str, Any]], pais: str) -> int | None:
+def _find_pais_member(dimensions: list[dict[str, Any]], pais: str) -> dict[str, Any] | None:
+    """The country member matching `pais`: an exact (accent-insensitive)
+    name, or the single member containing it. Several partial matches
+    ("Guin" -> Guinea, Guinea Ecuatorial) raise instead of picking the
+    first, mirroring helpers/irena_client._resolve_country."""
     q = _strip(pais)
     pais_dim = next(
         (d for d in dimensions if _PAIS_DIM_HINT in _strip(d.get("name", ""))), None
@@ -177,9 +181,17 @@ def _find_pais_member_id(dimensions: list[dict[str, Any]], pais: str) -> int | N
     members = pais_dim.get("members") or []
     exact = next((m for m in members if _strip(m.get("name", "")) == q), None)
     if exact is not None:
-        return exact["id"]
-    partial = next((m for m in members if q in _strip(m.get("name", ""))), None)
-    return partial["id"] if partial is not None else None
+        return exact
+    partial = [m for m in members if q and q in _strip(m.get("name", ""))]
+    if len(partial) == 1:
+        return partial[0]
+    if len(partial) > 1:
+        candidatos = ", ".join(str(m.get("name", "")) for m in partial[:8])
+        raise ValueError(
+            f"País ambiguo: '{pais}' coincide con varios países del indicador "
+            f"({candidatos}). Usa el nombre completo."
+        )
+    return None
 
 
 def _decode_dimension_labels(
@@ -231,15 +243,17 @@ async def get_indicador(
     pais_filtrado = None
     if pais:
         dimensions_catalog = await _fetch_dimensions(indicator_id, lang)
-        member_id = _find_pais_member_id(dimensions_catalog, pais)
-        if member_id is None:
+        member = _find_pais_member(dimensions_catalog, pais)
+        if member is None:
             raise ValueError(
                 f"No se encontró el país '{pais}' entre las dimensiones del "
                 f"indicador {indicator_id} (puede que este indicador no se "
                 "desagregue por país)."
             )
-        params["members"] = member_id
-        pais_filtrado = pais
+        params["members"] = member["id"]
+        # Label the result with CEPALSTAT's own member name, not the user's
+        # spelling, so "peru" reads back as "Perú".
+        pais_filtrado = member.get("name") or pais
 
     data = await _fetch_json(f"/indicator/{indicator_id}/data", **params)
     body = data.get("body") or {}

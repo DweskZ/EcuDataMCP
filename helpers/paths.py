@@ -26,7 +26,10 @@ def data_dir() -> Path:
     """
     override = os.getenv("ECUADOR_MCP_DATA_DIR", "").strip()
     if override:
-        return Path(override).expanduser()
+        # Resolved against the cwd once, here: the Supercías build runs as a
+        # subprocess with cwd=_PACKAGE_ROOT, so a relative override left
+        # unresolved would make it write the DB where the server never reads.
+        return Path(override).expanduser().resolve()
     if (_ROOT / "pyproject.toml").is_file():
         return _ROOT / "data"
     if sys.platform == "win32":

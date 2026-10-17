@@ -168,6 +168,7 @@ def test_trigger_background_build_skips_while_lock_held(monkeypatch):
 
 def test_build_in_progress_kills_hung_build(monkeypatch):
     killed: list[bool] = []
+    waited: list[float | None] = []
 
     class _HungProcess:
         pid = 4242
@@ -178,6 +179,10 @@ def test_build_in_progress_kills_hung_build(monkeypatch):
         def kill(self):
             killed.append(True)
 
+        def wait(self, timeout=None):
+            # kill() alone leaves a zombie on POSIX; the child must be reaped.
+            waited.append(timeout)
+
     monkeypatch.setattr(supercias_financials, "_build_process", _HungProcess())
     monkeypatch.setattr(
         supercias_financials,
@@ -187,6 +192,8 @@ def test_build_in_progress_kills_hung_build(monkeypatch):
 
     assert supercias_financials._build_in_progress() is False
     assert killed == [True]
+    assert waited == [5]
+    assert supercias_financials._build_process is None
 
 
 def test_missing_db_message_reports_last_failure(tmp_path, no_real_build):
@@ -453,3 +460,54 @@ def test_http_startup_still_starts_the_financials_build(monkeypatch):
     monkeypatch.setattr(uvicorn, "run", lambda *a, **k: calls.append("uvicorn"))
     main.main(["--transport", "http", "--host", "127.0.0.1"])
     assert calls == ["ensure", "uvicorn"]
+
+
+def test_trigger_background_build_truncates_previous_log(monkeypatch, tmp_path):
+    # The log used to be opened in append mode and never rotated; each build
+    # now starts it fresh so it only holds the run worth diagnosing.
+    log_path = tmp_path / "supercias_build.log"
+    log_path.write_bytes(b"salida de un build anterior\n")
+
+    class _FakeProcess:
+        pid = 4242
+
+        def poll(self):
+            return None
+
+    monkeypatch.setattr(supercias_financials, "DB_PATH", tmp_path / "db.sqlite3")
+    monkeypatch.setattr(supercias_financials, "_build_process", None)
+    monkeypatch.setattr(
+        supercias_financials.subprocess, "Popen", lambda args, **kwargs: _FakeProcess()
+    )
+
+    supercias_financials._trigger_background_build()
+
+    assert log_path.read_bytes() == b""
+
+
+def test_financials_status_reports_running_build_under_lock(monkeypatch, tmp_path):
+    class _Running:
+        pid = 4242
+
+        def poll(self):
+            return None
+
+    monkeypatch.setattr(supercias_financials, "_build_process", _Running())
+    monkeypatch.setattr(supercias_financials, "_build_started_at", time.time())
+
+    status = supercias_financials.financials_status(tmp_path / "missing.sqlite3")
+
+    assert status["construccion_en_curso"] is True
+    assert not supercias_financials._build_lock.locked()
+
+
+def test_data_dir_relative_override_is_resolved_against_cwd(monkeypatch, tmp_path):
+    # The build subprocess runs with cwd=_PACKAGE_ROOT; a relative override
+    # left unresolved would point the server and the build at two folders.
+    from helpers.paths import data_dir
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("ECUADOR_MCP_DATA_DIR", "datos_rel")
+
+    assert data_dir().is_absolute()
+    assert data_dir() == (tmp_path / "datos_rel").resolve()

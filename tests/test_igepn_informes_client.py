@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 import pytest
 
 from helpers import igepn_informes_client as c
@@ -102,3 +104,20 @@ async def test_download_informe_non_pdf_response(httpx_mock):
         await c.download_informe(
             "Informe Diario 2022-071", grupo="volcanico", anio=2022
         )
+
+
+async def test_default_anio_uses_ecuador_time(httpx_mock, monkeypatch):
+    # 03:00 UTC on 1 January is still 22:00 on 31 December in Ecuador
+    # (UTC-5), so the default report year must be the previous one.
+    class _FrozenDatetime:
+        @classmethod
+        def now(cls, tz=None):
+            return datetime(2026, 1, 1, 3, 0, tzinfo=UTC).astimezone(tz)
+
+    monkeypatch.setattr(c, "datetime", _FrozenDatetime)
+    httpx_mock.add_response(method="GET", html=_INITIAL_HTML)
+    httpx_mock.add_response(method="POST", text=_TWO_ROWS_XML)
+
+    result = await c.search_informes(grupo="volcanico")
+
+    assert result["anio"] == 2025

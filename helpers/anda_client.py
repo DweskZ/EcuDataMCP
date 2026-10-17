@@ -171,7 +171,12 @@ async def list_microdata_files(
         page.raise_for_status()
         token_match = _CSRF_RE.search(page.text)
         if not token_match:
-            return []
+            # An anti-bot or geoblock page has no form either; returning []
+            # here would read downstream as "this survey has no files".
+            raise ValueError(
+                "No se encontró el token CSRF en la página get-microdata de ANDA; "
+                "la página puede estar bloqueada o haber cambiado"
+            )
         resp = await session.post(
             url,
             data={"ncsrf": token_match.group(1), "accept": "Aceptar"},

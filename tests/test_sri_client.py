@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 
 from helpers import sri_client
@@ -91,3 +93,34 @@ async def test_download_page_retries_after_read_timeout(httpx_mock, monkeypatch)
     httpx_mock.add_response(text="<html>ok</html>")
 
     assert await sri_client._download_page(sri_client.SRI_DATASETS_URL) == "<html>ok</html>"
+
+
+_EMPTY_HTML = "<html><body><p>Sitio en mantenimiento.</p></body></html>"
+
+
+@pytest.mark.asyncio
+async def test_empty_datasets_parse_is_not_cached_and_warns(httpx_mock, caplog):
+    httpx_mock.add_response(url=sri_client.SRI_DATASETS_URL, html=_EMPTY_HTML)
+    httpx_mock.add_response(url=sri_client.SRI_DATASETS_URL, html=_DATASETS_HTML)
+
+    with caplog.at_level(logging.WARNING):
+        first = await sri_client.search_files()
+    assert first["total"] == 0
+    assert any("datasets del SRI" in r.getMessage() for r in caplog.records)
+
+    second = await sri_client.search_files()
+    assert second["total"] == 1
+
+
+@pytest.mark.asyncio
+async def test_empty_estadisticas_parse_is_not_cached_and_warns(httpx_mock, caplog):
+    httpx_mock.add_response(url=sri_client.SRI_ESTADISTICAS_URL, html=_EMPTY_HTML)
+    httpx_mock.add_response(url=sri_client.SRI_ESTADISTICAS_URL, html=_ESTADISTICAS_HTML)
+
+    with caplog.at_level(logging.WARNING):
+        first = await sri_client.search_estadisticas_recaudacion()
+    assert first["total"] == 0
+    assert any("Estadísticas de Recaudación" in r.getMessage() for r in caplog.records)
+
+    second = await sri_client.search_estadisticas_recaudacion()
+    assert second["total"] == 4

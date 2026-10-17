@@ -243,21 +243,32 @@ docker build -t ecuador-mcp https://github.com/DweskZ/EcuDataMCP.git
 docker run -i --rm ecuador-mcp
 ```
 
-Para el servidor HTTP, `docker compose` fija `MCP_TRANSPORT=http`:
+Para el servidor HTTP, `docker compose` fija `MCP_TRANSPORT=http` y exige
+autenticación (`MCP_REQUIRE_AUTH=1`): sin `MCP_AUTH_TOKEN` el proceso se
+detiene con un error y el contenedor se reinicia en bucle. Define el token
+antes de arrancar, en el entorno o en un `.env`:
 
 ```bash
 git clone https://github.com/DweskZ/EcuDataMCP.git
 cd EcuDataMCP
 
-# Iniciar con configuración por defecto (puerto 8000)
+# Opción A: token en el entorno (puerto 8000)
+MCP_AUTH_TOKEN="$(openssl rand -hex 32)" docker compose up -d
+
+# Opción B: token en .env (docker compose lo lee solo)
+cp .env.example .env    # edita MCP_AUTH_TOKEN=... y MCP_REQUIRE_AUTH=1
 docker compose up -d
 
 # Con variables personalizadas
-MCP_PORT=8007 LOG_LEVEL=DEBUG docker compose up -d
+MCP_AUTH_TOKEN=... MCP_PORT=8007 LOG_LEVEL=DEBUG docker compose up -d
 
 # Detener
 docker compose down
 ```
+
+Los clientes envían el token como `Authorization: Bearer <token>` en
+`POST /mcp`. La lista completa de variables y el despliegue detrás de un proxy
+HTTPS están en [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ### Instalación manual
 
@@ -277,7 +288,9 @@ cp .env.example .env
 uv run main.py
 ```
 
-**Variables de entorno:**
+**Variables de entorno** (las más usadas; la lista completa, con el perfil
+de tools, la concurrencia, el proxy geográfico y las URLs base de cada
+fuente, está en [docs/DEPLOYMENT.md § Variables de entorno](docs/DEPLOYMENT.md#variables-de-entorno)):
 
 | Variable | Descripción | Default |
 |----------|-------------|---------|

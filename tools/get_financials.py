@@ -1,8 +1,9 @@
 import logging
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import supercias_financials
 from helpers.format_out import render_structured
@@ -40,7 +41,7 @@ def register_get_financials_tool(mcp: MCPServer) -> None:
         expediente_or_ruc: str,
         anio: int | None = None,
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Get a company's financial history from Supercías balance-sheet filings.
 

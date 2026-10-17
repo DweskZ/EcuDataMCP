@@ -149,8 +149,8 @@ async def test_empty_scrape_is_not_cached(httpx_mock):
     httpx_mock.add_response(url=client._BASE_DATOS_URL, html=_EMPTY_HTML)
     httpx_mock.add_response(url=client._BASE_DATOS_URL, html=_BASE_DATOS_HTML)
 
-    first = await client.list_categorias()
-    assert first["total"] == 0
+    with pytest.raises(ValueError, match="ARCSA"):
+        await client.list_categorias()
 
     second = await client.list_categorias()
     assert second["total"] == 3

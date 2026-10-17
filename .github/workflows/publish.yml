@@ -5,19 +5,28 @@ name: Publish
 # in the official MCP Registry, which verifies the PyPI package through the
 # `mcp-name:` comment in README.md. The MCPB bundle is attached to the
 # release as well.
+#
+# `workflow_dispatch` only runs `build` (version check, tests, wheel): the
+# jobs that publish anywhere are gated on the release event, so a manual
+# run from a branch cannot push an unreleased version to PyPI or the
+# Registry. Actions are pinned to commit SHAs (Dependabot bumps them);
+# jobs that need more than `contents: read` declare it themselves.
 
 on:
   release:
     types: [published]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
 
       # The tag, pyproject.toml and server.json must agree, otherwise PyPI
       # and the MCP Registry end up advertising different versions.
@@ -38,13 +47,14 @@ jobs:
       - name: Build
         run: uv build
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: dist
           path: dist/
 
   pypi:
     needs: build
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -52,14 +62,14 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: dist
           path: dist/
 
       # A manual rerun after the registry step fails would otherwise stop
       # here, because PyPI refuses to re-upload an existing version.
-      - uses: pypa/gh-action-pypi-publish@release/v1
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           skip-existing: true
 
@@ -73,7 +83,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Pack bundle
         run: |
@@ -87,16 +97,26 @@ jobs:
 
   mcp-registry:
     needs: pypi
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # The checksum is copied from registry_<version>_checksums.txt on the
+      # same release page; bump both together. The binary signs in with the
+      # OIDC token, so it is never executed before the hash matches.
       - name: Install mcp-publisher
+        env:
+          MCP_PUBLISHER_VERSION: v1.8.1
+          MCP_PUBLISHER_SHA256: a06c9096dcb9727c13555b6be26c7effa707b01f06a4c561ba7a3635443cf2cc
         run: |
-          curl -L "https://github.com/modelcontextprotocol/registry/releases/download/v1.8.1/mcp-publisher_linux_amd64.tar.gz" \
-            | tar xz mcp-publisher
+          curl -fsSL -o mcp-publisher.tar.gz \
+            "https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}/mcp-publisher_linux_amd64.tar.gz"
+          echo "${MCP_PUBLISHER_SHA256}  mcp-publisher.tar.gz" | sha256sum -c -
+          tar xzf mcp-publisher.tar.gz mcp-publisher
+          chmod +x mcp-publisher
 
       - name: Publish to MCP Registry
         run: |

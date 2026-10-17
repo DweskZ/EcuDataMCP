@@ -21,7 +21,12 @@ from helpers.env_config import (
 )
 from helpers.geo_proxy import hide_geoblocked
 from helpers.http_security import with_http_security
-from helpers.logging import MAIN_LOGGER_NAME, UVICORN_LOGGING_CONFIG, setup_logging
+from helpers.logging import (
+    MAIN_LOGGER_NAME,
+    setup_logging,
+    uvicorn_log_level,
+    uvicorn_logging_config,
+)
 from helpers.mcp_server import EcuadorMCPServer
 from helpers.supercias_financials import ensure_financials_db_fresh, financials_status
 from helpers.version import get_version
@@ -240,8 +245,8 @@ def main(argv: list[str] | None = None) -> None:
         asgi_app,
         host=host,
         port=port,
-        log_level="info",
-        log_config=UVICORN_LOGGING_CONFIG,
+        log_level=uvicorn_log_level(),
+        log_config=uvicorn_logging_config(),
         ssl_certfile=certfile,
         ssl_keyfile=keyfile,
     )

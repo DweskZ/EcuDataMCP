@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import sgr_publicaciones_client
 from helpers.format_out import render_structured
@@ -21,7 +22,7 @@ def register_get_sgr_sitrep_archivos_tool(mcp: MCPServer) -> None:
     @log_tool
     async def get_sgr_sitrep_archivos(
         evento_url: str, format: Literal["text", "json"] = "text"
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         List the SITREP PDF report links published on one SGR adverse-event
         page.

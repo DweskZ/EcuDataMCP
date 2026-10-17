@@ -16,6 +16,7 @@ from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import (
     arcotel_client,
@@ -168,7 +169,7 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
         offset: int = 0,
         formato: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Search one institution's catalog of published files (direct links).
 

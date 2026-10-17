@@ -1,6 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers.biinec_extras import BIINEC_URL, search_extras
 from helpers.format_out import render_structured
@@ -20,7 +22,7 @@ def register_search_biinec_extras_tool(mcp: MCPServer) -> None:
     @log_tool
     async def search_biinec_extras(
         query: str = "", format: Literal["text", "json"] = "text"
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Check INEC's BIINEC ("Banco de Datos Abiertos") for data not found in
         search_anda or search_inec_estadisticas.
@@ -39,7 +41,10 @@ def register_search_biinec_extras_tool(mcp: MCPServer) -> None:
                 (accent-insensitive). Empty returns the full curated list.
             format: text | json
         """
-        matches = search_extras(query)
+        try:
+            matches = search_extras(query)
+        except Exception as e:
+            raise ToolError(f"Error al consultar la lista curada de BIINEC: {e}") from e
 
         payload = {
             "query": query or None,

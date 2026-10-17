@@ -10,6 +10,8 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
+from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
 from typing import Any
 
 import httpx
@@ -46,6 +48,19 @@ def _wait_seconds(resp: httpx.Response, attempt: int) -> float:
     header = resp.headers.get("Retry-After", "")
     if header.isdigit():
         return min(float(header), _MAX_WAIT_SECONDS)
+    # Retry-After may also be an HTTP-date (RFC 9110); a date already in
+    # the past, or an unparseable one, falls back to the backoff.
+    if header:
+        try:
+            until = parsedate_to_datetime(header)
+        except (TypeError, ValueError):
+            until = None
+        if until is not None:
+            if until.tzinfo is None:
+                until = until.replace(tzinfo=UTC)
+            wait = (until - datetime.now(UTC)).total_seconds()
+            if wait > 0:
+                return min(wait, _MAX_WAIT_SECONDS)
     return min(2.0 * attempt, _MAX_WAIT_SECONDS)
 
 

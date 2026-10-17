@@ -223,7 +223,8 @@ def _extract_archivos(html_text: str) -> list[dict[str, str]]:
     return archivos
 
 
-async def _fetch_pagina(pagina: dict[str, str]) -> dict[str, Any] | None:
+async def _fetch_pagina(pagina: dict[str, str]) -> dict[str, Any] | str:
+    """The parsed page, or its URL when it could not be downloaded."""
     url = f"{_BASE}/{pagina['pagina_id']}/"
     try:
         content, truncated = await download_bytes(url)
@@ -231,13 +232,13 @@ async def _fetch_pagina(pagina: dict[str, str]) -> dict[str, Any] | None:
             logger.warning(
                 "La página de Cuentas Nacionales %s superó el límite de descarga", url
             )
-            return None
+            return url
         html_text = content.decode("utf-8", errors="replace")
     except Exception as exc:
         logger.warning(
             "No se pudo leer la página de Cuentas Nacionales %s: %s", url, exc
         )
-        return None
+        return url
 
     archivos = _extract_archivos(html_text)
     return {
@@ -250,19 +251,21 @@ async def _fetch_pagina(pagina: dict[str, str]) -> dict[str, Any] | None:
     }
 
 
-async def _fetch_catalog() -> list[dict[str, Any]]:
+async def _fetch_catalog() -> tuple[list[dict[str, Any]], list[str]]:
+    """The catalog plus the URLs of pages that failed to download."""
     cached = _catalog_cache.get("catalog")
     if cached is not None:
-        return cached
+        return cached, []
 
     async with _fetch_lock:
         cached = _catalog_cache.get("catalog")
         if cached is not None:
-            return cached
+            return cached, []
 
         logger.info("Descargando páginas de Cuentas Nacionales del BCE")
         results = await asyncio.gather(*(_fetch_pagina(p) for p in _PAGINAS))
-        catalog = [entry for entry in results if entry is not None]
+        catalog = [entry for entry in results if isinstance(entry, dict)]
+        paginas_fallidas = [entry for entry in results if isinstance(entry, str)]
         # A page that fetched fine but matched zero /documentos/ file links
         # is a real, valid state for one page (e.g. a stale monthly page
         # between updates) -- but every page in the whole catalog coming
@@ -270,9 +273,15 @@ async def _fetch_catalog() -> list[dict[str, Any]]:
         # site-wide markup change, not that BCE removed every file. Same
         # "don't cache an apparent break" rationale as
         # helpers/bce_indices_client.py and helpers/bce_precios_comex_client.py.
-        if catalog and any(entry["total_archivos"] > 0 for entry in catalog):
+        # A partial catalog (one page failed) must not stick for the whole
+        # TTL either (see helpers/bce_client.py), so the next call retries it.
+        if (
+            catalog
+            and not paginas_fallidas
+            and any(entry["total_archivos"] > 0 for entry in catalog)
+        ):
             _catalog_cache.set("catalog", catalog)
-        return catalog
+        return catalog, paginas_fallidas
 
 
 def clear_cache() -> None:
@@ -282,6 +291,15 @@ def clear_cache() -> None:
 
 def _resumen(entry: dict[str, Any]) -> dict[str, Any]:
     return {k: v for k, v in entry.items() if k != "archivos"}
+
+
+def _nota_catalogo_incompleto(paginas_fallidas: list[str]) -> str:
+    if not paginas_fallidas:
+        return ""
+    return (
+        f" El catálogo quedó incompleto: no se pudieron leer {len(paginas_fallidas)} "
+        f"página(s) del BCE ({', '.join(paginas_fallidas[:3])}); reintenta en unos minutos."
+    )
 
 
 async def search_cuentas_nacionales(query: str = "") -> dict[str, Any]:
@@ -299,7 +317,7 @@ async def search_cuentas_nacionales(query: str = "") -> dict[str, Any]:
         query: Free text matched (accent-insensitive) against the page's
             title, category, or id. Empty returns all pages.
     """
-    catalog = await _fetch_catalog()
+    catalog, paginas_fallidas = await _fetch_catalog()
     q = _strip(query)
     matched = [
         entry
@@ -312,6 +330,7 @@ async def search_cuentas_nacionales(query: str = "") -> dict[str, Any]:
     return {
         "total": len(matched),
         "total_paginas": len(catalog),
+        "paginas_fallidas": paginas_fallidas,
         "source": _SOURCE_NAME,
         "paginas": [_resumen(entry) for entry in matched],
     }
@@ -333,12 +352,13 @@ async def get_archivo(
             `pagina_id` field (e.g. "boletin-de-cuentas-nacionales-trimestrales").
         max_archivos: Cap on returned files, 1-200.
     """
-    catalog = await _fetch_catalog()
+    catalog, paginas_fallidas = await _fetch_catalog()
     entry = next((e for e in catalog if e["pagina_id"] == pagina_id.strip()), None)
     if entry is None:
         raise ValueError(
             f"Página de Cuentas Nacionales '{pagina_id}' no encontrada. "
             "Usa search_bce_cuentas_nacionales para ver los pagina_id válidos."
+            + _nota_catalogo_incompleto(paginas_fallidas)
         )
 
     archivos = entry["archivos"]

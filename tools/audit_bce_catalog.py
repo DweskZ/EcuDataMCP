@@ -1,8 +1,9 @@
 import logging
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import bce_client
 from helpers.format_out import render_structured
@@ -30,7 +31,7 @@ def register_audit_bce_catalog_tool(mcp: MCPServer) -> None:
         comparar_anterior: bool = False,
         auditar_grid: bool = False,
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """Audit the live BCEData catalogue and report its coverage.
 
         Fetches the catalogue tree and every indicator group's metadata. The

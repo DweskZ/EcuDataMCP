@@ -25,3 +25,10 @@ CONTRIBUTING.md
 .uv-cache*/
 AGENTS.md
 .dockerignore
+# Site sources, registry/directory manifests and the env template are
+# repo metadata, not something the stdio server reads.
+web/
+glama.json
+server.json
+.env.example
+quality_reports/

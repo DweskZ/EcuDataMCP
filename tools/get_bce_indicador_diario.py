@@ -1,12 +1,30 @@
-from typing import Any, Literal
+import re
+from datetime import date
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import bce_indicadores_diarios_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.tool_meta import READ_ONLY
+
+_ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _validate_fecha(nombre: str, valor: str) -> None:
+    """The client compares dates as YYYY-MM-DD strings, so any other spelling
+    ("01/01/2024") would silently select a wrong window instead of failing."""
+    if not valor:
+        return
+    try:
+        if not _ISO_DATE_RE.match(valor):
+            raise ValueError(valor)
+        date.fromisoformat(valor)
+    except ValueError as e:
+        raise ToolError(f"{nombre} debe tener formato YYYY-MM-DD") from e
 
 
 def register_get_bce_indicador_diario_tool(mcp: MCPServer) -> None:
@@ -27,7 +45,7 @@ def register_get_bce_indicador_diario_tool(mcp: MCPServer) -> None:
         desde: str = "",
         hasta: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Fetch one BCE daily/monthly indicator's time series (e.g. Riesgo
         País), bounded to a window — never the full series (some run
@@ -54,12 +72,16 @@ def register_get_bce_indicador_diario_tool(mcp: MCPServer) -> None:
             hasta: Optional end date YYYY-MM-DD.
             format: text | json
         """
+        _validate_fecha("desde", desde)
+        _validate_fecha("hasta", hasta)
         try:
             result = await bce_indicadores_diarios_client.get_indicador_diario(
                 archivo, codigo, ultimos_n=ultimos_n, desde=desde or None, hasta=hasta or None
             )
         except ValueError as e:
             raise ToolError(f"Error: {e}") from e
+        except Exception as e:
+            raise ToolError(f"Error al consultar el indicador diario del BCE: {e}") from e
 
         def to_text(data: dict) -> str:
             rc = data["rango_completo"]
@@ -74,6 +96,12 @@ def register_get_bce_indicador_diario_tool(mcp: MCPServer) -> None:
                 parts.append("Sin datos en la ventana solicitada.")
                 return "\n".join(parts)
             parts.append(f"Ventana devuelta ({len(datos)} dato(s)):")
+            if data.get("truncado"):
+                parts.append(
+                    f"  (recortada a los últimos {len(datos)} de "
+                    f"{data['observaciones_en_rango']} datos en el rango pedido; "
+                    "acota desde/hasta para ver el resto)"
+                )
             for d in datos:
                 if "valor" in d:
                     parts.append(f"  {d['fecha']}: {d['valor']}")

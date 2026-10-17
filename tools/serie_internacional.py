@@ -11,6 +11,7 @@ from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import (
     comtrade_client,
@@ -280,7 +281,7 @@ def register_serie_internacional_tools(mcp: MCPServer) -> None:
         clave: str = "",
         ultimos: int = 0,
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Fetch a series from an international source, filtered to Ecuador.
 

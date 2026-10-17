@@ -453,3 +453,14 @@ async def test_bundle_is_cached_across_lookups(httpx_mock):
     # Second call must reuse the cached bundle (only one bundle/10 response
     # was mocked) and only re-fetch the grid.
     await bce_client.get_indicador(id_grupo=10)
+
+
+def test_revision_observations_are_capped():
+    bce_client.clear_caches()
+    for i in range(bce_client._MAX_REVISION_OBSERVATIONS + 25):
+        bce_client._record_revision_observation(f"endpoint-{i}", {}, {})
+
+    assert len(bce_client._revision_observations) == bce_client._MAX_REVISION_OBSERVATIONS
+    # The oldest entries are the ones dropped.
+    assert bce_client._revision_observations[0]["endpoint"] == "endpoint-25"
+    bce_client.clear_caches()

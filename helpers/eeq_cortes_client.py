@@ -71,6 +71,9 @@ _horarios_cache = TtlCache(ttl_seconds=86400.0, max_entries=64)
 # Largest PDF in the archive is ~3.7 MB (`25-27`); the project default cap
 # (5 MB) would leave little headroom, and a truncated PDF can't be parsed.
 _MAX_PDF_BYTES = 15 * 1024 * 1024
+# pypdf is CPU-bound and runs off the event loop; a pathological file must
+# not stall every concurrent request on the HTTP transport.
+_PARSE_TIMEOUT = 60.0
 _SLUG_OK_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
 
 # Not reachable through the site search (see module docstring). Periods
@@ -152,6 +155,10 @@ _SEED_ARCHIVOS: tuple[dict[str, str], ...] = (
 )
 
 _CARD_RE = re.compile(r'class="card-body">(.*?)</li', re.DOTALL)
+# The search page always prints its hit count ("3 resultados para
+# horarios"), even for zero hits; a response without it or any card is an
+# anti-bot/maintenance page or a redesign, not a genuine empty result.
+_RESULT_COUNT_RE = re.compile(r"\b\d+\s+resultados?\b", re.IGNORECASE)
 _TITLE_RE = re.compile(r'class="card-title">(.*?)</h3>', re.DOTALL)
 _DESC_RE = re.compile(r'class="card-description">(.*?)</p>', re.DOTALL)
 _SLUG_RE = re.compile(r"/d/empresa-electrica-quito/([^\s\"<?&]+)")
@@ -220,8 +227,14 @@ async def _fetch_archivos() -> list[dict[str, Any]]:
                     timeout=_TIMEOUT,
                 )
                 resp.raise_for_status()
+                cards = _CARD_RE.findall(resp.text)
+                if not cards and not _RESULT_COUNT_RE.search(resp.text):
+                    raise ValueError(
+                        "La búsqueda del sitio de EEQ no devolvió la lista de "
+                        "resultados (¿bloqueo anti-bots o cambio de diseño?)."
+                    )
                 encontrados.extend(_parse_search_page(resp.text))
-                if len(_CARD_RE.findall(resp.text)) < _PAGE_SIZE:
+                if len(cards) < _PAGE_SIZE:
                     break
 
         # Seeds first so a live card for the same slug overrides them.
@@ -292,7 +305,9 @@ async def get_eeq_cortes_horarios(slug: str, query: str = "") -> dict[str, Any]:
             raise ValueError(f"el PDF {slug!r} supera {_MAX_PDF_BYTES // 2**20} MB")
         if not raw.startswith(b"%PDF"):
             raise ValueError(f"{url} no devolvió un PDF")
-        parsed = parse_pdf(raw)
+        parsed = await asyncio.wait_for(
+            asyncio.to_thread(parse_pdf, raw), timeout=_PARSE_TIMEOUT
+        )
         _horarios_cache.set(slug, parsed)
 
     q = _strip(query)

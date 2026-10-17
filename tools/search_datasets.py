@@ -2,6 +2,7 @@ from typing import Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import ckan_client
 from helpers.format_out import render_structured
@@ -50,7 +51,7 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
         compact: bool = False,
         fields: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         Search for datasets on Ecuador's open data portal (www.datosabiertos.gob.ec).
 

@@ -1,7 +1,7 @@
 import pytest
 from fpdf import FPDF
 
-from helpers import centrosur_cortes_client
+from helpers import centrosur_cortes_client, centrosur_cortes_pdf
 from helpers.centrosur_cortes_pdf import _split_place, parse_pdf
 from helpers.eeq_cortes_pdf import parse_horario
 
@@ -145,3 +145,39 @@ async def test_get_centrosur_cortes_horarios_rejects_foreign_url():
         await centrosur_cortes_client.get_centrosur_cortes_horarios(
             "https://example.com/x.pdf"
         )
+
+
+def test_unlabelled_page_takes_the_nearest_preceding_horario():
+    # Page 1: 15:00-18:00. Page 2: 19:00-22:00. Page 3: a continuation of
+    # the page-2 table with no time label or date of its own -- it must
+    # inherit page 2's horario, not the first horario in the file.
+    second_block = [
+        (x, y, size, "De 19:00 - 22:00" if text == "De 15:00 - 18:00" else text)
+        for x, y, size, text in _TABLE_2023
+    ]
+    continuation = [
+        (x, y, size, text)
+        for x, y, size, text in _TABLE_2023
+        if not text.startswith(("De ", "Viernes"))
+    ]
+    filas = parse_pdf(_pdf([_TABLE_2023, second_block, continuation]))["filas"]
+
+    horarios_por_pagina: dict[int, set[tuple[str, ...]]] = {}
+    for f in filas:
+        horarios_por_pagina.setdefault(f["pagina"], set()).add(tuple(f["horario"]))
+    assert horarios_por_pagina[1] == {("15:00-18:00",)}
+    assert horarios_por_pagina[2] == {("19:00-22:00",)}
+    assert horarios_por_pagina[3] == {("19:00-22:00",)}
+    assert all(f["fecha_texto"] == "Viernes, 27 de octubre de 2023" for f in filas)
+
+
+def test_pdf_over_page_cap_is_rejected(monkeypatch):
+    monkeypatch.setattr(centrosur_cortes_pdf, "_MAX_PAGES", 2)
+
+    with pytest.raises(ValueError, match="máximo procesable"):
+        parse_pdf(_pdf([[], [], []]))
+
+
+def test_unreadable_pdf_is_a_value_error():
+    with pytest.raises(ValueError, match="no se pudo leer"):
+        parse_pdf(b"%PDF-1.4 garbage")

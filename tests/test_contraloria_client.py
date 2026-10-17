@@ -117,8 +117,8 @@ async def test_empty_scrape_result_is_not_cached(httpx_mock):
         url=contraloria_client._PLAN_ANUAL_SEED_URL, html=_PLAN_ANUAL_PAGE_HTML
     )
 
-    first = await contraloria_client.list_informes()
-    assert first == []
+    with pytest.raises(ValueError, match="Contraloría"):
+        await contraloria_client.list_informes()
 
     second = await contraloria_client.list_informes()
     assert len(second) == 5

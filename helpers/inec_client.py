@@ -432,7 +432,9 @@ async def _fetch_categories() -> dict[int, str]:
         return cached
 
     names: dict[int, str] = {}
-    async with httpx.AsyncClient(timeout=25.0) as session:
+    async with httpx.AsyncClient(
+        timeout=25.0, headers={"User-Agent": USER_AGENT}
+    ) as session:
         page = 1
         while True:
             try:
@@ -501,7 +503,9 @@ async def search_publicaciones(query: str = "", limit: int = 20, offset: int = 0
     if query:
         params["search"] = query
 
-    async with httpx.AsyncClient(timeout=25.0) as session:
+    async with httpx.AsyncClient(
+        timeout=25.0, headers={"User-Agent": USER_AGENT}
+    ) as session:
         posts, headers = await _get_api_json("posts", params, session=session)
         categories = await _fetch_categories()
 
@@ -545,7 +549,9 @@ async def get_publicacion_files(post: int | str) -> dict[str, Any]:
     if cached is not None:
         return cached
 
-    async with httpx.AsyncClient(timeout=25.0) as session:
+    async with httpx.AsyncClient(
+        timeout=25.0, headers={"User-Agent": USER_AGENT}
+    ) as session:
         matches, _ = await _get_api_json("posts", lookup, session=session)
         if not matches:
             raise ValueError(f"No se encontró la publicación '{post}' en Ecuador en Cifras")

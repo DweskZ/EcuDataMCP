@@ -9,6 +9,7 @@ change.
 Usage: uv run python build.py
 """
 
+import html
 import json
 import re
 import shutil
@@ -188,26 +189,30 @@ def flatten_sources(raw: list[dict]) -> list[dict]:
     return raw
 
 
-def atlas_search_key(tool: dict) -> str:
+def atlas_search_key(tool: dict) -> Markup:
     """Port of atlas.qmd's search_key: name + description + long_description
     + each param's "name description", lowercased, with quotes HTML-escaped
     so the value can sit inside a data-search="..." attribute."""
     parts = [tool["name"], tool["description"], tool["long_description"]]
     parts += [f"{p['name']} {p['description']}" for p in tool.get("params") or []]
     key = " ".join(parts).lower()
-    return key.replace('"', "&quot;")
+    # Markup: this already does the one escape the attribute needs; letting
+    # autoescape run on it again would turn &quot; into &amp;quot;.
+    return Markup(key.replace('"', "&quot;"))
 
 
 _MAIN_RE = re.compile(r"<main>(.*?)</main>", re.DOTALL)
 
 
-def extract_main_text(html: str) -> str:
+def extract_main_text(page: str) -> str:
     """Plain text of the page's <main> content only -- excludes the <head>
     (inline <style>, meta tags) and the navbar/footer chrome that every page
     shares, so search results reflect what's actually on that page."""
-    match = _MAIN_RE.search(html)
-    body = match.group(1) if match else html
-    return re.sub(r"<[^>]+>", " ", body)
+    match = _MAIN_RE.search(page)
+    body = match.group(1) if match else page
+    # Unescape after stripping tags: with autoescape on, quotes in the
+    # rendered page are entities, and the search index wants plain text.
+    return html.unescape(re.sub(r"<[^>]+>", " ", body))
 
 
 def load_json(lang: str, name: str):
@@ -314,7 +319,10 @@ def complete_tool_catalog(
 def build_env() -> jinja2.Environment:
     env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(str(TEMPLATES)),
-        autoescape=False,
+        # Every {{ }} is escaped unless a filter returns Markup (mdlite,
+        # codeescape, atlas_search_key): tool docstrings reach the Atlas via
+        # tool_signatures.json and already contain literal "<fuente>" text.
+        autoescape=True,
         undefined=jinja2.StrictUndefined,
     )
     env.filters["mdlite"] = mdlite

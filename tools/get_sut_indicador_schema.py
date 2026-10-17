@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import sut_powerbi_client
 from helpers.format_out import render_structured
@@ -23,7 +24,7 @@ def register_get_sut_indicador_schema_tool(mcp: MCPServer) -> None:
         indicador: str,
         fuente: Literal["sut", "judicatura"] = "sut",
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """
         List the queryable columns/measures/date-levels for one SUT
         Power BI dashboard, discovered from the report's own layout
@@ -55,6 +56,10 @@ def register_get_sut_indicador_schema_tool(mcp: MCPServer) -> None:
             result = await sut_powerbi_client.get_indicador_schema(indicador, fuente)
         except ValueError as e:
             raise ToolError(str(e)) from e
+        except Exception as e:
+            raise ToolError(
+                f"Error al consultar el esquema del indicador en Power BI: {e}"
+            ) from e
 
         def to_text(data: dict) -> str:
             campos = data.get("campos") or []

@@ -1,8 +1,9 @@
 import logging
-from typing import Any, Literal
+from typing import Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult
 
 from helpers import bce_iem_client
 from helpers.format_out import render_structured
@@ -31,7 +32,7 @@ def register_get_bce_iem_table_tool(mcp: MCPServer) -> None:
         boletin_numero: int = 0,
         rows: int = 20,
         format: Literal["text", "json"] = "text",
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """Inspect one official XLSX table from the latest BCE IEM bulletin.
 
         Get table_id from search_bce_iem. Tables with the common BCE layout
