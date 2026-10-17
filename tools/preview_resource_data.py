@@ -10,18 +10,11 @@ from mcp.types import CallToolResult
 from helpers import ckan_client
 from helpers.csv_reader import (
     format_table,
-    preview_csv,
-    preview_json,
-    preview_ods,
-    preview_targz,
-    preview_xls,
-    preview_xlsb,
-    preview_xlsx,
-    preview_zip,
     sniff_content_type,
 )
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.preview_dispatch import PREVIEW_DISPATCH, preview_by_kind
 from helpers.safe_download import UnsafeUrlError
 from helpers.tool_meta import READ_ONLY
 
@@ -195,22 +188,8 @@ def register_preview_resource_data_tool(mcp: MCPServer) -> None:
                         f"o directamente desde: {d['url']}"
                     ),
                 )
-            if kind == "TARGZ":
-                result = await preview_targz(url, max_rows=rows)
-            elif kind == "ZIP":
-                result = await preview_zip(url, max_rows=rows)
-            elif kind == "XLS":
-                result = await preview_xls(url, max_rows=rows)
-            elif kind == "XLSB":
-                result = await preview_xlsb(url, max_rows=rows)
-            elif kind == "XLSX":
-                result = await preview_xlsx(url, max_rows=rows)
-            elif kind == "ODS":
-                result = await preview_ods(url, max_rows=rows)
-            elif kind == "JSON":
-                result = await preview_json(url, max_rows=rows)
-            elif kind == "CSV":
-                result = await preview_csv(url, max_rows=rows)
+            if kind in PREVIEW_DISPATCH:
+                result = await preview_by_kind(kind, url, rows)
             else:
                 # Legitimate result, same reasoning as the RAR branch above.
                 return render_structured(

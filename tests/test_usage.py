@@ -1,6 +1,7 @@
 """helpers.usage counters, the JSONL log and log_tool's recording."""
 
 import json
+import logging
 
 import pytest
 
@@ -34,6 +35,23 @@ async def test_log_tool_records_success_and_failure():
         "calls": 1,
         "errors": 1,
     }
+
+
+async def test_log_tool_never_logs_identifiers_at_info(caplog):
+    @log_tool
+    async def cert_tool(identificacion: str = ""):
+        return {}
+
+    cedula = "1712345678"
+    with caplog.at_level(logging.INFO, logger="ecuador_mcp"):
+        await cert_tool(identificacion=cedula)
+    assert "cert_tool" in caplog.text
+    assert cedula not in caplog.text
+
+    caplog.clear()
+    with caplog.at_level(logging.DEBUG, logger="ecuador_mcp"):
+        await cert_tool(identificacion=cedula)
+    assert cedula not in caplog.text
 
 
 def test_no_log_file_unless_enabled(monkeypatch, tmp_path):

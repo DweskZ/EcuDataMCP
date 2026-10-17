@@ -850,3 +850,31 @@ def test_selected_columns_ignores_float_cells_even_in_year_range():
         (1, "2024"),
         (2, "2025"),
     ]
+def test_read_zip_member_capped_rejects_oversized_member(monkeypatch):
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("IEM-1.xls", b"\0" * 4096)
+    monkeypatch.setattr(bce_iem_client, "_MAX_ZIP_MEMBER_BYTES", 1024)
+
+    with pytest.raises(ValueError, match="bomba de descompresión"):
+        bce_iem_client._read_zip_member_capped(buf.getvalue(), "IEM-1.xls")
+
+
+def test_read_zip_member_capped_reads_normal_and_reports_missing():
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        zf.writestr("IEM-1.xls", b"hola")
+
+    assert bce_iem_client._read_zip_member_capped(buf.getvalue(), "IEM-1.xls") == b"hola"
+    with pytest.raises(ValueError, match="ya no está en el ZIP"):
+        bce_iem_client._read_zip_member_capped(buf.getvalue(), "otro.xls")
+
+
+def test_check_xlsx_container_size_rejects_expanding_xlsx(monkeypatch):
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("xl/sharedStrings.xml", b"a" * 4096)
+    monkeypatch.setattr(bce_iem_client, "_MAX_CONTAINER_UNCOMPRESSED_BYTES", 1024)
+
+    with pytest.raises(ValueError, match="bomba de descompresión"):
+        bce_iem_client._check_xlsx_container_size(buf.getvalue())

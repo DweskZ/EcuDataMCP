@@ -1,5 +1,6 @@
 import asyncio
 
+from helpers import http_security
 from helpers.http_security import with_http_security
 
 
@@ -72,15 +73,37 @@ async def test_mcp_applies_per_client_rate_limit():
     assert (b"retry-after", b"60") in second[0]["headers"]
 
 
-async def test_rate_limit_table_drops_idle_clients(monkeypatch):
-    monkeypatch.setattr("helpers.http_security._RATE_TABLE_SWEEP_SIZE", 2)
-    app = with_http_security(_ok_app, rate_limit_requests=5, rate_limit_window_seconds=1)
+async def test_mcp_non_ascii_bearer_token_returns_401():
+    app = with_http_security(_ok_app, auth_token="secret")
 
-    for i in range(4):
-        await _call(app, client=(f"10.0.0.{i}", 1234))
-    await asyncio.sleep(1.1)
-    await _call(app, client=("10.0.0.99", 1234))
+    messages = await _call(app, headers=[(b"authorization", "Bearer sécret".encode())])
 
-    # Introspect the closure: only the fresh client should remain.
-    cells = {c.cell_contents.__class__: c.cell_contents for c in app.__closure__}
-    assert list(cells[dict]) == ["10.0.0.99"]
+    assert messages[0]["status"] == 401
+
+
+async def test_rate_limiter_evicts_expired_clients(monkeypatch):
+    monkeypatch.setattr(http_security, "_RATE_PRUNE_THRESHOLD", 2)
+    clock = [100.0]
+    monkeypatch.setattr(http_security.time, "monotonic", lambda: clock[0])
+    app = with_http_security(_ok_app, rate_limit_requests=5, rate_limit_window_seconds=10)
+    seen = {}
+
+    async def call_as(ip):
+        scope = {"type": "http", "path": "/mcp", "headers": [], "client": (ip, 1)}
+
+        async def send(message):
+            seen["status"] = message.get("status", seen.get("status"))
+
+        await app(scope, None, send)
+
+    for ip in ("1.1.1.1", "2.2.2.2", "3.3.3.3"):
+        await call_as(ip)
+    clock[0] += 60
+    await call_as("4.4.4.4")
+
+    hits = app.__closure__ and [
+        c.cell_contents
+        for c in app.__closure__
+        if isinstance(c.cell_contents, dict) and "4.4.4.4" in c.cell_contents
+    ]
+    assert hits and list(hits[0]) == ["4.4.4.4"]

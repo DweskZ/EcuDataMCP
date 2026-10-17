@@ -31,6 +31,24 @@ jobs:
       - name: Test
         run: uv run pytest -q
 
+  # Builds the static site (web/) and checks search index, links and counts.
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - name: Install
+        run: uv sync --locked
+      - name: Extract tool signatures
+        run: uv run python scripts/extract_tool_signatures.py
+      - name: Build
+        run: uv run python build.py
+      - name: Test
+        run: uv run --with pytest pytest tests -q
+
   # Runs the image the way MCP clients and Glama's checks do (`docker run -i`,
   # JSON-RPC over stdio) and fails unless it answers tools/list.
   docker:

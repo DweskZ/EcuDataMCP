@@ -560,13 +560,33 @@ def test_select_item_aggregation_becomes_suma_field():
     )
 
 
-def test_dax_string_literal_doubles_embedded_quote():
-    assert sut._dax_string_literal("O'Higgins") == "'O''Higgins'"
-    assert sut._dax_string_literal("Vigente") == "'Vigente'"
+def test_literal_value_escapes_single_quotes_and_defaults_to_string():
+    assert sut._literal_value({"kind": "column"}, "O'Brien") == "'O''Brien'"
+    assert sut._literal_value({"kind": "column"}, "2024") == "'2024'"
 
 
-@pytest.mark.asyncio
-async def test_query_indicador_escapes_filter_quote_and_clamps_limite(httpx_mock):
+def test_literal_value_emits_typed_literals_from_data_type():
+    assert sut._literal_value({"data_type": "int"}, "2024") == "2024L"
+    assert sut._literal_value({"data_type": "decimal"}, "1.5") == "1.5D"
+    assert sut._literal_value({"data_type": "bool"}, "True") == "true"
+    # unparsable value for a numeric column falls back to a safe string
+    assert sut._literal_value({"data_type": "int"}, "abc'") == "'abc" + "''" + "'"
+
+
+def test_spec_from_select_item_reads_named_data_type_when_present():
+    col = {"Expression": {"SourceRef": {"Source": "a"}}, "Property": "Anio"}
+    typed = {"Column": {**col, "DataType": "Int64"}}
+    assert sut._spec_from_select_item(typed, {"a": "E"})["data_type"] == "int"
+    assert "data_type" not in sut._spec_from_select_item({"Column": col}, {"a": "E"})
+
+
+def _where_literal(httpx_mock):
+    sent = json.loads(httpx_mock.get_requests()[-1].content)
+    query = sent["queries"][0]["Query"]["Commands"][0]["SemanticQueryDataShapeCommand"]["Query"]
+    return query["Where"][0]["Condition"]["In"]["Values"][0][0]["Literal"]["Value"]
+
+
+def _setup_empty_query(httpx_mock):
     httpx_mock.add_response(
         url=f"{sut._BASE}/public/reports/{_RESOURCE_KEY}/modelsAndExploration",
         json=_EXPLORATION_RESPONSE,
@@ -576,6 +596,11 @@ async def test_query_indicador_escapes_filter_quote_and_clamps_limite(httpx_mock
         url=f"{sut._BASE}/public/reports/querydata?synchronous=true",
         json={"results": [{"result": {}}]},
     )
+
+
+@pytest.mark.asyncio
+async def test_query_indicador_escapes_filter_quote_and_clamps_limite(httpx_mock):
+    _setup_empty_query(httpx_mock)
 
     result = await sut.query_indicador(
         "contratos",
@@ -654,3 +679,26 @@ async def test_query_indicador_flags_truncation_when_window_fills(httpx_mock):
 
     assert [row["Calendario_.Mes"] for row in result["filas"]] == ["ene", "feb"]
     assert result["truncado"] is True
+
+
+@pytest.mark.asyncio
+async def test_untyped_numeric_filter_with_no_rows_adds_hint(httpx_mock):
+    _setup_empty_query(httpx_mock)
+
+    result = await sut.query_indicador("contratos", campos=["Calendario_.Mes"], filtros={"Calendario_.Mes": "2024"})
+
+    assert result["filas"] == []
+    assert "numérica" in result["aviso"]
+    assert _where_literal(httpx_mock) == "'2024'"
+
+
+@pytest.mark.asyncio
+async def test_typed_filter_emits_typed_literal_and_no_hint(httpx_mock):
+    _setup_empty_query(httpx_mock)
+    boot = await sut._get_bootstrap(_RESOURCE_KEY, "contratos")
+    boot["campos"]["Calendario_.Mes"]["data_type"] = "int"
+
+    result = await sut.query_indicador("contratos", campos=["Calendario_.Mes"], filtros={"Calendario_.Mes": "2024"})
+
+    assert "aviso" not in result
+    assert _where_literal(httpx_mock) == "2024L"

@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 import pytest
 
 from helpers import igepn_informes_client as c
+from helpers.ecuador_time import ECUADOR_TZ
 
 _INITIAL_HTML = (
     '<html><body><form id="form">'
@@ -109,12 +110,10 @@ async def test_download_informe_non_pdf_response(httpx_mock):
 async def test_default_anio_uses_ecuador_time(httpx_mock, monkeypatch):
     # 03:00 UTC on 1 January is still 22:00 on 31 December in Ecuador
     # (UTC-5), so the default report year must be the previous one.
-    class _FrozenDatetime:
-        @classmethod
-        def now(cls, tz=None):
-            return datetime(2026, 1, 1, 3, 0, tzinfo=UTC).astimezone(tz)
-
-    monkeypatch.setattr(c, "datetime", _FrozenDatetime)
+    frozen_utc = datetime(2026, 1, 1, 3, 0, tzinfo=UTC)
+    monkeypatch.setattr(
+        c, "today_ecuador", lambda: frozen_utc.astimezone(ECUADOR_TZ).date()
+    )
     httpx_mock.add_response(method="GET", html=_INITIAL_HTML)
     httpx_mock.add_response(method="POST", text=_TWO_ROWS_XML)
 

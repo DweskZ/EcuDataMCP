@@ -90,6 +90,10 @@ _MAX_PDF_BYTES = 25 * 1024 * 1024
 # not stall every concurrent request on the HTTP transport.
 _PARSE_TIMEOUT = 60.0
 _horarios_cache = TtlCache(ttl_seconds=86400.0, max_entries=16)
+# In-flight dedupe: concurrent misses for the same URL share one download +
+# parse. Locks are popped once the fill finishes, so the dict stays bounded
+# by the number of requests in flight.
+_fill_locks: dict[str, asyncio.Lock] = {}
 
 
 def _parse_item(item: dict[str, Any]) -> dict[str, Any]:
@@ -187,6 +191,33 @@ async def search_centrosur_cortes(query: str = "") -> dict[str, Any]:
     }
 
 
+async def _load_horarios(url: str) -> dict[str, Any]:
+    parsed = _horarios_cache.get(url)
+    if parsed is not None:
+        return parsed
+    lock = _fill_locks.setdefault(url, asyncio.Lock())
+    try:
+        async with lock:
+            parsed = _horarios_cache.get(url)
+            if parsed is None:
+                logger.info(
+                    "Descargando y procesando horario de cortes de Centrosur: %s", url
+                )
+                raw, truncated = await download_bytes(url, max_bytes=_MAX_PDF_BYTES)
+                if truncated:
+                    raise ValueError(f"el PDF supera {_MAX_PDF_BYTES // 2**20} MB")
+                if not raw.startswith(b"%PDF"):
+                    raise ValueError(f"{url} no devolvió un PDF")
+                parsed = await asyncio.wait_for(
+                    asyncio.to_thread(parse_pdf, raw), timeout=_PARSE_TIMEOUT
+                )
+                _horarios_cache.set(url, parsed)
+            return parsed
+    finally:
+        if _fill_locks.get(url) is lock:
+            _fill_locks.pop(url, None)
+
+
 async def get_centrosur_cortes_horarios(url: str, query: str = "") -> dict[str, Any]:
     """
     Parse one Centrosur schedule PDF into rows of time block × province ×
@@ -204,18 +235,7 @@ async def get_centrosur_cortes_horarios(url: str, query: str = "") -> dict[str, 
             "(usa search_centrosur_cortes para obtenerla)"
         )
 
-    parsed = _horarios_cache.get(url)
-    if parsed is None:
-        logger.info("Descargando y procesando horario de cortes de Centrosur: %s", url)
-        raw, truncated = await download_bytes(url, max_bytes=_MAX_PDF_BYTES)
-        if truncated:
-            raise ValueError(f"el PDF supera {_MAX_PDF_BYTES // 2**20} MB")
-        if not raw.startswith(b"%PDF"):
-            raise ValueError(f"{url} no devolvió un PDF")
-        parsed = await asyncio.wait_for(
-            asyncio.to_thread(parse_pdf, raw), timeout=_PARSE_TIMEOUT
-        )
-        _horarios_cache.set(url, parsed)
+    parsed = await _load_horarios(url)
 
     q = _strip(query)
     fields = ("canton", "zona", "subestacion", "sectores")

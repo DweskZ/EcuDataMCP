@@ -75,6 +75,8 @@ def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
             parts = [f"Indicador {data.get('fuente', 'sut')}: {data.get('nombre')}", f"{len(filas)} fila(s)", ""]
             if not filas:
                 parts.append("Sin resultados para esta combinación de campos/filtros.")
+                if data.get("aviso"):
+                    parts.append(data["aviso"])
                 return "\n".join(parts)
             shown = filas[:_TEXT_ROW_CAP]
             for row in shown:

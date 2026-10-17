@@ -21,6 +21,7 @@ from helpers import bce_iem_client
 from helpers import supercias_financials_build as build_script
 from helpers.cache import TtlCache
 from helpers.csv_reader import (
+    _MAX_DECOMPRESSED_BYTES,
     MAX_DOWNLOAD_BYTES,
     _parse_central_directory,
     download_bytes,
@@ -124,10 +125,11 @@ def test_parse_central_directory_reads_a_complete_entry_then_stops():
 
 async def test_preview_xls_over_cap_gives_actionable_message(httpx_mock):
     httpx_mock.add_response(
-        url="https://example.org/big.xls", content=b"\xd0\xcf" * (MAX_DOWNLOAD_BYTES // 2 + 8)
+        url="https://example.org/big.xls",
+        content=b"\xd0\xcf" * (_MAX_DECOMPRESSED_BYTES // 2 + 8),
     )
 
-    with pytest.raises(ValueError, match=r"supera el límite de 5 MB"):
+    with pytest.raises(ValueError, match=r"supera el límite de 20 MB"):
         await preview_xls("https://example.org/big.xls")
 
 

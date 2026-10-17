@@ -42,6 +42,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
+import zlib
 from html import unescape
 from typing import Any
 from urllib.parse import quote
@@ -79,12 +80,36 @@ _aip_locks: dict[str, asyncio.Lock] = {}
 _aip_index_lock = asyncio.Lock()
 
 
+_LOCK_POOL_SIZE = 64
+# ICAO location indicators are exactly four letters/digits (SEQM, SEGU).
+# The designator ends up in a URL path on the DGAC hosts, so anything else
+# ("../notam?designador=SEQM") must be refused before a URL is built, not
+# merely percent-quoted.
+_ICAO_RE = re.compile(r"^[A-Z0-9]{4}$")
+
+
 def _lock_for(store: dict[str, asyncio.Lock], key: str) -> asyncio.Lock:
-    lock = store.get(key)
+    """Fixed-size lock pool keyed by a hash of `key`, so the map can never
+    grow past _LOCK_POOL_SIZE entries (colliding keys just share a lock)."""
+    slot = str(zlib.crc32(key.encode("utf-8")) % _LOCK_POOL_SIZE)
+    lock = store.get(slot)
     if lock is None:
         lock = asyncio.Lock()
-        store[key] = lock
+        store[slot] = lock
     return lock
+
+
+def _normalize_designador(designador: str) -> str:
+    """Upper-case and validate an ICAO designator before any request/cache."""
+    icao = designador.strip().upper()
+    if not icao:
+        raise ValueError("Debe especificar un designador OACI (ej. SEQM).")
+    if not _ICAO_RE.match(icao):
+        raise ValueError(
+            f"Designador OACI inválido '{designador.strip()[:20]}': deben ser "
+            "4 caracteres alfanuméricos (ej. SEQM)."
+        )
+    return icao
 
 
 def _clean_text(text: str | None) -> str:
@@ -148,25 +173,6 @@ def _parse_metar(html: str, designador: str) -> list[dict[str, Any]]:
     return reportes
 
 
-# ICAO location indicators are exactly four letters/digits (SEQM, SEGU).
-# The designator ends up in a URL path on the DGAC hosts, so anything else
-# ("../notam?designador=SEQM") must be refused before a URL is built, not
-# merely percent-quoted.
-_ICAO_RE = re.compile(r"[A-Z0-9]{4}")
-
-
-def _validate_icao(designador: str) -> str:
-    icao = (designador or "").strip().upper()
-    if not icao:
-        raise ValueError("Debe especificar un designador OACI (ej. SEQM).")
-    if not _ICAO_RE.fullmatch(icao):
-        raise ValueError(
-            f"Designador OACI inválido: '{designador}'. Debe tener exactamente "
-            "4 letras o dígitos (ej. SEQM, SEGU)."
-        )
-    return icao
-
-
 async def _fetch_metar_html(designador: str) -> str:
     url = f"{_BASE}/metar/{quote(designador)}"
     logger.info("Consultando METAR/SPECI de %s en IFIS", designador)
@@ -185,7 +191,7 @@ async def get_metar(designador: str) -> dict[str, Any]:
         designador: ICAO code of the aerodrome/helipad (e.g. SEQM for
             Quito, SEGU for Guayaquil).
     """
-    icao = _validate_icao(designador)
+    icao = _normalize_designador(designador)
 
     cached = _metar_cache.get(icao)
     if cached is not None:
@@ -294,7 +300,7 @@ async def get_notam(designador: str) -> dict[str, Any]:
         designador: ICAO code of the aerodrome/helipad (e.g. SEQM for
             Quito, SEGU for Guayaquil).
     """
-    icao = _validate_icao(designador)
+    icao = _normalize_designador(designador)
 
     cached = _notam_cache.get(icao)
     if cached is not None:
@@ -446,7 +452,7 @@ async def get_aip_aerodromo(designador: str) -> dict[str, Any]:
         designador: ICAO code of the aerodrome/helipad (e.g. SEQM for
             Quito, SEGU for Guayaquil).
     """
-    icao = _validate_icao(designador)
+    icao = _normalize_designador(designador)
 
     cached = _aip_cache.get(icao)
     if cached is not None:
@@ -457,7 +463,7 @@ async def get_aip_aerodromo(designador: str) -> dict[str, Any]:
         if cached is not None:
             return cached
 
-        url = f"{_AIP_BASE}/aip/AD%202%20{icao}"
+        url = f"{_AIP_BASE}/aip/AD%202%20{quote(icao)}"
         logger.info("Consultando AIP AD 2 de %s en IFIS3", icao)
         try:
             content, truncated = await download_bytes(url)

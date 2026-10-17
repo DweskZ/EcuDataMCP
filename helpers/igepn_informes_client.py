@@ -42,12 +42,11 @@ from __future__ import annotations
 
 import logging
 import re
-from datetime import datetime
 from typing import Any
 
 import httpx
 
-from helpers.igepn_client import _ECUADOR_TZ
+from helpers.ecuador_time import today_ecuador
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.text_utils import strip_accents as _strip
 from helpers.user_agent import USER_AGENT
@@ -172,7 +171,7 @@ async def search_informes(
         anio: Report year (0 = current year)
         limit: Max reports to return (the underlying page holds up to 30)
     """
-    anio = anio or datetime.now(_ECUADOR_TZ).year  # IG-EPN publishes in Ecuador time
+    anio = anio or today_ecuador().year
     grupo_id = _grupo_id(grupo)
 
     async with httpx.AsyncClient(
@@ -221,7 +220,7 @@ async def download_informe(
 
     Returns (pdf_bytes, nombre).
     """
-    anio = anio or datetime.now(_ECUADOR_TZ).year  # IG-EPN publishes in Ecuador time
+    anio = anio or today_ecuador().year
     grupo_id = _grupo_id(grupo)
 
     async with httpx.AsyncClient(

@@ -1,6 +1,5 @@
 import asyncio
 from collections.abc import Coroutine
-from datetime import UTC, datetime
 from functools import partial
 from typing import Any, Literal
 
@@ -9,6 +8,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import CallToolResult
 
 from helpers import ckan_client, gobec_client, sercop_client, sgr_client
+from helpers.ecuador_time import today_ecuador
 from helpers.format_out import render_structured
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
@@ -104,7 +104,7 @@ def register_search_ecuador_tool(mcp: MCPServer) -> None:
             try:
                 return await sercop_client.search_contracts(
                     search=query,
-                    year=datetime.now(UTC).year,
+                    year=today_ecuador().year,
                     page=1,
                     fallback_years=2,
                 )

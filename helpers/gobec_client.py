@@ -4,6 +4,7 @@ import logging
 import re
 from html import unescape
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 
@@ -225,11 +226,16 @@ async def get_institucion(
     institucion_id: str, session: httpx.AsyncClient | None = None
 ) -> dict[str, Any] | None:
     """Get details of a specific public institution."""
+    institucion_id = str(institucion_id).strip()
+    if not institucion_id.isascii() or not institucion_id.isdigit():
+        raise ValueError(
+            f"El ID de institución debe ser numérico (ej. '8'); se recibió '{institucion_id}'."
+        )
     result = await _fetch_json(
-        _gobec_url(f"instituciones/{institucion_id}"), session=session
+        _gobec_url(f"instituciones/{quote(institucion_id, safe='')}"), session=session
     )
-    if isinstance(result, list) and result:
-        return result[0]
+    # A list-shaped response means the id resolved to the collection endpoint,
+    # not to one record: treat it as not found instead of returning result[0].
     if isinstance(result, dict):
         return result
     return None
@@ -252,11 +258,16 @@ async def get_regulacion(
     regulacion_id: str, session: httpx.AsyncClient | None = None
 ) -> dict[str, Any] | None:
     """Get details of a specific regulation."""
+    regulacion_id = str(regulacion_id).strip()
+    if not regulacion_id.isascii() or not regulacion_id.isdigit():
+        raise ValueError(
+            f"El ID de regulación debe ser numérico (ej. '8'); se recibió '{regulacion_id}'."
+        )
     result = await _fetch_json(
-        _gobec_url(f"regulaciones/{regulacion_id}"), session=session
+        _gobec_url(f"regulaciones/{quote(regulacion_id, safe='')}"), session=session
     )
-    if isinstance(result, list) and result:
-        return result[0]
+    # A list-shaped response means the id resolved to the collection endpoint,
+    # not to one record: treat it as not found instead of returning result[0].
     if isinstance(result, dict):
         return result
     return None

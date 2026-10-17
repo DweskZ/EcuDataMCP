@@ -7,18 +7,11 @@ from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import CallToolResult
 
 from helpers import ckan_client
-from helpers.csv_reader import (
-    preview_csv,
-    preview_json,
-    preview_targz,
-    preview_xls,
-    preview_xlsb,
-    preview_xlsx,
-    preview_zip,
-    sniff_content_type,
-)
+from helpers.csv_reader import sniff_content_type
 from helpers.format_out import render_structured
+from helpers.geo_proxy import proxy_for
 from helpers.logging import log_tool
+from helpers.preview_dispatch import preview_by_kind
 from helpers.text_utils import strip_accents
 from helpers.tool_meta import READ_ONLY
 from helpers.user_agent import USER_AGENT
@@ -167,23 +160,7 @@ async def _fetch_table(res: dict) -> dict:
     if kind == "UNKNOWN":
         raise ValueError(f"formato no soportado ('{fmt or 'desconocido'}')")
 
-    dispatch = {
-        "TARGZ": preview_targz,
-        "ZIP": preview_zip,
-        "XLS": preview_xls,
-        "XLSB": preview_xlsb,
-        "XLSX": preview_xlsx,
-        "JSON": preview_json,
-        "CSV": preview_csv,
-    }
-    if kind not in dispatch:
-        # classify_resource_format/classify_from_content_type recognize a
-        # few kinds (ODS today) that this function has never dispatched --
-        # a real, pre-existing gap, not something introduced here. Fail
-        # with the same clean message as an actually-unknown format rather
-        # than a raw KeyError.
-        raise ValueError(f"formato '{kind}' reconocido pero no soportado aquí")
-    return await dispatch[kind](url, max_rows=_ANALYZE_MAX_ROWS)
+    return await preview_by_kind(kind, url, _ANALYZE_MAX_ROWS)
 
 
 def _pick_pair(resources: list[dict]) -> tuple[dict, dict] | None:
@@ -257,9 +234,13 @@ def register_detect_series_pattern_tool(mcp: MCPServer) -> None:
                 "ninguno de los dos (para autodetectar el par)."
             )
 
-        # CKAN metadata calls share one session with the project User-Agent;
-        # the resource downloads in _fetch_table own theirs (see its docstring).
-        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
+        # The shared session only serves CKAN metadata calls; resource files
+        # live on other hosts, so sniffing and previews build their own
+        # per-URL clients (User-Agent + geo proxy for that host).
+        session = httpx.AsyncClient(
+            headers={"User-Agent": USER_AGENT},
+            proxy=proxy_for(ckan_client.site_url(source)),
+        )
         try:
             if resource_id_new and resource_id_old:
                 try:

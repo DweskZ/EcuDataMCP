@@ -167,3 +167,29 @@ def test_parse_item_unescapes_wordpress_rendered_title():
     }
 
     assert client._parse_item(item)["titulo"] == "Cortes – 23 al 29 de septiembre & octubre"
+
+
+async def test_concurrent_cache_misses_parse_pdf_once(monkeypatch):
+    import asyncio
+
+    from helpers import centrosur_cortes_client as client
+
+    client._horarios_cache.clear()
+    calls = {"download": 0, "parse": 0}
+
+    async def fake_download(url, max_bytes):
+        calls["download"] += 1
+        await asyncio.sleep(0.01)
+        return b"%PDF-fake", False
+
+    def fake_parse(raw):
+        calls["parse"] += 1
+        return {"filas": [], "paginas": 1}
+
+    monkeypatch.setattr(client, "download_bytes", fake_download)
+    monkeypatch.setattr(client, "parse_pdf", fake_parse)
+
+    await asyncio.gather(*(client._load_horarios("https://x/a.pdf") for _ in range(5)))
+
+    assert calls == {"download": 1, "parse": 1}
+    assert client._fill_locks == {}

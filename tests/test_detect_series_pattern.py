@@ -385,30 +385,40 @@ async def test_no_series_detected_without_ids(monkeypatch):
 # -- _fetch_table --------------------------------------------------------
 
 
-async def test_fetch_table_recognized_but_undispatched_format_gives_clear_error():
-    # ODS is recognized by classify_resource_format but was never added to
-    # this function's own dispatch table -- a real, pre-existing gap. This
-    # confirms it now fails with a clear message instead of a raw KeyError,
-    # the same guard that keeps a newly-recognized format (e.g. a future
-    # one) from crashing here before its parser is wired in.
+async def test_fetch_table_dispatches_ods(monkeypatch):
+    from helpers import preview_dispatch
+
+    seen = {}
+
+    async def fake_preview_ods(url, max_rows=20, session=None):
+        seen["url"] = url
+        seen["max_rows"] = max_rows
+        return {"headers": ["Mes"], "rows": [["Enero"]], "truncated": False}
+
+    monkeypatch.setitem(preview_dispatch.PREVIEW_DISPATCH, "ODS", fake_preview_ods)
     res = {"url": "https://x/reporte.ods", "format": "ODS"}
-    with pytest.raises(ValueError, match="reconocido pero no soportado"):
-        await _fetch_table(res)
+    table = await _fetch_table(res)
+    assert table["headers"] == ["Mes"]
+    assert seen["url"] == "https://x/reporte.ods"
 
 
-async def test_fetch_table_lets_download_own_its_session(monkeypatch):
-    # No shared session reaches the preview function: download_bytes builds
-    # its own per URL so the project User-Agent and geo proxy apply.
-    seen: dict[str, object] = {"called": False}
+async def test_fetch_table_rar_gives_clear_error():
+    with pytest.raises(ValueError, match="rar"):
+        await _fetch_table({"url": "https://x/a.rar", "format": "RAR"})
 
-    async def fake_preview_csv(url, max_rows=20, session=None):
-        seen["called"] = True
-        seen["session"] = session
-        return {"headers": ["a"], "rows": [["1"]], "truncated": False}
 
-    monkeypatch.setattr(detect_series_pattern_module, "preview_csv", fake_preview_csv)
+async def test_tool_session_carries_user_agent_and_geo_proxy(monkeypatch):
+    from helpers.user_agent import USER_AGENT
 
-    await _fetch_table({"url": "https://x/datos.csv", "format": "CSV"})
+    monkeypatch.setenv("ECUADOR_MCP_GEO_PROXY", "http://proxy.test:8080")
+    seen = {}
 
-    assert seen["called"] is True
-    assert seen["session"] is None
+    async def fake_get_dataset(dataset_id, source="nacional", session=None):
+        seen["ua"] = session.headers["User-Agent"]
+        seen["proxy"] = session._mounts and True
+        return {"resources": []}
+
+    monkeypatch.setattr(ckan_client, "get_dataset", fake_get_dataset)
+    await _make_tool()(dataset_id="d1", format="json")
+    assert seen["ua"] == USER_AGENT
+    assert seen["proxy"]

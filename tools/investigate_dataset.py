@@ -9,18 +9,12 @@ from mcp.types import CallToolResult
 from helpers import ckan_client
 from helpers.csv_reader import (
     format_table,
-    preview_csv,
-    preview_json,
-    preview_ods,
-    preview_targz,
-    preview_xls,
-    preview_xlsb,
-    preview_xlsx,
-    preview_zip,
     sniff_content_type,
 )
 from helpers.format_out import render_structured
+from helpers.geo_proxy import proxy_for
 from helpers.logging import log_tool
+from helpers.preview_dispatch import PREVIEWABLE_KINDS, preview_by_kind
 from helpers.tool_meta import READ_ONLY
 from helpers.user_agent import USER_AGENT
 from tools.list_dataset_resources import detect_periodic_series
@@ -29,24 +23,10 @@ from tools.preview_resource_data import (
     classify_resource_format,
 )
 
-# Prefer previewing a resource whose format we can actually parse into a
-# table over one search ranks higher but we'd just bounce off (RAR/UNKNOWN).
-_PREVIEWABLE_KINDS = {"CSV", "JSON", "XLS", "XLSB", "XLSX", "ODS", "ZIP", "TARGZ"}
 # Bounds for the Content-Type sniff pass over resources with no usable
 # format/extension (see the classification loop in investigate_dataset).
 _MAX_SNIFFED_RESOURCES = 25
 _SNIFF_CONCURRENCY = 5
-
-_PREVIEW_DISPATCH = {
-    "TARGZ": preview_targz,
-    "ZIP": preview_zip,
-    "XLS": preview_xls,
-    "XLSB": preview_xlsb,
-    "XLSX": preview_xlsx,
-    "ODS": preview_ods,
-    "JSON": preview_json,
-    "CSV": preview_csv,
-}
 
 
 async def _classify(res: dict) -> str:
@@ -125,10 +105,12 @@ def register_investigate_dataset_tool(mcp: MCPServer) -> None:
         dataset_id = dataset_stub.get("id") or dataset_stub.get("name")
         site = ckan_client.site_url(source).rstrip("/")
 
-        # The CKAN session carries the project User-Agent. Resource downloads
-        # deliberately do not reuse it: download_bytes owns its own session
-        # per URL so the geo proxy (proxy_for) applies to the file host.
-        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
+        # The shared session only serves CKAN metadata calls; resource files
+        # live on other hosts, so sniffing and previews build their own
+        # per-URL clients (User-Agent + geo proxy for that host).
+        session = httpx.AsyncClient(
+            headers={"User-Agent": USER_AGENT}, proxy=proxy_for(site)
+        )
         try:
             try:
                 dataset = await ckan_client.get_dataset(dataset_id, source=source, session=session)
@@ -169,7 +151,7 @@ def register_investigate_dataset_tool(mcp: MCPServer) -> None:
                 candidate_kind = classify_resource_format(
                     (res.get("format") or "").upper(), res.get("url") or ""
                 )
-                if candidate_kind in _PREVIEWABLE_KINDS:
+                if candidate_kind in PREVIEWABLE_KINDS:
                     chosen, kind = res, candidate_kind
                     break
             if chosen is None:
@@ -189,7 +171,7 @@ def register_investigate_dataset_tool(mcp: MCPServer) -> None:
                 sniffed = candidates[:_MAX_SNIFFED_RESOURCES]
                 kinds = await asyncio.gather(*(classify_bounded(r) for r in sniffed))
                 for res, candidate_kind in zip(sniffed, kinds, strict=True):
-                    if candidate_kind in _PREVIEWABLE_KINDS:
+                    if candidate_kind in PREVIEWABLE_KINDS:
                         chosen, kind = res, candidate_kind
                         break
 
@@ -215,7 +197,7 @@ def register_investigate_dataset_tool(mcp: MCPServer) -> None:
                 )
 
             try:
-                preview = await _PREVIEW_DISPATCH[kind](chosen["url"], max_rows=preview_rows)
+                preview = await preview_by_kind(kind, chosen["url"], preview_rows)
             except (ValueError, httpx.HTTPError) as e:
                 raise ToolError(
                     f"Dataset encontrado: {base_payload['dataset']['title']} "

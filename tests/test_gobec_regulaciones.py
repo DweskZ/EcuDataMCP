@@ -222,3 +222,22 @@ async def test_http_error_status_is_not_retried(httpx_mock, _no_retry_sleep):
         await gobec_client.search_tramites(institution_id="8", page=0)
 
     assert _no_retry_sleep == []
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("bad", ["", "abc", "1/../2", "8?x=1", " "])
+async def test_get_institucion_and_regulacion_reject_non_numeric_id(bad):
+    with pytest.raises(ValueError, match="numérico"):
+        await gobec_client.get_institucion(bad)
+    with pytest.raises(ValueError, match="numérico"):
+        await gobec_client.get_regulacion(bad)
+
+
+@pytest.mark.asyncio
+async def test_get_institucion_list_response_is_not_found(monkeypatch):
+    async def fake_fetch(url, params=None, session=None):
+        return [{"institucion": "Otra"}]
+
+    monkeypatch.setattr(gobec_client, "_fetch_json", fake_fetch)
+    assert await gobec_client.get_institucion("8") is None
+    assert await gobec_client.get_regulacion("8") is None

@@ -9,7 +9,7 @@ change.
 Usage: uv run python build.py
 """
 
-import html
+import html as html_lib
 import json
 import re
 import shutil
@@ -201,7 +201,8 @@ def atlas_search_key(tool: dict) -> Markup:
     return Markup(key.replace('"', "&quot;"))
 
 
-_MAIN_RE = re.compile(r"<main>(.*?)</main>", re.DOTALL)
+_MAIN_RE = re.compile(r"<main[^>]*>(.*?)</main>", re.DOTALL)
+_SCRIPT_STYLE_RE = re.compile(r"<(script|style)\b.*?</\1>", re.DOTALL | re.IGNORECASE)
 
 
 def extract_main_text(page: str) -> str:
@@ -210,9 +211,10 @@ def extract_main_text(page: str) -> str:
     shares, so search results reflect what's actually on that page."""
     match = _MAIN_RE.search(page)
     body = match.group(1) if match else page
+    body = _SCRIPT_STYLE_RE.sub(" ", body)
     # Unescape after stripping tags: with autoescape on, quotes in the
     # rendered page are entities, and the search index wants plain text.
-    return html.unescape(re.sub(r"<[^>]+>", " ", body))
+    return html_lib.unescape(re.sub(r"<[^>]+>", " ", body))
 
 
 def load_json(lang: str, name: str):
@@ -433,6 +435,28 @@ def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
     return search_entries
 
 
+def write_404(env: jinja2.Environment):
+    """Bilingual 404 for GitHub Pages. It is served from any path, so every
+    URL on it is root-relative to the Pages base, not relative to the file."""
+    base = f"/{SITE_URL.rsplit('/', 1)[1]}/"
+    page = env.get_template("404.html").render(
+        lang="es",
+        root=base,
+        assets=f"{base}assets/",
+        nav=NAV["es"],
+        lang_switch_href=f"{base}en/index.html",
+        t=TRANSLATIONS["es"],
+        status_badges=STATUS_BADGES["es"],
+        current_page="404",
+        page_title="Página no encontrada / Page not found",
+        page_description="La página que buscas no existe. / The page you are looking for does not exist.",
+        og_image=OG_IMAGE,
+        canonical_url=f"{SITE_URL}/404.html",
+        alternate_urls=[],
+    )
+    (SITE / "404.html").write_text(page, encoding="utf-8")
+
+
 def copy_assets():
     dest = SITE / "assets"
     if dest.exists():
@@ -476,6 +500,7 @@ def main():
     env = build_env()
     render_lang(env, "es")
     render_lang(env, "en")
+    write_404(env)
     copy_assets()
     write_seo_files()
     # GitHub Pages runs Jekyll by default; this disables it so files like

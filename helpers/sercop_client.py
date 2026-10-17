@@ -5,20 +5,21 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from typing import Any
 
 import httpx
 
 from helpers import env_config
 from helpers.cache import TtlCache, sercop_search_cache
+from helpers.ecuador_time import ECUADOR_TZ
 from helpers.geo_proxy import proxy_for
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.user_agent import USER_AGENT
 
 # Ecuador mainland is UTC-5 year-round (no DST); UTC would flip the default
 # year at 19:00 local time on 31 Dec.
-_ECUADOR_TZ = timezone(timedelta(hours=-5))
+_ECUADOR_TZ = ECUADOR_TZ
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 

@@ -34,6 +34,7 @@ pasaporte anterior, si sigue vigente</pre>
 <button type="button" class="chat-nav-btn" data-chat-prev aria-label="Ejemplo anterior">‹</button>
 <span class="chat-nav-label" data-chat-label>Pasaporte · 1 / 4</span>
 <button type="button" class="chat-nav-btn" data-chat-next aria-label="Ejemplo siguiente">›</button>
+<button type="button" class="chat-nav-btn" data-chat-toggle data-label-pause="Pausar ejemplos" data-label-play="Reanudar ejemplos" aria-label="Pausar ejemplos" aria-pressed="false">&#10074;&#10074;</button>
 </div>
 <script type="application/json" data-chat-examples>
 [
@@ -190,6 +191,7 @@ pasaporte anterior, si sigue vigente</pre>
 {% endfor %}
 </div>
 <button type="button" class="org-carousel-btn" data-org-next aria-label="Institución siguiente">›</button>
+<button type="button" class="org-carousel-btn" data-org-toggle data-label-pause="Pausar carrusel" data-label-play="Reanudar carrusel" aria-label="Pausar carrusel" aria-pressed="false">&#10074;&#10074;</button>
 </div>
 <a class="btn-cta secondary" href="atlas.html">Ver los {{ tool_count }} tools en la Referencia &rarr;</a>
 </div>
@@ -221,12 +223,12 @@ Verifica que el servidor responda antes de darlo por terminado.</code></pre>
 </div>
 <ul class="nav nav-tabs" id="client-tabs" role="tablist">
 {% for cl in clients %}
-<li class="nav-item" role="presentation"><button class="nav-link{% if loop.first %} active{% endif %}" id="{{ cl.id }}-tab" data-tab-target="{{ cl.id }}-pane" type="button" role="tab">{{ cl.name }}</button></li>
+<li class="nav-item" role="presentation"><button class="nav-link{% if loop.first %} active{% endif %}" id="{{ cl.id }}-tab" data-tab-target="{{ cl.id }}-pane" type="button" role="tab" aria-selected="{% if loop.first %}true{% else %}false{% endif %}" aria-controls="{{ cl.id }}-pane"{% if not loop.first %} tabindex="-1"{% endif %}>{{ cl.name }}</button></li>
 {% endfor %}
 </ul>
 <div class="tab-content" id="client-tabs-content">
 {% for cl in clients %}
-<div class="tab-pane fade{% if loop.first %} show active{% endif %}" id="{{ cl.id }}-pane" role="tabpanel">
+<div class="tab-pane fade{% if loop.first %} show active{% endif %}" id="{{ cl.id }}-pane" role="tabpanel" aria-labelledby="{{ cl.id }}-tab">
 {% if cl.intro %}<p class="client-intro">{{ cl.intro | mdlite }}</p>{% endif %}
 {% if cl.steps %}<ol class="client-steps">{% for step in cl.steps %}<li>{{ step | mdlite }}</li>{% endfor %}</ol>{% endif %}
 {% if cl.code %}<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><pre><code>{{ cl.code | codeescape }}</code></pre></div>{% endif %}
