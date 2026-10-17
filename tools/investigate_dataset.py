@@ -20,6 +20,7 @@ from helpers.csv_reader import (
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.tool_meta import READ_ONLY
+from helpers.user_agent import USER_AGENT
 from tools.list_dataset_resources import detect_periodic_series
 from tools.preview_resource_data import (
     classify_from_content_type,
@@ -42,12 +43,14 @@ _PREVIEW_DISPATCH = {
 }
 
 
-async def _classify(res: dict, session: httpx.AsyncClient) -> str:
+async def _classify(res: dict) -> str:
     url = res.get("url") or ""
     fmt = (res.get("format") or "").upper()
     kind = classify_resource_format(fmt, url)
     if kind == "UNKNOWN" and url:
-        content_type = await sniff_content_type(url, session=session)
+        # No shared session: sniff_content_type builds its own per URL, so
+        # the project User-Agent and the geo proxy (proxy_for) apply.
+        content_type = await sniff_content_type(url)
         kind = classify_from_content_type(content_type)
     return kind
 
@@ -116,7 +119,10 @@ def register_investigate_dataset_tool(mcp: MCPServer) -> None:
         dataset_id = dataset_stub.get("id") or dataset_stub.get("name")
         site = ckan_client.site_url(source).rstrip("/")
 
-        session = httpx.AsyncClient()
+        # The CKAN session carries the project User-Agent. Resource downloads
+        # deliberately do not reuse it: download_bytes owns its own session
+        # per URL so the geo proxy (proxy_for) applies to the file host.
+        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
         try:
             try:
                 dataset = await ckan_client.get_dataset(dataset_id, source=source, session=session)
@@ -153,7 +159,7 @@ def register_investigate_dataset_tool(mcp: MCPServer) -> None:
             for res in resources:
                 if not res.get("id") or not res.get("url"):
                     continue
-                candidate_kind = await _classify(res, session)
+                candidate_kind = await _classify(res)
                 if candidate_kind in _PREVIEWABLE_KINDS:
                     chosen, kind = res, candidate_kind
                     break
@@ -180,9 +186,7 @@ def register_investigate_dataset_tool(mcp: MCPServer) -> None:
                 )
 
             try:
-                preview = await _PREVIEW_DISPATCH[kind](
-                    chosen["url"], max_rows=preview_rows, session=session
-                )
+                preview = await _PREVIEW_DISPATCH[kind](chosen["url"], max_rows=preview_rows)
             except (ValueError, httpx.HTTPError) as e:
                 raise ToolError(
                     f"Dataset encontrado: {base_payload['dataset']['title']} "

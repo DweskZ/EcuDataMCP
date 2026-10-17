@@ -1,3 +1,4 @@
+import os
 import sqlite3
 from pathlib import Path
 
@@ -236,3 +237,46 @@ def test_verify_build_rejects_all_null_n_empleados(tmp_path):
     conn.close()
     with pytest.raises(RuntimeError, match="n_empleados"):
         build_script._verify_build(path)
+
+
+def test_replace_with_retry_waits_out_windows_reader(monkeypatch, tmp_path):
+    # On Windows os.replace raises PermissionError while a reader holds the
+    # target open; a 15-20 minute build must not be discarded over that.
+    src = tmp_path / "db.building"
+    dst = tmp_path / "db.sqlite"
+    src.write_bytes(b"new")
+    dst.write_bytes(b"old")
+    attempts: list[int] = []
+    real_replace = os.replace
+
+    def flaky_replace(a, b):
+        attempts.append(1)
+        if len(attempts) < 3:
+            raise PermissionError(5, "Access is denied")
+        real_replace(a, b)
+
+    sleeps: list[float] = []
+    monkeypatch.setattr(os, "replace", flaky_replace)
+    monkeypatch.setattr(build_script.time, "sleep", lambda s: sleeps.append(s))
+
+    build_script._replace_with_retry(src, dst)
+
+    assert dst.read_bytes() == b"new"
+    assert not src.exists()
+    assert len(attempts) == 3
+    assert len(sleeps) == 2
+
+
+def test_replace_with_retry_gives_up_after_max_attempts(monkeypatch, tmp_path):
+    src = tmp_path / "db.building"
+    dst = tmp_path / "db.sqlite"
+    src.write_bytes(b"new")
+
+    def always_locked(a, b):
+        raise PermissionError(5, "Access is denied")
+
+    monkeypatch.setattr(os, "replace", always_locked)
+    monkeypatch.setattr(build_script.time, "sleep", lambda s: None)
+
+    with pytest.raises(PermissionError):
+        build_script._replace_with_retry(src, dst)

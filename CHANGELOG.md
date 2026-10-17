@@ -7,6 +7,13 @@
   - The per-client rate limit drops idle client keys; behind a reverse proxy, set `FORWARDED_ALLOW_IPS` (Uvicorn's own variable) so clients get separate quotas (see docs/DEPLOYMENT.md).
   - Ranged requests (`list_zip_contents`) honour `ECUADOR_MCP_GEO_PROXY`; the unreachable `verify=False` fallbacks in the SRI and IESS certificate clients are removed (their hosts were never on the insecure-TLS allowlist); `list_sat_tsunami` caps its `limit`.
   - The compose healthcheck follows `MCP_SSL_CERTFILE`; the release workflow pins `mcp-publisher` and `@anthropic-ai/mcpb`; Python 3.14 added to the classifiers.
+  - CSV previews: a column of `1,234`-style cells is no longer read as European decimals (that is a US thousands group, and the conversion shrank values 1000x); a column needs one unambiguous cell such as `7.760,2` or `168,15`, and once it qualifies its `1.000`-style whole numbers are converted too.
+  - `get_bce_iem_table`: a data row such as `Banano | 1500 | 2300` can no longer be mistaken for the period header (years are bounded to 1900..next year and only text, date or integer cells count as period labels); a sheet without a real period header falls back to the layout preview.
+  - `.xlsb` previews apply the same 200 MB zip-expansion guard as `.xlsx`/`.ods`; `get_metar`/`get_aviso_aeronautico`/`get_aip_aerodromo` refuse an ICAO designator that is not exactly four letters or digits before building any URL.
+  - `download_resource` with `format="text"` no longer attaches the base64 file to the structured payload (the docstring already promised it would not).
+  - `query_sut_indicador`: filter values escape `'` as `''` in the Power BI literal, `limite` is clamped to 20000, the result carries `limite`/`truncado`, and a Power BI error body raises instead of returning zero rows.
+  - The Supercías financials build retries the final `os.replace` for up to ten seconds when a Windows reader holds the database open, instead of discarding the build; the comment no longer claims the rename is atomic on Windows.
+  - `investigate_dataset` and `detect_series_pattern` let `download_bytes` own the download session, so the project User-Agent and `ECUADOR_MCP_GEO_PROXY` apply to the file host (their CKAN session now sends the User-Agent too).
 
 - **International-series hardening**: `intl_http` retries connect/DNS/read errors
   (not only timeouts) and names the source in the final error; the "try again in

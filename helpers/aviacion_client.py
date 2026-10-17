@@ -148,6 +148,25 @@ def _parse_metar(html: str, designador: str) -> list[dict[str, Any]]:
     return reportes
 
 
+# ICAO location indicators are exactly four letters/digits (SEQM, SEGU).
+# The designator ends up in a URL path on the DGAC hosts, so anything else
+# ("../notam?designador=SEQM") must be refused before a URL is built, not
+# merely percent-quoted.
+_ICAO_RE = re.compile(r"[A-Z0-9]{4}")
+
+
+def _validate_icao(designador: str) -> str:
+    icao = (designador or "").strip().upper()
+    if not icao:
+        raise ValueError("Debe especificar un designador OACI (ej. SEQM).")
+    if not _ICAO_RE.fullmatch(icao):
+        raise ValueError(
+            f"Designador OACI inválido: '{designador}'. Debe tener exactamente "
+            "4 letras o dígitos (ej. SEQM, SEGU)."
+        )
+    return icao
+
+
 async def _fetch_metar_html(designador: str) -> str:
     url = f"{_BASE}/metar/{quote(designador)}"
     logger.info("Consultando METAR/SPECI de %s en IFIS", designador)
@@ -166,9 +185,7 @@ async def get_metar(designador: str) -> dict[str, Any]:
         designador: ICAO code of the aerodrome/helipad (e.g. SEQM for
             Quito, SEGU for Guayaquil).
     """
-    icao = designador.strip().upper()
-    if not icao:
-        raise ValueError("Debe especificar un designador OACI (ej. SEQM).")
+    icao = _validate_icao(designador)
 
     cached = _metar_cache.get(icao)
     if cached is not None:
@@ -277,9 +294,7 @@ async def get_notam(designador: str) -> dict[str, Any]:
         designador: ICAO code of the aerodrome/helipad (e.g. SEQM for
             Quito, SEGU for Guayaquil).
     """
-    icao = designador.strip().upper()
-    if not icao:
-        raise ValueError("Debe especificar un designador OACI (ej. SEQM).")
+    icao = _validate_icao(designador)
 
     cached = _notam_cache.get(icao)
     if cached is not None:
@@ -431,9 +446,7 @@ async def get_aip_aerodromo(designador: str) -> dict[str, Any]:
         designador: ICAO code of the aerodrome/helipad (e.g. SEQM for
             Quito, SEGU for Guayaquil).
     """
-    icao = designador.strip().upper()
-    if not icao:
-        raise ValueError("Debe especificar un designador OACI (ej. SEQM).")
+    icao = _validate_icao(designador)
 
     cached = _aip_cache.get(icao)
     if cached is not None:

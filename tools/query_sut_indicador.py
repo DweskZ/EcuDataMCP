@@ -56,7 +56,9 @@ def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
                 get_sut_indicador_schema.
             filtros: Optional {campo: valor} equality filters, plain
                 columns only.
-            limite: Row cap applied server-side by the query itself.
+            limite: Row cap applied server-side by the query itself
+                (clamped to 20000; the result carries truncado=true when
+                the cap was reached).
             fuente: sut (default) | judicatura
             format: text | json
         """
@@ -80,6 +82,11 @@ def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
                 parts.append(
                     f"... ({len(filas) - _TEXT_ROW_CAP} fila(s) más — usa format=\"json\" "
                     "o acota con filtros/campos para verlas todas)"
+                )
+            if data.get("truncado"):
+                parts.append(
+                    f"Resultado truncado al límite de {data.get('limite')} filas: "
+                    "acota con filtros o menos campos."
                 )
             return "\n".join(parts)
 

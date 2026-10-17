@@ -700,3 +700,68 @@ async def test_preview_ods_empty_sheet(httpx_mock, monkeypatch):
 
     assert result["headers"] == []
     assert result["rows"] == []
+
+
+def test_normalize_eu_decimal_columns_leaves_us_thousands_alone():
+    # Every cell matches the "\d+,\d+" branch of the EU pattern, but each
+    # one is exactly a US thousands group: converting would shrink the
+    # column 1000x under a confident "normalised" label.
+    headers = ["monto"]
+    rows = [["1,234"], ["12,500"], ["987,000"]]
+
+    new_rows, converted = normalize_eu_decimal_columns(headers, rows)
+
+    assert converted == []
+    assert new_rows == rows
+
+
+def test_normalize_eu_decimal_columns_one_unambiguous_cell_qualifies_column():
+    # "7.760,2" can only be European, so the ambiguous "1,234" beside it
+    # is read the same way.
+    headers = ["monto"]
+    rows = [["1,234"], ["7.760,2"], ["12,500"]]
+
+    new_rows, converted = normalize_eu_decimal_columns(headers, rows)
+
+    assert converted == ["monto"]
+    assert new_rows == [["1.234"], ["7760.2"], ["12.500"]]
+
+
+def test_normalize_eu_decimal_columns_converts_dot_thousands_once_column_is_eu():
+    # Sampled cells decide the column; "1.000" past the sample window is a
+    # whole thousand in that notation, not 1.0.
+    headers = ["monto"]
+    rows = [["1,5"], ["1,5"], ["1,5"], ["1,5"], ["1,5"], ["2.5"], ["1.000"]]
+
+    new_rows, converted = normalize_eu_decimal_columns(headers, rows)
+
+    assert converted == ["monto"]
+    assert [r[0] for r in new_rows] == ["1.5", "1.5", "1.5", "1.5", "1.5", "2.5", "1000"]
+
+
+def test_normalize_eu_decimal_columns_dot_thousands_alone_is_not_enough():
+    headers = ["monto"]
+    rows = [["1.000"], ["2.500"]]
+
+    new_rows, converted = normalize_eu_decimal_columns(headers, rows)
+
+    assert converted == []
+    assert new_rows == rows
+
+
+async def test_preview_xlsb_rejects_container_that_expands_past_cap(httpx_mock, monkeypatch):
+    # Same zip-bomb guard preview_xlsx/preview_ods already apply: pyxlsb
+    # reads sharedStrings.bin whole, so the declared uncompressed size is
+    # checked before the workbook is opened.
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+    monkeypatch.setattr(csv_reader_module, "_MAX_CONTAINER_UNCOMPRESSED_BYTES", 1024)
+
+    body = _make_zip({"xl/sharedStrings.bin": b"\x00" * 4096})
+    url = "https://example.com/bomba.xlsb"
+    httpx_mock.add_response(url=url, content=body)
+
+    with pytest.raises(ValueError, match="se expande a más de"):
+        await preview_xlsb(url)

@@ -2,6 +2,7 @@ from mcp.server.mcpserver import MCPServer
 
 import tools.investigate_dataset as investigate_dataset_module
 from helpers import ckan_client
+from helpers.user_agent import USER_AGENT
 from tools.investigate_dataset import register_investigate_dataset_tool
 
 
@@ -114,3 +115,30 @@ async def test_investigate_dataset_skips_unpreviewable_resource(monkeypatch):
 
     assert data["error"] == "sin_recurso_previsualizable"
     assert data["recursos"][0]["id"] == "res1"
+
+
+async def test_investigate_dataset_lets_download_own_its_session(monkeypatch):
+    # The bare shared httpx.AsyncClient used to bypass the User-Agent and
+    # geo proxy that download_bytes applies when it owns the session.
+    async def fake_search_datasets(query, rows=1, source="nacional", session=None):
+        return {"count": 1, "results": [{"id": "ds1", "name": "precios-cacao"}]}
+
+    async def fake_get_dataset(dataset_id, source="nacional", session=None):
+        assert session is not None
+        assert session.headers["user-agent"] == USER_AGENT
+        return _DATASET_WITH_PERIODIC_CSVS
+
+    seen: dict[str, object] = {}
+
+    async def fake_preview_csv(url, max_rows=20, session=None):
+        seen["session"] = session
+        return {"headers": ["a"], "rows": [["1"]], "total_rows_in_preview": 1, "format": "csv"}
+
+    monkeypatch.setattr(ckan_client, "search_datasets", fake_search_datasets)
+    monkeypatch.setattr(ckan_client, "get_dataset", fake_get_dataset)
+    monkeypatch.setitem(investigate_dataset_module._PREVIEW_DISPATCH, "CSV", fake_preview_csv)
+
+    fn = _make_tool()
+    await fn(query="cacao", format="json")
+
+    assert seen["session"] is None

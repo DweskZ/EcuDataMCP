@@ -795,8 +795,28 @@ _MONTHS = {
 }
 
 
+# Bare 4-digit integers are accepted as years, so bound them to the range a
+# BCE statistical series can actually cover: a data cell holding 1500 (a
+# value, not a year) must not make its row look like a period header.
+_MIN_YEAR = 1900
+
+
+def _max_year() -> int:
+    return datetime.now(UTC).year + 1
+
+
 def _period_key(value: Any) -> tuple[int, int] | None:
-    """Normalize annual, monthly and Spanish month-year labels for filtering."""
+    """Normalize annual, monthly and Spanish month-year labels for filtering.
+
+    Returns None for anything whose year falls outside 1900..next year.
+    """
+    period = _period_key_unbounded(value)
+    if period is None or not (_MIN_YEAR <= period[0] <= _max_year()):
+        return None
+    return period
+
+
+def _period_key_unbounded(value: Any) -> tuple[int, int] | None:
     if isinstance(value, datetime):
         return value.year, value.month
     text = _strip(str(value or "")).strip().replace(".", "")
@@ -877,6 +897,12 @@ def _selected_columns(
 
     selected = []
     for index, value in enumerate(header[1:], start=1):
+        # A period header cell is a label (str), a real date, or a bare
+        # integer year as openpyxl returns "2024". Floats and booleans are
+        # data values: a row like ("Banano", 1950.5, 2024.0) is a series,
+        # never a header, even when its label happens to contain "ano".
+        if not isinstance(value, (str, datetime, int)) or isinstance(value, bool):
+            continue
         period = _period_key(value)
         if period is None or not _period_in_bounds(period, start, end):
             continue

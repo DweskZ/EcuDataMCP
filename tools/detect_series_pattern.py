@@ -20,6 +20,7 @@ from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.text_utils import strip_accents
 from helpers.tool_meta import READ_ONLY
+from helpers.user_agent import USER_AGENT
 from tools.list_dataset_resources import detect_periodic_series, period_sort_key
 from tools.preview_resource_data import (
     classify_from_content_type,
@@ -139,8 +140,12 @@ def _period_keys(headers: list[str], rows: list[list[str]]) -> tuple[set[str], l
     return keys, [headers[i] for i in idxs]
 
 
-async def _fetch_table(res: dict, session: httpx.AsyncClient) -> dict:
+async def _fetch_table(res: dict) -> dict:
     """Download and parse a resource the same way preview_resource_data does.
+
+    No shared session is passed down: download_bytes/sniff_content_type
+    build their own per URL, which is what applies the project User-Agent
+    and the geo proxy (proxy_for) to the file host.
 
     Raises ValueError with a message safe to surface to the caller when the
     resource can't be read as a table (unsupported/unknown format, download
@@ -153,7 +158,7 @@ async def _fetch_table(res: dict, session: httpx.AsyncClient) -> dict:
     fmt = (res.get("format") or "").upper()
     kind = classify_resource_format(fmt, url)
     if kind == "UNKNOWN":
-        content_type = await sniff_content_type(url, session=session)
+        content_type = await sniff_content_type(url)
         kind = classify_from_content_type(content_type)
 
     if kind == "RAR":
@@ -177,7 +182,7 @@ async def _fetch_table(res: dict, session: httpx.AsyncClient) -> dict:
         # with the same clean message as an actually-unknown format rather
         # than a raw KeyError.
         raise ValueError(f"formato '{kind}' reconocido pero no soportado aquí")
-    return await dispatch[kind](url, max_rows=_ANALYZE_MAX_ROWS, session=session)
+    return await dispatch[kind](url, max_rows=_ANALYZE_MAX_ROWS)
 
 
 def _pick_pair(resources: list[dict]) -> tuple[dict, dict] | None:
@@ -251,7 +256,9 @@ def register_detect_series_pattern_tool(mcp: MCPServer) -> None:
                 "ninguno de los dos (para autodetectar el par)."
             )
 
-        session = httpx.AsyncClient()
+        # CKAN metadata calls share one session with the project User-Agent;
+        # the resource downloads in _fetch_table own theirs (see its docstring).
+        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
         try:
             if resource_id_new and resource_id_old:
                 try:
@@ -288,11 +295,11 @@ def register_detect_series_pattern_tool(mcp: MCPServer) -> None:
                 res_new, res_old = pair
 
             try:
-                table_new = await _fetch_table(res_new, session)
+                table_new = await _fetch_table(res_new)
             except (ValueError, httpx.HTTPError) as e:
                 raise ToolError(f"Error: recurso más reciente recurso_nuevo_no_legible: {e}") from e
             try:
-                table_old = await _fetch_table(res_old, session)
+                table_old = await _fetch_table(res_old)
             except (ValueError, httpx.HTTPError) as e:
                 raise ToolError(f"Error: recurso más antiguo recurso_viejo_no_legible: {e}") from e
         finally:

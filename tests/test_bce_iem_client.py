@@ -789,3 +789,64 @@ async def test_hash_catalog_tables_caps_by_unique_url_not_table_count(httpx_mock
     assert result["urls_unicas"] == 3
     assert result["archivos_consultados"] == 4
     assert result["archivos_omitidos_por_limite"] == 1
+
+
+def _wide_xlsx_without_period_token() -> bytes:
+    # Real header has no period/ano/fecha/mes token; the first data row is
+    # "Banano" (contains "ano") with values that look like bare years.
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.append(["Producto", 2024, 2025])
+    sheet.append(["Banano", 1500, 2300])
+    sheet.append(["Cacao", 800, 900])
+    out = io.BytesIO()
+    workbook.save(out)
+    return out.getvalue()
+
+
+def _wide_xlsx_with_float_year_like_values() -> bytes:
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.append(["Producto", 2024, 2025])
+    sheet.append(["Banano", 1950.5, 2024.0])
+    sheet.append(["Cacao", 800.0, 900.0])
+    out = io.BytesIO()
+    workbook.save(out)
+    return out.getvalue()
+
+
+def test_period_key_rejects_years_outside_statistical_range():
+    assert bce_iem_client._period_key(1500) is None
+    assert bce_iem_client._period_key("2300") is None
+    assert bce_iem_client._period_key(1900) == (1900, 0)
+    assert bce_iem_client._period_key("2024") == (2024, 0)
+    assert bce_iem_client._period_key(bce_iem_client._max_year()) is not None
+    assert bce_iem_client._period_key(bce_iem_client._max_year() + 1) is None
+
+
+def test_extract_wide_series_does_not_pick_banano_data_row_as_header():
+    workbook = openpyxl.load_workbook(
+        io.BytesIO(_wide_xlsx_without_period_token()), read_only=True, data_only=True
+    )
+    result = bce_iem_client._extract_wide_series(workbook.active, "", "", 20)
+    workbook.close()
+
+    # No real period header exists, so the wide-series reader declines and
+    # the caller falls back to the layout-preserving preview instead of
+    # keying Cacao by Banano's values.
+    assert result is None
+
+
+def test_selected_columns_ignores_float_cells_even_in_year_range():
+    workbook = openpyxl.load_workbook(
+        io.BytesIO(_wide_xlsx_with_float_year_like_values()), read_only=True, data_only=True
+    )
+    result = bce_iem_client._extract_wide_series(workbook.active, "", "", 20)
+    workbook.close()
+
+    assert result is None
+    assert bce_iem_client._selected_columns(("Banano", 1950.5, 2024.0), "", "") == []
+    assert bce_iem_client._selected_columns(("Período", 2024, 2025), "", "") == [
+        (1, "2024"),
+        (2, "2025"),
+    ]

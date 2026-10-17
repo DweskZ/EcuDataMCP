@@ -507,3 +507,20 @@ async def test_list_aip_aerodromos_is_cached_across_calls(httpx_mock):
 
     assert first == second
     assert len(httpx_mock.get_requests()) == 1
+
+
+@pytest.mark.parametrize(
+    "designador",
+    ["../notam?designador=SEQM", "SEQM/..", "SEQ", "SEQMX", "SE QM", "seqm;rm"],
+)
+async def test_invalid_icao_designador_is_refused_before_any_request(httpx_mock, designador):
+    # The designator lands in a URL path on the DGAC hosts, so anything
+    # other than four letters/digits is rejected without building a URL.
+    for fn in (
+        aviacion_client.get_metar,
+        aviacion_client.get_notam,
+        aviacion_client.get_aip_aerodromo,
+    ):
+        with pytest.raises(ValueError, match="Designador OACI inválido"):
+            await fn(designador)
+    assert httpx_mock.get_requests() == []

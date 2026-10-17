@@ -174,7 +174,7 @@ async def test_classifies_acumulado_when_newer_file_covers_older_periods(monkeyp
     async def fake_get_resource(resource_id, source="nacional", session=None):
         return res_new if resource_id == "pagos_junio.csv" else res_old
 
-    async def fake_fetch_table(res, session):
+    async def fake_fetch_table(res):
         if res is res_new:
             return {
                 "headers": ["Mes", "Monto"],
@@ -212,7 +212,7 @@ async def test_classifies_incremental_when_periods_dont_overlap(monkeypatch):
     async def fake_get_resource(resource_id, source="nacional", session=None):
         return res_new if resource_id == "semana_26.csv" else res_old
 
-    async def fake_fetch_table(res, session):
+    async def fake_fetch_table(res):
         if res is res_new:
             return {
                 "headers": ["Semana", "Precio"],
@@ -248,7 +248,7 @@ async def test_classifies_indeterminado_without_period_column(monkeypatch):
     async def fake_get_resource(resource_id, source="nacional", session=None):
         return res_new if resource_id == "a.csv" else res_old
 
-    async def fake_fetch_table(res, session):
+    async def fake_fetch_table(res):
         return {
             "headers": ["Provincia", "Monto"],
             "rows": [["Pichincha", "100"]],
@@ -280,7 +280,7 @@ async def test_flags_schema_mismatch_instead_of_misreading_as_incremental(monkey
     async def fake_get_resource(resource_id, source="nacional", session=None):
         return res_new if resource_id == "pagos_junio.csv" else res_old
 
-    async def fake_fetch_table(res, session):
+    async def fake_fetch_table(res):
         if res is res_new:
             return {
                 "headers": ["Mes", "Monto pagado", "Numero de Beneficiarios"],
@@ -351,7 +351,7 @@ async def test_autodetects_pair_from_dataset_when_no_ids_given(monkeypatch):
     async def fake_get_dataset(dataset_id, source="nacional", session=None):
         return {"resources": resources}
 
-    async def fake_fetch_table(res, session):
+    async def fake_fetch_table(res):
         return {
             "headers": ["Semana", "Precio"],
             "rows": [[res["id"], "1"]],
@@ -393,4 +393,22 @@ async def test_fetch_table_recognized_but_undispatched_format_gives_clear_error(
     # one) from crashing here before its parser is wired in.
     res = {"url": "https://x/reporte.ods", "format": "ODS"}
     with pytest.raises(ValueError, match="reconocido pero no soportado"):
-        await _fetch_table(res, session=None)
+        await _fetch_table(res)
+
+
+async def test_fetch_table_lets_download_own_its_session(monkeypatch):
+    # No shared session reaches the preview function: download_bytes builds
+    # its own per URL so the project User-Agent and geo proxy apply.
+    seen: dict[str, object] = {"called": False}
+
+    async def fake_preview_csv(url, max_rows=20, session=None):
+        seen["called"] = True
+        seen["session"] = session
+        return {"headers": ["a"], "rows": [["1"]], "truncated": False}
+
+    monkeypatch.setattr(detect_series_pattern_module, "preview_csv", fake_preview_csv)
+
+    await _fetch_table({"url": "https://x/datos.csv", "format": "CSV"})
+
+    assert seen["called"] is True
+    assert seen["session"] is None

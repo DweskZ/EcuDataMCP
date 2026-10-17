@@ -41,6 +41,13 @@ _WKT_PREFIXES = (
 
 # "7.760,2" (thousands dot, decimal comma) or plain "168,15".
 _EU_DECIMAL_RE = re.compile(r"^-?(?:\d{1,3}(?:\.\d{3})+|\d+),\d+$")
+# "1,234" also matches _EU_DECIMAL_RE but is exactly what a US-style
+# thousands group looks like, so on its own it proves nothing about the
+# column's notation.
+_AMBIGUOUS_THOUSANDS_RE = re.compile(r"^-?\d{1,3},\d{3}$")
+# "1.000" / "12.500.000": a whole number with dot thousands. Only converted
+# once the column has been established as European by an unambiguous cell.
+_EU_THOUSANDS_RE = re.compile(r"^-?\d{1,3}(?:\.\d{3})+$")
 
 
 def _looks_like_wkt(value: str) -> bool:
@@ -86,6 +93,16 @@ def _convert_eu_decimal(value: str) -> str:
     return sign + v
 
 
+def _is_eu_cell(value: str) -> bool:
+    v = value.strip()
+    return bool(_EU_DECIMAL_RE.match(v) or _EU_THOUSANDS_RE.match(v))
+
+
+def _is_unambiguous_eu_cell(value: str) -> bool:
+    v = value.strip()
+    return bool(_EU_DECIMAL_RE.match(v)) and not _AMBIGUOUS_THOUSANDS_RE.match(v)
+
+
 def normalize_eu_decimal_columns(
     headers: list[str], rows: list[list[str]]
 ) -> tuple[list[list[str]], list[str]]:
@@ -93,8 +110,13 @@ def normalize_eu_decimal_columns(
 
     Ecuadorian government CSVs commonly use dot-thousands/comma-decimal
     notation. Left as-is, those values sort and parse wrong downstream.
-    A column only qualifies if every sampled value matches the pattern, so
-    genuinely ambiguous columns are left untouched. Returns (rows, converted_names).
+    A column only qualifies if every sampled value fits the notation AND
+    at least one sampled value is unambiguous ("7.760,2", "168,15"): a
+    sample made only of "1,234"-style cells is just as likely US thousands
+    and converting it would silently shrink every value 1000x, so it is
+    left untouched. Once a column qualifies, dot-thousands whole numbers
+    ("1.000") in it are converted too, since in that column they can only
+    mean one thousand. Returns (rows, converted_names).
     """
     if not headers or not rows:
         return rows, []
@@ -102,7 +124,11 @@ def normalize_eu_decimal_columns(
     idxs: list[int] = []
     for i in range(len(headers)):
         sample = [row[i] for row in rows[:5] if i < len(row) and row[i]]
-        if sample and all(_EU_DECIMAL_RE.match(v.strip()) for v in sample):
+        if (
+            sample
+            and all(_is_eu_cell(v) for v in sample)
+            and any(_is_unambiguous_eu_cell(v) for v in sample)
+        ):
             idxs.append(i)
 
     if not idxs:
@@ -111,9 +137,7 @@ def normalize_eu_decimal_columns(
     idx_set = set(idxs)
     new_rows = [
         [
-            _convert_eu_decimal(cell)
-            if i in idx_set and cell and _EU_DECIMAL_RE.match(cell.strip())
-            else cell
+            _convert_eu_decimal(cell) if i in idx_set and cell and _is_eu_cell(cell) else cell
             for i, cell in enumerate(row)
         ]
         for row in rows
@@ -653,6 +677,8 @@ async def preview_xlsb(
             "contenedor ZIP interno vive al final del archivo). Usa "
             "download_resource para bajarlo completo, o el enlace directo."
         )
+
+    _check_zip_container_size(raw, ".xlsb")
 
     wb = open_workbook(io.BytesIO(raw))
     try:

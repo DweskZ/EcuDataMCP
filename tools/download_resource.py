@@ -96,4 +96,10 @@ def register_download_resource_tool(mcp: MCPServer) -> None:
                 "(decodifícalo en base64 para reconstruir el archivo original)."
             )
 
+        # The docstring promises text mode never carries the file: the
+        # structured payload goes to the client too, so strip the base64
+        # there as well, not only from the text block.
+        if format != "json":
+            payload = {k: v for k, v in payload.items() if k != "content_base64"}
+
         return render_structured(payload, format, text_builder=to_text)

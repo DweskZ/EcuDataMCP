@@ -558,3 +558,99 @@ def test_select_item_aggregation_becomes_suma_field():
     assert sut._field_label(spec["entity"], spec["property"], spec["kind"], None, spec["function"]) == (
         "CUB EST_CUB_AUDIENCIAS.Contador [suma]"
     )
+
+
+def test_dax_string_literal_doubles_embedded_quote():
+    assert sut._dax_string_literal("O'Higgins") == "'O''Higgins'"
+    assert sut._dax_string_literal("Vigente") == "'Vigente'"
+
+
+@pytest.mark.asyncio
+async def test_query_indicador_escapes_filter_quote_and_clamps_limite(httpx_mock):
+    httpx_mock.add_response(
+        url=f"{sut._BASE}/public/reports/{_RESOURCE_KEY}/modelsAndExploration",
+        json=_EXPLORATION_RESPONSE,
+    )
+    httpx_mock.add_response(
+        method="POST",
+        url=f"{sut._BASE}/public/reports/querydata?synchronous=true",
+        json={"results": [{"result": {}}]},
+    )
+
+    result = await sut.query_indicador(
+        "contratos",
+        campos=["Calendario_.Mes"],
+        filtros={"Calendario_.Mes": "O'Higgins"},
+        limite=10_000_000,
+    )
+
+    request = httpx_mock.get_requests(url=f"{sut._BASE}/public/reports/querydata?synchronous=true")[0]
+    body = json.loads(request.content)
+    command = body["queries"][0]["Query"]["Commands"][0]["SemanticQueryDataShapeCommand"]
+    literal = command["Query"]["Where"][0]["Condition"]["In"]["Values"][0][0]["Literal"]["Value"]
+    assert literal == "'O''Higgins'"
+    assert command["Binding"]["DataReduction"]["Primary"]["Window"]["Count"] == sut._MAX_ROW_LIMIT
+    assert result["limite"] == sut._MAX_ROW_LIMIT
+    assert result["truncado"] is False
+
+
+@pytest.mark.asyncio
+async def test_query_indicador_raises_on_power_bi_error_body(httpx_mock):
+    # Power BI rejects a query with HTTP 200 and an error object where the
+    # rows would be; that must not be reported as "0 rows".
+    httpx_mock.add_response(
+        url=f"{sut._BASE}/public/reports/{_RESOURCE_KEY}/modelsAndExploration",
+        json=_EXPLORATION_RESPONSE,
+    )
+    httpx_mock.add_response(
+        method="POST",
+        url=f"{sut._BASE}/public/reports/querydata?synchronous=true",
+        json={"error": {"code": "InvalidQuery", "message": "Column not found"}},
+    )
+
+    with pytest.raises(ValueError, match="Power BI rechazó la consulta: Column not found"):
+        await sut.query_indicador("contratos", campos=["Calendario_.Mes"])
+
+
+@pytest.mark.asyncio
+async def test_query_indicador_flags_truncation_when_window_fills(httpx_mock):
+    httpx_mock.add_response(
+        url=f"{sut._BASE}/public/reports/{_RESOURCE_KEY}/modelsAndExploration",
+        json=_EXPLORATION_RESPONSE,
+    )
+    query_response = {
+        "results": [
+            {
+                "result": {
+                    "data": {
+                        "descriptor": {"Select": [{"Value": "G0", "Name": "Calendario_.Mes"}]},
+                        "dsr": {
+                            "DS": [
+                                {
+                                    "PH": [
+                                        {
+                                            "DM0": [
+                                                {"S": [{"N": "G0", "T": 1, "DN": "D0"}], "C": [0]},
+                                                {"C": [1]},
+                                            ]
+                                        }
+                                    ],
+                                    "ValueDicts": {"D0": ["ene", "feb"]},
+                                }
+                            ]
+                        },
+                    }
+                }
+            }
+        ]
+    }
+    httpx_mock.add_response(
+        method="POST",
+        url=f"{sut._BASE}/public/reports/querydata?synchronous=true",
+        json=query_response,
+    )
+
+    result = await sut.query_indicador("contratos", campos=["Calendario_.Mes"], limite=2)
+
+    assert [row["Calendario_.Mes"] for row in result["filas"]] == ["ene", "feb"]
+    assert result["truncado"] is True

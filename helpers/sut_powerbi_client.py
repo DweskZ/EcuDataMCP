@@ -75,6 +75,10 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 _BASE = "https://wabi-south-central-us-c-primary-api.analysis.windows.net"
 _TIMEOUT = 30.0
 _DEFAULT_ROW_LIMIT = 20000
+# Hard cap on the DataReduction window: a wider request would never fit the
+# client's context anyway and gives Power BI a reason to answer with an
+# error body rather than rows.
+_MAX_ROW_LIMIT = 20000
 
 # Consejo de la Judicatura's Portal de Estadística Judicial
 # (fsweb.funcionjudicial.gob.ec/estadisticas/*.html) embeds Power BI
@@ -720,6 +724,7 @@ async def query_indicador(
     base = info.get("base", _BASE)
     if not campos:
         raise ValueError("Se requiere al menos un campo en 'campos'.")
+    limite = max(1, min(int(limite), _MAX_ROW_LIMIT))
 
     bootstrap = await _get_bootstrap(info["resource_key"], indicador, base)
     campos_by_label = bootstrap["campos"]
@@ -761,7 +766,7 @@ async def query_indicador(
                         "Expressions": [
                             {"Column": {"Expression": {"SourceRef": {"Source": alias}}, "Property": fspec["property"]}}
                         ],
-                        "Values": [[{"Literal": {"Value": f"'{valor}'"}}]],
+                        "Values": [[{"Literal": {"Value": _dax_string_literal(valor)}}]],
                     }
                 }
             }
@@ -812,10 +817,51 @@ async def query_indicador(
         resp.raise_for_status()
         payload = resp.json()
 
+    _raise_on_query_error(payload)
     result = payload["results"][0]["result"]
     if "data" not in result or "dsr" not in result.get("data", {}):
         filas: list[dict[str, Any]] = []
     else:
         filas = _decode_dsr(result["data"])
 
-    return {"indicador": indicador, "fuente": fuente, "nombre": info["nombre"], "campos": campos, "filas": filas}
+    return {
+        "indicador": indicador,
+        "fuente": fuente,
+        "nombre": info["nombre"],
+        "campos": campos,
+        "filas": filas,
+        "limite": limite,
+        # The window cap filled up: Power BI reports no "more rows" signal,
+        # so hitting the cap exactly is the only hint the result is partial.
+        "truncado": len(filas) >= limite,
+    }
+
+
+def _dax_string_literal(valor: Any) -> str:
+    """Quote a filter value as a Power BI string literal.
+
+    A single quote inside the value is doubled, the way DAX escapes it;
+    otherwise "O'Higgins" would end the literal early and let the rest of
+    the value be read as query syntax.
+    """
+    return "'" + str(valor).replace("'", "''") + "'"
+
+
+def _raise_on_query_error(payload: Any) -> None:
+    """Power BI answers HTTP 200 to a rejected query, with an error object
+    where the rows would be. Surface it instead of reporting zero rows."""
+    # The tool layer maps ValueError to a user-facing error, so a non-object
+    # body is reported the same way as a rejected query, not as a TypeError.
+    error = payload.get("error") if isinstance(payload, dict) else "respuesta no es un objeto JSON"
+    results = payload.get("results") if isinstance(payload, dict) else None
+    if error is None and isinstance(results, list) and results:
+        first = results[0] if isinstance(results[0], dict) else {}
+        error = first.get("error") or (first.get("result") or {}).get("error")
+    if error is not None:
+        if isinstance(error, dict):
+            detail = error.get("message") or error.get("code") or json.dumps(error, ensure_ascii=False)
+        else:
+            detail = str(error)
+        raise ValueError(f"Power BI rechazó la consulta: {detail}")
+    if not isinstance(results, list) or not results or not isinstance(results[0], dict):
+        raise ValueError("Power BI devolvió una respuesta sin 'results'.")

@@ -433,19 +433,36 @@ def _build() -> None:
         build_path.unlink(missing_ok=True)
         raise
 
-    # Atomic on both POSIX and Windows, and same-filesystem (build_path
-    # lives next to DB_PATH) so this can't fail partway through the way a
-    # plain unlink()-then-write to DB_PATH directly could -- a reader
-    # opening DB_PATH mid-build would either see the old file or the new
-    # one, never a half-written one, and a failed build never touches the
-    # previously-working database at all.
-    os.replace(build_path, DB_PATH)
+    # Same-filesystem rename (build_path lives next to DB_PATH), so a reader
+    # opening DB_PATH sees either the old file or the new one, never a
+    # half-written one, and a failed build never touches the previously
+    # working database at all. On POSIX the replace also succeeds while a
+    # reader has the old file open; on Windows it raises PermissionError
+    # until that reader closes, so retry briefly instead of discarding a
+    # 15-20 minute build because a get_financials call overlapped the rename.
+    _replace_with_retry(build_path, DB_PATH)
 
     for f in (ranking_csv, compania_csv, segmento_csv, ciiu_csv, sector_csv):
         f.unlink(missing_ok=True)
     tmp_dir.rmdir()
 
     print(f"Listo: {DB_PATH} ({DB_PATH.stat().st_size / (1024 * 1024):.1f} MB)")
+
+
+_REPLACE_ATTEMPTS = 20
+_REPLACE_DELAY_SECONDS = 0.5
+
+
+def _replace_with_retry(src: Path, dst: Path) -> None:
+    """os.replace that tolerates a Windows reader holding `dst` open."""
+    for attempt in range(1, _REPLACE_ATTEMPTS + 1):
+        try:
+            os.replace(src, dst)
+            return
+        except PermissionError:
+            if attempt == _REPLACE_ATTEMPTS:
+                raise
+            time.sleep(_REPLACE_DELAY_SECONDS)
 
 
 def main() -> None:

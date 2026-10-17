@@ -113,3 +113,22 @@ async def test_oversized_file_has_no_content_base64_and_keeps_direct_url(monkeyp
     assert "supera el límite" in message
     assert "https://x/enorme.zip" in message
     assert str(MAX_DOWNLOAD_BYTES // (1024 * 1024)) in message
+
+
+async def test_text_format_structured_content_omits_base64(monkeypatch):
+    # The docstring promises text mode never carries the file. The
+    # structured payload reaches the client too, so it must not smuggle
+    # the whole file there either.
+    raw = b"some bytes"
+
+    async def fake_download_bytes(url, session=None):
+        return raw, False
+
+    _mock_resource(monkeypatch)
+    monkeypatch.setattr(download_resource_module, "download_bytes", fake_download_bytes)
+
+    tool = _make_tool()
+    result = await tool(resource_id="abc123", format="text")
+
+    assert "content_base64" not in result.structured_content
+    assert result.structured_content["size_bytes"] == len(raw)
