@@ -1,5 +1,10 @@
 """Publish a GitHub release's MCPB bundle to Smithery.
 
+Blocked since 2026-10-17: publishing 0.13.0, Smithery answered 403 "Updating
+servers has been removed. Contact support@smithery.ai." with a valid login.
+`--dry-run` still builds the bundle; the publish step fails until Smithery
+re-enables updates.
+
 The bundle attached to each release (built by .github/workflows/publish.yml
 from manifest.json) can't go to Smithery unchanged, for two reasons found
 publishing 0.8.12:
