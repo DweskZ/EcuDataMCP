@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Releases – EcuDataMCP</title>
-<meta name="description" content="EcuDataMCP's version history and the real pace of its releases.">
+<meta name="description" content="EcuDataMCP&#39;s version history and the real pace of its releases.">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="canonical" href="https://dweskz.github.io/EcuDataMCP/en/releases.html">
 <link rel="alternate" hreflang="es" href="https://dweskz.github.io/EcuDataMCP/releases.html">
 <link rel="alternate" hreflang="en" href="https://dweskz.github.io/EcuDataMCP/en/releases.html">
 <link rel="alternate" hreflang="x-default" href="https://dweskz.github.io/EcuDataMCP/releases.html">
 <meta property="og:title" content="Releases – EcuDataMCP">
-<meta property="og:description" content="EcuDataMCP's version history and the real pace of its releases.">
+<meta property="og:description" content="EcuDataMCP&#39;s version history and the real pace of its releases.">
 <meta property="og:url" content="https://dweskz.github.io/EcuDataMCP/en/releases.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="en_US">
@@ -168,7 +168,7 @@
 
 <div class="release-row">
 <div class="release-meta"><span class="release-version">v0.11.0</span><span class="release-date">2026-10-02</span></div>
-<p class="release-summary">Breaking change in tool names: 90 down to 82 in the default profile. New get_serie_internacional(fuente) with World Bank WDI indicators, IRENA electricity capacity and generation, and XM's Colombia-Ecuador power flows since 2003. list_catalogo(fuente) replaces five listings (ARCONEL, BCE daily indicators, Contraloría, IESS and SUT); get_aviso_aeronautico(tipo) replaces get_metar, get_notam and get_sigmet; search_archivos absorbs BCE remittance, foreign-trade price and publication files and gains a formato filter. XM shows days without flow as 0 GWh, so the October 2024 suspension appears as zeros.</p>
+<p class="release-summary">Breaking change in tool names: 90 down to 82 in the default profile. New get_serie_internacional(fuente) with World Bank WDI indicators, IRENA electricity capacity and generation, and XM&#39;s Colombia-Ecuador power flows since 2003. list_catalogo(fuente) replaces five listings (ARCONEL, BCE daily indicators, Contraloría, IESS and SUT); get_aviso_aeronautico(tipo) replaces get_metar, get_notam and get_sigmet; search_archivos absorbs BCE remittance, foreign-trade price and publication files and gains a formato filter. XM shows days without flow as 0 GWh, so the October 2024 suspension appears as zeros.</p>
 </div>
 
 <div class="release-row">
@@ -203,27 +203,27 @@
 
 <div class="release-row">
 <div class="release-meta"><span class="release-version">v0.8.10</span><span class="release-date">2026-09-24</span></div>
-<p class="release-summary">IESS employer compliance check (arrears or not, by RUC or cédula), Centrosur's archive of scheduled power cuts since 2023, and energia-ecuador.com's 2024 blackout schedules recovered from the Wayback Machine. Fixes random disconnects in stdio clients like Claude Desktop, speeds up startup (~4.7 s to ~2.9 s), stops the IESS certificate from reporting an employer in arrears as compliant when its text can't be parsed, fixes a search_sri_ruc crash on empty responses, and hardens Supercías' n_empleados field.</p>
+<p class="release-summary">IESS employer compliance check (arrears or not, by RUC or cédula), Centrosur&#39;s archive of scheduled power cuts since 2023, and energia-ecuador.com&#39;s 2024 blackout schedules recovered from the Wayback Machine. Fixes random disconnects in stdio clients like Claude Desktop, speeds up startup (~4.7 s to ~2.9 s), stops the IESS certificate from reporting an employer in arrears as compliant when its text can&#39;t be parsed, fixes a search_sri_ruc crash on empty responses, and hardens Supercías&#39; n_empleados field.</p>
 </div>
 
 <div class="release-row">
 <div class="release-meta"><span class="release-version">v0.8.9</span><span class="release-date">2026-09-14</span></div>
-<p class="release-summary">MCP architecture cleanup: duplicate tools removed (list_recent_datasets folded into search_datasets(sort="recent")) and the ARCOTEL pair merged into search_arcotel(tipo=...); a new MCP_PROFILE separates maintenance tools; every tool now declares a Spanish title, MCP annotations, and native structuredContent. The Supercías financials DB (search_ranking/get_financials) now builds and refreshes itself in the background.</p>
+<p class="release-summary">MCP architecture cleanup: duplicate tools removed (list_recent_datasets folded into search_datasets(sort=&#34;recent&#34;)) and the ARCOTEL pair merged into search_arcotel(tipo=...); a new MCP_PROFILE separates maintenance tools; every tool now declares a Spanish title, MCP annotations, and native structuredContent. The Supercías financials DB (search_ranking/get_financials) now builds and refreshes itself in the background.</p>
 </div>
 
 <div class="release-row">
 <div class="release-meta"><span class="release-version">v0.8.8</span><span class="release-date">2026-09-10</span></div>
-<p class="release-summary">BCE National Accounts and publication calendar, SENESCYT's SIAU/CTI statistics and Higher Education Library, CEPALSTAT (CEPAL's regional indicator API, filtered to Ecuador by default), IADB's open-data portal as a new source="iadb" on the generic CKAN tools, and MSP's weekly vaccine-preventable-disease gazette archive. get_organization_info gained a text filter and no longer truncates large organizations at 25 datasets. Fixes redundant ZIP re-hashing in the IEM pipeline.</p>
+<p class="release-summary">BCE National Accounts and publication calendar, SENESCYT&#39;s SIAU/CTI statistics and Higher Education Library, CEPALSTAT (CEPAL&#39;s regional indicator API, filtered to Ecuador by default), IADB&#39;s open-data portal as a new source=&#34;iadb&#34; on the generic CKAN tools, and MSP&#39;s weekly vaccine-preventable-disease gazette archive. get_organization_info gained a text filter and no longer truncates large organizations at 25 datasets. Fixes redundant ZIP re-hashing in the IEM pipeline.</p>
 </div>
 
 <div class="release-row">
 <div class="release-meta"><span class="release-version">v0.8.7</span><span class="release-date">2026-09-07</span></div>
-<p class="release-summary">AIP data sheets for Ecuadorian aerodromes and helipads (DGAC) and ARCSA's live sanitary registry by category, .xlsb preview support, and a download cap raised to 20 MB for XLSX/XLSB/ODS. Removes the SRI Saiku tools (endpoint confirmed unreachable in live verification).</p>
+<p class="release-summary">AIP data sheets for Ecuadorian aerodromes and helipads (DGAC) and ARCSA&#39;s live sanitary registry by category, .xlsb preview support, and a download cap raised to 20 MB for XLSX/XLSB/ODS. Removes the SRI Saiku tools (endpoint confirmed unreachable in live verification).</p>
 </div>
 
 <div class="release-row">
 <div class="release-meta"><span class="release-version">v0.8.6</span><span class="release-date">2026-09-04</span></div>
-<p class="release-summary">IESS (statistical bulletins, actuarial studies, audit reports), Data Mashca (a third municipal CKAN portal), and everything accumulated since 0.8.5: ARCOTEL, SGR's document library and SITREP archive, SIPA's geoportal and indicator summaries, MEF/SENAE, MINEDEC, SEPS, CNIG, INAMHI, INEVAL, and more.</p>
+<p class="release-summary">IESS (statistical bulletins, actuarial studies, audit reports), Data Mashca (a third municipal CKAN portal), and everything accumulated since 0.8.5: ARCOTEL, SGR&#39;s document library and SITREP archive, SIPA&#39;s geoportal and indicator summaries, MEF/SENAE, MINEDEC, SEPS, CNIG, INAMHI, INEVAL, and more.</p>
 </div>
 
 <div class="release-row">
@@ -238,7 +238,7 @@
 
 <div class="release-row">
 <div class="release-meta"><span class="release-version">v0.8.2</span><span class="release-date">2026-08-29</span></div>
-<p class="release-summary">SIPA (agricultural statistics), Contraloría General del Estado, and BCE's IEM monthly bulletin tables. Fixed CSV delimiter sniffing and 26 bugs found in a full adversarial code review.</p>
+<p class="release-summary">SIPA (agricultural statistics), Contraloría General del Estado, and BCE&#39;s IEM monthly bulletin tables. Fixed CSV delimiter sniffing and 26 bugs found in a full adversarial code review.</p>
 </div>
 
 <div class="release-row">
