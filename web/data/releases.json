@@ -1,5 +1,10 @@
 [
   {
+    "version": "0.13.0",
+    "date": "2026-10-17",
+    "summary": "Sin tools nuevos (siguen siendo 83 en el perfil por defecto). get_serie_internacional gana cinco fuentes: comtrade (comercio bilateral de UN Comtrade), imf (FMI: IPC, tipos de cambio, balanza de pagos, flujos fiscales y monetarios), who (indicadores de salud de la OMS), ilo (estadísticas laborales de ILOSTAT) y unhcr (refugiados y solicitantes de asilo acogidos en Ecuador). El Consejo de la Judicatura entra como fuente=\"judicatura\" en list_catalogo, get_sut_indicador_schema y query_sut_indicador: diez tableros Power BI del Portal de Estadística Judicial. Ronda de endurecimiento tras una revisión completa del código y el smoke test en vivo: los parsers de hojas de cálculo y PDF corren fuera del event loop con tope de 60 s, los decimales europeos ya no confunden 1,234 con 1.234, los logs guardan solo nombres de parámetros, el guard SSRF rechaza CGNAT y NAT64, los catálogos del BCE y los scrapes que fallan a medias ya no se cachean como vacíos, y los resultados cortados avisan con truncado o hay_mas. CI con permisos mínimos y acciones fijadas por SHA; docs/DEPLOYMENT.md trae la tabla canónica de variables de entorno."
+  },
+  {
     "version": "0.12.0",
     "date": "2026-10-10",
     "summary": "Nuevo tool search_siniestros_ant (siniestros de tránsito: publicaciones trimestrales del INEC con registros de la ANT más datasets CKAN) y cinco fuentes nuevas dentro de list_archivo_secciones / get_archivo_seccion: EP Petroecuador (cifras institucionales), Ministerio de Ambiente y Energía (hidrocarburos, minería y Balance Energético Nacional), CNE (19 procesos electorales 2002-2025) y las bolsas de valores de Guayaquil y Quito. get_inec_estadistica_files sigue ahora las páginas de ronda enlazadas cuando un tema no lista archivos propios (ENDI, #55). Correcciones de la ronda de campo: ANDA acepta el id numérico y pagina todo el catálogo, nuevos microdatos históricos de defunciones del INEC, parroquias urbanas en lookup_ubicacion, search_datasets con compact y fields, y la descarga en segundo plano del directorio de Supercías. Ahora son 83 tools en el perfil por defecto."

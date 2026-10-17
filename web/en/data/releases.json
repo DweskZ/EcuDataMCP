@@ -1,5 +1,10 @@
 [
   {
+    "version": "0.13.0",
+    "date": "2026-10-17",
+    "summary": "No new tools (still 83 in the default profile). get_serie_internacional gains five sources: comtrade (UN Comtrade bilateral trade), imf (IMF: CPI, exchange rates, balance of payments, fiscal and monetary flows), who (WHO health indicators), ilo (ILOSTAT labour statistics) and unhcr (refugees and asylum seekers hosted in Ecuador). The Judiciary Council joins as fuente=\"judicatura\" in list_catalogo, get_sut_indicador_schema and query_sut_indicador: ten Power BI dashboards from the Portal de Estadística Judicial. Hardening round after a full code review and the live smoke test: spreadsheet and PDF parsers run off the event loop under a 60 s bound, European-decimal detection no longer mistakes 1,234 for 1.234, logs keep only parameter names, the SSRF guard refuses CGNAT and NAT64, BCE catalogs and half-failed scrapes are no longer cached as empty, and cut results say so with truncado or hay_mas. CI with minimal permissions and SHA-pinned actions; docs/DEPLOYMENT.md carries the canonical environment-variable table."
+  },
+  {
     "version": "0.12.0",
     "date": "2026-10-10",
     "summary": "New search_siniestros_ant tool (road crashes: INEC quarterly releases built from ANT records plus CKAN datasets) and five new sources inside list_archivo_secciones / get_archivo_seccion: EP Petroecuador (institutional figures), the Ministry of Environment and Energy (hydrocarbons, mining and the National Energy Balance), the CNE (19 election processes 2002-2025) and the Guayaquil and Quito stock exchanges. get_inec_estadistica_files now follows linked per-round pages when a topic lists no files itself (ENDI, #55). Field-report fixes: ANDA accepts the numeric id and pages the whole catalog, new INEC historical death microdata, urban parishes in lookup_ubicacion, search_datasets with compact and fields, and the background download of the Supercías directory. The default profile now has 83 tools."
