@@ -85,7 +85,7 @@ def _parse_time(raw: str, already_utc: bool = False) -> tuple[str, str] | None:
     value = (raw or "").strip()
     for fmt in _TIME_FORMATS:
         try:
-            naive = datetime.strptime(value, fmt)  # noqa: DTZ007 (tz applied below)
+            naive = datetime.strptime(value, fmt)  # tz applied below
         except ValueError:
             continue
         if already_utc:
