@@ -54,6 +54,16 @@ _DEGRADED_SOURCES = (
         "automáticamente en segundo plano",
     ),
     (
+        # Seen 2026-10-17 on the runner: both Supercías hosts
+        # (mercadodevalores, appscvsmovil) drop the TCP handshake from
+        # datacenter IPs (geo_proxy._DEFAULT_GEO_HOSTS), so search_companias,
+        # search_auditores and the financials build all end in a
+        # ConnectTimeout. A geo block, not a regression.
+        "supercias_geoblock",
+        "supercias.gob.ec",
+        "no se pudo conectar",
+    ),
+    (
         # Confirmed live 2026-09-18: search_anda 503'd on one run, then
         # 403'd on the next from a different network -- the same
         # GitHub-Actions-runner geo/bot block already seen on INEC's other
@@ -113,6 +123,7 @@ GEOBLOCKED_SOURCES = frozenset(
         "censo_ecuador_geoblock",
         "anda_inec_geoblock",
         "gobec_geoblock",
+        "supercias_geoblock",
     }
 )
 

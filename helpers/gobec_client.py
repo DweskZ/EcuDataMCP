@@ -222,6 +222,28 @@ async def find_institucion(
             await session.aclose()
 
 
+def _single_record(result: Any, id_key: str, wanted_id: str) -> dict[str, Any] | None:
+    """One gob.ec record for `wanted_id`, or None.
+
+    gob.ec answers /<coleccion>/{id} either with the record itself or with a
+    one-element list holding it (confirmed live 2026-10-17 for
+    /regulaciones/5051). A list whose records do not carry `wanted_id` is
+    the collection endpoint answering an unknown id: not found, never
+    result[0].
+    """
+    if isinstance(result, dict):
+        return result
+    if isinstance(result, list):
+        matches = [
+            item
+            for item in result
+            if isinstance(item, dict) and str(item.get(id_key, "")) == wanted_id
+        ]
+        if len(matches) == 1:
+            return matches[0]
+    return None
+
+
 async def get_institucion(
     institucion_id: str, session: httpx.AsyncClient | None = None
 ) -> dict[str, Any] | None:
@@ -234,11 +256,7 @@ async def get_institucion(
     result = await _fetch_json(
         _gobec_url(f"instituciones/{quote(institucion_id, safe='')}"), session=session
     )
-    # A list-shaped response means the id resolved to the collection endpoint,
-    # not to one record: treat it as not found instead of returning result[0].
-    if isinstance(result, dict):
-        return result
-    return None
+    return _single_record(result, "institucion_id", institucion_id)
 
 
 async def list_regulaciones(
@@ -266,11 +284,10 @@ async def get_regulacion(
     result = await _fetch_json(
         _gobec_url(f"regulaciones/{quote(regulacion_id, safe='')}"), session=session
     )
-    # A list-shaped response means the id resolved to the collection endpoint,
-    # not to one record: treat it as not found instead of returning result[0].
-    if isinstance(result, dict):
-        return result
-    return None
+    # gob.ec answers /regulaciones/{id} with a one-element list (confirmed
+    # live 2026-10-17 for id 5051), so a list is only "not found" when none
+    # of its records carries the requested id (the collection endpoint).
+    return _single_record(result, "regulacion_id", regulacion_id)
 
 
 async def find_regulaciones(

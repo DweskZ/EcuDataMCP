@@ -223,8 +223,13 @@ async def list_indicadores() -> list[dict[str, Any]]:
                     "n_datos": 1,
                 }
             else:
-                entry["fecha_desde"] = min(entry["fecha_desde"], fecha)
-                entry["fecha_hasta"] = max(entry["fecha_hasta"], fecha)
+                # A row without "Fecha" (seen live 2026-10-17) still counts
+                # as data but cannot widen the date range: min()/max() would
+                # raise comparing str with None.
+                if fecha is not None:
+                    desde, hasta = entry["fecha_desde"], entry["fecha_hasta"]
+                    entry["fecha_desde"] = fecha if desde is None else min(desde, fecha)
+                    entry["fecha_hasta"] = fecha if hasta is None else max(hasta, fecha)
                 entry["n_datos"] += 1
         catalog.extend(by_codigo.values())
     return catalog
