@@ -1593,7 +1593,7 @@
       "indicador": "A key from list_catalogo(fuente=<fuente>).",
       "campos": "Field labels exactly as returned by get_sut_indicador_schema.",
       "filtros": "Optional {campo: valor} equality filters, plain columns only.",
-      "limite": "Row cap applied server-side by the query itself.",
+      "limite": "Row cap applied server-side by the query itself (clamped to 20000; the result carries truncado=true when the cap was reached).",
       "fuente": "sut (default) | judicatura",
       "format": "text | json"
     }
