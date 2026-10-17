@@ -23,11 +23,16 @@ services:
       - MCP_RATE_LIMIT_WINDOW_SECONDS=${MCP_RATE_LIMIT_WINDOW_SECONDS:-60}
       - MCP_SSL_CERTFILE=${MCP_SSL_CERTFILE:-}
       - MCP_SSL_KEYFILE=${MCP_SSL_KEYFILE:-}
+      # Uvicorn reads this itself: set it to the reverse proxy's address so
+      # the per-client rate limit sees real client IPs (X-Forwarded-For).
+      - FORWARDED_ALLOW_IPS=${FORWARDED_ALLOW_IPS:-127.0.0.1}
       - BCE_CATALOG_SNAPSHOT_DIR=${BCE_CATALOG_SNAPSHOT_DIR:-/app/data/bce_catalog_snapshots}
       - IEM_CATALOG_DIR=${IEM_CATALOG_DIR:-/app/data/iem_catalog_snapshots}
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:${MCP_PORT:-8000}/health')"]
+      # Reads the port/TLS settings from the container's own environment, so
+      # it also works when MCP_SSL_CERTFILE makes Uvicorn serve HTTPS.
+      test: ["CMD", "python", "-c", "import os, ssl, urllib.request as u; s = 'https' if os.getenv('MCP_SSL_CERTFILE') else 'http'; u.urlopen(f\"{s}://localhost:{os.getenv('MCP_PORT', '8000')}/health\", context=ssl._create_unverified_context())"]
       interval: 30s
       timeout: 10s
       retries: 3

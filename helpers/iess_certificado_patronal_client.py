@@ -68,7 +68,6 @@ import httpx
 
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.pdf_reader import extract_text_from_bytes
-from helpers.tls import should_retry_insecure
 from helpers.user_agent import USER_AGENT
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
@@ -218,12 +217,11 @@ def _parse_certificado_text(text: str, identificacion: str) -> dict[str, Any]:
     return result
 
 
-async def _run(identificacion: str, verify: bool = True) -> httpx.Response:
+async def _run(identificacion: str) -> httpx.Response:
     async with httpx.AsyncClient(
         headers={"User-Agent": USER_AGENT},
         follow_redirects=True,
         timeout=_TIMEOUT,
-        verify=verify,
     ) as session:
         post_url, id_field, fields = await _get_form(session)
         return await _submit_certificado(session, post_url, id_field, fields, identificacion)
@@ -239,13 +237,7 @@ async def get_certificado_cumplimiento_patronal(identificacion: str) -> dict[str
     """
     identificacion = _validate_identificacion(identificacion)
 
-    try:
-        resp = await _run(identificacion)
-    except httpx.ConnectError as exc:
-        if not should_retry_insecure(exc, CERTIFICADO_URL):
-            raise
-        logger.warning("Falló la verificación TLS para el certificado patronal del IESS")
-        resp = await _run(identificacion, verify=False)
+    resp = await _run(identificacion)
 
     content_type = resp.headers.get("content-type", "")
     if "pdf" not in content_type.lower():

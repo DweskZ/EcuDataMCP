@@ -1009,7 +1009,9 @@ async def _fetch_range(
 
     own = session is None
     if own:
-        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
+        session = httpx.AsyncClient(
+            headers={"User-Agent": USER_AGENT}, proxy=proxy_for(url)
+        )
     assert session is not None
     try:
         try:
@@ -1023,7 +1025,9 @@ async def _fetch_range(
                     url,
                 )
                 async with httpx.AsyncClient(
-                    headers={"User-Agent": USER_AGENT}, verify=os_trust_context()
+                    headers={"User-Agent": USER_AGENT},
+                    verify=os_trust_context(),
+                    proxy=proxy_for(url),
                 ) as os_trust_session:
                     return await _do(os_trust_session)
             if not should_retry_insecure(exc, url):
@@ -1034,7 +1038,9 @@ async def _fetch_range(
                 url,
             )
             async with httpx.AsyncClient(
-                headers={"User-Agent": USER_AGENT}, verify=False
+                headers={"User-Agent": USER_AGENT},
+                verify=False,
+                proxy=proxy_for(url),
             ) as insecure_session:
                 return await _do(insecure_session)
     finally:

@@ -77,8 +77,8 @@ jobs:
 
       - name: Pack bundle
         run: |
-          npx -y @anthropic-ai/mcpb validate manifest.json
-          npx -y @anthropic-ai/mcpb pack . "ecuador-mcp-${GITHUB_REF_NAME#v}.mcpb"
+          npx -y @anthropic-ai/mcpb@2.1.2 validate manifest.json
+          npx -y @anthropic-ai/mcpb@2.1.2 pack . "ecuador-mcp-${GITHUB_REF_NAME#v}.mcpb"
 
       - name: Attach to release
         env:
@@ -95,7 +95,7 @@ jobs:
 
       - name: Install mcp-publisher
         run: |
-          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" \
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/download/v1.8.1/mcp-publisher_linux_amd64.tar.gz" \
             | tar xz mcp-publisher
 
       - name: Publish to MCP Registry

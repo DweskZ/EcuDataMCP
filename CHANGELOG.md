@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **Review fixes**:
+  - `log_tool` logs only the parameter names at INFO (values moved to DEBUG), so RUCs, cédulas and free-text queries stay out of hosted logs.
+  - The per-client rate limit drops idle client keys; behind a reverse proxy, set `FORWARDED_ALLOW_IPS` (Uvicorn's own variable) so clients get separate quotas (see docs/DEPLOYMENT.md).
+  - Ranged requests (`list_zip_contents`) honour `ECUADOR_MCP_GEO_PROXY`; the unreachable `verify=False` fallbacks in the SRI and IESS certificate clients are removed (their hosts were never on the insecure-TLS allowlist); `list_sat_tsunami` caps its `limit`.
+  - The compose healthcheck follows `MCP_SSL_CERTFILE`; the release workflow pins `mcp-publisher` and `@anthropic-ai/mcpb`; Python 3.14 added to the classifiers.
+
 - **International-series hardening**: `intl_http` retries connect/DNS/read errors
   (not only timeouts) and names the source in the final error; the "try again in
   N seconds" hint is honoured only on a 429; the IMF client maps an unknown flow

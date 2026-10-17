@@ -12,6 +12,8 @@ from collections.abc import Awaitable, Callable
 ASGIApp = Callable[[dict, Callable, Callable], Awaitable[None]]
 _MCP_PATHS = {"/mcp", "/mcp/"}
 _QUEUE_TIMEOUT_SECONDS = 0.05
+# Idle client keys are swept once the table passes this many entries.
+_RATE_TABLE_SWEEP_SIZE = 1024
 
 
 def _header(scope: dict, name: bytes) -> str | None:
@@ -92,6 +94,15 @@ def with_http_security(
             now = time.monotonic()
             client_key = _client_key(scope)
             async with rate_lock:
+                if len(rate_hits) > _RATE_TABLE_SWEEP_SIZE:
+                    # Without this a client that never returns keeps its key
+                    # forever, so memory grows with distinct client addresses.
+                    for key in [
+                        k
+                        for k, v in rate_hits.items()
+                        if not v or now - v[-1] >= rate_limit_window_seconds
+                    ]:
+                        del rate_hits[key]
                 hits = [
                     hit
                     for hit in rate_hits.get(client_key, [])

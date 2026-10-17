@@ -156,7 +156,7 @@ async def list_sat_stations(limit: int = 50) -> dict[str, Any]:
     )
     features = data.get("features") or []
     stations = []
-    for feat in features[: max(limit, 1)]:
+    for feat in features[: min(max(limit, 1), 200)]:
         attrs = feat.get("attributes") or {}
         geom = feat.get("geometry") or {}
         stations.append(

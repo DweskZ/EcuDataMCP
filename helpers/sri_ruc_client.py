@@ -47,7 +47,6 @@ import httpx
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.text_utils import strip_accents as _strip
 from helpers.timeout_retry import SLOW_HOST_TIMEOUT, retry_on_timeout
-from helpers.tls import should_retry_insecure
 from helpers.user_agent import USER_AGENT
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
@@ -174,13 +173,12 @@ def _validate_ruc(ruc: str) -> str:
     return value
 
 
-async def _fetch_page(url: str, ruc: str, verify: bool = True) -> str:
+async def _fetch_page(url: str, ruc: str) -> str:
     async def attempt() -> str:
         async with httpx.AsyncClient(
             headers={"User-Agent": USER_AGENT},
             follow_redirects=True,
             timeout=SLOW_HOST_TIMEOUT,
-            verify=verify,
         ) as session:
             response = await session.get(url, params={"ruc": ruc})
             response.raise_for_status()
@@ -190,13 +188,7 @@ async def _fetch_page(url: str, ruc: str, verify: bool = True) -> str:
 
 
 async def _fetch_public_page(url: str, ruc: str) -> str:
-    try:
-        return await _fetch_page(url, ruc)
-    except httpx.ConnectError as exc:
-        if not should_retry_insecure(exc, url):
-            raise
-        logger.warning("Falló la verificación TLS para la página pública del SRI")
-        return await _fetch_page(url, ruc, verify=False)
+    return await _fetch_page(url, ruc)
 
 
 async def get_ruc_info(
@@ -226,7 +218,7 @@ async def get_ruc_info(
     return data
 
 
-async def _fetch_catastro_json(path: str, params: list[tuple[str, str]], verify: bool = True) -> Any:
+async def _fetch_catastro_json(path: str, params: list[tuple[str, str]]) -> Any:
     url = f"{SRI_CATASTRO_BASE}/{path}"
 
     async def attempt() -> httpx.Response:
@@ -234,7 +226,6 @@ async def _fetch_catastro_json(path: str, params: list[tuple[str, str]], verify:
             headers={"User-Agent": USER_AGENT},
             follow_redirects=True,
             timeout=SLOW_HOST_TIMEOUT,
-            verify=verify,
         ) as session:
             response = await session.get(url, params=params)
             response.raise_for_status()
@@ -253,14 +244,7 @@ async def _fetch_catastro_json(path: str, params: list[tuple[str, str]], verify:
 
 
 async def _fetch_catastro_public(path: str, params: list[tuple[str, str]]) -> Any:
-    url = f"{SRI_CATASTRO_BASE}/{path}"
-    try:
-        return await _fetch_catastro_json(path, params)
-    except httpx.ConnectError as exc:
-        if not should_retry_insecure(exc, url):
-            raise
-        logger.warning("Falló la verificación TLS para la API pública de catastro del SRI")
-        return await _fetch_catastro_json(path, params, verify=False)
+    return await _fetch_catastro_json(path, params)
 
 
 def _fecha(value: str | None) -> str | None:

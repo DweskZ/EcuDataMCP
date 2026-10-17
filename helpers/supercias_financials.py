@@ -9,7 +9,7 @@ and ~38 financial ratios per company per fiscal year. The directory only has
 The source CSV (bi_ranking.csv) is ~356 MB / ~1.7M rows covering 2008-present,
 too large to hold in memory the way supercias_client.py holds the (also
 large, but 10x smaller) company directory. Instead this module only ever
-*queries* a local SQLite database that `scripts/build_supercias_financials_db.py`
+*queries* a local SQLite database that `helpers/supercias_financials_build.py`
 builds ahead of time, pruned to the last 5 fiscal years during that build.
 
 Building takes ~15-20 minutes (the 356 MB download dominates), too slow to run

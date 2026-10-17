@@ -3,7 +3,7 @@ import asyncio
 from helpers.http_security import with_http_security
 
 
-async def _call(app, path="/mcp", headers=()):
+async def _call(app, path="/mcp", headers=(), client=None):
     messages = []
 
     async def receive():
@@ -12,7 +12,7 @@ async def _call(app, path="/mcp", headers=()):
     async def send(message):
         messages.append(message)
 
-    scope = {"type": "http", "path": path, "headers": list(headers)}
+    scope = {"type": "http", "path": path, "headers": list(headers), "client": client}
     await app(scope, receive, send)
     return messages
 
@@ -70,3 +70,17 @@ async def test_mcp_applies_per_client_rate_limit():
     assert first[0]["status"] == 204
     assert second[0]["status"] == 429
     assert (b"retry-after", b"60") in second[0]["headers"]
+
+
+async def test_rate_limit_table_drops_idle_clients(monkeypatch):
+    monkeypatch.setattr("helpers.http_security._RATE_TABLE_SWEEP_SIZE", 2)
+    app = with_http_security(_ok_app, rate_limit_requests=5, rate_limit_window_seconds=1)
+
+    for i in range(4):
+        await _call(app, client=(f"10.0.0.{i}", 1234))
+    await asyncio.sleep(1.1)
+    await _call(app, client=("10.0.0.99", 1234))
+
+    # Introspect the closure: only the fresh client should remain.
+    cells = {c.cell_contents.__class__: c.cell_contents for c in app.__closure__}
+    assert list(cells[dict]) == ["10.0.0.99"]

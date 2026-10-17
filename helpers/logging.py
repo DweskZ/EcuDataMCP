@@ -66,7 +66,10 @@ def log_tool(func: Callable[..., Any]) -> Callable[..., Any]:
     @wraps(func)
     async def wrapper(*args: Any, **kwargs: Any) -> Any:
         tool_name = func.__name__
-        logger.info("Tool called: %s | params: %s", tool_name, kwargs or args)
+        # Names only: values can be RUCs, cédulas or free-text queries (see
+        # helpers/usage.py); DEBUG keeps the values for local troubleshooting.
+        logger.info("Tool called: %s | params: %s", tool_name, sorted(kwargs))
+        logger.debug("Tool %s arguments: %s", tool_name, kwargs or args)
         started = time.perf_counter()
         try:
             result = await func(*args, **kwargs)

@@ -7,7 +7,11 @@ exponerlo a agentes remotos, el despliegue debe tener:
   repositorio.
 - `MCP_RATE_LIMIT_REQUESTS` y `MCP_RATE_LIMIT_WINDOW_SECONDS` configurados para
   la capacidad real del servidor. El límite se aplica por dirección del cliente
-  que ve Uvicorn, además del límite global de concurrencia.
+  que ve Uvicorn, además del límite global de concurrencia. Detrás de un proxy
+  inverso, define `FORWARDED_ALLOW_IPS` (variable nativa de Uvicorn) con la
+  dirección del proxy: por defecto solo confía en `127.0.0.1`, e ignora
+  `X-Forwarded-For` de cualquier otro origen, así que todos los clientes
+  compartirían un único cupo.
 - HTTPS terminado en un proxy como Caddy/Nginx, o `MCP_SSL_CERTFILE` y
   `MCP_SSL_KEYFILE` si Uvicorn termina TLS directamente.
 - almacenamiento persistente para `/app/data` en Docker, health check para
