@@ -388,7 +388,7 @@ Bloqueos reales confirmados en vivo, o decisiones explícitas de no construir �
 | SERCOP — catálogo/órdenes de compra | CAPTCHA |
 | IG-EPN — `descarga-de-datos` | Cuenta obligatoria |
 | Superbancos — Catastro de Compañías | Login obligatorio (app JSF aparte) |
-| SRI Saiku (OLAP) | Tools removidas 2026-09-05 — `srienlinea.sri.gob.ec` confirmado inalcanzable en vivo desde tres entornos distintos (servidor MCP desplegado, `curl` local, navegador real): la conexión TLS se cierra abruptamente sin excepción, no es el gap de conectividad puntual que se sospechaba antes → RESEARCH.md § Décima pasada |
+| SRI Saiku (OLAP) | Tools removidas 2026-09-05 (`srienlinea.sri.gob.ec` inalcanzable desde tres entornos: la conexión TLS se cerraba abruptamente) y re-verificadas en vivo el 2026-10-18: **el servicio volvió a responder, pero la decisión es no reconstruirlas** (2026-10-18). Lo que aportarían ya está cubierto por archivos oficiales que el catálogo alcanza, y con más historia: `Recaudación por impuesto provincia y cantón` (hoja `BDD`: año, provincia, cantón, mes, grupo de impuesto, impuesto, gran contribuyente), `Recaudación por actividad económica` y `Estadísticas de Recaudación` vía `search_archivos(fuente="sri_recaudacion")`, más los 127 datasets del SRI en CKAN (`Recaudación de Impuestos`, `Ventas_Compras`, `Contribuyentes Activos Catastro`, 2017-2026, con recurso CSV). Solo `D101` (balance y resultados de sociedades) y `D103` (retenciones) son exclusivos del cubo, y no compensan un Saiku 2.6 sin contrato ni documentación, detrás de un WAF, que ya se cayó entero una vez y que crea un objeto de consulta en su servidor por cada llamada. Revisar solo si ese hueco pesa → RESEARCH.md § SRI Saiku re-verificado |
 
 ---
 

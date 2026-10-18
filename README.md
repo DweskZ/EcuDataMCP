@@ -79,7 +79,7 @@ Este MCP unifica fuentes gubernamentales en un solo servidor:
 | Fuente | Datos |
 |--------|-------|
 | **Datos Abiertos y Cuenca en Datos** (CKAN) | Catálogos, DataStore y archivos públicos |
-| **SRI** | Datasets estadísticos, recaudación, RUC y Saiku público |
+| **SRI** | Datasets estadísticos, recaudación y RUC |
 | **Gob.ec** | Trámites, instituciones y regulaciones |
 | **SERCOP/OCDS** | Contratación pública |
 | **SGR e IG-EPN** | Eventos de riesgo, tsunami y sismos |
