@@ -278,6 +278,27 @@ async def test_download_full_retries_insecurely_on_cert_failure(monkeypatch):
     assert calls == [True, False]
 
 
+async def test_download_once_follows_redirects_when_verifying(httpx_mock):
+    url = supercias_client._EXCEL_URL
+    target = "https://mercadodevalores.supercias.gob.ec/moved.xlsx"
+    httpx_mock.add_response(url=url, status_code=302, headers={"location": target})
+    httpx_mock.add_response(url=target, content=b"ok")
+
+    assert await supercias_client._download_once(url) == b"ok"
+
+
+async def test_download_once_does_not_follow_redirects_without_verification(httpx_mock):
+    url = supercias_client._EXCEL_URL
+    httpx_mock.add_response(
+        url=url, status_code=302, headers={"location": "https://other.example/file.xlsx"}
+    )
+
+    with pytest.raises(httpx.HTTPStatusError):
+        await supercias_client._download_once(url, verify=False)
+
+    assert len(httpx_mock.get_requests()) == 1
+
+
 async def test_download_full_does_not_retry_non_cert_connect_errors(monkeypatch):
     async def fake_download_once(url: str, verify: bool = True) -> bytes:
         raise httpx.ConnectError("connection refused")
