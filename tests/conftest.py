@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import shutil
+import socket
 import sys
 from collections.abc import Iterator
 from pathlib import Path
@@ -28,6 +29,24 @@ def tmp_path(request: pytest.FixtureRequest) -> Iterator[Path]:
         yield path
     finally:
         shutil.rmtree(path, ignore_errors=True)
+
+
+@pytest.fixture(autouse=True)
+def _offline_dns(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Resolve every host to a public address instead of asking real DNS.
+
+    Downloads go through the SSRF guard, which resolves the host name before
+    pytest-httpx intercepts the request. Without this, ~300 tests needed a
+    working resolver, and a slow lookup blew a test's timeout (the BVG
+    concurrency test failed once on a CI runner). Tests that care about the
+    resolved address patch socket.getaddrinfo themselves, which overrides
+    this stub.
+    """
+
+    def fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", port or 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", fake_getaddrinfo)
 
 
 @pytest.fixture(autouse=True)
