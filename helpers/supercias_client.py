@@ -274,7 +274,9 @@ async def _download_once(url: str, verify: bool = True) -> bytes:
     async with (
         httpx.AsyncClient(
             headers={"User-Agent": USER_AGENT},
-            follow_redirects=True,
+            # The unverified retry stays on the original host: a redirect would
+            # otherwise be followed to any host without certificate checks.
+            follow_redirects=verify,
             timeout=_DOWNLOAD_TIMEOUT,
             verify=verify,
             proxy=proxy_for(url),
