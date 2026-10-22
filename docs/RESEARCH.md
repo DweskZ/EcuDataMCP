@@ -4076,8 +4076,14 @@ sanitario de ARCSA). De las cinco:
 - **SNIESE** — sin dataset masivo propio (es un registro interno). El
   contenido real es `educacion.gob.ec/edusuperior/biblioteca/` (1,259
   documentos WordPress `download-monitor`, ya documentado en la sección
-  SENESCYT/MINEDEC de este archivo) — reachable pero nunca construido
-  como tool; queda pendiente.
+  SENESCYT/MINEDEC de este archivo). *Actualización 2026-10-21:* la
+  Biblioteca se construyó días después como
+  `list_archivo_secciones`/`get_archivo_seccion(fuente="senescyt")`, y lo
+  que SNIESE publica como datos es el dataset CKAN
+  `base-de-datos-de-oferta-academica-de-ies` (organización SENESCYT). Una
+  búsqueda CKAN por "SNIESE" daba 0 resultados porque el nombre no aparece
+  en los metadatos; `helpers/acronyms.py` ahora expande "sniese" a los
+  términos de ese dataset.
 - **CEAACES/CES cierre y contingencia** — resuelto a
   `ces.gob.ec/lotaip/AAAA/Mes/...` (resoluciones RPC-SO-XX-No.XXX,
   patrón LOTAIP-por-categoría-legal ya visto en IESS/Contraloría); queda
