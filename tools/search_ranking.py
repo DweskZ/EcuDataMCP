@@ -18,8 +18,8 @@ def register_search_ranking_tool(mcp: MCPServer) -> None:
         title="Rankear compañías por indicadores financieros",
         description=(
             "Rank Supercías companies by financial indicators for one fiscal year "
-            "(last five years), optionally by CIIU letter. descending=true for "
-            "top-N by a column."
+            "(2008 to the latest year), optionally by CIIU letter. descending=true "
+            "for top-N by a column."
         ),
         annotations=READ_ONLY,
     )
@@ -40,15 +40,22 @@ def register_search_ranking_tool(mcp: MCPServer) -> None:
         e.g. "C" for manufacturing), sorted by any indicator column (defaults
         to the dataset's own precomputed posicion_general). Each result
         includes the company's nombre/ruc alongside its financials. Covers
-        only the last five fiscal years in the local build, not the full
-        history; `metadatos.base_local` gives the build date and year range.
+        every fiscal year Supercías publishes, 2008 to the latest
+        (`metadatos.base_local.anios_disponibles` lists them). Older years
+        carry fewer columns: financial ratios (roe, roa, liquidez_corriente,
+        ...) start in 2018 and CIIU in 2009, so ordering by a ratio or
+        filtering by ciiu_n1 in a year without them returns an error that
+        says so. Years 2008-2018 also include unranked companies (no
+        financial statement that year), listed after the ranked ones.
         Use get_financials for one company's full detail, or
         get_compania_info for legal/registry data (address, legal
         representative, etc.).
 
         Args:
-            anio: Fiscal year filter; defaults to the latest available year
-                (the latest year may still be incomplete while filings arrive).
+            anio: Fiscal year, 2008 to the latest; defaults to the latest
+                available year (which may still be incomplete while filings
+                arrive). A year not in the local build returns an error
+                listing the available years.
             ciiu_n1: Optional CIIU level-1 filter, e.g. "C", "G", "I".
             order_by: Column to sort by (e.g. "posicion_general", "activos",
                 "roe"). Raises an error listing valid columns if unknown.
@@ -93,6 +100,7 @@ def register_search_ranking_tool(mcp: MCPServer) -> None:
                     f"offset={data['offset']})"
                 ),
                 *supercias_financials.stale_warning_lines(data),
+                *(f"Nota: {nota}" for nota in data.get("notas") or []),
                 "",
             ]
             if not companias:
@@ -100,9 +108,10 @@ def register_search_ranking_tool(mcp: MCPServer) -> None:
                 return "\n".join(parts)
             for i, c in enumerate(companias, 1):
                 nombre = c.get("nombre") or f"Expediente {c.get('expediente')}"
+                posicion = c.get("posicion_general")
                 parts.append(
-                    f"{i}. {nombre} — año {c.get('anio')} "
-                    f"— posición {c.get('posicion_general')}"
+                    f"{i}. {nombre} — año {c.get('anio')} — "
+                    + (f"posición {posicion}" if posicion is not None else "sin posición")
                 )
                 if c.get("ruc"):
                     parts.append(f"   RUC: {c['ruc']}  ·  Expediente: {c.get('expediente')}")

@@ -284,7 +284,7 @@
             "id": "supercias-ranking",
             "name": "Ranking financiero",
             "tag": null,
-            "description": "Financieros por balance (ingresos, activos, ROE, ~38 ratios), últimos años; requiere build local",
+            "description": "Financieros por balance (ingresos, activos, ROE, ~38 ratios) por año fiscal desde 2008 (ratios desde 2018); requiere build local",
             "coverage": "appscvsmovil.supercias.gob.ec",
             "url": "https://appscvsmovil.supercias.gob.ec",
             "status": "build-local"

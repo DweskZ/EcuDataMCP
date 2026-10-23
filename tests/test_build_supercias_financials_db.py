@@ -280,3 +280,102 @@ def test_replace_with_retry_gives_up_after_max_attempts(monkeypatch, tmp_path):
 
     with pytest.raises(PermissionError):
         build_script._replace_with_retry(src, dst)
+
+
+def _ranking_csv(years: range) -> bytes:
+    lines = ["anio,expediente,posicion_general,id_estado_financiero,n_empleados,ciiu_n1,roe"]
+    for year in years:
+        # Ratios only from 2018 and CIIU only from 2009, like the real export.
+        roe = '"0,15"' if year >= 2018 else ""
+        ciiu = "C" if year >= 2009 else ""
+        lines.append(f"{year},1,1,{year}01,12.00,{ciiu},{roe}")
+        lines.append(f"{year},2,,,3.00,{ciiu},")  # unranked: no statement
+    return ("\n".join(lines) + "\n").encode("utf-8")
+
+
+@pytest.fixture
+def mocked_export(httpx_mock, isolated_state, monkeypatch):
+    """Serve a tiny Supercías export (2008-2025) through pytest-httpx."""
+    monkeypatch.setattr(build_script, "DB_PATH", isolated_state.DB_PATH)
+    monkeypatch.delenv("ECUADOR_MCP_SUPERCIAS_YEARS", raising=False)
+    files = {
+        "bi_ranking.csv": _ranking_csv(range(2008, 2026)),
+        "bi_compania.csv": b"expediente,ruc,nombre\n1,1790013731001,ACME\n",
+        "bi_segmento.csv": b"id_segmento,segmento\n1,GRANDE\n",
+        "bi_ciiu.csv": b"ciiu,descripcion\nC,Manufactura\n",
+        "indicadores_sector.csv": b"anio,ciiu_n1,descripcion,roe\n2018,C,Manufactura,0.1\n"
+        b"2023,C,Manufactura,0.2\n",
+    }
+    for name, body in files.items():
+        httpx_mock.add_response(url=build_script._RESOURCES_BASE + name, content=body)
+    return isolated_state.DB_PATH
+
+
+def test_build_keeps_every_published_year(mocked_export):
+    build_script._build()
+
+    conn = sqlite3.connect(mocked_export)
+    years = [r[0] for r in conn.execute("SELECT DISTINCT anio FROM ranking ORDER BY anio")]
+    sector_years = [
+        r[0] for r in conn.execute("SELECT DISTINCT anio FROM indicadores_sector ORDER BY anio")
+    ]
+    version = conn.execute("PRAGMA user_version").fetchone()[0]
+    conn.close()
+    assert years == list(range(2008, 2026))
+    assert sector_years == [2018, 2023]
+    assert version == build_script.SCHEMA_VERSION
+
+
+def test_build_honours_retention_setting(mocked_export, monkeypatch):
+    monkeypatch.setenv("ECUADOR_MCP_SUPERCIAS_YEARS", "3")
+    build_script._build()
+
+    conn = sqlite3.connect(mocked_export)
+    years = [r[0] for r in conn.execute("SELECT DISTINCT anio FROM ranking ORDER BY anio")]
+    sector_years = [r[0] for r in conn.execute("SELECT DISTINCT anio FROM indicadores_sector")]
+    conn.close()
+    assert years == [2023, 2024, 2025]
+    assert sector_years == [2023]
+
+
+@pytest.mark.parametrize("value", ["0", "-2", "cinco"])
+def test_years_to_keep_rejects_invalid_values(monkeypatch, value):
+    monkeypatch.setenv("ECUADOR_MCP_SUPERCIAS_YEARS", value)
+    with pytest.raises(ValueError, match="ECUADOR_MCP_SUPERCIAS_YEARS"):
+        build_script._years_to_keep()
+
+
+@pytest.mark.parametrize("value", ["", "all", "ALL"])
+def test_years_to_keep_defaults_to_full_history(monkeypatch, value):
+    monkeypatch.setenv("ECUADOR_MCP_SUPERCIAS_YEARS", value)
+    assert build_script._years_to_keep() is None
+
+
+def test_verify_build_rejects_a_missing_year(tmp_path):
+    path = tmp_path / "gap.sqlite3"
+    _valid_db(path)
+    conn = sqlite3.connect(path)
+    conn.execute("INSERT INTO ranking VALUES (2023, 1, 12, 5)")  # 2024 missing
+    conn.commit()
+    conn.close()
+
+    with pytest.raises(RuntimeError, match="falta al menos un año"):
+        build_script._verify_build(path)
+
+
+def test_check_not_shrunk_compares_only_the_new_year_range(tmp_path):
+    # Lowering the retention setting drops old years on purpose; only a drop
+    # inside the years both builds share means a truncated source file.
+    previous = tmp_path / "prev.sqlite3"
+    new = tmp_path / "new.sqlite3"
+    for path, rows in (
+        (previous, [(2010,)] * 50 + [(2025,)] * 10),
+        (new, [(2025,)] * 10),
+    ):
+        conn = sqlite3.connect(path)
+        conn.execute("CREATE TABLE ranking (anio INTEGER)")
+        conn.executemany("INSERT INTO ranking VALUES (?)", rows)
+        conn.commit()
+        conn.close()
+
+    build_script._check_not_shrunk(new, previous)

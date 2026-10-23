@@ -72,9 +72,11 @@ fricción (sin registro, sin captcha).
 Hecho: directorio de compañías (`search_companias`/`get_compania_info`,
 226k+ compañías, actualizado a diario, parseado desde el export Excel
 estático del portal), ranking financiero (`search_ranking`/`get_financials`,
-~38 ratios financieros por compañía y año fiscal, sobre un SQLite local
-construido de antemano con `scripts/build_supercias_financials_db.py`) y
-registro de auditores externos (`search_auditores`/`get_auditor_info`).
+~38 ratios financieros por compañía y año fiscal, años fiscales 2008-2025 sin
+huecos, ratios desde 2018, sobre un SQLite local construido en segundo plano
+por `helpers/supercias_financials_build.py`; ver § Supercías — cobertura por
+año del Ranking de Compañías) y registro de auditores externos
+(`search_auditores`/`get_auditor_info`).
 
 ### Instituto Geofísico (IG-EPN)
 
@@ -6454,6 +6456,69 @@ cayó una vez, que ensucia su propio repositorio de consultas en cada llamada y
 que exigiría reintentos y limpieza. Si algún día pesa el hueco de `D101`/`D103`,
 reconstruir **una** tool parametrizada (`query_sri_estadisticas` con cubo /
 filas / medida), no las tres, con grano por defecto provincial o de sección.
+
+## Supercías — cobertura por año del Ranking de Compañías (2026-10-22)
+
+**Pregunta.** `search_ranking`/`get_financials` solo cubrían los últimos cinco
+años fiscales porque el build borraba el resto. ¿Desde qué año publica
+Supercías el ranking y los estados financieros, y con qué huecos?
+
+**Fuentes revisadas en vivo** (desde Canadá, sin proxy; el portal respondió
+200 en todas):
+
+- `appscvsmovil.supercias.gob.ec/ranking/reporte.html` enlaza
+  `recursos/bi_ranking.csv` (373.891.466 bytes, `Last-Modified` del 22-10-2026,
+  se regenera a diario), las tablas auxiliares (`bi_compania.csv`,
+  `bi_segmento.csv`, `bi_ciiu.csv`, `indicadores_sector.csv`), el PDF
+  `referencia_indicadores.pdf`, un tablero Power BI embebido y un Excel por año
+  en `recursos/archivos/ranking_<año>.xlsx`.
+- Los Excel anuales existen para **2010-2025** (4,8 MB el de 2010, 18 MB el de
+  2025); `ranking_2005` a `ranking_2009` y `ranking_2026` dan 404. El listado
+  de `recursos/` y de `recursos/archivos/` da 403.
+- El Excel de 2010 trae 51.962 filas: solo las compañías con posición, más
+  nombre, tipo, región, provincia, ciudad, tamaño y la posición del año
+  anterior. Es un subconjunto del CSV (51.893 filas con posición en 2010), no
+  una fuente con más años ni más filas. No se usa.
+
+**`bi_ranking.csv` es la fuente con la historia más larga: años fiscales
+2008-2025, sin huecos.** 1.676.986 filas, una por compañía y año (ningún
+`expediente` repetido dentro de un año), 54 columnas, 0 filas malformadas.
+
+| Años | Filas | Qué columnas traen datos |
+|---|---|---|
+| 2008 | 136.048 | Solo tamaño: ingresos por ventas, activos, patrimonio, utilidad antes de impuestos, impuesto a la renta, empleados, posición. **Sin CIIU** (`ciiu_n1`/`ciiu_n6` vacías). |
+| 2009 | 142.978 | Lo mismo que 2008 más CIIU. |
+| 2010-2017 | 42.357-69.980 por año | Lo anterior más ingresos totales, utilidad del ejercicio, utilidad neta y segmento. **Sin ratios.** |
+| 2018-2025 | 78.214-154.690 por año | Las 54 columnas, incluidos los ~38 ratios financieros. |
+
+- **Filas sin posición.** Entre 2008 y 2018 hay compañías listadas sin
+  `posicion_general` ni `id_estado_financiero` (82.821 en 2008, 88.156 en
+  2009, 12.384 en 2010, 15.326 en 2011, unos cientos por año entre 2012 y 2017,
+  4.965 en 2018; ninguna en 2019-2024 y 30 en 2025). Todas tienen ingresos y
+  activos en cero, pero muchas sí traen `n_empleados`. Son compañías que no
+  presentaron estado financiero ese año: se conservan (el dato de empleados es
+  real), se ordenan al final del ranking y `get_financials` las marca como
+  "sin estado financiero presentado".
+- **Saltos de cobertura.** 2008-2009 tienen el doble de filas que 2010 por esas
+  filas sin estado financiero. Las compañías con posición bajan en 2012
+  (41.785, frente a 54.654 en 2011) y desde ahí crecen cada año hasta 154.660
+  en 2025.
+- **`indicadores_sector.csv`** (promedios sectoriales por CIIU nivel 1) solo
+  cubre 2018-2023, 21 sectores por año.
+- **Nada anterior a 2008.** Ni el CSV ni los Excel ni la página citan años
+  previos; el tablero Power BI no se revisó (cubre el mismo ranking).
+
+**Qué cambió en el proyecto.** El build conserva todos los años
+(`ECUADOR_MCP_SUPERCIAS_YEARS=N` limita a los últimos N para hosts con poco
+disco). Build completo medido: 222 s con buena conexión, base de 388,5 MB
+(antes ~220 MB con cinco años); los topes de descarga (1 GB por archivo, plazo
+total) y el mínimo de 2 GB libres siguen bastando. El build rechaza ahora una
+base con un año faltante en medio del rango. `search_ranking` y
+`get_financials` validan el año pedido y responden con la lista de años
+disponibles (`2008-2025`); ordenar por un ratio antes de 2018 o filtrar por
+CIIU en 2008 da un error que explica la falta de datos. `get_financials` suma
+`desde`/`hasta`. Una base de la versión anterior (cinco años) se sigue
+sirviendo mientras se reconstruye.
 
 ## Notas históricas
 

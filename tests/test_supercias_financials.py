@@ -12,18 +12,25 @@ def _build_db(path) -> None:
     conn = sqlite3.connect(path)
     conn.execute(
         "CREATE TABLE ranking (anio INTEGER, expediente INTEGER, "
-        "posicion_general INTEGER, ciiu_n1 TEXT, ciiu_n6 TEXT, "
-        "ingresos_ventas REAL, activos REAL, roe REAL)"
+        "posicion_general INTEGER, id_estado_financiero INTEGER, ciiu_n1 TEXT, "
+        "ciiu_n6 TEXT, ingresos_ventas REAL, activos REAL, roe REAL)"
     )
     conn.executemany(
-        "INSERT INTO ranking VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO ranking VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
-            (2025, 1, 10, "C", "C1010.01", 1000.0, 5000.0, 0.1),
-            (2024, 1, 15, "C", "C1010.01", 900.0, 4800.0, 0.09),
-            (2025, 2, 3, "G", "G4510.01", 3000.0, 9000.0, 0.2),
+            (2025, 1, 10, 101, "C", "C1010.01", 1000.0, 5000.0, 0.1),
+            (2024, 1, 15, 102, "C", "C1010.01", 900.0, 4800.0, 0.09),
+            (2025, 2, 3, 103, "G", "G4510.01", 3000.0, 9000.0, 0.2),
             # expediente 3 has financials but no matching companias row --
             # tests the LEFT JOIN / "predates directory coverage" case.
-            (2025, 3, 20, "C", "C1010.01", 500.0, 2000.0, 0.05),
+            (2025, 3, 20, 104, "C", "C1010.01", 500.0, 2000.0, 0.05),
+            # Older years, shaped like the real export: no ratios before
+            # 2018, no CIIU in 2008, and unranked rows (no statement) with a
+            # NULL position and zeros.
+            (2010, 5, 2, 105, "C", "C1010.01", 700.0, 3000.0, None),
+            (2010, 6, None, None, "G", "G4510.01", 0.0, 0.0, None),
+            (2010, 7, 1, 106, "G", "G4510.01", 800.0, 3500.0, None),
+            (2008, 5, 1, 107, None, None, 600.0, 2500.0, None),
         ],
     )
     conn.execute(
@@ -107,7 +114,8 @@ def test_check_db_fresh_serves_stale_file_and_refreshes(tmp_path, no_real_build)
     status = supercias_financials.financials_status(path)
     assert status["disponible"] is True
     assert status["desactualizada"] is True
-    assert status["anios"] == [2024, 2025]
+    assert status["anios"] == [2008, 2025]
+    assert status["anios_disponibles"] == [2008, 2010, 2024, 2025]
 
 
 class _RunningProcess:
@@ -511,3 +519,138 @@ def test_data_dir_relative_override_is_resolved_against_cwd(monkeypatch, tmp_pat
 
     assert data_dir().is_absolute()
     assert data_dir() == (tmp_path / "datos_rel").resolve()
+
+
+def test_format_years_collapses_runs():
+    assert supercias_financials.format_years([2008, 2009, 2010, 2012, 2013]) == (
+        "2008-2010, 2012-2013"
+    )
+    assert supercias_financials.format_years([2025]) == "2025"
+    assert supercias_financials.format_years([]) == "ninguno"
+
+
+def test_check_db_fresh_serves_previous_schema_while_rebuilding(tmp_path, no_real_build):
+    # A version-2 DB (last five years only) has the same tables: keep serving
+    # it, flagged, while the full-history rebuild runs.
+    path = tmp_path / "v2.sqlite3"
+    _build_db(path)
+    conn = sqlite3.connect(path)
+    conn.execute("PRAGMA user_version = 2")
+    conn.commit()
+    conn.close()
+
+    assert supercias_financials._check_db_fresh(path) is True
+    assert no_real_build == [None]
+    status = supercias_financials.financials_status(path)
+    assert status["disponible"] is True
+    assert status["actualizacion_pendiente"] is True
+    warning = supercias_financials.stale_warning_lines({"metadatos": {"base_local": status}})
+    assert "histórico completo" in warning[0]
+
+
+async def test_search_ranking_older_year(db_path):
+    result = await supercias_financials.search_ranking(anio=2010)
+
+    assert result["anio"] == 2010
+    assert result["total"] == 3
+    # The unranked company (NULL position) comes last, not first.
+    assert [c["expediente"] for c in result["companias"]] == [7, 5, 6]
+    assert "ratios" in result["notas"][0]
+
+
+async def test_search_ranking_recent_year_has_no_coverage_note(db_path):
+    result = await supercias_financials.search_ranking(anio=2025)
+    assert "notas" not in result
+
+
+async def test_search_ranking_unloaded_year_lists_available_years(db_path, no_real_build):
+    with pytest.raises(supercias_financials.YearNotLoaded) as exc:
+        await supercias_financials.search_ranking(anio=2005)
+
+    message = str(exc.value)
+    assert "2005" in message
+    assert "2008, 2010, 2024-2025" in message
+    assert "reconstruyendo" not in message
+
+
+async def test_unloaded_year_on_previous_schema_says_rebuild_is_coming(
+    db_path, no_real_build
+):
+    conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA user_version = 2")
+    conn.commit()
+    conn.close()
+
+    with pytest.raises(supercias_financials.YearNotLoaded, match="vuelve a intentar"):
+        await supercias_financials.search_ranking(anio=2005)
+
+
+async def test_search_ranking_rejects_ratio_order_before_2018(db_path):
+    with pytest.raises(ValueError, match="desde 2018"):
+        await supercias_financials.search_ranking(anio=2010, order_by="roe")
+
+
+async def test_search_ranking_rejects_ciiu_filter_without_ciiu(db_path):
+    with pytest.raises(ValueError, match="desde 2009"):
+        await supercias_financials.search_ranking(anio=2008, ciiu_n1="C")
+
+
+async def test_get_financials_returns_full_history(db_path):
+    result = await supercias_financials.get_financials("5")
+    assert [y["anio"] for y in result["years"]] == [2010, 2008]
+
+
+async def test_get_financials_year_range(db_path):
+    result = await supercias_financials.get_financials("1", desde=2025)
+    assert [y["anio"] for y in result["years"]] == [2025]
+
+    result = await supercias_financials.get_financials("5", desde=2009, hasta=2024)
+    assert [y["anio"] for y in result["years"]] == [2010]
+
+
+async def test_get_financials_unloaded_year_lists_available_years(db_path):
+    with pytest.raises(supercias_financials.YearNotLoaded, match="2008, 2010, 2024-2025"):
+        await supercias_financials.get_financials("1", anio=2015)
+    with pytest.raises(supercias_financials.YearNotLoaded, match="Ningún año"):
+        await supercias_financials.get_financials("1", desde=2000, hasta=2005)
+
+
+async def test_get_financials_rejects_conflicting_year_filters(db_path):
+    with pytest.raises(ValueError, match="no ambos"):
+        await supercias_financials.get_financials("1", anio=2025, desde=2024)
+    with pytest.raises(ValueError, match="posterior"):
+        await supercias_financials.get_financials("1", desde=2025, hasta=2024)
+
+
+def _tool(name):
+    from mcp.server.mcpserver import MCPServer
+
+    from tools.get_financials import register_get_financials_tool
+    from tools.search_ranking import register_search_ranking_tool
+
+    mcp = MCPServer("test")
+    register_get_financials_tool(mcp)
+    register_search_ranking_tool(mcp)
+    return mcp._tool_manager.get_tool(name).fn
+
+
+async def test_search_ranking_tool_text_marks_unranked_rows_and_notes(db_path):
+    result = await _tool("search_ranking")(anio=2010)
+    text = result.content[0].text
+
+    assert "Nota: Para 2010 Supercías no publica ratios" in text
+    assert "sin posición" in text
+
+
+async def test_get_financials_tool_flags_year_without_statement(db_path):
+    result = await _tool("get_financials")(expediente_or_ruc="6")
+    assert "Sin estado financiero presentado ese año." in result.content[0].text
+
+
+async def test_year_errors_become_tool_errors(db_path):
+    from mcp.server.mcpserver.exceptions import ToolError
+
+    with pytest.raises(ToolError, match="Años disponibles: 2008, 2010, 2024-2025"):
+        await _tool("get_financials")(expediente_or_ruc="1", anio=2015)
+    with pytest.raises(ToolError, match="Años disponibles"):
+        await _tool("search_ranking")(anio=1999)

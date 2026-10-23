@@ -30,9 +30,9 @@ def register_get_financials_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Ver historial financiero de una compañía",
         description=(
-            "One company's Supercías financial history (last five fiscal years): "
-            "revenue, assets, equity, profit, employees and ratios. Takes "
-            "expediente or RUC."
+            "One company's Supercías financial history (fiscal years 2008 to "
+            "the latest): revenue, assets, equity, profit, employees and ratios. "
+            "Takes expediente or RUC; anio or desde/hasta narrow the years."
         ),
         annotations=READ_ONLY,
     )
@@ -40,30 +40,41 @@ def register_get_financials_tool(mcp: MCPServer) -> None:
     async def get_financials(
         expediente_or_ruc: str,
         anio: int | None = None,
+        desde: int | None = None,
+        hasta: int | None = None,
         format: Literal["text", "json"] = "text",
     ) -> CallToolResult:
         """
         Get a company's financial history from Supercías balance-sheet filings.
 
         Returns revenue, assets, equity, profit, employee count, and financial
-        ratios (liquidity, leverage, profitability) per fiscal year. Covers
-        only the last five fiscal years in the local build, not the full
-        history back to 2008; `metadatos.base_local` gives the build date and
-        year range, and the latest year may still be incomplete. If a RUC
-        maps to several companies, the error lists their expedientes. Complements
-        get_compania_info, which has legal/registry data but no financials.
+        ratios (liquidity, leverage, profitability) per fiscal year, most
+        recent first. Covers every fiscal year Supercías publishes, 2008 to
+        the latest (`metadatos.base_local.anios_disponibles` lists them; the
+        latest may still be incomplete). Ratios start in 2018 and CIIU in
+        2009; earlier years only have revenue, assets, equity, profit, income
+        tax and employees. A year with no financial statement shows as such.
+        If a RUC maps to several companies, the error lists their expedientes.
+        Complements get_compania_info, which has legal/registry data but no
+        financials.
 
         Args:
             expediente_or_ruc: The company's Supercías "expediente" number
                 (from search_companias/get_compania_info) or its 13-digit RUC.
-            anio: Optional single fiscal year filter.
+            anio: Optional single fiscal year. A year not in the local build
+                returns an error listing the available years.
+            desde: Optional first fiscal year of a range (inclusive).
+            hasta: Optional last fiscal year of a range (inclusive). Don't
+                combine desde/hasta with anio.
             format: text | json
         """
         try:
             result = await supercias_financials.get_financials(
-                expediente_or_ruc, anio
+                expediente_or_ruc, anio, desde, hasta
             )
         except supercias_financials.FinancialsDbUnavailable as e:
+            raise ToolError(str(e)) from e
+        except ValueError as e:
             raise ToolError(str(e)) from e
         except Exception as e:
             logger.exception(
@@ -101,12 +112,15 @@ def register_get_financials_tool(mcp: MCPServer) -> None:
             parts.append("")
             if not years:
                 parts.append(
-                    "Sin datos financieros cacheados para esta compañía "
-                    "(fuera del rango de años disponible, o sin filings)."
+                    "Sin datos financieros de esta compañía en los años pedidos "
+                    "(no aparece en el ranking de Supercías esos años)."
                 )
                 return "\n".join(parts)
             for y in years:
                 parts.append(f"--- Año fiscal {y.get('anio')} ---")
+                # Unranked rows (2008-2018 mostly) carry zeros, not figures.
+                if y.get("id_estado_financiero") is None:
+                    parts.append("  Sin estado financiero presentado ese año.")
                 for key, label in _DISPLAY_FIELDS:
                     value = y.get(key)
                     if value is not None:

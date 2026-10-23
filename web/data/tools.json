@@ -687,7 +687,7 @@
             "name": "anio",
             "type": "int | None",
             "default": "None",
-            "description": "Filtro opcional de año fiscal."
+            "description": "Año fiscal, de 2008 al último; por defecto el último disponible (que puede estar incompleto mientras llegan balances). Un año que no está en la base local devuelve un error con los años disponibles."
           },
           {
             "name": "ciiu_n1",
@@ -726,7 +726,7 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Rankea/filtra compañías de Supercías por indicadores financieros de un año fiscal. Filtra por año y/o actividad económica CIIU nivel 1 (una letra, ej. \"C\" para manufactura), ordenado por cualquier columna de indicador (default: posicion_general, ya precalculado en el dataset). Cada resultado incluye el nombre/RUC de la compañía junto a sus financieros. Cubre los últimos cinco años fiscales de la base local, no el historial completo. Usa get_financials para el detalle completo de una compañía, o get_compania_info para datos legales/de registro (dirección, representante legal, etc.)."
+        "long_description": "Rankea/filtra compañías de Supercías por indicadores financieros de un año fiscal. Filtra por año y/o actividad económica CIIU nivel 1 (una letra, ej. \"C\" para manufactura), ordenado por cualquier columna de indicador (default: posicion_general, ya precalculado en el dataset). Cada resultado incluye el nombre/RUC de la compañía junto a sus financieros. Cubre todos los años fiscales que publica Supercías, de 2008 al último (metadatos.base_local.anios_disponibles los lista). Los años antiguos traen menos columnas: los ratios financieros empiezan en 2018 y el CIIU en 2009, así que ordenar por un ratio o filtrar por ciiu_n1 en un año sin esos datos devuelve un error que lo explica. 2008-2018 incluyen además compañías sin posición (sin estado financiero ese año), listadas después de las rankeadas. Usa get_financials para el detalle completo de una compañía, o get_compania_info para datos legales/de registro (dirección, representante legal, etc.)."
       },
       {
         "name": "get_financials",
@@ -742,7 +742,19 @@
             "name": "anio",
             "type": "int | None",
             "default": "None",
-            "description": "Filtro opcional de un solo año fiscal."
+            "description": "Año fiscal opcional. Un año que no está en la base local devuelve un error con los años disponibles."
+          },
+          {
+            "name": "desde",
+            "type": "int | None",
+            "default": "None",
+            "description": "Primer año fiscal opcional de un rango (inclusive)."
+          },
+          {
+            "name": "hasta",
+            "type": "int | None",
+            "default": "None",
+            "description": "Último año fiscal opcional de un rango (inclusive). No combinar desde/hasta con anio."
           },
           {
             "name": "format",
@@ -751,7 +763,7 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Historial financiero de una compañía a partir de los balances de Supercías. Devuelve ingresos, activos, patrimonio, utilidad, cantidad de empleados, y ratios financieros (liquidez, endeudamiento, rentabilidad) por año fiscal. Cubre los últimos cinco años fiscales de la base local (ver metadatos.base_local para su fecha de construcción y rango de años), no el historial completo desde 2008. Complementa get_compania_info, que tiene datos legales/de registro pero no financieros."
+        "long_description": "Historial financiero de una compañía a partir de los balances de Supercías. Devuelve ingresos, activos, patrimonio, utilidad, cantidad de empleados y ratios financieros (liquidez, endeudamiento, rentabilidad) por año fiscal, del más reciente al más antiguo. Cubre todos los años fiscales que publica Supercías, de 2008 al último (metadatos.base_local.anios_disponibles los lista; el último puede estar incompleto). Los ratios empiezan en 2018 y el CIIU en 2009; los años anteriores solo traen ingresos, activos, patrimonio, utilidad, impuesto a la renta y empleados. Un año sin estado financiero se marca como tal. Complementa get_compania_info, que tiene datos legales/de registro pero no financieros."
       },
       {
         "name": "search_auditores",
