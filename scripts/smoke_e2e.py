@@ -282,6 +282,28 @@ async def main() -> int:
             ("search_archivos", {"fuente": "censo", "query": "poblacion", "limit": 3}, []),
             ("search_inec_estadisticas", {"query": "empleo", "limit": 3}, []),
             ("search_inec_publicaciones", {"query": "empleo", "limit": 3}, []),
+            # -- tools with no ID to discover: closed enums or optional-only
+            # arguments, so they can be called flat.
+            ("list_aip_aerodromos", {"format": "json"}, []),
+            ("get_aip_aerodromo", {"designador": "SEQM", "format": "json"}, ["SEQM"]),
+            ("get_aviso_aeronautico", {"tipo": "sigmet", "format": "json"}, []),
+            ("search_bce_calendario", {"limit": 3}, []),
+            ("search_capas_geo", {"fuente": "inamhi", "format": "json"}, []),
+            ("search_capas_geo", {"fuente": "mag", "format": "json"}, []),
+            ("search_cepalstat_indicadores", {"query": "poblacion"}, []),
+            ("search_cortes", {"distribuidora": "eeq", "format": "json"}, []),
+            ("search_cortes", {"distribuidora": "centrosur", "format": "json"}, []),
+            ("search_infomies_bases_mensuales", {"serie": "anc", "format": "json"}, []),
+            ("search_infomies_boletines_zonales", {"format": "json"}, []),
+            ("search_sgr_sitreps", {"format": "json"}, []),
+            ("get_energia_ecuador_snapshot", {"format": "json"}, []),
+            ("get_category_info", {"category": "sal", "format": "json"}, []),
+            ("get_iess_archivos", {"coleccion": "boletines", "format": "json"}, []),
+            (
+                "get_serie_internacional",
+                {"fuente": "wdi", "indicador": "NY.GDP.MKTP.CD", "ultimos": 3, "format": "json"},
+                [],
+            ),
         ]
 
         print("== tools ==")
@@ -311,6 +333,10 @@ async def main() -> int:
             ("superbancos: list -> archivos", chain_superbancos(client)),
             ("igepn: search -> informe", chain_igepn(client)),
             ("ckan: search -> resources -> preview", chain_ckan_preview(client)),
+            ("ckan: search -> dataset/resource info -> query", chain_ckan_info(client)),
+            ("tramites: search -> info -> estadisticas", chain_tramites(client)),
+            ("instituciones: list -> info", chain_instituciones(client)),
+            ("organizations: search -> info", chain_organizations(client)),
         ]:
             chains += 1
             try:
@@ -426,6 +452,52 @@ async def chain_ckan_preview(client: httpx.AsyncClient) -> None:
     raise AssertionError(
         "no dataset among the top 5 'SRI recaudacion' results had a previewable resource"
     )
+
+
+async def first_result(
+    client: httpx.AsyncClient, name: str, args: dict, key: str
+) -> str:
+    """Call a search tool and return the first row's ``key``, failing if none."""
+    search = json.loads(await call_chain_step(client, name, {**args, "format": "json"}))
+    rows = search.get("results") or []
+    if not rows or not rows[0].get(key):
+        raise AssertionError(f"{name} returned no row with '{key}' for {args}")
+    return str(rows[0][key])
+
+
+async def chain_ckan_info(client: httpx.AsyncClient) -> None:
+    dataset_id = await first_result(
+        client, "search_datasets", {"query": "SRI recaudacion", "page_size": 3}, "name"
+    )
+    await call_chain_step(client, "get_dataset_info", {"dataset_id": dataset_id, "format": "json"})
+    await call_chain_step(client, "investigate_dataset", {"query": "SRI recaudacion", "preview_rows": 3, "format": "json"})
+    listing = json.loads(
+        await call_chain_step(
+            client, "list_dataset_resources", {"dataset_id": dataset_id, "format": "json"}
+        )
+    )
+    resources = listing.get("resources") or []
+    if not resources:
+        raise AssertionError(f"dataset {dataset_id} has no resources")
+    resource_id = resources[0]["id"]
+    await call_chain_step(client, "get_resource_info", {"resource_id": resource_id, "format": "json"})
+    await call_chain_step(client, "query_resource_data", {"resource_id": resource_id, "rows": 3, "format": "json"})
+
+
+async def chain_tramites(client: httpx.AsyncClient) -> None:
+    tramite_id = await first_result(client, "search_tramites", {"query": "pasaporte"}, "tramite_id")
+    await call_chain_step(client, "get_tramite_info", {"tramite_id": tramite_id, "format": "json"})
+    await call_chain_step(client, "get_tramite_estadisticas", {"tramite_id": tramite_id, "format": "json"})
+
+
+async def chain_instituciones(client: httpx.AsyncClient) -> None:
+    institucion_id = await first_result(client, "list_instituciones", {"query": "SRI"}, "institucion_id")
+    await call_chain_step(client, "get_institucion_info", {"institucion_id": institucion_id, "format": "json"})
+
+
+async def chain_organizations(client: httpx.AsyncClient) -> None:
+    organization_id = await first_result(client, "search_organizations", {"query": "sri", "page_size": 3}, "name")
+    await call_chain_step(client, "get_organization_info", {"organization_id": organization_id, "format": "json"})
 
 
 if __name__ == "__main__":

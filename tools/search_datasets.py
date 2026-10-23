@@ -5,10 +5,11 @@ from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import CallToolResult
 
 from helpers import ckan_client
-from helpers.format_out import render_structured
+from helpers.format_out import cap_rows, render_structured
 from helpers.logging import log_tool
 from helpers.tool_meta import READ_ONLY
 
+MAX_RESPONSE_BYTES = 60_000
 _COMPACT_RESOURCE_KEYS = ("id", "name", "format", "size", "url")
 
 
@@ -84,7 +85,8 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
             compact: Shrink each dataset in the JSON output to id, name, title,
                      metadata_modified, organization and its resources (id,
                      name, format, size, url). Full results can reach 100+ KB
-                     per page.
+                     per page; the JSON is capped at ~60 KB and cut-off pages
+                     say so in metadatos.truncado.
             fields: Comma-separated dataset keys to keep in the JSON output
                     (e.g. "name,title,metadata_modified"); applied after compact.
             format: text | json
@@ -123,9 +125,17 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
             "results": datasets,
             "site": site,
         }
+        # Full CKAN objects can reach hundreds of KB per page; cap what is
+        # sent and say so in metadatos instead of relying on the client.
+        payload = cap_rows(
+            payload,
+            "results",
+            MAX_RESPONSE_BYTES,
+            hint="repetir la misma página con compact=true o un page_size menor",
+        )
         # The text view reads description, tags and organisation, which compact
         # and fields may have dropped from the JSON payload.
-        text_payload = {**payload, "results": text_datasets}
+        text_payload = {**payload, "results": text_datasets[: len(payload["results"])]}
 
         def to_text(data: dict) -> str:
             rows = data.get("results") or []
@@ -162,6 +172,12 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
                 slug = ds.get("name", ds.get("id", ""))
                 parts.append(f"   URL: {data['site']}/dataset/{slug}")
                 parts.append("")
+            truncado = (data.get("metadatos") or {}).get("truncado")
+            if truncado:
+                parts.append(
+                    f"Respuesta recortada: se omitieron {truncado['filas_omitidas']} "
+                    f"resultado(s) por tamaño; {truncado['como_pedir_el_resto']}."
+                )
             return "\n".join(parts)
 
         return render_structured(
