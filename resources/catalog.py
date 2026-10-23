@@ -296,7 +296,7 @@ def _all_fuentes() -> dict:
             },
             {
                 "id": "supercias-financials",
-                "nombre": "Superintendencia de Compañías (ranking financiero, últimos años)",
+                "nombre": "Superintendencia de Compañías (ranking financiero, 2008 en adelante)",
                 "base": "https://appscvsmovil.supercias.gob.ec/ranking/",
                 "tools": ["search_ranking", "get_financials"],
             },

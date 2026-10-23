@@ -284,7 +284,7 @@
             "id": "supercias-ranking",
             "name": "Financial ranking",
             "tag": null,
-            "description": "Financial statement data (revenue, assets, ROE, ~38 ratios), recent years; requires a local build",
+            "description": "Financial statement data (revenue, assets, ROE, ~38 ratios) per fiscal year since 2008 (ratios since 2018); requires a local build",
             "coverage": "appscvsmovil.supercias.gob.ec",
             "url": "https://appscvsmovil.supercias.gob.ec",
             "status": "build-local"

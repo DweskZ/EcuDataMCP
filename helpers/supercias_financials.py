@@ -6,11 +6,14 @@ derived from real balance-sheet filings — revenue, assets, equity, profit,
 and ~38 financial ratios per company per fiscal year. The directory only has
 "capital suscrito"; this has actual financial performance.
 
-The source CSV (bi_ranking.csv) is ~356 MB / ~1.7M rows covering 2008-present,
-too large to hold in memory the way supercias_client.py holds the (also
-large, but 10x smaller) company directory. Instead this module only ever
-*queries* a local SQLite database that `helpers/supercias_financials_build.py`
-builds ahead of time, pruned to the last 5 fiscal years during that build.
+The source CSV (bi_ranking.csv) is ~356 MB / ~1.7M rows covering fiscal years
+2008-present, too large to hold in memory the way supercias_client.py holds
+the (also large, but 10x smaller) company directory. Instead this module only
+ever *queries* a local SQLite database that
+`helpers/supercias_financials_build.py` builds ahead of time, with every year
+the export carries. Older years carry fewer columns (financial ratios only
+from 2018, CIIU from 2009), so queries check that the requested year and
+column actually have data before answering.
 
 Building takes ~15-20 minutes (the 356 MB download dominates), too slow to run
 inline inside a single MCP tool call. Instead, `_check_db_fresh` launches
@@ -31,7 +34,7 @@ did the latter and had a real bug for it: get_financials(expediente) needed
 a name/RUC lookup, that module's search only matched name/RUC text (not
 expediente), so the lookup silently failed almost every time. Duplicating
 three small columns (expediente, ruc, nombre) for ~226k rows is cheap next
-to the ~180 MB this DB already is, and removes that cross-module dependency
+to the size of this DB, and removes that cross-module dependency
 entirely -- this module's queries never await anything from
 helpers.supercias_client.
 """
@@ -74,8 +77,13 @@ BUILD_TIMEOUT_SECONDS = 45 * 60
 _RETRY_BACKOFF_SECONDS = (3600, 6 * 3600, 24 * 3600)
 # Stamped into the built DB as PRAGMA user_version. Bump it whenever a build
 # script fix changes the data, so existing DBs are rebuilt on first use
-# instead of serving the old data until they age out. 2 = n_empleados fix.
-SCHEMA_VERSION = 2
+# instead of serving the old data until they age out. 2 = n_empleados fix,
+# 3 = full history (2008-present) instead of the last five years.
+SCHEMA_VERSION = 3
+# Oldest build still served while the rebuild runs: a version-2 DB has the
+# same tables and columns, only fewer years, so refusing it would make the
+# tools unavailable for 15-20 minutes for no reason.
+_MIN_SERVED_SCHEMA_VERSION = 2
 
 # Guards the in-process launcher only. Cross-process exclusion (two servers,
 # the maintenance container, a manual run) is the build script's lock file.
@@ -109,6 +117,10 @@ _ORDERABLE_COLUMNS = frozenset(_RANKING_COLUMNS)
 
 class FinancialsDbUnavailable(Exception):
     """Raised when the SQLite build is missing or has an outdated schema."""
+
+
+class YearNotLoaded(ValueError):
+    """Raised when a requested fiscal year is not in the local DB."""
 
 
 def lock_path() -> Path:
@@ -254,7 +266,7 @@ def _check_db_fresh(path: Path | None = None) -> bool:
 
     A stale DB is still served (and a refresh started): it remains the latest
     valid build, and refusing it would make a Supercías outage an outage of
-    these tools too.
+    these tools too. The same goes for a build one schema version behind.
     """
     # Read the module attribute at call time, not as a bound default -- a
     # default evaluated at def-time would freeze the original DB_PATH value,
@@ -269,17 +281,67 @@ def _check_db_fresh(path: Path | None = None) -> bool:
             + _unavailable_suffix()
         )
     version = _db_schema_version(path)
-    if version != SCHEMA_VERSION:
+    if version is None or version < _MIN_SERVED_SCHEMA_VERSION:
         _trigger_background_build()
         raise FinancialsDbUnavailable(
             f"La base de datos financiera de Supercías fue construida con una "
             f"versión anterior del esquema ({version}, se requiere "
             f"{SCHEMA_VERSION})." + _unavailable_suffix()
         )
-    stale = time.time() - path.stat().st_mtime > _MAX_DB_AGE_SECONDS
+    stale = (
+        version < SCHEMA_VERSION
+        or time.time() - path.stat().st_mtime > _MAX_DB_AGE_SECONDS
+    )
     if stale:
         _trigger_background_build()
     return stale
+
+
+def _available_years(conn: sqlite3.Connection) -> list[int]:
+    return [
+        row[0]
+        for row in conn.execute(
+            "SELECT DISTINCT anio FROM ranking WHERE anio IS NOT NULL ORDER BY anio"
+        )
+    ]
+
+
+def format_years(years: list[int]) -> str:
+    """Collapse [2008, 2009, ..., 2025] into "2008-2025" (gaps as commas)."""
+    if not years:
+        return "ninguno"
+    spans: list[list[int]] = []
+    for year in years:
+        if spans and year == spans[-1][1] + 1:
+            spans[-1][1] = year
+        else:
+            spans.append([year, year])
+    return ", ".join(str(a) if a == b else f"{a}-{b}" for a, b in spans)
+
+
+def _year_not_loaded(anio: int, years: list[int]) -> YearNotLoaded:
+    message = (
+        f"El año fiscal {anio} no está en la base local de Supercías. "
+        f"Años disponibles: {format_years(years)}."
+    )
+    # Before the full-history build replaces a version-2 DB, only the last
+    # five years are there; say the rest is coming instead of implying the
+    # year doesn't exist.
+    if _db_schema_version(DB_PATH) != SCHEMA_VERSION:
+        message += (
+            " La base se está reconstruyendo con el histórico completo "
+            "(desde 2008) -- vuelve a intentar en unos minutos."
+        )
+    return YearNotLoaded(message)
+
+
+def _year_has_data(conn: sqlite3.Connection, anio: int, column: str) -> bool:
+    # `column` always comes from _RANKING_COLUMNS, never straight from a user.
+    row = conn.execute(
+        f"SELECT 1 FROM ranking WHERE anio = ? AND {column} IS NOT NULL LIMIT 1",
+        (anio,),
+    ).fetchone()
+    return row is not None
 
 
 def financials_status(path: Path | None = None) -> dict[str, Any]:
@@ -295,28 +357,36 @@ def financials_status(path: Path | None = None) -> dict[str, Any]:
         "antiguedad_dias": None,
         "desactualizada": None,
         "anios": None,
+        "anios_disponibles": None,
+        "actualizacion_pendiente": False,
         "construccion_en_curso": in_progress or _lock_is_held(),
         "ultimo_intento": state.get("ultimo_intento"),
         "ultimo_error": state.get("ultimo_error"),
     }
-    if not path.exists() or _db_schema_version(path) != SCHEMA_VERSION:
+    if not path.exists():
+        return status
+    version = _db_schema_version(path)
+    if version is None or version < _MIN_SERVED_SCHEMA_VERSION:
         return status
     mtime = path.stat().st_mtime
     age = time.time() - mtime
+    upgrade_pending = version < SCHEMA_VERSION
     status.update(
         disponible=True,
         construida_en=datetime.fromtimestamp(mtime, UTC).isoformat(),
         antiguedad_dias=round(age / 86400, 1),
-        desactualizada=age > _MAX_DB_AGE_SECONDS,
+        desactualizada=upgrade_pending or age > _MAX_DB_AGE_SECONDS,
+        actualizacion_pendiente=upgrade_pending,
     )
     try:
         conn = sqlite3.connect(f"file:{path.as_posix()}?mode=ro", uri=True)
         try:
-            status["anios"] = list(
-                conn.execute("SELECT MIN(anio), MAX(anio) FROM ranking").fetchone()
-            )
+            years = _available_years(conn)
         finally:
             conn.close()
+        if years:
+            status["anios"] = [years[0], years[-1]]
+            status["anios_disponibles"] = years
     except sqlite3.DatabaseError:
         pass
     return status
@@ -340,6 +410,14 @@ def with_financials_metadata(payload: dict[str, Any]) -> dict[str, Any]:
 
 def stale_warning_lines(data: dict[str, Any]) -> list[str]:
     status = (data.get("metadatos") or {}).get("base_local") or {}
+    if status.get("actualizacion_pendiente"):
+        return [
+            (
+                "Aviso: la base local solo tiene los años "
+                f"{format_years(status.get('anios_disponibles') or [])}; se está "
+                "reconstruyendo con el histórico completo de Supercías (desde 2008)."
+            )
+        ]
     if not status.get("desactualizada"):
         return []
     return [
@@ -409,10 +487,35 @@ def _companias_by_ruc(conn: sqlite3.Connection, ruc: str) -> list[dict[str, Any]
 
 
 def _query_get_financials(
-    expediente_or_ruc: str, anio: int | None
+    expediente_or_ruc: str,
+    anio: int | None,
+    desde: int | None = None,
+    hasta: int | None = None,
 ) -> dict[str, Any]:
+    if anio is not None and (desde is not None or hasta is not None):
+        raise ValueError("Usa anio para un solo año, o desde/hasta para un rango; no ambos.")
+    if desde is not None and hasta is not None and desde > hasta:
+        raise ValueError(f"desde ({desde}) es posterior a hasta ({hasta}).")
+
     conn = _connect()
     try:
+        years_loaded = _available_years(conn)
+        if anio is not None and anio not in years_loaded:
+            raise _year_not_loaded(anio, years_loaded)
+        if anio is not None:
+            desde = hasta = anio
+        in_range = [
+            y
+            for y in years_loaded
+            if (desde is None or y >= desde) and (hasta is None or y <= hasta)
+        ]
+        if not in_range:
+            raise YearNotLoaded(
+                f"Ningún año del rango pedido (desde={desde}, hasta={hasta}) está "
+                f"en la base local de Supercías. Años disponibles: "
+                f"{format_years(years_loaded)}."
+            )
+
         expediente = _resolve_expediente(expediente_or_ruc)
         if expediente is None:
             ruc = (expediente_or_ruc or "").strip()
@@ -438,17 +541,11 @@ def _query_get_financials(
         # source files aren't guaranteed to be in perfect lockstep.
         compania = _lookup_compania(conn, expediente)
 
-        if anio is not None:
-            cur = conn.execute(
-                "SELECT * FROM ranking WHERE expediente = ? AND anio = ? "
-                "ORDER BY anio DESC",
-                (expediente, anio),
-            )
-        else:
-            cur = conn.execute(
-                "SELECT * FROM ranking WHERE expediente = ? ORDER BY anio DESC",
-                (expediente,),
-            )
+        cur = conn.execute(
+            "SELECT * FROM ranking WHERE expediente = ? AND anio BETWEEN ? AND ? "
+            "ORDER BY anio DESC",
+            (expediente, in_range[0], in_range[-1]),
+        )
         years = [_row_to_dict(r) for r in cur.fetchall()]
 
         return {
@@ -468,7 +565,7 @@ def _query_search_ranking(
     descending: bool,
     limit: int,
     offset: int,
-) -> tuple[int | None, int, list[dict[str, Any]]]:
+) -> tuple[int | None, int, list[dict[str, Any]], list[str]]:
     if order_by not in _ORDERABLE_COLUMNS:
         disponibles = ", ".join(sorted(_ORDERABLE_COLUMNS))
         raise ValueError(f"order_by inválido '{order_by}'. Disponibles: {disponibles}")
@@ -477,8 +574,28 @@ def _query_search_ranking(
     try:
         # Without a year, rankings from different years interleave (one
         # "posición 1" per year), so default to the latest year in the DB.
+        years_loaded = _available_years(conn)
         if anio is None:
-            anio = conn.execute("SELECT MAX(anio) FROM ranking").fetchone()[0]
+            anio = years_loaded[-1] if years_loaded else None
+        elif anio not in years_loaded:
+            raise _year_not_loaded(anio, years_loaded)
+
+        # Older years lack whole groups of columns (ratios before 2018, CIIU
+        # in 2008). Sorting or filtering on an all-NULL column would return an
+        # arbitrary order or nothing, so say why instead.
+        if anio is not None and not _year_has_data(conn, anio, order_by):
+            raise ValueError(
+                f"order_by='{order_by}' no tiene datos para {anio}: Supercías "
+                "publica los ratios financieros desde 2018. Para años "
+                "anteriores ordena por posicion_general, ingresos_ventas, "
+                "activos, patrimonio, utilidad_an_imp o n_empleados."
+            )
+        if anio is not None and ciiu_n1 and not _year_has_data(conn, anio, "ciiu_n1"):
+            raise ValueError(
+                f"ciiu_n1 no está disponible para {anio}: Supercías publica la "
+                "actividad económica (CIIU) desde 2009."
+            )
+
         clauses: list[str] = []
         params: list[Any] = []
         if anio is not None:
@@ -496,19 +613,30 @@ def _query_search_ranking(
         direction = "DESC" if descending else "ASC"
         # LEFT JOIN, not INNER: a ranking row missing from companias should
         # still come back (with ruc/nombre as None) rather than silently
-        # vanish from results.
+        # vanish from results. NULLs sort last either way: SQLite puts them
+        # first in ASC, and 2008-2018 have thousands of unranked rows (no
+        # financial statement that year) with a NULL posicion_general.
         cur = conn.execute(
             f"""
             SELECT r.*, c.ruc AS ruc, c.nombre AS nombre
             FROM ranking r
             LEFT JOIN companias c ON c.expediente = r.expediente
             {where}
-            ORDER BY r.{order_by} {direction}
+            ORDER BY r.{order_by} IS NULL, r.{order_by} {direction}
             LIMIT ? OFFSET ?
             """,
             (*params, limit, offset),
         )
-        return anio, total, [_row_to_dict(r) for r in cur.fetchall()]
+        rows = [_row_to_dict(r) for r in cur.fetchall()]
+
+        notas: list[str] = []
+        if anio is not None and not _year_has_data(conn, anio, "roe"):
+            notas.append(
+                f"Para {anio} Supercías no publica ratios financieros (empiezan "
+                "en 2018): solo ingresos, activos, patrimonio, utilidad, "
+                "impuesto a la renta y empleados."
+            )
+        return anio, total, rows, notas
     finally:
         conn.close()
 
@@ -527,7 +655,10 @@ def _query_sector_benchmark(anio: int, ciiu_n1: str) -> dict[str, Any] | None:
 
 
 async def get_financials(
-    expediente_or_ruc: str, anio: int | None = None
+    expediente_or_ruc: str,
+    anio: int | None = None,
+    desde: int | None = None,
+    hasta: int | None = None,
 ) -> dict[str, Any]:
     """
     Financial history for a company, most recent fiscal year first.
@@ -536,9 +667,14 @@ async def get_financials(
         expediente_or_ruc: Either the company's Supercías "expediente" number
             or its 13-digit RUC (resolved to expediente via this DB's own
             `companias` table).
-        anio: Optional single fiscal year filter.
+        anio: Optional single fiscal year filter; raises YearNotLoaded
+            (listing the loaded years) if that year isn't in the DB.
+        desde: Optional first fiscal year of a range (inclusive).
+        hasta: Optional last fiscal year of a range (inclusive).
     """
-    return await asyncio.to_thread(_query_get_financials, expediente_or_ruc, anio)
+    return await asyncio.to_thread(
+        _query_get_financials, expediente_or_ruc, anio, desde, hasta
+    )
 
 
 async def search_ranking(
@@ -550,10 +686,11 @@ async def search_ranking(
     offset: int = 0,
 ) -> dict[str, Any]:
     """
-    Filter/rank companies within the cached fiscal years.
+    Filter/rank companies within one fiscal year of the local DB.
 
     Args:
         anio: Fiscal year filter; defaults to the latest year in the DB.
+            Raises YearNotLoaded (listing the loaded years) if not there.
         ciiu_n1: Optional CIIU level-1 economic activity filter (single letter).
         order_by: Column to sort by (any ranking column). Raises if unknown.
         descending: Sort highest-first (e.g. top revenue/profit) instead of
@@ -562,10 +699,18 @@ async def search_ranking(
         limit: Max results.
         offset: Pagination offset.
     """
-    anio, total, rows = await asyncio.to_thread(
+    anio, total, rows, notas = await asyncio.to_thread(
         _query_search_ranking, anio, ciiu_n1, order_by, descending, limit, offset
     )
-    return {"anio": anio, "total": total, "offset": offset, "companias": rows}
+    result: dict[str, Any] = {
+        "anio": anio,
+        "total": total,
+        "offset": offset,
+        "companias": rows,
+    }
+    if notas:
+        result["notas"] = notas
+    return result
 
 
 async def get_sector_benchmark(anio: int, ciiu_n1: str) -> dict[str, Any] | None:

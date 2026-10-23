@@ -50,7 +50,7 @@ de cobertura que falta en cada una.
 | Fuente | Herramientas | Qué cubre |
 |---|---|---|
 | Directorio de compañías | `search_companias`, `get_compania_info` | 226k+ compañías, actualizado a diario desde el export Excel estático del portal → RESEARCH.md § Superintendencia de Compañías (Supercías) |
-| Ranking financiero | `search_ranking`, `get_financials` | ~38 ratios financieros por compañía/año fiscal, incluido `n_empleados` (número de empleados — el único campo de plantilla laboral por empresa en todo el proyecto, corregido 2026-09-21: estaba en `NULL` para el 100% de las filas por un bug de conversión, no por falta de dato en la fuente), sobre SQLite local (`scripts/build_supercias_financials_db.py`) — ver Pendiente para portabilidad/actualización → RESEARCH.md § Trigésima pasada |
+| Ranking financiero | `search_ranking`, `get_financials` | ~38 ratios financieros por compañía/año fiscal, incluido `n_empleados` (número de empleados — el único campo de plantilla laboral por empresa en todo el proyecto, corregido 2026-09-21: estaba en `NULL` para el 100% de las filas por un bug de conversión, no por falta de dato en la fuente), años fiscales 2008-2025 (ratios desde 2018, CIIU desde 2009), sobre SQLite local (`helpers/supercias_financials_build.py`) — ver Pendiente para portabilidad/actualización → RESEARCH.md § Trigésima pasada y § Supercías — cobertura por año del Ranking de Compañías |
 | Auditores externos | `search_auditores`, `get_auditor_info` | Registro de auditores externos |
 
 ### SIPA (Ministerio de Agricultura)
@@ -306,8 +306,7 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 |---|---|---|
 | Fuente masiva actualizable | No iniciado | Usar el Ranking de Compañías oficial (`bi_ranking.csv` + tablas auxiliares, actualización cada 24h) en vez del proceso manual actual |
 | Refresh idempotente y automatización diaria | Parcial | Ya existe: reemplazo atómico tras validar, base vieja servida mientras refresca, backoff 1h/6h/24h tras fallos, lock entre procesos, rechazo por filas malformadas (>0,1%) o caída de filas (>20%), estado en `/health`. Falta: construir por cron/Actions y publicar la base como asset versionado (Release) que el servidor solo descarga; mover el build al paquete y el directorio de datos a `ECUADOR_MCP_DATA_DIR` (bloquea PyPI) |
-| Conservar toda la historia disponible | No iniciado | Dejar de eliminar años anteriores al último bloque de cinco (la fuente documenta datos desde 2008); retención configurable (`all` o N años) |
-| Consultas históricas sin respuestas gigantes | No iniciado | Filtros `desde`/`hasta`/`anio`, consultas resumidas por año/compañía/CIIU/métrica, paginación de rankings |
+| Consultas históricas sin respuestas gigantes | Parcial | Ya existe: toda la historia 2008-presente en la base, `anio` validado en ambos tools, `desde`/`hasta` en `get_financials`, paginación de rankings. Falta: consultas resumidas por año/compañía/CIIU/métrica |
 | Almacenamiento histórico por capas | No iniciado | SQLite indexado para búsquedas puntuales/rankings chicos, archivos fuente comprimidos por año como respaldo, Parquet/DuckDB solo para agregaciones grandes |
 | Comparabilidad entre años | No iniciado | Conservar columnas desaparecidas como `null`, registrar cambios de esquema, documentar razones no comparables entre años |
 | Distinguir diario de tiempo real | No iniciado | Etiquetar `search_ranking`/`get_financials` como `daily_bulk`; investigar aparte un `live_lookup` bajo demanda contra el Portal de Información oficial, con fallback explícito |

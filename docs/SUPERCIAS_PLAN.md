@@ -37,18 +37,19 @@ Open decision — where the prebuilt DB comes from:
 Recommendation: do the packaging/data-dir work now (needed for PyPI in any
 case); defer the A/B/C choice until the hosted endpoint exists, then prefer C.
 
-## Phase 2 — keep the full history (worth doing)
+## Phase 2 — keep the full history (done 2026-10-22)
 
-Gain: the build currently deletes 1,015,098 of 1,676,075 rows (2008-2020).
-Keeping them turns the tool from a "last five years" lookup into a usable
-firm-level panel for research — the main audience in the project page.
-Cost is small: DB grows from ~220 MB to roughly 500 MB; build time barely
-changes (the download dominates).
+The build keeps every fiscal year in `bi_ranking.csv` (2008-2025, 1,676,986
+rows, 388.5 MB DB). Year coverage and column gaps are in RESEARCH.md
+§ Supercías — cobertura por año del Ranking de Compañías.
 
-- Retention setting (`all` or N years), default `all`.
-- `desde` / `hasta` filters on `get_financials` and `search_ranking`.
-- Record each build's column list; keep dropped columns as `null` and note
-  ratios that aren't comparable across years.
+- Done: retention setting `ECUADOR_MCP_SUPERCIAS_YEARS` (unset = all years);
+  `anio` validated in both tools with the available years in the error;
+  `desde`/`hasta` on `get_financials` (`search_ranking` stays one year per
+  call, since positions are per year); errors when sorting by a ratio before
+  2018 or filtering by CIIU in 2008.
+- Open: record each build's column list and note ratios that aren't
+  comparable across years.
 - Parquet/DuckDB only if large aggregations become a real request — not now.
 
 ## Phase 3 — live per-company lookup (low value, park)

@@ -687,7 +687,7 @@
             "name": "anio",
             "type": "int | None",
             "default": "None",
-            "description": "Optional fiscal year filter."
+            "description": "Fiscal year, 2008 to the latest; defaults to the latest available year (which may still be incomplete while filings arrive). A year not in the local build returns an error listing the available years."
           },
           {
             "name": "ciiu_n1",
@@ -699,7 +699,7 @@
             "name": "order_by",
             "type": "str",
             "default": "'posicion_general'",
-            "description": "Column to sort ascending by (e.g. \"posicion_general\", \"activos\", \"roe\"). Falls back to posicion_general if unknown."
+            "description": "Column to sort by (e.g. \"posicion_general\", \"activos\", \"roe\"). An unknown column returns an error listing the valid ones."
           },
           {
             "name": "descending",
@@ -726,7 +726,7 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Rank/filter Supercías companies by financial indicators for a fiscal year. Filter by year and/or CIIU level-1 economic activity (single letter, e.g. \"C\" for manufacturing), sorted by any indicator column (defaults to the dataset's own precomputed posicion_general). Each result includes the company's nombre/ruc alongside its financials. Covers the last five fiscal years in the local build, not the full history. Use get_financials for one company's full detail, or get_compania_info for legal/registry data (address, legal representative, etc.)."
+        "long_description": "Rank/filter Supercías companies by financial indicators for a fiscal year. Filter by year and/or CIIU level-1 economic activity (single letter, e.g. \"C\" for manufacturing), sorted by any indicator column (defaults to the dataset's own precomputed posicion_general). Each result includes the company's nombre/ruc alongside its financials. Covers every fiscal year Supercías publishes, 2008 to the latest (metadatos.base_local.anios_disponibles lists them). Older years carry fewer columns: financial ratios start in 2018 and CIIU in 2009, so sorting by a ratio or filtering by ciiu_n1 in a year without them returns an error that says so. 2008-2018 also include unranked companies (no financial statement that year), listed after the ranked ones. Use get_financials for one company's full detail, or get_compania_info for legal/registry data (address, legal representative, etc.)."
       },
       {
         "name": "get_financials",
@@ -742,7 +742,19 @@
             "name": "anio",
             "type": "int | None",
             "default": "None",
-            "description": "Optional single fiscal year filter."
+            "description": "Optional single fiscal year. A year not in the local build returns an error listing the available years."
+          },
+          {
+            "name": "desde",
+            "type": "int | None",
+            "default": "None",
+            "description": "Optional first fiscal year of a range (inclusive)."
+          },
+          {
+            "name": "hasta",
+            "type": "int | None",
+            "default": "None",
+            "description": "Optional last fiscal year of a range (inclusive). Don't combine desde/hasta with anio."
           },
           {
             "name": "format",
@@ -751,7 +763,7 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Get a company's financial history from Supercías balance-sheet filings. Returns revenue, assets, equity, profit, employee count, and financial ratios (liquidity, leverage, profitability) per fiscal year. Covers the last five fiscal years in the local build (see metadatos.base_local for its build date and year range), not the full history back to 2008. Complements get_compania_info, which has legal/registry data but no financials."
+        "long_description": "Get a company's financial history from Supercías balance-sheet filings. Returns revenue, assets, equity, profit, employee count and financial ratios (liquidity, leverage, profitability) per fiscal year, most recent first. Covers every fiscal year Supercías publishes, 2008 to the latest (metadatos.base_local.anios_disponibles lists them; the latest may still be incomplete). Ratios start in 2018 and CIIU in 2009; earlier years only have revenue, assets, equity, profit, income tax and employees. A year with no financial statement is flagged as such. Complements get_compania_info, which has legal/registry data but no financials."
       },
       {
         "name": "search_auditores",

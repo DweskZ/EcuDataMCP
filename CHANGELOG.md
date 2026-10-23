@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+- **Supercías ranking covers every published year (2008-2025)**:
+  `search_ranking` and `get_financials` used to see only the last five fiscal
+  years because the build deleted the rest of `bi_ranking.csv`. The build now
+  keeps all of it (388.5 MB DB instead of ~220 MB; `ECUADOR_MCP_SUPERCIAS_YEARS=N`
+  keeps only the last N years) and rejects a build with a year missing in the
+  middle. Both tools check the requested `anio` and answer with the available
+  years when it isn't loaded; `get_financials` gains `desde`/`hasta`. Older years
+  carry fewer columns (ratios from 2018, CIIU from 2009): sorting by a ratio or
+  filtering by CIIU in a year without them returns an error that says so, and
+  `search_ranking` adds a `notas` line. Companies without a financial statement
+  that year (NULL `posicion_general`, mostly 2008-2018) now sort last instead of
+  first and are flagged in `get_financials`. `metadatos.base_local` gains
+  `anios_disponibles` and `actualizacion_pendiente`. Schema version 3: a
+  version-2 DB keeps being served, flagged, while the full-history build runs.
+
 ## 0.13.0 — 2026-10-17
 
 No new tools (83 in the default profile): new data behind existing selectors
