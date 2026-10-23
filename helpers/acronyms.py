@@ -4,7 +4,9 @@ import re
 # way CKAN's own metadata titles/descriptions actually spell them (verified
 # against INEC/institution naming, not guessed). CKAN's search underperforms
 # on a bare acronym because the catalog text rarely contains the acronym
-# itself, only the full name.
+# itself, only the full name. SNIESE is the exception: its full name appears
+# nowhere in the catalog, so it expands to the words of the dataset it feeds
+# (SENESCYT's "Base de datos de oferta académica de las IES").
 _ACRONYM_EXPANSIONS: dict[str, str] = {
     "enemdu": "encuesta nacional de empleo desempleo y subempleo",
     "ensanut": "encuesta nacional de salud y nutricion",
@@ -17,6 +19,7 @@ _ACRONYM_EXPANSIONS: dict[str, str] = {
     "bce": "banco central del ecuador",
     "sercop": "servicio nacional de contratacion publica",
     "senescyt": "secretaria de educacion superior ciencia tecnologia e innovacion",
+    "sniese": "oferta academica carreras programas educacion superior",
     "supercias": "superintendencia de companias valores y seguros",
     "sgr": "servicio nacional de gestion de riesgos y emergencias",
 }

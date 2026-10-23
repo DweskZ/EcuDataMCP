@@ -12,6 +12,11 @@ def test_expands_case_insensitively():
     assert "registro unico de contribuyentes" in result.lower()
 
 
+def test_expands_sniese_to_oferta_academica_terms():
+    result = expand_acronyms("SNIESE")
+    assert "oferta academica" in result.lower()
+
+
 def test_leaves_unknown_query_unchanged():
     assert expand_acronyms("cacao exportaciones") == "cacao exportaciones"
 
