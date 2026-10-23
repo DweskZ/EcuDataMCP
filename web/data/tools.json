@@ -847,7 +847,7 @@
             "name": "regulacion_id",
             "type": "str",
             "default": null,
-            "description": "ID de la regulación (ej. \"5051\")"
+            "description": "ID de la regulación (ej. \"2990\")"
           },
           {
             "name": "format",
