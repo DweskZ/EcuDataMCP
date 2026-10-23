@@ -1051,7 +1051,7 @@
     "description": "One gob.ec regulation's type, Registro Oficial reference, description and PDF link. Take regulacion_id from search_regulaciones; read the PDF's text with read_pdf.",
     "summary": "Get detailed information about a regulation published on gob.ec. Returns type, Registro Oficial reference, description and PDF/archivo URL when available. Get the regulacion_id from search_regulaciones.",
     "args_doc": {
-      "regulacion_id": "Regulation ID (e.g. \"5051\")",
+      "regulacion_id": "Regulation ID (e.g. \"2990\")",
       "format": "text | json"
     }
   },

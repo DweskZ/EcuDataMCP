@@ -225,7 +225,7 @@ async def main() -> int:
             ("search_datasets", {"query": "salud", "page_size": 2}, ["dataset"]),
             ("search_tramites", {"query": "pasaporte", "format": "json"}, ["tramite_id", "pasaporte"]),
             ("search_regulaciones", {"query": "datos", "format": "json"}, ["regulacion_id"]),
-            ("get_regulacion_info", {"regulacion_id": "5051", "format": "json"}, ["regulacion"]),
+            ("get_regulacion_info", {"regulacion_id": "2990", "format": "json"}, ["regulacion"]),
             ("search_eventos_riesgo", {"provincia": "Pichincha", "limit": 3}, ["SGR", "Evento", "riesgo"]),
             ("list_sat_tsunami", {"limit": 3, "format": "json"}, ["stations"]),
             (

@@ -28,7 +28,7 @@ def register_get_regulacion_info_tool(mcp: MCPServer) -> None:
         when available. Get the regulacion_id from search_regulaciones.
 
         Args:
-            regulacion_id: Regulation ID (e.g. "5051")
+            regulacion_id: Regulation ID (e.g. "2990")
             format: text | json
         """
         try:
