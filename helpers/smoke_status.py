@@ -64,6 +64,14 @@ _DEGRADED_SOURCES = (
         "no se pudo conectar",
     ),
     (
+        # Seen 2026-10-23 and 2026-10-24 on the runner: infoMIES never
+        # completes the TCP handshake from datacenter IPs (30 s timeout), the
+        # same block Render hits. A geo block, not a regression.
+        "infomies_geoblock",
+        "info.desarrollohumano.gob.ec",
+        "no se pudo conectar",
+    ),
+    (
         # Confirmed live 2026-09-18: search_anda 503'd on one run, then
         # 403'd on the next from a different network -- the same
         # GitHub-Actions-runner geo/bot block already seen on INEC's other
@@ -124,6 +132,7 @@ GEOBLOCKED_SOURCES = frozenset(
         "anda_inec_geoblock",
         "gobec_geoblock",
         "supercias_geoblock",
+        "infomies_geoblock",
     }
 )
 

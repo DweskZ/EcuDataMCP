@@ -8,6 +8,13 @@
   `info.desarrollohumano.gob.ec` offers a 1024-bit DH key. The host joins the
   `SECLEVEL=1` list in `helpers/tls.py` (certificate still verified), and
   `download_bytes` now applies that list to the client it creates.
+- **infoMIES is geoblocked from datacenters**: from Render and the GitHub
+  runners the same host never completes the TCP handshake (30 s timeout), so
+  it joins the geo-proxied hosts and both infoMIES tools join
+  `GEOBLOCKED_TOOLS` (hidden with `ECUADOR_MCP_HIDE_GEOBLOCKED=1` and no
+  proxy). A failed connection now names the host and failure kind instead of
+  an empty error, and the smoke run reports it as `infomies_geoblock`
+  (skipped without a tunnel) rather than a failure.
 - **Supercías ranking covers every published year (2008-2025)**:
   `search_ranking` and `get_financials` used to see only the last five fiscal
   years because the build deleted the rest of `bi_ranking.csv`. The build now

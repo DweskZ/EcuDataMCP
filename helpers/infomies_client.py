@@ -102,8 +102,11 @@ import re
 from html import unescape
 from typing import Any
 
+import httpx
+
 from helpers.cache import TtlCache
 from helpers.csv_reader import download_bytes
+from helpers.geo_proxy import unreachable_hint
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.text_utils import strip_accents as _strip
 
@@ -216,6 +219,24 @@ def _parse_phoca_items(page_html: str) -> list[dict[str, Any]]:
     return items
 
 
+async def _download(url: str) -> bytes:
+    try:
+        content, truncated = await download_bytes(url)
+    except httpx.HTTPStatusError:
+        raise
+    except httpx.RequestError as exc:
+        # A bare ConnectTimeout stringifies to "", which left the tool error
+        # empty. infoMIES never completes the handshake from Render or the
+        # GitHub runners, so name the host and point at the geo proxy.
+        raise RuntimeError(
+            f"No se pudo conectar a {httpx.URL(url).host} ({type(exc).__name__}). "
+            + unreachable_hint(url)
+        ) from exc
+    if truncated:
+        raise ValueError(f"La página de {url} superó el límite de descarga.")
+    return content
+
+
 async def _fetch_page_items(url: str) -> list[dict[str, Any]]:
     cached = _page_cache.get(url)
     if cached is not None:
@@ -225,9 +246,7 @@ async def _fetch_page_items(url: str) -> list[dict[str, Any]]:
         if cached is not None:
             return cached
         logger.info("Descargando página de infoMIES: %s", url)
-        content, truncated = await download_bytes(url)
-        if truncated:
-            raise ValueError(f"La página de {url} superó el límite de descarga.")
+        content = await _download(url)
         html_text = content.decode("utf-8", errors="replace")
         items = _parse_phoca_items(html_text)
         # Unlike most scrapers in this project, an empty result IS cached
@@ -256,9 +275,7 @@ async def _fetch_zona_anios(zona: str) -> list[str]:
             return cached
         url = f"{_BASE}/index.php/{zona}"
         logger.info("Descargando índice de años de la zona infoMIES: %s", zona)
-        content, truncated = await download_bytes(url)
-        if truncated:
-            raise ValueError(f"La página de {url} superó el límite de descarga.")
+        content = await _download(url)
         html_text = content.decode("utf-8", errors="replace")
         urls = sorted({_BASE + m.group(1) for m in _YEAR_LINK_RE.finditer(html_text)})
         if urls:

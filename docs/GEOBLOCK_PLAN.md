@@ -16,6 +16,7 @@ datacenter IPs (see `RESEARCH.md` and `helpers/smoke_status.py`):
 | `anda.inec.gob.ec`, `censoecuador.gob.ec` | 403 from GitHub runners | datacenter IP or bot filter |
 | `gob.ec` | HTTP 200 with empty body from runners | datacenter IP or bot filter |
 | `mercadodevalores.supercias.gob.ec`, `appscvsmovil.supercias.gob.ec` | TCP connect timeout from Render (2026-10-07); 0.15 s from a Canadian home IP | datacenter IP or country |
+| `info.desarrollohumano.gob.ec` (infoMIES) | 30 s connect timeout from Render and GitHub runners (2026-10-24); under 1 s from a Canadian home IP | datacenter IP |
 
 Re-checked 2026-10-02 from a residential IP in Canada (not a datacenter):
 `datosabiertos`, `anda.inec`, `censoecuador` and `eerssa` answer Apache 403,
@@ -32,7 +33,8 @@ anyone else. Goal: a free path that works away from one laptop.
 
 Until then, a host outside the region can set `ECUADOR_MCP_HIDE_GEOBLOCKED=1`
 so it doesn't offer tools that can only fail there
-(`helpers/geo_proxy.GEOBLOCKED_TOOLS`: ANDA and Supercías). Checked from
+(`helpers/geo_proxy.GEOBLOCKED_TOOLS`: ANDA, Supercías and, since
+2026-10-24, the two infoMIES tools). Checked from
 Render on 2026-10-07: ANDA 403 and Supercías connect timeouts, while SERCOP,
 ARCONEL reportes, gob.ec regulaciones, Centrosur, SRI and the Cuenca CKAN
 portal answered. `datosabiertos.gob.ec` failed (403) but the CKAN tools

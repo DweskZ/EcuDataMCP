@@ -155,8 +155,9 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_inec_publicacion_archivos_tool(mcp)
     register_search_biinec_extras_tool(mcp)
     register_search_siniestros_ant_tool(mcp)
-    register_search_infomies_bases_mensuales_tool(mcp)
-    register_search_infomies_boletines_zonales_tool(mcp)
+    if not hide_geoblocked():
+        register_search_infomies_bases_mensuales_tool(mcp)
+        register_search_infomies_boletines_zonales_tool(mcp)
 
     register_search_regulaciones_tool(mcp)
     register_get_regulacion_info_tool(mcp)
