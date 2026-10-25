@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **infoMIES on OpenSSL 3.5**: `search_infomies_bases_mensuales` and
+  `search_infomies_boletines_zonales` failed on the Render image
+  (`python:3.14-slim`) with `DH_KEY_TOO_SMALL`, because
+  `info.desarrollohumano.gob.ec` offers a 1024-bit DH key. The host joins the
+  `SECLEVEL=1` list in `helpers/tls.py` (certificate still verified), and
+  `download_bytes` now applies that list to the client it creates.
 - **Supercías ranking covers every published year (2008-2025)**:
   `search_ranking` and `get_financials` used to see only the last five fiscal
   years because the build deleted the rest of `bi_ranking.csv`. The build now

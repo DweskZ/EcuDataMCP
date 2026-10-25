@@ -151,7 +151,13 @@ def os_trust_context() -> ssl.SSLContext:
 # security level to 1 connects fine and still verifies the certificate
 # normally. Keep this list separate from _INSECURE_TLS_HOST_SUFFIXES — the
 # two are not interchangeable and must not be merged into one allowlist.
-_LEGACY_CIPHER_HOST_SUFFIXES = ("appscvsmovil.supercias.gob.ec",)
+# info.desarrollohumano.gob.ec (infoMIES) offers a 1024-bit DH key, which
+# OpenSSL 3.5 (python:3.14-slim, the Render image) rejects at SECLEVEL=2 with
+# DH_KEY_TOO_SMALL (checked 2026-10-24); SECLEVEL=1 connects and verifies.
+_LEGACY_CIPHER_HOST_SUFFIXES = (
+    "appscvsmovil.supercias.gob.ec",
+    "info.desarrollohumano.gob.ec",
+)
 
 
 def host_needs_legacy_ciphers(url: str) -> bool:

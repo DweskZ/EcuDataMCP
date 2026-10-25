@@ -5,6 +5,7 @@ import io
 import json
 import logging
 import re
+import ssl
 import struct
 import tarfile
 import zipfile
@@ -19,6 +20,8 @@ from helpers.logging import MAIN_LOGGER_NAME
 from helpers.safe_download import UnsafeUrlError, safe_stream
 from helpers.tls import (
     host_allows_insecure_tls,
+    host_needs_legacy_ciphers,
+    legacy_cipher_context,
     os_trust_context,
     should_retry_insecure,
     should_retry_with_os_trust,
@@ -253,7 +256,14 @@ async def download_bytes(
         # makes its own per-request follow_redirects=False and handles
         # redirects itself (validating each hop), so a client-level default
         # would be misleading rather than wrong.
-        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT}, proxy=proxy_for(url))
+        # Hosts with old TLS configs need SECLEVEL=1 to complete the
+        # handshake at all; the certificate is still verified.
+        verify: ssl.SSLContext | bool = (
+            legacy_cipher_context() if host_needs_legacy_ciphers(url) else True
+        )
+        session = httpx.AsyncClient(
+            headers={"User-Agent": USER_AGENT}, proxy=proxy_for(url), verify=verify
+        )
     assert session is not None
     try:
         logger.debug("Downloading from %s (max %d bytes)", url, max_bytes)

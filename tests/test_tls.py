@@ -67,6 +67,12 @@ def test_host_needs_legacy_ciphers():
         )
         is True
     )
+    assert (
+        host_needs_legacy_ciphers(
+            "https://info.desarrollohumano.gob.ec/index.php/zona-1-bz"
+        )
+        is True
+    )
     assert host_needs_legacy_ciphers("https://cdn.other.org/x.csv") is False
 
 
