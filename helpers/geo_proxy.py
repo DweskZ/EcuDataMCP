@@ -29,11 +29,15 @@ _DEFAULT_GEO_HOSTS = (
     # ([Errno 110], 2026-10-07) while a Canadian home IP connects in 0.15 s.
     "mercadodevalores.supercias.gob.ec",
     "appscvsmovil.supercias.gob.ec",
+    # infoMIES times out on connect from Render and the GitHub runners
+    # (30 s, 2026-10-24) and loads in under a second from a Canadian home IP.
+    "info.desarrollohumano.gob.ec",
 )
 
 
 # Tools whose only source refuses every request from Render (2026-10-07):
-# ANDA answers 403, both Supercías hosts drop the connection. Hidden as a
+# ANDA answers 403, both Supercías hosts drop the connection, and infoMIES
+# (2026-10-24) never completes the TCP handshake. Hidden as a
 # whole family so a search tool never outlives the get tool it points to.
 # CKAN, gob.ec, SERCOP and ARCONEL stay: from Render each either worked or
 # fails only for one `source`/endpoint while the rest of the tool works.
@@ -48,6 +52,8 @@ GEOBLOCKED_TOOLS = frozenset(
         "get_auditor_info",
         "search_ranking",
         "get_financials",
+        "search_infomies_bases_mensuales",
+        "search_infomies_boletines_zonales",
     }
 )
 

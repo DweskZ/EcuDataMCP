@@ -1,3 +1,4 @@
+import httpx
 import pytest
 
 from helpers import infomies_client
@@ -180,6 +181,23 @@ async def test_search_bases_mensuales_unknown_serie_raises(httpx_mock):
 async def test_search_bases_mensuales_year_out_of_range_raises(httpx_mock):
     with pytest.raises(ValueError, match="rango"):
         await infomies_client.search_bases_mensuales(serie="anc", anio=2018)
+
+
+@pytest.mark.asyncio
+async def test_search_bases_mensuales_connect_timeout_names_host(httpx_mock, monkeypatch):
+    # From Render and the GitHub runners the handshake never completes; a bare
+    # ConnectTimeout stringifies to "", so the message must name the host.
+    monkeypatch.delenv("ECUADOR_MCP_GEO_PROXY", raising=False)
+    httpx_mock.add_exception(
+        httpx.ConnectTimeout(""), url=infomies_client._SERIES["anc"]["anios"][2026]
+    )
+
+    with pytest.raises(RuntimeError) as excinfo:
+        await infomies_client.search_bases_mensuales(serie="anc", anio=2026)
+
+    message = str(excinfo.value)
+    assert "No se pudo conectar a info.desarrollohumano.gob.ec (ConnectTimeout)" in message
+    assert "ECUADOR_MCP_GEO_PROXY" in message
 
 
 @pytest.mark.asyncio

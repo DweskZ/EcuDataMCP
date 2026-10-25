@@ -91,3 +91,14 @@ def test_supercias_connect_timeout_is_a_known_geoblock(text):
     assert degraded_source(text) == "supercias_geoblock"
     assert "supercias_geoblock" in GEOBLOCKED_SOURCES
     assert assess_response(text, [], is_error=True).status == "degraded"
+
+
+def test_infomies_connect_timeout_is_a_known_geoblock():
+    text = (
+        "Error al consultar infoMIES: No se pudo conectar a "
+        "info.desarrollohumano.gob.ec (ConnectTimeout). Si el servidor corre fuera "
+        "de Ecuador (por ejemplo en Render), el sitio suele descartar esas conexiones."
+    )
+    assert degraded_source(text) == "infomies_geoblock"
+    assert "infomies_geoblock" in GEOBLOCKED_SOURCES
+    assert assess_response(text, [], is_error=True).status == "degraded"
