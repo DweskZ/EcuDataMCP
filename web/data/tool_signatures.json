@@ -2082,7 +2082,7 @@
       "category": "Optional category filter (e.g. \"sal\" for Salud, \"edu\" for Educación). Use list_categories to see all available categories.",
       "sort": "\"relevance\" (default, CKAN's own ranking) or \"recent\" (sort by metadata_modified descending, to discover newly added or freshly refreshed datasets)",
       "source": "\"nacional\" (www.datosabiertos.gob.ec, default), \"cuenca\" (cuencaendatos.cuenca.gob.ec, the Cuenca municipal open-data portal), \"latacunga\" (datosabiertos.latacunga.gob.ec, the Latacunga municipal open-data portal) — separate, smaller CKAN catalogs — or \"iadb\" (data.iadb.org, the Inter-American Development Bank's open-data portal — NOT Ecuador-only, a regional/global catalog: Latin Macro Watch macro/financial indicators for 26 LAC countries, the World Bank/IADB Database of Political Institutions for ~180 countries)",
-      "compact": "Shrink each dataset in the JSON output to id, name, title, metadata_modified, organization and its resources (id, name, format, size, url). Full results can reach 100+ KB per page.",
+      "compact": "Shrink each dataset in the JSON output to id, name, title, metadata_modified, organization and its resources (id, name, format, size, url). Full results can reach 100+ KB per page; the JSON is capped at ~60 KB and cut-off pages say so in metadatos.truncado.",
       "fields": "Comma-separated dataset keys to keep in the JSON output (e.g. \"name,title,metadata_modified\"); applied after compact.",
       "format": "text | json"
     }
