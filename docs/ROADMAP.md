@@ -275,6 +275,7 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 | Investigación "one-shot" | `investigate_dataset` — encadena `search_datasets` → `list_dataset_resources` → `preview_resource_data`, señala `detect_series_pattern` cuando aplica |
 | Protección HTTP base | `/mcp` admite Bearer token opcional, bind local por defecto a loopback, límite global de concurrencia; `/health` libre para health checks |
 | TLS | Renovación de certificado; CA intermedia Sectigo embebida en `helpers/tls.py` (reemplaza el fallback "OS trust store", que fallaba en runners Linux limpios) → RESEARCH.md § Infraestructura operativa |
+| Distribución | Paquete `ecuador-mcp` en PyPI (`pip install`/`uvx`, entry point `ecuador-mcp`), MCP Registry y bundle `.mcpb`, publicados por `.github/workflows/publish.yml` al crear un release; datos de runtime en `helpers/paths.data_dir()` (`ECUADOR_MCP_DATA_DIR` lo sobreescribe). Smithery rechaza actualizaciones desde 2026-10-17 |
 
 ---
 
@@ -290,7 +291,6 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 | Contrato de respuesta para agentes | Parcial — falta extender a otras fuentes | Las 83 tools ya devuelven `structuredContent`, pero el bloque `metadatos` estable solo cubre 4 (BCEData/IEM y las 2 de mantenimiento) y el `outputSchema` publicado es genérico en todas — ver MCP_ARCHITECTURE.md § Fases 5 y 6 para el plan medido; falta además paginar/enlazar archivos grandes en vez de enviarlos completos |
 | Operación 24/7 | Parcial — falta alertas de esquema | Smoke test diario (`scripts/smoke_e2e.py`) corre en GitHub Actions, separado de CI, pero llama 38 de las 83 tools (46%): 45 nunca se ejercitan contra la fuente real; falta alertar sobre cambios de esquema específicos → RESEARCH.md § Infraestructura operativa |
 | Rate limiting por usuario/IP y proxy HTTPS | Parcial — falta el proxy real | Cuotas por cliente/IP + límite global + Bearer opcional + TLS directo vía Uvicorn ya existen; falta proxy HTTPS/DNS/política operativa del endpoint remoto |
-| Publicar en PyPI | No iniciado | Empaquetar y publicar el servidor como paquete instalable (`pip install`/`uvx`) en vez de requerir clonar el repo; definir nombre de paquete, metadata de `pyproject.toml` para distribución, y versión/proceso de release |
 
 ### BCE — cobertura completa de BCEData e IEM
 
@@ -305,7 +305,7 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 | Fuente | Estado | Qué falta |
 |---|---|---|
 | Fuente masiva actualizable | No iniciado | Usar el Ranking de Compañías oficial (`bi_ranking.csv` + tablas auxiliares, actualización cada 24h) en vez del proceso manual actual |
-| Refresh idempotente y automatización diaria | Parcial | Ya existe: reemplazo atómico tras validar, base vieja servida mientras refresca, backoff 1h/6h/24h tras fallos, lock entre procesos, rechazo por filas malformadas (>0,1%) o caída de filas (>20%), estado en `/health`. Falta: construir por cron/Actions y publicar la base como asset versionado (Release) que el servidor solo descarga; mover el build al paquete y el directorio de datos a `ECUADOR_MCP_DATA_DIR` (bloquea PyPI) |
+| Refresh idempotente y automatización diaria | Parcial | Ya existe: reemplazo atómico tras validar, base vieja servida mientras refresca, backoff 1h/6h/24h tras fallos, lock entre procesos, rechazo por filas malformadas (>0,1%) o caída de filas (>20%), estado en `/health`. Falta: construir por cron/Actions y publicar la base como asset versionado (Release) que el servidor solo descarga. El build ya vive en el paquete (`helpers/supercias_financials_build.py`) y escribe en `helpers/paths.data_dir()` |
 | Consultas históricas sin respuestas gigantes | Parcial | Ya existe: toda la historia 2008-presente en la base, `anio` validado en ambos tools, `desde`/`hasta` en `get_financials`, paginación de rankings. Falta: consultas resumidas por año/compañía/CIIU/métrica |
 | Almacenamiento histórico por capas | No iniciado | SQLite indexado para búsquedas puntuales/rankings chicos, archivos fuente comprimidos por año como respaldo, Parquet/DuckDB solo para agregaciones grandes |
 | Comparabilidad entre años | No iniciado | Conservar columnas desaparecidas como `null`, registrar cambios de esquema, documentar razones no comparables entre años |
