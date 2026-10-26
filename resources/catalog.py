@@ -314,9 +314,17 @@ def _all_fuentes() -> dict:
             },
             {
                 "id": "cenace",
-                "nombre": "CENACE (snapshot en vivo de generación y demanda eléctrica)",
+                "nombre": (
+                    "CENACE (snapshot en vivo de generación y demanda eléctrica, "
+                    "boletín mensual de transacciones y Biblioteca)"
+                ),
                 "base": "https://www.cenace.gob.ec/",
-                "tools": ["get_cenace_tablero"],
+                "tools": [
+                    "get_cenace_tablero",
+                    "get_cenace_boletin",
+                    "list_archivo_secciones",
+                    "get_archivo_seccion",
+                ],
             },
             {
                 "id": "arconel",

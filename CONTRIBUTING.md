@@ -10,7 +10,7 @@ Contribuciones son bienvenidas. Por favor:
 
 Servidor MCP de datos abiertos *del gobierno ecuatoriano* (CKAN nacional y
 municipal, gob.ec, SRI, BCE, Supercías, IESS/SENESCYT, IG-EPN, SERCOP, SGR y
-más): 83 tools en el perfil `public`. Python, MCP SDK 2.x
+más): 84 tools en el perfil `public`. Python, MCP SDK 2.x
 (`mcp.server.mcpserver.MCPServer`), transporte stdio o HTTP streamable.
 Antes de dar por nueva una fuente, mira [docs/ROADMAP.md](docs/ROADMAP.md)
 (qué está integrado y qué falta), [docs/RESEARCH.md](docs/RESEARCH.md) (los

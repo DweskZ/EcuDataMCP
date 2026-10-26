@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+- **New tool `get_cenace_boletin`** (84 in the default profile): CENACE's
+  "Boletín y Estadística Mensual de Transacciones Comerciales", January 2019
+  onward. With no `mes` it lists the issues (optionally one `anio`); with
+  `mes=YYYY-MM` or `"ultimo"` it returns the issue's text page by page:
+  production by resource, commercial demand by distributor, average prices
+  and the transactions with Colombia and Peru, none of which is in CKAN.
+  CENACE publishes the issues only as FlipHTML5 flipbooks; the tool reads the
+  index `boletines.xlsx` and each book's search index
+  (`files/search/search_config.js`), so tables come back as text rows. New
+  client `helpers/cenace_boletin_client.py`; added to the smoke run.
+- **CENACE Biblioteca** in `list_archivo_secciones`/`get_archivo_seccion`
+  (`fuente="cenace"`): about 2,480 PDFs in 11 categories, among them the
+  monthly executive reports (2016 onward), annual and operating reports, CO₂
+  emission factors and the transmission-unavailability reports. New client
+  `helpers/cenace_biblioteca_client.py`, which reuses the download-monitor
+  category scan from the Educación Superior library.
 - **infoMIES on OpenSSL 3.5**: `search_infomies_bases_mensuales` and
   `search_infomies_boletines_zonales` failed on the Render image
   (`python:3.14-slim`) with `DH_KEY_TOO_SMALL`, because

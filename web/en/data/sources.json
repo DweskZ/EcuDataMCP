@@ -550,7 +550,7 @@
             "id": "cenace",
             "name": "CENACE",
             "tag": "Energy",
-            "description": "Operational snapshot of electricity demand, generation and dispatch",
+            "description": "Operational snapshot of demand and generation, monthly commercial-transactions bulletin (2019 onward) and report library",
             "coverage": "cenace.gob.ec",
             "url": "https://www.cenace.gob.ec",
             "status": "live"

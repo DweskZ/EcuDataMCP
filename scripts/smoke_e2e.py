@@ -265,6 +265,8 @@ async def main() -> int:
                 {"tablero": "produccion_tiempo_real"},
                 ["PRODUCCIÓN", "HIDRÁULICA"],
             ),
+            ("get_cenace_boletin", {"mes": "ultimo"}, ["TRANSACCIONES COMERCIALES"]),
+            ("list_archivo_secciones", {"fuente": "cenace"}, ["Informes de Gestión"]),
             ("search_sismos", {"limit": 3}, []),
             ("search_informes_igepn", {"anio": 2022, "grupo": "sismico", "limit": 3}, []),
             ("search_companias", {"query": "BANCO", "limit": 3}, []),

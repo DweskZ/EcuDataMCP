@@ -3,7 +3,7 @@
 Generado por `scripts/generate_catalog.py` desde `resources/catalog.py` y las
 descripciones de `tools/*.py`; no editar a mano.
 
-50 fuentes, 83 tools públicas.
+50 fuentes, 84 tools públicas.
 
 ## Datos Abiertos CKAN
 
@@ -76,7 +76,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `arcsa`
 - Base: https://www.controlsanitario.gob.ec/base-de-datos/
 
-- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ). Next: get_archivo_seccion(fuente, seccion).
+- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 
 ## gob.ec trámites / instituciones / regulaciones
@@ -115,7 +115,7 @@ descripciones de `tools/*.py`; no editar a mano.
 
 - `search_sgr_sitreps`: SGR's archive of ~54 adverse-event dossiers 2016-2026 (earthquakes, rainy and fire seasons, volcanic activity) with status. Next: get_sgr_sitrep_archivos(evento_url) for the SITREP PDFs.
 - `get_sgr_sitrep_archivos`: SITREP PDF links (national, provincial, cantonal) for one SGR event page from search_sgr_sitreps. Returns links, not contents.
-- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ). Next: get_archivo_seccion(fuente, seccion).
+- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 
 ## INAMHI (geoportal hidrometeorológico, capas WMS/WFS)
@@ -212,7 +212,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `sipa`
 - Base: https://sipa.agricultura.gob.ec/
 
-- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ). Next: get_archivo_seccion(fuente, seccion).
+- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 - `get_sipa_resumen_indicadores`: Monthly PDF links of SIPA's (MAG) "Resumen de Indicadores" for one year, 2018 onward.
 - `search_capas_geo`: Search layers of a GeoServer geoportal: inamhi (rainfall normals and anomalies, WRF forecast grids, watersheds) or mag (agro zoning, land cover, agricultural censuses, rural cadastre, agroclimatic risk). solo_wfs=true keeps layers with attribute data.
@@ -223,7 +223,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `petroecuador`
 - Base: https://www.eppetroecuador.ec/
 
-- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ). Next: get_archivo_seccion(fuente, seccion).
+- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 - `read_pdf`: Extract text from a PDF at a direct URL (max 5 MB, 20 pages per call; pages selects a range). No OCR: scanned PDFs come back empty.
 
@@ -232,7 +232,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `energia`
 - Base: https://www.ambienteyenergia.gob.ec/
 
-- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ). Next: get_archivo_seccion(fuente, seccion).
+- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 - `read_pdf`: Extract text from a PDF at a direct URL (max 5 MB, 20 pages per call; pages selects a range). No OCR: scanned PDFs come back empty.
 
@@ -241,7 +241,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `bvg`
 - Base: https://www.bolsadevaloresguayaquil.com/
 
-- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ). Next: get_archivo_seccion(fuente, seccion).
+- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 
 ## Bolsa de Valores de Quito (estadísticas)
@@ -249,7 +249,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `bvq`
 - Base: https://www.bolsadequito.com/index.php/estadisticas
 
-- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ). Next: get_archivo_seccion(fuente, seccion).
+- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 
 ## Contraloría General del Estado (informes de auditoría)
@@ -283,15 +283,18 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `superbancos`
 - Base: https://www.superbancos.gob.ec/estadisticas/portalestudios
 
-- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ). Next: get_archivo_seccion(fuente, seccion).
+- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 
-## CENACE (snapshot en vivo de generación y demanda eléctrica)
+## CENACE (snapshot en vivo de generación y demanda eléctrica, boletín mensual de transacciones y Biblioteca)
 
 - Id: `cenace`
 - Base: https://www.cenace.gob.ec/
 
 - `get_cenace_tablero`: CENACE live grid snapshot: generation mix and demand now, yesterday, month or year to date. No historical queries.
+- `get_cenace_boletin`: CENACE monthly electricity-market bulletin (2019 onward): production by resource, demand by distributor, average prices, trade with Colombia and Peru. Empty mes lists the issues; mes=YYYY-MM returns its text by page.
+- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE). Next: get_archivo_seccion(fuente, seccion).
+- `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 
 ## ARCONEL (reportes estadísticos del sector eléctrico)
 
@@ -370,7 +373,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `seps`
 - Base: https://estadisticas.seps.gob.ec/
 
-- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ). Next: get_archivo_seccion(fuente, seccion).
+- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 
 ## MEF / SENAE (operaciones fiscales y tributos recaudados)
@@ -386,7 +389,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Base: https://siau.senescyt.gob.ec/
 
 - `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications). Links, not contents.
-- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ). Next: get_archivo_seccion(fuente, seccion).
+- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 
 ## MINEDEC (matrícula escolar histórica, datos abiertos)
@@ -401,7 +404,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `ineval`
 - Base: https://evaluaciones.evaluacion.gob.ec/BI
 
-- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ). Next: get_archivo_seccion(fuente, seccion).
+- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 
 ## CNE (resultados y registro electoral por proceso, 2002-2025)
@@ -409,7 +412,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `cne`
 - Base: https://www.cne.gob.ec/estadisticas/bases-de-datos/
 
-- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ). Next: get_archivo_seccion(fuente, seccion).
+- `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 
 ## infoMIES (bases mensuales y boletines zonales del MIES)

@@ -1737,6 +1737,31 @@
         "long_description": "Fetch one tablero (tab) of CENACE's live grid-operations snapshot (Ecuador's national electricity operator) — generation mix and demand, always as-of-now. Tableros: - produccion_tiempo_real: current instant. - demanda_tiempo_real: current instant, plus a per-distributor (empresa eléctrica/CNEL) MW breakdown. - operativa_diaria: yesterday's full day total. - acumulada_mensual: month-to-date total (MWh). - acumulada_anual: year-to-date total (GWh). Each returns \"resumen\" (produccion total/exportación/importación/ hidráulica/térmica/renovable no convencional, or the demand equivalent). There is no historical query here — CENACE's page has no date picker, only these 5 as-of-now views."
       },
       {
+        "name": "get_cenace_boletin",
+        "description": "CENACE's monthly electricity-market bulletin (2019 onward): production, demand by distributor, prices and trade with Colombia and Peru.",
+        "params": [
+          {
+            "name": "mes",
+            "type": "str",
+            "default": "''",
+            "description": "Empty to list the issues; YYYY-MM (e.g. 2026-07) or \"ultimo\" for one issue's text."
+          },
+          {
+            "name": "anio",
+            "type": "int | None",
+            "default": "None",
+            "description": "With an empty `mes`, list only that year's issues."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "Output format: `text` (default) or `json`."
+          }
+        ],
+        "long_description": "Reads CENACE's \"Boletín y Estadística Mensual de Transacciones Comerciales\", the monthly report of Ecuador's electricity market (January 2019 onward, about a month behind). Each issue covers the month and the year to date: production by resource (hydro, thermal by fuel, non-conventional renewables, imports), commercial demand by distributor (CNEL units and empresas eléctricas), self-generators, average prices in USD¢/kWh and the international transactions with Colombia and Peru. None of this is in CENACE's CKAN datasets. CENACE publishes the issues only as FlipHTML5 flipbooks; the tool reads the flipbook's text index, so tables come back as text rows (\"CNEL GUAYAQUIL 3 036.06 39.1%\", thousands separated by a space) rather than columns, and charts carry only their labels."
+      },
+      {
         "name": "get_informe_igepn",
         "description": "Download and extract text from one IG-EPN report found via search_informes_igepn.",
         "params": [
@@ -2559,13 +2584,13 @@
       },
       {
         "name": "list_archivo_secciones",
-        "description": "Sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, SENESCYT, SIPA).",
+        "description": "Sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, SENESCYT, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE).",
         "params": [
           {
             "name": "fuente",
             "type": "Fuente",
             "default": null,
-            "description": "One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa."
+            "description": "One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa, petroecuador, energia, cne, bvg, bvq, cenace."
           },
           {
             "name": "format",
@@ -2574,7 +2599,7 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Lists the sections of one institution's document archive: the ARCSA sanitary registry, Superbancos and SEPS statistics, INEVAL evaluation datasets, SGR and Higher Education libraries, or SIPA agricultural statistics. Next: get_archivo_seccion(fuente, seccion)."
+        "long_description": "Lists the sections of one institution's document archive: the ARCSA sanitary registry, Superbancos and SEPS statistics, INEVAL evaluation datasets, the SGR, Higher Education and CENACE libraries, SIPA agricultural statistics, EP Petroecuador's Cifras Institucionales, the Energy Ministry's hydrocarbon and mining statistics, CNE election datasets, or the Guayaquil and Quito stock exchanges' statistics. Next: get_archivo_seccion(fuente, seccion)."
       },
       {
         "name": "get_archivo_seccion",
@@ -2584,7 +2609,7 @@
             "name": "fuente",
             "type": "Fuente",
             "default": null,
-            "description": "One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa."
+            "description": "One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa, petroecuador, energia, cne, bvg, bvq, cenace."
           },
           {
             "name": "seccion",

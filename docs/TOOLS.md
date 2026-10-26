@@ -1,6 +1,6 @@
 # Herramientas disponibles
 
-Referencia detallada de las 83 herramientas MCP del perfil público (por defecto)
+Referencia detallada de las 84 herramientas MCP del perfil público (por defecto)
 de EcuDataMCP, más 2 herramientas de mantenimiento (`audit_bce_catalog` y
 `compare_bce_sources`) que solo se registran con otro `MCP_PROFILE`. Casi todas
 aceptan `format="json"` además de texto.
@@ -157,6 +157,8 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | Tool | Descripción |
 |------|-------------|
 | `get_cenace_tablero` | Obtiene un tablero del snapshot en vivo de la operación de la red eléctrica de CENACE (el operador nacional de Ecuador) — mezcla de generación y demanda, siempre al instante. |
+| `get_cenace_boletin` | Boletín y Estadística Mensual de Transacciones Comerciales de CENACE (2019 en adelante): producción por recurso, demanda por distribuidora, precios medios e intercambios con Colombia y Perú. Sin `mes` lista los números; con `mes=YYYY-MM` devuelve el texto de cada página. |
+| `list_archivo_secciones` (`fuente="cenace"`) | Las 11 categorías de la Biblioteca de CENACE (~2.480 PDF): informes ejecutivos mensuales, informes anuales y operativos, factores de emisión de CO₂, indisponibilidad del SNT. |
 | `get_arconel_reporte` | Ejecuta un reporte de ARCONEL (p. ej. "Balance Energía" de un año) y devuelve sus filas. |
 | `search_cortes` (`distribuidora="eeq"`\|`"centrosur"`) | Archivo de PDFs de cortes de luz programados de EEQ (Quito, crisis 2023-2024) o Centrosur (Azuay, Cañar, Morona Santiago, 2023 en adelante). |
 | `get_cortes_horarios` | Convierte un PDF de cortes en filas: fecha, bloques horarios sin luz, ubicación (subestación o provincia/cantón/zona) y sectores. |
