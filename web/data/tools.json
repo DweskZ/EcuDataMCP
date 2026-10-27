@@ -1737,6 +1737,31 @@
         "long_description": "Obtiene un tablero del snapshot en vivo de la operación de la red eléctrica de CENACE (el operador nacional de Ecuador) — mezcla de generación y demanda, siempre al instante. Tableros: - produccion_tiempo_real: instante actual. - demanda_tiempo_real: instante actual, más el desglose en MW por distribuidora (empresa eléctrica/CNEL). - operativa_diaria: total del día completo de ayer. - acumulada_mensual: total del mes a la fecha (MWh). - acumulada_anual: total del año a la fecha (GWh). Cada uno devuelve un \"resumen\" (producción total/exportación/importación/hidráulica/térmica/renovable no convencional, o el equivalente de demanda). No hay consulta histórica aquí — la página de CENACE no tiene selector de fecha, solo estas 5 vistas al instante."
       },
       {
+        "name": "get_cenace_boletin",
+        "description": "Boletín mensual de transacciones comerciales de CENACE (2019 en adelante): producción, demanda por distribuidora, precios e intercambios con Colombia y Perú.",
+        "params": [
+          {
+            "name": "mes",
+            "type": "str",
+            "default": "''",
+            "description": "Vacío para listar los números; YYYY-MM (ej. 2026-07) o \"ultimo\" para el texto de un número."
+          },
+          {
+            "name": "anio",
+            "type": "int | None",
+            "default": "None",
+            "description": "Con `mes` vacío, lista solo los números de ese año."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "Formato de salida: `text` (default) o `json`."
+          }
+        ],
+        "long_description": "Lee el \"Boletín y Estadística Mensual de Transacciones Comerciales\" de CENACE, el informe mensual del mercado eléctrico ecuatoriano (enero 2019 en adelante, con un mes de rezago aproximado). Cada número cubre el mes y el acumulado del año: producción por recurso (hidráulica, térmica por combustible, renovables no convencionales, importaciones), demanda comercial por distribuidora (unidades de CNEL y empresas eléctricas), autogeneradores, precios medios en USD¢/kWh y las transacciones internacionales con Colombia y Perú. Nada de esto está en los datasets CKAN de CENACE. CENACE publica los números solo como flipbooks de FlipHTML5; el tool lee el índice de texto del flipbook, así que las tablas llegan como filas de texto (\"CNEL GUAYAQUIL 3 036.06 39.1%\", miles separados por espacio) y no como columnas, y los gráficos solo traen sus etiquetas."
+      },
+      {
         "name": "get_informe_igepn",
         "description": "Descarga y extrae el texto de un informe del IG-EPN encontrado vía search_informes_igepn.",
         "params": [
@@ -2559,13 +2584,13 @@
       },
       {
         "name": "list_archivo_secciones",
-        "description": "Secciones del archivo documental de una institución (ARCSA, Superbancos, SEPS, INEVAL, SGR, SENESCYT, SIPA).",
+        "description": "Secciones del archivo documental de una institución (ARCSA, Superbancos, SEPS, INEVAL, SGR, SENESCYT, SIPA, Petroecuador, Ministerio de Energía, CNE, BVG, BVQ, CENACE).",
         "params": [
           {
             "name": "fuente",
             "type": "Fuente",
             "default": null,
-            "description": "Una de arcsa, superbancos, seps, ineval, sgr, senescyt, sipa."
+            "description": "Una de arcsa, superbancos, seps, ineval, sgr, senescyt, sipa, petroecuador, energia, cne, bvg, bvq, cenace."
           },
           {
             "name": "format",
@@ -2574,7 +2599,7 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Lista las secciones del archivo documental de una institución: registro sanitario de ARCSA, estadísticas de Superbancos y SEPS, bases de INEVAL, bibliotecas de la SGR y de Educación Superior, o estadísticas agropecuarias del SIPA. Siguiente paso: get_archivo_seccion(fuente, seccion)."
+        "long_description": "Lista las secciones del archivo documental de una institución: registro sanitario de ARCSA, estadísticas de Superbancos y SEPS, bases de INEVAL, bibliotecas de la SGR, de Educación Superior y de CENACE, estadísticas agropecuarias del SIPA, Cifras Institucionales de EP Petroecuador, estadísticas de hidrocarburos y minería del Ministerio de Ambiente y Energía, bases electorales del CNE, o estadísticas de las bolsas de valores de Guayaquil y Quito. Siguiente paso: get_archivo_seccion(fuente, seccion)."
       },
       {
         "name": "get_archivo_seccion",
@@ -2584,7 +2609,7 @@
             "name": "fuente",
             "type": "Fuente",
             "default": null,
-            "description": "Una de arcsa, superbancos, seps, ineval, sgr, senescyt, sipa."
+            "description": "Una de arcsa, superbancos, seps, ineval, sgr, senescyt, sipa, petroecuador, energia, cne, bvg, bvq, cenace."
           },
           {
             "name": "seccion",

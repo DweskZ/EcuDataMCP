@@ -1,8 +1,8 @@
 """Institutional document archives behind one list/get pair.
 
-ARCSA, Superbancos, SEPS, INEVAL, the SGR and SENESCYT libraries, SIPA, EP
-Petroecuador, the Energy Ministry, the CNE and the Guayaquil and Quito stock
-exchanges (BVG, BVQ) each publish a fixed set of sections (categories,
+ARCSA, Superbancos, SEPS, INEVAL, the SGR, SENESCYT and CENACE libraries,
+SIPA, EP Petroecuador, the Energy Ministry, the CNE and the Guayaquil and
+Quito stock exchanges (BVG, BVQ) each publish a fixed set of sections (categories,
 families, modules) whose pages list downloadable files. They used to be 14
 tools, one list/get pair per institution, with the same two-step flow and the
 same file-listing shape; `fuente` now picks the institution instead (the same pattern as
@@ -19,6 +19,7 @@ from helpers import (
     arcsa_client,
     bvg_client,
     bvq_client,
+    cenace_biblioteca_client,
     cne_client,
     ineval_client,
     ministerio_energia_client,
@@ -46,6 +47,7 @@ Fuente = Literal[
     "cne",
     "bvg",
     "bvq",
+    "cenace",
 ]
 
 _NOMBRES = {
@@ -61,6 +63,7 @@ _NOMBRES = {
     "cne": "CNE — bases de datos de procesos electorales",
     "bvg": "Bolsa de Valores de Guayaquil — estadísticas históricas",
     "bvq": "Bolsa de Valores de Quito — estadísticas",
+    "cenace": "CENACE — Biblioteca",
 }
 
 # Sources whose list call scrapes a page and returns {"categorias": [...]}.
@@ -71,6 +74,7 @@ _CATEGORIA_LISTS = {
     "petroecuador": petroecuador_client.list_categorias,
     "energia": ministerio_energia_client.list_secciones,
     "cne": cne_client.list_procesos,
+    "cenace": cenace_biblioteca_client.list_biblioteca_categorias,
 }
 # Sources with a fixed, in-code section list keyed by `id_key`.
 _STATIC_LISTS = {
@@ -94,6 +98,7 @@ _GETTERS = {
     "cne": cne_client.get_proceso_archivos,
     "bvg": bvg_client.get_seccion_archivos,
     "bvq": bvq_client.get_seccion_archivos,
+    "cenace": cenace_biblioteca_client.get_biblioteca_categoria_archivos,
 }
 
 
@@ -145,7 +150,7 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
         description=(
             "List the sections of one institution's document archive (ARCSA, "
             "Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, "
-            "Petroecuador, Energy Ministry, CNE, BVG, BVQ). "
+            "Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE). "
             "Next: get_archivo_seccion(fuente, seccion)."
         ),
         annotations=READ_ONLY,
@@ -213,13 +218,21 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           históricas, emisiones, renta variable, sector público, boletines
           al cierre/semanales/por valor, valoración, emisores). Public
           files only; the Infolab bulletins need a login.
+        - cenace: CENACE Biblioteca (cenace.gob.ec/biblioteca/), ~2,480
+          documents in 11 categories. Mostly administrative (viáticos,
+          contracting); the data-bearing ones are Informes de Gestión
+          (monthly executive report 2016 onward, with a 13-month table of
+          production, imports, consumption and exports in GWh), Información
+          del Sector Eléctrico (annual and operating reports, CO₂ emission
+          factors, transmission unavailability) and Planes y programas.
+          Monthly transaction bulletins: get_cenace_boletin.
 
         Returns each section's `id` (pass it to get_archivo_seccion),
         `nombre`, and either its page `url` or `total_archivos`.
 
         Args:
             fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt,
-                sipa, petroecuador, energia, cne, bvg, bvq.
+                sipa, petroecuador, energia, cne, bvg, bvq, cenace.
             format: text | json
         """
         try:
@@ -263,10 +276,11 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
         `numero` (SIPA). Returns links, not contents.
 
         Per-source caveats:
-        - arcsa, sgr, senescyt: `seccion` may be the category id or its
+        - arcsa, sgr, senescyt, cenace: `seccion` may be the category id or its
           nombre (accent/case-insensitive). Links carry no extension, so
           formato is DESCONOCIDO. A real share of SGR links 404; treat the
-          SGR listing as a catalog, not a guarantee.
+          SGR listing as a catalog, not a guarantee. CENACE files are PDFs
+          (read them with read_pdf); `subgrupo` is usually the year.
         - superbancos: coverage is whatever the portal uploaded (static
           tables plus OneDrive folders), not a guaranteed monthly series.
         - seps: some links go through a download-monitor redirect
@@ -298,7 +312,7 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
 
         Args:
             fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt,
-                sipa, petroecuador, energia, cne, bvg, bvq.
+                sipa, petroecuador, energia, cne, bvg, bvq, cenace.
             seccion: A section `id` from list_archivo_secciones.
             format: text | json
         """

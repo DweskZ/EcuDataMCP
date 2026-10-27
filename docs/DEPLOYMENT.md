@@ -71,7 +71,7 @@ es obligatoria salvo `MCP_AUTH_TOKEN` cuando `MCP_REQUIRE_AUTH=1`.
 | `MCP_HOST` | Dirección de bind. `docker-compose.yml` la fija en `0.0.0.0` | `127.0.0.1` |
 | `MCP_PORT` | Puerto del servidor HTTP (`--port` lo sobreescribe) | `8000` |
 | `MCP_TRANSPORT` | `http` o `stdio` (`--transport` lo sobreescribe). La imagen Docker arranca en `stdio` | `http` |
-| `MCP_PROFILE` | `public` (83 tools), `maintenance` (solo `audit_bce_catalog` y `compare_bce_sources`) o `all` | `public` |
+| `MCP_PROFILE` | `public` (84 tools), `maintenance` (solo `audit_bce_catalog` y `compare_bce_sources`) o `all` | `public` |
 | `LOG_LEVEL` | Nivel de log de Python: `DEBUG`, `INFO`, `WARNING`, `ERROR` | `INFO` |
 | `MCP_AUTH_TOKEN` | Token Bearer exigido en `POST /mcp`; vacío desactiva la autenticación | vacío |
 | `MCP_REQUIRE_AUTH` | `1` aborta el arranque si falta `MCP_AUTH_TOKEN`; `docker-compose.yml` lo deja en `1` | `0` |

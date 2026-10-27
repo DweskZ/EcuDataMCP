@@ -20,6 +20,7 @@ from tools.get_auditor_info import register_get_auditor_info_tool
 from tools.get_bce_iem_table import register_get_bce_iem_table_tool
 from tools.get_bce_indicador_diario import register_get_bce_indicador_diario_tool
 from tools.get_category_info import register_get_category_info_tool
+from tools.get_cenace_boletin import register_get_cenace_boletin_tool
 from tools.get_cenace_tablero import register_get_cenace_tablero_tool
 from tools.get_cepalstat_indicador import register_get_cepalstat_indicador_tool
 from tools.get_certificado_cumplimiento_patronal import (
@@ -186,6 +187,7 @@ def register_tools(mcp: MCPServer) -> None:
     register_search_bce_calendario_tool(mcp)
     register_get_bce_indicador_diario_tool(mcp)
     register_get_cenace_tablero_tool(mcp)
+    register_get_cenace_boletin_tool(mcp)
     register_get_arconel_reporte_tool(mcp)
     register_cortes_tools(mcp)
     register_get_energia_ecuador_snapshot_tool(mcp)
