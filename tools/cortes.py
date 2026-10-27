@@ -1,12 +1,14 @@
-"""Scheduled power-cut archives (EEQ, Centrosur) behind one list/parse pair.
+"""Scheduled power cuts behind one list/parse pair.
 
 EEQ (Quito) and Centrosur (Azuay, Cañar, Morona Santiago) each had a
 search tool (list the published schedule PDFs) and a parse tool (one PDF
 into rows). Same two steps, and the rows share a core -- page, date text,
 time blocks, sectors -- plus location fields (EEQ: substation; Centrosur:
-province/canton/zone). `distribuidora` now picks the utility. The
-energia-ecuador.com snapshot stays its own tool: one frozen page with a
-different row shape, not an archive.
+province/canton/zone). `distribuidora` now picks the utility. Emelnorte,
+ElecGalápagos and EEASA joined with their routine maintenance notices
+(helpers/cortes_programados_client.py): one notice is one `archivo`, and
+its rows add `motivo`. The energia-ecuador.com snapshot stays its own tool:
+one frozen page with a different row shape, not an archive.
 """
 
 from typing import Any, Literal
@@ -15,22 +17,33 @@ from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import CallToolResult
 
-from helpers import centrosur_cortes_client, eeq_cortes_client
+from helpers import (
+    centrosur_cortes_client,
+    cortes_programados_client,
+    eeq_cortes_client,
+)
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.tool_meta import READ_ONLY
 
-Distribuidora = Literal["eeq", "centrosur"]
+Distribuidora = Literal["eeq", "centrosur", "emelnorte", "elecgalapagos", "eeasa"]
 
 _NOMBRES = {
     "eeq": "EEQ (Quito)",
     "centrosur": "Centrosur (Azuay, Cañar, Morona Santiago)",
+    "emelnorte": "Emelnorte (Imbabura, Carchi, norte de Pichincha)",
+    "elecgalapagos": "ElecGalápagos",
+    "eeasa": "EEASA (Tungurahua, Pastaza)",
 }
+_PROGRAMADOS = ("emelnorte", "elecgalapagos", "eeasa")
 _TEXT_ROWS = 40
 _TEXT_SECTORES = 220
 
 
 async def _search(distribuidora: str, query: str) -> dict[str, Any]:
+    if distribuidora in _PROGRAMADOS:
+        result = await cortes_programados_client.search(distribuidora, query=query)
+        return {**result, "distribuidora": distribuidora}
     if distribuidora == "eeq":
         result = await eeq_cortes_client.search_eeq_cortes(query=query)
         archivo_key = "slug"
@@ -44,7 +57,9 @@ async def _search(distribuidora: str, query: str) -> dict[str, Any]:
 
 
 async def _get_horarios(distribuidora: str, archivo: str, query: str) -> dict[str, Any]:
-    if distribuidora == "eeq":
+    if distribuidora in _PROGRAMADOS:
+        result = await cortes_programados_client.get_horarios(distribuidora, archivo, query=query)
+    elif distribuidora == "eeq":
         result = await eeq_cortes_client.get_eeq_cortes_horarios(slug=archivo, query=query)
     else:
         result = await centrosur_cortes_client.get_centrosur_cortes_horarios(url=archivo, query=query)
@@ -55,9 +70,10 @@ def register_cortes_tools(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Buscar cronogramas de cortes de luz",
         description=(
-            "Scheduled power-cut PDFs of one utility: eeq (Quito, 2023-2024 "
-            "blackout crises) or centrosur (Azuay, Cañar, Morona Santiago, 2023 on). "
-            "Next: get_cortes_horarios with a file's archivo."
+            "Scheduled power cuts of one utility: crisis schedule PDFs from eeq "
+            "(Quito, 2023-2024) and centrosur (2023 on), or current maintenance "
+            "notices from emelnorte, elecgalapagos and eeasa. Next: "
+            "get_cortes_horarios with an archivo."
         ),
         annotations=READ_ONLY,
     )
@@ -68,10 +84,11 @@ def register_cortes_tools(mcp: MCPServer) -> None:
         format: Literal["text", "json"] = "text",
     ) -> CallToolResult:
         """
-        List one electricity distributor's archive of scheduled power-cut PDFs.
+        List one electricity distributor's scheduled power cuts.
 
         Regional, not national: each archive covers one concession area.
-        Every file carries `archivo`, the id get_cortes_horarios takes.
+        Every file or notice carries `archivo`, the id get_cortes_horarios
+        takes.
 
         - eeq: Empresa Eléctrica Quito, 2023 and 2024 blackout crises.
           Mid-October to December 2024 is enumerated live from EEQ's site
@@ -82,15 +99,25 @@ def register_cortes_tools(mcp: MCPServer) -> None:
           including the 2024 estiaje blackouts, enumerated from WordPress's
           media library API. A separate `CortesEstiaje/` folder of extra 2024
           PDFs is not covered (no way to enumerate it).
+        - emelnorte: Emelnorte (Imbabura, Carchi, north of Pichincha), its
+          100 latest "Trabajos Programados" notices (one post per job,
+          April 2024 onward). `archivo` is the post id.
+        - elecgalapagos: ElecGalápagos, its 100 latest maintenance notices
+          for San Cristóbal, Santa Cruz and Isabela (almost daily).
+          `archivo` is the post id.
+        - eeasa: EEASA (Tungurahua, Pastaza), the notices for the coming
+          days on its "Trabajos Programados" page, as one archivo
+          (`vigentes`). No history: past notices are not kept.
 
         CNEL has no recoverable archive. For the national 2024 portal see
         get_energia_ecuador_snapshot.
 
         Args:
-            distribuidora: eeq or centrosur.
+            distribuidora: eeq, centrosur, emelnorte, elecgalapagos or eeasa.
             query: Free text matched (accent-insensitive) against the file's
-                period, date, title or URL, e.g. "noviembre", "2024-10".
-                Empty returns all files.
+                period, date, title or URL, e.g. "noviembre", "2024-10"
+                (emelnorte/elecgalapagos: title and body, e.g. "Otavalo";
+                eeasa: date and sectors). Empty returns all files.
             format: text | json
         """
         try:
@@ -127,9 +154,9 @@ def register_cortes_tools(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Horarios de cortes de luz por sector",
         description=(
-            "Parse one power-cut PDF (archivo from search_cortes) into rows: date, "
-            "time blocks without power, location (EEQ: substation; Centrosur: "
-            "province/canton/zone) and sectors. query filters by place."
+            "Parse one power-cut schedule or notice (archivo from search_cortes) "
+            "into rows: date, time blocks without power, location and sectors, "
+            "plus the motive for maintenance notices. query filters by place."
         ),
         annotations=READ_ONLY,
     )
@@ -156,11 +183,18 @@ def register_cortes_tools(mcp: MCPServer) -> None:
           near span boundaries). The Sep 2024 file is a scan with no text
           (returned with a note, no rows); one file is an EEQ schedule and
           is parsed as such (`nota` says so).
+        - emelnorte, elecgalapagos, eeasa: one row per job with `motivo`
+          (elecgalapagos adds `zona`, the island, `instituciones` and, for
+          overnight jobs, `fecha_fin`). Emelnorte's large jobs publish the
+          schedule only as images: no rows, `imagenes` holds the links and
+          `nota` says so. `horario` is empty when the notice's time has a
+          typo ("11h0").
 
         Args:
-            distribuidora: eeq or centrosur.
+            distribuidora: eeq, centrosur, emelnorte, elecgalapagos or eeasa.
             archivo: The file's `archivo` from search_cortes (EEQ: slug or
-                URL; Centrosur: PDF URL).
+                URL; Centrosur: PDF URL; emelnorte/elecgalapagos: post id;
+                eeasa: vigentes).
             query: Free text matched (accent-insensitive) against location
                 and sectors, e.g. "La Floresta", "Gualaceo". Empty returns
                 every row.
@@ -214,11 +248,16 @@ def register_cortes_tools(mcp: MCPServer) -> None:
                 sectores = f["sectores"]
                 if len(sectores) > _TEXT_SECTORES:
                     sectores = sectores[:_TEXT_SECTORES] + "…"
-                parts.append(
-                    f"p{f['pagina']} · {f['fecha_texto']} · {horario}{industrial} · "
-                    f"{lugar or 'ubicación no reconocida'}"
-                )
+                # Maintenance notices carry the place inside `sectores`.
+                if not lugar and data["distribuidora"] not in _PROGRAMADOS:
+                    lugar = "ubicación no reconocida"
+                encabezado = f"p{f['pagina']} · {f['fecha_texto']} · {horario}{industrial}"
+                parts.append(f"{encabezado} · {lugar}" if lugar else encabezado)
                 parts.append(f"   {sectores}")
+                if f.get("motivo"):
+                    parts.append(f"   Motivo: {f['motivo']}")
+            for imagen in data.get("imagenes") or []:
+                parts.append(f"Imagen: {imagen}")
             if len(filas) > _TEXT_ROWS:
                 parts.append(
                     f"... y {len(filas) - _TEXT_ROWS} filas más (usa query para acotar, o format=json)"
