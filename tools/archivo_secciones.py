@@ -1,8 +1,8 @@
 """Institutional document archives behind one list/get pair.
 
 ARCSA, Superbancos, SEPS, INEVAL, the SGR, SENESCYT and CENACE libraries,
-SIPA, EP Petroecuador, the Energy Ministry, the CNE and the Guayaquil and
-Quito stock exchanges (BVG, BVQ) each publish a fixed set of sections (categories,
+SIPA, EP Petroecuador, the Energy Ministry, ARCONEL, the CNE and the
+Guayaquil and Quito stock exchanges (BVG, BVQ) each publish a fixed set of sections (categories,
 families, modules) whose pages list downloadable files. They used to be 14
 tools, one list/get pair per institution, with the same two-step flow and the
 same file-listing shape; `fuente` now picks the institution instead (the same pattern as
@@ -16,6 +16,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import CallToolResult
 
 from helpers import (
+    arconel_publicaciones_client,
     arcsa_client,
     bvg_client,
     bvq_client,
@@ -48,6 +49,7 @@ Fuente = Literal[
     "bvg",
     "bvq",
     "cenace",
+    "arconel",
 ]
 
 _NOMBRES = {
@@ -64,6 +66,7 @@ _NOMBRES = {
     "bvg": "Bolsa de Valores de Guayaquil — estadísticas históricas",
     "bvq": "Bolsa de Valores de Quito — estadísticas",
     "cenace": "CENACE — Biblioteca",
+    "arconel": "ARCONEL — estadística, balances, tarifas y regulaciones",
 }
 
 # Sources whose list call scrapes a page and returns {"categorias": [...]}.
@@ -84,6 +87,7 @@ _STATIC_LISTS = {
     "sipa": (sipa_client.list_modulos, "modulo"),
     "bvg": (bvg_client.list_secciones, "seccion"),
     "bvq": (bvq_client.list_secciones, "seccion"),
+    "arconel": (arconel_publicaciones_client.list_secciones, "seccion"),
 }
 _GETTERS = {
     "arcsa": arcsa_client.get_categoria_archivos,
@@ -99,6 +103,7 @@ _GETTERS = {
     "bvg": bvg_client.get_seccion_archivos,
     "bvq": bvq_client.get_seccion_archivos,
     "cenace": cenace_biblioteca_client.get_biblioteca_categoria_archivos,
+    "arconel": arconel_publicaciones_client.get_seccion_archivos,
 }
 
 
@@ -150,7 +155,7 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
         description=(
             "List the sections of one institution's document archive (ARCSA, "
             "Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, "
-            "Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE). "
+            "Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE, ARCONEL). "
             "Next: get_archivo_seccion(fuente, seccion)."
         ),
         annotations=READ_ONLY,
@@ -226,13 +231,23 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           del Sector Eléctrico (annual and operating reports, CO₂ emission
           factors, transmission unavailability) and Planes y programas.
           Monthly transaction bulletins: get_cenace_boletin.
+        - arconel: ARCONEL's published files on arconel.gob.ec (5 sections):
+          estadistica (annual and multi-year statistics 1990-2025 and the
+          Atlas, PDF), mapas (electricity-sector maps, PDF), balances (the
+          current Balance Nacional de Energía Eléctrica, newer than CKAN's,
+          the 2015-2024 multi-year balance, coverage and per-capita
+          consumption, XLS/XLSX), tarifas (tariff schedules, cost and subsidy
+          reports, 2023-2026, PDF) and regulaciones (the 51 regulations and
+          resolutions in force by topic, PDF; search_regulaciones carries
+          only 6). Statistical series are in get_arconel_reporte and
+          search_capas_geo(fuente="arconel").
 
         Returns each section's `id` (pass it to get_archivo_seccion),
         `nombre`, and either its page `url` or `total_archivos`.
 
         Args:
             fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt,
-                sipa, petroecuador, energia, cne, bvg, bvq, cenace.
+                sipa, petroecuador, energia, cne, bvg, bvq, cenace, arconel.
             format: text | json
         """
         try:
@@ -281,6 +296,12 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           formato is DESCONOCIDO. A real share of SGR links 404; treat the
           SGR listing as a catalog, not a guarantee. CENACE files are PDFs
           (read them with read_pdf); `subgrupo` is usually the year.
+        - arconel: `grupo` is the year or theme (estadistica, mapas), the
+          page (balances, tarifas) or the topic (regulaciones, which also
+          carry `tipo`); tarifas add `periodo`, the year. estadistica and
+          mapas links go through download.php (PDF). The balances are
+          presentation workbooks with merged cells: download them rather
+          than previewing.
         - superbancos: coverage is whatever the portal uploaded (static
           tables plus OneDrive folders), not a guaranteed monthly series.
         - seps: some links go through a download-monitor redirect
@@ -312,7 +333,7 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
 
         Args:
             fuente: One of arcsa, superbancos, seps, ineval, sgr, senescyt,
-                sipa, petroecuador, energia, cne, bvg, bvq, cenace.
+                sipa, petroecuador, energia, cne, bvg, bvq, cenace, arconel.
             seccion: A section `id` from list_archivo_secciones.
             format: text | json
         """
