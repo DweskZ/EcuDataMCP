@@ -586,6 +586,33 @@
             "coverage": "eeq.com.ec",
             "url": "https://www.eeq.com.ec",
             "status": "live"
+          },
+          {
+            "id": "emelnorte-cortes",
+            "name": "Emelnorte",
+            "tag": "Energy",
+            "description": "Maintenance outage notices in Imbabura, Carchi and northern Pichincha (latest 100); search_cortes with distribuidora=\"emelnorte\"",
+            "coverage": "emelnorte.com",
+            "url": "https://www.emelnorte.com",
+            "status": "live"
+          },
+          {
+            "id": "elecgalapagos-cortes",
+            "name": "ElecGalápagos",
+            "tag": "Energy",
+            "description": "Scheduled maintenance on San Cristóbal, Santa Cruz and Isabela (latest 100); search_cortes with distribuidora=\"elecgalapagos\"",
+            "coverage": "elecgalapagos.com.ec",
+            "url": "https://www.elecgalapagos.com.ec",
+            "status": "live"
+          },
+          {
+            "id": "eeasa-cortes",
+            "name": "EEASA",
+            "tag": "Energy",
+            "description": "Scheduled work for the coming days in Tungurahua and Pastaza, no history; search_cortes with distribuidora=\"eeasa\"",
+            "coverage": "eeasa.com.ec",
+            "url": "https://www.eeasa.com.ec/trabajos-programados/",
+            "status": "live"
           }
         ]
       },
@@ -599,6 +626,38 @@
             "description": "Public electricity statistics builder: 28 report types (energy balance, losses, billing, infrastructure), 1998 on",
             "coverage": "reportes.arconel.gob.ec",
             "url": "https://reportes.arconel.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "arconel-arcgis",
+            "name": "ARCONEL — ArcGIS layers",
+            "tag": "Energy",
+            "description": "Energy balance and losses by distributor and month (1999-Apr 2024), billing, collection, subsidies and customers (1999-2025), plants, lines and substations; search_capas_geo with fuente=\"arconel\"",
+            "coverage": "services3.arcgis.com",
+            "url": "https://geopanel-arcelectricidad.hub.arcgis.com",
+            "status": "live"
+          },
+          {
+            "id": "arconel-publicaciones",
+            "name": "ARCONEL — publications",
+            "tag": "Energy",
+            "description": "Annual statistics 1990-2025 and Atlas, maps, the current national energy balance, 2023-2026 tariffs and the 51 regulations in force; list_archivo_secciones with fuente=\"arconel\"",
+            "coverage": "arconel.gob.ec",
+            "url": "https://arconel.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "CELEC EP",
+        "sources": [
+          {
+            "id": "celec-arcgis",
+            "name": "CELEC EP — ArcGIS portal",
+            "tag": "Energy",
+            "description": "CELEC's 40 generation plants and the National Transmission System network (March 2025); search_capas_geo with fuente=\"celec\"",
+            "coverage": "portalarcgis.celec.gob.ec",
+            "url": "https://portalarcgis.celec.gob.ec",
             "status": "live"
           }
         ]

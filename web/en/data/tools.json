@@ -1930,19 +1930,19 @@
       },
       {
         "name": "search_cortes",
-        "description": "Scheduled power-cut PDFs of one utility (EEQ or CentroSur).",
+        "description": "Scheduled power cuts: crisis PDFs (EEQ, CentroSur) or maintenance notices (Emelnorte, ElecGalápagos, EEASA).",
         "params": [
           {
             "name": "distribuidora",
             "type": "Distribuidora",
             "default": null,
-            "description": "eeq or centrosur."
+            "description": "eeq, centrosur, emelnorte, elecgalapagos or eeasa."
           },
           {
             "name": "query",
             "type": "str",
             "default": "''",
-            "description": "Free text matched (accent-insensitive) against the file's period, date, title or URL, e.g. \"noviembre\", \"2024-10\". Empty returns all files."
+            "description": "Free text matched, accent-insensitive, against the file's period, date, title or URL (emelnorte/elecgalapagos: the notice's title and text; eeasa: date and sectors). Empty returns all."
           },
           {
             "name": "format",
@@ -1951,23 +1951,23 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Lists one electricity distributor's archive of scheduled power-cut PDFs: eeq (Quito, 2023-2024 blackout crises) or centrosur (Azuay, Cañar, Morona Santiago, 2023 on). Regional, not national. Next: get_cortes_horarios with a file's `archivo`."
+        "long_description": "Lists one distributor's scheduled power cuts: the crisis PDFs of eeq (Quito, 2023-2024) and centrosur (Azuay, Cañar, Morona Santiago, 2023 onward), or the current maintenance notices of emelnorte (Imbabura, Carchi, north of Pichincha, latest 100), elecgalapagos (by island, latest 100) and eeasa (Tungurahua and Pastaza, the coming days, no history). Regional, not national. Next: get_cortes_horarios with the `archivo`."
       },
       {
         "name": "get_cortes_horarios",
-        "description": "Parse one power-cut PDF into rows: date, time blocks, location and sectors.",
+        "description": "Turns a power-cut PDF or notice into rows: date, time blocks, location, sectors and motive.",
         "params": [
           {
             "name": "distribuidora",
             "type": "Distribuidora",
             "default": null,
-            "description": "eeq or centrosur."
+            "description": "eeq, centrosur, emelnorte, elecgalapagos or eeasa."
           },
           {
             "name": "archivo",
             "type": "str",
             "default": null,
-            "description": "The file's `archivo` from search_cortes (EEQ: slug or URL; CentroSur: PDF URL)."
+            "description": "The `archivo` from search_cortes (EEQ: slug or URL; CentroSur: PDF URL; emelnorte/elecgalapagos: notice id; eeasa: vigentes)."
           },
           {
             "name": "query",
@@ -1982,7 +1982,7 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Parses one scheduled power-cut PDF (`archivo` from search_cortes) into rows with page, date, time blocks without power, sectors and the utility's location fields (EEQ: substation; CentroSur: province/canton/zone). query filters by place."
+        "long_description": "Turns a power-cut schedule or notice (`archivo` from search_cortes) into rows with date, time blocks without power, sectors and the location the utility publishes (EEQ: substation; CentroSur: province/canton/zone; ElecGalápagos: island). Maintenance notices add `motivo`; Emelnorte notices published only as images return the links in `imagenes`. query filters by place."
       },
       {
         "name": "get_arconel_reporte",
@@ -2652,13 +2652,13 @@
     "tools": [
       {
         "name": "search_capas_geo",
-        "description": "Layers of the INAMHI and MAG geoportals (rainfall, land cover, agricultural zoning).",
+        "description": "Geoportal layers: INAMHI and MAG (rainfall, land cover, agriculture) and electricity-sector ArcGIS (ARCONEL, CELEC).",
         "params": [
           {
             "name": "fuente",
             "type": "Fuente",
             "default": null,
-            "description": "inamhi or mag."
+            "description": "inamhi, mag, arconel or celec."
           },
           {
             "name": "query",
@@ -2670,7 +2670,7 @@
             "name": "solo_wfs",
             "type": "bool",
             "default": "False",
-            "description": "Only return layers with WFS (attribute data)."
+            "description": "Only return layers with WFS (attribute data). Ignored for arconel and celec."
           },
           {
             "name": "categoria",
@@ -2685,29 +2685,41 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Searches the layer catalog (WMS/WFS) of one GeoServer geoportal: inamhi (rainfall normals and anomalies, WRF forecast grids, watersheds) or mag (agro zoning, land cover, agricultural censuses, rural cadastre, agroclimatic risk). solo_wfs=true keeps layers with attribute data."
+        "long_description": "Searches one geoportal's layer catalog: inamhi (precipitation normals, anomalies, WRF grids, watersheds), mag (agro-ecological zoning, land cover, agricultural censuses, rural cadastre), arconel (energy balance and losses by distributor and month 1999-Apr 2024, billing, collection, subsidies and customers 1999-2025, plants, lines, substations, service areas) or celec (CELEC's plants and the March 2025 SNT transmission network; Survey123 layers are excluded on purpose). Each layer carries `capa`, the id get_capa_geo_datos takes."
       },
       {
         "name": "get_capa_geo_datos",
-        "description": "Attribute sample (up to 20 features) from a WFS-enabled layer.",
+        "description": "Attributes of a geoportal layer: a sample of up to 20 features (WFS) or up to 500 filtered rows (ArcGIS).",
         "params": [
           {
             "name": "fuente",
             "type": "Fuente",
             "default": null,
-            "description": "inamhi or mag."
+            "description": "inamhi, mag, arconel or celec."
           },
           {
             "name": "capa",
             "type": "str",
             "default": null,
-            "description": "The layer's `capa` from search_capas_geo (INAMHI: \"geonode:...\" name; MAG: \"categoria/store/name\")."
+            "description": "The layer's `capa` from search_capas_geo (INAMHI: \"geonode:...\" name; MAG: \"categoria/store/name\"; ArcGIS: the short id, e.g. balance_energia)."
           },
           {
             "name": "count",
             "type": "int",
             "default": "5",
-            "description": "Number of features to fetch (1-20, default 5)."
+            "description": "Features to fetch: 1-20 for inamhi/mag, 1-500 for arconel/celec (default 5)."
+          },
+          {
+            "name": "filtro",
+            "type": "str",
+            "default": "''",
+            "description": "arconel/celec only: SQL where clause; empty for all rows."
+          },
+          {
+            "name": "offset",
+            "type": "int",
+            "default": "0",
+            "description": "arconel/celec only: rows to skip when paging."
           },
           {
             "name": "format",
@@ -2716,7 +2728,7 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Fetches a small sample of a geoportal layer's feature attributes (capa from search_capas_geo) using WFS GetFeature. A preview, not a spatial query: no bbox or filters, and geometry coordinates are dropped. Layers without WFS (rasters, some MAG stores) raise an error."
+        "long_description": "Fetches the attributes of a layer from search_capas_geo, geometry coordinates dropped. For inamhi and mag it is a WFS GetFeature sample with no filters; layers without WFS return an error. For arconel and celec it is an ArcGIS REST query: `filtro` is a SQL where clause on the layer's fields (listed in `campos`), e.g. \"Anio = 2024 AND IdMes = 4\" or \"Empresa LIKE 'CNEL%'\"; `total_features_en_capa` counts the rows matching it and `hay_mas` says whether to page on with `offset`. Dates come back as ISO dates."
       }
     ]
   }

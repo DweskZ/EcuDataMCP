@@ -2,6 +2,35 @@
 
 ## Unreleased
 
+- **ARCONEL and CELEC ArcGIS layers** in `search_capas_geo`/`get_capa_geo_datos`
+  (`fuente="arconel"`, `fuente="celec"`): the distributor energy balance and
+  losses by month (January 1999 to April 2024), billing, collection,
+  subsidies and customers by distributor and consumption group (1999-2025),
+  355 plants, transmission lines, substations and service areas; CELEC's 40
+  plants and its March 2025 transmission network. Survey123 layers on CELEC's
+  portal are excluded on purpose. For these sources `get_capa_geo_datos`
+  gains `filtro` (an ArcGIS SQL where clause) and `offset`, returns up to 500
+  rows with `total_features_en_capa`, `hay_mas` and `campos`, converts dates
+  and repairs double-encoded text ("CNEL-BolÃ­var"). ARCONEL's own ArcGIS
+  server, which holds the per-plant monthly production, did not answer in
+  October 2026, so only its Esri-cloud copies are listed. New client
+  `helpers/arcgis_client.py`.
+- **Maintenance outage notices** in `search_cortes`/`get_cortes_horarios`
+  (`distribuidora="emelnorte"`, `"elecgalapagos"`, `"eeasa"`): each notice is
+  one `archivo` and its rows add `motivo`. Emelnorte and ElecGalápagos read the
+  100 latest WordPress posts (ElecGalápagos rows carry the island in `zona`
+  and handle the three layouts its notices have used, overnight jobs
+  included); Emelnorte notices published only as images return the image
+  links in `imagenes`. EEASA reads its `/trabajos-programados/` page (the old
+  `/suspensiones-programadas/` now returns "Page not found"), current notices
+  only. New client `helpers/cortes_programados_client.py`.
+- **ARCONEL's published files** in `list_archivo_secciones`/`get_archivo_seccion`
+  (`fuente="arconel"`): `estadistica` (yearbooks 1990-2025 and the Atlas),
+  `mapas`, `balances` (the current Balance Nacional de Energía Eléctrica,
+  July 2026 at the time, plus the multi-year balance, coverage and per-capita
+  consumption), `tarifas` (2023-2026 tariff schedules, cost and subsidy
+  reports) and `regulaciones` (the 51 regulations and resolutions in force,
+  by topic). New client `helpers/arconel_publicaciones_client.py`.
 - **New tool `get_cenace_boletin`** (84 in the default profile): CENACE's
   "Boletín y Estadística Mensual de Transacciones Comerciales", January 2019
   onward. With no `mes` it lists the issues (optionally one `anio`); with

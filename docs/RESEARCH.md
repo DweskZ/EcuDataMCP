@@ -6520,6 +6520,47 @@ CIIU en 2008 da un error que explica la falta de datos. `get_financials` suma
 `desde`/`hasta`. Una base de la versión anterior (cinco años) se sigue
 sirviendo mientras se reconstruye.
 
+## Sector eléctrico — re-verificación al construir (2026-10-26)
+
+Se construyeron los puntos 1, 5 y 6 del ranking de la Trigésimo quinta pasada
+(ArcGIS de ARCONEL/CELEC, cortes de mantenimiento, páginas de ARCONEL). Lo que
+cambió desde 2026-09-29, verificado desde una IP residencial de Canadá:
+
+- **`geoportal.arconel.gob.ec:6443` no acepta conexiones** (timeout en TCP con
+  curl y httpx; DNS resuelve a 190.11.14.51). `reportes.arconel.gob.ec` falló
+  el handshake TLS ese mismo día, mientras `arconel.gob.ec` respondía 200. No
+  se sabe si es caída o geobloqueo nuevo. Las copias en Esri
+  (`services3.arcgis.com/5Gdbxgyani9QGxyU`) sí responden: `resumen_balance_energia`
+  (6.078 filas, pero **2024 solo llega a abril**: 80 filas de ene-abr),
+  `resumen_facturacion` (35.546), `CENTRALES` (355, no 730), `LINEAS1` (604),
+  `SUBESTACIONES` (1.381) y `Áreas_de_Prestación_de_Servicio_Eléctrico` (20).
+  Los campos `*MV` son el total móvil de 12 meses. Los textos vienen con
+  doble codificación en partes ("CNEL-BolÃ­var").
+- **CELEC**: `SNT_03_2025` tiene 9 capas; `PUNTOS_SE` (93) duplica
+  `SUBESTACION` (93). El portal lista además ~25 servicios Survey123
+  (`_form`/`_results`), `encuesta_percepcion_social` y `PREDIOS_shp`, que se
+  dejaron fuera.
+- **EEASA** movió los avisos a `/trabajos-programados/` (tarjetas `card-body`
+  con `Fecha / Horario / Sector / Motivo`, agrupadas bajo un `h4` de motivo
+  general); `/suspensiones-programadas/` devuelve 200 con "Page not found".
+  `/cronograma-de-mantenimientos/` solo tiene un título de fecha, sin datos.
+- **Emelnorte**: de los 100 posts más recientes de la categoría 7, 26 publican
+  el horario solo como imágenes en una galería (mantenimientos de
+  subestación); los otros 74 siguen el formato de texto. Algunos traen
+  `FECHAS` y `: lunes …` en líneas separadas, y unos pocos dejan
+  `SECTORES AFECTADOS:` vacío.
+- **ElecGalápagos** usó tres formatos: `Fecha:` + `De 09H00 a 12H00` por
+  trabajo (actual), `Hora:` / `Sector:` / `Actividades:` con guion largo
+  (`01h00 – 05h00`), y uno sin etiquetas (`Viernes 14/08/2026`, `08H00 a
+  12H00`), además de `Fecha de inicio`/`Hora de Fin` para trabajos nocturnos.
+  Sobre los 100 posts más recientes, 117 filas y una sola sin horario (errata
+  `11h0` en la fuente).
+- **ARCONEL páginas**: el BNEE vigente ya es `BNEE_julio_2026.xls`; las
+  páginas de tarifas suman 41 PDF bajo encabezados `AÑO 2026/2025/2024`; el
+  arreglo `TEMAS` sigue con 51 ítems en 10 temas (uno sin `.pdf` en el
+  enlace); los mapas se agrupan por tema (generación, transmisión,
+  distribución), no por año.
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un
