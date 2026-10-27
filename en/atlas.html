@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Reference – EcuDataMCP</title>
-<meta name="description" content="EcuDataMCP&#39;s 83 tools, with a full description and a direct link to each one.">
+<meta name="description" content="EcuDataMCP&#39;s 84 tools, with a full description and a direct link to each one.">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="canonical" href="https://dweskz.github.io/EcuDataMCP/en/atlas.html">
 <link rel="alternate" hreflang="es" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <link rel="alternate" hreflang="en" href="https://dweskz.github.io/EcuDataMCP/en/atlas.html">
 <link rel="alternate" hreflang="x-default" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <meta property="og:title" content="Reference – EcuDataMCP">
-<meta property="og:description" content="EcuDataMCP&#39;s 83 tools, with a full description and a direct link to each one.">
+<meta property="og:description" content="EcuDataMCP&#39;s 84 tools, with a full description and a direct link to each one.">
 <meta property="og:url" content="https://dweskz.github.io/EcuDataMCP/en/atlas.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="en_US">
@@ -153,13 +153,13 @@
 <section class="landing hero">
 <div class="container-page">
 <p class="kicker">Reference</p>
-<h1>All <span class="accent">83 tools</span>, one by one.</h1>
+<h1>All <span class="accent">84 tools</span>, one by one.</h1>
 <p class="hero-sub">Find a tool by name, source, or task. Open only the group and detail you need.</p>
 <div class="atlas-filter-wrap">
 <input type="text" id="atlas-filter" class="atlas-filter" placeholder="Filter by name or keyword…" autocomplete="off">
 </div>
 <div class="atlas-toolbar" aria-live="polite">
-<p id="atlas-result-count">83 tools · open a group to see its details.</p>
+<p id="atlas-result-count">84 tools · open a group to see its details.</p>
 <div class="atlas-actions">
 <button type="button" data-atlas-action="open">Expand groups</button>
 <button type="button" data-atlas-action="close">Collapse groups</button>
@@ -1707,7 +1707,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">CENACE, SUT, IG-EPN, and power cuts<span class="tag">9</span></span>
+<span class="atlas-category-title">CENACE, SUT, IG-EPN, and power cuts<span class="tag">10</span></span>
 <span class="atlas-category-action">Show</span>
 </summary>
 <div class="atlas-category-tools">
@@ -1727,6 +1727,30 @@
 <tr><td><code>tablero</code></td><td><code>Literal[&#39;produccion_tiempo_real&#39;, &#39;demanda_tiempo_real&#39;, &#39;operativa_diaria&#39;, &#39;acumulada_mensual&#39;, &#39;acumulada_anual&#39;]</code></td><td><code>required</code></td><td>One of the 5 names above.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_cenace_boletin" data-search="get_cenace_boletin cenace's monthly electricity-market bulletin (2019 onward): production, demand by distributor, prices and trade with colombia and peru. reads cenace's &quot;boletín y estadística mensual de transacciones comerciales&quot;, the monthly report of ecuador's electricity market (january 2019 onward, about a month behind). each issue covers the month and the year to date: production by resource (hydro, thermal by fuel, non-conventional renewables, imports), commercial demand by distributor (cnel units and empresas eléctricas), self-generators, average prices in usd¢/kwh and the international transactions with colombia and peru. none of this is in cenace's ckan datasets. cenace publishes the issues only as fliphtml5 flipbooks; the tool reads the flipbook's text index, so tables come back as text rows (&quot;cnel guayaquil 3 036.06 39.1%&quot;, thousands separated by a space) rather than columns, and charts carry only their labels. mes empty to list the issues; yyyy-mm (e.g. 2026-07) or &quot;ultimo&quot; for one issue's text. anio with an empty `mes`, list only that year's issues. format output format: `text` (default) or `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_cenace_boletin</code>
+<span class="atlas-tool-desc">CENACE&#39;s monthly electricity-market bulletin (2019 onward): production, demand by distributor, prices and trade with Colombia and Peru.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Reads CENACE&#39;s &#34;Boletín y Estadística Mensual de Transacciones Comerciales&#34;, the monthly report of Ecuador&#39;s electricity market (January 2019 onward, about a month behind). Each issue covers the month and the year to date: production by resource (hydro, thermal by fuel, non-conventional renewables, imports), commercial demand by distributor (CNEL units and empresas eléctricas), self-generators, average prices in USD¢/kWh and the international transactions with Colombia and Peru. None of this is in CENACE&#39;s CKAN datasets. CENACE publishes the issues only as FlipHTML5 flipbooks; the tool reads the flipbook&#39;s text index, so tables come back as text rows (&#34;CNEL GUAYAQUIL 3 036.06 39.1%&#34;, thousands separated by a space) rather than columns, and charts carry only their labels.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>mes</code></td><td><code>str</code></td><td><code>empty</code></td><td>Empty to list the issues; YYYY-MM (e.g. 2026-07) or &#34;ultimo&#34; for one issue&#39;s text.</td></tr>
+
+<tr><td><code>anio</code></td><td><code>int | None</code></td><td><code>none</code></td><td>With an empty `mes`, list only that year&#39;s issues.</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
 
 </tbody>
 </table>
@@ -2418,19 +2442,19 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-list_archivo_secciones" data-search="list_archivo_secciones sections of one institution's document archive (arcsa, superbancos, seps, ineval, sgr, senescyt, sipa). lists the sections of one institution's document archive: the arcsa sanitary registry, superbancos and seps statistics, ineval evaluation datasets, sgr and higher education libraries, or sipa agricultural statistics. next: get_archivo_seccion(fuente, seccion). fuente one of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa. format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-list_archivo_secciones" data-search="list_archivo_secciones sections of one institution's document archive (arcsa, superbancos, seps, ineval, sgr, senescyt, sipa, petroecuador, energy ministry, cne, bvg, bvq, cenace). lists the sections of one institution's document archive: the arcsa sanitary registry, superbancos and seps statistics, ineval evaluation datasets, the sgr, higher education and cenace libraries, sipa agricultural statistics, ep petroecuador's cifras institucionales, the energy ministry's hydrocarbon and mining statistics, cne election datasets, or the guayaquil and quito stock exchanges' statistics. next: get_archivo_seccion(fuente, seccion). fuente one of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa, petroecuador, energia, cne, bvg, bvq, cenace. format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">list_archivo_secciones</code>
-<span class="atlas-tool-desc">Sections of one institution&#39;s document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, SENESCYT, SIPA).</span>
+<span class="atlas-tool-desc">Sections of one institution&#39;s document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, SENESCYT, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Lists the sections of one institution&#39;s document archive: the ARCSA sanitary registry, Superbancos and SEPS statistics, INEVAL evaluation datasets, SGR and Higher Education libraries, or SIPA agricultural statistics. Next: get_archivo_seccion(fuente, seccion).</p>
+<p class="atlas-tool-long">Lists the sections of one institution&#39;s document archive: the ARCSA sanitary registry, Superbancos and SEPS statistics, INEVAL evaluation datasets, the SGR, Higher Education and CENACE libraries, SIPA agricultural statistics, EP Petroecuador&#39;s Cifras Institucionales, the Energy Ministry&#39;s hydrocarbon and mining statistics, CNE election datasets, or the Guayaquil and Quito stock exchanges&#39; statistics. Next: get_archivo_seccion(fuente, seccion).</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa.</td></tr>
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa, petroecuador, energia, cne, bvg, bvq, cenace.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
 
@@ -2440,7 +2464,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_archivo_seccion" data-search="get_archivo_seccion downloadable files of one section of a document archive (title, url, format). lists the files in one section returned by list_archivo_secciones. each file has title, url and format, plus source-specific context (group, period, subgroup, description). returns links, not contents; download large files directly (the preview and download tools cap at 5 mb). fuente one of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa. seccion a section `id` from list_archivo_secciones. format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-get_archivo_seccion" data-search="get_archivo_seccion downloadable files of one section of a document archive (title, url, format). lists the files in one section returned by list_archivo_secciones. each file has title, url and format, plus source-specific context (group, period, subgroup, description). returns links, not contents; download large files directly (the preview and download tools cap at 5 mb). fuente one of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa, petroecuador, energia, cne, bvg, bvq, cenace. seccion a section `id` from list_archivo_secciones. format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_archivo_seccion</code>
 <span class="atlas-tool-desc">Downloadable files of one section of a document archive (title, URL, format).</span>
@@ -2452,7 +2476,7 @@
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa.</td></tr>
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>One of arcsa, superbancos, seps, ineval, sgr, senescyt, sipa, petroecuador, energia, cne, bvg, bvq, cenace.</td></tr>
 
 <tr><td><code>seccion</code></td><td><code>str</code></td><td><code>required</code></td><td>A section `id` from list_archivo_secciones.</td></tr>
 
@@ -2610,7 +2634,7 @@ window.SITE_SEARCH_EMPTY_LABEL = "No results.";
     var count = visibleTools().length;
     resultCount.textContent = query
       ? count + " tool" + (count === 1 ? "" : "s") + " match" + (count === 1 ? "es" : "") + "."
-      : "83 tools · open a group to see its details.";
+      : "84 tools · open a group to see its details.";
   }
 
   function applyFilter(query) {
