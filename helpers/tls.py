@@ -17,10 +17,12 @@ _INSECURE_TLS_HOST_SUFFIXES = (
 def insecure_tls_enabled() -> bool:
     """Allow insecure TLS retry, opt-in only.
 
-    The portal's cert was expired 2026-07-28 through early August; this
-    defaulted on during that window. Renewed 2026-08-07 (valid through
-    2026-11-05), so the fallback now defaults off. Set CKAN_INSECURE_TLS=1
-    if the portal's cert breaks again before the code is updated.
+    datosabiertos.gob.ec's cert was expired 2026-07-28 through early August;
+    this defaulted on during that window. Renewed 2026-08-07 (valid through
+    2026-11-05), so the fallback now defaults off. mercadodevalores uses a
+    separate *.supercias.gob.ec cert, valid 2026-08-19 through 2027-03-05
+    (both checked live 2026-10-27). Set CKAN_INSECURE_TLS=1 if either
+    breaks again before the code is updated.
     """
     raw = os.getenv("CKAN_INSECURE_TLS", "0").strip().lower()
     # Whitelist the opt-in: an empty value must not disable verification.

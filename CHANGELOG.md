@@ -45,6 +45,40 @@
   first and are flagged in `get_financials`. `metadatos.base_local` gains
   `anios_disponibles` and `actualizacion_pendiente`. Schema version 3: a
   version-2 DB keeps being served, flagged, while the full-history build runs.
+- **Supercías financials build survives the client closing the session**: on
+  Windows, closing a stdio client killed the 15-20 minute rebuild, and the
+  lock it left blocked every retry for 45 minutes. The server now launches the
+  build detached (its own session on POSIX; outside the client's job object
+  on Windows when the job allows it, otherwise detached only, with a
+  warning). The lock already held the build's PID; it is now read, and a lock
+  whose PID is no longer running is reclaimed at once, by the server's status
+  check and by the next build.
+- **Sector quartiles replace Supercías' sector means**: `indicadores_sector.csv`
+  holds plain means that a few extreme filings dominate (manufacturing 2023:
+  current ratio 23.7 against a median of 1.48, gross margin -1,245 against
+  0.41) and only covers 2018-2023, so it is no longer downloaded. The build
+  computes p25/median/p75 of every ratio per CIIU level-1 sector and year from
+  the ranking itself (table `cuartiles_sector`, sectors with at least 5
+  filings). `get_financials` adds `cuartiles_sector` to each year for the main
+  ratios (shown next to each ratio in the text view), and `search_ranking`
+  with `ciiu_n1` returns them for every ratio; `get_sector_benchmark` (not
+  used by any tool before) returns them too.
+- **Ratios Supercías could not calculate are NULL, not 0**: 85% of trade
+  companies "had" a 0 operating margin in 2023. A 0 becomes NULL when the row
+  has no ratios at all, when the ratio's denominator (sales, assets or
+  equity) is 0, or for ratios with no real zero for an operating company
+  (current ratio, acid test, turnovers, coverage, leverage, gross and
+  operating margin, collection and payment days). Ratios that can really be 0
+  (long-term debt, financial-cost burden, a profit rounding to 0.00) keep it.
+  `margen_operacional`, `per_med_cobranza` and `per_med_pago` also have no
+  consistent scale, even at the sector median, and no conversion recovers
+  them; they are kept as published and flagged in the tool descriptions,
+  `get_sector_benchmark` and `search_ranking` notes. Schema version 4: a
+  version-2 or 3 DB keeps being served, flagged, while the new build runs.
+- `helpers/tls.py`: the "valid through 2026-11-05" note is datosabiertos.gob.ec's
+  certificate (still correct); the comment now says so and adds
+  mercadodevalores' separate `*.supercias.gob.ec` certificate (valid to
+  2027-03-05), both checked live.
 
 ## 0.13.0 — 2026-10-17
 

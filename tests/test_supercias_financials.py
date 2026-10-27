@@ -45,12 +45,18 @@ def _build_db(path) -> None:
     )
     conn.execute("CREATE TABLE segmentos (id_segmento INTEGER, segmento TEXT)")
     conn.execute("CREATE TABLE ciiu (ciiu TEXT, descripcion TEXT)")
+    conn.execute("INSERT INTO ciiu VALUES ('C', 'Manufactura')")
     conn.execute(
-        "CREATE TABLE indicadores_sector (anio INTEGER, ciiu_n1 TEXT, "
-        "descripcion TEXT, roe REAL)"
+        "CREATE TABLE cuartiles_sector (anio INTEGER, ciiu_n1 TEXT, "
+        "indicador TEXT, n INTEGER, p25 REAL, mediana REAL, p75 REAL)"
     )
-    conn.execute(
-        "INSERT INTO indicadores_sector VALUES (2025, 'C', 'Manufactura', 0.08)"
+    conn.executemany(
+        "INSERT INTO cuartiles_sector VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [
+            (2025, "C", "roe", 40, 0.02, 0.07, 0.15),
+            (2025, "C", "margen_operacional", 12, -20.0, 2.0, 70.0),
+            (2024, "C", "roe", 38, 0.01, 0.06, 0.14),
+        ],
     )
     conn.execute(f"PRAGMA user_version = {supercias_financials.SCHEMA_VERSION}")
     conn.commit()
@@ -162,7 +168,7 @@ def test_trigger_background_build_skips_while_lock_held(monkeypatch):
     )
     lock = supercias_financials.lock_path()
     lock.parent.mkdir(parents=True, exist_ok=True)
-    lock.write_text("123")
+    lock.write_text(str(os.getpid()))  # a live build
 
     supercias_financials._trigger_background_build()
     assert popen_calls == []
@@ -387,6 +393,10 @@ async def test_get_sector_benchmark(db_path):
     benchmark = await supercias_financials.get_sector_benchmark(2025, "c")
     assert benchmark is not None
     assert benchmark["descripcion"] == "Manufactura"
+    assert benchmark["indicadores"]["roe"] == {
+        "n": 40, "p25": 0.02, "mediana": 0.07, "p75": 0.15,
+    }
+    assert "margen_operacional" in benchmark["nota"]
 
     missing = await supercias_financials.get_sector_benchmark(2025, "z")
     assert missing is None
@@ -654,3 +664,154 @@ async def test_year_errors_become_tool_errors(db_path):
         await _tool("get_financials")(expediente_or_ruc="1", anio=2015)
     with pytest.raises(ToolError, match="Años disponibles"):
         await _tool("search_ranking")(anio=1999)
+
+
+def test_lock_with_dead_pid_is_not_held(monkeypatch):
+    # A build killed along with its stdio session leaves its lock behind;
+    # once its PID is gone the lock must stop blocking retries.
+    popen_calls: list[list[str]] = []
+    monkeypatch.setattr(supercias_financials, "_build_process", None)
+    monkeypatch.setattr(
+        supercias_financials.subprocess,
+        "Popen",
+        lambda args, **kw: popen_calls.append(args) or _RunningProcess(),
+    )
+    lock = supercias_financials.lock_path()
+    lock.parent.mkdir(parents=True, exist_ok=True)
+    lock.write_text("999999")
+    monkeypatch.setattr(supercias_financials, "_pid_alive", lambda pid: pid != 999999)
+
+    assert supercias_financials.lock_is_stale() is True
+    assert supercias_financials.financials_status()["construccion_en_curso"] is False
+    supercias_financials._trigger_background_build()
+    assert len(popen_calls) == 1
+
+
+def test_lock_without_pid_yet_is_held():
+    # The lock file is created first and its PID written right after.
+    lock = supercias_financials.lock_path()
+    lock.parent.mkdir(parents=True, exist_ok=True)
+    lock.write_text("")
+    assert supercias_financials._lock_is_held() is True
+
+
+def test_pid_alive_detects_finished_process():
+    import subprocess
+
+    finished = subprocess.Popen([sys.executable, "-c", "pass"])
+    finished.wait()
+    assert supercias_financials._pid_alive(os.getpid()) is True
+    assert supercias_financials._pid_alive(finished.pid) is False
+
+
+def _capture_popen(monkeypatch, refuse_breakaway=False):
+    calls: list[dict] = []
+
+    def fake_popen(args, **kwargs):
+        calls.append(kwargs)
+        flags = kwargs.get("creationflags", 0)
+        if refuse_breakaway and flags & supercias_financials._WINDOWS_BREAKAWAY_FLAG:
+            raise PermissionError(13, "Access is denied")
+        return _RunningProcess()
+
+    monkeypatch.setattr(supercias_financials, "_build_process", None)
+    monkeypatch.setattr(supercias_financials.subprocess, "Popen", fake_popen)
+    return calls
+
+
+def test_build_launch_is_detached_on_windows(monkeypatch):
+    calls = _capture_popen(monkeypatch)
+    monkeypatch.setattr(supercias_financials.sys, "platform", "win32")
+
+    supercias_financials._trigger_background_build()
+
+    flags = calls[0]["creationflags"]
+    assert flags & 0x00000008  # DETACHED_PROCESS
+    assert flags & 0x00000200  # CREATE_NEW_PROCESS_GROUP
+    assert flags & 0x01000000  # CREATE_BREAKAWAY_FROM_JOB
+    assert calls[0]["stdin"] is supercias_financials.subprocess.DEVNULL
+
+
+def test_build_launch_falls_back_when_job_forbids_breakaway(monkeypatch):
+    calls = _capture_popen(monkeypatch, refuse_breakaway=True)
+    monkeypatch.setattr(supercias_financials.sys, "platform", "win32")
+
+    supercias_financials._trigger_background_build()
+
+    assert len(calls) == 2
+    assert not calls[1]["creationflags"] & 0x01000000
+    assert calls[1]["creationflags"] & 0x00000008
+    assert supercias_financials._build_process is not None
+
+
+def test_build_launch_starts_own_session_on_posix(monkeypatch):
+    calls = _capture_popen(monkeypatch)
+    monkeypatch.setattr(supercias_financials.sys, "platform", "linux")
+
+    supercias_financials._trigger_background_build()
+
+    assert calls[0]["start_new_session"] is True
+    assert "creationflags" not in calls[0]
+
+
+async def test_get_financials_includes_sector_quartiles(db_path):
+    result = await supercias_financials.get_financials("1")
+
+    by_year = {y["anio"]: y for y in result["years"]}
+    assert by_year[2025]["cuartiles_sector"] == {
+        "roe": {"n": 40, "p25": 0.02, "mediana": 0.07, "p75": 0.15}
+    }
+    assert by_year[2024]["cuartiles_sector"]["roe"]["mediana"] == 0.06
+
+
+async def test_get_financials_tool_text_shows_sector_quartiles(db_path):
+    result = await _tool("get_financials")(expediente_or_ruc="1", anio=2025)
+    assert "ROE: 0.1 (sector C: p25 0.02 · mediana 0.07 · p75 0.15, n=40)" in (
+        result.content[0].text
+    )
+
+
+async def test_search_ranking_with_sector_returns_quartiles(db_path):
+    result = await supercias_financials.search_ranking(anio=2025, ciiu_n1="C")
+    assert result["cuartiles_sector"]["roe"]["mediana"] == 0.07
+
+    text = (await _tool("search_ranking")(anio=2025, ciiu_n1="C")).content[0].text
+    assert "Sector — ROE: p25 0.02 · mediana 0.07 · p75 0.15 (n=40)" in text
+
+
+async def test_search_ranking_flags_unreliable_ratio(db_path):
+    conn = sqlite3.connect(db_path)
+    conn.execute("ALTER TABLE ranking ADD COLUMN margen_operacional REAL")
+    conn.execute("UPDATE ranking SET margen_operacional = 2.5 WHERE anio = 2025")
+    conn.commit()
+    conn.close()
+
+    result = await supercias_financials.search_ranking(anio=2025, order_by="roe")
+    assert "notas" not in result
+    result = await supercias_financials.search_ranking(
+        anio=2025, order_by="margen_operacional"
+    )
+    assert supercias_financials.UNRELIABLE_RATIOS_NOTE in result["notas"]
+
+
+async def test_previous_schema_without_quartiles_still_serves(
+    tmp_path, monkeypatch, no_real_build
+):
+    # A version-3 DB (zeros, no cuartiles_sector) keeps answering while the
+    # version-4 rebuild runs; only the sector comparison is missing.
+    path = tmp_path / "v3.sqlite3"
+    _build_db(path)
+    conn = sqlite3.connect(path)
+    conn.execute("DROP TABLE cuartiles_sector")
+    conn.execute("PRAGMA user_version = 3")
+    conn.commit()
+    conn.close()
+    monkeypatch.setattr(supercias_financials, "DB_PATH", path)
+
+    result = await supercias_financials.get_financials("1")
+    assert result["years"]
+    assert all("cuartiles_sector" not in y for y in result["years"])
+    assert await supercias_financials.get_sector_benchmark(2025, "C") is None
+    assert no_real_build
+    status = supercias_financials.financials_status(path)
+    assert status["actualizacion_pendiente"] is True

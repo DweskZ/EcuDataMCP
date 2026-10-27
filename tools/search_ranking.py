@@ -13,6 +13,29 @@ from helpers.tool_meta import READ_ONLY
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 
+# Sector quartiles shown in the text view; the JSON has every ratio.
+_QUARTILE_FIELDS = (
+    ("liquidez_corriente", "Liquidez corriente"),
+    ("end_activo", "Endeudamiento del activo"),
+    ("margen_bruto", "Margen bruto"),
+    ("roe", "ROE"),
+    ("roa", "ROA"),
+)
+
+
+def _quartile_lines(data: dict) -> list[str]:
+    cuartiles = data.get("cuartiles_sector") or {}
+    lines = []
+    for key, label in _QUARTILE_FIELDS:
+        q = cuartiles.get(key)
+        if q:
+            lines.append(
+                f"Sector — {label}: p25 {q['p25']:.2f} · mediana {q['mediana']:.2f}"
+                f" · p75 {q['p75']:.2f} (n={q['n']})"
+            )
+    return lines
+
+
 def register_search_ranking_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Rankear compañías por indicadores financieros",
@@ -47,6 +70,9 @@ def register_search_ranking_tool(mcp: MCPServer) -> None:
         filtering by ciiu_n1 in a year without them returns an error that
         says so. Years 2008-2018 also include unranked companies (no
         financial statement that year), listed after the ranked ones.
+        With ciiu_n1, the result also carries `cuartiles_sector`: p25,
+        median and p75 of every ratio across that sector's filings that
+        year. Ratios Supercías could not calculate are null (sorted last).
         Use get_financials for one company's full detail, or
         get_compania_info for legal/registry data (address, legal
         representative, etc.).
@@ -101,6 +127,7 @@ def register_search_ranking_tool(mcp: MCPServer) -> None:
                 ),
                 *supercias_financials.stale_warning_lines(data),
                 *(f"Nota: {nota}" for nota in data.get("notas") or []),
+                *_quartile_lines(data),
                 "",
             ]
             if not companias:
