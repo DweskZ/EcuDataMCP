@@ -1892,21 +1892,21 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-search_cortes" data-search="search_cortes scheduled power-cut pdfs of one utility (eeq or centrosur). lists one electricity distributor's archive of scheduled power-cut pdfs: eeq (quito, 2023-2024 blackout crises) or centrosur (azuay, cañar, morona santiago, 2023 on). regional, not national. next: get_cortes_horarios with a file's `archivo`. distribuidora eeq or centrosur. query free text matched (accent-insensitive) against the file's period, date, title or url, e.g. &quot;noviembre&quot;, &quot;2024-10&quot;. empty returns all files. format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-search_cortes" data-search="search_cortes scheduled power cuts: crisis pdfs (eeq, centrosur) or maintenance notices (emelnorte, elecgalápagos, eeasa). lists one distributor's scheduled power cuts: the crisis pdfs of eeq (quito, 2023-2024) and centrosur (azuay, cañar, morona santiago, 2023 onward), or the current maintenance notices of emelnorte (imbabura, carchi, north of pichincha, latest 100), elecgalapagos (by island, latest 100) and eeasa (tungurahua and pastaza, the coming days, no history). regional, not national. next: get_cortes_horarios with the `archivo`. distribuidora eeq, centrosur, emelnorte, elecgalapagos or eeasa. query free text matched, accent-insensitive, against the file's period, date, title or url (emelnorte/elecgalapagos: the notice's title and text; eeasa: date and sectors). empty returns all. format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_cortes</code>
-<span class="atlas-tool-desc">Scheduled power-cut PDFs of one utility (EEQ or CentroSur).</span>
+<span class="atlas-tool-desc">Scheduled power cuts: crisis PDFs (EEQ, CentroSur) or maintenance notices (Emelnorte, ElecGalápagos, EEASA).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Lists one electricity distributor&#39;s archive of scheduled power-cut PDFs: eeq (Quito, 2023-2024 blackout crises) or centrosur (Azuay, Cañar, Morona Santiago, 2023 on). Regional, not national. Next: get_cortes_horarios with a file&#39;s `archivo`.</p>
+<p class="atlas-tool-long">Lists one distributor&#39;s scheduled power cuts: the crisis PDFs of eeq (Quito, 2023-2024) and centrosur (Azuay, Cañar, Morona Santiago, 2023 onward), or the current maintenance notices of emelnorte (Imbabura, Carchi, north of Pichincha, latest 100), elecgalapagos (by island, latest 100) and eeasa (Tungurahua and Pastaza, the coming days, no history). Regional, not national. Next: get_cortes_horarios with the `archivo`.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>distribuidora</code></td><td><code>Distribuidora</code></td><td><code>required</code></td><td>eeq or centrosur.</td></tr>
+<tr><td><code>distribuidora</code></td><td><code>Distribuidora</code></td><td><code>required</code></td><td>eeq, centrosur, emelnorte, elecgalapagos or eeasa.</td></tr>
 
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched (accent-insensitive) against the file&#39;s period, date, title or URL, e.g. &#34;noviembre&#34;, &#34;2024-10&#34;. Empty returns all files.</td></tr>
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched, accent-insensitive, against the file&#39;s period, date, title or URL (emelnorte/elecgalapagos: the notice&#39;s title and text; eeasa: date and sectors). Empty returns all.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
 
@@ -1916,21 +1916,21 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_cortes_horarios" data-search="get_cortes_horarios parse one power-cut pdf into rows: date, time blocks, location and sectors. parses one scheduled power-cut pdf (`archivo` from search_cortes) into rows with page, date, time blocks without power, sectors and the utility's location fields (eeq: substation; centrosur: province/canton/zone). query filters by place. distribuidora eeq or centrosur. archivo the file's `archivo` from search_cortes (eeq: slug or url; centrosur: pdf url). query free text matched (accent-insensitive) against location and sectors, e.g. &quot;la floresta&quot;, &quot;gualaceo&quot;. empty returns every row. format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-get_cortes_horarios" data-search="get_cortes_horarios turns a power-cut pdf or notice into rows: date, time blocks, location, sectors and motive. turns a power-cut schedule or notice (`archivo` from search_cortes) into rows with date, time blocks without power, sectors and the location the utility publishes (eeq: substation; centrosur: province/canton/zone; elecgalápagos: island). maintenance notices add `motivo`; emelnorte notices published only as images return the links in `imagenes`. query filters by place. distribuidora eeq, centrosur, emelnorte, elecgalapagos or eeasa. archivo the `archivo` from search_cortes (eeq: slug or url; centrosur: pdf url; emelnorte/elecgalapagos: notice id; eeasa: vigentes). query free text matched (accent-insensitive) against location and sectors, e.g. &quot;la floresta&quot;, &quot;gualaceo&quot;. empty returns every row. format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_cortes_horarios</code>
-<span class="atlas-tool-desc">Parse one power-cut PDF into rows: date, time blocks, location and sectors.</span>
+<span class="atlas-tool-desc">Turns a power-cut PDF or notice into rows: date, time blocks, location, sectors and motive.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Parses one scheduled power-cut PDF (`archivo` from search_cortes) into rows with page, date, time blocks without power, sectors and the utility&#39;s location fields (EEQ: substation; CentroSur: province/canton/zone). query filters by place.</p>
+<p class="atlas-tool-long">Turns a power-cut schedule or notice (`archivo` from search_cortes) into rows with date, time blocks without power, sectors and the location the utility publishes (EEQ: substation; CentroSur: province/canton/zone; ElecGalápagos: island). Maintenance notices add `motivo`; Emelnorte notices published only as images return the links in `imagenes`. query filters by place.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>distribuidora</code></td><td><code>Distribuidora</code></td><td><code>required</code></td><td>eeq or centrosur.</td></tr>
+<tr><td><code>distribuidora</code></td><td><code>Distribuidora</code></td><td><code>required</code></td><td>eeq, centrosur, emelnorte, elecgalapagos or eeasa.</td></tr>
 
-<tr><td><code>archivo</code></td><td><code>str</code></td><td><code>required</code></td><td>The file&#39;s `archivo` from search_cortes (EEQ: slug or URL; CentroSur: PDF URL).</td></tr>
+<tr><td><code>archivo</code></td><td><code>str</code></td><td><code>required</code></td><td>The `archivo` from search_cortes (EEQ: slug or URL; CentroSur: PDF URL; emelnorte/elecgalapagos: notice id; eeasa: vigentes).</td></tr>
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched (accent-insensitive) against location and sectors, e.g. &#34;La Floresta&#34;, &#34;Gualaceo&#34;. Empty returns every row.</td></tr>
 
@@ -2520,23 +2520,23 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-search_capas_geo" data-search="search_capas_geo layers of the inamhi and mag geoportals (rainfall, land cover, agricultural zoning). searches the layer catalog (wms/wfs) of one geoserver geoportal: inamhi (rainfall normals and anomalies, wrf forecast grids, watersheds) or mag (agro zoning, land cover, agricultural censuses, rural cadastre, agroclimatic risk). solo_wfs=true keeps layers with attribute data. fuente inamhi or mag. query free text matched (accent-insensitive) against the layer's id, name, title or abstract. empty returns all layers. solo_wfs only return layers with wfs (attribute data). categoria only for fuente=&quot;mag&quot;: one of its 8 categories. ignored for inamhi. format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-search_capas_geo" data-search="search_capas_geo geoportal layers: inamhi and mag (rainfall, land cover, agriculture) and electricity-sector arcgis (arconel, celec). searches one geoportal's layer catalog: inamhi (precipitation normals, anomalies, wrf grids, watersheds), mag (agro-ecological zoning, land cover, agricultural censuses, rural cadastre), arconel (energy balance and losses by distributor and month 1999-apr 2024, billing, collection, subsidies and customers 1999-2025, plants, lines, substations, service areas) or celec (celec's plants and the march 2025 snt transmission network; survey123 layers are excluded on purpose). each layer carries `capa`, the id get_capa_geo_datos takes. fuente inamhi, mag, arconel or celec. query free text matched (accent-insensitive) against the layer's id, name, title or abstract. empty returns all layers. solo_wfs only return layers with wfs (attribute data). ignored for arconel and celec. categoria only for fuente=&quot;mag&quot;: one of its 8 categories. ignored for inamhi. format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_capas_geo</code>
-<span class="atlas-tool-desc">Layers of the INAMHI and MAG geoportals (rainfall, land cover, agricultural zoning).</span>
+<span class="atlas-tool-desc">Geoportal layers: INAMHI and MAG (rainfall, land cover, agriculture) and electricity-sector ArcGIS (ARCONEL, CELEC).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Searches the layer catalog (WMS/WFS) of one GeoServer geoportal: inamhi (rainfall normals and anomalies, WRF forecast grids, watersheds) or mag (agro zoning, land cover, agricultural censuses, rural cadastre, agroclimatic risk). solo_wfs=true keeps layers with attribute data.</p>
+<p class="atlas-tool-long">Searches one geoportal&#39;s layer catalog: inamhi (precipitation normals, anomalies, WRF grids, watersheds), mag (agro-ecological zoning, land cover, agricultural censuses, rural cadastre), arconel (energy balance and losses by distributor and month 1999-Apr 2024, billing, collection, subsidies and customers 1999-2025, plants, lines, substations, service areas) or celec (CELEC&#39;s plants and the March 2025 SNT transmission network; Survey123 layers are excluded on purpose). Each layer carries `capa`, the id get_capa_geo_datos takes.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>inamhi or mag.</td></tr>
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>inamhi, mag, arconel or celec.</td></tr>
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched (accent-insensitive) against the layer&#39;s id, name, title or abstract. Empty returns all layers.</td></tr>
 
-<tr><td><code>solo_wfs</code></td><td><code>bool</code></td><td><code>False</code></td><td>Only return layers with WFS (attribute data).</td></tr>
+<tr><td><code>solo_wfs</code></td><td><code>bool</code></td><td><code>False</code></td><td>Only return layers with WFS (attribute data). Ignored for arconel and celec.</td></tr>
 
 <tr><td><code>categoria</code></td><td><code>str</code></td><td><code>empty</code></td><td>Only for fuente=&#34;mag&#34;: one of its 8 categories. Ignored for inamhi.</td></tr>
 
@@ -2548,23 +2548,27 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_capa_geo_datos" data-search="get_capa_geo_datos attribute sample (up to 20 features) from a wfs-enabled layer. fetches a small sample of a geoportal layer's feature attributes (capa from search_capas_geo) using wfs getfeature. a preview, not a spatial query: no bbox or filters, and geometry coordinates are dropped. layers without wfs (rasters, some mag stores) raise an error. fuente inamhi or mag. capa the layer's `capa` from search_capas_geo (inamhi: &quot;geonode:...&quot; name; mag: &quot;categoria/store/name&quot;). count number of features to fetch (1-20, default 5). format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-get_capa_geo_datos" data-search="get_capa_geo_datos attributes of a geoportal layer: a sample of up to 20 features (wfs) or up to 500 filtered rows (arcgis). fetches the attributes of a layer from search_capas_geo, geometry coordinates dropped. for inamhi and mag it is a wfs getfeature sample with no filters; layers without wfs return an error. for arconel and celec it is an arcgis rest query: `filtro` is a sql where clause on the layer's fields (listed in `campos`), e.g. &quot;anio = 2024 and idmes = 4&quot; or &quot;empresa like 'cnel%'&quot;; `total_features_en_capa` counts the rows matching it and `hay_mas` says whether to page on with `offset`. dates come back as iso dates. fuente inamhi, mag, arconel or celec. capa the layer's `capa` from search_capas_geo (inamhi: &quot;geonode:...&quot; name; mag: &quot;categoria/store/name&quot;; arcgis: the short id, e.g. balance_energia). count features to fetch: 1-20 for inamhi/mag, 1-500 for arconel/celec (default 5). filtro arconel/celec only: sql where clause; empty for all rows. offset arconel/celec only: rows to skip when paging. format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_capa_geo_datos</code>
-<span class="atlas-tool-desc">Attribute sample (up to 20 features) from a WFS-enabled layer.</span>
+<span class="atlas-tool-desc">Attributes of a geoportal layer: a sample of up to 20 features (WFS) or up to 500 filtered rows (ArcGIS).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Fetches a small sample of a geoportal layer&#39;s feature attributes (capa from search_capas_geo) using WFS GetFeature. A preview, not a spatial query: no bbox or filters, and geometry coordinates are dropped. Layers without WFS (rasters, some MAG stores) raise an error.</p>
+<p class="atlas-tool-long">Fetches the attributes of a layer from search_capas_geo, geometry coordinates dropped. For inamhi and mag it is a WFS GetFeature sample with no filters; layers without WFS return an error. For arconel and celec it is an ArcGIS REST query: `filtro` is a SQL where clause on the layer&#39;s fields (listed in `campos`), e.g. &#34;Anio = 2024 AND IdMes = 4&#34; or &#34;Empresa LIKE &#39;CNEL%&#39;&#34;; `total_features_en_capa` counts the rows matching it and `hay_mas` says whether to page on with `offset`. Dates come back as ISO dates.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
 
-<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>inamhi or mag.</td></tr>
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>required</code></td><td>inamhi, mag, arconel or celec.</td></tr>
 
-<tr><td><code>capa</code></td><td><code>str</code></td><td><code>required</code></td><td>The layer&#39;s `capa` from search_capas_geo (INAMHI: &#34;geonode:...&#34; name; MAG: &#34;categoria/store/name&#34;).</td></tr>
+<tr><td><code>capa</code></td><td><code>str</code></td><td><code>required</code></td><td>The layer&#39;s `capa` from search_capas_geo (INAMHI: &#34;geonode:...&#34; name; MAG: &#34;categoria/store/name&#34;; ArcGIS: the short id, e.g. balance_energia).</td></tr>
 
-<tr><td><code>count</code></td><td><code>int</code></td><td><code>5</code></td><td>Number of features to fetch (1-20, default 5).</td></tr>
+<tr><td><code>count</code></td><td><code>int</code></td><td><code>5</code></td><td>Features to fetch: 1-20 for inamhi/mag, 1-500 for arconel/celec (default 5).</td></tr>
+
+<tr><td><code>filtro</code></td><td><code>str</code></td><td><code>empty</code></td><td>arconel/celec only: SQL where clause; empty for all rows.</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>arconel/celec only: rows to skip when paging.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
 

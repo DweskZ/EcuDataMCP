@@ -1892,21 +1892,21 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-search_cortes" data-search="search_cortes pdf de cortes de luz programados de una empresa eléctrica (eeq o centrosur). lista el archivo de pdf de cortes programados de una distribuidora: eeq (quito, crisis de apagones 2023-2024) o centrosur (azuay, cañar, morona santiago, desde 2023). es regional, no nacional. siguiente paso: get_cortes_horarios con el `archivo` de un pdf. distribuidora eeq o centrosur. query texto libre que se busca, sin distinguir tildes, en el período, fecha, título o url del archivo, p. ej. &quot;noviembre&quot;, &quot;2024-10&quot;. vacío devuelve todos. format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-search_cortes" data-search="search_cortes cortes de luz programados: pdf de crisis (eeq, centrosur) o avisos de mantenimiento (emelnorte, elecgalápagos, eeasa). lista los cortes programados de una distribuidora: los pdf de las crisis de eeq (quito, 2023-2024) y centrosur (azuay, cañar, morona santiago, desde 2023), o los avisos vigentes de mantenimiento de emelnorte (imbabura, carchi, norte de pichincha, los 100 más recientes), elecgalapagos (por isla, los 100 más recientes) y eeasa (tungurahua y pastaza, los próximos días, sin archivo histórico). es regional, no nacional. siguiente paso: get_cortes_horarios con el `archivo`. distribuidora eeq, centrosur, emelnorte, elecgalapagos o eeasa. query texto libre que se busca, sin distinguir tildes, en el período, fecha, título o url del archivo (emelnorte/elecgalapagos: título y texto del aviso; eeasa: fecha y sectores). vacío devuelve todos. format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_cortes</code>
-<span class="atlas-tool-desc">PDF de cortes de luz programados de una empresa eléctrica (EEQ o CentroSur).</span>
+<span class="atlas-tool-desc">Cortes de luz programados: PDF de crisis (EEQ, CentroSur) o avisos de mantenimiento (Emelnorte, ElecGalápagos, EEASA).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista el archivo de PDF de cortes programados de una distribuidora: eeq (Quito, crisis de apagones 2023-2024) o centrosur (Azuay, Cañar, Morona Santiago, desde 2023). Es regional, no nacional. Siguiente paso: get_cortes_horarios con el `archivo` de un PDF.</p>
+<p class="atlas-tool-long">Lista los cortes programados de una distribuidora: los PDF de las crisis de eeq (Quito, 2023-2024) y centrosur (Azuay, Cañar, Morona Santiago, desde 2023), o los avisos vigentes de mantenimiento de emelnorte (Imbabura, Carchi, norte de Pichincha, los 100 más recientes), elecgalapagos (por isla, los 100 más recientes) y eeasa (Tungurahua y Pastaza, los próximos días, sin archivo histórico). Es regional, no nacional. Siguiente paso: get_cortes_horarios con el `archivo`.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>distribuidora</code></td><td><code>Distribuidora</code></td><td><code>requerido</code></td><td>eeq o centrosur.</td></tr>
+<tr><td><code>distribuidora</code></td><td><code>Distribuidora</code></td><td><code>requerido</code></td><td>eeq, centrosur, emelnorte, elecgalapagos o eeasa.</td></tr>
 
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre que se busca, sin distinguir tildes, en el período, fecha, título o URL del archivo, p. ej. &#34;noviembre&#34;, &#34;2024-10&#34;. Vacío devuelve todos.</td></tr>
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre que se busca, sin distinguir tildes, en el período, fecha, título o URL del archivo (emelnorte/elecgalapagos: título y texto del aviso; eeasa: fecha y sectores). Vacío devuelve todos.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -1916,21 +1916,21 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_cortes_horarios" data-search="get_cortes_horarios lee un pdf de cortes de luz y lo convierte en filas: fecha, horario, ubicación y sectores. convierte un pdf de cortes programados (`archivo` de search_cortes) en filas con página, fecha, horario sin energía, sectores y los campos de ubicación de la empresa (eeq: subestación; centrosur: provincia/cantón/zona). el parámetro query filtra por lugar. distribuidora eeq o centrosur. archivo el `archivo` de search_cortes (eeq: slug o url; centrosur: url del pdf). query texto libre que se busca, sin distinguir tildes, en la ubicación y los sectores, p. ej. &quot;la floresta&quot;, &quot;gualaceo&quot;. vacío devuelve todas las filas. format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-get_cortes_horarios" data-search="get_cortes_horarios convierte un pdf o aviso de cortes en filas: fecha, horario, ubicación, sectores y motivo. convierte un cronograma o aviso de cortes (`archivo` de search_cortes) en filas con fecha, horario sin energía, sectores y la ubicación que publica la empresa (eeq: subestación; centrosur: provincia/cantón/zona; elecgalápagos: isla). los avisos de mantenimiento agregan `motivo`; los de emelnorte publicados solo como imagen devuelven los enlaces en `imagenes`. el parámetro query filtra por lugar. distribuidora eeq, centrosur, emelnorte, elecgalapagos o eeasa. archivo el `archivo` de search_cortes (eeq: slug o url; centrosur: url del pdf; emelnorte/elecgalapagos: id del aviso; eeasa: vigentes). query texto libre que se busca, sin distinguir tildes, en la ubicación y los sectores, p. ej. &quot;la floresta&quot;, &quot;gualaceo&quot;. vacío devuelve todas las filas. format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_cortes_horarios</code>
-<span class="atlas-tool-desc">Lee un PDF de cortes de luz y lo convierte en filas: fecha, horario, ubicación y sectores.</span>
+<span class="atlas-tool-desc">Convierte un PDF o aviso de cortes en filas: fecha, horario, ubicación, sectores y motivo.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Convierte un PDF de cortes programados (`archivo` de search_cortes) en filas con página, fecha, horario sin energía, sectores y los campos de ubicación de la empresa (EEQ: subestación; CentroSur: provincia/cantón/zona). El parámetro query filtra por lugar.</p>
+<p class="atlas-tool-long">Convierte un cronograma o aviso de cortes (`archivo` de search_cortes) en filas con fecha, horario sin energía, sectores y la ubicación que publica la empresa (EEQ: subestación; CentroSur: provincia/cantón/zona; ElecGalápagos: isla). Los avisos de mantenimiento agregan `motivo`; los de Emelnorte publicados solo como imagen devuelven los enlaces en `imagenes`. El parámetro query filtra por lugar.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>distribuidora</code></td><td><code>Distribuidora</code></td><td><code>requerido</code></td><td>eeq o centrosur.</td></tr>
+<tr><td><code>distribuidora</code></td><td><code>Distribuidora</code></td><td><code>requerido</code></td><td>eeq, centrosur, emelnorte, elecgalapagos o eeasa.</td></tr>
 
-<tr><td><code>archivo</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El `archivo` de search_cortes (EEQ: slug o URL; CentroSur: URL del PDF).</td></tr>
+<tr><td><code>archivo</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El `archivo` de search_cortes (EEQ: slug o URL; CentroSur: URL del PDF; emelnorte/elecgalapagos: id del aviso; eeasa: vigentes).</td></tr>
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre que se busca, sin distinguir tildes, en la ubicación y los sectores, p. ej. &#34;La Floresta&#34;, &#34;Gualaceo&#34;. Vacío devuelve todas las filas.</td></tr>
 
@@ -2520,23 +2520,23 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-search_capas_geo" data-search="search_capas_geo capas de los geoportales de inamhi y mag (lluvia, cobertura, zonificación agropecuaria). busca en el catálogo de capas (wms/wfs) de un geoportal geoserver: inamhi (normales de precipitación, anomalías, grillas del modelo wrf, cuencas) o mag (zonificación agroecológica, cobertura, censos agropecuarios, catastro rural, riesgo agroclimático). con solo_wfs=true deja las capas con datos de atributos. fuente inamhi o mag. query texto libre que se busca, sin distinguir tildes, en el id, nombre, título o resumen de la capa. vacío devuelve todas. solo_wfs devuelve solo las capas con wfs (datos de atributos). categoria solo para fuente=&quot;mag&quot;: una de sus 8 categorías. se ignora para inamhi. format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-search_capas_geo" data-search="search_capas_geo capas de geoportales: inamhi y mag (lluvia, cobertura, agro) y arcgis del sector eléctrico (arconel, celec). busca en el catálogo de capas de un geoportal: inamhi (normales de precipitación, anomalías, grillas wrf, cuencas), mag (zonificación agroecológica, cobertura, censos agropecuarios, catastro rural), arconel (balance de energía y pérdidas por distribuidora y mes 1999-abr 2024, facturación, recaudación, subsidios y clientes 1999-2025, centrales, líneas, subestaciones, áreas de servicio) o celec (centrales de celec y red de transmisión snt de marzo 2025; las capas de survey123 se excluyen a propósito). cada capa trae `capa`, el id que recibe get_capa_geo_datos. fuente inamhi, mag, arconel o celec. query texto libre que se busca, sin distinguir tildes, en el id, nombre, título o resumen de la capa. vacío devuelve todas. solo_wfs devuelve solo las capas con wfs (datos de atributos). se ignora para arconel y celec. categoria solo para fuente=&quot;mag&quot;: una de sus 8 categorías. se ignora para inamhi. format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_capas_geo</code>
-<span class="atlas-tool-desc">Capas de los geoportales de INAMHI y MAG (lluvia, cobertura, zonificación agropecuaria).</span>
+<span class="atlas-tool-desc">Capas de geoportales: INAMHI y MAG (lluvia, cobertura, agro) y ArcGIS del sector eléctrico (ARCONEL, CELEC).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Busca en el catálogo de capas (WMS/WFS) de un geoportal GeoServer: inamhi (normales de precipitación, anomalías, grillas del modelo WRF, cuencas) o mag (zonificación agroecológica, cobertura, censos agropecuarios, catastro rural, riesgo agroclimático). Con solo_wfs=true deja las capas con datos de atributos.</p>
+<p class="atlas-tool-long">Busca en el catálogo de capas de un geoportal: inamhi (normales de precipitación, anomalías, grillas WRF, cuencas), mag (zonificación agroecológica, cobertura, censos agropecuarios, catastro rural), arconel (balance de energía y pérdidas por distribuidora y mes 1999-abr 2024, facturación, recaudación, subsidios y clientes 1999-2025, centrales, líneas, subestaciones, áreas de servicio) o celec (centrales de CELEC y red de transmisión SNT de marzo 2025; las capas de Survey123 se excluyen a propósito). Cada capa trae `capa`, el id que recibe get_capa_geo_datos.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>requerido</code></td><td>inamhi o mag.</td></tr>
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>requerido</code></td><td>inamhi, mag, arconel o celec.</td></tr>
 
 <tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre que se busca, sin distinguir tildes, en el id, nombre, título o resumen de la capa. Vacío devuelve todas.</td></tr>
 
-<tr><td><code>solo_wfs</code></td><td><code>bool</code></td><td><code>False</code></td><td>Devuelve solo las capas con WFS (datos de atributos).</td></tr>
+<tr><td><code>solo_wfs</code></td><td><code>bool</code></td><td><code>False</code></td><td>Devuelve solo las capas con WFS (datos de atributos). Se ignora para arconel y celec.</td></tr>
 
 <tr><td><code>categoria</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Solo para fuente=&#34;mag&#34;: una de sus 8 categorías. Se ignora para inamhi.</td></tr>
 
@@ -2548,23 +2548,27 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_capa_geo_datos" data-search="get_capa_geo_datos muestra de atributos (hasta 20 objetos) de una capa con wfs. trae una muestra pequeña de atributos de una capa del geoportal (capa de search_capas_geo) mediante wfs getfeature. es una vista previa, no una consulta espacial: sin bbox ni filtros, y sin coordenadas de geometría. las capas sin wfs (rásteres, algunas del mag) devuelven error. fuente inamhi o mag. capa el campo `capa` de search_capas_geo (inamhi: nombre &quot;geonode:...&quot;; mag: &quot;categoria/store/nombre&quot;). count número de objetos a traer (1-20, default 5). format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-get_capa_geo_datos" data-search="get_capa_geo_datos atributos de una capa de geoportal: muestra de hasta 20 objetos (wfs) o hasta 500 filas filtradas (arcgis). trae los atributos de una capa de search_capas_geo, sin coordenadas de geometría. en inamhi y mag es una muestra por wfs getfeature, sin filtros; las capas sin wfs devuelven error. en arconel y celec es una consulta arcgis rest: `filtro` es una cláusula sql sobre los campos de la capa (listados en `campos`), p. ej. &quot;anio = 2024 and idmes = 4&quot; o &quot;empresa like 'cnel%'&quot;; `total_features_en_capa` cuenta las filas que cumplen el filtro y `hay_mas` indica si seguir con `offset`. las fechas llegan como fechas iso. fuente inamhi, mag, arconel o celec. capa el campo `capa` de search_capas_geo (inamhi: nombre &quot;geonode:...&quot;; mag: &quot;categoria/store/nombre&quot;; arcgis: el id corto, p. ej. balance_energia). count objetos a traer: 1-20 en inamhi/mag, 1-500 en arconel/celec (default 5). filtro solo arconel/celec: cláusula sql where; vacío trae todas las filas. offset solo arconel/celec: filas a saltar para paginar. format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_capa_geo_datos</code>
-<span class="atlas-tool-desc">Muestra de atributos (hasta 20 objetos) de una capa con WFS.</span>
+<span class="atlas-tool-desc">Atributos de una capa de geoportal: muestra de hasta 20 objetos (WFS) o hasta 500 filas filtradas (ArcGIS).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Trae una muestra pequeña de atributos de una capa del geoportal (capa de search_capas_geo) mediante WFS GetFeature. Es una vista previa, no una consulta espacial: sin bbox ni filtros, y sin coordenadas de geometría. Las capas sin WFS (rásteres, algunas del MAG) devuelven error.</p>
+<p class="atlas-tool-long">Trae los atributos de una capa de search_capas_geo, sin coordenadas de geometría. En inamhi y mag es una muestra por WFS GetFeature, sin filtros; las capas sin WFS devuelven error. En arconel y celec es una consulta ArcGIS REST: `filtro` es una cláusula SQL sobre los campos de la capa (listados en `campos`), p. ej. &#34;Anio = 2024 AND IdMes = 4&#34; o &#34;Empresa LIKE &#39;CNEL%&#39;&#34;; `total_features_en_capa` cuenta las filas que cumplen el filtro y `hay_mas` indica si seguir con `offset`. Las fechas llegan como fechas ISO.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
 <tbody>
 
-<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>requerido</code></td><td>inamhi o mag.</td></tr>
+<tr><td><code>fuente</code></td><td><code>Fuente</code></td><td><code>requerido</code></td><td>inamhi, mag, arconel o celec.</td></tr>
 
-<tr><td><code>capa</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El campo `capa` de search_capas_geo (INAMHI: nombre &#34;geonode:...&#34;; MAG: &#34;categoria/store/nombre&#34;).</td></tr>
+<tr><td><code>capa</code></td><td><code>str</code></td><td><code>requerido</code></td><td>El campo `capa` de search_capas_geo (INAMHI: nombre &#34;geonode:...&#34;; MAG: &#34;categoria/store/nombre&#34;; ArcGIS: el id corto, p. ej. balance_energia).</td></tr>
 
-<tr><td><code>count</code></td><td><code>int</code></td><td><code>5</code></td><td>Número de objetos a traer (1-20, default 5).</td></tr>
+<tr><td><code>count</code></td><td><code>int</code></td><td><code>5</code></td><td>Objetos a traer: 1-20 en inamhi/mag, 1-500 en arconel/celec (default 5).</td></tr>
+
+<tr><td><code>filtro</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Solo arconel/celec: cláusula SQL where; vacío trae todas las filas.</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Solo arconel/celec: filas a saltar para paginar.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
