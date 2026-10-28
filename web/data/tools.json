@@ -1930,19 +1930,19 @@
       },
       {
         "name": "search_cortes",
-        "description": "PDF de cortes de luz programados de una empresa eléctrica (EEQ o CentroSur).",
+        "description": "Cortes de luz programados: PDF de crisis (EEQ, CentroSur) o avisos de mantenimiento (Emelnorte, ElecGalápagos, EEASA).",
         "params": [
           {
             "name": "distribuidora",
             "type": "Distribuidora",
             "default": null,
-            "description": "eeq o centrosur."
+            "description": "eeq, centrosur, emelnorte, elecgalapagos o eeasa."
           },
           {
             "name": "query",
             "type": "str",
             "default": "''",
-            "description": "Texto libre que se busca, sin distinguir tildes, en el período, fecha, título o URL del archivo, p. ej. \"noviembre\", \"2024-10\". Vacío devuelve todos."
+            "description": "Texto libre que se busca, sin distinguir tildes, en el período, fecha, título o URL del archivo (emelnorte/elecgalapagos: título y texto del aviso; eeasa: fecha y sectores). Vacío devuelve todos."
           },
           {
             "name": "format",
@@ -1951,23 +1951,23 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Lista el archivo de PDF de cortes programados de una distribuidora: eeq (Quito, crisis de apagones 2023-2024) o centrosur (Azuay, Cañar, Morona Santiago, desde 2023). Es regional, no nacional. Siguiente paso: get_cortes_horarios con el `archivo` de un PDF."
+        "long_description": "Lista los cortes programados de una distribuidora: los PDF de las crisis de eeq (Quito, 2023-2024) y centrosur (Azuay, Cañar, Morona Santiago, desde 2023), o los avisos vigentes de mantenimiento de emelnorte (Imbabura, Carchi, norte de Pichincha, los 100 más recientes), elecgalapagos (por isla, los 100 más recientes) y eeasa (Tungurahua y Pastaza, los próximos días, sin archivo histórico). Es regional, no nacional. Siguiente paso: get_cortes_horarios con el `archivo`."
       },
       {
         "name": "get_cortes_horarios",
-        "description": "Lee un PDF de cortes de luz y lo convierte en filas: fecha, horario, ubicación y sectores.",
+        "description": "Convierte un PDF o aviso de cortes en filas: fecha, horario, ubicación, sectores y motivo.",
         "params": [
           {
             "name": "distribuidora",
             "type": "Distribuidora",
             "default": null,
-            "description": "eeq o centrosur."
+            "description": "eeq, centrosur, emelnorte, elecgalapagos o eeasa."
           },
           {
             "name": "archivo",
             "type": "str",
             "default": null,
-            "description": "El `archivo` de search_cortes (EEQ: slug o URL; CentroSur: URL del PDF)."
+            "description": "El `archivo` de search_cortes (EEQ: slug o URL; CentroSur: URL del PDF; emelnorte/elecgalapagos: id del aviso; eeasa: vigentes)."
           },
           {
             "name": "query",
@@ -1982,7 +1982,7 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Convierte un PDF de cortes programados (`archivo` de search_cortes) en filas con página, fecha, horario sin energía, sectores y los campos de ubicación de la empresa (EEQ: subestación; CentroSur: provincia/cantón/zona). El parámetro query filtra por lugar."
+        "long_description": "Convierte un cronograma o aviso de cortes (`archivo` de search_cortes) en filas con fecha, horario sin energía, sectores y la ubicación que publica la empresa (EEQ: subestación; CentroSur: provincia/cantón/zona; ElecGalápagos: isla). Los avisos de mantenimiento agregan `motivo`; los de Emelnorte publicados solo como imagen devuelven los enlaces en `imagenes`. El parámetro query filtra por lugar."
       },
       {
         "name": "get_arconel_reporte",
@@ -2652,13 +2652,13 @@
     "tools": [
       {
         "name": "search_capas_geo",
-        "description": "Capas de los geoportales de INAMHI y MAG (lluvia, cobertura, zonificación agropecuaria).",
+        "description": "Capas de geoportales: INAMHI y MAG (lluvia, cobertura, agro) y ArcGIS del sector eléctrico (ARCONEL, CELEC).",
         "params": [
           {
             "name": "fuente",
             "type": "Fuente",
             "default": null,
-            "description": "inamhi o mag."
+            "description": "inamhi, mag, arconel o celec."
           },
           {
             "name": "query",
@@ -2670,7 +2670,7 @@
             "name": "solo_wfs",
             "type": "bool",
             "default": "False",
-            "description": "Devuelve solo las capas con WFS (datos de atributos)."
+            "description": "Devuelve solo las capas con WFS (datos de atributos). Se ignora para arconel y celec."
           },
           {
             "name": "categoria",
@@ -2685,29 +2685,41 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Busca en el catálogo de capas (WMS/WFS) de un geoportal GeoServer: inamhi (normales de precipitación, anomalías, grillas del modelo WRF, cuencas) o mag (zonificación agroecológica, cobertura, censos agropecuarios, catastro rural, riesgo agroclimático). Con solo_wfs=true deja las capas con datos de atributos."
+        "long_description": "Busca en el catálogo de capas de un geoportal: inamhi (normales de precipitación, anomalías, grillas WRF, cuencas), mag (zonificación agroecológica, cobertura, censos agropecuarios, catastro rural), arconel (balance de energía y pérdidas por distribuidora y mes 1999-abr 2024, facturación, recaudación, subsidios y clientes 1999-2025, centrales, líneas, subestaciones, áreas de servicio) o celec (centrales de CELEC y red de transmisión SNT de marzo 2025; las capas de Survey123 se excluyen a propósito). Cada capa trae `capa`, el id que recibe get_capa_geo_datos."
       },
       {
         "name": "get_capa_geo_datos",
-        "description": "Muestra de atributos (hasta 20 objetos) de una capa con WFS.",
+        "description": "Atributos de una capa de geoportal: muestra de hasta 20 objetos (WFS) o hasta 500 filas filtradas (ArcGIS).",
         "params": [
           {
             "name": "fuente",
             "type": "Fuente",
             "default": null,
-            "description": "inamhi o mag."
+            "description": "inamhi, mag, arconel o celec."
           },
           {
             "name": "capa",
             "type": "str",
             "default": null,
-            "description": "El campo `capa` de search_capas_geo (INAMHI: nombre \"geonode:...\"; MAG: \"categoria/store/nombre\")."
+            "description": "El campo `capa` de search_capas_geo (INAMHI: nombre \"geonode:...\"; MAG: \"categoria/store/nombre\"; ArcGIS: el id corto, p. ej. balance_energia)."
           },
           {
             "name": "count",
             "type": "int",
             "default": "5",
-            "description": "Número de objetos a traer (1-20, default 5)."
+            "description": "Objetos a traer: 1-20 en inamhi/mag, 1-500 en arconel/celec (default 5)."
+          },
+          {
+            "name": "filtro",
+            "type": "str",
+            "default": "''",
+            "description": "Solo arconel/celec: cláusula SQL where; vacío trae todas las filas."
+          },
+          {
+            "name": "offset",
+            "type": "int",
+            "default": "0",
+            "description": "Solo arconel/celec: filas a saltar para paginar."
           },
           {
             "name": "format",
@@ -2716,7 +2728,7 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Trae una muestra pequeña de atributos de una capa del geoportal (capa de search_capas_geo) mediante WFS GetFeature. Es una vista previa, no una consulta espacial: sin bbox ni filtros, y sin coordenadas de geometría. Las capas sin WFS (rásteres, algunas del MAG) devuelven error."
+        "long_description": "Trae los atributos de una capa de search_capas_geo, sin coordenadas de geometría. En inamhi y mag es una muestra por WFS GetFeature, sin filtros; las capas sin WFS devuelven error. En arconel y celec es una consulta ArcGIS REST: `filtro` es una cláusula SQL sobre los campos de la capa (listados en `campos`), p. ej. \"Anio = 2024 AND IdMes = 4\" o \"Empresa LIKE 'CNEL%'\"; `total_features_en_capa` cuenta las filas que cumplen el filtro y `hay_mas` indica si seguir con `offset`. Las fechas llegan como fechas ISO."
       }
     ]
   }

@@ -586,6 +586,33 @@
             "coverage": "eeq.com.ec",
             "url": "https://www.eeq.com.ec",
             "status": "live"
+          },
+          {
+            "id": "emelnorte-cortes",
+            "name": "Emelnorte",
+            "tag": "Energía",
+            "description": "Avisos de cortes por mantenimiento en Imbabura, Carchi y el norte de Pichincha (los 100 más recientes); search_cortes con distribuidora=\"emelnorte\"",
+            "coverage": "emelnorte.com",
+            "url": "https://www.emelnorte.com",
+            "status": "live"
+          },
+          {
+            "id": "elecgalapagos-cortes",
+            "name": "ElecGalápagos",
+            "tag": "Energía",
+            "description": "Mantenimientos programados en San Cristóbal, Santa Cruz e Isabela (los 100 más recientes); search_cortes con distribuidora=\"elecgalapagos\"",
+            "coverage": "elecgalapagos.com.ec",
+            "url": "https://www.elecgalapagos.com.ec",
+            "status": "live"
+          },
+          {
+            "id": "eeasa-cortes",
+            "name": "EEASA",
+            "tag": "Energía",
+            "description": "Trabajos programados de los próximos días en Tungurahua y Pastaza, sin archivo histórico; search_cortes con distribuidora=\"eeasa\"",
+            "coverage": "eeasa.com.ec",
+            "url": "https://www.eeasa.com.ec/trabajos-programados/",
+            "status": "live"
           }
         ]
       },
@@ -599,6 +626,38 @@
             "description": "Generador público de estadísticas eléctricas: 28 tipos de reporte (balance de energía, pérdidas, facturación, infraestructura), desde 1998",
             "coverage": "reportes.arconel.gob.ec",
             "url": "https://reportes.arconel.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "arconel-arcgis",
+            "name": "ARCONEL — capas ArcGIS",
+            "tag": "Energía",
+            "description": "Balance de energía y pérdidas por distribuidora y mes (1999-abr 2024), facturación, recaudación, subsidios y clientes (1999-2025), centrales, líneas y subestaciones; search_capas_geo con fuente=\"arconel\"",
+            "coverage": "services3.arcgis.com",
+            "url": "https://geopanel-arcelectricidad.hub.arcgis.com",
+            "status": "live"
+          },
+          {
+            "id": "arconel-publicaciones",
+            "name": "ARCONEL — publicaciones",
+            "tag": "Energía",
+            "description": "Estadística anual 1990-2025 y Atlas, mapas, balance nacional vigente, tarifas 2023-2026 y las 51 regulaciones vigentes; list_archivo_secciones con fuente=\"arconel\"",
+            "coverage": "arconel.gob.ec",
+            "url": "https://arconel.gob.ec",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "CELEC EP",
+        "sources": [
+          {
+            "id": "celec-arcgis",
+            "name": "CELEC EP — portal ArcGIS",
+            "tag": "Energía",
+            "description": "Las 40 centrales de generación de CELEC y la red del Sistema Nacional de Transmisión (marzo 2025); search_capas_geo con fuente=\"celec\"",
+            "coverage": "portalarcgis.celec.gob.ec",
+            "url": "https://portalarcgis.celec.gob.ec",
             "status": "live"
           }
         ]
