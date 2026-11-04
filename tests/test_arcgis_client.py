@@ -178,3 +178,12 @@ async def test_sumar_rejects_unknown_and_text_fields(httpx_mock):
         await client.get_layer_features("arconel", "produccion_centrales", sumar="TipoCentral")
     with pytest.raises(ValueError, match="junto con"):
         await client.get_layer_features("arconel", "produccion_centrales", agrupar="TipoCentral")
+
+
+async def test_unreachable_server_names_the_host(httpx_mock):
+    import httpx
+
+    httpx_mock.add_exception(httpx.ConnectTimeout(""), url=f"{_PRODUCCION}?f=json")
+
+    with pytest.raises(ValueError, match=r"geoportal\.arconel\.gob\.ec:6443 no respondió \(ConnectTimeout\)"):
+        await client.get_layer_features("arconel", "produccion_centrales")

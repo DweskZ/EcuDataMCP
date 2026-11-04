@@ -35,7 +35,9 @@ import json
 import logging
 from datetime import UTC, datetime
 from typing import Any
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit
+
+import httpx
 
 from helpers.cache import TtlCache
 from helpers.csv_reader import download_bytes
@@ -239,7 +241,17 @@ def _entry(fuente: str, capa: str) -> dict[str, str]:
 
 
 async def _get_json(url: str) -> dict[str, Any]:
-    raw, truncated = await download_bytes(url)
+    try:
+        raw, truncated = await download_bytes(url)
+    except httpx.HTTPError as e:
+        # A connect timeout stringifies to "", which left the tool error
+        # empty. ARCONEL's own server (port 6443) goes down for days at a
+        # time (2026-10-26, 2026-11-04 afternoon).
+        host = urlsplit(url).netloc
+        raise ValueError(
+            f"{host} no respondió ({type(e).__name__}); el servidor puede estar caído, "
+            "reintenta luego."
+        ) from e
     if truncated:
         raise ValueError("La respuesta de ArcGIS superó el límite de descarga; reduce count.")
     payload = json.loads(raw.decode("utf-8", errors="replace"))

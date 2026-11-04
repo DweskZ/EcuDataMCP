@@ -56,20 +56,21 @@ uv run python main.py --host 127.0.0.1
 Este repositorio deja preparado el proceso y su configuración, pero no crea
 una instancia pública ni administra DNS, certificados, secretos o facturación.
 
-## Instancia en Azure (Brazil South)
+## Instancia en Azure (East US)
 
 Desde 2026-11-04 hay una instancia pública en Azure Container Apps, región
-Brazil South, la más cercana a Ecuador entre las de Azure:
+East US (Virginia):
 
-- URL: `https://ecudatamcp-mcp.ashystone-5da80e36.brazilsouth.azurecontainerapps.io/mcp`
+- URL: `https://ecudatamcp-mcp.happysky-44a1dbf7.eastus.azurecontainerapps.io/mcp`
   (`/health` para el estado).
 - Grupo de recursos `ecudatamcp-rg`, con:
-  - el registro `ecudatamcpacr94e57f`
-  - el entorno `ecudatamcp-env`
   - la app `ecudatamcp-mcp` (0,5 vCPU, 1 GiB, una réplica siempre encendida)
-  - la cuenta de almacenamiento `ecudatamcpdata94e57f`, cuyo recurso compartido
+    en el entorno `ecudatamcp-env-eastus`
+  - la cuenta de almacenamiento `ecudatamcpus94e57f`, cuyo recurso compartido
     `data` se monta en `/app/data`
-  - el área de trabajo de Log Analytics `ecudatamcp-logs`
+  - el registro `ecudatamcpacr94e57f` y el área de trabajo de Log Analytics
+    `ecudatamcp-logs`. Estos dos quedaron en Brazil South, donde estuvo la
+    primera versión; la app los usa entre regiones.
 - Configuración:
   - Sin token: `MCP_REQUIRE_AUTH=0`, con el límite de 120 peticiones por minuto
     y por IP.
@@ -78,18 +79,34 @@ Brazil South, la más cercana a Ecuador entre las de Azure:
     puede escribir en él y `nobrl` evita los bloqueos de rango que SQLite no
     tolera sobre SMB.
   - La app baja la imagen con su identidad administrada (rol `AcrPull`).
-- Geobloqueo: Brasil no basta, y para algunos hosts es peor que EE. UU.
-  Smoke del 2026-11-04 contra esta instancia: 68 de 77 checks bien, 9
-  fallidos, 4 saltados. No completan la conexión desde Brazil South:
-  - `www.gob.ec` (trámites, instituciones, regulaciones)
-  - `www.salud.gob.ec` (gacetas del MSP)
-  - `www.gestionderiesgos.gob.ec` (SITREP de la SGR)
-  - Supercías, ANDA e infoMIES
 
-  Los runners de GitHub, en EE. UU., sí llegan a gob.ec y a la SGR. CKAN,
-  Superbancos, ARCONEL, BCE y el resto responden. Sin
-  `ECUADOR_MCP_GEO_PROXY` esas fuentes quedan caídas aquí, y la base de
-  financieros de Supercías no se construye.
+**Por qué East US y no Brazil South.** El 2026-11-04 se probaron 56 URLs de
+fuentes, una petición por URL y por origen. Desde Brazil South respondieron
+34, desde Canada Central 38, desde East US 44 y desde una VPN con salida en
+Ecuador 51.
+
+Lo que bloquea cada origen:
+
+- **Solo Brazil South** (East US sí llega):
+  - `www.gob.ec`
+  - `www.salud.gob.ec`
+  - `www.gestionderiesgos.gob.ec`
+  - ARCSA, MEF/MDEP, Ambiente y Energía y CNIG
+- **Brazil South y Canada Central:** Supercías, Ministerio del Trabajo,
+  `arconel.gob.ec` y el CKAN de Cuenca.
+- **Todo centro de datos probado** (solo responden desde la VPN):
+  - con 403: ANDA, `censoecuador.gob.ec`, `www.igepn.edu.ec` y CNE
+  - sin respuesta: infoMIES, SEPS (`estadisticas.seps.gob.ec`) y
+    `educacion.gob.ec`
+
+Esas siete fuentes necesitan `ECUADOR_MCP_GEO_PROXY` con salida en Ecuador.
+`evaluaciones.evaluacion.gob.ec` (INEVAL BI) cierra el handshake TLS desde
+todos los orígenes, VPN incluida. `reportes.arconel.gob.ec` no respondió desde
+ninguno.
+
+La VPN probada sale por Datacamp/PacketHub: ip-api la ubica en Quito, ipinfo en
+Colombia. EEQ y el geoportal del MAG por HTTPS cortan esa VPN pero responden
+desde Azure.
 
 Para publicar una versión nueva desde un clon (en Git Bash, con
 `MSYS_NO_PATHCONV=1` para que los ids `/subscriptions/...` no se conviertan en
