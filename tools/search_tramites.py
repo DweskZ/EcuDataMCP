@@ -1,6 +1,6 @@
 import re
 from functools import partial
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -10,6 +10,7 @@ from helpers import gobec_client
 from helpers.format_out import render_structured
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoBusqueda
 from helpers.text_utils import strip_accents
 from helpers.tool_meta import READ_ONLY
 
@@ -91,7 +92,7 @@ def register_search_tramites_tool(mcp: MCPServer) -> None:
         institution_id: str = "",
         page: int = 1,
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         Search for government procedures (trámites) on Ecuador's official portal gob.ec.
 

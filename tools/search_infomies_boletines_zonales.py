@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import infomies_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoBusqueda
 from helpers.tool_meta import READ_ONLY
 
 
@@ -27,7 +28,7 @@ def register_search_infomies_boletines_zonales_tool(mcp: MCPServer) -> None:
         anio: int | None = None,
         query: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         List infoMIES's (info.desarrollohumano.gob.ec) zonal bulletin files.
         Two distinct series live under this name, confirmed live 2026-09-03

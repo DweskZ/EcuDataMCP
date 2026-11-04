@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import sgr_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoListado
 from helpers.tool_meta import READ_ONLY
 
 
@@ -19,7 +20,7 @@ def register_list_sat_tsunami_tool(mcp: MCPServer) -> None:
     @log_tool
     async def list_sat_tsunami(
         limit: int = 30, format: Literal["text", "json"] = "text"
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoListado]:
         """
         List tsunami early-warning SAT stations published by SGR (Gestión de Riesgos).
 

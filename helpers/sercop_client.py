@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import asyncio
 import logging
-import time
 from datetime import datetime
 from typing import Any
 
@@ -13,9 +11,8 @@ import httpx
 from helpers import env_config
 from helpers.cache import TtlCache, sercop_search_cache
 from helpers.ecuador_time import ECUADOR_TZ
-from helpers.geo_proxy import proxy_for
+from helpers.http_client import RateLimitedError, get_with_retry, new_client
 from helpers.logging import MAIN_LOGGER_NAME
-from helpers.user_agent import USER_AGENT
 
 # Ecuador mainland is UTC-5 year-round (no DST); UTC would flip the default
 # year at 19:00 local time on 31 Dec.
@@ -23,28 +20,21 @@ _ECUADOR_TZ = ECUADOR_TZ
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
-_TIMEOUT = 30.0
 _MAX_RETRIES = 4
-_COOLDOWN_UNTIL = 0.0
 _negative_cache = TtlCache(ttl_seconds=90.0, max_entries=64)
 
 
-class SercopRateLimitError(RuntimeError):
+class SercopRateLimitError(RateLimitedError):
     """Raised when SERCOP keeps returning HTTP 429 after retries."""
+
+    def __init__(self, message: str, seconds_left: float = 0.0) -> None:
+        RuntimeError.__init__(self, message)
+        self.host = "datosabiertos.compraspublicas.gob.ec"
+        self.seconds_left = seconds_left
 
 
 def _sercop_url(path: str) -> str:
     return f"{env_config.get_base_url('sercop')}{path.lstrip('/')}"
-
-
-def _in_cooldown() -> bool:
-    return time.monotonic() < _COOLDOWN_UNTIL
-
-
-def _trip_cooldown(seconds: float = 45.0) -> None:
-    global _COOLDOWN_UNTIL
-    _COOLDOWN_UNTIL = max(_COOLDOWN_UNTIL, time.monotonic() + seconds)
-    logger.warning("SERCOP cooldown active for %.0fs", seconds)
 
 
 async def _get_json(
@@ -52,82 +42,38 @@ async def _get_json(
     params: dict[str, Any] | None = None,
     session: httpx.AsyncClient | None = None,
 ) -> Any:
-    if _in_cooldown():
-        raise SercopRateLimitError(
-            "SERCOP en cooldown tras rate-limit (429). Reintenta en ~1 minuto."
-        )
-
     own = session is None
     if own:
-        session = httpx.AsyncClient(
-            headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
-            follow_redirects=True,
-            proxy=proxy_for(url),
-        )
+        session = new_client(url, headers={"Accept": "application/json"})
     assert session is not None
     try:
-        last_exc: Exception | None = None
-        for attempt in range(_MAX_RETRIES):
-            try:
-                logger.debug("SERCOP GET %s params=%s", url, params)
-                resp = await session.get(url, params=params, timeout=_TIMEOUT)
-                if resp.status_code == 429:
-                    retry_after = resp.headers.get("Retry-After")
-                    try:
-                        wait = float(retry_after) if retry_after else 2.0 * (attempt + 1)
-                    except ValueError:
-                        wait = 2.0 * (attempt + 1)
-                    wait = min(max(wait, 1.0), 20.0)
-                    logger.warning(
-                        "SERCOP rate limited (429); retrying in %.1fs", wait
-                    )
-                    await asyncio.sleep(wait)
-                    last_exc = httpx.HTTPStatusError(
-                        "SERCOP rate limited",
-                        request=resp.request,
-                        response=resp,
-                    )
-                    continue
-                resp.raise_for_status()
-                return resp.json()
-            except httpx.HTTPError as exc:
-                last_exc = exc
-                if attempt + 1 < _MAX_RETRIES:
-                    await asyncio.sleep(1.0 * (attempt + 1))
-                    continue
-                logger.error("SERCOP request failed for %s: %s", url, exc)
-                if isinstance(exc, httpx.HTTPStatusError):
-                    raise
-                # A bare ConnectError/ConnectTimeout stringifies to
-                # something like "All connection attempts failed", naming
-                # no host. compraspublicas.gob.ec has been observed
-                # dropping the TCP handshake entirely (no RST, no HTTP
-                # response) for connections from outside Ecuador/Latin
-                # America -- the same regional restriction
-                # datosabiertos.gob.ec enforces at the HTTP layer with a
-                # 403 (see ckan_client._fetch_json). Name that likely
-                # cause instead of a bare connection error.
-                raise RuntimeError(
-                    "No se pudo conectar al portal de Datos Abiertos de "
-                    "Compras Públicas (compraspublicas.gob.ec). Esto suele "
-                    "pasar cuando el servidor se conecta desde fuera de "
-                    "Latinoamérica. Si el problema persiste, prueba "
-                    "conectando desde una VPN con salida en algún país de "
-                    "la región."
-                ) from exc
-        _trip_cooldown(45.0)
-        if (
-            isinstance(last_exc, httpx.HTTPStatusError)
-            and last_exc.response is not None
-            and last_exc.response.status_code == 429
-        ):
+        logger.debug("SERCOP GET %s params=%s", url, params)
+        try:
+            resp = await get_with_retry(session, url, params=params, attempts=_MAX_RETRIES)
+        except RateLimitedError as exc:
             raise SercopRateLimitError(
-                "SERCOP rate limited (429) tras varios reintentos. "
-                "Espera ~1 minuto o usa un year/query distinto."
-            ) from last_exc
-        if last_exc:
-            raise last_exc
-        raise SercopRateLimitError("SERCOP rate limited (429)")
+                "SERCOP limitó las consultas (HTTP 429) tras varios reintentos. "
+                f"Espera ~{exc.seconds_left:.0f} s o usa un year/query distinto.",
+                exc.seconds_left,
+            ) from exc
+        except httpx.TransportError as exc:
+            logger.error("SERCOP request failed for %s: %s", url, exc)
+            # A bare ConnectError/ConnectTimeout stringifies to something
+            # like "All connection attempts failed", naming no host.
+            # compraspublicas.gob.ec has been observed dropping the TCP
+            # handshake entirely for connections from outside Ecuador/Latin
+            # America -- the same regional restriction datosabiertos.gob.ec
+            # enforces with a 403 (see ckan_client._fetch_json).
+            raise RuntimeError(
+                "No se pudo conectar al portal de Datos Abiertos de "
+                "Compras Públicas (compraspublicas.gob.ec). Esto suele "
+                "pasar cuando el servidor se conecta desde fuera de "
+                "Latinoamérica. Si el problema persiste, prueba "
+                "conectando desde una VPN con salida en algún país de "
+                "la región."
+            ) from exc
+        resp.raise_for_status()
+        return resp.json()
     finally:
         if own:
             await session.aclose()

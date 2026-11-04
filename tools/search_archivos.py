@@ -12,7 +12,7 @@ and keeps any source-specific fields beside them.
 """
 
 from collections.abc import Awaitable, Callable
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -35,6 +35,7 @@ from helpers import (
 )
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoBusqueda
 from helpers.text_utils import strip_accents
 from helpers.tool_meta import READ_ONLY
 
@@ -169,7 +170,7 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
         offset: int = 0,
         formato: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         Search one institution's catalog of published files (direct links).
 

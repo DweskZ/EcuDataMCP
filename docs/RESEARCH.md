@@ -6615,6 +6615,79 @@ formularios PrimeFaces (`bsf.jsf`, `bss.jsf`, `efpt.jsf`) en
 `appweb.superbancos.gob.ec`. La mayoría de los archivos de series pasa de
 5 MB.
 
+## Trigésimo séptima pasada — formularios de Superbancos, Turismo, IGM y Registro Oficial (2026-11-04)
+
+**Superbancos, balances y patrimonio técnico: descartado por captcha.** Las
+páginas WordPress `balances-generales`, `balances-generales-3` y
+`patrimonio-tecnico` incrustan
+`appweb.superbancos.gob.ec/gen/publico/reportes/{bsf,bss,efpt}.jsf`. Los tres
+son PrimeFaces con `javax.faces.ViewState` y combos en cascada por AJAX
+(`tipoInstitucion` → `institucion` → `anio` → `mes` → `formato`, PDF o
+`application/vnd.ms-excel`; en `efpt` el orden es año → mes → tipo). `bsf`
+lista 19 tipos de institución (bancos privados nacionales `3`, cooperativas
+`19`, mutualistas `14`, públicas `1`…), `bss` 4 de seguridad social y `efpt`
+años 2002-2026. El botón Descargar va detrás de un widget reCAPTCHA v2
+(`form:captcha`, sitekey de Google) en los tres formularios. Por la misma
+política que SERCOP y SENESCYT, no se automatiza; los indicadores de
+solidez y los boletines ya construidos cubren buena parte del contenido.
+
+**Ministerio de Turismo: el dominio ya no existe.** `servicios.turismo.gob.ec`,
+`turismo.gob.ec` y `www.turismo.gob.ec` dan NXDOMAIN (8.8.8.8, 1.1.1.1 y el
+resolvedor local); el ministerio se fusionó con Producción (Decreto 60,
+2025) y el trámite de gob.ec todavía enlaza la URL muerta. El sucesor es
+`https://www.produccion.gob.ec/boletin-de-cifras-sector-turismo/` (post
+15593): boletines mensuales en PDF de noviembre 2025 a septiembre 2026
+(~33 páginas: barómetro ONU Turismo, entradas y salidas con tabla por
+nacionalidad, ocupación en feriados, visitas a áreas protegidas, catastro
+de 36.017 establecimientos, más cifras del BCE, INEC y SRI). Sin XLSX ni
+CSV. La API de medios de WordPress enumera los PDFs con su URL real
+(`/wp-json/wp/v2/media?search=turismo&per_page=30&_fields=date,source_url,mime_type`),
+mejor que el post, cuyos enlaces pasan por acortadores (goo.su,
+acortar.link, lix.li, este último con TLS roto). HEAD de un boletín: 200,
+`application/pdf`, ~2,3 MB. Construible como listado de archivos +
+`read_pdf`; las tablas habría que sacarlas del PDF.
+
+**IGM Geoportal: geoservicios abiertos, GeoServer.** El host es
+`www.geoportaligm.gob.ec` (no existen `geoportal.igm.gob.ec` ni
+`www.igm.gob.ec`). WFS 2.0.0 con salida `application/json`, `SHAPE-ZIP` y
+`csv`, sin login:
+
+| Endpoint | Capas | Espacios de trabajo |
+|---|---|---|
+| `/nacional/wfs` (y `/nacional/wms`) | 68 | `nacional_2024` (37: límites, poblados, vías, ríos, curvas de nivel, ZEE…), `igm` (31) |
+| `/50k/wfs` (y `/50k/wms`) | 629 | `actualizada` 207, `galapagos50k` 168, `igm` 130, `igm_reservada` 124 |
+| `/25k/wfs` | 164 | `igm` |
+| `/geoserver/ows` | WMS 15, WFS 1 | solo `fiscalizacion:fiscalizacion` |
+
+`igm_reservada:*` responde 401 (reservada); 1:50.000 y 1:25.000 son
+abiertas; lo catastral solo aparece como huellas de contratos. Ejemplo:
+`/nacional/wfs?service=WFS&version=2.0.0&request=GetFeature&typeNames=nacional_2024:poblado_p_2024&count=1&outputFormat=application/json`
+→ 200 JSON, `numberMatched: 1340`. CRS nativo EPSG:32717;
+`srsName=EPSG:4326` funciona. Una sola provincia pesa 1,5 MB, así que hace
+falta tope de tamaño. Los WMS en cascada de `/geoserver` (`mapabase:*`)
+fallan en GetMap (el servidor no se alcanza a sí mismo); los teselas WMTS
+cacheadas sí responden. Las descargas libres 1:1M del portal son `.rar`
+(descartado). Encaja en `search_capas_geo`/`get_capa_geo_datos` como
+cliente WFS, igual que INAMHI/SIPA.
+
+**Registro Oficial: listado por AJAX abierto.** WordPress 6.7 + Divi, sin
+WAF ni captcha; la API REST pide autorización (401) pero
+`POST /wp-admin/admin-ajax.php` con `action=get_term_post_kilur_con_imagen`
+responde sin sesión. Parámetros: `year_id` (2026=2002, 2025=2000; mapeo en
+`data-year-id` de la página de producto, 26 años desde 2001), `mes_id`
+(octubre=1988, noviembre=1989, compartido entre años), `name_folder`,
+`page` (12 por página) e `id_carpeta` por tipo: 1954 Registro Oficial, 1991
+Suplementos (todos los niveles), 1992 Edición Especial, 1995 Constitucional,
+1994 Jurídica, 1993 Índice Mensual. Devuelve `{"success":true,"data":"<html>"}`
+con tipo, número ("Año II - Nº 381"), fecha, páginas y enlace. No hay filtro
+por día: se pide el mes y se pagina (los suplementos de octubre 2026 son
+11 páginas). Para 2026-10-01: RO Nº 381 (49 pp.), Primer a Sexto Suplemento
+y Ediciones Especiales 1673-1675. El PDF vive en
+`esacc.corteconstitucional.gob.ec/storage/api/v1/10_DWL_FL/<base64({"carpeta":"ro","uuid":"<uuid>.pdf"})>`:
+200, `application/pdf`, sin login, sin `Content-Length` y sin soporte de
+Range (el tope de 5 MB se aplica descargando). La búsqueda propia del sitio
+(`?s=`) no se probó.
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import sipa_resumen_indicadores_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoSerie
 from helpers.tool_meta import READ_ONLY
 
 
@@ -22,7 +23,7 @@ def register_get_sipa_resumen_indicadores_tool(mcp: MCPServer) -> None:
     @log_tool
     async def get_sipa_resumen_indicadores(
         anio: int, format: Literal["text", "json"] = "text"
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoSerie]:
         """
         List the direct monthly PDF links for one year of SIPA's (Ministerio
         de Agricultura) "Resumen de Indicadores" report — reached from the

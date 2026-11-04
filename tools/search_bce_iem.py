@@ -1,5 +1,5 @@
 import logging
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -9,6 +9,7 @@ from helpers import bce_iem_client
 from helpers.format_out import render_structured
 from helpers.logging import MAIN_LOGGER_NAME, log_tool
 from helpers.response_contract import with_response_metadata
+from helpers.result_types import ResultadoBusqueda
 from helpers.tool_meta import READ_ONLY
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
@@ -36,7 +37,7 @@ def register_search_bce_iem_tool(mcp: MCPServer) -> None:
         hash_archivos: bool = False,
         max_hash_archivos: int = 5000,
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """Search individual Excel tables in the BCE's latest IEM bulletin.
 
         Use this for detailed BCE tables not conveniently available through

@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import gobec_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoListado
 from helpers.tool_meta import READ_ONLY
 
 
@@ -22,7 +23,7 @@ def register_list_instituciones_tool(mcp: MCPServer) -> None:
     @log_tool
     async def list_instituciones(
         query: str = "", page: int = 1, format: Literal["text", "json"] = "text"
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoListado]:
         """
         List or search public institutions registered on Ecuador's gob.ec portal.
 

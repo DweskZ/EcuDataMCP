@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import sri_ruc_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoBusqueda
 from helpers.tool_meta import READ_ONLY
 
 
@@ -24,7 +25,7 @@ def register_search_sri_ruc_tool(mcp: MCPServer) -> None:
         razon_social: str,
         max_resultados: int = 25,
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         Buscar contribuyentes en el RUC del SRI por razón social o nombre
         comercial (texto parcial), sin necesitar el RUC exacto de antemano.

@@ -1,5 +1,5 @@
 import logging
-from typing import Literal
+from typing import Annotated, Literal
 from urllib.parse import urlsplit
 
 import httpx
@@ -15,6 +15,7 @@ from helpers.csv_reader import (
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.preview_dispatch import PREVIEW_DISPATCH, preview_by_kind
+from helpers.result_types import ResultadoTabla
 from helpers.safe_download import UnsafeUrlError
 from helpers.tool_meta import READ_ONLY
 
@@ -121,7 +122,7 @@ def register_preview_resource_data_tool(mcp: MCPServer) -> None:
         rows: int = 20,
         source: ckan_client.CkanSource = "nacional",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoTabla]:
         """
         Download and preview a resource from Ecuador's open data portal.
 

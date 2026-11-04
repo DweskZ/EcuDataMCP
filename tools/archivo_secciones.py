@@ -9,7 +9,7 @@ same file-listing shape; `fuente` now picks the institution instead (the same pa
 `source=` on the CKAN tools). The per-source clients are unchanged.
 """
 
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -33,6 +33,7 @@ from helpers import (
 )
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoArchivos, ResultadoListado
 from helpers.tool_meta import READ_ONLY
 
 Fuente = Literal[
@@ -163,7 +164,7 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
     @log_tool
     async def list_archivo_secciones(
         fuente: Fuente, format: Literal["text", "json"] = "text"
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoListado]:
         """
         List the sections of one institution's document archive.
 
@@ -288,7 +289,7 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
     @log_tool
     async def get_archivo_seccion(
         fuente: Fuente, seccion: str, format: Literal["text", "json"] = "text"
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoArchivos]:
         """
         List the files published in one section of an institutional archive.
 

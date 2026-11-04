@@ -68,7 +68,7 @@ _MAX_GRID_AUDIT_COMBINATIONS = 500
 
 # The catalog tree is small (~98 nodes) and rarely changes; a day balances
 # staleness against not re-fetching it on every search.
-_tree_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
+_tree_cache = TtlCache(ttl_seconds=86400.0, max_entries=1, persist="bcedata_tree")
 # Bundles (per-group metadata) change even less often than the tree itself.
 _bundle_cache = TtlCache(ttl_seconds=86400.0, max_entries=256)
 # The tree's leaf groups enriched with their series labels (see

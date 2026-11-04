@@ -73,8 +73,13 @@ async def test_text_output_lists_inec_files_ckan_and_avisos(mcp, calls):
 async def test_json_output_returns_the_structured_result(mcp):
     result = await mcp.call_tool("search_siniestros_ant", {"format": "json"})
 
-    assert json.loads(result.content[0].text) == _RESULT
-    assert result.structured_content == _RESULT
+    # Every response also carries the generic metadatos envelope.
+    payload = json.loads(result.content[0].text)
+    assert payload.pop("metadatos")["esquema"]["nombre"] == "ecudatamcp.search_siniestros_ant"
+    assert payload == _RESULT
+    structured = dict(result.structured_content)
+    structured.pop("metadatos")
+    assert structured == _RESULT
 
 
 async def test_text_output_reports_no_matches(monkeypatch, mcp):

@@ -11,7 +11,7 @@ get_capa_geo_datos also takes a `filtro` and an `offset` and returns up to
 500 rows, or server-side sums with `sumar`/`agrupar`.
 """
 
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -20,6 +20,7 @@ from mcp.types import CallToolResult
 from helpers import arcgis_client, inamhi_client, sipa_geoportal_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoBusqueda, ResultadoTabla
 from helpers.tool_meta import READ_ONLY
 
 Fuente = Literal["inamhi", "mag", "arconel", "celec"]
@@ -92,7 +93,7 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
         solo_wfs: bool = False,
         categoria: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         Search one geoportal's layer catalog (WMS/WFS).
 
@@ -191,7 +192,7 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
         agrupar: str = "",
         sumar: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoTabla]:
         """
         Fetch one geoportal layer's feature attributes.
 

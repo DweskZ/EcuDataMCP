@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import cenace_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoTabla
 from helpers.tool_meta import READ_ONLY
 
 
@@ -29,7 +30,7 @@ def register_get_cenace_tablero_tool(mcp: MCPServer) -> None:
             "acumulada_anual",
         ],
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoTabla]:
         """
         Fetch one tablero (tab) of CENACE's live grid-operations snapshot
         (Ecuador's national electricity operator) — generation mix and

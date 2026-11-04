@@ -10,7 +10,7 @@ ElecGalápagos and EEASA joined with their routine maintenance notices
 its rows add `motivo`.
 """
 
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -23,6 +23,7 @@ from helpers import (
 )
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoBusqueda, ResultadoTabla
 from helpers.tool_meta import READ_ONLY
 
 Distribuidora = Literal["eeq", "centrosur", "emelnorte", "elecgalapagos", "eeasa"]
@@ -81,7 +82,7 @@ def register_cortes_tools(mcp: MCPServer) -> None:
         distribuidora: Distribuidora,
         query: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         List one electricity distributor's scheduled power cuts.
 
@@ -164,7 +165,7 @@ def register_cortes_tools(mcp: MCPServer) -> None:
         archivo: str,
         query: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoTabla]:
         """
         Parse one scheduled power-cut PDF into rows.
 

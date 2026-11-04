@@ -79,7 +79,8 @@ or on estudios-y-analisis the title of the "advanced tabs" panel holding
 the widget). Mapped live 2026-11-04 (docs/RESEARCH.md § Trigésimo sexta
 pasada). Left out on purpose: /visualizadores/ (Power BI embeds only) and
 the balances-generales/patrimonio-tecnico pages, which are PrimeFaces query
-forms on appweb.superbancos.gob.ec that would need a JSF ViewState client.
+forms on appweb.superbancos.gob.ec whose download sits behind a reCAPTCHA
+(checked 2026-11-04), so they are out of scope.
 
 The same day the plugin started answering 200 with an empty body unless the
 AJAX call carries the site's Origin (or the page as Referer), which had
@@ -261,7 +262,7 @@ _LEGACY_SECCIONES = {
 
 # Section pages change a few times a year at most (a new archived year, a
 # new calendar). max_entries matches the fixed key space.
-_files_cache = TtlCache(ttl_seconds=21600.0, max_entries=len(_SECCIONES))
+_files_cache = TtlCache(ttl_seconds=21600.0, max_entries=len(_SECCIONES), persist="superbancos_secciones")
 _fetch_lock = asyncio.Lock()
 
 _TAG_RE = re.compile(r"<[^>]+>")

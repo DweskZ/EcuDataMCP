@@ -113,9 +113,9 @@ _API_BASE = "https://www.ecuadorencifras.gob.ec/wp-json/wp/v2"
 
 # Topic list changes only when INEC restructures its nav (rare); topic pages
 # themselves are refreshed with new bulletins roughly monthly.
-_topics_cache = TtlCache(ttl_seconds=21600.0, max_entries=1)
+_topics_cache = TtlCache(ttl_seconds=21600.0, max_entries=1, persist="inec_topics")
 _topic_files_cache = TtlCache(ttl_seconds=21600.0, max_entries=128)
-_categories_cache = TtlCache(ttl_seconds=21600.0, max_entries=1)
+_categories_cache = TtlCache(ttl_seconds=21600.0, max_entries=1, persist="inec_categories")
 _publicacion_files_cache = TtlCache(ttl_seconds=21600.0, max_entries=256)
 _fetch_lock = asyncio.Lock()
 

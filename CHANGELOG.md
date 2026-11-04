@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+- **Every tool now publishes an `outputSchema` and returns a `metadatos`
+  block.** Each tool's return is typed with one of six result families
+  (`helpers/result_types.py`: búsqueda, listado, archivos, serie, tabla,
+  ficha), so the SDK publishes the schema and validates `structuredContent`
+  against it. Tools that did not build `metadatos` themselves get it from
+  what the response already says (`source`, `url_fuente`), with the tool
+  name as `esquema.nombre`; unknown dates stay `null`. The published schema
+  is compact so `tools/list` stays inside its budget (97k of 110k
+  characters).
+- **Shared HTTP layer and a disk cache.** `helpers/http_client.py` gives
+  one client factory (timeout by profile, User-Agent, geo proxy) and one
+  retry policy (429/5xx with capped `Retry-After`, per-host cooldown).
+  SERCOP is the first client on it. `TtlCache(persist=...)` keeps expensive
+  catalogs in `data/cache/` across restarts: BCE index pages, the BCEData
+  tree, the IEM catalog, the SGR library and SITREP index, the Superbancos
+  sections, INEC topics and the CEPALSTAT tree. `ECUADOR_MCP_DISK_CACHE=0`
+  turns it off.
+- **The daily smoke run calls all 83 public tools** (59 before). Tools that
+  need an id are reached through list → get chains with ids found live; a
+  fixed public RUC covers the SRI, IESS and Supercías lookups. ARCONEL's
+  report site answering 500 is now classed as a known upstream outage.
+
 - **Removed `get_energia_ecuador_snapshot`** (83 tools in the default
   profile). It read the 2024 rationing schedules of energia-ecuador.com from
   one Wayback Machine capture, and the Wayback Machine stopped returning that

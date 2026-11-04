@@ -1,5 +1,5 @@
 import re
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -8,6 +8,7 @@ from mcp.types import CallToolResult
 from helpers import gobec_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoSerie
 from helpers.tool_meta import READ_ONLY
 
 _TIME_TAG_RE = re.compile(r"<[^>]+>")
@@ -36,7 +37,7 @@ def register_get_tramite_estadisticas_tool(mcp: MCPServer) -> None:
     @log_tool
     async def get_tramite_estadisticas(
         tramite_id: str, format: Literal["text", "json"] = "text"
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoSerie]:
         """
         Monthly usage/complaint stats (atenciones/quejas) for one trámite.
 

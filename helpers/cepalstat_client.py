@@ -63,7 +63,7 @@ _BASE = "https://api-cepalstat.cepal.org/cepalstat/api/v1"
 # The indicator catalog changes rarely (CEPAL adds/retires indicators a few
 # times a year at most) -- long TTL, same rationale as this project's other
 # hand-maintained catalog pages.
-_tree_cache = TtlCache(ttl_seconds=43200.0, max_entries=4)
+_tree_cache = TtlCache(ttl_seconds=43200.0, max_entries=4, persist="cepalstat_tree")
 _dimensions_cache = TtlCache(ttl_seconds=43200.0, max_entries=256)
 _tree_lock = asyncio.Lock()
 
