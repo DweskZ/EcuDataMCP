@@ -173,12 +173,20 @@ def register_archivo_secciones_tools(mcp: MCPServer) -> None:
           registry (food, medicines, cosmetics, medical devices...), 27
           categories. Different from the ARCSA CKAN datasets, which only
           cover suspended/cancelled records.
-        - superbancos: Superintendencia de Bancos statistics (4 sections:
-          boletines_financieros, servicios_financieros,
-          informacion_historica, calendario_estadistico). No CKAN
-          organization exists. boletines_financieros and
-          servicios_financieros add the page's OneDrive folders to the
-          static tables.
+        - superbancos: Superintendencia de Bancos statistics (12 sections):
+          boletines_financieros (banks), boletines_otras_entidades (public
+          institutions, sociedades financieras, groups, exchange houses...),
+          boletines_series (yearly cumulative series by entity type),
+          indicadores_solidez (CAMEL, morosidad, liquidez, solvencia and IMF
+          FSI tables, monthly since 2003, one XLSX a year), volumen_credito
+          (monthly, also by gender), cartera_depositos (CAPCOL),
+          servicios_financieros (cards, ATMs, offices, resolutions),
+          seguridad_social (IESS/ISSFA/ISSPOL/SCPN, closed pension funds,
+          BIESS), finanzas_verdes, estudios (~580 PDFs: inclusion bulletins,
+          stability reports, Dupont, stress tests...),
+          informacion_historica, calendario_estadistico. No CKAN
+          organization exists. Most series files are ZIP/XLSX above the
+          5 MB download cap: hand the user the link.
         - seps: SEPS statistics (estadisticas.seps.gob.ec), 22 SFPS
           sections (cooperatives: financial statements, deposits, credit,
           rates, risk ratings) plus 4 EPS sections. seps.gob.ec itself
