@@ -165,3 +165,10 @@ async def test_wp_api_is_paged(httpx_mock):
 
 def test_unknown_host_is_not_salud():
     assert not client._is_salud_url(str(httpx.URL("https://salud.gob.ec.evil.com/x.pdf")))
+
+
+async def test_unreachable_site_names_the_host(httpx_mock):
+    httpx_mock.add_exception(httpx.ConnectTimeout(""), url=_WP_URL)
+
+    with pytest.raises(ValueError, match=r"salud.gob.ec no respondió \(ConnectTimeout\)"):
+        await client.search_gacetas("vih")

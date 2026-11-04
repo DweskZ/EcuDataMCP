@@ -32,6 +32,12 @@ _DEFAULT_GEO_HOSTS = (
     # infoMIES times out on connect from Render and the GitHub runners
     # (30 s, 2026-10-24) and loads in under a second from a Canadian home IP.
     "info.desarrollohumano.gob.ec",
+    # MSP and SGR never complete the TCP handshake from Azure Brazil South
+    # (30 s, 2026-11-04), though the GitHub runners reach SGR and a Canadian
+    # home IP reaches MSP.
+    "www.salud.gob.ec",
+    "www.gestionderiesgos.gob.ec",
+    "sgrportal.gestionderiesgos.gob.ec",
 )
 
 

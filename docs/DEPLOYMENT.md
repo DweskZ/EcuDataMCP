@@ -56,6 +56,53 @@ uv run python main.py --host 127.0.0.1
 Este repositorio deja preparado el proceso y su configuración, pero no crea
 una instancia pública ni administra DNS, certificados, secretos o facturación.
 
+## Instancia en Azure (Brazil South)
+
+Desde 2026-11-04 hay una instancia pública en Azure Container Apps, región
+Brazil South, la más cercana a Ecuador entre las de Azure:
+
+- URL: `https://ecudatamcp-mcp.ashystone-5da80e36.brazilsouth.azurecontainerapps.io/mcp`
+  (`/health` para el estado).
+- Grupo de recursos `ecudatamcp-rg`, con:
+  - el registro `ecudatamcpacr94e57f`
+  - el entorno `ecudatamcp-env`
+  - la app `ecudatamcp-mcp` (0,5 vCPU, 1 GiB, una réplica siempre encendida)
+  - la cuenta de almacenamiento `ecudatamcpdata94e57f`, cuyo recurso compartido
+    `data` se monta en `/app/data`
+  - el área de trabajo de Log Analytics `ecudatamcp-logs`
+- Configuración:
+  - Sin token: `MCP_REQUIRE_AUTH=0`, con el límite de 120 peticiones por minuto
+    y por IP.
+  - `FORWARDED_ALLOW_IPS=*` y `MCP_PROFILE=public`.
+  - El recurso compartido se monta con `uid=1000,gid=1000,nobrl`. `appuser`
+    puede escribir en él y `nobrl` evita los bloqueos de rango que SQLite no
+    tolera sobre SMB.
+  - La app baja la imagen con su identidad administrada (rol `AcrPull`).
+- Geobloqueo: Brasil no basta, y para algunos hosts es peor que EE. UU.
+  Smoke del 2026-11-04 contra esta instancia: 68 de 77 checks bien, 9
+  fallidos, 4 saltados. No completan la conexión desde Brazil South:
+  - `www.gob.ec` (trámites, instituciones, regulaciones)
+  - `www.salud.gob.ec` (gacetas del MSP)
+  - `www.gestionderiesgos.gob.ec` (SITREP de la SGR)
+  - Supercías, ANDA e infoMIES
+
+  Los runners de GitHub, en EE. UU., sí llegan a gob.ec y a la SGR. CKAN,
+  Superbancos, ARCONEL, BCE y el resto responden. Sin
+  `ECUADOR_MCP_GEO_PROXY` esas fuentes quedan caídas aquí, y la base de
+  financieros de Supercías no se construye.
+
+Para publicar una versión nueva desde un clon (en Git Bash, con
+`MSYS_NO_PATHCONV=1` para que los ids `/subscriptions/...` no se conviertan en
+rutas):
+
+```bash
+SHA=$(git rev-parse --short HEAD)
+az acr build -r ecudatamcpacr94e57f -t ecudatamcp:$SHA -t ecudatamcp:latest --platform linux/amd64 .
+az containerapp update -g ecudatamcp-rg -n ecudatamcp-mcp --image ecudatamcpacr94e57f.azurecr.io/ecudatamcp:$SHA
+```
+
+Los logs están en `az containerapp logs show -g ecudatamcp-rg -n ecudatamcp-mcp --follow`.
+
 ## Variables de entorno
 
 Lista completa de lo que lee el código (`helpers/env_config.py`,

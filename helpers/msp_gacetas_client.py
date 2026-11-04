@@ -385,7 +385,17 @@ async def search_gacetas(query: str = "") -> dict[str, Any]:
     """
     tokens = _strip(query).split()
     candidatas = _series_candidatas(tokens)
-    paginas = [p for p in await _fetch_paginas() if p["serie"] in candidatas]
+    try:
+        todas = await _fetch_paginas()
+    except httpx.HTTPError as e:
+        # httpx's connect timeouts stringify to "", which left callers with
+        # "Error al buscar archivos de msp: " and nothing else.
+        raise ValueError(
+            f"salud.gob.ec no respondió ({type(e).__name__}). Desde fuera de Ecuador "
+            "el sitio suele descartar la conexión (p. ej. desde Azure Brazil South); "
+            "configura ECUADOR_MCP_GEO_PROXY (docs/GEOBLOCK_PLAN.md) o reintenta luego."
+        ) from e
+    paginas = [p for p in todas if p["serie"] in candidatas]
 
     sem = asyncio.Semaphore(_CONCURRENCY)
     por_pagina = await asyncio.gather(
