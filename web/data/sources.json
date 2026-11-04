@@ -570,15 +570,6 @@
             "status": "live"
           },
           {
-            "id": "energia-ecuador",
-            "name": "energia-ecuador.com (archivo)",
-            "tag": "Energía",
-            "description": "Horarios de racionamiento de 2024 de la EEQ, recuperados del Wayback Machine (foto fija)",
-            "coverage": "web.archive.org",
-            "url": "https://web.archive.org/web/2024/https://energia-ecuador.com/",
-            "status": "live"
-          },
-          {
             "id": "eeq-cortes",
             "name": "Cortes EEQ",
             "tag": "Energía",

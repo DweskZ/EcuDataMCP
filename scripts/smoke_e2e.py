@@ -325,7 +325,6 @@ async def main() -> int:
             ("search_infomies_bases_mensuales", {"serie": "anc", "format": "json"}, []),
             ("search_infomies_boletines_zonales", {"format": "json"}, []),
             ("search_sgr_sitreps", {"format": "json"}, []),
-            ("get_energia_ecuador_snapshot", {"format": "json"}, []),
             ("get_category_info", {"category": "sal", "format": "json"}, []),
             ("get_iess_archivos", {"coleccion": "boletines", "format": "json"}, []),
             (

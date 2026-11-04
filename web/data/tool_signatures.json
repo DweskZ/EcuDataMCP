@@ -205,7 +205,7 @@
       }
     ],
     "description": "Scheduled power cuts of one utility: crisis schedule PDFs from eeq (Quito, 2023-2024) and centrosur (2023 on), or current maintenance notices from emelnorte, elecgalapagos and eeasa. Next: get_cortes_horarios with an archivo.",
-    "summary": "List one electricity distributor's scheduled power cuts. Regional, not national: each archive covers one concession area. Every file or notice carries `archivo`, the id get_cortes_horarios takes. - eeq: Empresa Eléctrica Quito, 2023 and 2024 blackout crises. Mid-October to December 2024 is enumerated live from EEQ's site search; earlier files (Oct-Nov 2023, April/June 2024, Sep-early Oct 2024) come from a fixed list recovered via search-engine indexing, so that period may have gaps (`origen` says which). - centrosur: Empresa Eléctrica Regional Centro Sur, 2023 onward, including the 2024 estiaje blackouts, enumerated from WordPress's media library API. A separate `CortesEstiaje/` folder of extra 2024 PDFs is not covered (no way to enumerate it). - emelnorte: Emelnorte (Imbabura, Carchi, north of Pichincha), its 100 latest \"Trabajos Programados\" notices (one post per job, April 2024 onward). `archivo` is the post id. - elecgalapagos: ElecGalápagos, its 100 latest maintenance notices for San Cristóbal, Santa Cruz and Isabela (almost daily). `archivo` is the post id. - eeasa: EEASA (Tungurahua, Pastaza), the notices for the coming days on its \"Trabajos Programados\" page, as one archivo (`vigentes`). No history: past notices are not kept. CNEL has no recoverable archive. For the national 2024 portal see get_energia_ecuador_snapshot.",
+    "summary": "List one electricity distributor's scheduled power cuts. Regional, not national: each archive covers one concession area. Every file or notice carries `archivo`, the id get_cortes_horarios takes. - eeq: Empresa Eléctrica Quito, 2023 and 2024 blackout crises. Mid-October to December 2024 is enumerated live from EEQ's site search; earlier files (Oct-Nov 2023, April/June 2024, Sep-early Oct 2024) come from a fixed list recovered via search-engine indexing, so that period may have gaps (`origen` says which). - centrosur: Empresa Eléctrica Regional Centro Sur, 2023 onward, including the 2024 estiaje blackouts, enumerated from WordPress's media library API. A separate `CortesEstiaje/` folder of extra 2024 PDFs is not covered (no way to enumerate it). - emelnorte: Emelnorte (Imbabura, Carchi, north of Pichincha), its 100 latest \"Trabajos Programados\" notices (one post per job, April 2024 onward). `archivo` is the post id. - elecgalapagos: ElecGalápagos, its 100 latest maintenance notices for San Cristóbal, Santa Cruz and Isabela (almost daily). `archivo` is the post id. - eeasa: EEASA (Tungurahua, Pastaza), the notices for the coming days on its \"Trabajos Programados\" page, as one archivo (`vigentes`). No history: past notices are not kept. CNEL has no recoverable archive.",
     "args_doc": {
       "distribuidora": "eeq, centrosur, emelnorte, elecgalapagos or eeasa.",
       "query": "Free text matched (accent-insensitive) against the file's period, date, title or URL, e.g. \"noviembre\", \"2024-10\" (emelnorte/elecgalapagos: title and body, e.g. \"Otavalo\"; eeasa: date and sectors). Empty returns all files.",
@@ -809,27 +809,6 @@
     "args_doc": {
       "dataset_id": "The dataset ID or slug (e.g. \"registro-estadistico-de-recursos-y-actividades-de-salud-2019\")",
       "source": "\"nacional\" (default), \"cuenca\" (Cuenca municipal portal), \"latacunga\" (Latacunga municipal portal), or \"iadb\" (IADB's open-data portal, data.iadb.org — NOT Ecuador-only, a regional/global catalog)",
-      "format": "text | json"
-    }
-  },
-  "get_energia_ecuador_snapshot": {
-    "file": "get_energia_ecuador_snapshot.py",
-    "params": [
-      {
-        "name": "query",
-        "type": "str",
-        "default": "''"
-      },
-      {
-        "name": "format",
-        "type": "Literal['text', 'json']",
-        "default": "'text'"
-      }
-    ],
-    "description": "Frozen Wayback Machine copy (2024-04-24) of the defunct national blackout-schedule portal energia-ecuador.com; only EEQ's Pichincha rotation survived. For current schedules use search_cortes and get_cortes_horarios.",
-    "summary": "Recover, via the Wayback Machine, the national blackout-schedule aggregator the Ministry of Energy and Mines briefly ran during the 2024 crisis at energia-ecuador.com (\"Portal para actualización de racionamiento energético\"). The domain itself is dead (parked since 2025) and the site went behind a Cloudflare bot-block within days of launch, so only one of its nine distributor pages was fully archived: Empresa Eléctrica Quito, a single frozen snapshot from 2024-04-24 (province/canton/sector-level rotation for Pichincha, 40 rows). Centrosur, CNEL, Emelnorte, EEASA, and four other distributors' pages are confirmed to have existed (via the site's own archived sitemap) but were never successfully archived — not recoverable from this or any other source found so far. This is a one-time historical snapshot, not an ongoing series — there is no newer page to discover.",
-    "args_doc": {
-      "query": "Free text matched (accent-insensitive) against canton or sectores. Empty returns all rows.",
       "format": "text | json"
     }
   },

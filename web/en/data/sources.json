@@ -570,15 +570,6 @@
             "status": "live"
           },
           {
-            "id": "energia-ecuador",
-            "name": "energia-ecuador.com (archive)",
-            "tag": "Energy",
-            "description": "EEQ's 2024 blackout schedules, recovered from the Wayback Machine (frozen snapshot)",
-            "coverage": "web.archive.org",
-            "url": "https://web.archive.org/web/2024/https://energia-ecuador.com/",
-            "status": "live"
-          },
-          {
             "id": "eeq-cortes",
             "name": "EEQ power cuts",
             "tag": "Energy",

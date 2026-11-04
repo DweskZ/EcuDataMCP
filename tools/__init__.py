@@ -30,9 +30,6 @@ from tools.get_compania_info import register_get_compania_info_tool
 from tools.get_contraloria_informe import register_get_contraloria_informe_tool
 from tools.get_contrato_info import register_get_contrato_info_tool
 from tools.get_dataset_info import register_get_dataset_info_tool
-from tools.get_energia_ecuador_snapshot import (
-    register_get_energia_ecuador_snapshot_tool,
-)
 from tools.get_financials import register_get_financials_tool
 from tools.get_iess_archivos import register_get_iess_archivos_tool
 from tools.get_indicador_bce import register_get_indicador_bce_tool
@@ -190,7 +187,6 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_cenace_boletin_tool(mcp)
     register_get_arconel_reporte_tool(mcp)
     register_cortes_tools(mcp)
-    register_get_energia_ecuador_snapshot_tool(mcp)
     register_archivo_secciones_tools(mcp)
     register_geoportal_tools(mcp)
     register_search_archivos_tool(mcp)

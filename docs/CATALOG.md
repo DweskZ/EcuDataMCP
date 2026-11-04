@@ -3,7 +3,7 @@
 Generado por `scripts/generate_catalog.py` desde `resources/catalog.py` y las
 descripciones de `tools/*.py`; no editar a mano.
 
-54 fuentes, 84 tools públicas.
+53 fuentes, 83 tools públicas.
 
 ## Datos Abiertos CKAN
 
@@ -355,13 +355,6 @@ descripciones de `tools/*.py`; no editar a mano.
 
 - `search_cortes`: Scheduled power cuts of one utility: crisis schedule PDFs from eeq (Quito, 2023-2024) and centrosur (2023 on), or current maintenance notices from emelnorte, elecgalapagos and eeasa. Next: get_cortes_horarios with an archivo.
 - `get_cortes_horarios`: Parse one power-cut schedule or notice (archivo from search_cortes) into rows: date, time blocks without power, location and sectors, plus the motive for maintenance notices. query filters by place.
-
-## energia-ecuador.com vía Wayback Machine (horarios históricos de apagones)
-
-- Id: `energia-ecuador`
-- Base: https://web.archive.org/
-
-- `get_energia_ecuador_snapshot`: Frozen Wayback Machine copy (2024-04-24) of the defunct national blackout-schedule portal energia-ecuador.com; only EEQ's Pichincha rotation survived. For current schedules use search_cortes and get_cortes_horarios.
 
 ## Ministerio del Trabajo / SUT (tableros Power BI en vivo: contratos, brechas de empleo, políticas de género)
 

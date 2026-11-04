@@ -386,15 +386,6 @@ def _all_fuentes() -> dict:
                 "tools": ["search_cortes", "get_cortes_horarios"],
             },
             {
-                "id": "energia-ecuador",
-                "nombre": (
-                    "energia-ecuador.com vía Wayback Machine (horarios históricos "
-                    "de apagones)"
-                ),
-                "base": "https://web.archive.org/",
-                "tools": ["get_energia_ecuador_snapshot"],
-            },
-            {
                 "id": "sut",
                 "nombre": (
                     "Ministerio del Trabajo / SUT (tableros Power BI en vivo: "

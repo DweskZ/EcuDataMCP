@@ -1910,25 +1910,6 @@
         "long_description": "Search the IG-EPN PDF report archive (Instituto Geofísico): daily/weekly/monthly/special seismic bulletins, volcanic \"IG Al Instante\" alerts, field/annual reports, etc. Different from search_sismos, which reads the raw earthquake catalog feed -- this searches the narrative/PDF report archive instead. Use get_informe_igepn afterwards to download and read one report's text."
       },
       {
-        "name": "get_energia_ecuador_snapshot",
-        "description": "2024 blackout schedules from energia-ecuador.com, recovered from the Wayback Machine.",
-        "params": [
-          {
-            "name": "query",
-            "type": "str",
-            "default": "''",
-            "description": "Free text matched against canton or sectors, accent-insensitive. Empty returns all rows."
-          },
-          {
-            "name": "format",
-            "type": "Literal['text', 'json']",
-            "default": "'text'",
-            "description": "Output format: `text` (default) or `json`."
-          }
-        ],
-        "long_description": "Recovers, via the Wayback Machine, the national blackout-schedule aggregator the Ministry of Energy ran during the 2024 crisis (the domain is now dead). Only the Empresa Eléctrica Quito page was archived: a frozen 2024-04-24 snapshot of Pichincha's rotation by province, canton, and sector. Not a live series."
-      },
-      {
         "name": "search_cortes",
         "description": "Scheduled power cuts: crisis PDFs (EEQ, CentroSur) or maintenance notices (Emelnorte, ElecGalápagos, EEASA).",
         "params": [

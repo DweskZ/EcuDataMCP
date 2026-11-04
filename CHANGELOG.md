@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Removed `get_energia_ecuador_snapshot`** (83 tools in the default
+  profile). It read the 2024 rationing schedules of energia-ecuador.com from
+  one Wayback Machine capture, and the Wayback Machine stopped returning that
+  snapshot. The EEQ and Centrosur archives in `search_cortes` cover the same
+  2024 crisis from the utilities' own files.
 - **ARCONEL's own ArcGIS server** in `search_capas_geo`/`get_capa_geo_datos`
   (`fuente="arconel"`, 12 layers now): it answers again, so the catalog adds
   monthly gross/net production and fuel use by plant (220,121 rows each,

@@ -1910,25 +1910,6 @@
         "long_description": "Busca en el archivo de informes PDF del IG-EPN (Instituto Geofísico): boletines sísmicos diarios/semanales/mensuales/especiales, alertas volcánicas \"IG Al Instante\", informes de campo/anuales, etc. A diferencia de search_sismos, que lee el feed crudo del catálogo sísmico, este busca en el archivo narrativo de informes PDF. Usa get_informe_igepn después para descargar y leer el texto de un informe."
       },
       {
-        "name": "get_energia_ecuador_snapshot",
-        "description": "Horarios de racionamiento de 2024 de energia-ecuador.com, recuperados del Wayback Machine.",
-        "params": [
-          {
-            "name": "query",
-            "type": "str",
-            "default": "''",
-            "description": "Texto libre contra cantón o sectores, sin tildes. Vacío devuelve todas las filas."
-          },
-          {
-            "name": "format",
-            "type": "Literal['text', 'json']",
-            "default": "'text'",
-            "description": "Formato de salida: `text` (default) o `json`."
-          }
-        ],
-        "long_description": "Recupera, vía Wayback Machine, el agregador nacional de horarios de racionamiento que el Ministerio de Energía publicó durante la crisis de 2024 (dominio hoy muerto). Solo la página de la Empresa Eléctrica Quito quedó archivada: una foto fija del 24 de abril de 2024 con la rotación por provincia, cantón y sector de Pichincha. No es una serie viva."
-      },
-      {
         "name": "search_cortes",
         "description": "Cortes de luz programados: PDF de crisis (EEQ, CentroSur) o avisos de mantenimiento (Emelnorte, ElecGalápagos, EEASA).",
         "params": [
