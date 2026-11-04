@@ -303,8 +303,9 @@ def _all_fuentes() -> dict:
             {
                 "id": "superbancos",
                 "nombre": (
-                    "Superintendencia de Bancos (boletines financieros, "
-                    "servicios financieros, información histórica)"
+                    "Superintendencia de Bancos (boletines financieros y de series, "
+                    "indicadores de solidez, volumen de crédito, CAPCOL, seguridad "
+                    "social, estudios)"
                 ),
                 "base": "https://www.superbancos.gob.ec/estadisticas/portalestudios",
                 "tools": [
@@ -504,7 +505,7 @@ def _all_fuentes() -> dict:
             },
             {
                 "id": "msp",
-                "nombre": "MSP (gacetas semanales de enfermedades inmunoprevenibles)",
+                "nombre": "MSP (gacetas epidemiológicas semanales, 18 series)",
                 "base": "https://www.salud.gob.ec/",
                 "tools": ["search_archivos"],
             },

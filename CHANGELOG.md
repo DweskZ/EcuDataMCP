@@ -2,6 +2,49 @@
 
 ## Unreleased
 
+- **ARCONEL's own ArcGIS server** in `search_capas_geo`/`get_capa_geo_datos`
+  (`fuente="arconel"`, 12 layers now): it answers again, so the catalog adds
+  monthly gross/net production and fuel use by plant (220,121 rows each,
+  January 1999 to August 2026; May-December 2024 is missing at the source),
+  public-lighting luminaires by distributor, province and lamp type
+  (1999-2026), the 730-plant SISDAT register, distribution substations and
+  subtransmission lines. `get_capa_geo_datos` gains `sumar` and `agrupar`
+  for server-side sums by group (ArcGIS `outStatistics`), so yearly
+  national production is one call instead of hundreds of 500-row pages.
+  The server's own billing and loss layers answer every query with 400, so
+  the Esri-cloud copies stay.
+- **Every MSP epidemiological gazette series** in
+  `search_archivos(fuente="msp")`: 18 series and about 3,500 PDFs from 2013
+  on (inmunoprevenibles, vectoriales, piel/reemergentes, indicadores,
+  general, ETAS, IRAG, brotes, efectos tóxicos, respiratorias, zoonóticas,
+  muerte materna and neonatal, tuberculosis, desnutrición, VIH, fiebre
+  amarilla, SIVE-Alerta), instead of inmunoprevenibles only. One paged
+  WordPress search finds the ~110 archive pages and each is classified by
+  slug; files carry `serie`, and `semana` now reads every naming convention
+  MSP has used, reporting the last week of cumulative files with
+  `semana_desde`. A series named in `query` limits which pages are fetched,
+  and a page that fails is reported in `paginas_con_error` instead of
+  failing the call. `helpers/msp_gacetas_inmunoprevenibles_client.py` is
+  replaced by `helpers/msp_gacetas_client.py`.
+- **Superbancos: eight more sections** in `list_archivo_secciones`/
+  `get_archivo_seccion` (`fuente="superbancos"`, 12 now):
+  `indicadores_solidez` (CAMEL, morosidad, liquidez, solvencia and IMF FSI
+  tables, monthly since 2003), `volumen_credito`, `boletines_series`,
+  `boletines_otras_entidades`, `cartera_depositos` (CAPCOL),
+  `finanzas_verdes`, `seguridad_social` (IESS, ISSFA, ISSPOL, SCPN, closed
+  pension funds, BIESS) and `estudios` (~580 PDFs). The OneDrive crawl now
+  follows lazily revealed subfolders to any depth and retries a folder
+  once on a 502 or timeout.
+- **Fix: Superbancos OneDrive folders were empty.** The site's plugin began
+  answering 200 with an empty body unless the request carries the site's
+  `Origin` or the page as `Referer`, which had silently cut
+  `boletines_financieros` and `servicios_financieros` back to their static
+  tables (`servicios_financieros`: 39 files instead of 663). Both headers
+  are sent now.
+- **Smithery dropped**: `scripts/publish_smithery.py` is gone and the docs no
+  longer list Smithery as a channel. It stopped accepting updates on
+  2026-10-17, so releases go to PyPI, the MCP Registry, the `.mcpb` asset,
+  LobeHub and Glama only.
 - **ARCONEL and CELEC ArcGIS layers** in `search_capas_geo`/`get_capa_geo_datos`
   (`fuente="arconel"`, `fuente="celec"`): the distributor energy balance and
   losses by month (January 1999 to April 2024), billing, collection,

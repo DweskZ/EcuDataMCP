@@ -6561,6 +6561,60 @@ cambió desde 2026-09-29, verificado desde una IP residencial de Canadá:
   enlace); los mapas se agrupan por tema (generación, transmisión,
   distribución), no por año.
 
+## Trigésimo sexta pasada — ARCONEL ArcGIS, gacetas del MSP y Superbancos (2026-11-04)
+
+**ARCONEL, servidor propio.** `geoportal.arconel.gob.ec:6443/arcgis/rest/services`
+(ArcGIS 10.91) vuelve a responder, anónimo, maxRecordCount 1000, paginación y
+estadísticas soportadas; texto en UTF-8 limpio. Falta el intermedio TLS (ya
+cubierto por `arconel.gob.ec` en `_OS_TRUST_HOST_SUFFIXES`). En
+`ServDashboards`: `CENTRALES_PRODUCCION` y `CENTRALES_COMBUSTIBLES` (capa 1,
+HISTORICO, 220.121 filas, ene 1999-ago 2026; la capa 0 tiene el mismo
+esquema con menos centrales antes de 2018). Mayo-diciembre de 2024 falta en
+ambas copias. El año se llama `AnioProduccion` en producción y `Anio` en
+combustibles y alumbrado. `LUMINARIAS/2` (52.837 filas, códigos de empresa y
+provincia sin nombres), `CENTRALES/0` (730), `DISTRIBUCION_INFRAESTRUCTURA/0`
+y `/1` (568 subestaciones, 428 líneas). `DISTRIBUCION_TRANSACCIONES` (0, 2, 3,
+4) y `RESUMEN_FACTURACION/0` cargan metadatos pero responden 400 a toda
+consulta, también en MapServer: las copias de `services3.arcgis.com` siguen
+siendo la fuente de facturación y balance. `SERVMAE` y `portal` solo
+duplican capas de mapa. `outStatistics` con `groupByFieldsForStatistics`
+funciona: neto nacional 2025 = 37,8 TWh en una consulta.
+
+**MSP, todas las gacetas.** `/wp-json/wp/v2/pages` no devuelve nada; con
+`/posts?search=gaceta` paginado (124 resultados, 2 páginas) salen las 110
+páginas de archivo de todas las series, sin necesidad de otros términos.
+Cada serie usó dos o tres familias de slug, así que se clasifica con una
+regex por serie. 18 series, ~3.500 PDF tras deduplicar por URL; 126 enlaces
+apuntan a `instituciones.msp.gob.ec`, que no responde (la página 2012 de
+Indicadores queda vacía y SIVE-Alerta pierde la mitad). Convenciones de
+semana vistas: `SE-NN`, `SENN`, `SE_-NN`, `SEM-NN`, `SEMANA-NN`, `S20`,
+`gaceta_brotesSE31`, número suelto (`ETV_Gaceta_42`, `5.-Gaceta-brotes-41`,
+`ETAS-52`), año abreviado al final (`VECTORES-10_20`), sufijo de duplicado
+pegado (`SE-341` = 34) y rangos acumulados (`SE-01-53`, `SE-01-SE45`,
+`Lepra-SE-01-03`). Hay rutas `/wp-content/uploads/downloads/AAAA/MM/` y dos
+enlaces `//www.salud.gob.ec/...`. El sitio devuelve 503 tras una ráfaga de
+pedidos: concurrencia 3 y un reintento por página.
+
+**Superbancos, resto del portal.** La API WordPress lista 59 páginas. Desde
+esta fecha `admin-ajax.php?action=shareonedrive-get-filelist` responde 200
+vacío salvo con `Origin: https://www.superbancos.gob.ec` o `Referer` de la
+página; sin eso las secciones OneDrive ya construidas volvían solo con sus
+tablas estáticas. El árbol del widget es perezoso: las subcarpetas de
+segundo nivel (CAPCOL: año → CAPTACIONES/COLOCACIONES) aparecen solo en la
+respuesta de su carpeta padre. Secciones nuevas: Indicadores de Solidez
+(`/volumen-de-credito-2/`: un XLSX acumulado por año, ~9 MB, hojas BAL, PYG,
+INDIC CARTERA, INDICAD, CAMEL, tablas FSI del FMI, ~293 columnas mensuales
+desde 2003), Volumen de Crédito (con rama por género, ZIP de 4-27 MB, un
+XLSB), Boletines de Series (8 páginas por tipo de entidad), boletines
+mensuales de otras entidades (6 páginas, estático 2000-2021 + OneDrive),
+CAPCOL (3 páginas), Finanzas Verdes, Seguridad Social (2 páginas) y
+Estudios (10 widgets dentro de pestañas "advanced tabs" de Essential
+Addons: el título del widget es el de la pestaña). `/visualizadores/` solo
+tiene embeds Power BI; balances generales y patrimonio técnico son
+formularios PrimeFaces (`bsf.jsf`, `bss.jsf`, `efpt.jsf`) en
+`appweb.superbancos.gob.ec`. La mayoría de los archivos de series pasa de
+5 MB.
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un
