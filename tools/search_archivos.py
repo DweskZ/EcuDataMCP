@@ -27,7 +27,7 @@ from helpers import (
     cnig_client,
     mef_fiscal_client,
     minedec_client,
-    msp_gacetas_inmunoprevenibles_client,
+    msp_gacetas_client,
     salarios_sectoriales_client,
     senescyt_client,
     sri_client,
@@ -69,7 +69,7 @@ _UNPAGINATED: dict[str, Callable[..., Awaitable[dict[str, Any]]]] = {
     "senae": mef_fiscal_client.search_senae_tributos,
     "minedec": minedec_client.search_matricula,
     "senescyt": senescyt_client.search_estadisticas,
-    "msp": msp_gacetas_inmunoprevenibles_client.search_gacetas_inmunoprevenibles,
+    "msp": msp_gacetas_client.search_gacetas,
     "cnig": cnig_client.search_femicidios,
     "trabajo_boletin": trabajo_boletin_anual_client.search_boletines,
     "arcotel_boletines": arcotel_client.search_boletines_estadisticos,
@@ -198,8 +198,16 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
           (start/end-of-year XLSX of 30-140 MB, metadata, dictionary).
         - senescyt: SENESCYT SIAU higher-education and CTI reports; "wpdm"
           links have no extension (formato DESCONOCIDO).
-        - msp: MSP weekly vaccine-preventable disease gazettes, 2019 to date;
-          `tipo` separates the general bulletin from disease companions.
+        - msp: MSP's weekly epidemiological gazettes, 18 series, ~3,500
+          PDFs 2013 to date: inmunoprevenibles, vectoriales (dengue,
+          malaria...), piel_reemergentes, indicadores, general, etas, irag,
+          brotes, efectos_toxicos, respiratorias, zoonoticas, muerte_materna,
+          muerte_neonatal, tuberculosis, desnutricion, vih, fiebre_amarilla,
+          sive_alerta. Every file has `serie`, `anio`, `mes`, `semana` (the
+          last week of cumulative files, with `semana_desde`) and `tipo`
+          (disease companions such as tosferina or fiebre_amarilla). Name
+          the series in `query` ("vectoriales 2026") or the first call
+          fetches all ~110 archive pages.
         - cnig: CNIG gender-violence PDFs incl. the femicide matrix (snapshot
           to April 2023, not a live feed).
         - trabajo_boletin: Ministerio del Trabajo annual labor-market
