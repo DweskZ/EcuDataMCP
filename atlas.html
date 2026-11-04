@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Referencia – EcuDataMCP</title>
-<meta name="description" content="Los 84 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
+<meta name="description" content="Los 83 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="canonical" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <link rel="alternate" hreflang="es" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <link rel="alternate" hreflang="en" href="https://dweskz.github.io/EcuDataMCP/en/atlas.html">
 <link rel="alternate" hreflang="x-default" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <meta property="og:title" content="Referencia – EcuDataMCP">
-<meta property="og:description" content="Los 84 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
+<meta property="og:description" content="Los 83 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
 <meta property="og:url" content="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_EC">
@@ -153,13 +153,13 @@
 <section class="landing hero">
 <div class="container-page">
 <p class="kicker">Referencia</p>
-<h1>Los <span class="accent">84 tools</span>, uno por uno.</h1>
+<h1>Los <span class="accent">83 tools</span>, uno por uno.</h1>
 <p class="hero-sub">Encuentra un tool por nombre, fuente o tarea. Abre solo el grupo y el detalle que necesitas.</p>
 <div class="atlas-filter-wrap">
 <input type="text" id="atlas-filter" class="atlas-filter" placeholder="Filtrar por nombre o palabra clave…" autocomplete="off">
 </div>
 <div class="atlas-toolbar" aria-live="polite">
-<p id="atlas-result-count">84 tools · abre un grupo para ver sus detalles.</p>
+<p id="atlas-result-count">83 tools · abre un grupo para ver sus detalles.</p>
 <div class="atlas-actions">
 <button type="button" data-atlas-action="open">Expandir grupos</button>
 <button type="button" data-atlas-action="close">Cerrar grupos</button>
@@ -1707,7 +1707,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">CENACE, SUT, IG-EPN y cortes de luz<span class="tag">10</span></span>
+<span class="atlas-category-title">CENACE, SUT, IG-EPN y cortes de luz<span class="tag">9</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
@@ -1863,28 +1863,6 @@
 <tr><td><code>limit</code></td><td><code>int</code></td><td><code>15</code></td><td>Máximo de informes a devolver (default 15, máx. 30)</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-get_energia_ecuador_snapshot" data-search="get_energia_ecuador_snapshot horarios de racionamiento de 2024 de energia-ecuador.com, recuperados del wayback machine. recupera, vía wayback machine, el agregador nacional de horarios de racionamiento que el ministerio de energía publicó durante la crisis de 2024 (dominio hoy muerto). solo la página de la empresa eléctrica quito quedó archivada: una foto fija del 24 de abril de 2024 con la rotación por provincia, cantón y sector de pichincha. no es una serie viva. query texto libre contra cantón o sectores, sin tildes. vacío devuelve todas las filas. format formato de salida: `text` (default) o `json`.">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_energia_ecuador_snapshot</code>
-<span class="atlas-tool-desc">Horarios de racionamiento de 2024 de energia-ecuador.com, recuperados del Wayback Machine.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Recupera, vía Wayback Machine, el agregador nacional de horarios de racionamiento que el Ministerio de Energía publicó durante la crisis de 2024 (dominio hoy muerto). Solo la página de la Empresa Eléctrica Quito quedó archivada: una foto fija del 24 de abril de 2024 con la rotación por provincia, cantón y sector de Pichincha. No es una serie viva.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Texto libre contra cantón o sectores, sin tildes. Vacío devuelve todas las filas.</td></tr>
-
-<tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
 </tbody>
 </table>
@@ -2548,7 +2526,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_capa_geo_datos" data-search="get_capa_geo_datos atributos de una capa de geoportal: muestra de hasta 20 objetos (wfs) o hasta 500 filas filtradas (arcgis). trae los atributos de una capa de search_capas_geo, sin coordenadas de geometría. en inamhi y mag es una muestra por wfs getfeature, sin filtros; las capas sin wfs devuelven error. en arconel y celec es una consulta arcgis rest: `filtro` es una cláusula sql sobre los campos de la capa (listados en `campos`), p. ej. &quot;anio = 2024 and idmes = 4&quot; o &quot;empresa like 'cnel%'&quot;; `total_features_en_capa` cuenta las filas que cumplen el filtro y `hay_mas` indica si seguir con `offset`. las fechas llegan como fechas iso. fuente inamhi, mag, arconel o celec. capa el campo `capa` de search_capas_geo (inamhi: nombre &quot;geonode:...&quot;; mag: &quot;categoria/store/nombre&quot;; arcgis: el id corto, p. ej. balance_energia). count objetos a traer: 1-20 en inamhi/mag, 1-500 en arconel/celec (default 5). filtro solo arconel/celec: cláusula sql where; vacío trae todas las filas. offset solo arconel/celec: filas a saltar para paginar. format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-get_capa_geo_datos" data-search="get_capa_geo_datos atributos de una capa de geoportal: muestra de hasta 20 objetos (wfs) o hasta 500 filas filtradas (arcgis). trae los atributos de una capa de search_capas_geo, sin coordenadas de geometría. en inamhi y mag es una muestra por wfs getfeature, sin filtros; las capas sin wfs devuelven error. en arconel y celec es una consulta arcgis rest: `filtro` es una cláusula sql sobre los campos de la capa (listados en `campos`), p. ej. &quot;anio = 2024 and idmes = 4&quot; o &quot;empresa like 'cnel%'&quot;; `total_features_en_capa` cuenta las filas que cumplen el filtro y `hay_mas` indica si seguir con `offset`. las fechas llegan como fechas iso. fuente inamhi, mag, arconel o celec. capa el campo `capa` de search_capas_geo (inamhi: nombre &quot;geonode:...&quot;; mag: &quot;categoria/store/nombre&quot;; arcgis: el id corto, p. ej. balance_energia). count objetos a traer: 1-20 en inamhi/mag, 1-500 en arconel/celec (default 5). filtro solo arconel/celec: cláusula sql where; vacío trae todas las filas. offset solo arconel/celec: filas a saltar para paginar. agrupar arconel/celec only: comma-separated fields to group by; needs `sumar`. sumar arconel/celec only: comma-separated numeric fields to sum. format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_capa_geo_datos</code>
 <span class="atlas-tool-desc">Atributos de una capa de geoportal: muestra de hasta 20 objetos (WFS) o hasta 500 filas filtradas (ArcGIS).</span>
@@ -2569,6 +2547,10 @@
 <tr><td><code>filtro</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Solo arconel/celec: cláusula SQL where; vacío trae todas las filas.</td></tr>
 
 <tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Solo arconel/celec: filas a saltar para paginar.</td></tr>
+
+<tr><td><code>agrupar</code></td><td><code>str</code></td><td><code>vacío</code></td><td>arconel/celec only: comma-separated fields to group by; needs `sumar`.</td></tr>
+
+<tr><td><code>sumar</code></td><td><code>str</code></td><td><code>vacío</code></td><td>arconel/celec only: comma-separated numeric fields to sum.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -2638,7 +2620,7 @@ window.SITE_SEARCH_EMPTY_LABEL = "Sin resultados.";
     var count = visibleTools().length;
     resultCount.textContent = query
       ? count + " tool" + (count === 1 ? "" : "s") + " coincide" + (count === 1 ? "" : "n") + "."
-      : "84 tools · abre un grupo para ver sus detalles.";
+      : "83 tools · abre un grupo para ver sus detalles.";
   }
 
   function applyFilter(query) {

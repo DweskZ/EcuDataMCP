@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Reference – EcuDataMCP</title>
-<meta name="description" content="EcuDataMCP&#39;s 84 tools, with a full description and a direct link to each one.">
+<meta name="description" content="EcuDataMCP&#39;s 83 tools, with a full description and a direct link to each one.">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="canonical" href="https://dweskz.github.io/EcuDataMCP/en/atlas.html">
 <link rel="alternate" hreflang="es" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <link rel="alternate" hreflang="en" href="https://dweskz.github.io/EcuDataMCP/en/atlas.html">
 <link rel="alternate" hreflang="x-default" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <meta property="og:title" content="Reference – EcuDataMCP">
-<meta property="og:description" content="EcuDataMCP&#39;s 84 tools, with a full description and a direct link to each one.">
+<meta property="og:description" content="EcuDataMCP&#39;s 83 tools, with a full description and a direct link to each one.">
 <meta property="og:url" content="https://dweskz.github.io/EcuDataMCP/en/atlas.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="en_US">
@@ -153,13 +153,13 @@
 <section class="landing hero">
 <div class="container-page">
 <p class="kicker">Reference</p>
-<h1>All <span class="accent">84 tools</span>, one by one.</h1>
+<h1>All <span class="accent">83 tools</span>, one by one.</h1>
 <p class="hero-sub">Find a tool by name, source, or task. Open only the group and detail you need.</p>
 <div class="atlas-filter-wrap">
 <input type="text" id="atlas-filter" class="atlas-filter" placeholder="Filter by name or keyword…" autocomplete="off">
 </div>
 <div class="atlas-toolbar" aria-live="polite">
-<p id="atlas-result-count">84 tools · open a group to see its details.</p>
+<p id="atlas-result-count">83 tools · open a group to see its details.</p>
 <div class="atlas-actions">
 <button type="button" data-atlas-action="open">Expand groups</button>
 <button type="button" data-atlas-action="close">Collapse groups</button>
@@ -1707,7 +1707,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">CENACE, SUT, IG-EPN, and power cuts<span class="tag">10</span></span>
+<span class="atlas-category-title">CENACE, SUT, IG-EPN, and power cuts<span class="tag">9</span></span>
 <span class="atlas-category-action">Show</span>
 </summary>
 <div class="atlas-category-tools">
@@ -1863,28 +1863,6 @@
 <tr><td><code>limit</code></td><td><code>int</code></td><td><code>15</code></td><td>Max reports to return (default 15, max 30)</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>text | json</td></tr>
-
-</tbody>
-</table>
-
-</div>
-</details>
-
-<details class="atlas-tool" id="tool-get_energia_ecuador_snapshot" data-search="get_energia_ecuador_snapshot 2024 blackout schedules from energia-ecuador.com, recovered from the wayback machine. recovers, via the wayback machine, the national blackout-schedule aggregator the ministry of energy ran during the 2024 crisis (the domain is now dead). only the empresa eléctrica quito page was archived: a frozen 2024-04-24 snapshot of pichincha's rotation by province, canton, and sector. not a live series. query free text matched against canton or sectors, accent-insensitive. empty returns all rows. format output format: `text` (default) or `json`.">
-<summary class="atlas-tool-summary">
-<code class="atlas-tool-name">get_energia_ecuador_snapshot</code>
-<span class="atlas-tool-desc">2024 blackout schedules from energia-ecuador.com, recovered from the Wayback Machine.</span>
-</summary>
-<div class="atlas-tool-body">
-<p class="atlas-tool-long">Recovers, via the Wayback Machine, the national blackout-schedule aggregator the Ministry of Energy ran during the 2024 crisis (the domain is now dead). Only the Empresa Eléctrica Quito page was archived: a frozen 2024-04-24 snapshot of Pichincha&#39;s rotation by province, canton, and sector. Not a live series.</p>
-
-<table class="atlas-params">
-<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
-<tbody>
-
-<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Free text matched against canton or sectors, accent-insensitive. Empty returns all rows.</td></tr>
-
-<tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
 
 </tbody>
 </table>
@@ -2548,7 +2526,7 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_capa_geo_datos" data-search="get_capa_geo_datos attributes of a geoportal layer: a sample of up to 20 features (wfs) or up to 500 filtered rows (arcgis). fetches the attributes of a layer from search_capas_geo, geometry coordinates dropped. for inamhi and mag it is a wfs getfeature sample with no filters; layers without wfs return an error. for arconel and celec it is an arcgis rest query: `filtro` is a sql where clause on the layer's fields (listed in `campos`), e.g. &quot;anio = 2024 and idmes = 4&quot; or &quot;empresa like 'cnel%'&quot;; `total_features_en_capa` counts the rows matching it and `hay_mas` says whether to page on with `offset`. dates come back as iso dates. fuente inamhi, mag, arconel or celec. capa the layer's `capa` from search_capas_geo (inamhi: &quot;geonode:...&quot; name; mag: &quot;categoria/store/name&quot;; arcgis: the short id, e.g. balance_energia). count features to fetch: 1-20 for inamhi/mag, 1-500 for arconel/celec (default 5). filtro arconel/celec only: sql where clause; empty for all rows. offset arconel/celec only: rows to skip when paging. format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-get_capa_geo_datos" data-search="get_capa_geo_datos attributes of a geoportal layer: a sample of up to 20 features (wfs) or up to 500 filtered rows (arcgis). fetches the attributes of a layer from search_capas_geo, geometry coordinates dropped. for inamhi and mag it is a wfs getfeature sample with no filters; layers without wfs return an error. for arconel and celec it is an arcgis rest query: `filtro` is a sql where clause on the layer's fields (listed in `campos`), e.g. &quot;anio = 2024 and idmes = 4&quot; or &quot;empresa like 'cnel%'&quot;; `total_features_en_capa` counts the rows matching it and `hay_mas` says whether to page on with `offset`. dates come back as iso dates. fuente inamhi, mag, arconel or celec. capa the layer's `capa` from search_capas_geo (inamhi: &quot;geonode:...&quot; name; mag: &quot;categoria/store/name&quot;; arcgis: the short id, e.g. balance_energia). count features to fetch: 1-20 for inamhi/mag, 1-500 for arconel/celec (default 5). filtro arconel/celec only: sql where clause; empty for all rows. offset arconel/celec only: rows to skip when paging. agrupar arconel/celec only: comma-separated fields to group by; needs `sumar`. sumar arconel/celec only: comma-separated numeric fields to sum. format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_capa_geo_datos</code>
 <span class="atlas-tool-desc">Attributes of a geoportal layer: a sample of up to 20 features (WFS) or up to 500 filtered rows (ArcGIS).</span>
@@ -2569,6 +2547,10 @@
 <tr><td><code>filtro</code></td><td><code>str</code></td><td><code>empty</code></td><td>arconel/celec only: SQL where clause; empty for all rows.</td></tr>
 
 <tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>arconel/celec only: rows to skip when paging.</td></tr>
+
+<tr><td><code>agrupar</code></td><td><code>str</code></td><td><code>empty</code></td><td>arconel/celec only: comma-separated fields to group by; needs `sumar`.</td></tr>
+
+<tr><td><code>sumar</code></td><td><code>str</code></td><td><code>empty</code></td><td>arconel/celec only: comma-separated numeric fields to sum.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
 
@@ -2638,7 +2620,7 @@ window.SITE_SEARCH_EMPTY_LABEL = "No results.";
     var count = visibleTools().length;
     resultCount.textContent = query
       ? count + " tool" + (count === 1 ? "" : "s") + " match" + (count === 1 ? "es" : "") + "."
-      : "84 tools · open a group to see its details.";
+      : "83 tools · open a group to see its details.";
   }
 
   function applyFilter(query) {
