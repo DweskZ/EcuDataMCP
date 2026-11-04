@@ -6561,6 +6561,133 @@ cambió desde 2026-09-29, verificado desde una IP residencial de Canadá:
   enlace); los mapas se agrupan por tema (generación, transmisión,
   distribución), no por año.
 
+## Trigésimo sexta pasada — ARCONEL ArcGIS, gacetas del MSP y Superbancos (2026-11-04)
+
+**ARCONEL, servidor propio.** `geoportal.arconel.gob.ec:6443/arcgis/rest/services`
+(ArcGIS 10.91) vuelve a responder, anónimo, maxRecordCount 1000, paginación y
+estadísticas soportadas; texto en UTF-8 limpio. Falta el intermedio TLS (ya
+cubierto por `arconel.gob.ec` en `_OS_TRUST_HOST_SUFFIXES`). En
+`ServDashboards`: `CENTRALES_PRODUCCION` y `CENTRALES_COMBUSTIBLES` (capa 1,
+HISTORICO, 220.121 filas, ene 1999-ago 2026; la capa 0 tiene el mismo
+esquema con menos centrales antes de 2018). Mayo-diciembre de 2024 falta en
+ambas copias. El año se llama `AnioProduccion` en producción y `Anio` en
+combustibles y alumbrado. `LUMINARIAS/2` (52.837 filas, códigos de empresa y
+provincia sin nombres), `CENTRALES/0` (730), `DISTRIBUCION_INFRAESTRUCTURA/0`
+y `/1` (568 subestaciones, 428 líneas). `DISTRIBUCION_TRANSACCIONES` (0, 2, 3,
+4) y `RESUMEN_FACTURACION/0` cargan metadatos pero responden 400 a toda
+consulta, también en MapServer: las copias de `services3.arcgis.com` siguen
+siendo la fuente de facturación y balance. `SERVMAE` y `portal` solo
+duplican capas de mapa. `outStatistics` con `groupByFieldsForStatistics`
+funciona: neto nacional 2025 = 37,8 TWh en una consulta.
+
+**MSP, todas las gacetas.** `/wp-json/wp/v2/pages` no devuelve nada; con
+`/posts?search=gaceta` paginado (124 resultados, 2 páginas) salen las 110
+páginas de archivo de todas las series, sin necesidad de otros términos.
+Cada serie usó dos o tres familias de slug, así que se clasifica con una
+regex por serie. 18 series, ~3.500 PDF tras deduplicar por URL; 126 enlaces
+apuntan a `instituciones.msp.gob.ec`, que no responde (la página 2012 de
+Indicadores queda vacía y SIVE-Alerta pierde la mitad). Convenciones de
+semana vistas: `SE-NN`, `SENN`, `SE_-NN`, `SEM-NN`, `SEMANA-NN`, `S20`,
+`gaceta_brotesSE31`, número suelto (`ETV_Gaceta_42`, `5.-Gaceta-brotes-41`,
+`ETAS-52`), año abreviado al final (`VECTORES-10_20`), sufijo de duplicado
+pegado (`SE-341` = 34) y rangos acumulados (`SE-01-53`, `SE-01-SE45`,
+`Lepra-SE-01-03`). Hay rutas `/wp-content/uploads/downloads/AAAA/MM/` y dos
+enlaces `//www.salud.gob.ec/...`. El sitio devuelve 503 tras una ráfaga de
+pedidos: concurrencia 3 y un reintento por página.
+
+**Superbancos, resto del portal.** La API WordPress lista 59 páginas. Desde
+esta fecha `admin-ajax.php?action=shareonedrive-get-filelist` responde 200
+vacío salvo con `Origin: https://www.superbancos.gob.ec` o `Referer` de la
+página; sin eso las secciones OneDrive ya construidas volvían solo con sus
+tablas estáticas. El árbol del widget es perezoso: las subcarpetas de
+segundo nivel (CAPCOL: año → CAPTACIONES/COLOCACIONES) aparecen solo en la
+respuesta de su carpeta padre. Secciones nuevas: Indicadores de Solidez
+(`/volumen-de-credito-2/`: un XLSX acumulado por año, ~9 MB, hojas BAL, PYG,
+INDIC CARTERA, INDICAD, CAMEL, tablas FSI del FMI, ~293 columnas mensuales
+desde 2003), Volumen de Crédito (con rama por género, ZIP de 4-27 MB, un
+XLSB), Boletines de Series (8 páginas por tipo de entidad), boletines
+mensuales de otras entidades (6 páginas, estático 2000-2021 + OneDrive),
+CAPCOL (3 páginas), Finanzas Verdes, Seguridad Social (2 páginas) y
+Estudios (10 widgets dentro de pestañas "advanced tabs" de Essential
+Addons: el título del widget es el de la pestaña). `/visualizadores/` solo
+tiene embeds Power BI; balances generales y patrimonio técnico son
+formularios PrimeFaces (`bsf.jsf`, `bss.jsf`, `efpt.jsf`) en
+`appweb.superbancos.gob.ec`. La mayoría de los archivos de series pasa de
+5 MB.
+
+## Trigésimo séptima pasada — formularios de Superbancos, Turismo, IGM y Registro Oficial (2026-11-04)
+
+**Superbancos, balances y patrimonio técnico: descartado por captcha.** Las
+páginas WordPress `balances-generales`, `balances-generales-3` y
+`patrimonio-tecnico` incrustan
+`appweb.superbancos.gob.ec/gen/publico/reportes/{bsf,bss,efpt}.jsf`. Los tres
+son PrimeFaces con `javax.faces.ViewState` y combos en cascada por AJAX
+(`tipoInstitucion` → `institucion` → `anio` → `mes` → `formato`, PDF o
+`application/vnd.ms-excel`; en `efpt` el orden es año → mes → tipo). `bsf`
+lista 19 tipos de institución (bancos privados nacionales `3`, cooperativas
+`19`, mutualistas `14`, públicas `1`…), `bss` 4 de seguridad social y `efpt`
+años 2002-2026. El botón Descargar va detrás de un widget reCAPTCHA v2
+(`form:captcha`, sitekey de Google) en los tres formularios. Por la misma
+política que SERCOP y SENESCYT, no se automatiza; los indicadores de
+solidez y los boletines ya construidos cubren buena parte del contenido.
+
+**Ministerio de Turismo: el dominio ya no existe.** `servicios.turismo.gob.ec`,
+`turismo.gob.ec` y `www.turismo.gob.ec` dan NXDOMAIN (8.8.8.8, 1.1.1.1 y el
+resolvedor local); el ministerio se fusionó con Producción (Decreto 60,
+2025) y el trámite de gob.ec todavía enlaza la URL muerta. El sucesor es
+`https://www.produccion.gob.ec/boletin-de-cifras-sector-turismo/` (post
+15593): boletines mensuales en PDF de noviembre 2025 a septiembre 2026
+(~33 páginas: barómetro ONU Turismo, entradas y salidas con tabla por
+nacionalidad, ocupación en feriados, visitas a áreas protegidas, catastro
+de 36.017 establecimientos, más cifras del BCE, INEC y SRI). Sin XLSX ni
+CSV. La API de medios de WordPress enumera los PDFs con su URL real
+(`/wp-json/wp/v2/media?search=turismo&per_page=30&_fields=date,source_url,mime_type`),
+mejor que el post, cuyos enlaces pasan por acortadores (goo.su,
+acortar.link, lix.li, este último con TLS roto). HEAD de un boletín: 200,
+`application/pdf`, ~2,3 MB. Construible como listado de archivos +
+`read_pdf`; las tablas habría que sacarlas del PDF.
+
+**IGM Geoportal: geoservicios abiertos, GeoServer.** El host es
+`www.geoportaligm.gob.ec` (no existen `geoportal.igm.gob.ec` ni
+`www.igm.gob.ec`). WFS 2.0.0 con salida `application/json`, `SHAPE-ZIP` y
+`csv`, sin login:
+
+| Endpoint | Capas | Espacios de trabajo |
+|---|---|---|
+| `/nacional/wfs` (y `/nacional/wms`) | 68 | `nacional_2024` (37: límites, poblados, vías, ríos, curvas de nivel, ZEE…), `igm` (31) |
+| `/50k/wfs` (y `/50k/wms`) | 629 | `actualizada` 207, `galapagos50k` 168, `igm` 130, `igm_reservada` 124 |
+| `/25k/wfs` | 164 | `igm` |
+| `/geoserver/ows` | WMS 15, WFS 1 | solo `fiscalizacion:fiscalizacion` |
+
+`igm_reservada:*` responde 401 (reservada); 1:50.000 y 1:25.000 son
+abiertas; lo catastral solo aparece como huellas de contratos. Ejemplo:
+`/nacional/wfs?service=WFS&version=2.0.0&request=GetFeature&typeNames=nacional_2024:poblado_p_2024&count=1&outputFormat=application/json`
+→ 200 JSON, `numberMatched: 1340`. CRS nativo EPSG:32717;
+`srsName=EPSG:4326` funciona. Una sola provincia pesa 1,5 MB, así que hace
+falta tope de tamaño. Los WMS en cascada de `/geoserver` (`mapabase:*`)
+fallan en GetMap (el servidor no se alcanza a sí mismo); los teselas WMTS
+cacheadas sí responden. Las descargas libres 1:1M del portal son `.rar`
+(descartado). Encaja en `search_capas_geo`/`get_capa_geo_datos` como
+cliente WFS, igual que INAMHI/SIPA.
+
+**Registro Oficial: listado por AJAX abierto.** WordPress 6.7 + Divi, sin
+WAF ni captcha; la API REST pide autorización (401) pero
+`POST /wp-admin/admin-ajax.php` con `action=get_term_post_kilur_con_imagen`
+responde sin sesión. Parámetros: `year_id` (2026=2002, 2025=2000; mapeo en
+`data-year-id` de la página de producto, 26 años desde 2001), `mes_id`
+(octubre=1988, noviembre=1989, compartido entre años), `name_folder`,
+`page` (12 por página) e `id_carpeta` por tipo: 1954 Registro Oficial, 1991
+Suplementos (todos los niveles), 1992 Edición Especial, 1995 Constitucional,
+1994 Jurídica, 1993 Índice Mensual. Devuelve `{"success":true,"data":"<html>"}`
+con tipo, número ("Año II - Nº 381"), fecha, páginas y enlace. No hay filtro
+por día: se pide el mes y se pagina (los suplementos de octubre 2026 son
+11 páginas). Para 2026-10-01: RO Nº 381 (49 pp.), Primer a Sexto Suplemento
+y Ediciones Especiales 1673-1675. El PDF vive en
+`esacc.corteconstitucional.gob.ec/storage/api/v1/10_DWL_FL/<base64({"carpeta":"ro","uuid":"<uuid>.pdf"})>`:
+200, `application/pdf`, sin login, sin `Content-Length` y sin soporte de
+Range (el tope de 5 MB se aplica descargando). La búsqueda propia del sitio
+(`?s=`) no se probó.
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

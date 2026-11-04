@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import cepalstat_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoSerie
 from helpers.tool_meta import READ_ONLY
 
 
@@ -22,7 +23,7 @@ def register_get_cepalstat_indicador_tool(mcp: MCPServer) -> None:
         pais: str = "Ecuador",
         lang: Literal["es", "en"] = "es",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoSerie]:
         """
         Fetch one CEPALSTAT indicator's observations, filtered to one
         country (Ecuador by default) so the response stays small — CEPAL's

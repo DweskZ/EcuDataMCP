@@ -45,7 +45,7 @@ async def test_search_capas_filters_by_text():
     result = await client.search_capas("arconel", "perdidas")
 
     assert [c["capa"] for c in result["capas"]] == ["balance_energia"]
-    assert result["total_en_catalogo"] == 6
+    assert result["total_en_catalogo"] == 12
 
 
 async def test_celec_catalog_excludes_survey_layers():
@@ -125,3 +125,65 @@ async def test_tools_route_arcgis_and_reject_filters_on_geoserver(httpx_mock):
         await server.call_tool(
             "get_capa_geo_datos", {"fuente": "inamhi", "capa": "x", "filtro": "a = 1"}
         )
+
+
+_PRODUCCION = client._entry("arconel", "produccion_centrales")["url"]
+_PRODUCCION_META = {
+    "type": "Table",
+    "geometryType": None,
+    "objectIdField": "IdResumenEnergiaProducida",
+    "fields": [
+        {"name": "IdResumenEnergiaProducida", "type": "esriFieldTypeOID"},
+        {"name": "NombreCentral", "type": "esriFieldTypeString"},
+        {"name": "AnioProduccion", "type": "esriFieldTypeInteger"},
+        {"name": "TipoCentral", "type": "esriFieldTypeString"},
+        {"name": "EnergiaNeta", "type": "esriFieldTypeDouble"},
+    ],
+}
+
+
+async def test_sumar_groups_server_side(httpx_mock):
+    httpx_mock.add_response(url=f"{_PRODUCCION}?f=json", json=_PRODUCCION_META)
+    httpx_mock.add_response(
+        url=re.compile(rf"^{re.escape(_PRODUCCION)}/query\?.*outStatistics="),
+        json={
+            "features": [
+                {"attributes": {"AnioProduccion": 2024, "suma_EnergiaNeta": 10.5, "filas": 3}},
+                {"attributes": {"AnioProduccion": 2025, "suma_EnergiaNeta": 37.8, "filas": 12}},
+            ]
+        },
+    )
+
+    result = await client.get_layer_features(
+        "arconel",
+        "produccion_centrales",
+        count=1,
+        sumar="energianeta",
+        agrupar="AnioProduccion",
+    )
+
+    assert result["sumar"] == ["EnergiaNeta"]
+    assert result["total_grupos"] == 2
+    assert result["grupos"] == [{"AnioProduccion": 2024, "suma_EnergiaNeta": 10.5, "filas": 3}]
+    assert result["hay_mas"] is True
+    assert "groupByFieldsForStatistics=AnioProduccion" in result["url_consulta"]
+
+
+async def test_sumar_rejects_unknown_and_text_fields(httpx_mock):
+    httpx_mock.add_response(url=f"{_PRODUCCION}?f=json", json=_PRODUCCION_META)
+
+    with pytest.raises(ValueError, match="no existe"):
+        await client.get_layer_features("arconel", "produccion_centrales", sumar="1=1; drop")
+    with pytest.raises(ValueError, match="no numéricos"):
+        await client.get_layer_features("arconel", "produccion_centrales", sumar="TipoCentral")
+    with pytest.raises(ValueError, match="junto con"):
+        await client.get_layer_features("arconel", "produccion_centrales", agrupar="TipoCentral")
+
+
+async def test_unreachable_server_names_the_host(httpx_mock):
+    import httpx
+
+    httpx_mock.add_exception(httpx.ConnectTimeout(""), url=f"{_PRODUCCION}?f=json")
+
+    with pytest.raises(ValueError, match=r"geoportal\.arconel\.gob\.ec:6443 no respondió \(ConnectTimeout\)"):
+        await client.get_layer_features("arconel", "produccion_centrales")

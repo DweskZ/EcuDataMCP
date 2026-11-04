@@ -1,5 +1,5 @@
 import base64
-from typing import Literal
+from typing import Annotated, Literal
 
 import httpx
 from mcp.server.mcpserver import MCPServer
@@ -10,6 +10,7 @@ from helpers import ckan_client
 from helpers.csv_reader import MAX_DOWNLOAD_BYTES, download_bytes
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoArchivos
 from helpers.tool_meta import READ_ONLY
 
 
@@ -28,7 +29,7 @@ def register_download_resource_tool(mcp: MCPServer) -> None:
         resource_id: str,
         source: ckan_client.CkanSource = "nacional",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoArchivos]:
         """
         Download a resource's raw bytes from Ecuador's open data portal, base64-encoded.
 

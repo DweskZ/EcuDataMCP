@@ -6,14 +6,19 @@ quinta pasada, re-checked 2026-10-26).
 Both publish anonymous FeatureServer `/query` endpoints (maxRecordCount
 2000). The layer list is curated rather than discovered:
 
-- ARCONEL's own server (`geoportal.arconel.gob.ec:6443/.../ServDashboards`)
-  holds the per-plant monthly production (219k rows) and fuel consumption,
-  but it did not accept connections from a Canadian home IP on 2026-10-26
-  (it did on 2026-09-29). Its Esri-cloud copies on `services3.arcgis.com`
-  (org 5Gdbxgyani9QGxyU) answered: the distributor energy balance
-  (1999-2024), billing/collection/subsidies/customers (1999-2025), 355
-  plants, transmission lines, substations and service areas. Those are the
-  ones listed here; the 6443 layers can be added once the host answers.
+- ARCONEL's Esri-cloud copies on `services3.arcgis.com` (org
+  5Gdbxgyani9QGxyU): the distributor energy balance (1999-2024),
+  billing/collection/subsidies/customers (1999-2025), 355 plants,
+  transmission lines, substations and service areas.
+- ARCONEL's own server (`geoportal.arconel.gob.ec:6443/.../ServDashboards`),
+  down on 2026-10-26 and back on 2026-11-04: per-plant monthly production
+  and fuel consumption (220k rows each, 1999-Aug 2026, May-Dec 2024
+  missing at the source), public-lighting luminaires, the 730-plant SISDAT
+  register, distribution substations and subtransmission lines. The
+  HISTORICO tables (FeatureServer/1) are used: layer 0 has the same schema
+  with fewer pre-2018 plants. Its billing and loss layers
+  (DISTRIBUCION_TRANSACCIONES, RESUMEN_FACTURACION) answer every /query
+  with 400, so the cloud copies above stay. Text there is clean UTF-8.
 - CELEC's portal (`portalarcgis.celec.gob.ec/server/rest/services/Hosted`)
   lists ~55 services, most of them Survey123 forms and their `_results`
   (personal data), land parcels and orthophotos. Only the generation plants
@@ -30,7 +35,9 @@ import json
 import logging
 from datetime import UTC, datetime
 from typing import Any
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit
+
+import httpx
 
 from helpers.cache import TtlCache
 from helpers.csv_reader import download_bytes
@@ -43,6 +50,7 @@ MAX_FEATURE_COUNT = 500
 _DEFAULT_FEATURE_COUNT = 5
 
 _ARCONEL = "https://services3.arcgis.com/5Gdbxgyani9QGxyU/arcgis/rest/services"
+_ARCONEL_GEO = "https://geoportal.arconel.gob.ec:6443/arcgis/rest/services/ServDashboards"
 _CELEC = "https://portalarcgis.celec.gob.ec/server/rest/services/Hosted"
 
 _CATALOGO: dict[str, list[dict[str, str]]] = {
@@ -98,6 +106,76 @@ _CATALOGO: dict[str, list[dict[str, str]]] = {
                 "/FeatureServer/0"
             ),
         },
+        {
+            "capa": "produccion_centrales",
+            "titulo": (
+                "Producción mensual de energía por central (220.121 filas, "
+                "ene 1999-ago 2026; la fuente no tiene may-dic 2024)"
+            ),
+            "descripcion": (
+                "IdCentral, NombreCentral, AnioProduccion (no Anio), IdMes 1-12, "
+                "EnergiaBruta y EnergiaNeta (MWh), Provincia, TipoEnergia "
+                "(Renovable/No Renovable), TipoCentral (Hidráulica, Térmica...). "
+                "Muchas filas en cero. Para totales usa sumar/agrupar."
+            ),
+            "url": f"{_ARCONEL_GEO}/CENTRALES_PRODUCCION/FeatureServer/1",
+        },
+        {
+            "capa": "combustibles_centrales",
+            "titulo": (
+                "Consumo mensual de combustibles por central (220.121 filas, "
+                "ene 1999-ago 2026; la fuente no tiene may-dic 2024)"
+            ),
+            "descripcion": (
+                "IdCentral, NombreCentral, Anio, IdMes 1-12; cantidad y TEP "
+                "(toneladas equivalentes de petróleo) por combustible: FuelOil, "
+                "Diesel2, Nafta, GasNatural, Crudo, Residuo, Bagazo, GLP, Biogas; "
+                "TotalTEP; Provincia, TipoEnergia, TipoCentral."
+            ),
+            "url": f"{_ARCONEL_GEO}/CENTRALES_COMBUSTIBLES/FeatureServer/1",
+        },
+        {
+            "capa": "alumbrado_publico",
+            "titulo": (
+                "Alumbrado público: luminarias por empresa, provincia y tipo "
+                "(52.837 filas, 1999-2026)"
+            ),
+            "descripcion": (
+                "IdEmpresa e IdProvincia (códigos, sin nombres), Anio, IdMes 1-12, "
+                "Tipo (Na, Hg, Led, Refl, Incan, Fl, Hm, Sem, Mixta, Orn, In, "
+                "Otras), NumeroLuminarias, PotenciaLuminarias (kW). Denso desde "
+                "2009; antes, pocas filas por año."
+            ),
+            "url": f"{_ARCONEL_GEO}/LUMINARIAS/FeatureServer/2",
+        },
+        {
+            "capa": "centrales_sisdat",
+            "titulo": "Catastro de centrales de generación del SISDAT (730)",
+            "descripcion": (
+                "IdCentral, NombreCentral, NombreEmpresa, TipoEmpresa, TipoCentral, "
+                "Sistema (S.N.I./aislado), TipoEnergia, provincia/cantón/parroquia, "
+                "FechaInicioOperacion, potencia nominal y efectiva (MW). Tabla de "
+                "referencia de IdCentral para produccion_centrales."
+            ),
+            "url": f"{_ARCONEL_GEO}/CENTRALES/FeatureServer/0",
+        },
+        {
+            "capa": "subestaciones_distribucion",
+            "titulo": "Subestaciones de distribución (568)",
+            "descripcion": (
+                "Nombre, TipoSubestacion, Provincia, capacidadMaxima (MVA), NombreEmpresa."
+            ),
+            "url": f"{_ARCONEL_GEO}/DISTRIBUCION_INFRAESTRUCTURA/FeatureServer/0",
+        },
+        {
+            "capa": "lineas_subtransmision",
+            "titulo": "Líneas de subtransmisión de las distribuidoras (428)",
+            "descripcion": (
+                "Descripcion, SubestacionSalida/Llegada, Topologia, Voltaje (kV), "
+                "Longitud_km, NumeroCircuitos, NombreEmpresa."
+            ),
+            "url": f"{_ARCONEL_GEO}/DISTRIBUCION_INFRAESTRUCTURA/FeatureServer/1",
+        },
     ],
     "celec": [
         {
@@ -127,7 +205,10 @@ _CATALOGO: dict[str, list[dict[str, str]]] = {
 }
 
 _SOURCES = {
-    "arconel": "ARCONEL — servicios ArcGIS del SISDAT (services3.arcgis.com)",
+    "arconel": (
+        "ARCONEL — servicios ArcGIS del SISDAT (services3.arcgis.com y "
+        "geoportal.arconel.gob.ec)"
+    ),
     "celec": "CELEC EP — portal ArcGIS (portalarcgis.celec.gob.ec)",
 }
 
@@ -160,7 +241,17 @@ def _entry(fuente: str, capa: str) -> dict[str, str]:
 
 
 async def _get_json(url: str) -> dict[str, Any]:
-    raw, truncated = await download_bytes(url)
+    try:
+        raw, truncated = await download_bytes(url)
+    except httpx.HTTPError as e:
+        # A connect timeout stringifies to "", which left the tool error
+        # empty. ARCONEL's own server (port 6443) goes down for days at a
+        # time (2026-10-26, 2026-11-04 afternoon).
+        host = urlsplit(url).netloc
+        raise ValueError(
+            f"{host} no respondió ({type(e).__name__}); el servidor puede estar caído, "
+            "reintenta luego."
+        ) from e
     if truncated:
         raise ValueError("La respuesta de ArcGIS superó el límite de descarga; reduce count.")
     payload = json.loads(raw.decode("utf-8", errors="replace"))
@@ -201,12 +292,99 @@ async def search_capas(fuente: str, query: str = "") -> dict[str, Any]:
     }
 
 
+def _field_list(value: str, campos: dict[str, dict[str, Any]], what: str) -> list[str]:
+    """Split a comma list of field names and check each against the layer
+    (case-insensitive), so only real field names reach the query."""
+    by_lower = {name.lower(): name for name in campos}
+    names = []
+    for raw in value.split(","):
+        raw = raw.strip()
+        if not raw:
+            continue
+        name = by_lower.get(raw.lower())
+        if name is None:
+            raise ValueError(
+                f"Campo '{raw}' en {what} no existe en la capa. Campos: {', '.join(campos)}"
+            )
+        names.append(name)
+    return names
+
+
+_NUMERIC_TYPES = {
+    "esriFieldTypeInteger",
+    "esriFieldTypeSmallInteger",
+    "esriFieldTypeBigInteger",
+    "esriFieldTypeDouble",
+    "esriFieldTypeSingle",
+}
+
+
+async def _get_statistics(
+    entry: dict[str, str],
+    meta: dict[str, Any],
+    where: str,
+    agrupar: str,
+    sumar: str,
+    capped: int,
+    offset: int,
+) -> dict[str, Any]:
+    """Server-side sums grouped by fields (outStatistics), so a total over
+    220k rows is one request instead of hundreds of pages."""
+    campos = {f["name"]: f for f in meta.get("fields") or []}
+    sumas = _field_list(sumar, campos, "sumar")
+    grupos = _field_list(agrupar, campos, "agrupar")
+    if not sumas:
+        raise ValueError("`sumar` necesita al menos un campo numérico.")
+    no_numericos = [c for c in sumas if campos[c].get("type") not in _NUMERIC_TYPES]
+    if no_numericos:
+        raise ValueError(f"Campos no numéricos en sumar: {', '.join(no_numericos)}")
+
+    estadisticas = [
+        {"statisticType": "sum", "onStatisticField": c, "outStatisticFieldName": f"suma_{c}"}
+        for c in sumas
+    ]
+    estadisticas.append(
+        {"statisticType": "count", "onStatisticField": sumas[0], "outStatisticFieldName": "filas"}
+    )
+    params: dict[str, Any] = {
+        "where": where,
+        "f": "json",
+        "outStatistics": json.dumps(estadisticas),
+    }
+    if grupos:
+        params["groupByFieldsForStatistics"] = ",".join(grupos)
+        params["orderByFields"] = ",".join(grupos)
+    url = f"{entry['url']}/query?{urlencode(params)}"
+    payload = await _get_json(url)
+
+    filas = [
+        {k: _fix_text(v) for k, v in (f.get("attributes") or {}).items()}
+        for f in payload.get("features") or []
+    ]
+    pagina = filas[offset : offset + capped]
+    return {
+        "capa": entry["capa"],
+        "titulo": entry["titulo"],
+        "filtro": where,
+        "agrupar": grupos,
+        "sumar": sumas,
+        "offset": offset,
+        "total_grupos": len(filas),
+        "grupos_devueltos": len(pagina),
+        "hay_mas": offset + len(pagina) < len(filas),
+        "grupos": pagina,
+        "url_consulta": url,
+    }
+
+
 async def get_layer_features(
     fuente: str,
     capa: str,
     count: int = _DEFAULT_FEATURE_COUNT,
     filtro: str = "",
     offset: int = 0,
+    agrupar: str = "",
+    sumar: str = "",
 ) -> dict[str, Any]:
     """
     Query one curated layer's attributes.
@@ -218,9 +396,24 @@ async def get_layer_features(
         filtro: An ArcGIS SQL where clause (e.g. "Anio = 2024 AND Empresa LIKE
             'CNEL%'"); empty means all rows.
         offset: Rows to skip, for paging through a filtered result.
+        agrupar: Comma-separated fields to group by when `sumar` is given.
+        sumar: Comma-separated numeric fields to sum server-side; the result
+            then holds one row per group (`grupos`) instead of features.
     """
     entry = _entry(fuente, capa)
     meta = await _layer_meta(entry["url"])
+    if agrupar and not sumar:
+        raise ValueError("`agrupar` solo aplica junto con `sumar`.")
+    if sumar:
+        return await _get_statistics(
+            entry,
+            meta,
+            filtro.strip() or "1=1",
+            agrupar,
+            sumar,
+            max(1, min(count, MAX_FEATURE_COUNT)),
+            max(0, offset),
+        )
     fechas = {f["name"] for f in meta.get("fields") or [] if f.get("type") == "esriFieldTypeDate"}
     where = filtro.strip() or "1=1"
     capped = max(1, min(count, MAX_FEATURE_COUNT))

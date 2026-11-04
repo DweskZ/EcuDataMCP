@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -8,6 +8,7 @@ from helpers import gobec_client
 from helpers.format_out import render_structured
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoBusqueda
 from helpers.tool_meta import READ_ONLY
 
 
@@ -23,7 +24,7 @@ def register_search_regulaciones_tool(mcp: MCPServer) -> None:
     @log_tool
     async def search_regulaciones(
         query: str = "", page: int = 1, format: Literal["text", "json"] = "text"
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         Search or list regulations published on Ecuador's gob.ec portal.
 

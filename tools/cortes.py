@@ -7,11 +7,10 @@ time blocks, sectors -- plus location fields (EEQ: substation; Centrosur:
 province/canton/zone). `distribuidora` now picks the utility. Emelnorte,
 ElecGalápagos and EEASA joined with their routine maintenance notices
 (helpers/cortes_programados_client.py): one notice is one `archivo`, and
-its rows add `motivo`. The energia-ecuador.com snapshot stays its own tool:
-one frozen page with a different row shape, not an archive.
+its rows add `motivo`.
 """
 
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -24,6 +23,7 @@ from helpers import (
 )
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoBusqueda, ResultadoTabla
 from helpers.tool_meta import READ_ONLY
 
 Distribuidora = Literal["eeq", "centrosur", "emelnorte", "elecgalapagos", "eeasa"]
@@ -82,7 +82,7 @@ def register_cortes_tools(mcp: MCPServer) -> None:
         distribuidora: Distribuidora,
         query: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         List one electricity distributor's scheduled power cuts.
 
@@ -109,8 +109,7 @@ def register_cortes_tools(mcp: MCPServer) -> None:
           days on its "Trabajos Programados" page, as one archivo
           (`vigentes`). No history: past notices are not kept.
 
-        CNEL has no recoverable archive. For the national 2024 portal see
-        get_energia_ecuador_snapshot.
+        CNEL has no recoverable archive.
 
         Args:
             distribuidora: eeq, centrosur, emelnorte, elecgalapagos or eeasa.
@@ -166,7 +165,7 @@ def register_cortes_tools(mcp: MCPServer) -> None:
         archivo: str,
         query: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoTabla]:
         """
         Parse one scheduled power-cut PDF into rows.
 

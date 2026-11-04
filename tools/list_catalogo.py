@@ -8,7 +8,7 @@ catalog; the `get_*` tools are unchanged.
 """
 
 from collections.abc import Awaitable, Callable
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -23,6 +23,7 @@ from helpers import (
 )
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoListado
 from helpers.tool_meta import READ_ONLY
 
 Fuente = Literal["arconel", "bce_diarios", "contraloria", "iess", "sut", "judicatura"]
@@ -196,7 +197,7 @@ def register_list_catalogo_tool(mcp: MCPServer) -> None:
     async def list_catalogo(
         fuente: Fuente,
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoListado]:
         """
         List the catalog of one source that has no search filters.
 

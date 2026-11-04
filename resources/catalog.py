@@ -303,8 +303,9 @@ def _all_fuentes() -> dict:
             {
                 "id": "superbancos",
                 "nombre": (
-                    "Superintendencia de Bancos (boletines financieros, "
-                    "servicios financieros, información histórica)"
+                    "Superintendencia de Bancos (boletines financieros y de series, "
+                    "indicadores de solidez, volumen de crédito, CAPCOL, seguridad "
+                    "social, estudios)"
                 ),
                 "base": "https://www.superbancos.gob.ec/estadisticas/portalestudios",
                 "tools": [
@@ -383,15 +384,6 @@ def _all_fuentes() -> dict:
                 "nombre": "EEASA (trabajos programados en Tungurahua y Pastaza)",
                 "base": "https://www.eeasa.com.ec/",
                 "tools": ["search_cortes", "get_cortes_horarios"],
-            },
-            {
-                "id": "energia-ecuador",
-                "nombre": (
-                    "energia-ecuador.com vía Wayback Machine (horarios históricos "
-                    "de apagones)"
-                ),
-                "base": "https://web.archive.org/",
-                "tools": ["get_energia_ecuador_snapshot"],
             },
             {
                 "id": "sut",
@@ -504,7 +496,7 @@ def _all_fuentes() -> dict:
             },
             {
                 "id": "msp",
-                "nombre": "MSP (gacetas semanales de enfermedades inmunoprevenibles)",
+                "nombre": "MSP (gacetas epidemiológicas semanales, 18 series)",
                 "base": "https://www.salud.gob.ec/",
                 "tools": ["search_archivos"],
             },

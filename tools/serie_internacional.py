@@ -7,7 +7,7 @@ with a `fuente` selector keeps tools/list small (the same pattern as
 search_archivos); the per-source clients are separate.
 """
 
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -25,6 +25,7 @@ from helpers import (
 )
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoSerie
 from helpers.tool_meta import READ_ONLY
 
 Fuente = Literal["wdi", "irena", "xm", "comtrade", "imf", "who", "ilo", "unhcr"]
@@ -281,7 +282,7 @@ def register_serie_internacional_tools(mcp: MCPServer) -> None:
         clave: str = "",
         ultimos: int = 0,
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoSerie]:
         """
         Fetch a series from an international source, filtered to Ecuador.
 

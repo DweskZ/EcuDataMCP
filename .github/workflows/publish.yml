@@ -73,9 +73,9 @@ jobs:
         with:
           skip-existing: true
 
-  # The MCPB bundle (manifest.json + .mcpbignore) is what Smithery and
-  # Claude Desktop install for a local stdio server; it is attached to the
-  # GitHub release rather than uploaded anywhere.
+  # The MCPB bundle (manifest.json + .mcpbignore) is what Claude Desktop
+  # and other MCPB clients install for a local stdio server; it is attached
+  # to the GitHub release rather than uploaded anywhere.
   mcpb:
     needs: build
     if: github.event_name == 'release'

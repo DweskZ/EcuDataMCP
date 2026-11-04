@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import arconel_reportes_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoTabla
 from helpers.tool_meta import READ_ONLY
 
 _TEXT_ROWS = 25
@@ -30,7 +31,7 @@ def register_get_arconel_reporte_tool(mcp: MCPServer) -> None:
         mes: int | None = None,
         max_paginas: int = 10,
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoTabla]:
         """
         Run one report from ARCONEL's public statistics builder
         (reportes.arconel.gob.ec) and return its rows, e.g. "Balance

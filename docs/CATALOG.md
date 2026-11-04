@@ -3,7 +3,7 @@
 Generado por `scripts/generate_catalog.py` desde `resources/catalog.py` y las
 descripciones de `tools/*.py`; no editar a mano.
 
-54 fuentes, 84 tools públicas.
+53 fuentes, 83 tools públicas.
 
 ## Datos Abiertos CKAN
 
@@ -123,8 +123,8 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `inamhi`
 - Base: https://geoservicios.inamhi.gob.ec/geoserver
 
-- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals and anomalies, WRF grids, watersheds), mag (agro zoning, land cover, agricultural censuses, rural cadastre), arconel (distributor energy balance and billing 1999-2025, power plants, grid) or celec (CELEC plants, transmission network).
-- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset.
+- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals and anomalies, WRF grids, watersheds), mag (agro zoning, land cover, agricultural censuses, rural cadastre), arconel (distributor energy balance and billing 1999-2025, monthly production and fuel by plant 1999-2026, public lighting, plants, grid) or celec (CELEC plants, transmission network).
+- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
 
 ## DGAC / AIS Ecuador (AIP de aeródromos, METAR, NOTAM, SIGMET)
 
@@ -215,8 +215,8 @@ descripciones de `tools/*.py`; no editar a mano.
 - `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE, ARCONEL). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 - `get_sipa_resumen_indicadores`: Monthly PDF links of SIPA's (MAG) "Resumen de Indicadores" for one year, 2018 onward.
-- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals and anomalies, WRF grids, watersheds), mag (agro zoning, land cover, agricultural censuses, rural cadastre), arconel (distributor energy balance and billing 1999-2025, power plants, grid) or celec (CELEC plants, transmission network).
-- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset.
+- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals and anomalies, WRF grids, watersheds), mag (agro zoning, land cover, agricultural censuses, rural cadastre), arconel (distributor energy balance and billing 1999-2025, monthly production and fuel by plant 1999-2026, public lighting, plants, grid) or celec (CELEC plants, transmission network).
+- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
 
 ## EP Petroecuador (Cifras Institucionales)
 
@@ -278,7 +278,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - `search_ranking`: Rank Supercías companies by financial indicators for one fiscal year (2008 to the latest year), optionally by CIIU letter. descending=true for top-N by a column.
 - `get_financials`: One company's Supercías financial history (fiscal years 2008 to the latest): revenue, assets, equity, profit, employees and ratios. Takes expediente or RUC; anio or desde/hasta narrow the years.
 
-## Superintendencia de Bancos (boletines financieros, servicios financieros, información histórica)
+## Superintendencia de Bancos (boletines financieros y de series, indicadores de solidez, volumen de crédito, CAPCOL, seguridad social, estudios)
 
 - Id: `superbancos`
 - Base: https://www.superbancos.gob.ec/estadisticas/portalestudios
@@ -303,8 +303,8 @@ descripciones de `tools/*.py`; no editar a mano.
 
 - `list_catalogo`: List one source's catalog, the step before its get tool: arconel (get_arconel_reporte), bce_diarios (get_bce_indicador_diario), contraloria (get_contraloria_informe), iess (get_iess_archivos), sut and judicatura (get_sut_indicador_schema, query_sut_indicador with the same fuente).
 - `get_arconel_reporte`: Run one ARCONEL report (e.g. "Balance Energía" for a year) and return its rows. Slow, ~50 rows per page; max_paginas caps work and completo says if everything was read.
-- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals and anomalies, WRF grids, watersheds), mag (agro zoning, land cover, agricultural censuses, rural cadastre), arconel (distributor energy balance and billing 1999-2025, power plants, grid) or celec (CELEC plants, transmission network).
-- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset.
+- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals and anomalies, WRF grids, watersheds), mag (agro zoning, land cover, agricultural censuses, rural cadastre), arconel (distributor energy balance and billing 1999-2025, monthly production and fuel by plant 1999-2026, public lighting, plants, grid) or celec (CELEC plants, transmission network).
+- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
 - `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE, ARCONEL). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 
@@ -313,8 +313,8 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `celec`
 - Base: https://portalarcgis.celec.gob.ec/server/rest/services/Hosted
 
-- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals and anomalies, WRF grids, watersheds), mag (agro zoning, land cover, agricultural censuses, rural cadastre), arconel (distributor energy balance and billing 1999-2025, power plants, grid) or celec (CELEC plants, transmission network).
-- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset.
+- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals and anomalies, WRF grids, watersheds), mag (agro zoning, land cover, agricultural censuses, rural cadastre), arconel (distributor energy balance and billing 1999-2025, monthly production and fuel by plant 1999-2026, public lighting, plants, grid) or celec (CELEC plants, transmission network).
+- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
 
 ## Empresa Eléctrica Quito (cronogramas de cortes de luz en PDF)
 
@@ -355,13 +355,6 @@ descripciones de `tools/*.py`; no editar a mano.
 
 - `search_cortes`: Scheduled power cuts of one utility: crisis schedule PDFs from eeq (Quito, 2023-2024) and centrosur (2023 on), or current maintenance notices from emelnorte, elecgalapagos and eeasa. Next: get_cortes_horarios with an archivo.
 - `get_cortes_horarios`: Parse one power-cut schedule or notice (archivo from search_cortes) into rows: date, time blocks without power, location and sectors, plus the motive for maintenance notices. query filters by place.
-
-## energia-ecuador.com vía Wayback Machine (horarios históricos de apagones)
-
-- Id: `energia-ecuador`
-- Base: https://web.archive.org/
-
-- `get_energia_ecuador_snapshot`: Frozen Wayback Machine copy (2024-04-24) of the defunct national blackout-schedule portal energia-ecuador.com; only EEQ's Pichincha rotation survived. For current schedules use search_cortes and get_cortes_horarios.
 
 ## Ministerio del Trabajo / SUT (tableros Power BI en vivo: contratos, brechas de empleo, políticas de género)
 
@@ -459,7 +452,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - `search_infomies_bases_mensuales`: infoMIES monthly program databases, serie "anc" (economic inclusion) or "is" (social inclusion). Closed years have one year-end file. .rar files: links only.
 - `search_infomies_boletines_zonales`: infoMIES zonal bulletins: modo="zonal" (per-zone .rar, 2017-2021, needs zona) or "consolidado" (yearly XLSX 2021-2026, still updated). Returns links.
 
-## MSP (gacetas semanales de enfermedades inmunoprevenibles)
+## MSP (gacetas epidemiológicas semanales, 18 series)
 
 - Id: `msp`
 - Base: https://www.salud.gob.ec/

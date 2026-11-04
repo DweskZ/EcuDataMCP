@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import anda_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoFicha
 from helpers.tool_meta import READ_ONLY
 
 _MAX_TEXT_CHARS = 800
@@ -31,7 +32,7 @@ def register_get_anda_survey_info_tool(mcp: MCPServer) -> None:
     @log_tool
     async def get_anda_survey_info(
         idno: str, format: Literal["text", "json"] = "text"
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoFicha]:
         """
         Get full metadata for one ANDA (INEC) survey/census by its idno or numeric id.
 

@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import aviacion_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoListado
 from helpers.tool_meta import READ_ONLY
 
 
@@ -20,7 +21,7 @@ def register_list_aip_aerodromos_tool(mcp: MCPServer) -> None:
         annotations=READ_ONLY,
     )
     @log_tool
-    async def list_aip_aerodromos(format: Literal["text", "json"] = "text") -> CallToolResult:
+    async def list_aip_aerodromos(format: Literal["text", "json"] = "text") -> Annotated[CallToolResult, ResultadoListado]:
         """
         List the ICAO designators and names of every aerodrome/helipad with
         a published AIP AD 2.x page, from DGAC's public eAIP

@@ -55,8 +55,8 @@ IEM_ARCHIVE_URL = "https://contenido.bce.fin.ec/iem-publicaciones/"
 _SOURCE_NAME = "Banco Central del Ecuador — Información Estadística Mensual"
 _DEFAULT_CATALOG_DIR = data_dir() / "iem_catalog_snapshots"
 
-_catalog_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
-_bulletins_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
+_catalog_cache = TtlCache(ttl_seconds=86400.0, max_entries=1, persist="bce_iem_catalog")
+_bulletins_cache = TtlCache(ttl_seconds=86400.0, max_entries=1, persist="bce_iem_bulletins")
 # Bulletin sources that failed on the most recent reconciliation.
 _last_bulletin_failures: list[str] = []
 _bulletin_tables_cache = TtlCache(ttl_seconds=86400.0, max_entries=512)

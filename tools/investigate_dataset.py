@@ -1,5 +1,5 @@
 import asyncio
-from typing import Literal
+from typing import Annotated, Literal
 
 import httpx
 from mcp.server.mcpserver import MCPServer
@@ -15,6 +15,7 @@ from helpers.format_out import render_structured
 from helpers.geo_proxy import proxy_for
 from helpers.logging import log_tool
 from helpers.preview_dispatch import PREVIEWABLE_KINDS, preview_by_kind
+from helpers.result_types import ResultadoFicha
 from helpers.tool_meta import READ_ONLY
 from helpers.user_agent import USER_AGENT
 from tools.list_dataset_resources import detect_periodic_series
@@ -57,7 +58,7 @@ def register_investigate_dataset_tool(mcp: MCPServer) -> None:
         source: ckan_client.CkanSource = "nacional",
         preview_rows: int = 10,
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoFicha]:
         """
         One-shot research shortcut: search for a dataset, list its resources,
         and preview the most promising one's actual data -- the

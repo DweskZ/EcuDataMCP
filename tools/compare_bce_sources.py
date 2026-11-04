@@ -1,5 +1,5 @@
 import logging
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -9,6 +9,7 @@ from helpers import bce_client, bce_equivalence, bce_equivalence_store, bce_iem_
 from helpers.format_out import render_structured
 from helpers.logging import MAIN_LOGGER_NAME, log_tool
 from helpers.response_contract import with_response_metadata
+from helpers.result_types import ResultadoFicha
 from helpers.tool_meta import WRITES_LOCAL_ARTIFACTS
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
@@ -31,7 +32,7 @@ def register_compare_bce_sources_tool(mcp: MCPServer) -> None:
         historico: bool = False,
         guardar_revision: bool = False,
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoFicha]:
         """Build a cautious BCEData ↔ IEM candidate-equivalence map.
 
         Matching uses normalized group/series/table labels. It reports

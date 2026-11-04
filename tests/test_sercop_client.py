@@ -1,17 +1,17 @@
 import httpx
 import pytest
 
-from helpers import sercop_client
+from helpers import http_client, sercop_client
 from helpers.cache import TtlCache
 
 
 @pytest.fixture(autouse=True)
 def _reset_sercop_state():
-    sercop_client._COOLDOWN_UNTIL = 0.0
+    http_client.reset_cooldowns()
     sercop_client.sercop_search_cache = TtlCache(ttl_seconds=60)
     sercop_client._negative_cache = TtlCache(ttl_seconds=60)
     yield
-    sercop_client._COOLDOWN_UNTIL = 0.0
+    http_client.reset_cooldowns()
 
 
 @pytest.mark.asyncio
@@ -50,7 +50,7 @@ async def test_search_contracts_rate_limit(httpx_mock, monkeypatch):
     async def _no_sleep(_: float) -> None:
         return None
 
-    monkeypatch.setattr(sercop_client.asyncio, "sleep", _no_sleep)
+    monkeypatch.setattr(http_client.asyncio, "sleep", _no_sleep)
 
     url = (
         "https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/api/search_ocds"
@@ -72,7 +72,7 @@ async def test_search_contracts_names_regional_block_on_connect_error(
     async def _no_sleep(_: float) -> None:
         return None
 
-    monkeypatch.setattr(sercop_client.asyncio, "sleep", _no_sleep)
+    monkeypatch.setattr(http_client.asyncio, "sleep", _no_sleep)
 
     httpx_mock.add_exception(httpx.ConnectError("All connection attempts failed"))
 

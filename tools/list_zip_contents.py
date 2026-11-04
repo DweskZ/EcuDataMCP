@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers.csv_reader import list_zip_contents as _list_zip_contents
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoArchivos
 from helpers.tool_meta import READ_ONLY
 
 
@@ -34,7 +35,7 @@ def register_list_zip_contents_tool(mcp: MCPServer) -> None:
         limit: int = 200,
         offset: int = 0,
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoArchivos]:
         """
         List a .zip archive's member files (name, size) from a direct URL,
         without downloading the archive.

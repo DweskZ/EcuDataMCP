@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import sut_powerbi_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoFicha
 from helpers.tool_meta import READ_ONLY
 
 
@@ -24,7 +25,7 @@ def register_get_sut_indicador_schema_tool(mcp: MCPServer) -> None:
         indicador: str,
         fuente: Literal["sut", "judicatura"] = "sut",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoFicha]:
         """
         List the queryable columns/measures/date-levels for one SUT
         Power BI dashboard, discovered from the report's own layout

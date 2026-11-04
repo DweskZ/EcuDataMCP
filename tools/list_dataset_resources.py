@@ -1,5 +1,5 @@
 import re
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -8,6 +8,7 @@ from mcp.types import CallToolResult
 from helpers import ckan_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoListado
 from helpers.tool_meta import READ_ONLY
 
 _DIGIT_RE = re.compile(r"\d+")
@@ -135,7 +136,7 @@ def register_list_dataset_resources_tool(mcp: MCPServer) -> None:
         dataset_id: str,
         source: ckan_client.CkanSource = "nacional",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoListado]:
         """
         List all resources (files) in a dataset with their metadata.
 

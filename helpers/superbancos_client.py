@@ -3,9 +3,10 @@
 from the institutional site (/bancos/). No CKAN organization exists for this
 source and there is no "datos abiertos" section anywhere on the domain.
 
-Four sections are scraped here, all sharing the same TablePress-based table
-markup (Elementor + the "TablePress" plugin), except the calendar which uses
-a small "feature list" widget instead:
+Twelve sections are scraped here. The first four have page-specific
+parsing, all sharing the same TablePress-based table markup (Elementor +
+the "TablePress" plugin), except the calendar which uses a small "feature
+list" widget instead:
 
 - boletines_financieros: monthly financial bulletins (/bancos/).
 - servicios_financieros: cards, ATMs, non-bank correspondents, offices
@@ -67,6 +68,25 @@ has regardless of type: a dedicated download-button
 (class='entry_action_download ', no "entry_link" prefix) whose own
 "download='...'" attribute gives the filename with extension directly.
 
+The eight sections added 2026-11-04 (indicadores_solidez, volumen_credito,
+boletines_series, boletines_otras_entidades, cartera_depositos,
+finanzas_verdes, seguridad_social, estudios) go through one generic path,
+_pagina_generica: every TablePress table plus every OneDrive widget on each
+of the section's pages, crawled to full depth (the widget tree is lazy, so
+grandchild folders only appear in their parent's response), with grupo
+prefixed by the page label and the widget's heading (an Elementor heading,
+or on estudios-y-analisis the title of the "advanced tabs" panel holding
+the widget). Mapped live 2026-11-04 (docs/RESEARCH.md § Trigésimo sexta
+pasada). Left out on purpose: /visualizadores/ (Power BI embeds only) and
+the balances-generales/patrimonio-tecnico pages, which are PrimeFaces query
+forms on appweb.superbancos.gob.ec whose download sits behind a reCAPTCHA
+(checked 2026-11-04), so they are out of scope.
+
+The same day the plugin started answering 200 with an empty body unless the
+AJAX call carries the site's Origin (or the page as Referer), which had
+silently cut both older OneDrive-backed sections back to their static
+tables; _wpcp_get_filelist now sends both.
+
 Files are never downloaded here — only metadata and the direct URL, same
 pattern as helpers/sipa_client.py (some boletines are 5+ MB ZIPs, well over
 this project's 5 MB cap). The OneDrive download-proxy URLs are the one
@@ -124,16 +144,129 @@ _SECCIONES: list[dict[str, str]] = [
         "nombre": "Calendario Estadístico (año vigente y anterior)",
         "url": f"{_BASE}/",
     },
+    {
+        "seccion": "indicadores_solidez",
+        "nombre": (
+            "Indicadores de Solidez Financiera — un XLSX acumulado por año con "
+            "series mensuales desde enero 2003: balance, PyG, CAMEL, morosidad, "
+            "liquidez, solvencia y tablas FSI del FMI (~9 MB)"
+        ),
+        "url": f"{_BASE}/volumen-de-credito-2/",
+    },
+    {
+        "seccion": "volumen_credito",
+        "nombre": "Volumen de Crédito — mensual 2021 en adelante y por género (ZIP de 4-27 MB)",
+        "url": f"{_BASE}/volumen-de-credito/",
+    },
+    {
+        "seccion": "boletines_series",
+        "nombre": (
+            "Boletines de Series Mensuales — un archivo acumulado por año y tipo "
+            "de entidad (bancos privados, públicas, sociedades financieras, "
+            "grupos financieros, oficinas en el exterior, casas de cambio, "
+            "almaceneras, CTH)"
+        ),
+        "url": f"{_BASE}/boletines-de-series-mensuales/",
+        "paginas": [
+            ("Bancos privados", f"{_BASE}/bancos-2/"),
+            ("Instituciones públicas", f"{_BASE}/instituciones-publicas-2/"),
+            ("Sociedades financieras", f"{_BASE}/sociedades-financieras-2/"),
+            (
+                "Grupos financieros",
+                f"{_BASE}/boletines-financieros-mensuales/grupos-financieros-2/",
+            ),
+            (
+                "Oficinas subsidiarias en el exterior",
+                f"{_BASE}/boletines-de-series-mensuales/oficinas-subsidiarias-en-el-exterior/",
+            ),
+            ("Casas de cambio", f"{_BASE}/boletines-financieros-mensuales/casas-de-cambio-2/"),
+            ("Almaceneras", f"{_BASE}/almaceneras-2/"),
+            ("Compañías de titularización hipotecaria (CTH)", f"{_BASE}/cth-2/"),
+        ],
+    },
+    {
+        "seccion": "boletines_otras_entidades",
+        "nombre": (
+            "Boletines Financieros Mensuales de otras entidades — públicas, "
+            "sociedades financieras, grupos financieros, oficinas en el exterior, "
+            "casas de cambio, almaceneras (estático 2000-2021 + OneDrive)"
+        ),
+        "url": f"{_BASE}/boletines-financieros-mensuales/",
+        "paginas": [
+            ("Instituciones públicas", f"{_BASE}/instituciones-publicas/"),
+            ("Sociedades financieras", f"{_BASE}/sociedades-financieras/"),
+            (
+                "Grupos financieros",
+                f"{_BASE}/boletines-financieros-mensuales/grupos-financieros/",
+            ),
+            (
+                "Oficinas subsidiarias en el exterior",
+                f"{_BASE}/boletines-financieros-mensuales/oficinas-subsidiarias-en-el-exterior-2/",
+            ),
+            ("Casas de cambio", f"{_BASE}/boletines-financieros-mensuales/casas-de-cambio/"),
+            ("Almaceneras", f"{_BASE}/almaceneras-2-2/"),
+        ],
+    },
+    {
+        "seccion": "cartera_depositos",
+        "nombre": (
+            "Cartera y Depósitos (CAPCOL) — captaciones y colocaciones de bancos "
+            "privados (2014+), instituciones públicas (2016+) y sociedades "
+            "financieras (2021)"
+        ),
+        "url": f"{_BASE}/captaciones-y-colocaciones-capcol/",
+        "paginas": [
+            ("Bancos privados", f"{_BASE}/capcol-bancos/"),
+            ("Instituciones públicas", f"{_BASE}/capcol-instituciones-publicas/"),
+            ("Sociedades financieras", f"{_BASE}/capcol-sociedades-financieras/"),
+        ],
+    },
+    {
+        "seccion": "finanzas_verdes",
+        "nombre": "Finanzas Verdes — un ZIP por año, 2023 en adelante",
+        "url": f"{_BASE}/finanzas-verdes/",
+    },
+    {
+        "seccion": "seguridad_social",
+        "nombre": (
+            "Sistema de Seguridad Social — estadísticas de IESS, ISSFA, ISSPOL, "
+            "SCPN y fondos complementarios (2018+), y series, fondos y boletín "
+            "mensual del BIESS (2017+)"
+        ),
+        "url": f"{_BASE}/sistema-de-seguridad-social/",
+        "paginas": [
+            ("Estadísticas generales", f"{_BASE}/estadisticas-generales-seguridad-social/"),
+            ("Banco del IESS (BIESS)", f"{_BASE}/informacion-banco-del-iess/"),
+        ],
+    },
+    {
+        "seccion": "estudios",
+        "nombre": (
+            "Estudios y Análisis — ~300 PDF 2012 en adelante: boletines de "
+            "inclusión financiera, reportes de estabilidad, análisis Dupont, de "
+            "cosechas y de matrices de transición, comportamiento crediticio "
+            "sectorial, interconexiones, pruebas de tensión, memorias"
+        ),
+        "url": f"{_BASE}/estudios-y-analisis/",
+    },
 ]
 _SECCIONES_BY_KEY = {s["seccion"]: s for s in _SECCIONES}
+# The first four sections keep their own page-specific parsing; the rest go
+# through _pagina_generica.
+_LEGACY_SECCIONES = {
+    "boletines_financieros",
+    "servicios_financieros",
+    "informacion_historica",
+    "calendario_estadistico",
+}
 
 # Section pages change a few times a year at most (a new archived year, a
 # new calendar). max_entries matches the fixed key space.
-_files_cache = TtlCache(ttl_seconds=21600.0, max_entries=len(_SECCIONES))
+_files_cache = TtlCache(ttl_seconds=21600.0, max_entries=len(_SECCIONES), persist="superbancos_secciones")
 _fetch_lock = asyncio.Lock()
 
 _TAG_RE = re.compile(r"<[^>]+>")
-_KNOWN_FORMATS = {"XLSX", "XLS", "CSV", "PDF", "ZIP", "DOCX", "DOC"}
+_KNOWN_FORMATS = {"XLSX", "XLSB", "XLS", "CSV", "PDF", "ZIP", "RAR", "DOCX", "DOC"}
 
 _TABLE_RE = re.compile(r'<table id="tablepress-\d+"[^>]*>(?P<body>.*?)</table>', re.DOTALL)
 _ROW_RE = re.compile(r"<tr[^>]*>(?P<row>.*?)</tr>", re.DOTALL)
@@ -165,8 +298,20 @@ _WPCP_DRIVE_RE = re.compile(r"data-drive-id='([^']+)'")
 _WPCP_NONCE_RE = re.compile(r'"refresh_nonce":"([0-9a-f]+)"')
 _WPCP_YEAR_FOLDER_RE = re.compile(r"^Año \d{4}$")
 _WPCP_HEADING_RE = re.compile(r'<h3 class="elementor-heading-title[^"]*">(?P<heading>[^<]*)</h3>')
+_ANY_HEADING_RE = re.compile(r"<h[2-4][^>]*>(?P<heading>[^<]{3,120})</h[2-4]>")
+# Essential Addons "advanced tabs": the tab titles sit together in a nav
+# list and the panels follow in the same order, so a widget inside a panel
+# is titled by the nav entry with the panel's index (estudios-y-analisis
+# has two such tab sets holding 8 of its 10 widgets).
+_TABS_RE = re.compile(r'class="eael-advance-tabs')
+_TAB_TITLE_RE = re.compile(r'<span class="eael-tab-title[^"]*"\s*>(?P<title>[^<]*)</span>')
+_TAB_PANEL_RE = re.compile(r'class="clearfix eael-tab-content-item')
 
 _WPCP_AJAX_URL = f"{_BASE}/wp-admin/admin-ajax.php"
+_WPCP_CONCURRENCY = 4
+# estudios-y-analisis is the largest tree (~60 folders); the cap only
+# guards against a runaway tree.
+_WPCP_MAX_FOLDERS = 400
 
 # The filelist response's "html" field uses the same single-quoted-attribute
 # style as the widget container. Split-then-search-per-chunk, same pattern
@@ -257,6 +402,27 @@ def _extract_wpcp_params(html: str) -> dict[str, str] | None:
     }
 
 
+def _tab_title(html: str, pos: int) -> str | None:
+    """Title of the tab panel holding position pos, or None when pos is not
+    inside a tab set (or a heading sits between the last panel and pos,
+    meaning the tab set ended before it)."""
+    starts = [m.start() for m in _TABS_RE.finditer(html)]
+    previous = [s for s in starts if s < pos]
+    if not previous:
+        return None
+    start = previous[-1]
+    end = next((s for s in starts if s > start), len(html))
+    panels = [m.start() for m in _TAB_PANEL_RE.finditer(html, start, end)]
+    inside = [i for i, p in enumerate(panels) if p < pos]
+    if not panels or not inside:
+        return None
+    if _ANY_HEADING_RE.search(html, panels[inside[-1]], pos) and inside[-1] == len(panels) - 1:
+        return None
+    titles = [_clean(m.group("title")) for m in _TAB_TITLE_RE.finditer(html, start, panels[0])]
+    index = inside[-1]
+    return titles[index] if index < len(titles) else None
+
+
 def _extract_all_wpcp_widgets(html: str) -> list[dict[str, Any]]:
     """Like _extract_wpcp_params, but for a page with more than one OneDrive
     widget (servicios_financieros has three, distinct listtoken per widget,
@@ -287,11 +453,15 @@ def _extract_all_wpcp_widgets(html: str) -> list[dict[str, Any]]:
         drive_m = _WPCP_DRIVE_RE.search(window)
         if not (account_m and drive_m):
             continue
-        heading = None
-        for h in headings:
-            if h.start() >= token_m.start():
-                break
-            heading = _clean(h.group("heading"))
+        heading = _tab_title(html, token_m.start())
+        if heading is None:
+            for h in headings:
+                if h.start() >= token_m.start():
+                    break
+                heading = _clean(h.group("heading"))
+        if heading is None:
+            for h in _ANY_HEADING_RE.finditer(html, 0, token_m.start()):
+                heading = _clean(h.group("heading"))
         widgets.append(
             {
                 "listtoken": token_m.group(1),
@@ -321,7 +491,15 @@ async def _wpcp_get_filelist(params: dict[str, str], folder_id: str, page_url: s
         "query": "",
         "page_url": page_url,
     }
-    headers = {"User-Agent": USER_AGENT}
+    # Since about October 2026 the plugin answers 200 with an empty body
+    # unless the request carries the site's Origin or the page as Referer,
+    # as a browser's XHR does.
+    headers = {
+        "User-Agent": USER_AGENT,
+        "Origin": "https://www.superbancos.gob.ec",
+        "Referer": page_url,
+        "X-Requested-With": "XMLHttpRequest",
+    }
     try:
         async with httpx.AsyncClient(headers=headers) as session:
             resp = await session.post(_WPCP_AJAX_URL, data=data, timeout=30.0)
@@ -457,28 +635,61 @@ async def _wpcp_crawl_tree(params: dict[str, str], page_url: str, seccion: str) 
         )
         return []
 
-    tree = root.get("tree") or []
-    by_id = {n["id"]: n for n in tree}
+    by_id: dict[str, dict[str, Any]] = {}
     archivos = list(_parse_wpcp_files(root.get("html") or "", seccion))
 
-    child_nodes = [n for n in tree if n.get("parent") not in (None, "#")]
-    results = await asyncio.gather(
-        *(_wpcp_get_filelist(params, n["id"], page_url) for n in child_nodes),
-        return_exceptions=True,
-    )
-    for node, result in zip(child_nodes, results):
-        if isinstance(result, BaseException):
-            logger.warning(
-                "Superbancos sección %s: no se pudo listar la carpeta OneDrive '%s'.",
-                seccion,
-                node.get("text"),
-                exc_info=result,
-            )
-            continue
-        path = _wpcp_node_path(by_id, node["id"])
-        for archivo in _parse_wpcp_files(result.get("html") or "", seccion):
-            archivo["grupo"] = path
-            archivos.append(archivo)
+    # The tree is lazy: grandchild folders only appear in the response for
+    # their parent (capcol-bancos' year folders hold CAPTACIONES and
+    # COLOCACIONES subfolders), so every response's tree is merged and any
+    # node not yet listed is queued, level by level.
+    def merge(tree: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        nuevos = []
+        for node in tree:
+            if node.get("id") and node["id"] not in by_id:
+                by_id[node["id"]] = node
+                if node.get("parent") not in (None, "#"):
+                    nuevos.append(node)
+        return nuevos
+
+    pending = merge(root.get("tree") or [])
+    visited = 0
+    sem = asyncio.Semaphore(_WPCP_CONCURRENCY)
+
+    async def listar(node_id: str) -> dict[str, Any]:
+        async with sem:
+            try:
+                return await _wpcp_get_filelist(params, node_id, page_url)
+            except (httpx.HTTPStatusError, httpx.TimeoutException):
+                # The admin-ajax endpoint answers the odd 502 or stalls
+                # under a burst of folder listings; one retry after a pause.
+                await asyncio.sleep(2.0)
+                return await _wpcp_get_filelist(params, node_id, page_url)
+
+    while pending and visited < _WPCP_MAX_FOLDERS:
+        batch = pending[: _WPCP_MAX_FOLDERS - visited]
+        visited += len(batch)
+        results = await asyncio.gather(*(listar(n["id"]) for n in batch), return_exceptions=True)
+        pending = []
+        for node, result in zip(batch, results, strict=True):
+            if isinstance(result, BaseException):
+                logger.warning(
+                    "Superbancos sección %s: no se pudo listar la carpeta OneDrive '%s'.",
+                    seccion,
+                    node.get("text"),
+                    exc_info=result,
+                )
+                continue
+            pending.extend(merge(result.get("tree") or []))
+            path = _wpcp_node_path(by_id, node["id"])
+            for archivo in _parse_wpcp_files(result.get("html") or "", seccion):
+                archivo["grupo"] = path
+                archivos.append(archivo)
+    if pending:
+        logger.warning(
+            "Superbancos sección %s: se alcanzó el tope de %d carpetas OneDrive.",
+            seccion,
+            _WPCP_MAX_FOLDERS,
+        )
     return archivos
 
 
@@ -506,9 +717,43 @@ async def _wpcp_servicios_financieros_recientes(html: str, page_url: str, seccio
     return archivos
 
 
+async def _pagina_generica(label: str | None, url: str, seccion: str) -> list[dict[str, Any]]:
+    """One page of a newer section: its TablePress tables plus every
+    OneDrive widget on it, crawled to full depth. grupo is prefixed with
+    the page label (multi-page sections) and the widget's heading."""
+    content, truncated = await download_bytes(url)
+    if truncated:
+        raise ValueError(f"La página de {url} superó el límite de descarga.")
+    html = content.decode("utf-8", errors="replace")
+    archivos = _parse_tablepress_archivos(html, seccion)
+    for widget in _extract_all_wpcp_widgets(html):
+        heading = widget.get("heading")
+        for archivo in await _wpcp_crawl_tree(widget, url, seccion):
+            partes = [p for p in (heading, archivo["grupo"]) if p]
+            archivo["grupo"] = " / ".join(partes) or None
+            archivos.append(archivo)
+    if label:
+        for archivo in archivos:
+            archivo["grupo"] = f"{label} / {archivo['grupo']}" if archivo["grupo"] else label
+    return archivos
+
+
+def _dedup(archivos: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Same file listed twice (two widgets on estudios-y-analisis point at
+    the same folder): keep the first."""
+    seen: set[str] = set()
+    unicos = []
+    for archivo in archivos:
+        if archivo["url"] in seen:
+            continue
+        seen.add(archivo["url"])
+        unicos.append(archivo)
+    return unicos
+
+
 def list_secciones() -> list[dict[str, str]]:
-    """The four fixed Superbancos statistics sections."""
-    return [dict(s) for s in _SECCIONES]
+    """The fixed Superbancos statistics sections."""
+    return [{k: v for k, v in s.items() if k != "paginas"} for s in _SECCIONES]
 
 
 def _parse_tablepress_archivos(html: str, seccion: str) -> list[dict[str, Any]]:
@@ -602,9 +847,7 @@ async def get_seccion_archivos(seccion: str) -> dict[str, Any]:
     Fetch one Superbancos section page and list its direct download links.
 
     Args:
-        seccion: One of the keys from list_secciones() ("boletines_financieros",
-            "servicios_financieros", "informacion_historica",
-            "calendario_estadistico").
+        seccion: One of the keys from list_secciones().
     """
     info = _SECCIONES_BY_KEY.get(seccion)
     if info is None:
@@ -621,6 +864,32 @@ async def get_seccion_archivos(seccion: str) -> dict[str, Any]:
             return cached
 
         logger.info("Descargando página de sección Superbancos: %s", seccion)
+        if seccion not in _LEGACY_SECCIONES:
+            paginas = info.get("paginas") or [(None, info["url"])]
+            archivos = []
+            for label, url in paginas:
+                try:
+                    archivos.extend(await _pagina_generica(label, url, seccion))
+                except Exception:
+                    if len(paginas) == 1:
+                        raise
+                    logger.warning(
+                        "Superbancos sección %s: no se pudo leer %s.", seccion, url, exc_info=True
+                    )
+            result = {
+                "seccion": seccion,
+                "nombre": info["nombre"],
+                "url": info["url"],
+                "nota": (
+                    "Muchos archivos de esta sección pasan de 5 MB: descárgalos "
+                    "directamente, no con download_resource."
+                ),
+                "archivos": _dedup(archivos),
+            }
+            if archivos:
+                _files_cache.set(seccion, result)
+            return result
+
         content, truncated = await download_bytes(info["url"])
         if truncated:
             raise ValueError(f"La página de {info['url']} superó el límite de descarga.")

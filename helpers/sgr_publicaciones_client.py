@@ -106,8 +106,8 @@ _BIBLIOTECA_URL = f"{_BASE}/biblioteca/"
 # event starts — infrequent. Biblioteca's category list is similarly
 # hand-maintained. Both get a long TTL, matching
 # helpers/bce_remesas_client.py / helpers/cnig_client.py's rationale.
-_sitrep_index_cache = TtlCache(ttl_seconds=21600.0, max_entries=1)
-_biblioteca_cache = TtlCache(ttl_seconds=21600.0, max_entries=1)
+_sitrep_index_cache = TtlCache(ttl_seconds=21600.0, max_entries=1, persist="sgr_sitrep_index")
+_biblioteca_cache = TtlCache(ttl_seconds=21600.0, max_entries=1, persist="sgr_biblioteca")
 # One active event's own page (e.g. "Época Lluviosa 2026") can gain a new
 # SITREP every few days while it's EN CURSO -- a much shorter TTL than the
 # index, keyed per event URL since many event pages can be requested.

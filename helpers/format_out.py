@@ -8,6 +8,8 @@ from typing import Any
 
 from mcp.types import CallToolResult, TextContent
 
+from helpers.response_contract import current_tool, ensure_response_metadata
+
 
 def normalize_format(fmt: str | None) -> str:
     value = (fmt or "text").strip().lower()
@@ -88,6 +90,8 @@ def render_structured(
     same payload as structured_content alongside it, so a client that reads
     structured output doesn't need to re-parse the text block.
     """
+    if isinstance(data, dict):
+        data = ensure_response_metadata(data, current_tool.get())
     text = render_output(data, fmt, text_builder=text_builder)
     return CallToolResult(
         content=[TextContent(type="text", text=text)], structured_content=data

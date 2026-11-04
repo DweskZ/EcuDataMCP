@@ -56,6 +56,51 @@ uv run python main.py --host 127.0.0.1
 Este repositorio deja preparado el proceso y su configuración, pero no crea
 una instancia pública ni administra DNS, certificados, secretos o facturación.
 
+## Instancia pública en Render
+
+La instancia pública corre en Render (plan gratuito, Oregon), servicio
+`ecuador-mcp` del workspace `ecuador-mcp`:
+`https://ecuador-mcp-lb0s.onrender.com/mcp` (`/health` para el estado). Se
+construye con el `Dockerfile` desde la rama `main` del fork
+`dsanchezp18/EcuDataMCP`. En el plan gratuito el servicio se suspende tras
+unos 15 minutos sin tráfico, y la primera petición después tarda cerca de un
+minuto. Tampoco hay disco persistente, así que la base de financieros de
+Supercías se reconstruye tras cada reinicio.
+
+**Alcance por origen (2026-11-04).** Se probaron 57 URLs de fuentes, una
+petición por URL y por origen. Resultados:
+
+| Origen | URLs que respondieron (de 57) |
+|---|---|
+| VPN con salida en Ecuador | 52 |
+| Render Oregon | 47 |
+| Azure, las nueve regiones de EE. UU. | 44-45 |
+| Azure Mexico Central y Chile Central | 44 |
+| Conexión residencial en Canadá (Shaw, Edmonton) | 41 |
+| Azure Canada Central y Canada East | 38-39 |
+| Azure Brazil South | 34 |
+
+Hallazgos:
+
+- **Render frente a Azure EE. UU.:** Render llega además a
+  `www.igepn.edu.ec` y CNE, que devuelven 403 a todas las regiones de Azure.
+- **IP de Canadá, residencial o de centro de datos:** no llegan a Supercías,
+  SERCOP, SIGTIERRAS, el Ministerio del Trabajo ni el CKAN de Cuenca.
+- **IP de Latinoamérica:** solo Mexico y Chile (y la VPN) llegan a ANDA y a
+  `censoecuador.gob.ec`, pero desde ahí no responden el Ministerio del Trabajo
+  ni el CKAN de Cuenca, y Emelnorte devuelve 418.
+- **Brazil South** es el peor origen: además no llega a `www.gob.ec`, MSP, la
+  SGR, ARCSA, MEF/MDEP, Ambiente y Energía ni CNIG.
+- **Solo desde la VPN:** infoMIES, SEPS y MINEDEC. Hace falta
+  `ECUADOR_MCP_GEO_PROXY` con salida en Ecuador.
+- **Fallan desde todos los orígenes:** `evaluaciones.evaluacion.gob.ec`
+  (INEVAL BI) cierra el handshake TLS. `reportes.arconel.gob.ec` responde
+  "Error en runtime" (500) o no responde.
+
+Una instancia en Azure Container Apps (Brazil South, luego East US) funcionó
+el 2026-11-04 y se retiró el mismo día. Costaba unos 25-40 USD al mes y no
+llegaba a más fuentes que Render.
+
 ## Variables de entorno
 
 Lista completa de lo que lee el código (`helpers/env_config.py`,

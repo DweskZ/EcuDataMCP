@@ -113,17 +113,25 @@ def clear_cache():
     sb._files_cache.clear()
 
 
-def test_list_secciones_returns_four_fixed_secciones():
+def test_list_secciones_returns_the_fixed_secciones():
     secciones = sb.list_secciones()
 
-    assert len(secciones) == 4
     keys = {s["seccion"] for s in secciones}
     assert keys == {
         "boletines_financieros",
         "servicios_financieros",
         "informacion_historica",
         "calendario_estadistico",
+        "indicadores_solidez",
+        "volumen_credito",
+        "boletines_series",
+        "boletines_otras_entidades",
+        "cartera_depositos",
+        "finanzas_verdes",
+        "seguridad_social",
+        "estudios",
     }
+    assert all("paginas" not in s for s in secciones)
     secciones[0]["seccion"] = "mutated"
     assert sb.list_secciones()[0]["seccion"] != "mutated"
 
@@ -366,3 +374,93 @@ async def test_get_seccion_archivos_merges_static_table_and_onedrive_for_boletin
     # OneDrive entry (the mistyped-domain one is dropped).
     assert len(result["archivos"]) == 4
     assert any(a["grupo"] == "Año 2026" for a in result["archivos"])
+
+
+_PAGE = "https://www.superbancos.gob.ec/estadisticas/portalestudios/capcol-bancos/"
+
+
+def _file_html(entry_id: str, name: str) -> str:
+    return (
+        f"<div class='entry file ' data-id='{entry_id}' data-name='{name}'>"
+        "<a class='entry_action_download ' href='https://www.superbancos.gob.ec/estadisticas/"
+        f"portalestudios/wp-admin/admin-ajax.php?action=shareonedrive-download&id={entry_id}' "
+        f"download='{name}.zip'></a></div>"
+    )
+
+
+@pytest.mark.asyncio
+async def test_filelist_sends_origin_and_referer(httpx_mock):
+    httpx_mock.add_response(method="POST", url=sb._WPCP_AJAX_URL, json={"tree": [], "html": ""})
+    params = sb._extract_wpcp_params(_WPCP_WIDGET_HTML)
+
+    await sb._wpcp_get_filelist(params, "", _PAGE)
+
+    request = httpx_mock.get_request()
+    assert request.headers["Origin"] == "https://www.superbancos.gob.ec"
+    assert request.headers["Referer"] == _PAGE
+
+
+@pytest.mark.asyncio
+async def test_crawl_tree_follows_lazily_revealed_grandchildren(httpx_mock):
+    # As capcol-bancos answers: the root lists year folders only; each year
+    # folder's own response reveals its CAPTACIONES/COLOCACIONES children.
+    responses = {
+        "": {"tree": [{"id": "R", "text": "Inicio", "parent": "#"},
+                      {"id": "Y14", "text": "Año 2014", "parent": "R"}], "html": ""},
+        "Y14": {"tree": [{"id": "C", "text": "CAPTACIONES", "parent": "Y14"},
+                         {"id": "Y14", "text": "Año 2014", "parent": "R"}], "html": ""},
+        "C": {"tree": [], "html": _file_html("F1", "captaciones dic 2014")},
+    }
+
+    def answer(request):
+        from urllib.parse import parse_qs
+
+        import httpx
+
+        folder = parse_qs(request.content.decode()).get("id", [""])[0]
+        return httpx.Response(200, json=responses[folder])
+
+    httpx_mock.add_callback(answer, method="POST", url=sb._WPCP_AJAX_URL, is_reusable=True)
+    params = sb._extract_wpcp_params(_WPCP_WIDGET_HTML)
+
+    archivos = await sb._wpcp_crawl_tree(params, _PAGE, "cartera_depositos")
+
+    assert [(a["grupo"], a["titulo"]) for a in archivos] == [
+        ("Año 2014 / CAPTACIONES", "captaciones dic 2014.zip")
+    ]
+
+
+def test_widget_inside_a_tab_panel_takes_the_tab_title():
+    html = (
+        '<h3>Publicaciones</h3><div class="eael-advance-tabs eael-tabs-horizontal">'
+        '<span class="eael-tab-title title-after-icon" >Libros</span>'
+        '<span class="eael-tab-title title-after-icon" >Boletín de Inclusión</span>'
+        '<div class="clearfix eael-tab-content-item active">libros</div>'
+        '<div class="clearfix eael-tab-content-item inactive">'
+        + _WPCP_WIDGET_HTML
+        + "</div></div>"
+    )
+
+    widgets = sb._extract_all_wpcp_widgets(html)
+
+    assert widgets[0]["heading"] == "Boletín de Inclusión"
+
+
+@pytest.mark.asyncio
+async def test_generic_section_prefixes_page_label_and_dedups(httpx_mock, monkeypatch):
+    calls = []
+
+    async def fake_pagina(label, url, seccion):
+        calls.append(url)
+        return [
+            {"grupo": f"{label} / Año 2026", "titulo": "a.zip", "url": "https://www.superbancos.gob.ec/x/a"},
+            {"grupo": f"{label} / Año 2026", "titulo": "a.zip", "url": "https://www.superbancos.gob.ec/x/a"},
+        ]
+
+    monkeypatch.setattr(sb, "_pagina_generica", fake_pagina)
+
+    result = await sb.get_seccion_archivos("cartera_depositos")
+
+    assert len(calls) == 3
+    assert len(result["archivos"]) == 1
+    assert "5 MB" in result["nota"]

@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import sut_powerbi_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoSerie
 from helpers.tool_meta import READ_ONLY
 
 _TEXT_ROW_CAP = 200
@@ -26,7 +27,7 @@ def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
         limite: int = 500,
         fuente: Literal["sut", "judicatura"] = "sut",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoSerie]:
         """
         Run a live query against one SUT Power BI dashboard's underlying
         data model — any combination of its fields, e.g. month AND

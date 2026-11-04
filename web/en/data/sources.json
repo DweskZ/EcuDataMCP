@@ -298,7 +298,7 @@
             "id": "superbancos",
             "name": "Superbancos",
             "tag": "Banking",
-            "description": "Monthly financial bulletins, financial services, historical information and statistical calendar",
+            "description": "Financial and series bulletins, soundness indicators (CAMEL, NPLs, liquidity), credit volume, deposits and loans, social security and studies",
             "coverage": "superbancos.gob.ec",
             "url": "https://www.superbancos.gob.ec/estadisticas/portalestudios",
             "status": "live"
@@ -567,15 +567,6 @@
             "description": "Centrosur's scheduled power cuts (Azuay, Cañar, Morona Santiago), 2023 onward, including the 2024 crisis",
             "coverage": "centrosur.gob.ec",
             "url": "https://www.centrosur.gob.ec",
-            "status": "live"
-          },
-          {
-            "id": "energia-ecuador",
-            "name": "energia-ecuador.com (archive)",
-            "tag": "Energy",
-            "description": "EEQ's 2024 blackout schedules, recovered from the Wayback Machine (frozen snapshot)",
-            "coverage": "web.archive.org",
-            "url": "https://web.archive.org/web/2024/https://energia-ecuador.com/",
             "status": "live"
           },
           {
@@ -877,12 +868,12 @@
         "name": "Ministry of Public Health (MSP)",
         "sources": [
           {
-            "id": "msp-gacetas-inmunoprevenibles",
-            "name": "Vaccine-preventable-disease gazettes",
+            "id": "msp-gacetas",
+            "name": "Epidemiological gazettes",
             "tag": "MSP",
-            "description": "Weekly vaccine-preventable-disease surveillance bulletins, 2019-present",
+            "description": "MSP weekly surveillance bulletins, 18 series (vaccine-preventable, vector-borne, food and water-borne, SARI, outbreaks, maternal deaths, tuberculosis...), 2013-present",
             "coverage": "salud.gob.ec",
-            "url": "https://www.salud.gob.ec/gacetas-inmunoprevenibles/",
+            "url": "https://www.salud.gob.ec/gacetas-epidemiologicas/",
             "status": "live"
           }
         ]

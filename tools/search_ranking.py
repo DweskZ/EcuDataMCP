@@ -1,5 +1,5 @@
 import logging
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -8,6 +8,7 @@ from mcp.types import CallToolResult
 from helpers import supercias_financials
 from helpers.format_out import render_structured
 from helpers.logging import MAIN_LOGGER_NAME, log_tool
+from helpers.result_types import ResultadoBusqueda
 from helpers.tool_meta import READ_ONLY
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
@@ -32,7 +33,7 @@ def register_search_ranking_tool(mcp: MCPServer) -> None:
         limit: int = 20,
         offset: int = 0,
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         Rank/filter Supercías companies by financial indicators for a fiscal year.
 

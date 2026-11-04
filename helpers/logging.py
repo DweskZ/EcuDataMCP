@@ -7,6 +7,7 @@ from functools import wraps
 from typing import Any
 
 from helpers import usage
+from helpers.response_contract import current_tool
 
 MAIN_LOGGER_NAME = "ecuador_mcp"
 
@@ -91,6 +92,23 @@ def _redact(params: dict[str, Any]) -> dict[str, Any]:
     return {k: "***" if k.lower() in _SENSITIVE_KEYS else v for k, v in params.items()}
 
 
+def _name_silent_cause(exc: Exception) -> Exception | None:
+    """Rebuild a tool error whose cause has no message of its own.
+
+    Tools raise ``ToolError(f"Error al ...: {e}")``. httpx timeouts
+    (ReadTimeout, ConnectTimeout, PoolTimeout) stringify to "", so the
+    agent got "Error al consultar ...: " with nothing after the colon. Name
+    the exception type instead. Returns None when there is nothing to fix.
+    """
+    cause = exc.__cause__
+    if cause is None or str(cause).strip() or not str(exc).rstrip().endswith(":"):
+        return None
+    detail = type(cause).__name__
+    if "Timeout" in detail:
+        detail += " (la fuente no respondió a tiempo; reintenta en unos minutos)"
+    return type(exc)(f"{str(exc).rstrip()} {detail}")
+
+
 def log_tool(func: Callable[..., Any]) -> Callable[..., Any]:
     """Decorator to log MCP tool invocations and record their usage."""
     TOOL_DOCS[func.__name__] = inspect.cleandoc(func.__doc__ or "")
@@ -105,12 +123,18 @@ def log_tool(func: Callable[..., Any]) -> Callable[..., Any]:
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug("Tool %s params: %s", tool_name, _redact(kwargs))
         started = time.perf_counter()
+        token = current_tool.set(tool_name)
         try:
             result = await func(*args, **kwargs)
-        except Exception:
+        except Exception as exc:
             usage.record(tool_name, ok=False, duration_ms=_elapsed_ms(started))
             logger.exception("Tool %s failed", tool_name)
+            named = _name_silent_cause(exc)
+            if named is not None:
+                raise named from exc.__cause__
             raise
+        finally:
+            current_tool.reset(token)
         usage.record(tool_name, ok=True, duration_ms=_elapsed_ms(started))
         logger.debug("Tool %s completed successfully", tool_name)
         return result

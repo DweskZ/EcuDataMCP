@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers.biinec_extras import BIINEC_URL, search_extras
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoBusqueda
 from helpers.tool_meta import READ_ONLY
 
 
@@ -22,7 +23,7 @@ def register_search_biinec_extras_tool(mcp: MCPServer) -> None:
     @log_tool
     async def search_biinec_extras(
         query: str = "", format: Literal["text", "json"] = "text"
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         Check INEC's BIINEC ("Banco de Datos Abiertos") for data not found in
         search_anda or search_inec_estadisticas.

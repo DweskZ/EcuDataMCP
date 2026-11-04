@@ -10,7 +10,7 @@ Contribuciones son bienvenidas. Por favor:
 
 Servidor MCP de datos abiertos *del gobierno ecuatoriano* (CKAN nacional y
 municipal, gob.ec, SRI, BCE, Supercías, IESS/SENESCYT, IG-EPN, SERCOP, SGR y
-más): 84 tools en el perfil `public`. Python, MCP SDK 2.x
+más): 83 tools en el perfil `public`. Python, MCP SDK 2.x
 (`mcp.server.mcpserver.MCPServer`), transporte stdio o HTTP streamable.
 Antes de dar por nueva una fuente, mira [docs/ROADMAP.md](docs/ROADMAP.md)
 (qué está integrado y qué falta), [docs/RESEARCH.md](docs/RESEARCH.md) (los
@@ -29,7 +29,7 @@ hallazgos y callejones sin salida detrás de cada fila) y
   `safe_download.py`, `format_out.py`, `tls.py`, `geo_data.py`,
   `env_config.py`.
 - `prompts/`, `resources/` — prompts y recursos MCP.
-- `scripts/` — mantenimiento: `smoke_e2e.py`, `publish_smithery.py` y el
+- `scripts/` — mantenimiento: `smoke_e2e.py` y el
   wrapper de la base de Supercías (la construcción vive en
   `helpers/supercias_financials_build.py` para que las instalaciones
   PyPI/MCPB, sin `scripts/`, también puedan ejecutarla).
@@ -80,6 +80,6 @@ uv run python -m helpers.supercias_financials_build  # reconstruir la base de Su
 
 Subir la versión en `pyproject.toml`, `server.json` y `manifest.json` y
 publicar un release de GitHub `vX.Y.Z`; `.github/workflows/publish.yml` sube
-a PyPI y al MCP Registry y adjunta el `.mcpb`. Smithery es manual
-(`scripts/publish_smithery.py`). Después del release, añadir la entrada en
+a PyPI y al MCP Registry y adjunta el `.mcpb`. Ya no se publica en
+Smithery. Después del release, añadir la entrada en
 `web/data/releases.json` y `web/en/data/releases.json`.

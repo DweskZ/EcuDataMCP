@@ -1,6 +1,6 @@
 # Herramientas disponibles
 
-Referencia detallada de las 84 herramientas MCP del perfil público (por defecto)
+Referencia detallada de las 83 herramientas MCP del perfil público (por defecto)
 de EcuDataMCP, más 2 herramientas de mantenimiento (`audit_bce_catalog` y
 `compare_bce_sources`) que solo se registran con otro `MCP_PROFILE`. Casi todas
 aceptan `format="json"` además de texto.
@@ -165,7 +165,6 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `search_cortes` (`distribuidora="eeq"`\|`"centrosur"`) | Archivo de PDFs de cortes de luz programados de EEQ (Quito, crisis 2023-2024) o Centrosur (Azuay, Cañar, Morona Santiago, 2023 en adelante). |
 | `search_cortes` (`distribuidora="emelnorte"`\|`"elecgalapagos"`\|`"eeasa"`) | Avisos vigentes de cortes por mantenimiento: los 100 más recientes de Emelnorte (Imbabura, Carchi, norte de Pichincha) y ElecGalápagos (por isla), y los trabajos programados de los próximos días de EEASA (Tungurahua, Pastaza). |
 | `get_cortes_horarios` | Convierte un PDF o aviso de cortes en filas: fecha, bloques horarios sin luz, ubicación (subestación, provincia/cantón/zona o isla), sectores y, en los avisos de mantenimiento, el motivo. |
-| `get_energia_ecuador_snapshot` | Snapshot (2024-04-24, Wayback Machine) del portal nacional de horarios de apagones energia-ecuador.com; solo sobrevivió la rotación de EEQ. |
 | `get_informe_igepn` | Descarga y extrae el texto de un informe del IG-EPN encontrado vía search_informes_igepn. |
 | `get_sut_indicador_schema` | Lista las columnas/medidas/niveles de fecha consultables de un tablero Power BI del SUT o de la Judicatura (`fuente`), descubiertos desde la definición propia del reporte (la consulta subyacente de cada visual), no por adivinanza. |
 | `query_sut_indicador` | Ejecuta una consulta en vivo contra el modelo de datos subyacente de un tablero Power BI del SUT o de la Judicatura (`fuente`) — cualquier combinación de sus campos, ej. mes y provincia juntos. |

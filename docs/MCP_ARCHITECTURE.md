@@ -530,6 +530,45 @@ puntaje de "Tool Count" de Glama probablemente siga bajo con 90 tools; se
 acepta a cambio de que un cliente con la configuración por defecto vea
 todas las fuentes.
 
+## Ejecución 2026-11-04: fases 5 y 7 (primer paso)
+
+**Fase 5, hecha.** Las 85 tools anotan su retorno como
+`Annotated[CallToolResult, Resultado<Familia>]` con seis familias
+(`helpers/result_types.py`): búsqueda, listado, archivos, serie, tabla y
+ficha. El SDK publica el schema y valida `structuredContent` en cada
+llamada. Los campos del cuerpo están tipados `Any` y las familias aceptan
+claves extra a propósito: la clave de la lista cambia por fuente
+(`companias`, `indicadores`, `archivos`…) y un schema estricto convertiría
+un campo nuevo inofensivo en una llamada fallida. Lo garantizado es
+`metadatos`: `render_structured` lo completa para toda respuesta que no lo
+traiga (`helpers/response_contract.ensure_response_metadata`), con el nombre
+del tool que `log_tool` deja en un `ContextVar`.
+
+El schema completo de pydantic repite un bloque `$defs` de ~800 caracteres
+por tool y llevó `tools/list` de ~95k a 222k caracteres, más que el doble
+del presupuesto de la fase 4. `compact_output_schema` publica solo lo que
+un agente necesita: `metadatos` requerido con `contrato` constante y los
+nombres de las claves compartidas de la familia. Resultado: 97k de 110k.
+El detalle de `metadatos` queda documentado en `helpers/result_types.py` y
+se valida igual en el servidor.
+
+**Fase 6, parcial.** `metadatos` ya está en las 83 tools públicas; siguen
+pendientes el tope de bytes uniforme, el cursor de paginación común y
+`resource_link`.
+
+**Fase 7, primer paso.** `helpers/http_client.py` promueve el patrón de
+SERCOP: `new_client` (timeout por perfil `rapido`/`normal`/`lento` =
+15/30/120 s, User-Agent, proxy geográfico) y `get_with_retry` (reintento
+ante errores de transporte y 429/500/502/503/504, `Retry-After` en segundos
+o fecha HTTP acotado a 1-20 s, cooldown por host tras 429 repetidos).
+SERCOP es el primer cliente migrado; el resto sigue con `httpx` directo y
+se migra fuente por fuente. `TtlCache(persist=...)` escribe en
+`data_dir()/cache/<nombre>.json` con vencimiento en hora de reloj, de modo
+que un reinicio no alarga la vida de una entrada; solo guarda valores que
+sobreviven un viaje de ida y vuelta por JSON. No hay revalidación
+`ETag`/`Last-Modified` todavía: los catálogos activados se rearman al
+vencer su TTL.
+
 ## Fuentes oficiales consultadas
 
 - [MCP Tools, especificación 2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25/server/tools)

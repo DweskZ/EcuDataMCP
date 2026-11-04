@@ -8,10 +8,10 @@ workspace-qualified name, MAG's categoria/store/name triple, a short curated
 id for the ArcGIS sources). ARCONEL and CELEC are ArcGIS REST services
 (helpers/arcgis_client.py) whose layers are mostly tables, so for them
 get_capa_geo_datos also takes a `filtro` and an `offset` and returns up to
-500 rows.
+500 rows, or server-side sums with `sumar`/`agrupar`.
 """
 
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -20,6 +20,7 @@ from mcp.types import CallToolResult
 from helpers import arcgis_client, inamhi_client, sipa_geoportal_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoBusqueda, ResultadoTabla
 from helpers.tool_meta import READ_ONLY
 
 Fuente = Literal["inamhi", "mag", "arconel", "celec"]
@@ -49,14 +50,24 @@ async def _search(fuente: str, query: str, solo_wfs: bool, categoria: str) -> di
     return {**result, "fuente": fuente, "capas": capas}
 
 
-async def _sample(fuente: str, capa: str, count: int, filtro: str, offset: int) -> dict[str, Any]:
+async def _sample(
+    fuente: str,
+    capa: str,
+    count: int,
+    filtro: str,
+    offset: int,
+    agrupar: str = "",
+    sumar: str = "",
+) -> dict[str, Any]:
     if fuente in _ARCGIS:
         result = await arcgis_client.get_layer_features(
-            fuente, capa, count=count, filtro=filtro, offset=offset
+            fuente, capa, count=count, filtro=filtro, offset=offset, agrupar=agrupar, sumar=sumar
         )
         return {**result, "fuente": fuente}
-    if filtro or offset:
-        raise ValueError("filtro y offset solo aplican a las fuentes arconel y celec.")
+    if filtro or offset or agrupar or sumar:
+        raise ValueError(
+            "filtro, offset, agrupar y sumar solo aplican a las fuentes arconel y celec."
+        )
     client = inamhi_client if fuente == "inamhi" else sipa_geoportal_client
     result = await client.get_layer_features(capa, count=count)
     return {**result, "fuente": fuente}
@@ -69,7 +80,8 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
             "Search layers of a geoportal: inamhi (rainfall normals and anomalies, "
             "WRF grids, watersheds), mag (agro zoning, land cover, agricultural "
             "censuses, rural cadastre), arconel (distributor energy balance and "
-            "billing 1999-2025, power plants, grid) or celec (CELEC plants, "
+            "billing 1999-2025, monthly production and fuel by plant 1999-2026, "
+            "public lighting, plants, grid) or celec (CELEC plants, "
             "transmission network)."
         ),
         annotations=READ_ONLY,
@@ -81,7 +93,7 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
         solo_wfs: bool = False,
         categoria: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         Search one geoportal's layer catalog (WMS/WFS).
 
@@ -95,14 +107,18 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
           fisiografia, sigtierras, agroestadistica). 257 have WFS; the rural
           cadastre (sigtierras/catastro_rural) and
           agroestadistica/tipologias_territorio_hih have WFS disabled.
-        - arconel: ARCONEL's SISDAT layers on ArcGIS (6 curated):
+        - arconel: ARCONEL's SISDAT layers on ArcGIS (12 curated):
           balance_energia (energy available, technical/non-technical losses
           and billed energy by distributor and month, Jan 1999-Apr 2024),
           facturacion (customers, billed MWh/USD, collection and subsidies
-          by distributor, month and consumption group, 1999-2025), centrales
-          (355 plants), lineas_transmision, subestaciones, areas_servicio.
-          Per-plant monthly production lives on ARCONEL's own ArcGIS server,
-          which did not answer in October 2026, and is not listed.
+          by distributor, month and consumption group, 1999-2025),
+          produccion_centrales and combustibles_centrales (gross/net MWh and
+          fuel use by plant and month, Jan 1999-Aug 2026; May-Dec 2024 is
+          missing at the source), alumbrado_publico (luminaires by
+          distributor, province and lamp type), centrales (355 plants),
+          centrales_sisdat (730-plant register), lineas_transmision,
+          subestaciones, subestaciones_distribucion, lineas_subtransmision,
+          areas_servicio.
         - celec: CELEC EP's ArcGIS portal, curated to its 40 generation plants
           and the March 2025 transmission network (snt_*). Its Survey123
           forms and results are excluded on purpose.
@@ -161,7 +177,8 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
         description=(
             "Attributes of a layer from search_capas_geo, geometry dropped. "
             "GeoServer (inamhi, mag): a sample of up to 20 features. ArcGIS "
-            "(arconel, celec): up to 500 rows with a SQL filtro and offset."
+            "(arconel, celec): up to 500 rows with a SQL filtro and offset, or "
+            "server-side sums by group (sumar, agrupar)."
         ),
         annotations=READ_ONLY,
     )
@@ -172,8 +189,10 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
         count: int = 5,
         filtro: str = "",
         offset: int = 0,
+        agrupar: str = "",
+        sumar: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoTabla]:
         """
         Fetch one geoportal layer's feature attributes.
 
@@ -186,7 +205,12 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
         on the layer's fields (listed in `campos`), e.g. "Anio = 2024 AND
         IdMes = 4" or "Empresa LIKE 'CNEL%'"; `total_features_en_capa` is
         the count matching it and `hay_mas` says whether to page on with
-        `offset`. Dates come back as ISO dates.
+        `offset`. Dates come back as ISO dates. With `sumar` the server
+        adds up those numeric fields per `agrupar` group instead of
+        returning rows, e.g. capa="produccion_centrales",
+        sumar="EnergiaNeta", agrupar="AnioProduccion,TipoCentral" gives
+        yearly net MWh by plant type in one call; `filas` is the rows per
+        group and `grupos` is paged with count/offset.
 
         Geometry coordinates are dropped from the output; only the geometry
         type is kept.
@@ -199,15 +223,35 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
             count: Features to fetch: 1-20 for inamhi/mag, 1-500 for
                 arconel/celec (default 5).
             filtro: arconel/celec only: SQL where clause; empty for all rows.
-            offset: arconel/celec only: rows to skip when paging.
+            offset: arconel/celec only: rows (or groups) to skip when paging.
+            agrupar: arconel/celec only: comma-separated fields to group by;
+                needs `sumar`.
+            sumar: arconel/celec only: comma-separated numeric fields to sum.
             format: text | json
         """
         try:
-            result = await _sample(fuente, capa, count, filtro, offset)
+            result = await _sample(fuente, capa, count, filtro, offset, agrupar, sumar)
         except Exception as e:
             raise ToolError(f"Error al consultar la capa '{capa}' de {fuente}: {e}") from e
 
         def to_text(data: dict) -> str:
+            if "grupos" in data:
+                parts = [
+                    f"{data['capa']} ({data.get('titulo')}) — suma de "
+                    f"{', '.join(data['sumar'])}"
+                    + (f" por {', '.join(data['agrupar'])}" if data["agrupar"] else "")
+                    + f": {data['grupos_devueltos']} de {data['total_grupos']} grupo(s)"
+                ]
+                if data.get("filtro") and data["filtro"] != "1=1":
+                    parts.append(f"Filtro: {data['filtro']}")
+                if data.get("hay_mas"):
+                    siguiente = data["offset"] + data["grupos_devueltos"]
+                    parts.append(f"Hay más grupos: repite con offset={siguiente}.")
+                parts.append("")
+                for g in data["grupos"]:
+                    parts.append("- " + ", ".join(f"{k}: {v}" for k, v in g.items()))
+                parts += ["", f"Consulta: {data.get('url_consulta')}"]
+                return "\n".join(parts)
             features = data.get("features") or []
             parts = [
                 (
