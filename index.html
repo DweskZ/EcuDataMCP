@@ -242,7 +242,7 @@ pasaporte anterior, si sigue vigente</pre>
 </div>
 </div>
 <div class="hero-stats">
-<div class="hero-stat"><span class="num">83</span><span class="label">tools MCP</span></div>
+<div class="hero-stat"><span class="num">84</span><span class="label">tools MCP</span></div>
 <div class="hero-stat"><span class="num">72</span><span class="label">fuentes oficiales</span></div>
 <div class="hero-stat"><span class="num">0</span><span class="label">API keys de fuentes</span></div>
 </div>
@@ -422,7 +422,7 @@ pasaporte anterior, si sigue vigente</pre>
 <button type="button" class="org-carousel-btn" data-org-next aria-label="Institución siguiente">›</button>
 <button type="button" class="org-carousel-btn" data-org-toggle data-label-pause="Pausar carrusel" data-label-play="Reanudar carrusel" aria-label="Pausar carrusel" aria-pressed="false">&#10074;&#10074;</button>
 </div>
-<a class="btn-cta secondary" href="atlas.html">Ver los 83 tools en la Referencia &rarr;</a>
+<a class="btn-cta secondary" href="atlas.html">Ver los 84 tools en la Referencia &rarr;</a>
 </div>
 </section>
 
@@ -614,7 +614,7 @@ Verifica que el servidor responda antes de darlo por terminado.</code></pre>
 </details>
 <details class="faq-item">
 <summary>El preview sale cortado o dice que el archivo es muy grande</summary>
-<p>Es intencional: las descargas se limitan a 5 MB y la descompresión de ZIP/tar.gz a 20 MB. Para recursos grandes usa <code>query_resource_data</code> (filtra en el DataStore de CKAN sin bajar el archivo) o <code>list_zip_contents</code> para ver qué trae un ZIP antes de abrirlo.</p>
+<p>Es intencional: las descargas se limitan a 5 MB y la descompresión de ZIP/tar.gz a 20 MB. Para recursos grandes usa <code>query_resource_data</code> (filtra en el DataStore de CKAN sin bajar el archivo) o <code>list_zip_contents</code> para ver qué trae un ZIP y <code>read_zip_member</code> para leer uno de sus archivos sin bajar el ZIP entero.</p>
 </details>
 <details class="faq-item">
 <summary>Necesito más detalle para reportar un bug</summary>

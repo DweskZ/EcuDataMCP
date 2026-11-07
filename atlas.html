@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Referencia – EcuDataMCP</title>
-<meta name="description" content="Los 83 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
+<meta name="description" content="Los 84 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="canonical" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <link rel="alternate" hreflang="es" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <link rel="alternate" hreflang="en" href="https://dweskz.github.io/EcuDataMCP/en/atlas.html">
 <link rel="alternate" hreflang="x-default" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <meta property="og:title" content="Referencia – EcuDataMCP">
-<meta property="og:description" content="Los 83 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
+<meta property="og:description" content="Los 84 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
 <meta property="og:url" content="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_EC">
@@ -153,13 +153,13 @@
 <section class="landing hero">
 <div class="container-page">
 <p class="kicker">Referencia</p>
-<h1>Los <span class="accent">83 tools</span>, uno por uno.</h1>
+<h1>Los <span class="accent">84 tools</span>, uno por uno.</h1>
 <p class="hero-sub">Encuentra un tool por nombre, fuente o tarea. Abre solo el grupo y el detalle que necesitas.</p>
 <div class="atlas-filter-wrap">
 <input type="text" id="atlas-filter" class="atlas-filter" placeholder="Filtrar por nombre o palabra clave…" autocomplete="off">
 </div>
 <div class="atlas-toolbar" aria-live="polite">
-<p id="atlas-result-count">83 tools · abre un grupo para ver sus detalles.</p>
+<p id="atlas-result-count">84 tools · abre un grupo para ver sus detalles.</p>
 <div class="atlas-actions">
 <button type="button" data-atlas-action="open">Expandir grupos</button>
 <button type="button" data-atlas-action="close">Cerrar grupos</button>
@@ -1955,7 +1955,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">Utilidades de investigación<span class="tag">3</span></span>
+<span class="atlas-category-title">Utilidades de investigación<span class="tag">4</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
@@ -1986,13 +1986,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-list_zip_contents" data-search="list_zip_contents lista los archivos miembro (nombre, tamaño) de un .zip desde una url directa, sin descargar el archivo completo. lista los archivos miembro (nombre, tamaño) de un .zip desde una url directa, sin descargar el archivo completo. lee solo el registro end of central directory y el directorio central vía peticiones http range, así que funciona para archivos mucho más grandes que el tope de 5 mb de preview_resource_data/download_resource -- ej. zips de microdatos de inec o del censo de varios cientos de mb. requiere que el servidor respete peticiones range; falla con un error claro si no. no soporta archivos zip64. listar los nombres es barato de esta forma, pero previsualizar las filas de un miembro específico no lo es (igual hay que descomprimir desde el offset de ese miembro en adelante) -- este tool solo lista metadata. url url directa a un archivo .zip (del resultado de otro tool, ej. get_inec_publicacion_archivos, search_archivos). limit máximo de miembros devueltos (default 200, máx. 1000). offset desplazamiento de paginación sobre la lista de miembros. format text | json">
+<details class="atlas-tool" id="tool-list_zip_contents" data-search="list_zip_contents lista los archivos miembro (nombre, tamaño) de un .zip desde una url directa, sin descargar el archivo completo. lista los archivos miembro (nombre, tamaño) de un .zip desde una url directa, sin descargar el archivo completo. lee solo el registro end of central directory y el directorio central vía peticiones http range, así que funciona para archivos mucho más grandes que el tope de 5 mb de preview_resource_data/download_resource -- ej. zips de microdatos de inec o del censo de varios cientos de mb. requiere que el servidor respete peticiones range; falla con un error claro si no. no soporta archivos zip64. listar los nombres es barato de esta forma, pero previsualizar las filas de un miembro específico no lo es (igual hay que descomprimir desde el offset de ese miembro en adelante) -- este tool solo lista metadata; para leer las filas de un miembro usa read_zip_member, que baja solo los bytes de ese archivo. url url directa a un archivo .zip (del resultado de otro tool, ej. get_inec_publicacion_archivos, search_archivos). limit máximo de miembros devueltos (default 200, máx. 1000). offset desplazamiento de paginación sobre la lista de miembros. format text | json">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">list_zip_contents</code>
 <span class="atlas-tool-desc">Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo. Lee solo el registro End Of Central Directory y el directorio central vía peticiones HTTP Range, así que funciona para archivos mucho más grandes que el tope de 5 MB de preview_resource_data/download_resource -- ej. ZIPs de microdatos de INEC o del censo de varios cientos de MB. Requiere que el servidor respete peticiones Range; falla con un error claro si no. No soporta archivos ZIP64. Listar los nombres es barato de esta forma, pero previsualizar las filas de un miembro específico no lo es (igual hay que descomprimir desde el offset de ese miembro en adelante) -- este tool solo lista metadata.</p>
+<p class="atlas-tool-long">Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo. Lee solo el registro End Of Central Directory y el directorio central vía peticiones HTTP Range, así que funciona para archivos mucho más grandes que el tope de 5 MB de preview_resource_data/download_resource -- ej. ZIPs de microdatos de INEC o del censo de varios cientos de MB. Requiere que el servidor respete peticiones Range; falla con un error claro si no. No soporta archivos ZIP64. Listar los nombres es barato de esta forma, pero previsualizar las filas de un miembro específico no lo es (igual hay que descomprimir desde el offset de ese miembro en adelante) -- este tool solo lista metadata; para leer las filas de un miembro usa read_zip_member, que baja solo los bytes de ese archivo.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
@@ -2003,6 +2003,34 @@
 <tr><td><code>limit</code></td><td><code>int</code></td><td><code>200</code></td><td>Máximo de miembros devueltos (default 200, máx. 1000).</td></tr>
 
 <tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Desplazamiento de paginación sobre la lista de miembros.</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>text | json</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-read_zip_member" data-search="read_zip_member lee como tabla un archivo (csv/tsv/txt o xlsx/xls/xlsb/ods) dentro de un .zip remoto, bajando solo los bytes de ese miembro. lee las filas de un archivo dentro de un .zip remoto sin descargar el .zip. primero usa list_zip_contents para obtener el nombre exacto del miembro. lee el directorio central del .zip y luego baja solo la cabecera local y los bytes comprimidos de ese miembro vía peticiones http range, así que funciona dentro de archivos mucho más grandes que el tope de 5 mb de preview_resource_data/download_resource -- ej. los 90 tabulados csv de la endi r3 del inec. límites: el servidor debe respetar http range (responder 206); el miembro debe pesar como máximo 5 mb comprimido; los csv/tsv/txt se cortan a 5 mb descomprimidos (marcado como truncado) y las hojas de cálculo deben caber en 20 mb descomprimidas porque no se pueden abrir incompletas; solo miembros sin comprimir o deflate, sin cifrado y sin zip64. formatos: .csv, .tsv, .txt, .xlsx, .xls, .xlsb, .ods (primera hoja). verifica el crc32 cuando el miembro se lee completo. busca el nombre exacto, luego una coincidencia única sin distinguir mayúsculas o por nombre base; si no encuentra, el error sugiere nombres parecidos. url url directa al .zip (la misma que se pasó a list_zip_contents). member ruta del archivo dentro del .zip, tal como la lista list_zip_contents. rows filas de datos a devolver (default 50, máx. 500). offset filas de datos a saltar antes de devolver, para paginar. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">read_zip_member</code>
+<span class="atlas-tool-desc">Lee como tabla un archivo (CSV/TSV/TXT o XLSX/XLS/XLSB/ODS) dentro de un .zip remoto, bajando solo los bytes de ese miembro.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Lee las filas de UN archivo dentro de un .zip remoto sin descargar el .zip. Primero usa list_zip_contents para obtener el nombre exacto del miembro. Lee el directorio central del .zip y luego baja solo la cabecera local y los bytes comprimidos de ese miembro vía peticiones HTTP Range, así que funciona dentro de archivos mucho más grandes que el tope de 5 MB de preview_resource_data/download_resource -- ej. los 90 tabulados CSV de la ENDI R3 del INEC. Límites: el servidor debe respetar HTTP Range (responder 206); el miembro debe pesar como máximo 5 MB comprimido; los CSV/TSV/TXT se cortan a 5 MB descomprimidos (marcado como truncado) y las hojas de cálculo deben caber en 20 MB descomprimidas porque no se pueden abrir incompletas; solo miembros sin comprimir o deflate, sin cifrado y sin ZIP64. Formatos: .csv, .tsv, .txt, .xlsx, .xls, .xlsb, .ods (primera hoja). Verifica el CRC32 cuando el miembro se lee completo. Busca el nombre exacto, luego una coincidencia única sin distinguir mayúsculas o por nombre base; si no encuentra, el error sugiere nombres parecidos.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>url</code></td><td><code>str</code></td><td><code>requerido</code></td><td>URL directa al .zip (la misma que se pasó a list_zip_contents).</td></tr>
+
+<tr><td><code>member</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Ruta del archivo dentro del .zip, tal como la lista list_zip_contents.</td></tr>
+
+<tr><td><code>rows</code></td><td><code>int</code></td><td><code>50</code></td><td>Filas de datos a devolver (default 50, máx. 500).</td></tr>
+
+<tr><td><code>offset</code></td><td><code>int</code></td><td><code>0</code></td><td>Filas de datos a saltar antes de devolver, para paginar.</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>text | json</td></tr>
 
@@ -2620,7 +2648,7 @@ window.SITE_SEARCH_EMPTY_LABEL = "Sin resultados.";
     var count = visibleTools().length;
     resultCount.textContent = query
       ? count + " tool" + (count === 1 ? "" : "s") + " coincide" + (count === 1 ? "" : "n") + "."
-      : "83 tools · abre un grupo para ver sus detalles.";
+      : "84 tools · abre un grupo para ver sus detalles.";
   }
 
   function applyFilter(query) {
