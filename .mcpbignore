@@ -32,3 +32,4 @@ glama.json
 server.json
 .env.example
 quality_reports/
+.mypy_cache/
