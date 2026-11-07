@@ -10,6 +10,12 @@ life. Set ``ECUADOR_MCP_DISK_CACHE=0`` to keep everything in memory.
 Only values that survive a JSON round trip unchanged are written: a value
 holding tuples, bytes or non-string dict keys would come back as a different
 type, so it stays memory-only rather than being silently altered.
+
+Expired entries are kept for ``stale_seconds`` more (7 days by default) so a
+caller whose source is down can still answer from the last good copy:
+``serve_stale(key, exc)`` returns it and records the fact, which the response
+envelope reports as ``metadatos.frescura = "obsoleta"``. ``get`` never
+returns an expired entry.
 """
 
 from __future__ import annotations
@@ -19,10 +25,12 @@ import logging
 import os
 import time
 from collections.abc import Hashable
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 from helpers.paths import data_dir
+from helpers.response_contract import record_stale_response
 
 logger = logging.getLogger("ecuador_mcp")
 
@@ -60,10 +68,12 @@ class TtlCache:
         ttl_seconds: float = 3600.0,
         max_entries: int = 256,
         persist: str | None = None,
+        stale_seconds: float = 7 * 86400.0,
     ) -> None:
         self._ttl = ttl_seconds
         self._max = max_entries
         self._persist = persist
+        self._stale = stale_seconds
         self._loaded = False
         # key -> (wall-clock expiry, value)
         self._store: dict[Hashable, tuple[float, Any]] = {}
@@ -87,7 +97,7 @@ class TtlCache:
             return
         now = time.time()
         for raw_key, (expires_at, value) in entries.items():
-            if expires_at > now:
+            if expires_at + self._stale > now:
                 self._store.setdefault(_as_key(json.loads(raw_key)), (expires_at, value))
 
     def _save(self) -> None:
@@ -113,19 +123,50 @@ class TtlCache:
         if item is None:
             return None
         expires_at, value = item
-        if time.time() >= expires_at:
-            self._store.pop(key, None)
+        now = time.time()
+        if now >= expires_at:
+            if now >= expires_at + self._stale:
+                self._store.pop(key, None)
             return None
+        return value
+
+    def serve_stale(self, key: Hashable, exc: BaseException) -> Any | None:
+        """Return the last good value for ``key`` after a failed refresh.
+
+        Callers use it in the ``except`` around their fetch: a value still
+        inside the stale window comes back and is recorded for the response
+        envelope; ``None`` means there is nothing to fall back on, so the
+        caller re-raises.
+        """
+        self._load()
+        item = self._store.get(key)
+        if item is None:
+            return None
+        expires_at, value = item
+        if time.time() >= expires_at + self._stale:
+            return None
+        stored_at = expires_at - self._ttl
+        logger.warning(
+            "Serving stale %s entry from %s after a failed refresh: %s",
+            self._persist or "cache",
+            datetime.fromtimestamp(stored_at, UTC).isoformat(),
+            exc,
+        )
+        record_stale_response(self._persist or "cache", stored_at, exc)
         return value
 
     def set(self, key: Hashable, value: Any) -> None:
         self._load()
         if len(self._store) >= self._max:
-            # Drop expired first; if still full, drop an arbitrary oldest-ish entry.
+            # Drop entries past their stale window, then expired ones; if
+            # still full, drop an arbitrary oldest-ish entry.
             now = time.time()
-            expired = [k for k, (exp, _) in self._store.items() if now >= exp]
-            for k in expired:
-                self._store.pop(k, None)
+            for cutoff in (self._stale, 0.0):
+                gone = [k for k, (exp, _) in self._store.items() if now >= exp + cutoff]
+                for k in gone:
+                    self._store.pop(k, None)
+                if len(self._store) < self._max:
+                    break
             if len(self._store) >= self._max:
                 self._store.pop(next(iter(self._store)))
         self._store[key] = (time.time() + self._ttl, value)

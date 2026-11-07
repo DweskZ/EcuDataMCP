@@ -7,7 +7,7 @@ from functools import wraps
 from typing import Any
 
 from helpers import usage
-from helpers.response_contract import current_tool
+from helpers.response_contract import current_tool, stale_responses
 
 MAIN_LOGGER_NAME = "ecuador_mcp"
 
@@ -124,6 +124,7 @@ def log_tool(func: Callable[..., Any]) -> Callable[..., Any]:
             logger.debug("Tool %s params: %s", tool_name, _redact(kwargs))
         started = time.perf_counter()
         token = current_tool.set(tool_name)
+        stale_token = stale_responses.set([])
         try:
             result = await func(*args, **kwargs)
         except Exception as exc:
@@ -135,6 +136,7 @@ def log_tool(func: Callable[..., Any]) -> Callable[..., Any]:
             raise
         finally:
             current_tool.reset(token)
+            stale_responses.reset(stale_token)
         usage.record(tool_name, ok=True, duration_ms=_elapsed_ms(started))
         logger.debug("Tool %s completed successfully", tool_name)
         return result
