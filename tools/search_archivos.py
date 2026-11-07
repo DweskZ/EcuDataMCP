@@ -32,6 +32,7 @@ from helpers import (
     senescyt_client,
     sri_client,
     trabajo_boletin_anual_client,
+    turismo_client,
 )
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
@@ -56,6 +57,7 @@ Fuente = Literal[
     "bce_remesas",
     "bce_precios_comex",
     "bce_publicaciones",
+    "turismo",
 ]
 
 # Clients that paginate themselves; the rest return every match and are
@@ -78,6 +80,7 @@ _UNPAGINATED: dict[str, Callable[..., Awaitable[dict[str, Any]]]] = {
     "bce_remesas": bce_remesas_client.search_archivos,
     "bce_precios_comex": bce_precios_comex_client.search_archivos,
     "bce_publicaciones": bce_publicaciones_client.search_publicaciones,
+    "turismo": turismo_client.search_boletines,
 }
 
 # Keys the clients use for the same three things, first match wins.
@@ -158,7 +161,7 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
         description=(
             "File links from one institution's catalog, filtered by text: SRI, MEF, "
             "SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and "
-            "BCE (remesas, comex prices, latest publications). Links, not contents."
+            "BCE (remesas, comex prices, latest publications), Turismo. Links, not contents."
         ),
         annotations=READ_ONLY,
     )
@@ -228,6 +231,11 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
         - bce_publicaciones: BCE's ~30 most recent reports and bulletins
           (rolling window, newest first, with `fecha`); an editorial feed, not
           data series.
+        - turismo: monthly tourism bulletins ("Boletín de Cifras del Sector
+          Turismo"), November 2025 on, now published by the Ministerio de
+          Producción: arrivals and departures by nationality, holiday
+          occupancy, protected-area visits, establishment register. PDF only
+          (read_pdf extracts the tables); files carry `anio`, `mes`, `periodo`.
 
         Args:
             fuente: Catalog to search; see the list above.

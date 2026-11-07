@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+- **Three new sources, no new tools.**
+  - `search_capas_geo` / `get_capa_geo_datos` gain `fuente="igm"`: the
+    Instituto Geográfico Militar's GeoServer, 737 open WFS layers of official
+    cartography (68 national 1:1M from 2024, 505 at 1:50,000, 164 at
+    1:25,000; the reserved workspace is left out). `categoria` picks the
+    scale; samples carry attributes only, since one province is ~1.5 MB.
+  - `search_archivos` gains `fuente="turismo"`: the monthly tourism figures
+    bulletins (12 PDFs, November 2025 to October 2026), listed from
+    produccion.gob.ec's WordPress media API since the Ministerio de Turismo
+    domains no longer resolve.
+  - `get_serie_internacional` gains `fuente="ember"`: Ember's electricity
+    data through Our World in Data's electricity-mix explorer (no key; CC BY
+    4.0), 56 metric/source views, yearly or monthly from 2019. The monthly
+    by-source view is empty upstream, so it is assembled from the
+    single-source series.
+  - The Registro Oficial stays out of scope; the ROADMAP says so.
+
 - **New tool `get_resumen_compras`** (85 tools in the default profile): one
   buyer's SERCOP procurement in a year, summarized. It pages through the
   OCDS search filtered by buyer (up to 300 processes, marked `parcial` past
