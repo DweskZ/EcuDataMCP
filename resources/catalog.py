@@ -113,7 +113,7 @@ def _all_fuentes() -> dict:
                 "id": "sercop",
                 "nombre": "SERCOP Contrataciones Abiertas OCDS",
                 "base": "https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/",
-                "tools": ["search_contratos", "get_contrato_info"],
+                "tools": ["search_contratos", "get_contrato_info", "get_resumen_compras"],
             },
             {
                 "id": "sgr",

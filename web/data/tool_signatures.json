@@ -1124,6 +1124,39 @@
       "format": "text | json"
     }
   },
+  "get_resumen_compras": {
+    "file": "get_resumen_compras.py",
+    "params": [
+      {
+        "name": "comprador",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "year",
+        "type": "int",
+        "default": "0"
+      },
+      {
+        "name": "query",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "format",
+        "type": "Literal['text', 'json']",
+        "default": "'text'"
+      }
+    ],
+    "description": "Summarize one buyer's SERCOP procurement in a year: process count, total amount, by procedure type, by month and top suppliers. Reads up to 300 processes and says when the summary is partial.",
+    "summary": "Summarize the public procurement of one buyer (institution) in a year, from SERCOP's OCDS open data. Pages through the same search search_contratos uses, filtered by buyer, and totals what it reads: number of processes, total amount (the OCDS `amount`, awarded or estimated value) and budget, split by procedure type, by month and by supplier, plus first and last dates. `comprador` is a keyword, so several institutions can match (\"agua\" matches every water utility); each is summarized on its own, largest first, top 10. Limits: reads at most 300 processes (30 pages); past that the summary is marked `parcial` with `total_en_fuente`. Processes without an amount are counted but add nothing (`procesos_con_monto`). Supplier names are only present on some search rows. SERCOP rate-limits busy clients; a page that fails is listed in `paginas_fallidas`. For one process's full record use get_contrato_info(ocid).",
+    "args_doc": {
+      "comprador": "Buyer/institution keyword, min 3 chars (e.g. \"Municipio de Quito\", \"IESS\").",
+      "year": "Year of the processes (2015-current). 0 = current year.",
+      "query": "Optional topic keyword (min 3 chars) to narrow the processes; empty uses the buyer keyword.",
+      "format": "text | json"
+    }
+  },
   "get_sgr_sitrep_archivos": {
     "file": "get_sgr_sitrep_archivos.py",
     "params": [

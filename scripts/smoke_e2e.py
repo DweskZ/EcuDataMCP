@@ -765,6 +765,18 @@ async def chain_contrato(client: httpx.AsyncClient) -> None:
     if contrato is None:
         raise AssertionError("search_contratos returned no row with an ocid and a title")
     await call_chain_step(client, "get_contrato_info", {"ocid": contrato["ocid"], "format": "json"})
+    # The per-buyer summary on that same row's buyer: the search found it, so
+    # the summary must find at least one process.
+    if contrato.get("buyer"):
+        summary = json.loads(
+            await call_chain_step(
+                client,
+                "get_resumen_compras",
+                {"comprador": contrato["buyer"][:60], "year": 2024, "format": "json"},
+            )
+        )
+        if not summary.get("procesos_leidos"):
+            raise AssertionError(f"get_resumen_compras found nothing for {contrato['buyer']!r}")
 
 
 if __name__ == "__main__":

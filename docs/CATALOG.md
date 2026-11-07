@@ -3,7 +3,7 @@
 Generado por `scripts/generate_catalog.py` desde `resources/catalog.py` y las
 descripciones de `tools/*.py`; no editar a mano.
 
-53 fuentes, 84 tools públicas.
+53 fuentes, 85 tools públicas.
 
 ## Datos Abiertos CKAN
 
@@ -99,6 +99,7 @@ descripciones de `tools/*.py`; no editar a mano.
 
 - `search_contratos`: Search SERCOP public procurement (OCDS) by keyword (min 3 characters), year, buyer or supplier.
 - `get_contrato_info`: Full OCDS record of one SERCOP procurement process (ocid from search_contratos): buyer, tender, awards, contracts.
+- `get_resumen_compras`: Summarize one buyer's SERCOP procurement in a year: process count, total amount, by procedure type, by month and top suppliers. Reads up to 300 processes and says when the summary is partial.
 
 ## SGR Gestión de Riesgos (COE + SAT)
 
