@@ -247,6 +247,17 @@ def _parse_tables(html: str, bulletin: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 async def _fetch_catalog() -> dict[str, Any]:
+    """Fresh fetch, or the last good copy when the source fails (see TtlCache.serve_stale)."""
+    try:
+        return await _fetch_catalog_fresh()
+    except Exception as exc:
+        stale = _catalog_cache.serve_stale("catalog", exc)
+        if stale is None:
+            raise
+        return stale
+
+
+async def _fetch_catalog_fresh() -> dict[str, Any]:
     """Fetch the current bulletin catalogue (the cheap/default path)."""
     cached = _catalog_cache.get("catalog")
     if cached is not None:
@@ -258,6 +269,17 @@ async def _fetch_catalog() -> dict[str, Any]:
 
 
 async def _fetch_bulletins() -> list[dict[str, Any]]:
+    """Fresh fetch, or the last good copy when the source fails (see TtlCache.serve_stale)."""
+    try:
+        return await _fetch_bulletins_fresh()
+    except Exception as exc:
+        stale = _bulletins_cache.serve_stale("bulletins", exc)
+        if stale is None:
+            raise
+        return stale
+
+
+async def _fetch_bulletins_fresh() -> list[dict[str, Any]]:
     cached = _bulletins_cache.get("bulletins")
     if cached is not None:
         return cached

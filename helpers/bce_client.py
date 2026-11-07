@@ -131,6 +131,17 @@ async def _get_json(
 
 
 async def _fetch_tree() -> list[dict[str, Any]]:
+    """Fresh fetch, or the last good copy when the source fails (see TtlCache.serve_stale)."""
+    try:
+        return await _fetch_tree_fresh()
+    except Exception as exc:
+        stale = _tree_cache.serve_stale("tree", exc)
+        if stale is None:
+            raise
+        return stale
+
+
+async def _fetch_tree_fresh() -> list[dict[str, Any]]:
     cached = _tree_cache.get("tree")
     if cached is not None:
         return cached

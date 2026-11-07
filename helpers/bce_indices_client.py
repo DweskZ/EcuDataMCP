@@ -310,6 +310,17 @@ async def _discover_paginas() -> list[dict[str, str]]:
 
 
 async def _fetch_catalog() -> tuple[list[dict[str, Any]], list[str]]:
+    """Fresh fetch, or the last good copy when the source fails (see TtlCache.serve_stale)."""
+    try:
+        return await _fetch_catalog_fresh()
+    except Exception as exc:
+        stale = _catalog_cache.serve_stale("catalog", exc)
+        if stale is None:
+            raise
+        return stale, []
+
+
+async def _fetch_catalog_fresh() -> tuple[list[dict[str, Any]], list[str]]:
     """The catalog plus the URLs of pages that failed to download.
 
     A page without a recognized widget is a valid "not an índice page"

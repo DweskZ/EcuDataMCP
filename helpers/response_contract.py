@@ -13,6 +13,41 @@ CONTRACT_VERSION = "ecudatamcp.response.v1"
 # tools passing its own name to render_structured.
 current_tool: ContextVar[str | None] = ContextVar("current_tool", default=None)
 
+# Reset to a fresh list by log_tool for every call. TtlCache.serve_stale
+# appends to it when a source is down and a cached copy answers instead;
+# tasks spawned during the call share the same list object.
+stale_responses: ContextVar[list[dict[str, Any]] | None] = ContextVar(
+    "stale_responses", default=None
+)
+
+
+def record_stale_response(cache_name: str, stored_at: float, exc: BaseException) -> None:
+    notices = stale_responses.get()
+    if notices is None:
+        return
+    notices.append(
+        {
+            "catalogo": cache_name,
+            "datos_de": datetime.fromtimestamp(stored_at, UTC).isoformat(),
+            "motivo": f"{type(exc).__name__}: {exc}"[:200],
+        }
+    )
+
+
+def _apply_stale(payload: dict[str, Any]) -> dict[str, Any]:
+    notices = stale_responses.get()
+    if not notices:
+        return payload
+    metadata = dict(payload.get("metadatos") or {})
+    metadata["frescura"] = "obsoleta"
+    metadata["respuesta_obsoleta"] = {
+        "datos_de": min(n["datos_de"] for n in notices),
+        "catalogos": sorted({n["catalogo"] for n in notices}),
+        "motivo": notices[0]["motivo"],
+        "nota": "La fuente no respondió; se usó la última copia buena guardada.",
+    }
+    return {**payload, "metadatos": metadata}
+
 # Keys tools already use for provenance, in the order they are trusted.
 _SOURCE_KEYS = ("source", "fuente_nombre", "fuente")
 _SOURCE_URL_KEYS = ("url_fuente", "source_url")
@@ -41,7 +76,7 @@ def ensure_response_metadata(
     existing = payload.get("metadatos")
     metadata = dict(existing) if isinstance(existing, dict) else {}
     if metadata.get("contrato") == CONTRACT_VERSION:
-        return payload
+        return _apply_stale(payload)
     filled = {
         "contrato": CONTRACT_VERSION,
         "fuente": _first_str(payload, _SOURCE_KEYS),
@@ -55,7 +90,7 @@ def ensure_response_metadata(
             "campos_principales": [k for k in payload if k != "metadatos"],
         },
     }
-    return {**payload, "metadatos": {**filled, **metadata}}
+    return _apply_stale({**payload, "metadatos": {**filled, **metadata}})
 
 
 def with_response_metadata(

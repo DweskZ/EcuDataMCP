@@ -552,9 +552,28 @@ nombres de las claves compartidas de la familia. Resultado: 97k de 110k.
 El detalle de `metadatos` queda documentado en `helpers/result_types.py` y
 se valida igual en el servidor.
 
-**Fase 6, parcial.** `metadatos` ya está en las 83 tools públicas; siguen
-pendientes el tope de bytes uniforme, el cursor de paginación común y
-`resource_link`.
+**Fase 6, hecha salvo la lista blanca de campos (2026-11-07).**
+`render_structured` aplica a toda respuesta un tope de bytes uniforme
+(`ECUADOR_MCP_MAX_RESPONSE_BYTES`, 200 KB por defecto; `search_datasets`
+mantiene su tope propio de 60 KB): pasado el tope recorta la lista
+principal y lo declara en `metadatos.truncado`. `metadatos.paginacion`
+describe en una sola forma (`estilo` offset o page, `actual`, `total`,
+`hay_mas`, `siguiente`) lo que cada tool ya dice de su paginación, sin
+adivinar: se omite cuando la respuesta no lo dice. Las listas de archivos
+(`archivos`, `files`, `resources`) salen además como bloques
+`resource_link` (hasta 25) después del bloque de texto, con el payload JSON
+intacto. La lista blanca de campos con un parámetro `campos` queda fuera:
+la regla de este documento rechaza parámetros que cambian la forma de la
+respuesta, y el tope de bytes ya acota el riesgo de tamaño.
+
+**Respuesta obsoleta ante caídas.** Los cachés `TtlCache` guardan una
+entrada vencida 7 días más (`stale_seconds`); `get` nunca la devuelve, pero
+`serve_stale` sí, cuando la consulta fresca falla. Los catálogos
+persistidos (índices y catálogo IEM del BCE, árbol BCEData, árbol
+CEPALSTAT, temas y categorías del INEC, índice de SITREP y Biblioteca de la
+SGR, secciones de Superbancos) responden así con la última copia buena, y
+el sobre lo dice: `metadatos.frescura = "obsoleta"` y
+`metadatos.respuesta_obsoleta` (`datos_de`, `catalogos`, `motivo`).
 
 **Fase 7, primer paso.** `helpers/http_client.py` promueve el patrón de
 SERCOP: `new_client` (timeout por perfil `rapido`/`normal`/`lento` =
