@@ -57,8 +57,18 @@ def register_get_contrato_info_tool(mcp: MCPServer) -> None:
             ) from e
 
         records = package.get("records") or []
+
+        # Some OCDS endpoints answer with a release package (top-level
+        # `releases`) instead of a record package; wrap it so both shapes read
+        # the same way.
+        if not records and package.get("releases"):
+            records = [{"ocid": ocid, "releases": package["releases"]}]
         if not records:
-            raise ToolError(f"No se encontró el proceso con OCID '{ocid}'.")
+            keys = ", ".join(sorted(package)) or "respuesta vacía"
+            raise ToolError(
+                f"No se encontró el proceso con OCID '{ocid}' "
+                f"(la API de SERCOP respondió sin 'records'; claves: {keys})."
+            )
 
         record = records[0]
         releases = record.get("releases") or []

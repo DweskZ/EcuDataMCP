@@ -82,6 +82,15 @@ _DEGRADED_SOURCES = (
         "500 internal server error",
     ),
     (
+        # Seen 2026-11-05 to 2026-11-07 on the runner: the IESS certificate
+        # form never answers in time, while the same call from Render (no
+        # proxy for iess.gob.ec) returned the certificate on 2026-11-07. The
+        # IESS host throttling datacenter IPs, not a regression.
+        "iess_certificado_timeout",
+        "certificado de cumplimiento patronal del iess",
+        "readtimeout",
+    ),
+    (
         # Seen 2026-10-23 and 2026-10-24 on the runner: infoMIES never
         # completes the TCP handshake from datacenter IPs (30 s timeout), the
         # same block Render hits. A geo block, not a regression.

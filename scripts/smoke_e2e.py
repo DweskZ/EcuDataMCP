@@ -299,7 +299,10 @@ async def main() -> int:
             (
                 "get_archivo_seccion",
                 {"fuente": "superbancos", "seccion": "indicadores_solidez"},
-                ["Año 2026"],
+                # Any year folder proves the OneDrive tree was crawled; a
+                # fixed year flakes while the site rebuilds that folder and
+                # rots every January.
+                ["Año 20"],
             ),
             ("search_archivos", {"fuente": "msp", "query": "vectoriales 2026", "limit": 3}, []),
             ("get_archivo_seccion", {"fuente": "bvg", "seccion": "historicos"}, ["BVG_Acciones"]),
@@ -546,7 +549,15 @@ async def chain_ckan_info(client: httpx.AsyncClient) -> None:
         raise AssertionError(f"dataset {dataset_id} has no resources")
     resource_id = resources[0]["id"]
     await call_chain_step(client, "get_resource_info", {"resource_id": resource_id, "format": "json"})
-    await call_chain_step(client, "query_resource_data", {"resource_id": resource_id, "rows": 3, "format": "json"})
+
+    # Most CKAN uploads are never loaded into the DataStore. The resource was
+    # just confirmed to exist, so the tool's "sin DataStore" refusal (pointing
+    # to preview_resource_data) is the documented answer, not a failure.
+    text, is_error = await call_tool(
+        client, "query_resource_data", {"resource_id": resource_id, "rows": 3, "format": "json"}
+    )
+    if not (is_error and "sin DataStore" in text):
+        chain_step(text, is_error=is_error)
 
 
 async def chain_tramites(client: httpx.AsyncClient) -> None:
@@ -722,9 +733,20 @@ async def chain_auditor(client: httpx.AsyncClient) -> None:
 
 
 async def chain_contrato(client: httpx.AsyncClient) -> None:
-    contrato = await first_item(
-        client, "search_contratos", {"query": "agua", "year": 2024}, "results"
+    search = json.loads(
+        await call_chain_step(
+            client, "search_contratos", {"query": "agua", "year": 2024, "format": "json"}
+        )
     )
+    # SERCOP's search index also lists stub processes (title and method null)
+    # whose OCDS record was never published, so `record` finds nothing for
+    # them. Only a fully described row is expected to have a record.
+    contrato = next(
+        (r for r in search.get("results") or [] if r.get("ocid") and r.get("title")),
+        None,
+    )
+    if contrato is None:
+        raise AssertionError("search_contratos returned no row with an ocid and a title")
     await call_chain_step(client, "get_contrato_info", {"ocid": contrato["ocid"], "format": "json"})
 
 
