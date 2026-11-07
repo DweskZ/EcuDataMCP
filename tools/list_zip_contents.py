@@ -45,9 +45,9 @@ def register_list_zip_contents_tool(mcp: MCPServer) -> None:
         larger than the 5 MB preview_resource_data/download_resource cap -- e.g. INEC
         or censo microdata ZIPs of multiple hundred MB. Requires the server
         to honor Range requests; fails with a clear error otherwise. Does
-        not support ZIP64 archives. Listing names is cheap this way, but
-        previewing a specific member's rows is not (still needs decompressing
-        from that member's offset onward) -- this tool only lists metadata.
+        not support ZIP64 archives. This tool only lists metadata; to read one
+        member's rows, pass its name to read_zip_member, which fetches only
+        that member's bytes.
 
         Args:
             url: Direct URL to a .zip file (from another tool's result, e.g.

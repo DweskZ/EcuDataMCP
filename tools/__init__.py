@@ -63,6 +63,7 @@ from tools.preview_resource_data import register_preview_resource_data_tool
 from tools.query_resource_data import register_query_resource_data_tool
 from tools.query_sut_indicador import register_query_sut_indicador_tool
 from tools.read_pdf import register_read_pdf_tool
+from tools.read_zip_member import register_read_zip_member_tool
 from tools.search_anda import register_search_anda_tool
 from tools.search_archivos import register_search_archivos_tool
 from tools.search_auditores import register_search_auditores_tool
@@ -130,6 +131,7 @@ def register_tools(mcp: MCPServer) -> None:
     register_search_sri_ruc_tool(mcp)
     register_read_pdf_tool(mcp)
     register_list_zip_contents_tool(mcp)
+    register_read_zip_member_tool(mcp)
     register_investigate_dataset_tool(mcp)
 
     register_search_tramites_tool(mcp)

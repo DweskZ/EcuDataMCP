@@ -525,6 +525,7 @@ def _all_fuentes() -> dict:
                     "search_ecuador",
                     "investigate_dataset",
                     "list_zip_contents",
+                    "read_zip_member",
                 ],
             },
         ]

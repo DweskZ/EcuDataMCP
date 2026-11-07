@@ -279,7 +279,7 @@ Verify the server responds before calling it done.</code></pre>
 </details>
 <details class="faq-item">
 <summary>The preview is cut off or says the file is too large</summary>
-<p>That's intentional: downloads are capped at 5 MB and ZIP/tar.gz decompression at 20 MB. For large resources use <code>query_resource_data</code> (filters in the CKAN DataStore without downloading the file) or <code>list_zip_contents</code> to see what a ZIP contains before opening it.</p>
+<p>That's intentional: downloads are capped at 5 MB and ZIP/tar.gz decompression at 20 MB. For large resources use <code>query_resource_data</code> (filters in the CKAN DataStore without downloading the file) or <code>list_zip_contents</code> to see what a ZIP contains and <code>read_zip_member</code> to read one of its files without downloading the whole ZIP.</p>
 </details>
 <details class="faq-item">
 <summary>I need more detail to report a bug</summary>
