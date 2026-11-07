@@ -411,6 +411,22 @@ def _all_fuentes() -> dict:
                 ],
             },
             {
+                "id": "cfn",
+                "nombre": "CFN (Corporación Financiera Nacional: crédito por provincia, estados financieros y garantías del FNG, Power BI en vivo)",
+                "base": "https://www.cfn.fin.ec/estadisticas/",
+                "tools": [
+                    "list_catalogo",
+                    "get_sut_indicador_schema",
+                    "query_sut_indicador",
+                ],
+            },
+            {
+                "id": "gremios",
+                "nombre": "Gremios privados: FEDEXPOR (Expordata, comercio exterior mensual) y AEADE (ventas de vehículos, anuarios)",
+                "base": "https://www.fedexpor.com/inteligencia-comercial/reporte-expordata/",
+                "tools": ["search_archivos"],
+            },
+            {
                 "id": "judicatura",
                 "nombre": (
                     "Consejo de la Judicatura (Portal de Estadística Judicial: "

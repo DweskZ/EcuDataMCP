@@ -26,7 +26,7 @@ from helpers.logging import log_tool
 from helpers.result_types import ResultadoListado
 from helpers.tool_meta import READ_ONLY
 
-Fuente = Literal["arconel", "bce_diarios", "contraloria", "iess", "sut", "judicatura"]
+Fuente = Literal["arconel", "bce_diarios", "contraloria", "iess", "sut", "judicatura", "cfn"]
 
 
 async def _arconel() -> dict[str, Any]:
@@ -50,6 +50,11 @@ async def _sut() -> dict[str, Any]:
 
 async def _judicatura() -> dict[str, Any]:
     indicadores = sut_powerbi_client.list_indicadores("judicatura")
+    return {"total": len(indicadores), "indicadores": indicadores}
+
+
+async def _cfn() -> dict[str, Any]:
+    indicadores = sut_powerbi_client.list_indicadores("cfn")
     return {"total": len(indicadores), "indicadores": indicadores}
 
 
@@ -98,6 +103,7 @@ _SOURCES: dict[str, Callable[[], Awaitable[dict[str, Any]]]] = {
     "iess": _iess,
     "sut": _sut,
     "judicatura": _judicatura,
+    "cfn": _cfn,
 }
 
 
@@ -156,6 +162,15 @@ def _text_judicatura(data: dict) -> str:
     return "\n".join(parts)
 
 
+def _text_cfn(data: dict) -> str:
+    rows = data["indicadores"]
+    parts = [f"Corporación Financiera Nacional (Power BI) — {len(rows)} tablero(s):", ""]
+    parts += [f"- {i['indicador']}: {i['nombre']}" for i in rows]
+    parts.append("")
+    parts.append("Siguiente paso: get_sut_indicador_schema(indicador, fuente='cfn').")
+    return "\n".join(parts)
+
+
 def _text_iess(data: dict) -> str:
     parts = ["IESS — Colecciones de documentos:", ""]
     for c in data["colecciones"]:
@@ -178,17 +193,18 @@ _TEXT: dict[str, Callable[[dict], str]] = {
     "iess": _text_iess,
     "sut": _text_sut,
     "judicatura": _text_judicatura,
+    "cfn": _text_cfn,
 }
 
 
 def register_list_catalogo_tool(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Listar el catálogo de una fuente (ARCONEL, BCE, Contraloría, IESS, SUT, Judicatura)",
+        title="Listar el catálogo de una fuente (ARCONEL, BCE, Contraloría, IESS, SUT, Judicatura, CFN)",
         description=(
             "List one source's catalog, the step before its get tool: arconel "
             "(get_arconel_reporte), bce_diarios (get_bce_indicador_diario), "
             "contraloria (get_contraloria_informe), iess (get_iess_archivos), "
-            "sut and judicatura (get_sut_indicador_schema, query_sut_indicador "
+            "sut, judicatura and cfn (get_sut_indicador_schema, query_sut_indicador "
             "with the same fuente)."
         ),
         annotations=READ_ONLY,
@@ -220,6 +236,12 @@ def register_list_catalogo_tool(mcp: MCPServer) -> None:
           notarial, productividad de jueces, remates, SUPA pensiones
           alimenticias); follow with get_sut_indicador_schema(indicador,
           fuente="judicatura"), then query_sut_indicador.
+        - cfn: Corporación Financiera Nacional statistics (one Power BI
+          report: credit lines, disbursements and operations by province,
+          financial inclusion, monthly financial statements, investments,
+          Fondo Nacional de Garantías guarantees by province, sector and
+          borrower type); follow with get_sut_indicador_schema("estadisticas",
+          fuente="cfn"), then query_sut_indicador.
 
         Args:
             fuente: Catalog to list; see the list above.

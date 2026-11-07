@@ -374,6 +374,43 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Corporación Financiera Nacional (CFN)",
+        "sources": [
+          {
+            "id": "cfn-powerbi",
+            "name": "Estadísticas CFN",
+            "tag": "Power BI",
+            "description": "Crédito y desembolsos por provincia, estados financieros mensuales, inversiones y garantías del FNG",
+            "coverage": "cfn.fin.ec/estadisticas",
+            "url": "https://www.cfn.fin.ec/estadisticas/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Gremios privados",
+        "sources": [
+          {
+            "id": "fedexpor-expordata",
+            "name": "FEDEXPOR — Expordata",
+            "tag": "FEDEXPOR",
+            "description": "Informe mensual de comercio exterior (PDF en Google Drive)",
+            "coverage": "fedexpor.com",
+            "url": "https://www.fedexpor.com/inteligencia-comercial/reporte-expordata/",
+            "status": "live"
+          },
+          {
+            "id": "aeade-ventas",
+            "name": "AEADE — ventas de vehículos",
+            "tag": "AEADE",
+            "description": "Boletines mensuales de ventas de vehículos y anuarios del sector automotor",
+            "coverage": "aeade.net",
+            "url": "https://www.aeade.net/boletines-de-prensa-venta-de-vehiculos/",
+            "status": "live"
+          }
+        ]
       }
     ]
   },

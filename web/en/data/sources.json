@@ -374,6 +374,43 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Corporación Financiera Nacional (CFN)",
+        "sources": [
+          {
+            "id": "cfn-powerbi",
+            "name": "CFN statistics",
+            "tag": "Power BI",
+            "description": "Credit and disbursements by province, monthly financial statements, investments and FNG guarantees",
+            "coverage": "cfn.fin.ec/estadisticas",
+            "url": "https://www.cfn.fin.ec/estadisticas/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Private trade associations",
+        "sources": [
+          {
+            "id": "fedexpor-expordata",
+            "name": "FEDEXPOR — Expordata",
+            "tag": "FEDEXPOR",
+            "description": "Monthly foreign-trade report (PDF on Google Drive)",
+            "coverage": "fedexpor.com",
+            "url": "https://www.fedexpor.com/inteligencia-comercial/reporte-expordata/",
+            "status": "live"
+          },
+          {
+            "id": "aeade-ventas",
+            "name": "AEADE — vehicle sales",
+            "tag": "AEADE",
+            "description": "Monthly vehicle-sales bulletins and automotive yearbooks",
+            "coverage": "aeade.net",
+            "url": "https://www.aeade.net/boletines-de-prensa-venta-de-vehiculos/",
+            "status": "live"
+          }
+        ]
       }
     ]
   },
