@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Reference – EcuDataMCP</title>
-<meta name="description" content="EcuDataMCP&#39;s 84 tools, with a full description and a direct link to each one.">
+<meta name="description" content="EcuDataMCP&#39;s 85 tools, with a full description and a direct link to each one.">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="canonical" href="https://dweskz.github.io/EcuDataMCP/en/atlas.html">
 <link rel="alternate" hreflang="es" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <link rel="alternate" hreflang="en" href="https://dweskz.github.io/EcuDataMCP/en/atlas.html">
 <link rel="alternate" hreflang="x-default" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <meta property="og:title" content="Reference – EcuDataMCP">
-<meta property="og:description" content="EcuDataMCP&#39;s 84 tools, with a full description and a direct link to each one.">
+<meta property="og:description" content="EcuDataMCP&#39;s 85 tools, with a full description and a direct link to each one.">
 <meta property="og:url" content="https://dweskz.github.io/EcuDataMCP/en/atlas.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="en_US">
@@ -153,13 +153,13 @@
 <section class="landing hero">
 <div class="container-page">
 <p class="kicker">Reference</p>
-<h1>All <span class="accent">84 tools</span>, one by one.</h1>
+<h1>All <span class="accent">85 tools</span>, one by one.</h1>
 <p class="hero-sub">Find a tool by name, source, or task. Open only the group and detail you need.</p>
 <div class="atlas-filter-wrap">
 <input type="text" id="atlas-filter" class="atlas-filter" placeholder="Filter by name or keyword…" autocomplete="off">
 </div>
 <div class="atlas-toolbar" aria-live="polite">
-<p id="atlas-result-count">84 tools · open a group to see its details.</p>
+<p id="atlas-result-count">85 tools · open a group to see its details.</p>
 <div class="atlas-actions">
 <button type="button" data-atlas-action="open">Expand groups</button>
 <button type="button" data-atlas-action="close">Collapse groups</button>
@@ -911,7 +911,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">Regulations &amp; contracts<span class="tag">4</span></span>
+<span class="atlas-category-title">Regulations &amp; contracts<span class="tag">5</span></span>
 <span class="atlas-category-action">Show</span>
 </summary>
 <div class="atlas-category-tools">
@@ -1007,6 +1007,32 @@
 <tr><td><code>ocid</code></td><td><code>str</code></td><td><code>required</code></td><td>Open Contracting ID, e.g. &#34;ocds-5wno2w-001-LICO-GPLR-2020-2805&#34;</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_resumen_compras" data-search="get_resumen_compras summarizes one buyer's public procurement in a year: processes, amount, procedure types, months and suppliers. summarizes the public procurement of one buyer (institution) in a year, from sercop's ocds open data. it pages through the same search search_contratos uses, filtered by buyer, and totals what it reads: number of processes, total amount (the ocds amount, awarded or estimated value) and budget, by procedure type, by month and by supplier, with first and last dates. the buyer is a keyword, so several institutions can match (&quot;agua&quot; brings every water utility): each is summarized separately, largest amount first, top 10. reads up to 300 processes (30 pages); past that the summary is marked partial with total_en_fuente. processes without an amount are counted but add nothing (procesos_con_monto), and a page that fails is listed in paginas_fallidas. for one process's full record use get_contrato_info. comprador buyer or institution keyword, min 3 characters (e.g. &quot;municipio de quito&quot;, &quot;iess&quot;). year year of the processes (2015 on). 0 = current year. query optional topic keyword (min 3 characters); empty uses the buyer keyword. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_resumen_compras</code>
+<span class="atlas-tool-desc">Summarizes one buyer&#39;s public procurement in a year: processes, amount, procedure types, months and suppliers.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Summarizes the public procurement of one buyer (institution) in a year, from SERCOP&#39;s OCDS open data. It pages through the same search search_contratos uses, filtered by buyer, and totals what it reads: number of processes, total amount (the OCDS amount, awarded or estimated value) and budget, by procedure type, by month and by supplier, with first and last dates. The buyer is a keyword, so several institutions can match (&#34;agua&#34; brings every water utility): each is summarized separately, largest amount first, top 10. Reads up to 300 processes (30 pages); past that the summary is marked partial with total_en_fuente. Processes without an amount are counted but add nothing (procesos_con_monto), and a page that fails is listed in paginas_fallidas. For one process&#39;s full record use get_contrato_info.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+
+<tr><td><code>comprador</code></td><td><code>str</code></td><td><code>required</code></td><td>Buyer or institution keyword, min 3 characters (e.g. &#34;Municipio de Quito&#34;, &#34;IESS&#34;).</td></tr>
+
+<tr><td><code>year</code></td><td><code>int</code></td><td><code>0</code></td><td>Year of the processes (2015 on). 0 = current year.</td></tr>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>empty</code></td><td>Optional topic keyword (min 3 characters); empty uses the buyer keyword.</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2650,7 +2676,7 @@ window.SITE_SEARCH_EMPTY_LABEL = "No results.";
     var count = visibleTools().length;
     resultCount.textContent = query
       ? count + " tool" + (count === 1 ? "" : "s") + " match" + (count === 1 ? "es" : "") + "."
-      : "84 tools · open a group to see its details.";
+      : "85 tools · open a group to see its details.";
   }
 
   function applyFilter(query) {

@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Referencia – EcuDataMCP</title>
-<meta name="description" content="Los 84 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
+<meta name="description" content="Los 85 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="canonical" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <link rel="alternate" hreflang="es" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <link rel="alternate" hreflang="en" href="https://dweskz.github.io/EcuDataMCP/en/atlas.html">
 <link rel="alternate" hreflang="x-default" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <meta property="og:title" content="Referencia – EcuDataMCP">
-<meta property="og:description" content="Los 84 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
+<meta property="og:description" content="Los 85 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
 <meta property="og:url" content="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_EC">
@@ -153,13 +153,13 @@
 <section class="landing hero">
 <div class="container-page">
 <p class="kicker">Referencia</p>
-<h1>Los <span class="accent">84 tools</span>, uno por uno.</h1>
+<h1>Los <span class="accent">85 tools</span>, uno por uno.</h1>
 <p class="hero-sub">Encuentra un tool por nombre, fuente o tarea. Abre solo el grupo y el detalle que necesitas.</p>
 <div class="atlas-filter-wrap">
 <input type="text" id="atlas-filter" class="atlas-filter" placeholder="Filtrar por nombre o palabra clave…" autocomplete="off">
 </div>
 <div class="atlas-toolbar" aria-live="polite">
-<p id="atlas-result-count">84 tools · abre un grupo para ver sus detalles.</p>
+<p id="atlas-result-count">85 tools · abre un grupo para ver sus detalles.</p>
 <div class="atlas-actions">
 <button type="button" data-atlas-action="open">Expandir grupos</button>
 <button type="button" data-atlas-action="close">Cerrar grupos</button>
@@ -911,7 +911,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">Regulaciones y contratos<span class="tag">4</span></span>
+<span class="atlas-category-title">Regulaciones y contratos<span class="tag">5</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
@@ -1007,6 +1007,32 @@
 <tr><td><code>ocid</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Open Contracting ID, ej. &#34;ocds-5wno2w-001-LICO-GPLR-2020-2805&#34;</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_resumen_compras" data-search="get_resumen_compras resume las compras públicas de un comprador en un año: procesos, monto, tipos de procedimiento, meses y proveedores. resume las compras públicas de un comprador (institución) en un año, desde los datos abiertos ocds del sercop. recorre la misma búsqueda que search_contratos, filtrada por comprador, y totaliza lo leído: número de procesos, monto total (el amount ocds, valor adjudicado o estimado) y presupuesto, por tipo de procedimiento, por mes y por proveedor, con primera y última fecha. como comprador es una palabra clave, pueden coincidir varias instituciones (&quot;agua&quot; trae todas las empresas de agua): cada una se resume por separado, de mayor a menor monto, las 10 primeras. lee hasta 300 procesos (30 páginas); si hay más, el resumen sale marcado parcial con total_en_fuente. los procesos sin monto se cuentan pero no suman (procesos_con_monto) y una página que falla se lista en paginas_fallidas. para el expediente de un proceso usa get_contrato_info. comprador palabra clave del comprador o institución, mínimo 3 caracteres (ej. &quot;municipio de quito&quot;, &quot;iess&quot;). year año de los procesos (2015 en adelante). 0 = año actual. query palabra clave opcional del tema (mínimo 3 caracteres); vacío usa la del comprador. format text | json">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_resumen_compras</code>
+<span class="atlas-tool-desc">Resume las compras públicas de un comprador en un año: procesos, monto, tipos de procedimiento, meses y proveedores.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Resume las compras públicas de un comprador (institución) en un año, desde los datos abiertos OCDS del SERCOP. Recorre la misma búsqueda que search_contratos, filtrada por comprador, y totaliza lo leído: número de procesos, monto total (el amount OCDS, valor adjudicado o estimado) y presupuesto, por tipo de procedimiento, por mes y por proveedor, con primera y última fecha. Como comprador es una palabra clave, pueden coincidir varias instituciones (&#34;agua&#34; trae todas las empresas de agua): cada una se resume por separado, de mayor a menor monto, las 10 primeras. Lee hasta 300 procesos (30 páginas); si hay más, el resumen sale marcado parcial con total_en_fuente. Los procesos sin monto se cuentan pero no suman (procesos_con_monto) y una página que falla se lista en paginas_fallidas. Para el expediente de un proceso usa get_contrato_info.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>comprador</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Palabra clave del comprador o institución, mínimo 3 caracteres (ej. &#34;Municipio de Quito&#34;, &#34;IESS&#34;).</td></tr>
+
+<tr><td><code>year</code></td><td><code>int</code></td><td><code>0</code></td><td>Año de los procesos (2015 en adelante). 0 = año actual.</td></tr>
+
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>vacío</code></td><td>Palabra clave opcional del tema (mínimo 3 caracteres); vacío usa la del comprador.</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>text | json</td></tr>
 
 </tbody>
 </table>
@@ -2650,7 +2676,7 @@ window.SITE_SEARCH_EMPTY_LABEL = "Sin resultados.";
     var count = visibleTools().length;
     resultCount.textContent = query
       ? count + " tool" + (count === 1 ? "" : "s") + " coincide" + (count === 1 ? "" : "n") + "."
-      : "84 tools · abre un grupo para ver sus detalles.";
+      : "85 tools · abre un grupo para ver sus detalles.";
   }
 
   function applyFilter(query) {
