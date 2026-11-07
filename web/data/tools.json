@@ -2073,7 +2073,44 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo. Lee solo el registro End Of Central Directory y el directorio central vía peticiones HTTP Range, así que funciona para archivos mucho más grandes que el tope de 5 MB de preview_resource_data/download_resource -- ej. ZIPs de microdatos de INEC o del censo de varios cientos de MB. Requiere que el servidor respete peticiones Range; falla con un error claro si no. No soporta archivos ZIP64. Listar los nombres es barato de esta forma, pero previsualizar las filas de un miembro específico no lo es (igual hay que descomprimir desde el offset de ese miembro en adelante) -- este tool solo lista metadata."
+        "long_description": "Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo. Lee solo el registro End Of Central Directory y el directorio central vía peticiones HTTP Range, así que funciona para archivos mucho más grandes que el tope de 5 MB de preview_resource_data/download_resource -- ej. ZIPs de microdatos de INEC o del censo de varios cientos de MB. Requiere que el servidor respete peticiones Range; falla con un error claro si no. No soporta archivos ZIP64. Listar los nombres es barato de esta forma, pero previsualizar las filas de un miembro específico no lo es (igual hay que descomprimir desde el offset de ese miembro en adelante) -- este tool solo lista metadata; para leer las filas de un miembro usa read_zip_member, que baja solo los bytes de ese archivo."
+      },
+      {
+        "name": "read_zip_member",
+        "description": "Lee como tabla un archivo (CSV/TSV/TXT o XLSX/XLS/XLSB/ODS) dentro de un .zip remoto, bajando solo los bytes de ese miembro.",
+        "params": [
+          {
+            "name": "url",
+            "type": "str",
+            "default": null,
+            "description": "URL directa al .zip (la misma que se pasó a list_zip_contents)."
+          },
+          {
+            "name": "member",
+            "type": "str",
+            "default": null,
+            "description": "Ruta del archivo dentro del .zip, tal como la lista list_zip_contents."
+          },
+          {
+            "name": "rows",
+            "type": "int",
+            "default": "50",
+            "description": "Filas de datos a devolver (default 50, máx. 500)."
+          },
+          {
+            "name": "offset",
+            "type": "int",
+            "default": "0",
+            "description": "Filas de datos a saltar antes de devolver, para paginar."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Lee las filas de UN archivo dentro de un .zip remoto sin descargar el .zip. Primero usa list_zip_contents para obtener el nombre exacto del miembro. Lee el directorio central del .zip y luego baja solo la cabecera local y los bytes comprimidos de ese miembro vía peticiones HTTP Range, así que funciona dentro de archivos mucho más grandes que el tope de 5 MB de preview_resource_data/download_resource -- ej. los 90 tabulados CSV de la ENDI R3 del INEC. Límites: el servidor debe respetar HTTP Range (responder 206); el miembro debe pesar como máximo 5 MB comprimido; los CSV/TSV/TXT se cortan a 5 MB descomprimidos (marcado como truncado) y las hojas de cálculo deben caber en 20 MB descomprimidas porque no se pueden abrir incompletas; solo miembros sin comprimir o deflate, sin cifrado y sin ZIP64. Formatos: .csv, .tsv, .txt, .xlsx, .xls, .xlsb, .ods (primera hoja). Verifica el CRC32 cuando el miembro se lee completo. Busca el nombre exacto, luego una coincidencia única sin distinguir mayúsculas o por nombre base; si no encuentra, el error sugiere nombres parecidos."
       },
       {
         "name": "read_pdf",

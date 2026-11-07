@@ -279,7 +279,7 @@ Verifica que el servidor responda antes de darlo por terminado.</code></pre>
 </details>
 <details class="faq-item">
 <summary>El preview sale cortado o dice que el archivo es muy grande</summary>
-<p>Es intencional: las descargas se limitan a 5 MB y la descompresión de ZIP/tar.gz a 20 MB. Para recursos grandes usa <code>query_resource_data</code> (filtra en el DataStore de CKAN sin bajar el archivo) o <code>list_zip_contents</code> para ver qué trae un ZIP antes de abrirlo.</p>
+<p>Es intencional: las descargas se limitan a 5 MB y la descompresión de ZIP/tar.gz a 20 MB. Para recursos grandes usa <code>query_resource_data</code> (filtra en el DataStore de CKAN sin bajar el archivo) o <code>list_zip_contents</code> para ver qué trae un ZIP y <code>read_zip_member</code> para leer uno de sus archivos sin bajar el ZIP entero.</p>
 </details>
 <details class="faq-item">
 <summary>Necesito más detalle para reportar un bug</summary>

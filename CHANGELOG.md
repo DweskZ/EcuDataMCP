@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- **New tool `read_zip_member`** (84 tools in the default profile). It reads
+  one CSV/TSV/TXT or XLSX/XLS/XLSB/ODS file inside a remote .zip as a table,
+  fetching only that member's bytes through HTTP Range requests, so an agent
+  can open, say, one of the 90 CSV tables in INEC's ENDI R3 tabulados ZIP
+  without the server downloading the archive. Caps: 5 MB compressed per
+  member, 5 MB decompressed for text (marked truncated), 20 MB for
+  spreadsheets; stored and deflate only, no encryption, no ZIP64. Every
+  Range answer must be a 206 starting at the requested offset, and the
+  CRC32 is checked when the member is read in full. `list_zip_contents` and
+  `read_zip_member` share the central-directory fetch; the listing's output
+  is unchanged. The smoke run chains the two on the first member.
+
 - **Every tool now publishes an `outputSchema` and returns a `metadatos`
   block.** Each tool's return is typed with one of six result families
   (`helpers/result_types.py`: búsqueda, listado, archivos, serie, tabla,

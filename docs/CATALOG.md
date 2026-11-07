@@ -3,7 +3,7 @@
 Generado por `scripts/generate_catalog.py` desde `resources/catalog.py` y las
 descripciones de `tools/*.py`; no editar a mano.
 
-53 fuentes, 83 tools públicas.
+53 fuentes, 84 tools públicas.
 
 ## Datos Abiertos CKAN
 
@@ -488,3 +488,4 @@ descripciones de `tools/*.py`; no editar a mano.
 - `search_ecuador`: Unified first-step search across CKAN datasets, organizations, gob.ec trámites and regulations, SERCOP contracts and SGR risk events, a few hits per source. Drill down with the source-specific get_* tools; for CKAN datasets alone use search_datasets.
 - `investigate_dataset`: One-step shortcut: search CKAN, pick the top dataset and preview its first readable resource. Use the individual tools when the top hit isn't the right one.
 - `list_zip_contents`: List a remote ZIP's members (name, size) via HTTP Range requests, without downloading it; works for archives far beyond 5 MB. No ZIP64.
+- `read_zip_member`: Read one CSV/TSV/TXT or XLSX/XLS/XLSB/ODS file inside a remote ZIP as a table, fetching only that file's bytes via HTTP Range. Get member names from list_zip_contents first. Max 5 MB compressed per member; no ZIP64.

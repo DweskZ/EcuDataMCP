@@ -694,7 +694,24 @@ async def chain_inec_estadistica(client: httpx.AsyncClient) -> None:
     zips = [a["url"] for a in files.get("archivos") or [] if a["url"].lower().endswith(".zip")]
     if not zips:
         raise AssertionError(f"no ZIP among the files of {tema['url']}")
-    await call_chain_step(client, "list_zip_contents", {"url": zips[0], "limit": 5, "format": "json"})
+    listing = json.loads(
+        await call_chain_step(
+            client, "list_zip_contents", {"url": zips[0], "limit": 5, "format": "json"}
+        )
+    )
+    members = [m["name"] for m in listing.get("members") or [] if not m["is_dir"]]
+    if not members:
+        raise AssertionError(f"list_zip_contents returned no files for {zips[0]}")
+
+    # Not every member is tabular (PDF manuals, .sav microdata): a refusal
+    # naming the supported formats is the tool working, not a failure.
+    text, is_error = await call_tool(
+        client,
+        "read_zip_member",
+        {"url": zips[0], "member": members[0], "rows": 3, "format": "json"},
+    )
+    if not (is_error and "Formatos soportados" in text):
+        chain_step(text, is_error=is_error)
 
 
 async def chain_inec_publicacion(client: httpx.AsyncClient) -> None:
