@@ -108,6 +108,17 @@ def _flatten_tree(node: dict[str, Any], trail: list[str]) -> list[dict[str, Any]
 
 
 async def _fetch_indicadores(lang: str) -> list[dict[str, Any]]:
+    """Fresh fetch, or the last good copy when the source fails (see TtlCache.serve_stale)."""
+    try:
+        return await _fetch_indicadores_fresh(lang)
+    except Exception as exc:
+        stale = _tree_cache.serve_stale(f"tree:{lang}", exc)
+        if stale is None:
+            raise
+        return stale
+
+
+async def _fetch_indicadores_fresh(lang: str) -> list[dict[str, Any]]:
     cache_key = f"tree:{lang}"
     cached = _tree_cache.get(cache_key)
     if cached is not None:

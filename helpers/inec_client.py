@@ -184,6 +184,17 @@ def _parse_topics(html: str) -> list[dict[str, str]]:
 
 
 async def _fetch_topics() -> list[dict[str, str]]:
+    """Fresh fetch, or the last good copy when the source fails (see TtlCache.serve_stale)."""
+    try:
+        return await _fetch_topics_fresh()
+    except Exception as exc:
+        stale = _topics_cache.serve_stale("topics", exc)
+        if stale is None:
+            raise
+        return stale
+
+
+async def _fetch_topics_fresh() -> list[dict[str, str]]:
     cached = _topics_cache.get("topics")
     if cached is not None:
         return cached
@@ -423,6 +434,17 @@ async def _get_api_json(
 
 
 async def _fetch_categories() -> dict[int, str]:
+    """Fresh fetch, or the last good copy when the source fails (see TtlCache.serve_stale)."""
+    try:
+        return await _fetch_categories_fresh()
+    except Exception as exc:
+        stale = _categories_cache.serve_stale("categories", exc)
+        if stale is None:
+            raise
+        return stale
+
+
+async def _fetch_categories_fresh() -> dict[int, str]:
     """id -> name map for every WordPress category, fetched once and cached.
 
     These are broad subject buckets (e.g. "Economía Laboral" holds both

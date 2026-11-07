@@ -857,7 +857,16 @@ async def get_seccion_archivos(seccion: str) -> dict[str, Any]:
     cached = _files_cache.get(seccion)
     if cached is not None:
         return cached
+    try:
+        return await _fetch_seccion_fresh(seccion, info)
+    except Exception as exc:
+        stale = _files_cache.serve_stale(seccion, exc)
+        if stale is None:
+            raise
+        return stale
 
+
+async def _fetch_seccion_fresh(seccion: str, info: dict[str, Any]) -> dict[str, Any]:
     async with _fetch_lock:
         cached = _files_cache.get(seccion)
         if cached is not None:

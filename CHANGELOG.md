@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+- **Uniform response contract (MCP_ARCHITECTURE Fase 6).** Every tool's
+  structured response now has a byte ceiling (`ECUADOR_MCP_MAX_RESPONSE_BYTES`,
+  200 KB by default): past it the main list is trimmed and the cut is
+  declared in `metadatos.truncado`. `metadatos.paginacion` states the next
+  page in one shape (`estilo` offset or page, `actual`, `total`, `hay_mas`,
+  `siguiente`) whenever a tool's payload says how it pages. File lists
+  (`archivos`, `files`, `resources`) also come back as MCP `resource_link`
+  blocks after the text block; the JSON is unchanged.
+- **Last good copy when a source is down.** Cache entries now outlive their
+  TTL by up to 7 days; `get` still ignores them, but when a refresh fails
+  the persisted catalogs (BCE indices, IEM and BCEData tree, CEPALSTAT tree,
+  INEC topics and categories, SGR SITREP index and library, Superbancos
+  sections) answer from that copy and say so: `metadatos.frescura` becomes
+  `"obsoleta"` and `metadatos.respuesta_obsoleta` gives the copy's date, the
+  catalog and the failure.
+
 ## 0.14.0 — 2026-11-07
 
 84 tools in the default profile: `read_zip_member` and `get_cenace_boletin`

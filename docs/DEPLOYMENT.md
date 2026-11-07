@@ -138,6 +138,8 @@ es obligatoria salvo `MCP_AUTH_TOKEN` cuando `MCP_REQUIRE_AUTH=1`.
 | `BCE_CATALOG_SNAPSHOT_DIR` | Snapshots del catálogo BCEData que escribe `audit_bce_catalog` | `<data_dir>/bce_catalog_snapshots` |
 | `BCE_EQUIVALENCE_REVIEW_DIR` | Mapas de equivalencia que escribe `compare_bce_sources` | `<data_dir>/bce_equivalence_reviews` |
 | `IEM_CATALOG_DIR` | Catálogo IEM persistido para inspección | `<data_dir>/iem_catalog_snapshots` |
+| `ECUADOR_MCP_DISK_CACHE` | `0` deja todos los cachés en memoria; con `1` los catálogos caros se guardan en `<data_dir>/cache/` y sobreviven reinicios, y una copia vencida (hasta 7 días) responde, marcada `frescura: "obsoleta"`, cuando su fuente falla | `1` |
+| `ECUADOR_MCP_MAX_RESPONSE_BYTES` | Tope de bytes del `structuredContent` de cualquier tool; pasado el tope se recorta la lista principal y se declara en `metadatos.truncado` | `200000` |
 | `ECUADOR_MCP_USAGE_LOG` | `1` guarda cada llamada (tool, resultado, duración; nunca argumentos) en `<data_dir>/usage.jsonl`; `scripts/usage_report.py` lo resume | vacío |
 
 ### Geobloqueo y TLS

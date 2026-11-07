@@ -40,6 +40,8 @@ class Metadatos(TypedDict, total=False):
     frescura: Annotated[str | None, Field(description="Cadencia de actualización, p. ej. daily_bulk o boletin_mensual")]
     esquema: Esquema
     truncado: Annotated[dict[str, Any], Field(description="Presente si se omitieron filas por tamaño")]
+    paginacion: Annotated[dict[str, Any], Field(description="Dónde está la página siguiente, si la respuesta pagina")]
+    respuesta_obsoleta: Annotated[dict[str, Any], Field(description="Presente si la fuente falló y se usó la última copia buena")]
 
 
 @with_config(ConfigDict(extra="allow"))
