@@ -124,7 +124,7 @@ PAGE_DESCRIPTIONS = {
     "es": {
         "index": "Servidor MCP de código abierto para explorar datos abiertos del gobierno de Ecuador desde tu asistente de IA.",
         "atlas": "Los {n} tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.",
-        "examples": "Diez preguntas reales, respondidas con EcuDataMCP: sin inventar datos de Ecuador.",
+        "examples": "Once preguntas reales, respondidas con EcuDataMCP: sin inventar datos de Ecuador.",
         "releases": "Historial de versiones de EcuDataMCP y el ritmo real de los releases.",
         "about": "Qué es EcuDataMCP, de dónde viene y quién lo mantiene.",
         "colaborar": "Cómo proponer una fuente, un tool o un cambio al sitio de EcuDataMCP.",
@@ -133,7 +133,7 @@ PAGE_DESCRIPTIONS = {
     "en": {
         "index": "Open-source MCP server for exploring Ecuador's open government data from your AI assistant.",
         "atlas": "EcuDataMCP's {n} tools, with a full description and a direct link to each one.",
-        "examples": "Ten real questions, answered with EcuDataMCP: no invented data about Ecuador.",
+        "examples": "Eleven real questions, answered with EcuDataMCP: no invented data about Ecuador.",
         "releases": "EcuDataMCP's version history and the real pace of its releases.",
         "about": "What EcuDataMCP is, where it comes from, and who maintains it.",
         "colaborar": "How to propose a source, a tool, or a change to the EcuDataMCP site.",

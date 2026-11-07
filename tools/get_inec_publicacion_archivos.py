@@ -16,7 +16,8 @@ def register_get_inec_publicacion_archivos_tool(mcp: MCPServer) -> None:
         title="Ver archivos de una publicación del INEC",
         description=(
             "File links (PDF/XLSX/CSV/ZIP) in one INEC publication (id or URL from "
-            "search_inec_publicaciones)."
+            "search_inec_publicaciones). For a ZIP, next: list_zip_contents, "
+            "then read_zip_member."
         ),
         annotations=READ_ONLY,
     )
@@ -26,7 +27,9 @@ def register_get_inec_publicacion_archivos_tool(mcp: MCPServer) -> None:
     ) -> Annotated[CallToolResult, ResultadoArchivos]:
         """
         List the direct file links (PDF/XLSX/CSV/ZIP) embedded in one INEC
-        publication found via search_inec_publicaciones.
+        publication found via search_inec_publicaciones. For a .zip link,
+        list_zip_contents shows its files and read_zip_member reads one of
+        them as a table without downloading the archive.
 
         Args:
             post: Either the numeric "id" from search_inec_publicaciones, or
@@ -60,6 +63,12 @@ def register_get_inec_publicacion_archivos_tool(mcp: MCPServer) -> None:
             for i, f in enumerate(archivos, 1):
                 parts.append(f"{i}. {f.get('label')} [{f.get('format')}]")
                 parts.append(f"   {f.get('url')}")
+            if any((f.get("format") or "").upper() == "ZIP" for f in archivos):
+                parts.append("")
+                parts.append(
+                    "Para un .zip: list_zip_contents(url) muestra sus archivos y "
+                    "read_zip_member(url, member) lee uno como tabla sin bajar el .zip."
+                )
             return "\n".join(parts)
 
         return render_structured(result, format, text_builder=to_text)

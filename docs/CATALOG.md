@@ -165,9 +165,9 @@ descripciones de `tools/*.py`; no editar a mano.
 - Base: https://www.ecuadorencifras.gob.ec/
 
 - `search_inec_estadisticas`: INEC's ~75 statistical topic pages on ecuadorencifras.gob.ec (IPC, ENEMDU, pobreza, cuentas nacionales...), where published aggregate series live. Next: get_inec_estadistica_files.
-- `get_inec_estadistica_files`: File links (bulletins, methodology, historical series) on one INEC topic page from search_inec_estadisticas.
+- `get_inec_estadistica_files`: File links (bulletins, methodology, historical series) on one INEC topic page from search_inec_estadisticas. For a ZIP, next: list_zip_contents, then read_zip_member.
 - `search_inec_publicaciones`: Every INEC post on Ecuador en Cifras, newest first; use for the latest release of an operation (topic pages can go stale). Next: get_inec_publicacion_archivos.
-- `get_inec_publicacion_archivos`: File links (PDF/XLSX/CSV/ZIP) in one INEC publication (id or URL from search_inec_publicaciones).
+- `get_inec_publicacion_archivos`: File links (PDF/XLSX/CSV/ZIP) in one INEC publication (id or URL from search_inec_publicaciones). For a ZIP, next: list_zip_contents, then read_zip_member.
 
 ## Siniestros de tránsito (registros de la ANT, vía INEC y CKAN)
 
@@ -487,5 +487,5 @@ descripciones de `tools/*.py`; no editar a mano.
 
 - `search_ecuador`: Unified first-step search across CKAN datasets, organizations, gob.ec trámites and regulations, SERCOP contracts and SGR risk events, a few hits per source. Drill down with the source-specific get_* tools; for CKAN datasets alone use search_datasets.
 - `investigate_dataset`: One-step shortcut: search CKAN, pick the top dataset and preview its first readable resource. Use the individual tools when the top hit isn't the right one.
-- `list_zip_contents`: List a remote ZIP's members (name, size) via HTTP Range requests, without downloading it; works for archives far beyond 5 MB. No ZIP64.
-- `read_zip_member`: Read one CSV/TSV/TXT or XLSX/XLS/XLSB/ODS file inside a remote ZIP as a table, fetching only that file's bytes via HTTP Range. Get member names from list_zip_contents first. Max 5 MB compressed per member; no ZIP64.
+- `list_zip_contents`: List a remote ZIP's members (name, size) via HTTP Range requests, without downloading it; works for archives far beyond 5 MB, ZIP64 included.
+- `read_zip_member`: Read one CSV/TSV/TXT or XLSX/XLS/XLSB/ODS file inside a remote ZIP as a table, fetching only that file's bytes via HTTP Range. Get member names from list_zip_contents first. Max 5 MB compressed per member. Detects the header below a report's title block.

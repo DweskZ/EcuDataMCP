@@ -346,7 +346,7 @@ Capacidades transversales, no atadas a una sola fuente de datos.
 | Fuente | Estado | Qué falta |
 |---|---|---|
 | SENESCYT/Educación Superior | Parcial | Biblioteca y SIAU CTI ya cubiertos (ver Hecho); registro de títulos sigue bloqueado por captcha (no automatizable, por política) → RESEARCH.md § SENESCYT, § Vigésimo cuarta pasada |
-| INEC — preview de archivos grandes | Parcial | `list_zip_contents` lista miembros de ZIP vía HTTP Range sin descargar todo, y `read_zip_member` (2026-11-07) lee un miembro CSV/TSV/TXT o de hoja de cálculo bajando solo sus bytes, con tope de 5 MB comprimido (caso real: los 90 tabulados CSV de la ENDI R3). Sigue decidido en contra de un índice pre-construido por dataset y de cualquier transferencia completa de archivo; falta ZIP64 |
+| INEC — preview de archivos grandes | Parcial | `list_zip_contents` lista miembros de ZIP vía HTTP Range sin descargar todo, y `read_zip_member` (2026-11-07) lee un miembro CSV/TSV/TXT o de hoja de cálculo bajando solo sus bytes, con tope de 5 MB comprimido (caso real: los 90 tabulados CSV de la ENDI R3). Sigue decidido en contra de un índice pre-construido por dataset y de cualquier transferencia completa de archivo. Desde la misma fecha ambos tools leen ZIP64, y read_zip_member detecta el encabezado real de los tabulados (bloque de título arriba, cientos de columnas vacías) |
 | CEPAL — geoportal del Censo Ecuador | Parcial | 9 capas reales vía API, pero derivadas del Clasificador Geográfico de INEC (fuente primaria); bajo valor salvo interés específico en la geometría → RESEARCH.md § CEPAL |
 
 ### Calidad y arquitectura

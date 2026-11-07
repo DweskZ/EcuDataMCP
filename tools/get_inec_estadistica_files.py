@@ -16,7 +16,8 @@ def register_get_inec_estadistica_files_tool(mcp: MCPServer) -> None:
         title="Ver archivos de un tema estadístico del INEC",
         description=(
             "File links (bulletins, methodology, historical series) on one INEC "
-            "topic page from search_inec_estadisticas."
+            "topic page from search_inec_estadisticas. For a ZIP, next: "
+            "list_zip_contents, then read_zip_member."
         ),
         annotations=READ_ONLY,
     )
@@ -31,8 +32,10 @@ def register_get_inec_estadistica_files_tool(mcp: MCPServer) -> None:
         methodology, and historical series as direct PDF/XLSX/CSV/ZIP links —
         not the file contents. Historical microdata pages (general deaths
         1990-2015, 2017, 2018, 2019) are listed by search_inec_estadisticas
-        under "defunciones". Use read_pdf on a .pdf link, or download it
-        yourself for tabular formats. When a topic page lists no files itself
+        under "defunciones". Use read_pdf on a .pdf link; for a .zip link,
+        list_zip_contents shows its files and read_zip_member reads one of
+        them as a table without downloading the archive (e.g. ENDI's
+        tabulados ZIP). Download other tabular files yourself. When a topic page lists no files itself
         (e.g. ENDI), the files of the per-round landing pages it links to are
         merged in and those pages are named in "paginas_relacionadas".
 
@@ -68,6 +71,12 @@ def register_get_inec_estadistica_files_tool(mcp: MCPServer) -> None:
                     + (f" {f['year']}" if f.get("year") else "")
                 )
                 parts.append(f"   {f.get('url')}")
+            if any((f.get("format") or "").upper() == "ZIP" for f in archivos):
+                parts.append("")
+                parts.append(
+                    "Para un .zip: list_zip_contents(url) muestra sus archivos y "
+                    "read_zip_member(url, member) lee uno como tabla sin bajar el .zip."
+                )
             return "\n".join(parts)
 
         return render_structured(result, format, text_builder=to_text)
