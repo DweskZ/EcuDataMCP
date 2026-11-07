@@ -1,6 +1,6 @@
 # Herramientas disponibles
 
-Referencia detallada de las 84 herramientas MCP del perfil público (por defecto)
+Referencia detallada de las 85 herramientas MCP del perfil público (por defecto)
 de EcuDataMCP, más 2 herramientas de mantenimiento (`audit_bce_catalog` y
 `compare_bce_sources`) que solo se registran con otro `MCP_PROFILE`. Casi todas
 aceptan `format="json"` además de texto.
@@ -72,6 +72,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `get_regulacion_info` | Detalle de una regulación + enlace al PDF. |
 | `search_contratos` | Buscar procedimientos de contratación pública (SERCOP/OCDS). |
 | `get_contrato_info` | Expediente OCDS: comprador, licitación, adjudicaciones, contratos. |
+| `get_resumen_compras` | Resumen de las compras de un comprador en un año: procesos, monto total, por tipo de procedimiento, por mes y principales proveedores (hasta 300 procesos; marca `parcial` si hay más). |
 
 ## Riesgos y sismos
 

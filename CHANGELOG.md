@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **New tool `get_resumen_compras`** (85 tools in the default profile): one
+  buyer's SERCOP procurement in a year, summarized. It pages through the
+  OCDS search filtered by buyer (up to 300 processes, marked `parcial` past
+  that) and totals processes, amount and budget per institution, by
+  procedure type, by month and by supplier. Per-buyer summaries were the
+  main procurement gap against other Ecuadorian MCP servers. The smoke run
+  summarizes the buyer of the contract it already checks.
 - **Uniform response contract (MCP_ARCHITECTURE Fase 6).** Every tool's
   structured response now has a byte ceiling (`ECUADOR_MCP_MAX_RESPONSE_BYTES`,
   200 KB by default): past it the main list is trimmed and the cut is

@@ -931,6 +931,37 @@
           }
         ],
         "long_description": "Expediente OCDS completo de un procedimiento de contratación pública (SERCOP). Devuelve comprador, licitación, adjudicaciones, contratos y enlaces útiles cuando están disponibles. Obtén el ocid de search_contratos."
+      },
+      {
+        "name": "get_resumen_compras",
+        "description": "Resume las compras públicas de un comprador en un año: procesos, monto, tipos de procedimiento, meses y proveedores.",
+        "params": [
+          {
+            "name": "comprador",
+            "type": "str",
+            "default": null,
+            "description": "Palabra clave del comprador o institución, mínimo 3 caracteres (ej. \"Municipio de Quito\", \"IESS\")."
+          },
+          {
+            "name": "year",
+            "type": "int",
+            "default": "0",
+            "description": "Año de los procesos (2015 en adelante). 0 = año actual."
+          },
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Palabra clave opcional del tema (mínimo 3 caracteres); vacío usa la del comprador."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Resume las compras públicas de un comprador (institución) en un año, desde los datos abiertos OCDS del SERCOP. Recorre la misma búsqueda que search_contratos, filtrada por comprador, y totaliza lo leído: número de procesos, monto total (el amount OCDS, valor adjudicado o estimado) y presupuesto, por tipo de procedimiento, por mes y por proveedor, con primera y última fecha. Como comprador es una palabra clave, pueden coincidir varias instituciones (\"agua\" trae todas las empresas de agua): cada una se resume por separado, de mayor a menor monto, las 10 primeras. Lee hasta 300 procesos (30 páginas); si hay más, el resumen sale marcado parcial con total_en_fuente. Los procesos sin monto se cuentan pero no suman (procesos_con_monto) y una página que falla se lista en paginas_fallidas. Para el expediente de un proceso usa get_contrato_info."
       }
     ]
   },

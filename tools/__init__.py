@@ -42,6 +42,7 @@ from tools.get_institucion_info import register_get_institucion_info_tool
 from tools.get_organization_info import register_get_organization_info_tool
 from tools.get_regulacion_info import register_get_regulacion_info_tool
 from tools.get_resource_info import register_get_resource_info_tool
+from tools.get_resumen_compras import register_get_resumen_compras_tool
 from tools.get_sgr_sitrep_archivos import register_get_sgr_sitrep_archivos_tool
 from tools.get_sipa_resumen_indicadores import (
     register_get_sipa_resumen_indicadores_tool,
@@ -177,6 +178,7 @@ def register_tools(mcp: MCPServer) -> None:
 
     register_search_contratos_tool(mcp)
     register_get_contrato_info_tool(mcp)
+    register_get_resumen_compras_tool(mcp)
 
     register_search_indicadores_bce_tool(mcp)
     register_get_indicador_bce_tool(mcp)
