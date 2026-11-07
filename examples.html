@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ejemplos – EcuDataMCP</title>
-<meta name="description" content="Diez preguntas reales, respondidas con EcuDataMCP: sin inventar datos de Ecuador.">
+<meta name="description" content="Once preguntas reales, respondidas con EcuDataMCP: sin inventar datos de Ecuador.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="canonical" href="https://dweskz.github.io/EcuDataMCP/examples.html">
 <link rel="alternate" hreflang="es" href="https://dweskz.github.io/EcuDataMCP/examples.html">
 <link rel="alternate" hreflang="en" href="https://dweskz.github.io/EcuDataMCP/en/examples.html">
 <link rel="alternate" hreflang="x-default" href="https://dweskz.github.io/EcuDataMCP/examples.html">
 <meta property="og:title" content="Ejemplos – EcuDataMCP">
-<meta property="og:description" content="Diez preguntas reales, respondidas con EcuDataMCP: sin inventar datos de Ecuador.">
+<meta property="og:description" content="Once preguntas reales, respondidas con EcuDataMCP: sin inventar datos de Ecuador.">
 <meta property="og:url" content="https://dweskz.github.io/EcuDataMCP/examples.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_EC">
@@ -154,7 +154,7 @@
 <div class="container-page">
 <p class="kicker">El problema, primero</p>
 <h1>Preguntas reales, <span class="accent">datos citados.</span></h1>
-<p class="hero-sub">Pregúntale a un asistente de IA sobre datos de Ecuador y es común que invente cifras con total confianza: no hay suficiente Ecuador en los datos con los que se entrenó, y no tiene forma de verificar nada en tiempo real. Dale las herramientas de EcuDataMCP y deja de adivinar: busca en el portal oficial, cita la fuente, y el número que devuelve es real. Estos diez ejemplos muestran esa diferencia.</p>
+<p class="hero-sub">Pregúntale a un asistente de IA sobre datos de Ecuador y es común que invente cifras con total confianza: no hay suficiente Ecuador en los datos con los que se entrenó, y no tiene forma de verificar nada en tiempo real. Dale las herramientas de EcuDataMCP y deja de adivinar: busca en el portal oficial, cita la fuente, y el número que devuelve es real. Estos once ejemplos muestran esa diferencia.</p>
 </div>
 </section>
 
@@ -187,6 +187,13 @@
 <p class="example-flow"><span class="tool-chip">query_resource_data</span></p>
 <p class="example-result">Junio 2026: <strong>2.561 beneficiarios</strong>, <strong>USD 836.716,99</strong> en total, excluyendo la fila <code>TOTAL:</code> embebida en el archivo.</p>
 <a class="example-source" href="https://www.datosabiertos.gob.ec" target="_blank" rel="noopener">datosabiertos.gob.ec (IESS) &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;¿Qué porcentaje de hogares con niños menores de 5 años no tiene un sistema adecuado de eliminación de excretas, según la ENDI?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">list_zip_contents</span> &rarr; <span class="tool-chip">read_zip_member</span></p>
+<p class="example-result">ENDI 2025-2026: <strong>24,8 %</strong> a nivel nacional (IC 95 %: 23,1-26,6), con <strong>8,6 %</strong> en la Sierra frente a <strong>36,4 %</strong> en la Costa. Leído de un solo CSV dentro del ZIP de 90 tabulados del INEC, sin bajar el ZIP.</p>
+<a class="example-source" href="https://www.ecuadorencifras.gob.ec/documentos/web-inec/ENDI/R3/Tabulados_ENDI_R3_csv.zip" target="_blank" rel="noopener">ecuadorencifras.gob.ec (ENDI R3) &#8599;</a>
 </div>
 
 <div class="example-mini">
