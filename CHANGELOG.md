@@ -8,11 +8,25 @@
   can open, say, one of the 90 CSV tables in INEC's ENDI R3 tabulados ZIP
   without the server downloading the archive. Caps: 5 MB compressed per
   member, 5 MB decompressed for text (marked truncated), 20 MB for
-  spreadsheets; stored and deflate only, no encryption, no ZIP64. Every
+  spreadsheets; stored and deflate only, no encryption. Every
   Range answer must be a 206 starting at the requested offset, and the
   CRC32 is checked when the member is read in full. `list_zip_contents` and
   `read_zip_member` share the central-directory fetch; the listing's output
   is unchanged. The smoke run chains the two on the first member.
+- **`read_zip_member` reads report tables as tables.** INEC's tabulados open
+  with a title block and carry hundreds of empty columns; ENDI R3's T1_i1
+  has its header on row 8 and 663 empty columns. The header is now the
+  first row at least half as full as the fullest of the first 30 (the
+  title rows come back as `preamble`), lines the source quoted whole are
+  split back into fields, and empty columns are dropped. `skip_rows=0`
+  keeps row 1 as the header; a plain CSV comes back unchanged.
+- **ZIP64 in `list_zip_contents` and `read_zip_member`.** Archives past 4 GB
+  or 65535 entries used to be refused; both tools now read the ZIP64 end
+  record (fetching it separately when it falls outside the tail) and the
+  ZIP64 extra field of each member.
+- `get_inec_estadistica_files` and `get_inec_publicacion_archivos` point to
+  `list_zip_contents` → `read_zip_member` when a result has ZIP links, and
+  the Examples page gains the ENDI case.
 
 - **Every tool now publishes an `outputSchema` and returns a `metadatos`
   block.** Each tool's return is typed with one of six result families

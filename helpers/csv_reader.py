@@ -1185,12 +1185,73 @@ def _parse_eocd(tail: bytes) -> tuple[int, int, int]:
         struct.unpack_from("<4sHHHHIIH", tail, idx)
     )
     if total_entries == 0xFFFF or cd_offset == 0xFFFFFFFF or cd_size == 0xFFFFFFFF:
-        raise ValueError(
-            "Este .zip usa ZIP64 (más de 65535 archivos o directorio central "
-            "de más de 4 GB); el listado por HTTP Range todavía no lo "
-            "soporta. Usa download_resource o el enlace directo."
-        )
+        raise _Zip64Required(idx)
     return cd_offset, cd_size, total_entries
+
+
+class _Zip64Required(ValueError):
+    """The classic EOCD holds ZIP64 sentinels; the real values live in the
+    ZIP64 end-of-central-directory record found through its locator."""
+
+    def __init__(self, eocd_index: int) -> None:
+        super().__init__(
+            "Este .zip usa ZIP64 (más de 65535 archivos o más de 4 GB) y no "
+            "trae el registro ZIP64 que lo describe; parece corrupto."
+        )
+        self.eocd_index = eocd_index
+
+
+_ZIP64_LOCATOR_SIGNATURE = b"PK\x06\x07"
+_ZIP64_EOCD_SIGNATURE = b"PK\x06\x06"
+
+
+async def _read_zip64_eocd(
+    url: str,
+    tail: bytes,
+    tail_start: int,
+    eocd_index: int,
+    session: httpx.AsyncClient | None,
+) -> tuple[int, int, int]:
+    """Return (cd_offset, cd_size, total_entries) from the ZIP64 EOCD record."""
+    loc = eocd_index - 20
+    if loc < 0 or tail[loc : loc + 4] != _ZIP64_LOCATOR_SIGNATURE:
+        raise _Zip64Required(eocd_index)
+    _sig, _disk, record_offset, _disks = struct.unpack_from("<4sIQI", tail, loc)
+
+    if tail_start <= record_offset and record_offset + 56 <= tail_start + len(tail):
+        record = tail[record_offset - tail_start : record_offset - tail_start + 56]
+    else:
+        record, headers, status = await _fetch_range(
+            url, f"bytes={record_offset}-{record_offset + 55}", cap=56, session=session
+        )
+        _check_partial(status, headers, record_offset)
+    if len(record) < 56 or record[:4] != _ZIP64_EOCD_SIGNATURE:
+        raise _Zip64Required(eocd_index)
+    (_sig, _size, _made, _needed, _disk, _cd_disk, _entries_disk, total_entries,
+     cd_size, cd_offset) = struct.unpack_from("<4sQHHIIQQQQ", record, 0)
+    return cd_offset, cd_size, total_entries
+
+
+def _apply_zip64_extra(extra: bytes, sizes: dict[str, int]) -> None:
+    """Replace 0xFFFFFFFF sizes/offset with the 8-byte values of extra field 0x0001.
+
+    The ZIP64 extra field lists only the fields whose 32-bit slot holds the
+    sentinel, in a fixed order: uncompressed size, compressed size, local
+    header offset.
+    """
+    pos = 0
+    while pos + 4 <= len(extra):
+        header_id, size = struct.unpack_from("<HH", extra, pos)
+        body = extra[pos + 4 : pos + 4 + size]
+        pos += 4 + size
+        if header_id != 0x0001:
+            continue
+        cursor = 0
+        for key in ("uncompressed_size", "compressed_size", "local_header_offset"):
+            if sizes[key] == 0xFFFFFFFF and cursor + 8 <= len(body):
+                (sizes[key],) = struct.unpack_from("<Q", body, cursor)
+                cursor += 8
+        return
 
 
 def _parse_central_directory(data: bytes, expected_entries: int) -> list[dict[str, Any]]:
@@ -1224,6 +1285,17 @@ def _parse_central_directory(data: bytes, expected_entries: int) -> list[dict[st
         name = data[pos : pos + name_len].decode(
             "utf-8" if flags & 0x0800 else "cp437", errors="replace"
         )
+        sizes = {
+            "uncompressed_size": uncompressed_size,
+            "compressed_size": compressed_size,
+            "local_header_offset": local_offset,
+        }
+        if 0xFFFFFFFF in sizes.values():
+            extra = data[pos + name_len : pos + name_len + extra_len]
+            _apply_zip64_extra(extra, sizes)
+            uncompressed_size = sizes["uncompressed_size"]
+            compressed_size = sizes["compressed_size"]
+            local_offset = sizes["local_header_offset"]
         pos += name_len + extra_len + comment_len
         members.append(
             {
@@ -1274,7 +1346,12 @@ async def _fetch_central_directory(
         )
     tail_start, total_size = _parse_content_range(tail_headers)
 
-    cd_offset, cd_size, total_entries = _parse_eocd(tail)
+    try:
+        cd_offset, cd_size, total_entries = _parse_eocd(tail)
+    except _Zip64Required as zip64:
+        cd_offset, cd_size, total_entries = await _read_zip64_eocd(
+            url, tail, tail_start, zip64.eocd_index, session
+        )
 
     if cd_offset >= tail_start:
         cd_data = tail[cd_offset - tail_start : cd_offset - tail_start + cd_size]
@@ -1312,7 +1389,8 @@ async def list_zip_contents(
     Central Directory record and the central directory itself are fetched --
     both tiny relative to the archive, proportional to entry count rather
     than entry content. Requires the server to honor Range requests (returns
-    HTTP 206); raises ValueError otherwise. Does not support ZIP64 archives.
+    HTTP 206); raises ValueError otherwise. Reads ZIP64 end records and
+    extra fields, so archives past 4 GB or 65535 entries list too.
     """
     members, total_size, total_entries = await _fetch_central_directory(url, session)
     return {
@@ -1375,15 +1453,19 @@ async def read_zip_member(
     member: str,
     max_rows: int = 50,
     session: httpx.AsyncClient | None = None,
+    skip_rows: int = -1,
 ) -> dict[str, Any]:
     """Read one member of a remote .zip by fetching only that member's bytes.
+
+    `skip_rows`: rows above the column header (-1 detects it, see
+    _tidy_report_table). Empty columns are dropped from the result.
 
     Uses the central directory (as list_zip_contents does) to locate the
     member, then Range-fetches its local header and compressed data. Caps:
     compressed size <= MAX_DOWNLOAD_BYTES; CSV/text output stops at
     MAX_DOWNLOAD_BYTES (marked truncated); spreadsheets must fit in
     _MAX_DECOMPRESSED_BYTES since their parsers need the whole file. Only
-    stored and deflate members, no encryption, no ZIP64.
+    stored and deflate members, no encryption; ZIP64 is supported.
     """
     members, total_size, _entries = await _fetch_central_directory(url, session)
     info = _resolve_member(members, member)
@@ -1405,7 +1487,7 @@ async def read_zip_member(
         info["local_header_offset"],
     ):
         raise ValueError(
-            f"'{name}' usa ZIP64 (más de 4 GB); la lectura por HTTP Range no lo soporta."
+            f"'{name}': el .zip está corrupto (tamaño ZIP64 sin su campo extra)."
         )
     compressed_size = info["compressed_size"]
     if compressed_size > MAX_DOWNLOAD_BYTES:
@@ -1484,15 +1566,29 @@ async def read_zip_member(
             "descomprimido; una hoja de cálculo no se puede abrir incompleta."
         )
 
+    # Read past max_rows so a title block above the real header still leaves
+    # max_rows data rows once it is skipped.
+    parse_rows = max_rows + (_HEADER_SCAN_ROWS if skip_rows < 0 else skip_rows)
     if is_sheet:
         result = await run_parser_off_loop(
-            _ZIP_SHEET_PARSERS[ext], out, max_rows, False
+            _ZIP_SHEET_PARSERS[ext], out, parse_rows, False
         )
     else:
-        result = _parse_csv_bytes(out, max_rows, truncated=truncated)
+        result = _parse_csv_bytes(out, parse_rows, truncated=truncated)
         result["format"] = ext.lstrip(".")
+
+    more = result["truncated"]
+    tidy = _tidy_report_table([result["headers"], *result["rows"]], skip_rows)
+    rows = tidy["rows"]
     result.update(
         {
+            "headers": tidy["headers"],
+            "rows": rows[:max_rows],
+            "total_rows_in_preview": min(len(rows), max_rows),
+            "truncated": more or len(rows) > max_rows,
+            "header_row": tidy["header_row"],
+            "preamble": tidy["preamble"],
+            "dropped_empty_columns": tidy["dropped_empty_columns"],
             "member_name": name,
             "compressed_size": compressed_size,
             "uncompressed_size": info["uncompressed_size"],
@@ -1500,6 +1596,87 @@ async def read_zip_member(
         }
     )
     return result
+
+
+_HEADER_SCAN_ROWS = 30
+_PREAMBLE_MAX_ROWS = 10
+
+
+def _unwrap_quoted_line(row: list[str]) -> list[str]:
+    """Split a row whose whole line was quoted into one cell.
+
+    INEC's tabulados (ENDI R3, 2026-11-07) quote some entire lines, e.g.
+    the line for Nacional starts with a quote and keeps its own thousands
+    ("4,288") as doubled quotes inside, so the CSV reader returns the
+    line as a single cell. Re-parse that cell when it clearly holds several
+    fields; a lone title with a comma ("..., que están") is left alone.
+    """
+    cells = [c for c in row if c.strip()]
+    if len(cells) != 1 or row[0] != cells[0]:
+        return row
+    text = cells[0]
+    delimiter = _sniff_delimiter(text)
+    if delimiter not in text:
+        return row
+    try:
+        fields = next(csv.reader([text], delimiter=delimiter))
+    except (csv.Error, StopIteration):
+        return row
+    filled = [f for f in fields if f.strip()]
+    if len(filled) >= 3 or (len(filled) >= 2 and '"' in text):
+        return fields
+    return row
+
+
+def _tidy_report_table(table: list[list[str]], skip_rows: int) -> dict[str, Any]:
+    """Find the real header in a report-style table and drop empty columns.
+
+    Statistical tabulados (INEC, BCE) open with a title block -- table
+    number, indicator, population, source -- before the column header, and
+    often carry hundreds of empty trailing columns. `skip_rows` < 0 detects
+    the header as the first row at least half as full as the fullest of the
+    first _HEADER_SCAN_ROWS rows; 0 keeps row 1; n skips n rows. A normal
+    CSV, whose first row is already the fullest, comes back unchanged.
+    """
+    table = [_unwrap_quoted_line(row) for row in table]
+    if skip_rows >= 0:
+        header_row = min(skip_rows, max(len(table) - 1, 0))
+    else:
+        counts = [sum(1 for c in row if c.strip()) for row in table[:_HEADER_SCAN_ROWS]]
+        fullest = max(counts, default=0)
+        header_row = 0
+        if fullest >= 2 and counts[0] * 2 < fullest:
+            header_row = next(i for i, n in enumerate(counts) if n * 2 >= fullest)
+
+    preamble = [
+        " | ".join(c.strip() for c in row if c.strip())[:300]
+        for row in table[:header_row]
+        if any(c.strip() for c in row)
+    ][:_PREAMBLE_MAX_ROWS]
+    body = table[header_row:]
+    if not body:
+        return {
+            "headers": [],
+            "rows": [],
+            "header_row": header_row,
+            "preamble": preamble,
+            "dropped_empty_columns": 0,
+        }
+
+    width = max(len(row) for row in body)
+    keep = [
+        i
+        for i in range(width)
+        if any(i < len(row) and row[i].strip() for row in body)
+    ]
+    trimmed = [[row[i] if i < len(row) else "" for i in keep] for row in body]
+    return {
+        "headers": trimmed[0],
+        "rows": trimmed[1:],
+        "header_row": header_row,
+        "preamble": preamble,
+        "dropped_empty_columns": width - len(keep),
+    }
 
 
 def format_table(headers: list[str], rows: list[list[str]], max_col_width: int = 40) -> str:

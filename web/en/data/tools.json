@@ -2073,7 +2073,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List a .zip archive's member files (name, size) from a direct URL, without downloading the archive. Reads only the End Of Central Directory record and the central directory via HTTP Range requests, so it works for archives far larger than the 5 MB preview_resource_data/download_resource cap -- e.g. INEC or censo microdata ZIPs of multiple hundred MB. Requires the server to honor Range requests; fails with a clear error otherwise. Does not support ZIP64 archives. Listing names is cheap this way, but previewing a specific member's rows is not (still needs decompressing from that member's offset onward) -- this tool only lists metadata; to read one member's rows use read_zip_member, which fetches only that file's bytes."
+        "long_description": "List a .zip archive's member files (name, size) from a direct URL, without downloading the archive. Reads only the End Of Central Directory record and the central directory via HTTP Range requests, so it works for archives far larger than the 5 MB preview_resource_data/download_resource cap -- e.g. INEC or censo microdata ZIPs of multiple hundred MB. Requires the server to honor Range requests; fails with a clear error otherwise. ZIP64 archives (past 4 GB or 65535 entries) are supported. Listing names is cheap this way, but previewing a specific member's rows is not (still needs decompressing from that member's offset onward) -- this tool only lists metadata; to read one member's rows use read_zip_member, which fetches only that file's bytes."
       },
       {
         "name": "read_zip_member",
@@ -2104,13 +2104,19 @@
             "description": "Data rows to skip before returning, for pagination."
           },
           {
+            "name": "skip_rows",
+            "type": "int",
+            "default": "-1",
+            "description": "Rows above the column header; -1 (default) detects them, 0 keeps row 1."
+          },
+          {
             "name": "format",
             "type": "Literal['text', 'json']",
             "default": "'text'",
             "description": "text | json"
           }
         ],
-        "long_description": "Reads the rows of ONE file inside a remote .zip without downloading the .zip. Run list_zip_contents first to get the member's exact name. It reads the archive's central directory, then fetches only that member's local header and compressed bytes via HTTP Range requests, so it works inside archives far larger than the 5 MB cap of preview_resource_data/download_resource -- e.g. the 90 CSV tables of INEC's ENDI R3. Limits: the server must honor HTTP Range (answer 206); the member must be at most 5 MB compressed; CSV/TSV/TXT output stops at 5 MB decompressed (marked truncated) and spreadsheets must fit in 20 MB decompressed since they can't be opened partially; only stored or deflate members, no encryption and no ZIP64. Formats: .csv, .tsv, .txt, .xlsx, .xls, .xlsb, .ods (first sheet). The CRC32 is checked whenever the member is read in full. Matching tries the exact name, then a unique case-insensitive or basename match; otherwise the error suggests close names."
+        "long_description": "Reads the rows of ONE file inside a remote .zip without downloading the .zip. Run list_zip_contents first to get the member's exact name. It reads the archive's central directory, then fetches only that member's local header and compressed bytes via HTTP Range requests, so it works inside archives far larger than the 5 MB cap of preview_resource_data/download_resource -- e.g. the 90 CSV tables of INEC's ENDI R3. Limits: the server must honor HTTP Range (answer 206); the member must be at most 5 MB compressed; CSV/TSV/TXT output stops at 5 MB decompressed (marked truncated) and spreadsheets must fit in 20 MB decompressed since they can't be opened partially; only stored or deflate members, no encryption; ZIP64 is supported. Formats: .csv, .tsv, .txt, .xlsx, .xls, .xlsb, .ods (first sheet). The CRC32 is checked whenever the member is read in full. Matching tries the exact name, then a unique case-insensitive or basename match; otherwise the error suggests close names. For report tables with a title block on top (INEC, BCE) it detects the real header row (the first at least half as full as the fullest of the first 30), returns the title rows as preamble and drops empty columns; skip_rows=0 keeps row 1 and skip_rows=n skips n rows."
       },
       {
         "name": "read_pdf",

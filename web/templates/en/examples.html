@@ -4,7 +4,7 @@
 <div class="container-page">
 <p class="kicker">The problem, first</p>
 <h1>Real questions, <span class="accent">cited data.</span></h1>
-<p class="hero-sub">Ask a general AI assistant about Ecuador and it's common for it to invent figures with total confidence: there isn't enough Ecuador in the data it was trained on, and it has no way to verify anything in real time. Give it EcuDataMCP's tools and it stops guessing: it searches the official portal, cites the source, and the number it returns is real. These ten examples show that difference.</p>
+<p class="hero-sub">Ask a general AI assistant about Ecuador and it's common for it to invent figures with total confidence: there isn't enough Ecuador in the data it was trained on, and it has no way to verify anything in real time. Give it EcuDataMCP's tools and it stops guessing: it searches the official portal, cites the source, and the number it returns is real. These eleven examples show that difference.</p>
 </div>
 </section>
 
@@ -37,6 +37,13 @@
 <p class="example-flow"><span class="tool-chip">query_resource_data</span></p>
 <p class="example-result">June 2026: <strong>2,561 beneficiaries</strong>, <strong>USD 836,716.99</strong> in total, excluding the <code>TOTAL:</code> row embedded in the file.</p>
 <a class="example-source" href="https://www.datosabiertos.gob.ec" target="_blank" rel="noopener">datosabiertos.gob.ec (IESS) &#8599;</a>
+</div>
+
+<div class="example-mini">
+<p class="example-question">&ldquo;What share of households with children under 5 lacks an adequate sewage disposal system, according to the ENDI?&rdquo;</p>
+<p class="example-flow"><span class="tool-chip">list_zip_contents</span> &rarr; <span class="tool-chip">read_zip_member</span></p>
+<p class="example-result">ENDI 2025-2026: <strong>24.8%</strong> nationally (95% CI: 23.1-26.6), with <strong>8.6%</strong> in the Highlands against <strong>36.4%</strong> on the Coast. Read from one CSV inside INEC's ZIP of 90 tables, without downloading the ZIP.</p>
+<a class="example-source" href="https://www.ecuadorencifras.gob.ec/documentos/web-inec/ENDI/R3/Tabulados_ENDI_R3_csv.zip" target="_blank" rel="noopener">ecuadorencifras.gob.ec (ENDI R3) &#8599;</a>
 </div>
 
 <div class="example-mini">

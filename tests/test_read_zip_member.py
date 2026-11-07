@@ -289,3 +289,170 @@ async def test_tool_maps_value_errors_to_tool_errors(httpx_mock):
 
     with pytest.raises(ToolError, match="list_zip_contents"):
         await server.call_tool("read_zip_member", {"url": URL, "member": "zzz.pdf"})
+
+
+# -- report tables (INEC tabulados) -------------------------------------------
+
+_TABULADO = (
+    "Tabla N°:,1,,,,,,,,,,,\n"
+    "Indicador/variable:,Porcentaje de hogares,,,,,,,,,,,\n"
+    "Fuente:,ENDI 2025 - 2026,,,,,,,,,,,\n"
+    ",,,,,,,,,,,,\n"
+    "Desagregación,,Indicador,Error,Inferior,Superior,,,,,,,\n"
+    '"Nacional *,Nacional,24.8,0.9,23.1,26.6,,,,",,,\n'
+    "Provincia,Azuay,10.2,1.9,7.0,14.8,,,,,,,\n"
+    ",Bolívar,14.2,1.8,11.1,18.1,,,,,,,\n"
+).encode("cp1252")
+
+
+async def test_detects_the_header_below_a_title_block(httpx_mock):
+    _serve(httpx_mock, _make_zip({"T1_i1.csv": _TABULADO}))
+
+    result = await read_zip_member(URL, "T1_i1.csv")
+
+    assert result["header_row"] == 4
+    assert result["headers"] == [
+        "Desagregación",
+        "",
+        "Indicador",
+        "Error",
+        "Inferior",
+        "Superior",
+    ]
+    assert result["preamble"][0] == "Tabla N°: | 1"
+    assert result["rows"][0] == [
+        "Nacional *",
+        "Nacional",
+        "24.8",
+        "0.9",
+        "23.1",
+        "26.6",
+    ]
+    assert result["rows"][2] == ["", "Bolívar", "14.2", "1.8", "11.1", "18.1"]
+    assert result["dropped_empty_columns"] > 0
+
+
+async def test_skip_rows_zero_keeps_the_first_row(httpx_mock):
+    _serve(httpx_mock, _make_zip({"T1_i1.csv": _TABULADO}))
+
+    result = await read_zip_member(URL, "T1_i1.csv", skip_rows=0)
+
+    assert result["header_row"] == 0
+    assert result["headers"][:2] == ["Tabla N°:", "1"]
+
+
+async def test_a_plain_csv_is_left_alone(httpx_mock):
+    _serve(httpx_mock, _make_zip({"a.csv": b"x,y,z\n1,,3\n"}))
+
+    result = await read_zip_member(URL, "a.csv")
+
+    assert result["header_row"] == 0
+    assert result["headers"] == ["x", "y", "z"]
+    assert result["rows"] == [["1", "", "3"]]
+    assert result["preamble"] == []
+
+
+async def test_a_quoted_title_with_one_comma_is_not_split(httpx_mock):
+    body = b'"Hogares con menores de 5, por area"\nx,y\n1,2\n'
+    _serve(httpx_mock, _make_zip({"a.csv": body}))
+
+    result = await read_zip_member(URL, "a.csv", skip_rows=1)
+
+    assert result["preamble"] == ["Hogares con menores de 5, por area"]
+
+
+# -- ZIP64 ------------------------------------------------------------------
+
+
+async def test_reads_members_with_zip64_extra_fields(httpx_mock, monkeypatch):
+    # A tiny ZIP64_LIMIT makes zipfile write ZIP64 sentinels and extra fields
+    # (and ZIP64 end records) exactly as it does past 4 GB.
+    with monkeypatch.context() as patch:
+        patch.setattr(zipfile, "ZIP64_LIMIT", 8)
+        blob = _make_zip({"a.csv": b"x,y\n1,2\n", "b.csv": b"n\n" + b"7\n" * 20})
+    _serve(httpx_mock, blob)
+
+    listing = await list_zip_contents(URL)
+    result = await read_zip_member(URL, "b.csv")
+
+    sizes = {m["name"]: m["uncompressed_size"] for m in listing["members"]}
+    assert sizes == {"a.csv": 8, "b.csv": 42}
+    assert result["rows"][0] == ["7"]
+
+
+def _zip64_eocd_zip(name: str, data: bytes) -> bytes:
+    """Single stored member whose classic EOCD holds only ZIP64 sentinels."""
+    name_b = name.encode()
+    crc = zlib.crc32(data)
+    local = (
+        struct.pack(
+            "<4sHHHHHIIIHH",
+            b"PK\x03\x04",
+            45,
+            0,
+            0,
+            0,
+            0,
+            crc,
+            len(data),
+            len(data),
+            len(name_b),
+            0,
+        )
+        + name_b
+        + data
+    )
+    cd = (
+        struct.pack(
+            "<4sHHHHHHIIIHHHHHII",
+            b"PK\x01\x02",
+            45,
+            45,
+            0,
+            0,
+            0,
+            0,
+            crc,
+            len(data),
+            len(data),
+            len(name_b),
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+        )
+        + name_b
+    )
+    cd_offset = len(local)
+    record_offset = cd_offset + len(cd)
+    record = struct.pack(
+        "<4sQHHIIQQQQ", b"PK\x06\x06", 44, 45, 45, 0, 0, 1, 1, len(cd), cd_offset
+    )
+    locator = struct.pack("<4sIQI", b"PK\x06\x07", 0, record_offset, 1)
+    eocd = struct.pack(
+        "<4sHHHHIIH", b"PK\x05\x06", 0, 0, 0xFFFF, 0xFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0
+    )
+    return local + cd + record + locator + eocd
+
+
+async def test_reads_the_zip64_end_of_central_directory(httpx_mock):
+    _serve(httpx_mock, _zip64_eocd_zip("datos.csv", b"a,b\n1,2\n"))
+
+    listing = await list_zip_contents(URL)
+    result = await read_zip_member(URL, "datos.csv")
+
+    assert listing["total_entries"] == 1
+    assert result["rows"] == [["1", "2"]]
+
+
+async def test_fetches_a_zip64_record_outside_the_tail(httpx_mock, monkeypatch):
+    # The locator (20 B) and EOCD (22 B) fit the tail; the 56-byte ZIP64
+    # record before them does not, forcing its own Range request.
+    monkeypatch.setattr(csv_reader, "_EOCD_TAIL_BYTES", 42)
+    _serve(httpx_mock, _zip64_eocd_zip("datos.csv", b"a,b\n1,2\n"))
+
+    result = await read_zip_member(URL, "datos.csv")
+
+    assert result["rows"] == [["1", "2"]]

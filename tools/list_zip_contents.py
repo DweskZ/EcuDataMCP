@@ -25,7 +25,7 @@ def register_list_zip_contents_tool(mcp: MCPServer) -> None:
         title="Listar el contenido de un archivo ZIP",
         description=(
             "List a remote ZIP's members (name, size) via HTTP Range requests, "
-            "without downloading it; works for archives far beyond 5 MB. No ZIP64."
+            "without downloading it; works for archives far beyond 5 MB, ZIP64 included."
         ),
         annotations=READ_ONLY,
     )
@@ -44,10 +44,10 @@ def register_list_zip_contents_tool(mcp: MCPServer) -> None:
         directory via HTTP Range requests, so it works for archives far
         larger than the 5 MB preview_resource_data/download_resource cap -- e.g. INEC
         or censo microdata ZIPs of multiple hundred MB. Requires the server
-        to honor Range requests; fails with a clear error otherwise. Does
-        not support ZIP64 archives. This tool only lists metadata; to read one
-        member's rows, pass its name to read_zip_member, which fetches only
-        that member's bytes.
+        to honor Range requests; fails with a clear error otherwise. ZIP64
+        archives (past 4 GB or 65535 entries) are supported. This tool only
+        lists metadata; to read one member's rows, pass its name to
+        read_zip_member, which fetches only that member's bytes.
 
         Args:
             url: Direct URL to a .zip file (from another tool's result, e.g.
