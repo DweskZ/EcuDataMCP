@@ -6688,6 +6688,68 @@ y Ediciones Especiales 1673-1675. El PDF vive en
 Range (el tope de 5 MB se aplica descargando). La búsqueda propia del sitio
 (`?s=`) no se probó.
 
+## Trigésimo octava pasada — fuentes económicas candidatas (2026-11-07)
+
+Revisión en vivo de siete pistas económicas que no figuraban en el ROADMAP,
+desde una conexión residencial en Canadá (sin proxy).
+
+**CFN (Corporación Financiera Nacional): construible.** `cfn.fin.ec/estadisticas/`
+no publica archivos: es un Power BI público ("publish to web",
+`app.powerbi.com/view?r=...`, recurso `bd2e40e9-243f-4d44-94b9-720388d3a408`,
+tenant `17888ad5-...`). La clave no resuelve en los clústeres del SUT ni de
+la Judicatura (401 `UnableToFindKeyInDBorCacheException`); la ruta
+`/public/routing/cluster/{tenant}` en `wabi-south-central-us-api` devuelve
+`FixedClusterUri` = `wabi-south-central-us-redirect`, y
+`modelsAndExploration` responde 200 en `wabi-south-central-us-api`. Doce
+páginas: Inicio, Ubicación, Líneas de crédito, Operaciones y monto por
+provincia, Inclusión, Estados financieros (2), Inversiones, Garantías
+otorgadas y cuatro del Fondo Nacional de Garantías (FNG). Encaja como
+`fuente="cfn"` en `list_catalogo`/`get_sut_indicador_schema`/
+`query_sut_indicador` reutilizando `helpers/sut_powerbi_client.py` con su
+propio clúster. La biblioteca de medios de WordPress solo tiene un PDF suelto
+("FNG ESTADISTICA Marzo 2025").
+
+**FEDEXPOR "Reporte Estadístico Expordata": construible, confirmado de
+nuevo.** `fedexpor.com/inteligencia-comercial/reporte-expordata/` responde
+200 y lista 16 informes mensuales en Google Drive (`drive.google.com/file/d/...`),
+sin login. Es comercio exterior mensual que SENAE no publica abierto.
+Listado de archivos + `read_pdf` sobre el PDF de Drive (habría que pasar el
+enlace de vista a descarga directa, `uc?export=download&id=`).
+
+**AEADE: construible, confirmado de nuevo.** Boletines mensuales de venta de
+vehículos en `aeade.net/boletines-de-prensa-venta-de-vehiculos/`: 73 descargas
+por el plugin Simple Download Monitor (`?sdm_process_download=1&download_id=`).
+Anuarios en PDF directos en `/anuario/` (2020, 2021, 2022, 2024, 2025). El
+"Boletín de facturación del sector automotor" ya no enlaza archivos.
+
+**Enterprise Surveys (Banco Mundial): bajo valor.** La API del Banco Mundial
+la expone como fuente 13 (115 indicadores: soborno, crédito, mujeres en la
+propiedad, exportación...), así que entraría en `get_serie_internacional`
+con el cliente WDI cambiando `source`. Pero la fuente se actualizó por
+última vez el 2022-03-25: para Ecuador solo trae la ronda 2017 y muchos
+indicadores vacíos; la ronda 2024 está en el sitio, no en la API.
+
+**BCE cuentas regionales: ya cubiertas.** `search_bce_paginas(catalogo=
+"cuentas_nacionales", query="provincial")` devuelve "Cuentas Nacionales
+Regionales — serie histórica provincial y cantonal" y los cuadros anuales
+regionales. El listado de directorio `contenido.bce.fin.ec/.../CuentasProvinciales/`
+da 403, pero no hace falta.
+
+**BDE (Banco de Desarrollo del Ecuador): bloqueado.** `bde.fin.ec` responde
+con el desafío de Imperva/Incapsula (`_Incapsula_Resource`) a cualquier
+petición, también a la API de WordPress. Igual que con los captchas, no se
+automatiza.
+
+**PRO ECUADOR: sin datos estructurados.** El sitio tiene estudios de
+inteligencia comercial y fichas, no series; la biblioteca de medios solo
+devuelve imágenes con "estadística" en el nombre (2019). Las estadísticas
+de comercio exterior ya llegan por Comtrade, BCE y, si se construye, FEDEXPOR.
+
+**SCPM (Superintendencia de Control del Poder de Mercado): fuera de línea.**
+`www.scpm.gob.ec` y `scpm.gob.ec` resuelven a `127.0.0.1`/`::1` también en
+8.8.8.8 y 1.1.1.1: el DNS público apunta a localhost, así que no hay sitio
+que leer hasta que lo corrijan.
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un
