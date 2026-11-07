@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.14.0 — 2026-11-07
+
+84 tools in the default profile: `read_zip_member` and `get_cenace_boletin`
+are new, `get_energia_ecuador_snapshot` is removed.
+
 - **New tool `read_zip_member`** (84 tools in the default profile). It reads
   one CSV/TSV/TXT or XLSX/XLS/XLSB/ODS file inside a remote .zip as a table,
   fetching only that member's bytes through HTTP Range requests, so an agent
@@ -27,6 +32,13 @@
 - `get_inec_estadistica_files` and `get_inec_publicacion_archivos` point to
   `list_zip_contents` → `read_zip_member` when a result has ZIP links, and
   the Examples page gains the ENDI case.
+- **Smoke run back to green.** The IESS certificate timing out on GitHub
+  runners is classed as degraded (`iess_certificado_timeout`); the CKAN chain
+  accepts the documented "sin DataStore" answer; the Superbancos check no
+  longer pins a year; the SERCOP chain picks a search hit with a title.
+  `get_contrato_info` reads release packages too and, when the record API
+  returns neither, names the keys it did return. `.mcpbignore` drops
+  `.mypy_cache/`.
 
 - **Every tool now publishes an `outputSchema` and returns a `metadatos`
   block.** Each tool's return is typed with one of six result families
