@@ -23,7 +23,7 @@ def register_get_sut_indicador_schema_tool(mcp: MCPServer) -> None:
     @log_tool
     async def get_sut_indicador_schema(
         indicador: str,
-        fuente: Literal["sut", "judicatura"] = "sut",
+        fuente: Literal["sut", "judicatura", "cfn"] = "sut",
         format: Literal["text", "json"] = "text",
     ) -> Annotated[CallToolResult, ResultadoFicha]:
         """
@@ -50,7 +50,7 @@ def register_get_sut_indicador_schema_tool(mcp: MCPServer) -> None:
 
         Args:
             indicador: A key from list_catalogo(fuente=<fuente>).
-            fuente: sut (default) | judicatura
+            fuente: sut (default) | judicatura | cfn
             format: text | json
         """
         try:

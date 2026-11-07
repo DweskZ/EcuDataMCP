@@ -39,7 +39,7 @@ _PERIOD_RE = re.compile(r"(" + "|".join(_MESES) + r")[\s_-]*(20\d\d)")
 _cache = TtlCache(ttl_seconds=21600.0, max_entries=1, persist="turismo_boletines")
 
 
-def _period(title: str) -> tuple[int | None, int | None]:
+def period_from_title(title: str) -> tuple[int | None, int | None]:
     """(año, mes) of the bulletin, read from its title ("... Octubre 2026")."""
     match = _PERIOD_RE.search(strip_accents(title))
     if not match:
@@ -60,7 +60,7 @@ def parse_media(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if "boletin" not in plain or "turismo" not in plain or not url or url in seen:
             continue
         seen.add(url)
-        anio, mes = _period(title)
+        anio, mes = period_from_title(title)
         boletines.append(
             {
                 "titulo": title,

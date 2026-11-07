@@ -24,7 +24,7 @@ aceptan `format="json"` además de texto.
 | `download_resource` | Baja el archivo crudo de un recurso en base64 (máx. 5 MB), para formatos que no se pueden previsualizar como tabla (.rar, .tar.gz, etc.). |
 | `query_resource_data` | Consulta tabular vía CKAN DataStore (filtros, texto, paginación) sin descargar el archivo. |
 | `detect_series_pattern` | Para datasets con un archivo por período: determina si cada archivo nuevo reemplaza a los anteriores (acumulado) o los complementa (incremental). |
-| `search_archivos` (`fuente="sri_datasets"`) | Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN: catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables. Incluye `fuente="turismo"`: boletines mensuales de cifras de turismo (PDF, noviembre 2025 en adelante). |
+| `search_archivos` (`fuente="sri_datasets"`) | Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN: catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables. Incluye `fuente="turismo"`: boletines mensuales de cifras de turismo (PDF, noviembre 2025 en adelante). `fuente="fedexpor"`: informes mensuales Expordata de comercio exterior (Google Drive, ~30 MB). `fuente="aeade"`: boletines mensuales de ventas de vehículos y anuarios. |
 
 Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca"` o `source="latacunga"` (portales municipales), o `source="iadb"` (data.iadb.org, el portal de datos abiertos del BID — NO exclusivo de Ecuador, un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID).
 
@@ -168,7 +168,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `get_cortes_horarios` | Convierte un PDF o aviso de cortes en filas: fecha, bloques horarios sin luz, ubicación (subestación, provincia/cantón/zona o isla), sectores y, en los avisos de mantenimiento, el motivo. |
 | `get_informe_igepn` | Descarga y extrae el texto de un informe del IG-EPN encontrado vía search_informes_igepn. |
 | `get_sut_indicador_schema` | Lista las columnas/medidas/niveles de fecha consultables de un tablero Power BI del SUT o de la Judicatura (`fuente`), descubiertos desde la definición propia del reporte (la consulta subyacente de cada visual), no por adivinanza. |
-| `query_sut_indicador` | Ejecuta una consulta en vivo contra el modelo de datos subyacente de un tablero Power BI del SUT o de la Judicatura (`fuente`) — cualquier combinación de sus campos, ej. mes y provincia juntos. |
+| `query_sut_indicador` | Ejecuta una consulta en vivo contra el modelo de datos subyacente de un tablero Power BI del SUT o de la Judicatura (`fuente`) — cualquier combinación de sus campos, ej. mes y provincia juntos. `fuente="cfn"`: tablero de estadísticas de la Corporación Financiera Nacional (crédito por provincia, estados financieros mensuales, garantías del FNG). |
 | `search_informes_igepn` | Busca en el archivo de informes PDF del IG-EPN (Instituto Geofísico): boletines sísmicos diarios/semanales/mensuales/especiales, alertas volcánicas "IG Al Instante", informes de campo/anuales, etc. |
 
 ## Utilidades de investigación

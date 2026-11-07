@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- **CFN, FEDEXPOR and AEADE as sources, no new tools.**
+  - `list_catalogo` / `get_sut_indicador_schema` / `query_sut_indicador`
+    gain `fuente="cfn"`: the Corporación Financiera Nacional's public Power
+    BI report (credit lines, disbursements and operations by province,
+    monthly financial statements, investments, Fondo Nacional de Garantías
+    guarantees), 167 fields, on its own cluster. A query whose rows come
+    back without a column descriptor now raises a clear error instead of a
+    `KeyError`.
+  - `search_archivos` gains `fuente="fedexpor"` (the monthly Expordata
+    foreign-trade report, Google Drive links with a direct-download form)
+    and `fuente="aeade"` (73 monthly vehicle-sales bulletins and the sector
+    yearbooks).
+
 - **Three new sources, no new tools.**
   - `search_capas_geo` / `get_capa_geo_datos` gain `fuente="igm"`: the
     Instituto Geográfico Militar's GeoServer, 737 open WFS layers of official

@@ -87,7 +87,12 @@ _MAX_ROW_LIMIT = 20000
 # 401 UnableToFindKeyInDBorCacheException), so each registry entry may carry
 # its own `base`; entries without one use _BASE.
 _JUDICATURA_BASE = "https://wabi-paas-1-scus-api.analysis.windows.net"
-_FUENTES = ("sut", "judicatura")
+# Corporación Financiera Nacional's statistics page (cfn.fin.ec/estadisticas/)
+# embeds one "publish to web" report on yet another cluster: the tenant's
+# routing (/public/routing/cluster/{tenant}) answers wabi-south-central-us
+# (checked 2026-11-07); the other two bases return 401 for its key.
+_CFN_BASE = "https://wabi-south-central-us-api.analysis.windows.net"
+_FUENTES = ("sut", "judicatura", "cfn")
 
 # Power BI AggregateFunction codes seen live on the Judicatura dashboards and
 # worth exposing as fields; other codes (min/max/count) are skipped.
@@ -190,12 +195,27 @@ _JUDICATURA_INDICADORES: list[dict[str, str]] = [
         "resource_key": "6a820389-fb8b-44c1-b93d-d1d29bbe58af",
     },
 ]
+_CFN_INDICADORES: list[dict[str, str]] = [
+    {
+        "indicador": "estadisticas",
+        "nombre": (
+            "CFN — estadísticas institucionales: líneas de crédito, operaciones y monto "
+            "por provincia, inclusión financiera, estados financieros, inversiones y "
+            "garantías del Fondo Nacional de Garantías (FNG)"
+        ),
+        "resource_key": "bd2e40e9-243f-4d44-94b9-720388d3a408",
+    },
+]
 for _entry in _INDICADORES:
     _entry["fuente"] = "sut"
 for _entry in _JUDICATURA_INDICADORES:
     _entry["fuente"] = "judicatura"
     _entry["base"] = _JUDICATURA_BASE
+for _entry in _CFN_INDICADORES:
+    _entry["fuente"] = "cfn"
+    _entry["base"] = _CFN_BASE
 _INDICADORES.extend(_JUDICATURA_INDICADORES)
+_INDICADORES.extend(_CFN_INDICADORES)
 _INDICADORES_BY_KEY = {i["indicador"]: i for i in _INDICADORES if i["fuente"] == "sut"}
 _INDICADORES_BY_FUENTE_KEY = {(i["fuente"], i["indicador"]): i for i in _INDICADORES}
 
@@ -886,6 +906,16 @@ async def query_indicador(
     result = payload["results"][0]["result"]
     if "data" not in result or "dsr" not in result.get("data", {}):
         filas: list[dict[str, Any]] = []
+    elif "descriptor" not in result["data"]:
+        # Seen on the CFN report (2026-11-07): some field combinations (e.g. a
+        # column with a [suma] of a table the visuals never aggregate) come
+        # back with rows but no descriptor to name them. Say so instead of a
+        # KeyError deep in the decoder.
+        raise ValueError(
+            "Power BI no devolvió la descripción de columnas para esa combinación de "
+            "campos. Prueba con campos de la misma tabla o con una [medida] en lugar "
+            "de un [suma] (ver get_sut_indicador_schema)."
+        )
     else:
         filas = _decode_dsr(result["data"])
 

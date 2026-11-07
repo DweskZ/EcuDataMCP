@@ -330,6 +330,20 @@ async def main() -> int:
                 ["poblado"],
             ),
             ("search_archivos", {"fuente": "turismo", "limit": 3}, ["Turismo"]),
+            ("search_archivos", {"fuente": "fedexpor", "limit": 3}, ["Expordata"]),
+            ("search_archivos", {"fuente": "aeade", "query": "ventas", "limit": 3}, ["ventas"]),
+            ("list_catalogo", {"fuente": "cfn"}, ["estadisticas"]),
+            (
+                "query_sut_indicador",
+                {
+                    "fuente": "cfn",
+                    "indicador": "estadisticas",
+                    "campos": ["Garantias FNG.nombre_provincia", "Medidas FNG.Monto Garantizado (USD) [medida]"],
+                    "limite": 5,
+                    "format": "json",
+                },
+                ["nombre_provincia"],
+            ),
             (
                 "get_serie_internacional",
                 {

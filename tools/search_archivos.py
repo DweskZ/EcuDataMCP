@@ -25,6 +25,7 @@ from helpers import (
     bce_remesas_client,
     censo_client,
     cnig_client,
+    gremios_client,
     mef_fiscal_client,
     minedec_client,
     msp_gacetas_client,
@@ -58,6 +59,8 @@ Fuente = Literal[
     "bce_precios_comex",
     "bce_publicaciones",
     "turismo",
+    "fedexpor",
+    "aeade",
 ]
 
 # Clients that paginate themselves; the rest return every match and are
@@ -81,6 +84,8 @@ _UNPAGINATED: dict[str, Callable[..., Awaitable[dict[str, Any]]]] = {
     "bce_precios_comex": bce_precios_comex_client.search_archivos,
     "bce_publicaciones": bce_publicaciones_client.search_publicaciones,
     "turismo": turismo_client.search_boletines,
+    "fedexpor": gremios_client.search_expordata,
+    "aeade": gremios_client.search_aeade,
 }
 
 # Keys the clients use for the same three things, first match wins.
@@ -161,7 +166,7 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
         description=(
             "File links from one institution's catalog, filtered by text: SRI, MEF, "
             "SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and "
-            "BCE (remesas, comex prices, latest publications), Turismo. Links, not contents."
+            "BCE (remesas, comex prices, latest publications), Turismo, FEDEXPOR, AEADE. Links, not contents."
         ),
         annotations=READ_ONLY,
     )
@@ -236,6 +241,12 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
           Producción: arrivals and departures by nationality, holiday
           occupancy, protected-area visits, establishment register. PDF only
           (read_pdf extracts the tables); files carry `anio`, `mes`, `periodo`.
+        - fedexpor: FEDEXPOR's monthly "Reporte Estadístico Expordata" (foreign
+          trade, the detail SENAE does not publish openly), January 2026 on.
+          Hosted on Google Drive, ~30 MB each (over read_pdf's 5 MB cap):
+          `descarga_directa` is the direct-download link.
+        - aeade: AEADE vehicle-sales press bulletins (monthly PDF, `tipo`
+          boletin_ventas) and the sector yearbooks (`tipo` anuario).
 
         Args:
             fuente: Catalog to search; see the list above.
