@@ -48,6 +48,19 @@ def test_classifies_sercop_regional_block_as_degraded():
     assert assessment.source == "sercop_compras_publicas"
 
 
+def test_classifies_iess_certificate_timeout_as_degraded():
+    text = (
+        "Error executing tool get_certificado_cumplimiento_patronal: Error al "
+        "consultar el certificado de cumplimiento patronal del IESS: "
+        "ReadTimeout (la fuente no respondió a tiempo; reintenta en unos minutos)"
+    )
+
+    assessment = assess_response(text, [], is_error=True)
+
+    assert assessment.status == "degraded"
+    assert assessment.source == "iess_certificado_timeout"
+
+
 def test_keeps_unknown_errors_as_failures():
     assessment = assess_response("Error: unexpected source response", [])
 
