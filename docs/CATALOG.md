@@ -3,7 +3,7 @@
 Generado por `scripts/generate_catalog.py` desde `resources/catalog.py` y las
 descripciones de `tools/*.py`; no editar a mano.
 
-53 fuentes, 85 tools públicas.
+55 fuentes, 85 tools públicas.
 
 ## Datos Abiertos CKAN
 
@@ -67,7 +67,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `sri`
 - Base: https://www.sri.gob.ec/datasets
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications). Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications), Turismo. Links, not contents.
 - `get_sri_ruc_info`: Public SRI record for one 13-digit RUC: name, status, type, activity, dates and registered establishments. No tax amounts.
 - `search_sri_ruc`: Find SRI taxpayers by partial razón social or trade name (min 4 characters) when the RUC is unknown. SRI caps results at 100.
 
@@ -124,8 +124,23 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `inamhi`
 - Base: https://geoservicios.inamhi.gob.ec/geoserver
 
-- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals and anomalies, WRF grids, watersheds), mag (agro zoning, land cover, agricultural censuses, rural cadastre), arconel (distributor energy balance and billing 1999-2025, monthly production and fuel by plant 1999-2026, public lighting, plants, grid) or celec (CELEC plants, transmission network).
-- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
+- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals, anomalies, watersheds), mag (agro zoning, land cover, rural cadastre), igm (official base cartography 1:1M/1:50k/1:25k), arconel (energy balance, billing, production by plant 1999-2026, lighting, grid) or celec (plants, transmission).
+- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
+
+## IGM (cartografía oficial: 737 capas WFS a 1:1M, 1:50.000 y 1:25.000)
+
+- Id: `igm`
+- Base: https://www.geoportaligm.gob.ec
+
+- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals, anomalies, watersheds), mag (agro zoning, land cover, rural cadastre), igm (official base cartography 1:1M/1:50k/1:25k), arconel (energy balance, billing, production by plant 1999-2026, lighting, grid) or celec (plants, transmission).
+- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
+
+## Turismo (Boletín de Cifras del Sector Turismo, Ministerio de Producción)
+
+- Id: `turismo`
+- Base: https://www.produccion.gob.ec/boletin-de-cifras-sector-turismo/
+
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications), Turismo. Links, not contents.
 
 ## DGAC / AIS Ecuador (AIP de aeródromos, METAR, NOTAM, SIGMET)
 
@@ -189,7 +204,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `inec-censo`
 - Base: https://www.censoecuador.gob.ec/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications). Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications), Turismo. Links, not contents.
 
 ## Banco Central del Ecuador (BCEData, Información Estadística Mensual, indicadores diarios en línea y remesas de trabajadores)
 
@@ -216,8 +231,8 @@ descripciones de `tools/*.py`; no editar a mano.
 - `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE, ARCONEL). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 - `get_sipa_resumen_indicadores`: Monthly PDF links of SIPA's (MAG) "Resumen de Indicadores" for one year, 2018 onward.
-- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals and anomalies, WRF grids, watersheds), mag (agro zoning, land cover, agricultural censuses, rural cadastre), arconel (distributor energy balance and billing 1999-2025, monthly production and fuel by plant 1999-2026, public lighting, plants, grid) or celec (CELEC plants, transmission network).
-- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
+- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals, anomalies, watersheds), mag (agro zoning, land cover, rural cadastre), igm (official base cartography 1:1M/1:50k/1:25k), arconel (energy balance, billing, production by plant 1999-2026, lighting, grid) or celec (plants, transmission).
+- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
 
 ## EP Petroecuador (Cifras Institucionales)
 
@@ -304,8 +319,8 @@ descripciones de `tools/*.py`; no editar a mano.
 
 - `list_catalogo`: List one source's catalog, the step before its get tool: arconel (get_arconel_reporte), bce_diarios (get_bce_indicador_diario), contraloria (get_contraloria_informe), iess (get_iess_archivos), sut and judicatura (get_sut_indicador_schema, query_sut_indicador with the same fuente).
 - `get_arconel_reporte`: Run one ARCONEL report (e.g. "Balance Energía" for a year) and return its rows. Slow, ~50 rows per page; max_paginas caps work and completo says if everything was read.
-- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals and anomalies, WRF grids, watersheds), mag (agro zoning, land cover, agricultural censuses, rural cadastre), arconel (distributor energy balance and billing 1999-2025, monthly production and fuel by plant 1999-2026, public lighting, plants, grid) or celec (CELEC plants, transmission network).
-- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
+- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals, anomalies, watersheds), mag (agro zoning, land cover, rural cadastre), igm (official base cartography 1:1M/1:50k/1:25k), arconel (energy balance, billing, production by plant 1999-2026, lighting, grid) or celec (plants, transmission).
+- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
 - `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE, ARCONEL). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 
@@ -314,8 +329,8 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `celec`
 - Base: https://portalarcgis.celec.gob.ec/server/rest/services/Hosted
 
-- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals and anomalies, WRF grids, watersheds), mag (agro zoning, land cover, agricultural censuses, rural cadastre), arconel (distributor energy balance and billing 1999-2025, monthly production and fuel by plant 1999-2026, public lighting, plants, grid) or celec (CELEC plants, transmission network).
-- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
+- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals, anomalies, watersheds), mag (agro zoning, land cover, rural cadastre), igm (official base cartography 1:1M/1:50k/1:25k), arconel (energy balance, billing, production by plant 1999-2026, lighting, grid) or celec (plants, transmission).
+- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm): a sample of up to 20 features. ArcGIS (arconel, celec): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
 
 ## Empresa Eléctrica Quito (cronogramas de cortes de luz en PDF)
 
@@ -380,14 +395,14 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `arcotel`
 - Base: https://www.arcotel.gob.ec/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications). Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications), Turismo. Links, not contents.
 
 ## Ministerio del Trabajo (salarios sectoriales y boletín estadístico anual)
 
 - Id: `trabajo`
 - Base: https://www.trabajo.gob.ec/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications). Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications), Turismo. Links, not contents.
 
 ## IESS (boletines y documentos estadísticos, certificado de cumplimiento patronal)
 
@@ -411,14 +426,14 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `mef`
 - Base: https://www.economicoproductivo.gob.ec/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications). Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications), Turismo. Links, not contents.
 
 ## SENESCYT / Educación Superior (estadísticas SIAU y Biblioteca)
 
 - Id: `senescyt`
 - Base: https://siau.senescyt.gob.ec/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications). Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications), Turismo. Links, not contents.
 - `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE, ARCONEL). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 
@@ -427,7 +442,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `minedec`
 - Base: https://educacion.gob.ec/datos-abiertos-minedec/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications). Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications), Turismo. Links, not contents.
 
 ## INEVAL (resultados de evaluaciones educativas)
 
@@ -458,14 +473,14 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `msp`
 - Base: https://www.salud.gob.ec/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications). Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications), Turismo. Links, not contents.
 
 ## CNIG (estadísticas de violencia de género y femicidios)
 
 - Id: `cnig`
 - Base: https://www.igualdadgenero.gob.ec/violencia/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications). Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE (remesas, comex prices, latest publications), Turismo. Links, not contents.
 
 ## CEPALSTAT (indicadores de CEPAL filtrados a Ecuador)
 
@@ -475,12 +490,12 @@ descripciones de `tools/*.py`; no editar a mano.
 - `search_cepalstat_indicadores`: Search CEPALSTAT's 2,059 regional indicators (demographic, economic, environmental, SDG). Next: get_cepalstat_indicador for Ecuador's values.
 - `get_cepalstat_indicador`: Observations of one CEPALSTAT indicator for one country (Ecuador by default), with dimension ids decoded to labels. Take indicator_id from search_cepalstat_indicadores.
 
-## Series internacionales con Ecuador: Banco Mundial WDI, IRENA, XM Colombia, UN Comtrade, FMI, OMS, OIT, ACNUR
+## Series internacionales con Ecuador: Banco Mundial WDI, IRENA, Ember, XM Colombia, UN Comtrade, FMI, OMS, OIT, ACNUR
 
 - Id: `series_internacionales`
 - Base: https://api.worldbank.org/v2
 
-- `get_serie_internacional`: International series for Ecuador via `fuente`: wdi (World Bank), irena (electricity), xm (Colombia-Ecuador power flows), comtrade (UN bilateral trade), imf (IMF SDMX), who (health), ilo (ILOSTAT labour), unhcr (refugees/asylum). Without indicador/flow, wdi/who/imf/ilo list their catalog (set query).
+- `get_serie_internacional`: International series for Ecuador via `fuente`: wdi (World Bank), irena (electricity), ember (monthly power mix), xm (Colombia-Ecuador flows), comtrade (UN bilateral trade), imf (IMF SDMX), who (health), ilo (ILOSTAT labour), unhcr (refugees/asylum). Without indicador/flow, wdi/who/imf/ilo list their catalog (set query).
 
 ## Utilidades transversales (búsqueda global, archivos, orientación)
 

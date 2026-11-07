@@ -360,6 +360,20 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Ministry of Production (Tourism)",
+        "sources": [
+          {
+            "id": "turismo-boletin",
+            "name": "Tourism figures bulletin",
+            "tag": "Tourism",
+            "description": "Monthly PDF bulletins: arrivals by nationality, occupancy, protected areas, establishment register (Nov 2025+)",
+            "coverage": "produccion.gob.ec",
+            "url": "https://www.produccion.gob.ec/boletin-de-cifras-sector-turismo/",
+            "status": "live"
+          }
+        ]
       }
     ]
   },
@@ -502,6 +516,20 @@
             "description": "~1,259 documents (PAC, LOES/SNNA regulations, agreements, ACTI indicators) across 17 categories",
             "coverage": "educacion.gob.ec/edusuperior",
             "url": "https://educacion.gob.ec/edusuperior/biblioteca/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Military Geographic Institute (IGM)",
+        "sources": [
+          {
+            "id": "igm-geoportal",
+            "name": "IGM geoportal",
+            "tag": "IGM",
+            "description": "737 WFS layers of official cartography: boundaries, settlements, roads, rivers (1:1M, 1:50k, 1:25k)",
+            "coverage": "www.geoportaligm.gob.ec",
+            "url": "https://www.geoportaligm.gob.ec",
             "status": "live"
           }
         ]
@@ -920,9 +948,9 @@
           },
           {
             "id": "series-internacionales",
-            "name": "International series (WDI, IRENA, XM, Comtrade, IMF, WHO, ILO, UNHCR)",
+            "name": "International series (WDI, IRENA, Ember, XM, Comtrade, IMF, WHO, ILO, UNHCR)",
             "tag": "International",
-            "description": "World Bank WDI, IRENA, XM Colombia-Ecuador flows, UN Comtrade bilateral trade, IMF series, WHO health, ILO labour and UNHCR displacement; Ecuador by default",
+            "description": "World Bank WDI, IRENA, Ember's monthly power mix, XM Colombia-Ecuador flows, UN Comtrade bilateral trade, IMF series, WHO health, ILO labour and UNHCR displacement; Ecuador by default",
             "coverage": "api.worldbank.org, pxweb.irena.org, servapibi.xm.com.co, comtradeapi.un.org, api.imf.org, ghoapi.azureedge.net, sdmx.ilo.org, api.unhcr.org",
             "url": "https://databank.worldbank.org/source/world-development-indicators",
             "status": "live"

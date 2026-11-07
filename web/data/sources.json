@@ -360,6 +360,20 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Ministerio de Producción (Turismo)",
+        "sources": [
+          {
+            "id": "turismo-boletin",
+            "name": "Boletín de Cifras del Sector Turismo",
+            "tag": "Turismo",
+            "description": "Boletines mensuales en PDF: llegadas por nacionalidad, ocupación, áreas protegidas, catastro (nov 2025+)",
+            "coverage": "produccion.gob.ec",
+            "url": "https://www.produccion.gob.ec/boletin-de-cifras-sector-turismo/",
+            "status": "live"
+          }
+        ]
       }
     ]
   },
@@ -502,6 +516,20 @@
             "description": "~1.259 documentos (PAC, normativa LOES/SNNA, acuerdos, indicadores ACTI) en 17 categorías",
             "coverage": "educacion.gob.ec/edusuperior",
             "url": "https://educacion.gob.ec/edusuperior/biblioteca/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Instituto Geográfico Militar (IGM)",
+        "sources": [
+          {
+            "id": "igm-geoportal",
+            "name": "Geoportal IGM",
+            "tag": "IGM",
+            "description": "737 capas WFS de cartografía oficial: límites, poblados, vías, ríos (1:1M, 1:50.000, 1:25.000)",
+            "coverage": "www.geoportaligm.gob.ec",
+            "url": "https://www.geoportaligm.gob.ec",
             "status": "live"
           }
         ]
@@ -920,9 +948,9 @@
           },
           {
             "id": "series-internacionales",
-            "name": "Series internacionales (WDI, IRENA, XM, Comtrade, FMI, OMS, OIT, ACNUR)",
+            "name": "Series internacionales (WDI, IRENA, Ember, XM, Comtrade, FMI, OMS, OIT, ACNUR)",
             "tag": "Internacional",
-            "description": "Banco Mundial WDI, IRENA, flujos Colombia-Ecuador de XM, comercio bilateral de UN Comtrade, series del FMI, salud de la OMS, empleo de la OIT y refugio del ACNUR; Ecuador por defecto",
+            "description": "Banco Mundial WDI, IRENA, el mix eléctrico mensual de Ember, flujos Colombia-Ecuador de XM, comercio bilateral de UN Comtrade, series del FMI, salud de la OMS, empleo de la OIT y refugio del ACNUR; Ecuador por defecto",
             "coverage": "api.worldbank.org, pxweb.irena.org, servapibi.xm.com.co, comtradeapi.un.org, api.imf.org, ghoapi.azureedge.net, sdmx.ilo.org, api.unhcr.org",
             "url": "https://databank.worldbank.org/source/world-development-indicators",
             "status": "live"

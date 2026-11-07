@@ -24,7 +24,7 @@ aceptan `format="json"` además de texto.
 | `download_resource` | Baja el archivo crudo de un recurso en base64 (máx. 5 MB), para formatos que no se pueden previsualizar como tabla (.rar, .tar.gz, etc.). |
 | `query_resource_data` | Consulta tabular vía CKAN DataStore (filtros, texto, paginación) sin descargar el archivo. |
 | `detect_series_pattern` | Para datasets con un archivo por período: determina si cada archivo nuevo reemplaza a los anteriores (acumulado) o los complementa (incremental). |
-| `search_archivos` (`fuente="sri_datasets"`) | Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN: catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables. |
+| `search_archivos` (`fuente="sri_datasets"`) | Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN: catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables. Incluye `fuente="turismo"`: boletines mensuales de cifras de turismo (PDF, noviembre 2025 en adelante). |
 
 Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca"` o `source="latacunga"` (portales municipales), o `source="iadb"` (data.iadb.org, el portal de datos abiertos del BID — NO exclusivo de Ecuador, un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID).
 
@@ -85,7 +85,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `get_sgr_sitrep_archivos` | Reportes SITREP en PDF de un evento adverso de la SGR. |
 | `list_archivo_secciones` (`fuente="sgr"`) | Categorías de la biblioteca documental de la SGR (~1660 documentos). |
 | `get_archivo_seccion` (`fuente="sgr"`) | Documentos de una categoría de la biblioteca de la SGR. |
-| `search_capas_geo` (`fuente="inamhi"`) | Catálogo de capas del geoportal de INAMHI (meteorología e hidrología). |
+| `search_capas_geo` (`fuente="inamhi"`) | Catálogo de capas del geoportal de INAMHI (meteorología e hidrología). Incluye `fuente="igm"`: 737 capas WFS de cartografía oficial del IGM (1:1M, 1:50.000, 1:25.000; `categoria` elige la escala). |
 | `get_capa_geo_datos` (`fuente="inamhi"`) | Muestra de atributos reales de una capa del geoportal de INAMHI. |
 
 ## Exploración
@@ -108,7 +108,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `list_catalogo` (`fuente="bce_diarios"|"arconel"|"contraloria"|"iess"|"sut"|"judicatura"`) | Catálogo previo al `get_*` de cada fuente: widgets diarios/mensuales del BCE (Riesgo País desde 2004), reportes de ARCONEL, informes de Contraloría, colecciones del IESS, tableros del SUT y tableros del Consejo de la Judicatura. |
 | `search_archivos` (`fuente="bce_remesas"|"bce_precios_comex"|"bce_publicaciones"`) | Enlaces a archivos de remesas, índices de precios de comercio exterior y las publicaciones recientes del BCE. |
 | `get_aviso_aeronautico` (`tipo="metar"|"notam"|"sigmet"`) | METAR/SPECI y NOTAM de un aeródromo (código ICAO) y SIGMET activos del FIR ecuatoriano, desde DGAC/AIS. |
-| `get_serie_internacional` (`fuente="wdi"|"irena"|"xm"`) | Series con Ecuador del Banco Mundial (WDI), IRENA (capacidad y generación) y XM Colombia (flujos horarios Colombia-Ecuador desde 2003). |
+| `get_serie_internacional` (`fuente="wdi"|"irena"|"xm"`) | Series con Ecuador del Banco Mundial (WDI), IRENA (capacidad y generación) y XM Colombia (flujos horarios Colombia-Ecuador desde 2003). Incluye `fuente="ember"`: mix eléctrico de Ember vía Our World in Data, anual o mensual (2019+), por fuente, demanda, importaciones netas e intensidad de carbono. |
 | `search_bce_iem` | Busca tablas individuales de Excel en el último boletín IEM del BCE. |
 | `search_bce_paginas` (`catalogo="indices"`) | Catálogo de páginas "índice" del BCE con archivo histórico por serie. |
 | `get_bce_pagina_archivos` (`catalogo="indices"`) | Archivo de archivos de una página "índice" del BCE. |

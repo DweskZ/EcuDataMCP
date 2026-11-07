@@ -139,6 +139,18 @@ def _all_fuentes() -> dict:
                 "tools": ["search_capas_geo", "get_capa_geo_datos"],
             },
             {
+                "id": "igm",
+                "nombre": "IGM (cartografía oficial: 737 capas WFS a 1:1M, 1:50.000 y 1:25.000)",
+                "base": "https://www.geoportaligm.gob.ec",
+                "tools": ["search_capas_geo", "get_capa_geo_datos"],
+            },
+            {
+                "id": "turismo",
+                "nombre": "Turismo (Boletín de Cifras del Sector Turismo, Ministerio de Producción)",
+                "base": "https://www.produccion.gob.ec/boletin-de-cifras-sector-turismo/",
+                "tools": ["search_archivos"],
+            },
+            {
                 "id": "aviacion",
                 "nombre": "DGAC / AIS Ecuador (AIP de aeródromos, METAR, NOTAM, SIGMET)",
                 "base": "https://www.ais.aviacioncivil.gob.ec/",
@@ -514,7 +526,7 @@ def _all_fuentes() -> dict:
             },
             {
                 "id": "series_internacionales",
-                "nombre": "Series internacionales con Ecuador: Banco Mundial WDI, IRENA, XM Colombia, UN Comtrade, FMI, OMS, OIT, ACNUR",
+                "nombre": "Series internacionales con Ecuador: Banco Mundial WDI, IRENA, Ember, XM Colombia, UN Comtrade, FMI, OMS, OIT, ACNUR",
                 "base": "https://api.worldbank.org/v2",
                 "tools": ["get_serie_internacional"],
             },

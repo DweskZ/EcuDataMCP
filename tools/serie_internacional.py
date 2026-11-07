@@ -1,6 +1,6 @@
 """International sources with Ecuador data behind one tool.
 
-World Bank WDI, IRENA's electricity statistics, XM Colombia's hourly
+World Bank WDI, IRENA's electricity statistics, Ember's electricity data, XM Colombia's hourly
 interconnection flows, UN Comtrade, the IMF, WHO, ILOSTAT and UNHCR each
 answer "give me a series for Ecuador" but take different filters. One tool
 with a `fuente` selector keeps tools/list small (the same pattern as
@@ -15,6 +15,7 @@ from mcp.types import CallToolResult
 
 from helpers import (
     comtrade_client,
+    ember_client,
     ilo_client,
     imf_client,
     irena_client,
@@ -28,7 +29,7 @@ from helpers.logging import log_tool
 from helpers.result_types import ResultadoSerie
 from helpers.tool_meta import READ_ONLY
 
-Fuente = Literal["wdi", "irena", "xm", "comtrade", "imf", "who", "ilo", "unhcr"]
+Fuente = Literal["wdi", "irena", "ember", "xm", "comtrade", "imf", "who", "ilo", "unhcr"]
 
 
 def _year(value: str, name: str) -> int | None:
@@ -79,6 +80,19 @@ async def _run(fuente: str, p: dict[str, Any]) -> dict[str, Any]:
                 conexion=p["conexion"],
                 desde=_year(p["desde"], "desde"),
                 hasta=_year(p["hasta"], "hasta"),
+            ),
+        }
+    if fuente == "ember":
+        if not p["indicador"]:
+            return {"fuente": "ember", **await ember_client.search_indicadores(p["query"], p["limit"])}
+        return {
+            "fuente": "ember",
+            **await ember_client.get_serie(
+                p["indicador"],
+                pais=p["pais"],
+                frecuencia=p["frecuencia"],
+                desde=p["desde"],
+                hasta=p["hasta"],
             ),
         }
     if fuente == "comtrade":
@@ -161,6 +175,26 @@ def _to_text(data: dict) -> str:
         ]
         if data["total_registros"] > 300:
             parts.append(f"... y {data['total_registros'] - 300} más (usa format=json)")
+    elif src == "ember" and "indicadores" in data:
+        parts = [
+            f"Ember — {data['total']} indicador(es) de {data['total_catalogo']} (indicador = métrica/fuente)",
+            "",
+        ]
+        parts += [f"- {i['indicador']}: {i['nombre']} ({i['unidad']})" for i in data["indicadores"]]
+    elif src == "ember":
+        parts = [
+            (
+                f"Ember — {data['nombre']} ({data['indicador']}), {data['pais']}, "
+                f"{data['frecuencia']}, en {data['unidad']}: {data['total_registros']} periodo(s)"
+            ),
+            "",
+        ]
+        for r in data["registros"][-120:]:
+            vals = ", ".join(f"{k}: {v}" for k, v in r["valores"].items() if v is not None)
+            parts.append(f"- {r['periodo']}: {vals}")
+        if data["total_registros"] > 120:
+            parts.append(f"(últimos 120 de {data['total_registros']}; acota con desde/hasta o usa format=json)")
+        parts.append("Licencia: CC BY 4.0 (Ember, vía Our World in Data)")
     elif src == "comtrade":
         parts = [
             f"UN Comtrade — reportero {data['reportero']}, {data['total_registros']} registro(s)",
@@ -250,10 +284,10 @@ def _to_text(data: dict) -> str:
 
 def register_serie_internacional_tools(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Series internacionales con datos de Ecuador (WDI, IRENA, XM, Comtrade, FMI, OMS, OIT, ACNUR)",
+        title="Series internacionales con datos de Ecuador (WDI, IRENA, Ember, XM, Comtrade, FMI, OMS, OIT, ACNUR)",
         description=(
             "International series for Ecuador via `fuente`: wdi (World Bank), irena "
-            "(electricity), xm (Colombia-Ecuador power flows), comtrade (UN bilateral "
+            "(electricity), ember (monthly power mix), xm (Colombia-Ecuador flows), comtrade (UN bilateral "
             "trade), imf (IMF SDMX), who (health), ilo (ILOSTAT labour), unhcr "
             "(refugees/asylum). Without indicador/flow, wdi/who/imf/ilo list their "
             "catalog (set query)."
@@ -293,6 +327,13 @@ def register_serie_internacional_tools(mcp: MCPServer) -> None:
           catalog. Years without a value are dropped and counted.
         - irena: IRENASTAT electricity installed capacity (MW) and
           generation (GWh) by technology, 2000 to latest, on/off-grid.
+        - ember: Ember's electricity data via Our World in Data (CC BY 4.0),
+          yearly (`frecuencia` A, generation back to 1965) or monthly (M,
+          2019 on): generation and share by source, per capita, demand, net
+          imports, carbon intensity. `indicador` = metric/source, e.g.
+          generation/hydro, share_of_generation/renewables,
+          by_source/total (one column per source), carbon_intensity,
+          net_imports. Empty indicador + `query` lists the 56 views.
         - xm: XM Colombia hourly energy on the Colombia-Ecuador
           interconnection, summed to days or months. Requires desde/hasta.
           Blank hours (no flow) count as zero. Shows the Oct-2024 suspension.
@@ -318,15 +359,16 @@ def register_serie_internacional_tools(mcp: MCPServer) -> None:
           empty = totals.
 
         Args:
-            fuente: wdi, irena, xm, comtrade, imf, who, ilo or unhcr.
+            fuente: wdi, irena, ember, xm, comtrade, imf, who, ilo or unhcr.
             indicador: wdi/who: indicator code. imf/ilo: dataflow id.
+                ember: metric/source (generation/hydro, by_source/total...).
                 Empty with `query` searches (wdi/who) or lists flows (imf/ilo).
-            query: wdi/who/imf/ilo: catalog search text, used when
+            query: wdi/who/imf/ilo/ember: catalog search text, used when
                 indicador is empty.
             pais: wdi/irena/who/imf/ilo/unhcr: ISO3 code (irena also accepts
                 the English name). comtrade: ISO3 or numeric M49 reporter.
                 Ignored by xm. Default ECU.
-            desde: Start: a year (AAAA) for wdi/irena/who/unhcr, a date
+            desde: Start: a year (AAAA) for wdi/irena/who/unhcr (ember: AAAA or AAAA-MM), a date
                 (AAAA-MM-DD) for xm, a period (AAAA, AAAA-MM) for imf/ilo.
             hasta: End, same format as desde. xm allows at most 366 days.
             tecnologia: irena only: technology label substring (solar, hydro,
@@ -343,7 +385,7 @@ def register_serie_internacional_tools(mcp: MCPServer) -> None:
                 NLD, ITA...) or M49 number; empty = 0 (World). unhcr: origin.
             cmd: comtrade only: TOTAL or an HS code of 2, 4 or 6 digits.
             flujo: comtrade only: X (exports), M (imports) or ambos.
-            frecuencia: comtrade only: A (annual) or M (monthly).
+            frecuencia: comtrade and ember: A (annual) or M (monthly).
             clave: imf/ilo only: SDMX key, dot-separated (ECU.CPI._T.IX.M).
                 Empty = pais.
             ultimos: imf/ilo only: last N observations per series. Default
