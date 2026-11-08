@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.15.0 — 2026-11-07
+
+85 tools in the default profile (`get_resumen_compras` is new) and eleven
+new sources behind existing selectors; every structured response now has a
+size ceiling, a common pagination block and file links, and cached catalogs
+answer with their last good copy when the source is down.
+
 - **Ministry sources, no new tools.**
   - `search_capas_geo` / `get_capa_geo_datos` gain `fuente="msp"`: nine
     curated layers of the Ministry of Public Health's ArcGIS Online org
