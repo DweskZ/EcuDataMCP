@@ -99,6 +99,13 @@ _DEGRADED_SOURCES = (
         "no se pudo conectar",
     ),
     (
+        # Seen 2026-11-07 on the runner and from Canada: educacion.gob.ec
+        # never completes the TCP handshake from outside Ecuador.
+        "minedec_geoblock",
+        "educacion.gob.ec",
+        "no se pudo conectar",
+    ),
+    (
         # Confirmed live 2026-09-18: search_anda 503'd on one run, then
         # 403'd on the next from a different network -- the same
         # GitHub-Actions-runner geo/bot block already seen on INEC's other
@@ -160,6 +167,7 @@ GEOBLOCKED_SOURCES = frozenset(
         "gobec_geoblock",
         "supercias_geoblock",
         "infomies_geoblock",
+        "minedec_geoblock",
     }
 )
 

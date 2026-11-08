@@ -24,7 +24,7 @@ aceptan `format="json"` además de texto.
 | `download_resource` | Baja el archivo crudo de un recurso en base64 (máx. 5 MB), para formatos que no se pueden previsualizar como tabla (.rar, .tar.gz, etc.). |
 | `query_resource_data` | Consulta tabular vía CKAN DataStore (filtros, texto, paginación) sin descargar el archivo. |
 | `detect_series_pattern` | Para datasets con un archivo por período: determina si cada archivo nuevo reemplaza a los anteriores (acumulado) o los complementa (incremental). |
-| `search_archivos` (`fuente="sri_datasets"`) | Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN: catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables. Incluye `fuente="turismo"`: boletines mensuales de cifras de turismo (PDF, noviembre 2025 en adelante). `fuente="fedexpor"`: informes mensuales Expordata de comercio exterior (Google Drive, ~30 MB). `fuente="aeade"`: boletines mensuales de ventas de vehículos y anuarios. |
+| `search_archivos` (`fuente="sri_datasets"`) | Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN: catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables. Incluye `fuente="turismo"`: boletines mensuales de cifras de turismo (PDF, noviembre 2025 en adelante). `fuente="fedexpor"`: informes mensuales Expordata de comercio exterior (Google Drive, ~30 MB). `fuente="aeade"`: boletines mensuales de ventas de vehículos y anuarios. Más: `arcotel_series` (25 series XLSX de ARCOTEL, la más reciente por código, con historia completa), `msp_precios` (precios techo de medicamentos 2016+), `mit_vias` (informe diario de la Red Vial Estatal) y `minedec_bases` (registros AMIE por año lectivo 2009-2025 en XLSX/CSV y archivos temáticos). |
 
 Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca"` o `source="latacunga"` (portales municipales), o `source="iadb"` (data.iadb.org, el portal de datos abiertos del BID — NO exclusivo de Ecuador, un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID).
 
@@ -85,7 +85,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `get_sgr_sitrep_archivos` | Reportes SITREP en PDF de un evento adverso de la SGR. |
 | `list_archivo_secciones` (`fuente="sgr"`) | Categorías de la biblioteca documental de la SGR (~1660 documentos). |
 | `get_archivo_seccion` (`fuente="sgr"`) | Documentos de una categoría de la biblioteca de la SGR. |
-| `search_capas_geo` (`fuente="inamhi"`) | Catálogo de capas del geoportal de INAMHI (meteorología e hidrología). Incluye `fuente="igm"`: 737 capas WFS de cartografía oficial del IGM (1:1M, 1:50.000, 1:25.000; `categoria` elige la escala). |
+| `search_capas_geo` (`fuente="inamhi"`) | Catálogo de capas del geoportal de INAMHI (meteorología e hidrología). Incluye `fuente="igm"`: 737 capas WFS de cartografía oficial del IGM (1:1M, 1:50.000, 1:25.000; `categoria` elige la escala). `fuente="msp"`: 9 capas ArcGIS del MSP (establecimientos de la red pública, indicadores de salud sexual y reproductiva por cantón, atenciones y egresos por establecimiento). |
 | `get_capa_geo_datos` (`fuente="inamhi"`) | Muestra de atributos reales de una capa del geoportal de INAMHI. |
 
 ## Exploración

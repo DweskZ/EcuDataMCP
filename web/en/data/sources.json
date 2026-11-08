@@ -489,6 +489,15 @@
             "coverage": "educacion.gob.ec",
             "url": "https://educacion.gob.ec/datos-abiertos-minedec/",
             "status": "live"
+          },
+          {
+            "id": "minedec-bases",
+            "name": "AMIE registers by school year",
+            "tag": "CSV/XLSX",
+            "description": "2009-2010 to 2024-2025, start and end cuts, with dictionaries; thematic files",
+            "coverage": "educacion.gob.ec",
+            "url": "https://educacion.gob.ec/base-de-datos/",
+            "status": "live"
           }
         ]
       },
@@ -907,6 +916,20 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Ministry of Infrastructure and Technology (MIT)",
+        "sources": [
+          {
+            "id": "mit-red-vial",
+            "name": "State road network status",
+            "tag": "PDF",
+            "description": "Daily report: closed and restricted roads by province",
+            "coverage": "mit.gob.ec",
+            "url": "https://www.mit.gob.ec/",
+            "status": "live"
+          }
+        ]
       }
     ]
   },
@@ -940,6 +963,24 @@
             "coverage": "salud.gob.ec",
             "url": "https://www.salud.gob.ec/gacetas-epidemiologicas/",
             "status": "live"
+          },
+          {
+            "id": "msp-precios",
+            "name": "Medicine ceiling prices",
+            "tag": "XLSX",
+            "description": "Every revision of the price-setting council since 2016",
+            "coverage": "salud.gob.ec",
+            "url": "https://www.salud.gob.ec/consejo-nacional-de-fijacion-y-revision-de-precios-de-medicamentos/",
+            "status": "live"
+          },
+          {
+            "id": "msp-arcgis",
+            "name": "MSP ArcGIS layers",
+            "tag": "ArcGIS",
+            "description": "Public-network health facilities, sexual and reproductive health indicators by canton, visits and discharges",
+            "coverage": "services7.arcgis.com",
+            "url": "https://www.salud.gob.ec/",
+            "status": "live"
           }
         ]
       }
@@ -960,6 +1001,15 @@
             "description": "Monthly statistical reports (2017-2026) and annual/topical bulletins (2015-2024)",
             "coverage": "arcotel.gob.ec",
             "url": "https://www.arcotel.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "arcotel-series",
+            "name": "XLSX statistical series",
+            "tag": "XLSX",
+            "description": "25 indicators (active lines, base stations, internet, pay TV, concessions, complaints) with full history",
+            "coverage": "arcotel.gob.ec",
+            "url": "https://www.arcotel.gob.ec/estadisticas-de-telecomunicaciones2/",
             "status": "live"
           }
         ]

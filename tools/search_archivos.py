@@ -28,7 +28,9 @@ from helpers import (
     gremios_client,
     mef_fiscal_client,
     minedec_client,
+    mit_client,
     msp_gacetas_client,
+    msp_precios_client,
     salarios_sectoriales_client,
     senescyt_client,
     sri_client,
@@ -61,6 +63,10 @@ Fuente = Literal[
     "turismo",
     "fedexpor",
     "aeade",
+    "arcotel_series",
+    "msp_precios",
+    "mit_vias",
+    "minedec_bases",
 ]
 
 # Clients that paginate themselves; the rest return every match and are
@@ -86,6 +92,10 @@ _UNPAGINATED: dict[str, Callable[..., Awaitable[dict[str, Any]]]] = {
     "turismo": turismo_client.search_boletines,
     "fedexpor": gremios_client.search_expordata,
     "aeade": gremios_client.search_aeade,
+    "arcotel_series": arcotel_client.search_series_estadisticas,
+    "msp_precios": msp_precios_client.search_precios,
+    "mit_vias": mit_client.search_estado_vias,
+    "minedec_bases": minedec_client.search_bases,
 }
 
 # Keys the clients use for the same three things, first match wins.
@@ -166,7 +176,7 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
         description=(
             "File links from one institution's catalog, filtered by text: SRI, MEF, "
             "SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and "
-            "BCE (remesas, comex prices, latest publications), Turismo, FEDEXPOR, AEADE. Links, not contents."
+            "BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status. Links, not contents."
         ),
         annotations=READ_ONLY,
     )
@@ -247,6 +257,21 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
           `descarga_directa` is the direct-download link.
         - aeade: AEADE vehicle-sales press bulletins (monthly PDF, `tipo`
           boletin_ventas) and the sector yearbooks (`tipo` anuario).
+        - arcotel_series: ARCOTEL's statistical XLSX series, the newest file
+          per indicator code (1.1.1 active lines, 1.2 base stations, 1.3.1
+          portability, 3.1.1 internet accounts, 4.1.1 pay TV, 8.1.x radio/TV
+          concessions, 14.1 complaints...): each file holds the full
+          history (lines from 2008, internet from 2010). Open with
+          preview_resource_data.
+        - msp_precios: MSP medicine ceiling prices (Consejo Nacional de
+          Fijación de Precios), every revision 2016 on (`tipo`
+          precios_techo or segmentos_mercado, `fecha_corte`); the first is
+          the one in force.
+        - mit_vias: today's MIT state-road status report (closed and
+          restricted roads by province, PDF; earlier days are removed).
+        - minedec_bases: MINEDEC per-school-year registers 2009-2010 to
+          2024-2025 (Inicio/Fin, XLSX and CSV twins, dictionaries,
+          metadata), thematic files and the 1993-2007 statistics.
 
         Args:
             fuente: Catalog to search; see the list above.

@@ -23,7 +23,7 @@ from helpers.logging import log_tool
 from helpers.result_types import ResultadoBusqueda, ResultadoTabla
 from helpers.tool_meta import READ_ONLY
 
-Fuente = Literal["inamhi", "mag", "igm", "arconel", "celec"]
+Fuente = Literal["inamhi", "mag", "igm", "arconel", "celec", "msp"]
 
 _NOMBRES = {
     "inamhi": "Geoportal INAMHI",
@@ -31,8 +31,9 @@ _NOMBRES = {
     "igm": "Geoportal IGM (cartografía oficial)",
     "arconel": "ARCONEL (ArcGIS, SISDAT)",
     "celec": "CELEC EP (ArcGIS)",
+    "msp": "Ministerio de Salud Pública (ArcGIS)",
 }
-_ARCGIS = ("arconel", "celec")
+_ARCGIS = ("arconel", "celec", "msp")
 
 
 async def _search(fuente: str, query: str, solo_wfs: bool, categoria: str) -> dict[str, Any]:
@@ -70,7 +71,7 @@ async def _sample(
         return {**result, "fuente": fuente}
     if filtro or offset or agrupar or sumar:
         raise ValueError(
-            "filtro, offset, agrupar y sumar solo aplican a las fuentes arconel y celec."
+            "filtro, offset, agrupar y sumar solo aplican a las fuentes arconel, celec y msp."
         )
     client = {"inamhi": inamhi_client, "igm": igm_client}.get(fuente, sipa_geoportal_client)
     result = await client.get_layer_features(capa, count=count)
@@ -79,13 +80,13 @@ async def _sample(
 
 def register_geoportal_tools(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Buscar capas de un geoportal (INAMHI, MAG, IGM, ARCONEL o CELEC)",
+        title="Buscar capas de un geoportal (INAMHI, MAG, IGM, ARCONEL, CELEC o MSP)",
         description=(
             "Search layers of a geoportal: inamhi (rainfall normals, anomalies, "
             "watersheds), mag (agro zoning, land cover, rural cadastre), igm "
             "(official base cartography 1:1M/1:50k/1:25k), arconel (energy balance, "
             "billing, production by plant 1999-2026, lighting, grid) or celec "
-            "(plants, transmission)."
+            "(plants, transmission) or msp (health facilities, indicators)."
         ),
         annotations=READ_ONLY,
     )
@@ -128,6 +129,13 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
           centrales_sisdat (730-plant register), lineas_transmision,
           subestaciones, subestaciones_distribucion, lineas_subtransmision,
           areas_servicio.
+        - msp: Ministerio de Salud Pública's ArcGIS Online layers (9 curated):
+          establecimientos_rpis (6,411 public-network facilities, 71 fields),
+          establecimientos_msp, indicadores_ssr (18 sexual and reproductive
+          health indicators by canton, year and age band, 2018-2026),
+          atenciones and egresos_hospitalarios by facility and year (2019
+          on), fecundidad, vacunacion_covid_cantonal (Dec 2022), areas_eais,
+          categorizacion_distritos. Same filtro/sumar/agrupar as arconel.
         - celec: CELEC EP's ArcGIS portal, curated to its 40 generation plants
           and the March 2025 transmission network (snt_*). Its Survey123
           forms and results are excluded on purpose.
@@ -137,11 +145,11 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
         no attribute data); every ArcGIS layer is queryable.
 
         Args:
-            fuente: inamhi, mag, igm, arconel or celec.
+            fuente: inamhi, mag, igm, arconel, celec or msp.
             query: Free text matched (accent-insensitive) against the layer's
                 id, name, title or abstract. Empty returns all layers.
             solo_wfs: Only return layers with WFS (attribute data). Ignored
-                for arconel and celec.
+                for arconel, celec and msp.
             categoria: mag: one of its 8 categories. igm: scale (nacional, 50k
                 or 25k). Ignored for the other sources.
             format: text | json
@@ -186,7 +194,7 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
         description=(
             "Attributes of a layer from search_capas_geo, geometry dropped. "
             "GeoServer (inamhi, mag, igm): a sample of up to 20 features. ArcGIS "
-            "(arconel, celec): up to 500 rows with a SQL filtro and offset, or "
+            "(arconel, celec, msp): up to 500 rows with a SQL filtro and offset, or "
             "server-side sums by group (sumar, agrupar)."
         ),
         annotations=READ_ONLY,
@@ -210,7 +218,7 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
         as INAMHI's wrf_tiempo_* grids, or MAG stores with WFS disabled)
         raise an error.
 
-        arconel, celec: an ArcGIS REST query. `filtro` is a SQL where clause
+        arconel, celec, msp: an ArcGIS REST query. `filtro` is a SQL where clause
         on the layer's fields (listed in `campos`), e.g. "Anio = 2024 AND
         IdMes = 4" or "Empresa LIKE 'CNEL%'"; `total_features_en_capa` is
         the count matching it and `hay_mas` says whether to page on with
@@ -225,18 +233,18 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
         type is kept.
 
         Args:
-            fuente: inamhi, mag, igm, arconel or celec.
+            fuente: inamhi, mag, igm, arconel, celec or msp.
             capa: The layer's `capa` from search_capas_geo (INAMHI:
                 "geonode:..." name; IGM: "workspace:name", e.g.
                 nacional_2024:poblado_p_2024; MAG: "categoria/store/name"; ArcGIS: the
                 short id, e.g. balance_energia).
             count: Features to fetch: 1-20 for inamhi/mag/igm, 1-500 for
-                arconel/celec (default 5).
-            filtro: arconel/celec only: SQL where clause; empty for all rows.
-            offset: arconel/celec only: rows (or groups) to skip when paging.
-            agrupar: arconel/celec only: comma-separated fields to group by;
+                arconel/celec/msp (default 5).
+            filtro: arconel/celec/msp only: SQL where clause; empty for all rows.
+            offset: arconel/celec/msp only: rows (or groups) to skip when paging.
+            agrupar: arconel/celec/msp only: comma-separated fields to group by;
                 needs `sumar`.
-            sumar: arconel/celec only: comma-separated numeric fields to sum.
+            sumar: arconel/celec/msp only: comma-separated numeric fields to sum.
             format: text | json
         """
         try:

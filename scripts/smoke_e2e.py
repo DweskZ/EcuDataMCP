@@ -331,6 +331,16 @@ async def main() -> int:
             ),
             ("search_archivos", {"fuente": "turismo", "limit": 3}, ["Turismo"]),
             ("search_archivos", {"fuente": "fedexpor", "limit": 3}, ["Expordata"]),
+            ("search_archivos", {"fuente": "arcotel_series", "query": "1.1.1"}, ["Lineas activas"]),
+            ("search_archivos", {"fuente": "msp_precios", "limit": 2}, ["precios"]),
+            ("search_archivos", {"fuente": "mit_vias"}, ["mit.gob.ec"]),
+            ("search_archivos", {"fuente": "minedec_bases", "query": "csv 2024-2025"}, ["2024-2025"]),
+            ("search_capas_geo", {"fuente": "msp"}, ["indicadores_ssr"]),
+            (
+                "get_capa_geo_datos",
+                {"fuente": "msp", "capa": "egresos_hospitalarios", "sumar": "EGRESOS", "agrupar": "AÑO"},
+                ["suma_EGRESOS"],
+            ),
             ("search_archivos", {"fuente": "aeade", "query": "ventas", "limit": 3}, ["ventas"]),
             ("list_catalogo", {"fuente": "cfn"}, ["estadisticas"]),
             (
