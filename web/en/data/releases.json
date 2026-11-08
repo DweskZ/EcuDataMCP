@@ -1,5 +1,10 @@
 [
   {
+    "version": "0.15.0",
+    "date": "2026-11-07",
+    "summary": "85 tools in the default profile. New get_resumen_compras: one buyer's public procurement in a year (processes, amount, procedure types, months and suppliers). Eleven new sources behind existing selectors: IGM official cartography (737 WFS layers), tourism bulletins, Ember's power mix (yearly and monthly), CFN statistics on Power BI, FEDEXPOR's Expordata, AEADE vehicle sales, MSP ArcGIS layers (facilities, sexual and reproductive health by canton, visits and discharges), medicine ceiling prices, 25 ARCOTEL XLSX series, MIT's daily state-road report and MINEDEC's AMIE registers by school year. Response contract: a uniform byte ceiling declared in metadatos.truncado, a common metadatos.paginacion and resource_link blocks for file lists; cached catalogs answer with their last good copy (frescura obsoleta) when the source is down."
+  },
+  {
     "version": "0.14.0",
     "date": "2026-11-07",
     "summary": "84 tools in the default profile. New read_zip_member: reads one CSV/TSV/TXT or spreadsheet file inside a remote ZIP as a table, fetching only its bytes via HTTP Range (5 MB compressed cap), and finds the real header in INEC's report tables (e.g. the 90 ENDI R3 CSVs); list_zip_contents and read_zip_member support ZIP64. New get_cenace_boletin (CENACE's monthly commercial-transactions bulletin, 2019 on) and get_energia_ecuador_snapshot is removed. Wider sources: ARCONEL's own ArcGIS server (monthly production by plant 1999-2026, public lighting, the SISDAT register) with grouped sums in get_capa_geo_datos, CELEC layers, ARCONEL's published files, the CENACE library, all 18 MSP epidemiological gazette series, eight more Superintendencia de Bancos sections, outage notices from Emelnorte, ElecGalápagos and EEASA, and the Supercías ranking for every year 2008-2025. Every tool publishes an outputSchema and a metadatos block; a shared HTTP layer with retries and a disk cache; the daily smoke run calls every public tool."
