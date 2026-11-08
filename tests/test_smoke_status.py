@@ -255,3 +255,15 @@ def test_supercias_schema_mismatch_is_not_a_cold_start():
 
     assert degraded_source(text) is None
     assert assess_response(text, [], is_error=True).status == "failed"
+
+
+def test_classifies_minedec_connect_failure_as_geoblocked():
+    text = (
+        "Error executing tool search_archivos: Error al buscar archivos de minedec_bases: "
+        "No se pudo conectar a educacion.gob.ec (ConnectTimeout). Configura ECUADOR_MCP_GEO_PROXY."
+    )
+
+    assessment = assess_response(text, [], is_error=True)
+
+    assert assessment.status == "degraded"
+    assert assessment.source == "minedec_geoblock"

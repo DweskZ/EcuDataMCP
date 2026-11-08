@@ -38,6 +38,9 @@ _DEFAULT_GEO_HOSTS = (
     "www.salud.gob.ec",
     "www.gestionderiesgos.gob.ec",
     "sgrportal.gestionderiesgos.gob.ec",
+    # MINEDEC never completes the TCP handshake from Canada or the GitHub
+    # runners (2026-11-07).
+    "educacion.gob.ec",
 )
 
 

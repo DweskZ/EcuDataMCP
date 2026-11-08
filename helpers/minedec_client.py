@@ -68,8 +68,11 @@ import re
 from typing import Any
 from urllib.parse import unquote, urljoin
 
+import httpx
+
 from helpers.cache import TtlCache
 from helpers.csv_reader import _decode_text, download_bytes
+from helpers.geo_proxy import unreachable_hint
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.text_utils import strip_accents as _strip
 
@@ -94,6 +97,24 @@ _LINK_RE = re.compile(
 )
 _WS_RE = re.compile(r"\s+")
 _LEADING_DIGIT_RE = re.compile(r"^\d+")
+
+
+async def _download(url: str) -> tuple[bytes, bool]:
+    """download_bytes, naming the host when the connection never completes.
+
+    educacion.gob.ec drops connections from outside Ecuador (checked
+    2026-11-07 from Canada and from GitHub's runners; it is on the geo-proxy
+    list), and a bare ConnectTimeout stringifies to "".
+    """
+    try:
+        return await download_bytes(url)
+    except httpx.HTTPStatusError:
+        raise
+    except httpx.RequestError as exc:
+        raise RuntimeError(
+            f"No se pudo conectar a {httpx.URL(url).host} ({type(exc).__name__}). "
+            + unreachable_hint(url)
+        ) from exc
 
 
 def _label_from_url(url: str) -> str:
@@ -166,7 +187,7 @@ async def _fetch_files() -> list[dict[str, Any]]:
             return cached
 
         logger.info("Descargando la página de Datos Abiertos del MINEDEC")
-        content, truncated = await download_bytes(_PAGE_URL)
+        content, truncated = await _download(_PAGE_URL)
         if truncated:
             raise ValueError(f"La página de {_PAGE_URL} superó el límite de descarga.")
         html = content.decode("utf-8", errors="replace")
@@ -219,8 +240,9 @@ async def search_matricula(query: str = "") -> dict[str, Any]:
 # download-monitor plugin (school connectivity, intercultural bilingual
 # schools, typology 2024-2025, early-childhood family service, the violence
 # victims support plan) and the 1993-1994 to 2006-2007 statistics with their
-# bulletins. Read from a 2026-01 archived copy: educacion.gob.ec drops
-# connections from outside Ecuador (it answers from GitHub's runners).
+# bulletins. Built from a 2026-01 archived copy: educacion.gob.ec drops
+# connections from outside Ecuador, GitHub's runners included, so it goes
+# through the geo proxy when one is configured.
 _BASES_URL = "https://educacion.gob.ec/base-de-datos/"
 _REG_HREF_RE = re.compile(
     r'href="((?:https?:)?//educacion\.gob\.ec/wp-content/uploads/downloads/[^"]*?'
@@ -287,7 +309,7 @@ async def _fetch_bases_fresh() -> list[dict[str, Any]]:
     cached = _bases_cache.get("bases")
     if cached is not None:
         return cached
-    raw, truncated = await download_bytes(_BASES_URL)
+    raw, truncated = await _download(_BASES_URL)
     if truncated:
         raise ValueError(f"La página {_BASES_URL} superó el límite de descarga.")
     files = parse_bases(_decode_text(raw))

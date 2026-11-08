@@ -6769,7 +6769,7 @@ Los 7 Power BI de `informacion-de-salud/` dan PowerBINotLicensedException
 (ECTS). GeoSalud en Cifras volvió a existir, pero su Power BI tiene la
 misma licencia vencida.
 
-**MINEDEC.** `educacion.gob.ec` no responde desde Canadá (TCP en ~21 s);
+**MINEDEC.** `educacion.gob.ec` no responde desde Canadá ni desde los runners de GitHub (TCP en ~21 s; queda en la lista del proxy geográfico);
 se leyó la copia de enero 2026 de Wayback. `/base-de-datos/` tiene el
 registro AMIE por año lectivo (2009-2010 a 2024-2025, Inicio y Fin, XLSX
 y CSV con diccionario y metadato), seis archivos temáticos por download
