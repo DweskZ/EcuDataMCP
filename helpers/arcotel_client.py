@@ -196,3 +196,147 @@ async def search_boletines_estadisticos(query: str = "") -> dict[str, Any]:
         "url_fuente": _BOLETINES_URL,
         "archivos": matched,
     }
+
+
+# -- statistical series (XLSX) -------------------------------------------------
+
+# ARCOTEL's statistics tree (/estadisticas-de-telecomunicaciones2/ and its
+# per-service pages) links ~3,000 XLSX/XLS uploads, named
+# "{código}-{Indicador}_{mes}_{año}[_F|_V2].xlsx" (1.1.1 líneas activas,
+# 1.2 radiobases, 1.3.1 portabilidad, 2.1.1 telefonía fija, 3.1.1 cuentas de
+# internet, 4.1.1 TV pagada, 8.1.x concesiones de radio y TV, 14.1 reclamos,
+# ...). Each monthly file carries the series' whole history (1.1.1 from 2008,
+# 3.1.1 from 2010, checked 2026-11-07), so the newest file per code is the
+# series. The WordPress media API lists them newest first, which is easier
+# than walking three levels of pages.
+_MEDIA_URL = "https://www.arcotel.gob.ec/wp-json/wp/v2/media"
+_SERIES_MIME = (
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-excel",
+)
+# Ten pages of 100 reach back past every series' latest upload (the slowest,
+# yearly ones included) without paging all ~4,000 files.
+_SERIES_PAGES = 10
+_CODE_RE = re.compile(r"^(\d+(?:[.-]\d+)*)\.?[-_]")
+_NAMED_SERIES = {"informe_series_tel_fija": "Informe series de telefonía fija", "indice_de_valor_agregado_parroquial": "Índice de Valor Agregado Parroquial (IVAP)"}
+_MONTH_TOKENS = {
+    "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+    "septiembre", "setiembre", "octubre", "noviembre", "diciembre",
+    "ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic", "mes",
+}
+_series_cache = TtlCache(ttl_seconds=21600.0, max_entries=1, persist="arcotel_series")
+_SERIES_CODE_RE = re.compile(r"\d{1,2}(\.\d{1,2}){1,2}")
+_NOT_SERIES_RE = re.compile(r"observacion|formulario|formato|matriz|copy|reforma|analisis")
+
+
+def series_key(filename: str) -> tuple[str, str] | None:
+    """(code, readable name) of an ARCOTEL statistics file, or None."""
+    stem = filename.rsplit(".", 1)[0]
+    match = _CODE_RE.match(stem)
+    if match:
+        code = match.group(1).replace("-", ".").strip(".")
+        rest = stem[match.end():]
+    else:
+        lowered = stem.lower().replace("-", "_")
+        named = next((k for k in _NAMED_SERIES if lowered.startswith(k)), None)
+        if named is None:
+            return None
+        return named, _NAMED_SERIES[named]
+    words = []
+    for token in re.split(r"[-_\s]+", rest):
+        low = _strip(token)
+        if not token or low in _MONTH_TOKENS or re.fullmatch(r"(19|20)\d\d|v\d+|f|\d{1,2}|\d{6,8}", low):
+            if low in _MONTH_TOKENS or re.fullmatch(r"(19|20)\d\d", low):
+                break
+            continue
+        words.append(token)
+    return code, " ".join(words) or code
+
+
+def parse_series_media(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Newest file per series code, with how many uploads were seen."""
+    series: dict[str, dict[str, Any]] = {}
+    for item in sorted(items, key=lambda i: i.get("date") or "", reverse=True):
+        url = item.get("source_url") or ""
+        key = series_key(url.rsplit("/", 1)[-1])
+        if key is None:
+            continue
+        code, name = key
+        # Real series codes are 1-2 digit groups ("1.1.1", "14.1"); the same
+        # media library holds consultation forms ("Formulario observaciones",
+        # "Matriz ...") that also start with numbers.
+        if code[0].isdigit() and (
+            not _SERIES_CODE_RE.fullmatch(code) or _NOT_SERIES_RE.search(_strip(name))
+        ):
+            continue
+        if code in series:
+            series[code]["versiones_vistas"] += 1
+            continue
+        series[code] = {
+            "codigo": code,
+            "titulo": f"{code} {name}" if code[0].isdigit() else name,
+            "url": url,
+            "formato": url.rsplit(".", 1)[-1].upper(),
+            "fecha": str(item.get("date") or "")[:10],
+            "versiones_vistas": 1,
+        }
+
+    def order(entry: dict[str, Any]) -> list[Any]:
+        return [int(p) if p.isdigit() else p for p in re.split(r"[.]", entry["codigo"])]
+
+    return sorted(series.values(), key=lambda e: (not e["codigo"][0].isdigit(), order(e)))
+
+
+async def _fetch_series_fresh() -> list[dict[str, Any]]:
+    cached = _series_cache.get("series")
+    if cached is not None:
+        return cached
+    import json as _json
+    from urllib.parse import urlencode
+
+    async def page(mime: str, n: int) -> list[dict[str, Any]]:
+        query = urlencode(
+            {"mime_type": mime, "per_page": 100, "page": n, "_fields": "date,source_url"}
+        )
+        raw, truncated = await download_bytes(f"{_MEDIA_URL}?{query}", raise_for_status=frozenset({400}))
+        if truncated:
+            raise ValueError("La API de medios de ARCOTEL superó el límite de descarga.")
+        data = _json.loads(raw.decode("utf-8", errors="replace"))
+        return data if isinstance(data, list) else []  # 400 past the last page
+
+    pages = await asyncio.gather(
+        *(page(_SERIES_MIME[0], n) for n in range(1, _SERIES_PAGES + 1)),
+        *(page(_SERIES_MIME[1], n) for n in range(1, 4)),
+    )
+    series = parse_series_media([item for p in pages for item in p])
+    if series:
+        _series_cache.set("series", series)
+    return series
+
+
+async def _fetch_series() -> list[dict[str, Any]]:
+    """Fresh fetch, or the last good copy when the source fails (see TtlCache.serve_stale)."""
+    try:
+        return await _fetch_series_fresh()
+    except Exception as exc:
+        stale = _series_cache.serve_stale("series", exc)
+        if stale is None:
+            raise
+        return stale
+
+
+async def search_series_estadisticas(query: str = "") -> dict[str, Any]:
+    """Latest XLSX of each ARCOTEL statistical series, filtered by text."""
+    series = await _fetch_series()
+    q = _strip(query)
+    matched = [s for s in series if not q or q in _strip(f"{s['codigo']} {s['titulo']}")]
+    return {
+        "source": "ARCOTEL — series estadísticas de telecomunicaciones (XLSX)",
+        "url_fuente": "https://www.arcotel.gob.ec/estadisticas-de-telecomunicaciones2/",
+        "nota": (
+            "Un archivo por serie, el más reciente: cada XLSX trae la historia completa "
+            "(líneas activas desde 2008, cuentas de internet desde 2010). Ábrelo con "
+            "preview_resource_data o download_resource."
+        ),
+        "archivos": matched,
+    }

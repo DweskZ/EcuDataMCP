@@ -53,6 +53,8 @@ _ARCONEL = "https://services3.arcgis.com/5Gdbxgyani9QGxyU/arcgis/rest/services"
 _ARCONEL_GEO = "https://geoportal.arconel.gob.ec:6443/arcgis/rest/services/ServDashboards"
 _CELEC = "https://portalarcgis.celec.gob.ec/server/rest/services/Hosted"
 
+_MSP = "https://services7.arcgis.com/mrexCE3lvn5U08zq/arcgis/rest/services"
+
 _CATALOGO: dict[str, list[dict[str, str]]] = {
     "arconel": [
         {
@@ -202,6 +204,73 @@ _CATALOGO: dict[str, list[dict[str, str]]] = {
             )
         ),
     ],
+    # MSP's own ArcGIS Online organization (owner mps_unfpa, 204 public
+    # items, checked 2026-11-07): the health-network register and the
+    # indicator layers behind its dashboards. All answer group-by statistics.
+    "msp": [
+        {
+            "capa": "establecimientos_rpis",
+            "titulo": "Red Pública Integral de Salud: establecimientos (6.411)",
+            "descripcion": (
+                "Establecimientos del MSP, IESS, Fuerzas Armadas, Policía y GAD con nivel, "
+                "tipología, servicios, conectividad y tiempo al hospital de referencia "
+                "(71 campos, edición 2026)."
+            ),
+            "url": f"{_MSP}/rpis_202501_p/FeatureServer/0",
+        },
+        {
+            "capa": "establecimientos_msp",
+            "titulo": "Establecimientos del MSP al 16-09-2026 (2.077)",
+            "descripcion": "Código, nombre, dirección, provincia/cantón/parroquia, nivel, tipología y estado.",
+            "url": f"{_MSP}/est_msp_16092026/FeatureServer/0",
+        },
+        {
+            "capa": "indicadores_ssr",
+            "titulo": "Indicadores de salud sexual y reproductiva por cantón (71.617 filas)",
+            "descripcion": (
+                "18 indicadores por cantón, año (2018-2026) y rango etario: control prenatal, "
+                "partos en adolescentes, planificación familiar, abortos, violencia sexual. "
+                "Campos: prov, canton, año, rango_etar, indicador1, valor."
+            ),
+            "url": f"{_MSP}/capa_indicadores_p/FeatureServer/6",
+        },
+        {
+            "capa": "atenciones",
+            "titulo": "Atenciones por establecimiento y año (2019 en adelante)",
+            "descripcion": "Campos: PRV_DESCRI, CAN_DESCRI, UNI_NOMBRE, NIVEL_DESC, aten, AÑO.",
+            "url": f"{_MSP}/ATENCIONES_COMPLETO_F/FeatureServer/0",
+        },
+        {
+            "capa": "egresos_hospitalarios",
+            "titulo": "Egresos hospitalarios por establecimiento y año (2019 en adelante)",
+            "descripcion": "Campos: UNICÓDIGO, PROV, AÑO, EGRESOS.",
+            "url": f"{_MSP}/EGRESOS_COMPLETA_F/FeatureServer/0",
+        },
+        {
+            "capa": "fecundidad",
+            "titulo": "Fecundidad: mujeres en edad fértil y nacidos vivos por provincia",
+            "descripcion": "Campos: PROVINCIA, AÑO, RANGO_ETARIO, MEF, NV.",
+            "url": f"{_MSP}/FEC_indicadoresv2/FeatureServer/0",
+        },
+        {
+            "capa": "vacunacion_covid_cantonal",
+            "titulo": "Vacunación COVID-19 por cantón (diciembre 2022)",
+            "descripcion": "Cobertura por cantón y dosis; corte único.",
+            "url": f"{_MSP}/VACUNACION_CANT_061222/FeatureServer/0",
+        },
+        {
+            "capa": "areas_eais",
+            "titulo": "Áreas de cobertura de los Equipos de Atención Integral en Salud (1.918)",
+            "descripcion": "Polígonos de cobertura por establecimiento.",
+            "url": f"{_MSP}/es_area_eais/FeatureServer/0",
+        },
+        {
+            "capa": "categorizacion_distritos",
+            "titulo": "Categorización de distritos de salud (129)",
+            "descripcion": "Polígonos distritales con su categoría.",
+            "url": f"{_MSP}/categorizacion115_gdb/FeatureServer/0",
+        },
+    ],
 }
 
 _SOURCES = {
@@ -210,6 +279,7 @@ _SOURCES = {
         "geoportal.arconel.gob.ec)"
     ),
     "celec": "CELEC EP — portal ArcGIS (portalarcgis.celec.gob.ec)",
+    "msp": "Ministerio de Salud Pública — ArcGIS Online (services7.arcgis.com)",
 }
 
 # Layer metadata (fields, geometry type) only changes with a republish.

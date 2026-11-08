@@ -444,7 +444,8 @@ def _all_fuentes() -> dict:
                 "id": "arcotel",
                 "nombre": (
                     "ARCOTEL (estadísticas del sector de telecomunicaciones: "
-                    "reportes mensuales y boletines anuales/temáticos)"
+                    "reportes mensuales, boletines anuales/temáticos y 25 series XLSX "
+                    "con historia completa)"
                 ),
                 "base": "https://www.arcotel.gob.ec/",
                 "tools": ["search_archivos"],
@@ -497,7 +498,7 @@ def _all_fuentes() -> dict:
             },
             {
                 "id": "minedec",
-                "nombre": "MINEDEC (matrícula escolar histórica, datos abiertos)",
+                "nombre": "MINEDEC (matrícula escolar histórica, registros AMIE por año lectivo en XLSX/CSV, archivos temáticos)",
                 "base": "https://educacion.gob.ec/datos-abiertos-minedec/",
                 "tools": ["search_archivos"],
             },
@@ -524,8 +525,18 @@ def _all_fuentes() -> dict:
             },
             {
                 "id": "msp",
-                "nombre": "MSP (gacetas epidemiológicas semanales, 18 series)",
+                "nombre": (
+                    "MSP (gacetas epidemiológicas, precios techo de medicamentos, capas ArcGIS: "
+                    "establecimientos de la red pública, indicadores de salud sexual y "
+                    "reproductiva, atenciones y egresos)"
+                ),
                 "base": "https://www.salud.gob.ec/",
+                "tools": ["search_archivos", "search_capas_geo", "get_capa_geo_datos"],
+            },
+            {
+                "id": "mit",
+                "nombre": "MIT (ex MTOP: informe diario de la Red Vial Estatal)",
+                "base": "https://www.mit.gob.ec/",
                 "tools": ["search_archivos"],
             },
             {

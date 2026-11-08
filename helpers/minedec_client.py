@@ -62,13 +62,14 @@ routing it through download_resource/preview_resource_data.
 from __future__ import annotations
 
 import asyncio
+import html
 import logging
 import re
 from typing import Any
 from urllib.parse import unquote, urljoin
 
 from helpers.cache import TtlCache
-from helpers.csv_reader import download_bytes
+from helpers.csv_reader import _decode_text, download_bytes
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.text_utils import strip_accents as _strip
 
@@ -205,5 +206,122 @@ async def search_matricula(query: str = "") -> dict[str, Any]:
         "total_en_pagina": len(files),
         "source": "MINEDEC — Registro Administrativo Histórico (Educación Básica)",
         "url_fuente": _PAGE_URL,
+        "archivos": matched,
+    }
+
+
+# -- per-school-year registers and thematic files (base-de-datos/) ------------
+
+# A sibling page, educacion.gob.ec/base-de-datos/, splits the same AMIE
+# registry by school year: for every year from 2009-2010 to 2024-2025 an
+# "Inicio" and a "Fin" cut, each as XLSX and as a CSV twin (2_...csv), with
+# its own dictionary and metadata. It also links thematic files through the
+# download-monitor plugin (school connectivity, intercultural bilingual
+# schools, typology 2024-2025, early-childhood family service, the violence
+# victims support plan) and the 1993-1994 to 2006-2007 statistics with their
+# bulletins. Read from a 2026-01 archived copy: educacion.gob.ec drops
+# connections from outside Ecuador (it answers from GitHub's runners).
+_BASES_URL = "https://educacion.gob.ec/base-de-datos/"
+_REG_HREF_RE = re.compile(
+    r'href="((?:https?:)?//educacion\.gob\.ec/wp-content/uploads/downloads/[^"]*?'
+    r'Registros?Administrativos?_(\d{4})-(\d{4})-?(Inicio|Fin)\.(xlsx|csv))"',
+    re.IGNORECASE,
+)
+_DLM_RE = re.compile(
+    r'<a[^>]+href="([^"]*download-monitor/download\.php\?id=(\d+)[^"]*)"[^>]*>(.*?)</a>', re.DOTALL
+)
+_bases_cache = TtlCache(ttl_seconds=43200.0, max_entries=1, persist="minedec_bases")
+
+
+def _bases_tipo(name: str, ext: str) -> str:
+    low = name.lower()
+    if "diccionario" in low:
+        return "diccionario"
+    if "metadato" in low:
+        return "metadato"
+    return f"registro_{ext.lower()}"
+
+
+def parse_bases(page: str) -> list[dict[str, Any]]:
+    """Per-year registry files and thematic downloads from base-de-datos/."""
+    files: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for href, y1, y2, corte, ext in _REG_HREF_RE.findall(page):
+        url = "https:" + href if href.startswith("//") else href
+        if url in seen:
+            continue
+        seen.add(url)
+        tipo = _bases_tipo(url.rsplit("/", 1)[-1], ext)
+        files.append(
+            {
+                "titulo": f"Registro administrativo {y1}-{y2} {corte} ({tipo.replace('_', ' ')})",
+                "url": url,
+                "formato": ext.upper(),
+                "tipo": tipo,
+                "periodo": f"{y1}-{y2}",
+                "corte": corte.capitalize(),
+            }
+        )
+    for href, ident, inner in _DLM_RE.findall(page):
+        url = html.unescape(href)
+        if url in seen:
+            continue
+        seen.add(url)
+        label = _WS_RE.sub(" ", re.sub(r"<[^>]+>", " ", html.unescape(inner))).strip()
+        label = re.sub(r"\s*\(\d+\)$", "", label)  # trailing download counter
+        historic = re.fullmatch(r"(?:Bolet[ií]n electr[oó]nico )?(19|20)\d\d-(19|20)\d\d", label)
+        files.append(
+            {
+                "titulo": label or f"Archivo {ident}",
+                "url": url,
+                "formato": None,
+                "tipo": "historico_1993_2007" if historic else "tematico",
+                "periodo": re.search(r"\d{4}-\d{4}", label).group(0) if re.search(r"\d{4}-\d{4}", label) else None,
+                "corte": None,
+            }
+        )
+    return files
+
+
+async def _fetch_bases_fresh() -> list[dict[str, Any]]:
+    cached = _bases_cache.get("bases")
+    if cached is not None:
+        return cached
+    raw, truncated = await download_bytes(_BASES_URL)
+    if truncated:
+        raise ValueError(f"La página {_BASES_URL} superó el límite de descarga.")
+    files = parse_bases(_decode_text(raw))
+    if files:
+        _bases_cache.set("bases", files)
+    return files
+
+
+async def _fetch_bases() -> list[dict[str, Any]]:
+    """Fresh fetch, or the last good copy when the source fails (see TtlCache.serve_stale)."""
+    try:
+        return await _fetch_bases_fresh()
+    except Exception as exc:
+        stale = _bases_cache.serve_stale("bases", exc)
+        if stale is None:
+            raise
+        return stale
+
+
+async def search_bases(query: str = "") -> dict[str, Any]:
+    """Per-year AMIE registers (XLSX and CSV) and MINEDEC thematic files."""
+    files = await _fetch_bases()
+    q = _strip(query)
+    matched = [
+        f for f in files
+        if not q or q in _strip(f"{f['titulo']} {f['tipo']} {f['periodo'] or ''} {f['corte'] or ''}")
+    ]
+    return {
+        "source": "MINEDEC — bases de datos por año lectivo (AMIE) y archivos temáticos",
+        "url_fuente": _BASES_URL,
+        "nota": (
+            "Un registro por año lectivo 2009-2010 a 2024-2025, corte Inicio o Fin, en XLSX "
+            "y en CSV (tipo registro_csv), con diccionario y metadato. Pide 'csv 2024-2025' "
+            "para el más reciente. Los archivos temáticos (tipo tematico) no declaran formato."
+        ),
         "archivos": matched,
     }

@@ -6750,6 +6750,65 @@ de comercio exterior ya llegan por Comtrade, BCE y, si se construye, FEDEXPOR.
 8.8.8.8 y 1.1.1.1: el DNS público apunta a localhost, así que no hay sitio
 que leer hasta que lo corrijan.
 
+## Trigésimo novena pasada — ministerios: MSP, MINEDEC, MIT, vivienda, Gobierno, Interior, ARCOTEL y LOTAIP (2026-11-07)
+
+Tres revisiones en paralelo desde Canadá (curl, más el navegador para
+Interior). Lo construido está en el ROADMAP (§ Ministerios: segunda pasada).
+
+**MSP.** El sitio no está "vacío fuera de CKAN", como decía una nota de
+2023: tiene (1) los precios techo de medicamentos del Consejo de Fijación
+de Precios, ~110 revisiones en XLSX desde 2016, listadas por la API de
+medios; (2) su propia organización de ArcGIS Online (dueño `mps_unfpa`,
+org `mrexCE3lvn5U08zq`, 204 ítems públicos) con el registro de
+establecimientos de la red pública e indicadores de salud sexual y
+reproductiva por cantón; (3) recursos Nextcloud "Datos Abiertos" en
+`almacenamiento.msp.gob.ec` (COVID, consulta externa, vacunas, emergencias,
+laboratorio) que no responden desde Canadá, posiblemente la fuente más rica.
+Los 7 Power BI de `informacion-de-salud/` dan PowerBINotLicensedException
+(seis en el tenant `d1031f2d…`) o UnableToFindKeyInDBorCacheException
+(ECTS). GeoSalud en Cifras volvió a existir, pero su Power BI tiene la
+misma licencia vencida.
+
+**MINEDEC.** `educacion.gob.ec` no responde desde Canadá (TCP en ~21 s);
+se leyó la copia de enero 2026 de Wayback. `/base-de-datos/` tiene el
+registro AMIE por año lectivo (2009-2010 a 2024-2025, Inicio y Fin, XLSX
+y CSV con diccionario y metadato), seis archivos temáticos por download
+monitor y las estadísticas 1993-2007 con sus boletines.
+`/publicaciones-estadistica-educativa/` solo tiene anuarios en PDF.
+
+**MIT (ex MTOP) y vivienda.** `obraspublicas.gob.ec` ya falla en DNS. No
+hay conteos de tráfico (TPDA), peajes ni SIG vial abiertos: geoportal, sig
+y datos.mit.gob.ec fallan; `sitop.mit.gob.ec` responde 503. Sí hay un
+informe diario de la Red Vial Estatal en PDF. Vivienda pasó al MIT; la API
+de `prd-sitop.mit.gob.ec` pide token, y los archivos sueltos (proyectos
+VIS/VIP a marzo 2025) son una foto con datos de contacto de promotores.
+`habitatyvivienda.gob.ec` sigue con TLS roto.
+
+**Gobierno.** Solo el CKAN `mdg` (organización territorial de CONALI,
+vigente) y PDFs metodológicos del indicador PND; las tablas de migración
+por nacionalidad y puerto de su biblioteca de medios terminan en 2020.
+
+**Interior.** `cifras.ministeriodelinterior.gob.ec` responde 403 de
+Incapsula también al navegador desde Canadá. El CKAN
+`ministerio-del-interior` está vigente (seis paquetes con archivo histórico
+y enero-septiembre 2026, actualizados entre el 13 y el 20 de octubre de
+2026) y ECU 911 publica su base de emergencias mensual hasta septiembre
+2026 (algunos recursos declarados CSV son XLSX). Ambos alcanzables con los
+tools CKAN.
+
+**ARCOTEL.** La biblioteca de medios tiene 3.074 XLSX, 974 XLS, 106 CSV y
+67 ZIP. Los XLSX siguen el patrón `{código}-{Indicador}_{mes}_{año}` y
+cada archivo mensual trae la serie completa (1.1.1 desde 2008, 3.1.1 desde
+2010). Sin Power BI. MINTEL tiene 5 paquetes CKAN (madurez de ciudades
+inteligentes, habilidades digitales 2023).
+
+**LOTAIP.** Desde ~febrero 2025 los sitios institucionales solo redirigen
+al portal nacional de la Defensoría (`transparencia.dpe.gob.ec/entidades/{id}`,
+Gobierno 22, MIT 35, ARCOTEL 1362), que no responde desde Canadá; octubre
+2024-enero 2025 queda en cada sitio como CSV por numeral (separador `;`,
+latin-1) bajo download monitor. Una herramienta transversal no es viable
+desde aquí; hay que probar el portal de la Defensoría desde Ecuador.
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

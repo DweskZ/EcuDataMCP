@@ -489,6 +489,15 @@
             "coverage": "educacion.gob.ec",
             "url": "https://educacion.gob.ec/datos-abiertos-minedec/",
             "status": "live"
+          },
+          {
+            "id": "minedec-bases",
+            "name": "Registros AMIE por año lectivo",
+            "tag": "CSV/XLSX",
+            "description": "2009-2010 a 2024-2025, corte Inicio y Fin, con diccionario; archivos temáticos",
+            "coverage": "educacion.gob.ec",
+            "url": "https://educacion.gob.ec/base-de-datos/",
+            "status": "live"
           }
         ]
       },
@@ -907,6 +916,20 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Ministerio de Infraestructura y Tecnología (MIT)",
+        "sources": [
+          {
+            "id": "mit-red-vial",
+            "name": "Estado de la Red Vial Estatal",
+            "tag": "PDF",
+            "description": "Informe diario: vías cerradas y con paso restringido por provincia",
+            "coverage": "mit.gob.ec",
+            "url": "https://www.mit.gob.ec/",
+            "status": "live"
+          }
+        ]
       }
     ]
   },
@@ -940,6 +963,24 @@
             "coverage": "salud.gob.ec",
             "url": "https://www.salud.gob.ec/gacetas-epidemiologicas/",
             "status": "live"
+          },
+          {
+            "id": "msp-precios",
+            "name": "Precios techo de medicamentos",
+            "tag": "XLSX",
+            "description": "Cada revisión del Consejo de Fijación de Precios desde 2016",
+            "coverage": "salud.gob.ec",
+            "url": "https://www.salud.gob.ec/consejo-nacional-de-fijacion-y-revision-de-precios-de-medicamentos/",
+            "status": "live"
+          },
+          {
+            "id": "msp-arcgis",
+            "name": "Capas ArcGIS del MSP",
+            "tag": "ArcGIS",
+            "description": "Establecimientos de la red pública, indicadores de salud sexual y reproductiva por cantón, atenciones y egresos",
+            "coverage": "services7.arcgis.com",
+            "url": "https://www.salud.gob.ec/",
+            "status": "live"
           }
         ]
       }
@@ -960,6 +1001,15 @@
             "description": "Reportes estadísticos mensuales (2017-2026) y boletines anuales/temáticos (2015-2024)",
             "coverage": "arcotel.gob.ec",
             "url": "https://www.arcotel.gob.ec",
+            "status": "live"
+          },
+          {
+            "id": "arcotel-series",
+            "name": "Series estadísticas XLSX",
+            "tag": "XLSX",
+            "description": "25 indicadores (líneas activas, radiobases, internet, TV pagada, concesiones, reclamos) con historia completa",
+            "coverage": "arcotel.gob.ec",
+            "url": "https://www.arcotel.gob.ec/estadisticas-de-telecomunicaciones2/",
             "status": "live"
           }
         ]

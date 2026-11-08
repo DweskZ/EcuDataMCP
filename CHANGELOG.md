@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+- **Ministry sources, no new tools.**
+  - `search_capas_geo` / `get_capa_geo_datos` gain `fuente="msp"`: nine
+    curated layers of the Ministry of Public Health's ArcGIS Online org
+    (6,411 public-network facilities, 18 sexual and reproductive health
+    indicators by canton 2018-2026, visits and discharges by facility,
+    fertility, COVID vaccination by canton...), with filters and grouped sums.
+  - `search_archivos` gains `msp_precios` (every medicine ceiling-price
+    revision since 2016), `arcotel_series` (the newest XLSX of each of 25
+    ARCOTEL statistical series, each with full history), `mit_vias` (MIT's
+    daily state-road status report) and `minedec_bases` (AMIE registers by
+    school year 2009-2025 in XLSX and CSV, plus thematic files).
+  - RESEARCH and ROADMAP record what stays out: MSP's Nextcloud shares and
+    LOTAIP's national portal (unreachable from outside Ecuador), MSP's
+    Power BI reports (unlicensed), Interior's statistics site (Incapsula),
+    and housing (moved into MIT, API behind a login, CKAN frozen in 2021).
+
 - **CFN, FEDEXPOR and AEADE as sources, no new tools.**
   - `list_catalogo` / `get_sut_indicador_schema` / `query_sut_indicador`
     gain `fuente="cfn"`: the Corporación Financiera Nacional's public Power
