@@ -1,18 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-{# Atlas hero: map + honest client-side search over the sources catalog #}
+{# Atlas hero: map + theme chips over the sources catalog #}
 <section class="atlas-hero">
 <div class="wrap hero-grid">
 <div class="hero-copy">
 <p class="kick">Public data atlas · <span class="nocase">v{{ releases[0].version }}</span></p>
 <h1>The whole Ecuadorian state, <i>one question away.</i></h1>
 <p class="lead">EcuDataMCP connects your AI assistant to {{ source_count }} official sources —from the Central Bank to SERCOP— and answers with the origin link for every figure. Open source, read-only, no sign-up.</p>
-<form class="search" role="search" id="sform">
-<svg class="search-ico" width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.75"/><line x1="10.2" y1="10.2" x2="14" y2="14"/></svg>
-<input id="q" type="search" autocomplete="off" enterkeyhint="search" aria-label="Search the {{ source_count }} sources" aria-describedby="results" placeholder="Search the {{ source_count }} sources: passport, earthquakes, remittances, census…">
-<kbd aria-hidden="true">Enter</kbd>
-</form>
-<div class="results" id="results" role="status" aria-live="polite"></div>
 <div class="hero-actions">
 <a class="btn y" href="#connect">Install in 1 minute</a>
 <a class="btn" href="#sources">Explore the {{ source_count }} sources →</a>
@@ -117,7 +111,9 @@
 <h2>In plain language, <i>without searching portal by portal.</i></h2>
 <p class="lead">Eight real questions with the answer EcuDataMCP returned. Open one to see the tools used and the official source.</p>
 <div class="qs" id="qs">
-{% for a in home.answers %}<details class="qa" id="qa-{{ a.id }}"{% if loop.first %} open{% endif %}><summary><span class="qtext">“{{ a.question }}”</span><span class="qhint" aria-hidden="true">View answer</span></summary><div class="qa-a"><p>{{ a.answer }}</p><div class="qa-meta"><span class="mono">{% for t in a.tools %}{{ t }}(){% if not loop.last %} · {% endif %}{% endfor %}</span><a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.source }} ↗</a></div></div></details>
+{% for col in [home.answers[:(home.answers|length + 1) // 2], home.answers[(home.answers|length + 1) // 2:]] %}<div class="qs-col">
+{% set first_col = loop.first %}{% for a in col %}<details class="qa" id="qa-{{ a.id }}"{% if first_col and loop.first %} open{% endif %}><summary><span class="qtext">“{{ a.question }}”</span><span class="qhint" aria-hidden="true">View answer</span></summary><div class="qa-a"><p>{{ a.answer }}</p><div class="qa-meta"><span class="mono">{% for t in a.tools %}{{ t }}(){% if not loop.last %} · {% endif %}{% endfor %}</span><a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.source }} ↗</a></div></div></details>
+{% endfor %}</div>
 {% endfor %}</div>
 <p class="qsnote">Answers extracted on {{ home.extracted_label }} with EcuDataMCP v{{ home.server_version }}. Each answer came from a real query to the official source listed; values may have changed since then.</p>
 </div></section>
