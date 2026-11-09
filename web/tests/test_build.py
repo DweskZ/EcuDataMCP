@@ -122,20 +122,28 @@ def test_home_atlas_is_data_driven(site, lang):
     source_count = len(build.flatten_sources(build.load_json(lang, "sources.json")))
     answers = build.load_json(lang, "stored_answers.json")
     assert home.count('class="dot"') == source_count
-    assert home.count('class="qa"') == len(answers["answers"])
+    assert home.count('class="qa-card"') == len(answers["answers"])
     assert f"v{answers['server_version']}" in home
     assert 'id="home-data"' in home
 
 
 @pytest.mark.parametrize("lang", ["es", "en"])
-def test_home_only_first_stored_answer_is_open_in_two_columns(site, lang):
+def test_home_stored_answers_are_always_visible_cards(site, lang):
     home = (site / ("index.html" if lang == "es" else "en/index.html")).read_text(
         encoding="utf-8"
     )
-    cards = re.findall(r'<details class="qa"[^>]*>', home)
-    assert len(cards) == 8
-    assert [" open" in c for c in cards] == [True] + [False] * 7
-    assert home.count('class="qs-col"') == 2
+    assert len(re.findall(r'<article class="qa-card"', home)) == 8
+    assert '<details class="qa"' not in home
+
+
+@pytest.mark.parametrize("lang", ["es", "en"])
+def test_assets_are_cache_busted(site, lang):
+    home = (site / ("index.html" if lang == "es" else "en/index.html")).read_text(
+        encoding="utf-8"
+    )
+    assert re.search(r'site\.css\?v=[0-9a-f]{10}"', home)
+    assert re.search(r'home\.css\?v=[0-9a-f]{10}"', home)
+    assert re.search(r'home\.js\?v=[0-9a-f]{10}"', home)
 
 
 @pytest.mark.parametrize("lang", ["es", "en"])

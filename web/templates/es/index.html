@@ -109,11 +109,8 @@
 <section id="preguntas"><div class="wrap">
 <p class="kick">Qué puedes preguntar</p>
 <h2>En lenguaje natural, <i>sin buscar portal por portal.</i></h2>
-<p class="lead">Ocho preguntas reales con la respuesta que devolvió EcuDataMCP. Abre una para ver las tools usadas y la fuente oficial.</p>
-<div class="qs" id="qs">
-{% for col in [home.answers[:(home.answers|length + 1) // 2], home.answers[(home.answers|length + 1) // 2:]] %}<div class="qs-col">
-{% set first_col = loop.first %}{% for a in col %}<details class="qa" id="qa-{{ a.id }}"{% if first_col and loop.first %} open{% endif %}><summary><span class="qtext">“{{ a.question }}”</span><span class="qhint" aria-hidden="true">Ver respuesta</span></summary><div class="qa-a"><p>{{ a.answer }}</p><div class="qa-meta"><span class="mono">{% for t in a.tools %}{{ t }}(){% if not loop.last %} · {% endif %}{% endfor %}</span><a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.source }} ↗</a></div></div></details>
-{% endfor %}</div>
+<p class="lead">Ocho preguntas reales, con la respuesta que devolvió EcuDataMCP, las tools que usó y la fuente oficial.</p>
+<div class="qs" id="qs">{% for a in home.answers %}<article class="qa-card" id="qa-{{ a.id }}"><p class="qtext">“{{ a.question }}”</p><p class="qans">{{ a.answer }}</p><footer class="qa-meta"><span class="mono">{% for t in a.tools %}{{ t }}(){% if not loop.last %} · {% endif %}{% endfor %}</span><a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.source }} ↗</a></footer></article>
 {% endfor %}</div>
 <p class="qsnote">Respuestas extraídas el {{ home.extracted_label }} con EcuDataMCP v{{ home.server_version }}. Cada respuesta se obtuvo con una consulta real a la fuente oficial indicada; los valores pueden haber cambiado desde entonces.</p>
 </div></section>
@@ -210,4 +207,4 @@ Verifica que el servidor responda antes de darlo por terminado.</code></pre>
 
 <script type="application/json" id="home-data">{{ home.data | tojson }}</script>
 {% endblock %}
-{% block extra_script %}<script src="{{ assets }}home.js"></script>{% endblock %}
+{% block extra_script %}<script src="{{ assets }}home.js?v={{ v }}"></script>{% endblock %}
