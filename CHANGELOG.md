@@ -20,6 +20,22 @@
   lists only real candidates. Percentage series with a year-over-year jump above
   25 pp now carry `posible_quiebre_serie` (e.g. indicator 4891, Peru 2022 to
   2023: Total 55.2 to 89.6).
+- **`get_resumen_compras`: totals no longer change between identical runs.**
+  `search_ocds` has no stable ordering: the same `page` returns a different
+  sample of rows on every call (`sort`/`order`/`limit` are ignored), so one pass
+  over pages 1..N repeated some processes and missed others while
+  `procesos_leidos` still equalled `total_en_fuente` and `parcial` stayed
+  `false` (Manta 2025 gave USD 32.4-42.5 M across runs; a pass held ~210
+  distinct processes out of 253). The summary now sweeps the pages repeatedly
+  without the page cache, de-duplicates by OCID, sums in OCID order and reports
+  `parcial=true` unless as many distinct processes as `total_en_fuente` were
+  collected. Concurrency drops to 2, a rate-limited host stops the sweep (the
+  429 `Retry-After` is still honoured by the shared retry), requests are capped
+  (6 passes, 150 s), `paginas_fallidas` / `solicitudes` are returned, and the
+  distinct rows already collected are kept 15 min in memory so a repeat call
+  resumes from them and converges on the full set.
+  `monto_total` sums the OCDS `amount` (awarded value when the process has one,
+  else the estimated value); `presupuesto_total` sums `budget` separately.
 - **Census 2022: search inside the tabulados.** `search_archivos(fuente="censo")`
   matched only file names plus one hand-written ICT description. A committed
   index (`helpers/data/censo_tabulados_index.json`, 19 workbooks, 282 tables)
