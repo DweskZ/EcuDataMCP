@@ -28,6 +28,12 @@ def _matches_query(row: dict, words: list[str]) -> bool:
     return all(w in blob for w in words)
 
 
+_UNVERIFIED_HINT = (
+    "No verificado (verificar_acceso=auto): usa get_anda_survey_info(idno) o "
+    "repite con verificar_acceso=true"
+)
+
+
 def register_search_anda_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Buscar encuestas y censos en ANDA",
@@ -43,7 +49,7 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
         query: str = "",
         limit: int = 10,
         page: int = 1,
-        verificar_acceso: bool = True,
+        verificar_acceso: bool | Literal["auto"] = "auto",
         format: Literal["text", "json"] = "text",
     ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
@@ -59,12 +65,17 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
         search_inec_estadisticas with the same query.
 
         microdatos_disponibles is checked against each study's real download
-        page (verificar_acceso=true), and tipo_acceso says how: directo (files
+        page (verificar_acceso), and tipo_acceso says how: directo (files
         in ANDA), enlace_externo (ANDA only links to another site, e.g. the
         2022 Census to censoecuador.gob.ec), registro (ANDA login), solicitud
         or ninguno. The catalog flag alone is unreliable: it marks the 2022
         Census "direct" although no file is attached. If a check fails the
         result falls back to the catalog flag with tipo_acceso "desconocido".
+        verificar_acceso="auto" (default) checks only the first 10 results of the
+        page and marks the rest "desconocido" (with a hint); true checks them
+        all (slower on a long page: up to 2 requests per result, 8 at a time);
+        false trusts the catalog flag. Verified answers are cached per study
+        on disk, so repeated searches get faster.
         Studies hosted elsewhere: get_inec_estadistica_files or
         search_archivos(fuente="censo").
 
@@ -75,9 +86,10 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
             query: Search keywords (e.g. "empleo", "REEM", "censo agropecuario")
             limit: Results per page (default: 10, max: 50)
             page: Page of results, 1-based (default: 1); see total/total_pages
-            verificar_acceso: Check each result's real download page (2 extra
-                requests per result with microdata, cached 6 h); false trusts
-                the catalog flag and is faster
+            verificar_acceso: auto (default) = check the real download page of
+                the first 10 results; true = check all of them (2 extra
+                requests each, 8 in parallel); false = trust the catalog flag
+                (fastest). Checks are cached per study (6 h memory, 7 days disk)
             format: text | json
         """
         limit = min(max(limit, 1), 50)
@@ -101,12 +113,25 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
         # without one the server paged it for us.
         total = total_catalog
         shown = matched[(page - 1) * limit : page * limit] if query else matched
+        if isinstance(verificar_acceso, str):
+            lowered = verificar_acceso.strip().lower()
+            if lowered not in ("auto", "true", "false"):
+                raise ToolError('verificar_acceso debe ser "auto", true o false')
+            modo = lowered if lowered == "auto" else ("si" if lowered == "true" else "no")
+        else:
+            modo = "si" if verificar_acceso else "no"
+        top = anda_client.AUTO_VERIFY_TOP if modo == "auto" else None
         accesses: dict = {}
-        if verificar_acceso and shown:
+        if modo != "no" and shown:
             try:
-                accesses = await anda_client.verify_access(shown)
+                accesses = await anda_client.verify_access(shown, top=top)
             except Exception:
                 accesses = {}
+        unverified = {
+            str(r.get("id"))
+            for r in shown[top:]
+            if top is not None and anda_client.has_microdata(r)
+        }
         payload = {
             "query": query,
             "total": total,
@@ -121,13 +146,24 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
                     "anio": r.get("year_start"),
                     "entidad": r.get("authoring_entity"),
                     **anda_client.access_summary(
-                        r, accesses.get(str(r.get("id"))) if verificar_acceso else None
+                        r, accesses.get(str(r.get("id"))) if modo != "no" else None
+                    ),
+                    **(
+                        {"nota_acceso": _UNVERIFIED_HINT}
+                        if str(r.get("id")) in unverified
+                        else {}
                     ),
                     "url": r.get("url"),
                 }
                 for r in shown
             ],
         }
+        if unverified:
+            payload["aviso_verificacion"] = (
+                f"Solo se verificó el acceso real de los primeros {anda_client.AUTO_VERIFY_TOP} "
+                f"resultados; {len(unverified)} más figuran como tipo_acceso 'desconocido'. "
+                "Usa verificar_acceso=true para verificarlos todos."
+            )
 
         def to_text(data: dict) -> str:
             rows = data.get("results") or []
@@ -147,6 +183,8 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
                 )
                 parts.append(f"   URL: {r.get('url')}")
                 parts.append("")
+            if data.get("aviso_verificacion"):
+                parts.append(data["aviso_verificacion"])
             return "\n".join(parts)
 
         return render_structured(payload, format, text_builder=to_text)
