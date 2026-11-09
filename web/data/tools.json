@@ -488,9 +488,9 @@
           },
           {
             "name": "verificar_acceso",
-            "type": "bool",
-            "default": "True",
-            "description": "Verifica la página de descarga real de cada resultado (2 solicitudes extra por resultado con microdatos, caché de 6 h); false confía en la marca del catálogo y es más rápido"
+            "type": "bool | Literal['auto']",
+            "default": "'auto'",
+            "description": "auto (default) = verifica la página de descarga real de los 10 primeros resultados; true = de todos (2 solicitudes extra cada uno, 8 en paralelo); false = confía en la marca del catálogo (lo más rápido). Cada verificación se guarda por estudio (6 h en memoria, 7 días en disco)"
           },
           {
             "name": "format",
@@ -499,7 +499,7 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Busca en el catálogo ANDA del INEC (anda.inec.gob.ec) de encuestas y censos. ANDA corre sobre NADA (Banco Mundial/IHSN), separado de datosabiertos.gob.ec. Cataloga 437+ encuestas/censos del INEC con metadata (título, año, entidad autora). No todas las entradas tienen microdatos descargables — muchas son publicaciones solo agregadas (ej. índices de precios); cada resultado lo indica. microdatos_disponibles se verifica contra la página de descarga real de cada estudio (verificar_acceso=true) y tipo_acceso dice cómo se obtienen: directo (archivos en ANDA), enlace_externo (ANDA solo enlaza a otro sitio; p. ej. el Censo 2022 a censoecuador.gob.ec), registro (inicio de sesión en ANDA), solicitud o ninguno. La marca del catálogo por sí sola no es fiable: marca el Censo 2022 como \"direct\" aunque no tiene archivos adjuntos. Si la verificación falla, el resultado cae a la marca del catálogo con tipo_acceso \"desconocido\". Sigue con get_anda_survey_info(idno) para la metadata completa de una encuesta."
+        "long_description": "Busca en el catálogo ANDA del INEC (anda.inec.gob.ec) de encuestas y censos. ANDA corre sobre NADA (Banco Mundial/IHSN), separado de datosabiertos.gob.ec. Cataloga 437+ encuestas/censos del INEC con metadata (título, año, entidad autora). No todas las entradas tienen microdatos descargables — muchas son publicaciones solo agregadas (ej. índices de precios); cada resultado lo indica. microdatos_disponibles se verifica contra la página de descarga real de cada estudio (verificar_acceso) y tipo_acceso dice cómo se obtienen: directo (archivos en ANDA), enlace_externo (ANDA solo enlaza a otro sitio; p. ej. el Censo 2022 a censoecuador.gob.ec), registro (inicio de sesión en ANDA), solicitud o ninguno. La marca del catálogo por sí sola no es fiable: marca el Censo 2022 como \"direct\" aunque no tiene archivos adjuntos. Si la verificación falla, el resultado cae a la marca del catálogo con tipo_acceso \"desconocido\". verificar_acceso=\"auto\" (default) verifica solo los 10 primeros resultados de la página y marca el resto como \"desconocido\" (con una nota); true los verifica todos (más lento en una página larga: hasta 2 solicitudes por resultado, 8 a la vez); false confía en la marca del catálogo. Las verificaciones se guardan por estudio en disco, así que las búsquedas repetidas son más rápidas. Sigue con get_anda_survey_info(idno) para la metadata completa de una encuesta."
       },
       {
         "name": "get_anda_survey_info",

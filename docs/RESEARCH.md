@@ -6912,6 +6912,52 @@ encabezados casi vacíos (`["Período (5)(6)\\Variable","","TOTAL NACIONAL","",
 - Construido: ver CHANGELOG (encabezados aplanados con ` — `, `Período`
   normalizado, `Bloque`, notas al pie excluidas).
 
+## Cuadragésima segunda pasada — índice del contenido de los tabulados del Censo 2022 y velocidad de `search_anda` (2026-11-08)
+
+**Tabulados.** Los 19 XLSX de `/resultados-censo/` (los 18 de las pestañas
+Población/Vivienda/Hogar más la Serie histórica 1950-2022; 0,3-8,9 MB, ninguno
+sobre el umbral de 25 MB) comparten diseño: hoja `Índice` (`Tabla.N°` /
+`Contenido`) y una hoja por tabla donde la fila 4 dice `Nombre de la tabla:` (a
+veces `Cuadro N°`), y la fila `Índice` abre el encabezado (columna B = geografía,
+siguientes = variables). Hay 282 tablas. Las hojas `N`, `N.1`, `N.2` repiten la
+misma tabla a nivel provincia, cantón y parroquia, así que los niveles se
+leen del título y del encabezado de geografía, no del nombre de la hoja.
+- Construido: `helpers/censo_index_build.py` (script `scripts/build_censo_index.py`)
+  lee solo las primeras 16 filas de cada hoja (openpyxl `read_only`), descarga
+  con tope (`--max-mb`) y guarda `helpers/data/censo_tabulados_index.json`
+  (~160 KB) con URL, SHA-256, tamaño y fecha por archivo. El servidor solo lee
+  ese JSON.
+- Qué no está en el índice: "migración" y "agua potable" no aparecen como
+  palabras en los títulos (son "lugar de nacimiento", "agua por red pública"),
+  así que se añadieron alias (`potable`, `discapacidad`, `etnia`, `defunciones`).
+  Es un recurso estático: si INEC republica un XLSX hay que reconstruirlo; el
+  SHA-256 permite saber qué cambió.
+- Los CSV comparten las tablas de su XLSX (mismo rótulo base de la página).
+
+**ANDA.** Medido en vivo (`search_anda("encuesta", limit=50)`, 50 resultados, 35
+con microdatos): ya antes de esta pasada las sondas corrían 6 a la vez, así que
+el costo real no era la secuencialidad de las sondas sino el volumen (71
+solicitudes: 3 de catálogo + 2 por estudio) y la paginación secuencial del
+catálogo (~4,3 s solo con `verificar_acceso=false`).
+| Variante | Tiempo | Solicitudes |
+|---|---|---|
+| antes (verificar todo, 6 a la vez) | 5,1-5,4 s | 71 |
+| `auto`, frío | 3,4 s | 23 |
+| `auto`, caché en disco | 2,8 s | 3 |
+| `true`, frío (8 a la vez, páginas en paralelo) | 4,0 s | 69 |
+| `true`, caché en disco | 2,8 s | 3 |
+| `false` | 2,9-4,3 s | 3 |
+- El listado trae `changed` (fecha de modificación del estudio): se usa en la
+  clave del caché persistente junto con un TTL de 7 días, porque ANDA puede
+  cambiar el acceso sin tocar `changed`.
+- `form_model` fiable para saltarse la sonda: solo `public` (login; 351, 365,
+  389). `direct` no lo es (CPV 2022) y `remote`/`licensed` nunca se vieron en vivo
+  (de 100 filas de "encuesta": `data_na` 57, `direct` 40, `public` 2, nulo 1), así que
+  esos siguen sondeándose.
+- Compromiso de `auto`: los resultados 11+ de una página quedan `desconocido`
+  hasta que se pida `verificar_acceso=true` o `get_anda_survey_info`. La
+  exactitud de los 10 primeros no cambia.
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

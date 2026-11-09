@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+- **Census 2022: search inside the tabulados.** `search_archivos(fuente="censo")`
+  matched only file names plus one hand-written ICT description. A committed
+  index (`helpers/data/censo_tabulados_index.json`, 19 workbooks, 282 tables)
+  now records, per sheet, the table title, geographic levels (provincia,
+  cantón, parroquia) and column headers, with each file's URL, SHA-256, size
+  and extraction date. Queries such as `computadora`, `discapacidad`, `agua
+  potable`, `tablet` or `parroquia` match on those and the results carry
+  `tablas_coincidentes` (sheet, title, levels, columns) and `tablas_total`;
+  files whose label matches rank first. If censoecuador.gob.ec is unreachable
+  (network error or HTTP 5xx) the tabulado list comes from the index with an
+  `aviso`; 403/404 still raise. No workbook is downloaded at query time.
+  Refresh with `uv run python scripts/build_censo_index.py` (also
+  `python -m helpers.censo_index_build`; workbooks above `--max-mb`, default
+  25, are skipped and listed under `omitidos`).
+- **`search_anda`: faster access checks, new default `verificar_acceso="auto"`.**
+  The check of each result's real download page (up to 2 requests each) made a
+  50-result search ~70 requests. Now: catalog pages are fetched concurrently,
+  probes run 8 at a time, answers are cached per study on disk for 7 days
+  (keyed by id + the catalog's `changed` date; the 6 h memory cache stays), and
+  `form_model=public` (ANDA's login wall) is classified from the catalog
+  without a probe. `"auto"` (default) verifies only the first 10 results and
+  marks the rest `tipo_acceso: "desconocido"` with `nota_acceso` and a top-level
+  `aviso_verificacion`; `true` verifies all of them, `false` trusts the catalog
+  flag (both unchanged). Live, `search_anda("encuesta", limit=50)`: 5.1-5.4 s and
+  71 requests before; auto 3.4 s / 23 requests cold and 2.8 s / 3 warm; `true`
+  4.0 s / 69 cold.
+
 - **`get_bce_iem_table`: multi-row headers and month rows in "tabla_larga".**
   `iem-451-e` (consumer confidence, bulletin 2095) returned headers such as
   `["Período (5)(6)\\Variable","","TOTAL NACIONAL","","","URBANO",...]` and only
