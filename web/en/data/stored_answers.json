@@ -1,5 +1,5 @@
 {
-  "extracted_at": "2026-11-08",
+  "extracted_at": "2026-11-09",
   "server_version": "0.15.0",
   "answers": [
     {
@@ -37,7 +37,7 @@
     {
       "id": "manta-compras",
       "question": "How much did the public sector contract in Manta in 2025?",
-      "answer": "253 procedures worth US$ 36.2 million (awarded or estimated value of 207 procedures with an amount). The largest buyers were the Manta General Hospital (US$ 18.8 million) and the Municipality of Manta (US$ 9.1 million).",
+      "answer": "253 procedures worth US$ 42.5 million (awarded or estimated value of 214 procedures with an amount). The largest buyers were the Manta General Hospital (US$ 19.2 million) and the Municipality of Manta (US$ 12.1 million).",
       "tools": ["get_resumen_compras"],
       "source": "SERCOP · public procurement (OCDS)",
       "url": "https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/procedimientos"
@@ -45,7 +45,7 @@
     {
       "id": "cortes-luz",
       "question": "Are there scheduled power outages in Ambato or Puyo?",
-      "answer": "Yes, 5 active notices. For example: Monday, November 9, from 09:00 to 14:00, in the Callate San Antonio neighborhood (Píllaro); Tuesday, November 10, from 10:00 to 14:00, in the La Libertad neighborhood of Puyo, for pole removal.",
+      "answer": "Yes, 3 active notices. For example: Monday, November 9, from 09:00 to 14:00, in the Callate San Antonio neighborhood (Píllaro); Tuesday, November 10, from 10:00 to 14:00, in the La Libertad neighborhood (Puyo).",
       "tools": ["search_cortes", "get_cortes_horarios"],
       "source": "EEASA · scheduled works",
       "url": "https://www.eeasa.com.ec/trabajos-programados/"

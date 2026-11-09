@@ -1,5 +1,5 @@
 {
-  "extracted_at": "2026-11-08",
+  "extracted_at": "2026-11-09",
   "server_version": "0.15.0",
   "answers": [
     {
@@ -37,7 +37,7 @@
     {
       "id": "manta-compras",
       "question": "¿Cuánto contrató el sector público en Manta en 2025?",
-      "answer": "253 procesos por US$ 36,2 millones (valor adjudicado o estimado de 207 procesos con monto). Los mayores compradores fueron el Hospital General Manta (US$ 18,8 millones) y el Municipio de Manta (US$ 9,1 millones).",
+      "answer": "253 procesos por US$ 42,5 millones (valor adjudicado o estimado de 214 procesos con monto). Los mayores compradores fueron el Hospital General Manta (US$ 19,2 millones) y el Municipio de Manta (US$ 12,1 millones).",
       "tools": ["get_resumen_compras"],
       "source": "SERCOP · compras públicas (OCDS)",
       "url": "https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/procedimientos"
@@ -45,7 +45,7 @@
     {
       "id": "cortes-luz",
       "question": "¿Hay cortes de luz programados en Ambato o el Puyo?",
-      "answer": "Sí, 5 avisos vigentes. Por ejemplo: lunes 9 de noviembre, de 09:00 a 14:00, en el barrio Callate San Antonio (Píllaro); martes 10, de 10:00 a 14:00, en el barrio La Libertad del Puyo, por retiro de postes.",
+      "answer": "Sí, 3 avisos vigentes. Por ejemplo: lunes 9 de noviembre, de 09:00 a 14:00, en el barrio Callate San Antonio (Píllaro); martes 10, de 10:00 a 14:00, en el barrio La Libertad (Puyo).",
       "tools": ["search_cortes", "get_cortes_horarios"],
       "source": "EEASA · trabajos programados",
       "url": "https://www.eeasa.com.ec/trabajos-programados/"
