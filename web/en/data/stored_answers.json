@@ -13,7 +13,7 @@
     {
       "id": "sismos",
       "question": "Were there any strong earthquakes in Ecuador this week?",
-      "answer": "The strongest within Ecuadorian territory was magnitude 4.8, 45.7 km from Salinas (Santa Elena), on November 7 at 17:17, at a depth of 2.4 km. There was also a 3.7 near Pasaje (El Oro).",
+      "answer": "The strongest within Ecuadorian territory was magnitude 4.7, 44.5 km from Puerto Lopez (Manabi), on November 7 at 17:17, at a depth of 30.7 km. There was also a 3.7 near Pasaje (El Oro).",
       "tools": ["search_sismos"],
       "source": "IG-EPN · seismic catalog",
       "url": "https://www.igepn.edu.ec/portal/eventos/www/events/igepn2026vvse/overview.html"
@@ -32,7 +32,8 @@
       "answer": "RUC 1790016919001. Active corporation (sociedad anónima), incorporated on November 30, 1957 in Quito, with subscribed capital of US$ 900 million. Activity: retail trade (CIIU G4711.01). Latest balance sheet filed: 2025.",
       "tools": ["search_companias"],
       "source": "Superintendencia de Compañías · company directory",
-      "url": "https://mercadodevalores.supercias.gob.ec/"
+      "url": "https://mercadodevalores.supercias.gob.ec/",
+      "extracted_at": "2026-11-09"
     },
     {
       "id": "manta-compras",
@@ -46,7 +47,7 @@
     {
       "id": "cortes-luz",
       "question": "Are there scheduled power outages in Ambato or Puyo?",
-      "answer": "Yes, 3 active notices. For example: Monday, November 9, from 09:00 to 14:00, in the Callate San Antonio neighborhood (Píllaro); Tuesday, November 10, from 10:00 to 14:00, in the La Libertad neighborhood (Puyo).",
+      "answer": "Yes, 4 active notices. For example: Tuesday, November 10, from 10:00 to 14:00, in the La Libertad neighborhood (Puyo); Wednesday, November 11, from 09:00 to 10:00, in Provincia Pastaza, Cantón Pastaza, Parroquia Fátima, en la Vía Puyo - Tena, a 100 Metros Antes de Llegar a los Hangares del Consejo Provincial de Pastaza.",
       "tools": ["search_cortes", "get_cortes_horarios"],
       "source": "EEASA · scheduled works",
       "url": "https://www.eeasa.com.ec/trabajos-programados/"
@@ -57,7 +58,8 @@
       "answer": "According to the 2022 Census, 65.0% of households in Manta have fixed internet (66.6% in urban areas and 33.1% in rural areas), compared with 47.4% in Manabí and 60.9% nationwide.",
       "tools": ["search_archivos"],
       "source": "INEC · 2022 Census, ICT tabulation",
-      "url": "https://www.censoecuador.gob.ec/resultados-censo/"
+      "url": "https://www.censoecuador.gob.ec/resultados-censo/",
+      "extracted_at": "2026-11-09"
     },
     {
       "id": "censo-internet",
@@ -65,7 +67,8 @@
       "answer": "In the «Information technologies» tabulation of the 2022 Census (03_2022_CPV_TIC.xlsx), with households by internet, computer and cell phone availability by province, canton and parish.",
       "tools": ["search_anda", "download_anda_microdata", "search_archivos"],
       "source": "INEC · censoecuador.gob.ec",
-      "url": "https://www.censoecuador.gob.ec/resultados-censo/"
+      "url": "https://www.censoecuador.gob.ec/resultados-censo/",
+      "extracted_at": "2026-11-09"
     }
   ]
 }

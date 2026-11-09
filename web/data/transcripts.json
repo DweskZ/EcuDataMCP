@@ -18,7 +18,7 @@
       {"kind": "question", "step": -1, "text": "¿Hubo temblores fuertes en Ecuador esta semana?"},
       {"kind": "call", "step": 0, "n": "01", "tool": "search_sismos", "args": "dias=7, magnitud_minima=3.5", "result": "6 eventos · catálogo IG-EPN"},
       {"kind": "reason", "step": 2, "n": "03", "text": "el asistente filtra los eventos dentro del Ecuador y los ordena por magnitud"},
-      {"kind": "answer", "step": 3, "n": "04", "text": "El más fuerte en Ecuador fue de **magnitud 4,8**, a 45,7 km de Salinas (Santa Elena), el 7 de noviembre a las 17:17, a 2,4 km de profundidad. También hubo uno de 3,7 cerca de Pasaje (El Oro).", "cite": "igepn.edu.ec · evento igepn2026vvse"}
+      {"kind": "answer", "step": 3, "n": "04", "text": "El más fuerte en Ecuador fue de **magnitud 4,7**, a 44,5 km de Puerto Lopez (Manabi), el 7 de noviembre a las 17:17, a 30,7 km de profundidad. También hubo uno de 3,7 cerca de Pasaje (El Oro).", "cite": "igepn.edu.ec · evento igepn2026vvse"}
     ]
   },
   {
