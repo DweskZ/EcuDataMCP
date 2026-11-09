@@ -23,6 +23,21 @@ WEB = Path(__file__).parent
 TEMPLATES = WEB / "templates"
 DATA = WEB / "data"
 ASSETS = WEB / "assets"
+
+
+def _asset_version() -> str:
+    """Short content hash of the shipped CSS/JS so browsers refetch them after
+    each deploy instead of serving a stale cached copy."""
+    import hashlib
+
+    h = hashlib.sha256()
+    for f in sorted(ASSETS.glob("*.css")) + sorted(ASSETS.glob("*.js")):
+        h.update(f.name.encode())
+        h.update(f.read_bytes())
+    return h.hexdigest()[:10]
+
+
+ASSET_VERSION = _asset_version()
 SITE = WEB / "_site"
 
 PAGES = ["index", "atlas", "examples", "releases", "about", "colaborar"]
@@ -598,6 +613,7 @@ def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
             lang=lang,
             root=root,
             assets=assets_prefix,
+            v=ASSET_VERSION,
             nav=NAV[lang],
             lang_switch_href=f"{other_root}{other_page}.html",
             t=TRANSLATIONS[lang],
@@ -647,6 +663,7 @@ def write_404(env: jinja2.Environment):
         lang="es",
         root=base,
         assets=f"{base}assets/",
+        v=ASSET_VERSION,
         nav=NAV["es"],
         lang_switch_href=f"{base}en/index.html",
         t=TRANSLATIONS["es"],
