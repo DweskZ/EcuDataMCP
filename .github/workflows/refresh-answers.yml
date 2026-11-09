@@ -1,0 +1,58 @@
+name: Refresh stored answers
+
+# Re-runs the tool calls behind the homepage's stored answers and terminal
+# transcripts (web/scripts/refresh_answers.py), in-process against the live
+# government sources, and opens a PR with the result. It never merges: the PR
+# is a human review gate, so a reviewer reads the numbers before they go live.
+#
+# Heads up: PRs opened with the default GITHUB_TOKEN do not trigger other
+# workflows (ci.yml). Close and reopen the PR, or push to it, to run CI.
+
+on:
+  schedule:
+    - cron: "0 12 * * 1" # Mondays 12:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: refresh-answers
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: uv sync --locked
+      # Exit 0 = full or partial refresh (answers that failed keep their previous
+      # text and are listed in the report); 3 = nothing could be refreshed.
+      - name: Refresh answers
+        run: uv run python web/scripts/refresh_answers.py --report "$RUNNER_TEMP/refresh-report.md"
+      - name: Check the site still builds
+        working-directory: web
+        run: |
+          uv sync --locked
+          uv run python scripts/extract_tool_signatures.py
+          uv run python build.py
+      - name: Open or update the pull request
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          branch: chore/refresh-stored-answers
+          delete-branch: true
+          commit-message: "chore(web): refresh stored answers and transcripts"
+          title: "chore(web): refresh stored answers and transcripts"
+          body-path: ${{ runner.temp }}/refresh-report.md
+          add-paths: |
+            web/data/stored_answers.json
+            web/data/transcripts.json
+            web/en/data/stored_answers.json
+            web/en/data/transcripts.json
+          sign-commits: false
