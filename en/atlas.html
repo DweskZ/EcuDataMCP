@@ -19,132 +19,55 @@
 <meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
-<script>
-(function () {
-  try {
-    var stored = localStorage.getItem("ecudata-theme");
-    var theme = stored || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
-    document.documentElement.setAttribute("data-theme", theme);
-  } catch (e) {
-    document.documentElement.setAttribute("data-theme", "dark");
-  }
-})();
-</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../assets/styles.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/site.css">
+
 <link rel="stylesheet" href="../assets/atlas.css">
-<style>@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }</style>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
-<div class="ecu-flag-stripe" aria-hidden="true"></div>
-<nav class="navbar navbar-expand-lg site-navbar" data-bs-theme="dark">
-  <div class="navbar-container container-fluid">
-    <div class="navbar-brand-container mx-auto">
-      <a class="navbar-brand" href="index.html">
-        <span class="brand-logo-wrap" aria-hidden="true">
-          <img class="brand-logo logo-light" src="../assets/logo-navy.svg" width="28" height="28" alt="" decoding="async">
-          <img class="brand-logo logo-dark" src="../assets/logo-light.svg" width="28" height="28" alt="" decoding="async">
-        </span>
-        <span class="navbar-title">EcuDataMCP</span>
-      </a>
-    </div>
-    <button class="site-search-toggle" type="button" title="Search" aria-label="Search" aria-expanded="false" aria-controls="siteSearchPanel">
-      <svg class="icon-search" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.75"/><line x1="10.2" y1="10.2" x2="14" y2="14"/></svg>
-    </button>
-    <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" data-nav-toggle="navbarCollapse">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-      <ul class="navbar-nav navbar-nav-scroll me-auto">
+<div class="tri" aria-hidden="true"></div>
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="index.html">
+      <img class="brand-logo" src="../assets/logo-navy.svg" width="28" height="28" alt="" decoding="async">
+      <span>EcuDataMCP</span>
+    </a>
+    <nav class="nav-links" id="navbarCollapse" aria-label="Main">
+      <a href="index.html#how-it-works">How it works</a>
+      <a href="fuentes.html">Sources</a>
+      <a href="atlas.html" aria-current="page">Reference</a>
+      <a href="examples.html">Examples</a>
+      <a href="releases.html">Releases</a>
+      <a href="about.html">About</a>
+      <a href="colaborar.html">Contribute</a>
+      
+    </nav>
+    <div class="nav-tools">
+      <button class="site-search-toggle" type="button" title="Search" aria-label="Search" aria-expanded="false" aria-controls="siteSearchPanel">
+        <svg class="icon-search" width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.75"/><line x1="10.2" y1="10.2" x2="14" y2="14"/></svg>
+      </button>
+      <div class="lang-toggle" role="group" aria-label="Language / Idioma">
         
-        <li class="nav-item">
-          <a class="nav-link" href="index.html#how-it-works">
-            <span class="menu-text">How it works</span>
-          </a>
-        </li>
+        <a class="lang-toggle-option" href="../atlas.html" hreflang="es" lang="es">ES</a>
+        <span class="lang-toggle-option active" aria-current="true">EN</span>
         
-        <li class="nav-item">
-          <a class="nav-link" href="fuentes.html">
-            <span class="menu-text">Sources</span>
-          </a>
-        </li>
-        
-        <li class="nav-item">
-          <a class="nav-link active" href="atlas.html" aria-current="page">
-            <span class="menu-text">Reference</span>
-          </a>
-        </li>
-        
-        <li class="nav-item">
-          <a class="nav-link" href="examples.html">
-            <span class="menu-text">Examples</span>
-          </a>
-        </li>
-        
-        <li class="nav-item">
-          <a class="nav-link" href="releases.html">
-            <span class="menu-text">Releases</span>
-          </a>
-        </li>
-        
-        <li class="nav-item">
-          <a class="nav-link" href="about.html">
-            <span class="menu-text">About</span>
-          </a>
-        </li>
-        
-        <li class="nav-item">
-          <a class="nav-link" href="colaborar.html">
-            <span class="menu-text">Contribute</span>
-          </a>
-        </li>
-        
-      </ul>
-      <ul class="navbar-nav navbar-nav-scroll ms-auto">
-        <li class="nav-item">
-          <button
-            type="button"
-            class="theme-toggle"
-            data-theme-toggle
-            aria-label="Switch to light mode"
-            data-label-light="Switch to light mode"
-            data-label-dark="Switch to dark mode"
-          >
-            <svg class="icon-theme icon-sun" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-              <circle cx="8" cy="8" r="2.75"/>
-              <path stroke-linecap="round" d="M8 1.5v1.4M8 13.1v1.4M1.5 8h1.4M13.1 8h1.4M3.4 3.4l1 1M11.6 11.6l1 1M12.6 3.4l-1 1M4.4 11.6l-1 1"/>
-            </svg>
-            <svg class="icon-theme icon-moon" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M13.2 9.2A5.2 5.2 0 0 1 6.8 2.8 5.4 5.4 0 1 0 13.2 9.2z"/>
-            </svg>
-          </button>
-        </li>
-        <li class="nav-item">
-          <div class="lang-toggle" role="group" aria-label="Language / Idioma">
-            
-            <a class="lang-toggle-option" href="../atlas.html">ES</a>
-            <span class="lang-toggle-option active" aria-current="true">EN</span>
-            
-          </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link github-mark" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener" aria-label="GitHub">
-            <span class="menu-text">GitHub</span>
-          </a>
-        </li>
-      </ul>
+      </div>
+      <a class="btn github-btn" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn y" href="index.html#connect">Install</a>
+      <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" data-nav-toggle="navbarCollapse">
+        <span class="navbar-toggler-icon" aria-hidden="true"></span>
+      </button>
     </div>
   </div>
-</nav>
+</header>
 
 <div class="site-search-panel" id="siteSearchPanel" hidden>
-  <div class="site-search-panel-inner">
-    <input type="text" id="siteSearchInput" class="site-search-input" aria-label="Search" placeholder="Search the site…" autocomplete="off">
-    <div id="siteSearchResults" class="site-search-results"></div>
+  <div class="site-search-panel-inner" role="dialog" aria-modal="true" aria-label="Search">
+    <input type="search" id="siteSearchInput" class="site-search-input" aria-label="Search" placeholder="Search the site…" autocomplete="off">
+    <div id="siteSearchResults" class="site-search-results" aria-live="polite"></div>
   </div>
 </div>
 
@@ -598,13 +521,13 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-search_anda" data-search="search_anda search inec's anda catalog of surveys and censuses (nada/ihsn). indicates whether each survey has downloadable microdata. search inec's anda catalog (anda.inec.gob.ec) of surveys and censuses. anda runs on nada (world bank/ihsn), separate from datosabiertos.gob.ec. it catalogs 437+ inec surveys/censuses with metadata (title, year, authoring entity). not every entry has downloadable microdata — many are aggregate-only publications (e.g. price indices); each result says so. follow up with get_anda_survey_info(idno) for full metadata on one survey. query search keywords (e.g. &quot;empleo&quot;, &quot;reem&quot;, &quot;censo agropecuario&quot;) limit max results (default: 10, max: 50) page page of results, 1-based (default: 1); see total/total_pages format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-search_anda" data-search="search_anda search inec's anda catalog of surveys and censuses (nada/ihsn). indicates whether each survey's microdata can be obtained and how (tipo_acceso). search inec's anda catalog (anda.inec.gob.ec) of surveys and censuses. anda runs on nada (world bank/ihsn), separate from datosabiertos.gob.ec. it catalogs 437+ inec surveys/censuses with metadata (title, year, authoring entity). not every entry has downloadable microdata — many are aggregate-only publications (e.g. price indices); each result says so. microdatos_disponibles is checked against each study's real download page (verificar_acceso=true) and tipo_acceso says how: directo (files in anda), enlace_externo (anda only links to another site, e.g. the 2022 census to censoecuador.gob.ec), registro (anda login), solicitud or ninguno. the catalog flag alone is unreliable: it marks the 2022 census &quot;direct&quot; although no file is attached. if a check fails the result falls back to the catalog flag with tipo_acceso &quot;desconocido&quot;. follow up with get_anda_survey_info(idno) for full metadata on one survey. query search keywords (e.g. &quot;empleo&quot;, &quot;reem&quot;, &quot;censo agropecuario&quot;) limit max results (default: 10, max: 50) page page of results, 1-based (default: 1); see total/total_pages verificar_acceso check each result's real download page (2 extra requests per result with microdata, cached 6 h); false trusts the catalog flag and is faster format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_anda</code>
-<span class="atlas-tool-desc">Search INEC&#39;s ANDA catalog of surveys and censuses (NADA/IHSN). Indicates whether each survey has downloadable microdata.</span>
+<span class="atlas-tool-desc">Search INEC&#39;s ANDA catalog of surveys and censuses (NADA/IHSN). Indicates whether each survey&#39;s microdata can be obtained and how (tipo_acceso).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Search INEC&#39;s ANDA catalog (anda.inec.gob.ec) of surveys and censuses. ANDA runs on NADA (World Bank/IHSN), separate from datosabiertos.gob.ec. It catalogs 437+ INEC surveys/censuses with metadata (title, year, authoring entity). Not every entry has downloadable microdata — many are aggregate-only publications (e.g. price indices); each result says so. Follow up with get_anda_survey_info(idno) for full metadata on one survey.</p>
+<p class="atlas-tool-long">Search INEC&#39;s ANDA catalog (anda.inec.gob.ec) of surveys and censuses. ANDA runs on NADA (World Bank/IHSN), separate from datosabiertos.gob.ec. It catalogs 437+ INEC surveys/censuses with metadata (title, year, authoring entity). Not every entry has downloadable microdata — many are aggregate-only publications (e.g. price indices); each result says so. microdatos_disponibles is checked against each study&#39;s real download page (verificar_acceso=true) and tipo_acceso says how: directo (files in ANDA), enlace_externo (ANDA only links to another site, e.g. the 2022 Census to censoecuador.gob.ec), registro (ANDA login), solicitud or ninguno. The catalog flag alone is unreliable: it marks the 2022 Census &#34;direct&#34; although no file is attached. If a check fails the result falls back to the catalog flag with tipo_acceso &#34;desconocido&#34;. Follow up with get_anda_survey_info(idno) for full metadata on one survey.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
@@ -616,6 +539,8 @@
 
 <tr><td><code>page</code></td><td><code>int</code></td><td><code>1</code></td><td>Page of results, 1-based (default: 1); see total/total_pages</td></tr>
 
+<tr><td><code>verificar_acceso</code></td><td><code>bool</code></td><td><code>True</code></td><td>Check each result&#39;s real download page (2 extra requests per result with microdata, cached 6 h); false trusts the catalog flag and is faster</td></tr>
+
 <tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>Output format: `text` (default) or `json`.</td></tr>
 
 </tbody>
@@ -624,13 +549,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-get_anda_survey_info" data-search="get_anda_survey_info full metadata for an anda survey: summary, variables, confidentiality, and contact. get full metadata for one anda (inec) survey/census by its idno. get the idno from search_anda results — it's the string identifier (e.g. &quot;idd-ecu-inec-cgtpe-decon-enesem-2023-v1.3&quot;), not the numeric id. returns scope/abstract, variable count, whether microdata is actually downloadable, confidentiality terms, and a contact email for requesting restricted data when it isn't. idno survey identifier from search_anda (the &quot;idno&quot; field) format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-get_anda_survey_info" data-search="get_anda_survey_info full metadata for an anda survey: summary, variables, confidentiality, and contact. get full metadata for one anda (inec) survey/census by its idno. get the idno from search_anda results — it's the string identifier (e.g. &quot;idd-ecu-inec-cgtpe-decon-enesem-2023-v1.3&quot;), not the numeric id. returns scope/abstract, variable count, whether microdata is actually obtainable and how (tipo_acceso, checked on the real download page, with any external links; see download_anda_microdata), confidentiality terms, and a contact email for requesting restricted data when it isn't. idno survey identifier from search_anda (the &quot;idno&quot; field) format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">get_anda_survey_info</code>
 <span class="atlas-tool-desc">Full metadata for an ANDA survey: summary, variables, confidentiality, and contact.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Get full metadata for one ANDA (INEC) survey/census by its idno. Get the idno from search_anda results — it&#39;s the string identifier (e.g. &#34;IDD-ECU-INEC-CGTPE-DECON-ENESEM-2023-v1.3&#34;), not the numeric id. Returns scope/abstract, variable count, whether microdata is actually downloadable, confidentiality terms, and a contact email for requesting restricted data when it isn&#39;t.</p>
+<p class="atlas-tool-long">Get full metadata for one ANDA (INEC) survey/census by its idno. Get the idno from search_anda results — it&#39;s the string identifier (e.g. &#34;IDD-ECU-INEC-CGTPE-DECON-ENESEM-2023-v1.3&#34;), not the numeric id. Returns scope/abstract, variable count, whether microdata is actually obtainable and how (tipo_acceso, checked on the real download page, with any external links; see download_anda_microdata), confidentiality terms, and a contact email for requesting restricted data when it isn&#39;t.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
@@ -646,13 +571,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-download_anda_microdata" data-search="download_anda_microdata direct download links for an anda survey's microdata files. get direct download links for an anda survey's microdata files. automates anda's one-click usage-terms step (research/statistical use only, no re-identifying respondents, cite the source — see get_anda_survey_info for the full text) to reveal the file list. check get_anda_survey_info first: aggregate-only surveys (microdatos_disponibles false) have no files here. returns direct urls, not the file contents — the files are typically multi-mb zips (spss .sav inside), too large to embed in a tool result. download them with the returned url. idno survey identifier from search_anda (the &quot;idno&quot; field) format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-download_anda_microdata" data-search="download_anda_microdata download links for an anda survey's microdata, with its tipo_acceso (directo, enlace_externo, registro, solicitud, ninguno). links to an anda survey's microdata and how it is served. automates anda's one-click usage-terms step (research/statistical use only, no re-identifying respondents, cite the source — see get_anda_survey_info) to reveal the list. tipo_acceso is read from the real download page, not the catalog flag: directo (files hosted by anda, in `archivos`), enlace_externo (anda only links to another site, in `enlaces_externos`; the 2022 census points to censoecuador.gob.ec), registro (anda login), solicitud (request to inec) or ninguno. a study can be flagged &quot;direct&quot; in the catalog and have no attached file: total_archivos 0 with enlace_externo means the data lives elsewhere; follow `siguiente_paso` (e.g. search_archivos(fuente=&quot;censo&quot;)). returns urls, not contents; anda files are usually multi-mb zips. idno survey identifier from search_anda (the &quot;idno&quot; field) format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">download_anda_microdata</code>
-<span class="atlas-tool-desc">Direct download links for an ANDA survey&#39;s microdata files.</span>
+<span class="atlas-tool-desc">Download links for an ANDA survey&#39;s microdata, with its tipo_acceso (directo, enlace_externo, registro, solicitud, ninguno).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Get direct download links for an ANDA survey&#39;s microdata files. Automates ANDA&#39;s one-click usage-terms step (research/statistical use only, no re-identifying respondents, cite the source — see get_anda_survey_info for the full text) to reveal the file list. Check get_anda_survey_info first: aggregate-only surveys (microdatos_disponibles false) have no files here. Returns direct URLs, not the file contents — the files are typically multi-MB ZIPs (SPSS .sav inside), too large to embed in a tool result. Download them with the returned URL.</p>
+<p class="atlas-tool-long">Links to an ANDA survey&#39;s microdata and how it is served. Automates ANDA&#39;s one-click usage-terms step (research/statistical use only, no re-identifying respondents, cite the source — see get_anda_survey_info) to reveal the list. tipo_acceso is read from the real download page, not the catalog flag: directo (files hosted by ANDA, in `archivos`), enlace_externo (ANDA only links to another site, in `enlaces_externos`; the 2022 Census points to censoecuador.gob.ec), registro (ANDA login), solicitud (request to INEC) or ninguno. A study can be flagged &#34;direct&#34; in the catalog and have no attached file: total_archivos 0 with enlace_externo means the data lives elsewhere; follow `siguiente_paso` (e.g. search_archivos(fuente=&#34;censo&#34;)). Returns URLs, not contents; ANDA files are usually multi-MB ZIPs.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
@@ -2446,13 +2371,13 @@
 </summary>
 <div class="atlas-category-tools">
 
-<details class="atlas-tool" id="tool-search_archivos" data-search="search_archivos file links published by one institution (sri, mef, senae, inec, minedec, etc.). searches one institution's catalog of published files and returns direct links (title, url, format), not contents. sources: sri_datasets, sri_recaudacion, mef, senae, censo, minedec, senescyt, msp, cnig, trabajo_boletin, salarios, arcotel_boletines and arcotel_mensuales. download with download_resource or read_pdf (5 mb cap). source turismo: the monthly tourism figures bulletins (november 2025 on), now published by the ministry of production; pdf only, read_pdf extracts the tables. source fedexpor: fedexpor's monthly expordata foreign-trade report from january 2026, on google drive (~30 mb, over read_pdf's cap; descarga_directa is the direct link). source aeade: aeade's monthly vehicle-sales bulletins (tipo boletin_ventas) and sector yearbooks (tipo anuario). new sources: arcotel_series (the newest xlsx of each of arcotel's 25 statistical series, each with full history), msp_precios (medicine ceiling prices, every revision since 2016), mit_vias (mit's daily state-road status report) and minedec_bases (amie registers by school year 2009-2010 to 2024-2025, start and end cuts, xlsx and csv, plus thematic files). fuente catalog to search; see the list of sources. query free text matched (accent-insensitive) against each file's title and source fields. empty returns all files. limit max files returned (1-100, default 50). offset pagination offset over the matched files. formato optional exact file format (pdf, xlsx, csv, zip...); not for sri_datasets, sri_recaudacion or censo. format output format: `text` (default) or `json`.">
+<details class="atlas-tool" id="tool-search_archivos" data-search="search_archivos file links published by one institution (sri, mef, senae, inec, minedec, etc.). searches one institution's catalog of published files and returns direct links (title, url, format), not contents. sources: sri_datasets, sri_recaudacion, mef, senae, censo, minedec, senescyt, msp, cnig, trabajo_boletin, salarios, arcotel_boletines and arcotel_mensuales. source censo (censoecuador.gob.ec): ~100 files with `tipo` tabulado, microdatos, diccionario or documento; the results tabulados by theme (population, housing, household) as xlsx or csv-in-zip — the household ict one (cellphone, internet, computer, tablet by province and cantón) comes up with query &quot;internet&quot; or &quot;tic&quot; —, the microdata bases by cantón, sector and city block (csv, spss, redatam) and the dictionaries. download with download_resource or read_pdf (5 mb cap). source turismo: the monthly tourism figures bulletins (november 2025 on), now published by the ministry of production; pdf only, read_pdf extracts the tables. source fedexpor: fedexpor's monthly expordata foreign-trade report from january 2026, on google drive (~30 mb, over read_pdf's cap; descarga_directa is the direct link). source aeade: aeade's monthly vehicle-sales bulletins (tipo boletin_ventas) and sector yearbooks (tipo anuario). new sources: arcotel_series (the newest xlsx of each of arcotel's 25 statistical series, each with full history), msp_precios (medicine ceiling prices, every revision since 2016), mit_vias (mit's daily state-road status report) and minedec_bases (amie registers by school year 2009-2010 to 2024-2025, start and end cuts, xlsx and csv, plus thematic files). fuente catalog to search; see the list of sources. query free text matched (accent-insensitive) against each file's title and source fields. empty returns all files. limit max files returned (1-100, default 50). offset pagination offset over the matched files. formato optional exact file format (pdf, xlsx, csv, zip...); not for sri_datasets, sri_recaudacion or censo. format output format: `text` (default) or `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_archivos</code>
 <span class="atlas-tool-desc">File links published by one institution (SRI, MEF, SENAE, INEC, MINEDEC, etc.).</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Searches one institution&#39;s catalog of published files and returns direct links (title, URL, format), not contents. Sources: sri_datasets, sri_recaudacion, mef, senae, censo, minedec, senescyt, msp, cnig, trabajo_boletin, salarios, arcotel_boletines and arcotel_mensuales. Download with download_resource or read_pdf (5 MB cap). Source turismo: the monthly tourism figures bulletins (November 2025 on), now published by the Ministry of Production; PDF only, read_pdf extracts the tables. Source fedexpor: FEDEXPOR&#39;s monthly Expordata foreign-trade report from January 2026, on Google Drive (~30 MB, over read_pdf&#39;s cap; descarga_directa is the direct link). Source aeade: AEADE&#39;s monthly vehicle-sales bulletins (tipo boletin_ventas) and sector yearbooks (tipo anuario). New sources: arcotel_series (the newest XLSX of each of ARCOTEL&#39;s 25 statistical series, each with full history), msp_precios (medicine ceiling prices, every revision since 2016), mit_vias (MIT&#39;s daily state-road status report) and minedec_bases (AMIE registers by school year 2009-2010 to 2024-2025, start and end cuts, XLSX and CSV, plus thematic files).</p>
+<p class="atlas-tool-long">Searches one institution&#39;s catalog of published files and returns direct links (title, URL, format), not contents. Sources: sri_datasets, sri_recaudacion, mef, senae, censo, minedec, senescyt, msp, cnig, trabajo_boletin, salarios, arcotel_boletines and arcotel_mensuales. Source censo (censoecuador.gob.ec): ~100 files with `tipo` tabulado, microdatos, diccionario or documento; the results tabulados by theme (population, housing, household) as XLSX or CSV-in-ZIP — the household ICT one (cellphone, internet, computer, tablet by province and cantón) comes up with query &#34;internet&#34; or &#34;tic&#34; —, the microdata bases by cantón, sector and city block (CSV, SPSS, REDATAM) and the dictionaries. Download with download_resource or read_pdf (5 MB cap). Source turismo: the monthly tourism figures bulletins (November 2025 on), now published by the Ministry of Production; PDF only, read_pdf extracts the tables. Source fedexpor: FEDEXPOR&#39;s monthly Expordata foreign-trade report from January 2026, on Google Drive (~30 MB, over read_pdf&#39;s cap; descarga_directa is the direct link). Source aeade: AEADE&#39;s monthly vehicle-sales bulletins (tipo boletin_ventas) and sector yearbooks (tipo anuario). New sources: arcotel_series (the newest XLSX of each of ARCOTEL&#39;s 25 statistical series, each with full history), msp_precios (medicine ceiling prices, every revision since 2016), mit_vias (MIT&#39;s daily state-road status report) and minedec_bases (AMIE registers by school year 2009-2010 to 2024-2025, start and end cuts, XLSX and CSV, plus thematic files).</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
@@ -2632,22 +2557,45 @@
 
 </main>
 
-<footer class="page-footer">
-  <div class="site-footer">
-    <div class="site-footer-brand">
-      <a class="site-footer-name" href="index.html">
-        <span class="brand-logo-wrap" aria-hidden="true">
-          <img class="brand-logo logo-light" src="../assets/logo-navy.svg" width="28" height="28" alt="" decoding="async">
-          <img class="brand-logo logo-dark" src="../assets/logo-light.svg" width="28" height="28" alt="" decoding="async">
-        </span>
-        EcuDataMCP
-      </a>
-      <p>MIT License · Independent project, not affiliated with any Ecuadorian government institution.</p>
+<footer class="site-footer">
+  <div class="wrap">
+    <h2 class="footer-cta">Ecuador&#39;s open data, <i>with your favorite AI assistant.</i></h2>
+    <div class="footer-actions">
+      <a class="btn y" href="index.html#connect">Install</a>
+      <a class="btn btn-dark" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">View on GitHub</a>
     </div>
-    <ul class="site-footer-links">
-      <li><a class="github-mark" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">GitHub</a></li>
-      <li><a href="releases.html">Releases</a></li>
-    </ul>
+    <div class="fgrid">
+      <div>
+        <a class="footer-brand" href="index.html">
+          <img class="brand-logo" src="../assets/logo-light.svg" width="26" height="26" alt="" decoding="async">
+          <span>EcuDataMCP</span>
+        </a>
+        <p>MIT License · Independent project, not affiliated with any Ecuadorian government institution.</p>
+      </div>
+      <div>
+        <b>Product</b>
+        <a href="index.html#how-it-works">How it works</a>
+        <a href="fuentes.html">Sources</a>
+        <a href="atlas.html">Tool reference</a>
+        <a href="examples.html">Examples</a>
+        
+      </div>
+      <div>
+        <b>Project</b>
+        <a href="releases.html">Releases</a>
+        <a href="colaborar.html">Contribute</a>
+        <a href="about.html">About</a>
+        
+        <a href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <div>
+        <b>Language</b>
+        
+        <a href="../atlas.html" hreflang="es" lang="es">Español</a>
+        <span class="footer-current" aria-current="true">English</span>
+        
+      </div>
+    </div>
   </div>
 </footer>
 

@@ -19,132 +19,55 @@
 <meta property="og:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dweskz.github.io/EcuDataMCP/assets/og-image.png">
-<script>
-(function () {
-  try {
-    var stored = localStorage.getItem("ecudata-theme");
-    var theme = stored || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
-    document.documentElement.setAttribute("data-theme", theme);
-  } catch (e) {
-    document.documentElement.setAttribute("data-theme", "dark");
-  }
-})();
-</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../assets/styles.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/site.css">
 
-<style>@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }</style>
+
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
-<div class="ecu-flag-stripe" aria-hidden="true"></div>
-<nav class="navbar navbar-expand-lg site-navbar" data-bs-theme="dark">
-  <div class="navbar-container container-fluid">
-    <div class="navbar-brand-container mx-auto">
-      <a class="navbar-brand" href="index.html">
-        <span class="brand-logo-wrap" aria-hidden="true">
-          <img class="brand-logo logo-light" src="../assets/logo-navy.svg" width="28" height="28" alt="" decoding="async">
-          <img class="brand-logo logo-dark" src="../assets/logo-light.svg" width="28" height="28" alt="" decoding="async">
-        </span>
-        <span class="navbar-title">EcuDataMCP</span>
-      </a>
-    </div>
-    <button class="site-search-toggle" type="button" title="Search" aria-label="Search" aria-expanded="false" aria-controls="siteSearchPanel">
-      <svg class="icon-search" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.75"/><line x1="10.2" y1="10.2" x2="14" y2="14"/></svg>
-    </button>
-    <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" data-nav-toggle="navbarCollapse">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-      <ul class="navbar-nav navbar-nav-scroll me-auto">
+<div class="tri" aria-hidden="true"></div>
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="index.html">
+      <img class="brand-logo" src="../assets/logo-navy.svg" width="28" height="28" alt="" decoding="async">
+      <span>EcuDataMCP</span>
+    </a>
+    <nav class="nav-links" id="navbarCollapse" aria-label="Main">
+      <a href="index.html#how-it-works">How it works</a>
+      <a href="fuentes.html">Sources</a>
+      <a href="atlas.html">Reference</a>
+      <a href="examples.html" aria-current="page">Examples</a>
+      <a href="releases.html">Releases</a>
+      <a href="about.html">About</a>
+      <a href="colaborar.html">Contribute</a>
+      
+    </nav>
+    <div class="nav-tools">
+      <button class="site-search-toggle" type="button" title="Search" aria-label="Search" aria-expanded="false" aria-controls="siteSearchPanel">
+        <svg class="icon-search" width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.75"/><line x1="10.2" y1="10.2" x2="14" y2="14"/></svg>
+      </button>
+      <div class="lang-toggle" role="group" aria-label="Language / Idioma">
         
-        <li class="nav-item">
-          <a class="nav-link" href="index.html#how-it-works">
-            <span class="menu-text">How it works</span>
-          </a>
-        </li>
+        <a class="lang-toggle-option" href="../examples.html" hreflang="es" lang="es">ES</a>
+        <span class="lang-toggle-option active" aria-current="true">EN</span>
         
-        <li class="nav-item">
-          <a class="nav-link" href="fuentes.html">
-            <span class="menu-text">Sources</span>
-          </a>
-        </li>
-        
-        <li class="nav-item">
-          <a class="nav-link" href="atlas.html">
-            <span class="menu-text">Reference</span>
-          </a>
-        </li>
-        
-        <li class="nav-item">
-          <a class="nav-link active" href="examples.html" aria-current="page">
-            <span class="menu-text">Examples</span>
-          </a>
-        </li>
-        
-        <li class="nav-item">
-          <a class="nav-link" href="releases.html">
-            <span class="menu-text">Releases</span>
-          </a>
-        </li>
-        
-        <li class="nav-item">
-          <a class="nav-link" href="about.html">
-            <span class="menu-text">About</span>
-          </a>
-        </li>
-        
-        <li class="nav-item">
-          <a class="nav-link" href="colaborar.html">
-            <span class="menu-text">Contribute</span>
-          </a>
-        </li>
-        
-      </ul>
-      <ul class="navbar-nav navbar-nav-scroll ms-auto">
-        <li class="nav-item">
-          <button
-            type="button"
-            class="theme-toggle"
-            data-theme-toggle
-            aria-label="Switch to light mode"
-            data-label-light="Switch to light mode"
-            data-label-dark="Switch to dark mode"
-          >
-            <svg class="icon-theme icon-sun" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-              <circle cx="8" cy="8" r="2.75"/>
-              <path stroke-linecap="round" d="M8 1.5v1.4M8 13.1v1.4M1.5 8h1.4M13.1 8h1.4M3.4 3.4l1 1M11.6 11.6l1 1M12.6 3.4l-1 1M4.4 11.6l-1 1"/>
-            </svg>
-            <svg class="icon-theme icon-moon" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M13.2 9.2A5.2 5.2 0 0 1 6.8 2.8 5.4 5.4 0 1 0 13.2 9.2z"/>
-            </svg>
-          </button>
-        </li>
-        <li class="nav-item">
-          <div class="lang-toggle" role="group" aria-label="Language / Idioma">
-            
-            <a class="lang-toggle-option" href="../examples.html">ES</a>
-            <span class="lang-toggle-option active" aria-current="true">EN</span>
-            
-          </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link github-mark" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener" aria-label="GitHub">
-            <span class="menu-text">GitHub</span>
-          </a>
-        </li>
-      </ul>
+      </div>
+      <a class="btn github-btn" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn y" href="index.html#connect">Install</a>
+      <button class="navbar-toggler" type="button" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" data-nav-toggle="navbarCollapse">
+        <span class="navbar-toggler-icon" aria-hidden="true"></span>
+      </button>
     </div>
   </div>
-</nav>
+</header>
 
 <div class="site-search-panel" id="siteSearchPanel" hidden>
-  <div class="site-search-panel-inner">
-    <input type="text" id="siteSearchInput" class="site-search-input" aria-label="Search" placeholder="Search the site…" autocomplete="off">
-    <div id="siteSearchResults" class="site-search-results"></div>
+  <div class="site-search-panel-inner" role="dialog" aria-modal="true" aria-label="Search">
+    <input type="search" id="siteSearchInput" class="site-search-input" aria-label="Search" placeholder="Search the site…" autocomplete="off">
+    <div id="siteSearchResults" class="site-search-results" aria-live="polite"></div>
   </div>
 </div>
 
@@ -259,22 +182,45 @@
 
 </main>
 
-<footer class="page-footer">
-  <div class="site-footer">
-    <div class="site-footer-brand">
-      <a class="site-footer-name" href="index.html">
-        <span class="brand-logo-wrap" aria-hidden="true">
-          <img class="brand-logo logo-light" src="../assets/logo-navy.svg" width="28" height="28" alt="" decoding="async">
-          <img class="brand-logo logo-dark" src="../assets/logo-light.svg" width="28" height="28" alt="" decoding="async">
-        </span>
-        EcuDataMCP
-      </a>
-      <p>MIT License · Independent project, not affiliated with any Ecuadorian government institution.</p>
+<footer class="site-footer">
+  <div class="wrap">
+    <h2 class="footer-cta">Ecuador&#39;s open data, <i>with your favorite AI assistant.</i></h2>
+    <div class="footer-actions">
+      <a class="btn y" href="index.html#connect">Install</a>
+      <a class="btn btn-dark" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">View on GitHub</a>
     </div>
-    <ul class="site-footer-links">
-      <li><a class="github-mark" href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">GitHub</a></li>
-      <li><a href="releases.html">Releases</a></li>
-    </ul>
+    <div class="fgrid">
+      <div>
+        <a class="footer-brand" href="index.html">
+          <img class="brand-logo" src="../assets/logo-light.svg" width="26" height="26" alt="" decoding="async">
+          <span>EcuDataMCP</span>
+        </a>
+        <p>MIT License · Independent project, not affiliated with any Ecuadorian government institution.</p>
+      </div>
+      <div>
+        <b>Product</b>
+        <a href="index.html#how-it-works">How it works</a>
+        <a href="fuentes.html">Sources</a>
+        <a href="atlas.html">Tool reference</a>
+        <a href="examples.html">Examples</a>
+        
+      </div>
+      <div>
+        <b>Project</b>
+        <a href="releases.html">Releases</a>
+        <a href="colaborar.html">Contribute</a>
+        <a href="about.html">About</a>
+        
+        <a href="https://github.com/DweskZ/EcuDataMCP" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <div>
+        <b>Language</b>
+        
+        <a href="../examples.html" hreflang="es" lang="es">Español</a>
+        <span class="footer-current" aria-current="true">English</span>
+        
+      </div>
+    </div>
   </div>
 </footer>
 
