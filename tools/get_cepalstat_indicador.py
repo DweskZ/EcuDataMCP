@@ -78,6 +78,13 @@ def register_get_cepalstat_indicador_tool(mcp: MCPServer) -> None:
                 parts.append(f"- {r.get('valor')} [{etiqueta}]")
             if len(registros) > 100:
                 parts.append(f"... y {len(registros) - 100} más (usa format=json para verlos todos)")
+            for q in data.get("posible_quiebre_serie") or []:
+                parts.append(
+                    f"! posible_quiebre_serie: {q['serie']} pasa de {q['valor_desde']} "
+                    f"({q['desde']}) a {q['valor_hasta']} ({q['hasta']}), "
+                    f"{q['salto_pp']:+} pp; revisa las notas de la fuente antes de "
+                    "leerlo como tendencia."
+                )
             fuentes = data.get("fuentes") or []
             if fuentes:
                 parts.append("")

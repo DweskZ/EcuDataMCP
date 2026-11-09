@@ -48,6 +48,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+from itertools import pairwise
 from typing import Any
 from urllib.parse import urlencode
 
@@ -178,29 +179,93 @@ async def _fetch_dimensions(indicator_id: int, lang: str) -> list[dict[str, Any]
     return dimensions
 
 
+# ISO 3166-1 alpha-3 -> accent-stripped CEPALSTAT member name (the part
+# before any parenthetical), for the countries and territories CEPALSTAT
+# reports. Lets "BOL" or "PER" resolve; the table doubles as the list of
+# genuine countries whose names contain " y " (see _is_aggregate).
+_ISO3_TO_NAME: dict[str, str] = {
+    "ARG": "argentina", "ATG": "antigua y barbuda", "BHS": "bahamas",
+    "BRB": "barbados", "BLZ": "belice", "BOL": "bolivia", "BRA": "brasil",
+    "CHL": "chile", "COL": "colombia", "CRI": "costa rica", "CUB": "cuba",
+    "DMA": "dominica", "DOM": "republica dominicana", "ECU": "ecuador",
+    "SLV": "el salvador", "GRD": "granada", "GTM": "guatemala",
+    "GUY": "guyana", "HTI": "haiti", "HND": "honduras", "JAM": "jamaica",
+    "MEX": "mexico", "NIC": "nicaragua", "PAN": "panama", "PRY": "paraguay",
+    "PER": "peru", "KNA": "saint kitts y nevis", "LCA": "santa lucia",
+    "VCT": "san vicente y las granadinas", "SUR": "suriname",
+    "TTO": "trinidad y tabago", "URY": "uruguay", "VEN": "venezuela",
+    "PRI": "puerto rico", "ESP": "espana", "USA": "estados unidos",
+    "CAN": "canada", "PRT": "portugal", "FRA": "francia", "DEU": "alemania",
+    "ITA": "italia", "GBR": "reino unido", "CHN": "china", "JPN": "japon",
+}
+
+
+def _pais_names(member: dict[str, Any]) -> tuple[str, str, str]:
+    """(full name, name before the parenthetical, parenthetical text),
+    accent-stripped and lowercased."""
+    full = _strip(member.get("name", "")).strip()
+    base, _, rest = full.partition("(")
+    return full, base.strip(), rest.rstrip(") ").strip()
+
+
+def _is_aggregate(member: dict[str, Any]) -> bool:
+    """True for regional groupings and lists of countries ("Mercado Comun
+    del Sur (MERCOSUR), Bolivia (...) y Chile"): names with a comma, or
+    joined with " y " when the name is not a known country such as
+    "Trinidad y Tabago"."""
+    full, base, _ = _pais_names(member)
+    if "," in full:
+        return True
+    return " y " in full and base not in _ISO3_TO_NAME.values()
+
+
 def _find_pais_member(dimensions: list[dict[str, Any]], pais: str) -> dict[str, Any] | None:
-    """The country member matching `pais`: an exact (accent-insensitive)
-    name, or the single member containing it. Several partial matches
-    ("Guin" -> Guinea, Guinea Ecuatorial) raise instead of picking the
-    first, mirroring helpers/irena_client._resolve_country."""
-    q = _strip(pais)
+    """The country member matching `pais`, in this order:
+
+    1. exact (accent-insensitive) full name, name before the parenthetical
+       ("Bolivia" -> "Bolivia (Estado Plurinacional de)") or the
+       parenthetical itself ("MERCOSUR");
+    2. an ISO3 code ("BOL");
+    3. the single partial match among real countries; aggregates (regional
+       groupings, "A, B y C" lists) are considered only when no country
+       matches, i.e. when they are named explicitly.
+
+    Several remaining partial matches ("Guin" -> Guinea, Guinea
+    Ecuatorial) raise, listing only those candidates."""
+    q = _strip(pais).strip()
     pais_dim = next(
         (d for d in dimensions if _PAIS_DIM_HINT in _strip(d.get("name", ""))), None
     )
     if pais_dim is None:
         return None
     members = pais_dim.get("members") or []
-    exact = next((m for m in members if _strip(m.get("name", "")) == q), None)
-    if exact is not None:
-        return exact
-    partial = [m for m in members if q and q in _strip(m.get("name", ""))]
-    if len(partial) == 1:
-        return partial[0]
-    if len(partial) > 1:
-        candidatos = ", ".join(str(m.get("name", "")) for m in partial[:8])
+    if not q:
+        return None
+
+    def exact(target: str) -> dict[str, Any] | None:
+        hits = [m for m in members if target in _pais_names(m)]
+        # Prefer a real country over an aggregate that shares the label.
+        hits.sort(key=_is_aggregate)
+        return hits[0] if hits else None
+
+    found = exact(q)
+    if found is not None:
+        return found
+    iso = _ISO3_TO_NAME.get(q.upper()) if len(q) == 3 and q.isalpha() else None
+    if iso is not None:
+        found = exact(iso)
+        if found is not None:
+            return found
+    partial = [m for m in members if q in _pais_names(m)[0]]
+    countries = [m for m in partial if not _is_aggregate(m)]
+    candidates = countries or partial
+    if len(candidates) == 1:
+        return candidates[0]
+    if len(candidates) > 1:
+        listado = "; ".join(str(m.get("name", "")) for m in candidates[:8])
         raise ValueError(
             f"País ambiguo: '{pais}' coincide con varios países del indicador "
-            f"({candidatos}). Usa el nombre completo."
+            f"({listado}). Usa el nombre completo."
         )
     return None
 
@@ -232,6 +297,51 @@ def _decode_record(record: dict[str, Any], dim_labels: dict[str, dict[int, str]]
         elif key not in ("notes_ids",):
             decoded[key] = value
     return decoded
+
+
+_QUIEBRE_UMBRAL_PP = 25.0
+
+
+def _detectar_quiebres(
+    registros: list[dict[str, Any]], unit: str
+) -> list[dict[str, Any]]:
+    """Year-over-year jumps above 25 percentage points in a percentage
+    series, per (country, other-dimension) group. Real changes of that size
+    are rare; they are usually a methodology or survey change, so the
+    caller is told to check the source's footnotes before reading a trend."""
+    if "porcentaje" not in _strip(unit) and "percent" not in _strip(unit) and "%" not in unit:
+        return []
+    groups: dict[tuple, dict[int, float]] = {}
+    for r in registros:
+        year = next((v for k, v in r.items() if k.startswith("Año")), None)
+        try:
+            y, v = int(str(year)), float(str(r.get("valor")).replace(",", "."))
+        except (TypeError, ValueError):
+            continue
+        key = tuple(
+            sorted(
+                (k, str(val))
+                for k, val in r.items()
+                if k not in ("valor", "iso3", "source_id") and not k.startswith("Año")
+            )
+        )
+        groups.setdefault(key, {})[y] = v
+    out: list[dict[str, Any]] = []
+    for key, serie in groups.items():
+        years = sorted(serie)
+        for prev, cur in pairwise(years):
+            if cur - prev == 1 and abs(serie[cur] - serie[prev]) > _QUIEBRE_UMBRAL_PP:
+                out.append(
+                    {
+                        "serie": dict(key),
+                        "desde": prev,
+                        "hasta": cur,
+                        "valor_desde": serie[prev],
+                        "valor_hasta": serie[cur],
+                        "salto_pp": round(serie[cur] - serie[prev], 1),
+                    }
+                )
+    return out
 
 
 async def get_indicador(
@@ -271,13 +381,18 @@ async def get_indicador(
     dim_labels = _decode_dimension_labels(body.get("dimensions") or [], lang)
     registros = [_decode_record(r, dim_labels) for r in body.get("data") or []]
 
-    return {
+    metadata = body.get("metadata") or {}
+    result: dict[str, Any] = {
         "indicator_id": indicator_id,
         "pais_filtrado": pais_filtrado,
-        "metadata": body.get("metadata") or {},
+        "metadata": metadata,
         "total_registros": len(registros),
         "registros": registros,
         "fuentes": body.get("sources") or [],
         "notas": body.get("footnotes") or [],
         "source": "CEPALSTAT — CEPAL",
     }
+    quiebres = _detectar_quiebres(registros, str(metadata.get("unit") or ""))
+    if quiebres:
+        result["posible_quiebre_serie"] = quiebres
+    return result

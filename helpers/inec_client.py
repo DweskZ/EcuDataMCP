@@ -495,10 +495,76 @@ def _summarize_post(post: dict[str, Any], categories: dict[int, str]) -> dict[st
     }
 
 
+_PUB_FIELDS = "id,link,date,modified,title,excerpt,categories"
+_PUB_PAGE = 100
+_PUB_MAX_PAGES = 20  # per token: 2,000 posts, above the ~1,700 INEC has published
+_PUB_STOPWORDS = frozenset(
+    {"a", "al", "con", "de", "del", "e", "el", "en", "la", "las", "lo", "los",
+     "o", "para", "por", "u", "un", "una", "y"}
+)
+_pub_token_cache = TtlCache(ttl_seconds=1800.0, max_entries=64)
+
+
+def _query_tokens(query: str) -> list[str]:
+    """Distinct, accent-stripped, lowercase word tokens of `query`, without
+    Spanish stopwords ("de", "la", ...), in order."""
+    seen: dict[str, None] = {}
+    for tok in re.findall(r"[a-z0-9]+", _strip_accents(query)):
+        if tok not in _PUB_STOPWORDS:
+            seen.setdefault(tok, None)
+    return list(seen)
+
+
+def _text_words(text: str) -> list[str]:
+    return re.findall(r"[a-z0-9]+", _strip_accents(unescape(re.sub(r"<[^>]+>", " ", text or ""))))
+
+
+def _token_in_words(token: str, words: list[str]) -> bool:
+    """Word-boundary match: tokens of 4+ characters match as a word prefix
+    ("tecnolog" -> "tecnologias"); shorter ones ("tic") only as a whole word,
+    so they do not match inside "estadisticas" or "practica"."""
+    if len(token) >= 4:
+        return any(w.startswith(token) for w in words)
+    return token in words
+
+
+async def _fetch_token_posts(token: str, session: httpx.AsyncClient) -> list[dict[str, Any]]:
+    """Every post the WordPress search returns for one token (WordPress
+    matches it as a substring of title, content or excerpt, so this is a
+    superset the caller narrows down). Pages are fetched concurrently."""
+    cached = _pub_token_cache.get(token)
+    if cached is not None:
+        return cached
+    base = {
+        "per_page": _PUB_PAGE,
+        "orderby": "date",
+        "order": "desc",
+        "_fields": _PUB_FIELDS,
+        "search": token,
+    }
+    first, headers = await _get_api_json("posts", {**base, "page": 1}, session=session)
+    posts = list(first)
+    try:
+        pages = min(int(headers.get("X-WP-TotalPages") or 1), _PUB_MAX_PAGES)
+    except ValueError:
+        pages = 1
+    if pages > 1:
+        rest = await asyncio.gather(
+            *[
+                _get_api_json("posts", {**base, "page": n}, session=session)
+                for n in range(2, pages + 1)
+            ]
+        )
+        for batch, _ in rest:
+            posts.extend(batch)
+    _pub_token_cache.set(token, posts)
+    return posts
+
+
 async def search_publicaciones(query: str = "", limit: int = 20, offset: int = 0) -> dict[str, Any]:
     """
-    Full-text search over every post INEC has ever published on Ecuador en
-    Cifras, via its public WordPress REST API, newest first.
+    Search every post INEC has ever published on Ecuador en Cifras, via its
+    public WordPress REST API, newest first.
 
     This is the authoritative, always-current layer -- confirmed live to
     hold 1,707 posts, the newest within days of being checked -- unlike
@@ -508,38 +574,79 @@ async def search_publicaciones(query: str = "", limit: int = 20, offset: int = 0
     questions; use search_topics/get_topic_files for one operation's fixed
     landing page instead of a specific dated release.
 
+    WordPress's own `search` is a substring LIKE ("tic" matches
+    "estadisticas", "practica", "transito"...), so with a query the posts it
+    returns per token are re-checked here on word boundaries against the
+    title and excerpt (accent- and case-insensitive; see _token_in_words)
+    and ranked by how many tokens match (all of them first), then by token rarity and
+    title matches, then recency.
+
     Args:
-        query: Free text, matched by WordPress against title/content/excerpt
-            (e.g. "ENEMDU anual 2025", "inflación julio", "censo"). Empty
-            returns the most recent posts regardless of topic.
+        query: Free text (e.g. "ENEMDU anual 2025", "inflación julio",
+            "censo"). Empty returns the most recent posts regardless of topic.
         limit: Max results returned (max 100, the WordPress REST API's own
             per-page ceiling).
         offset: Pagination offset over the matched set.
     """
     limit = min(max(limit, 1), 100)
     offset = max(offset, 0)
-    params: dict[str, Any] = {
-        "per_page": limit,
-        "offset": offset,
-        "orderby": "date",
-        "order": "desc",
-        "_fields": "id,link,date,modified,title,categories",
-    }
-    if query:
-        params["search"] = query
+    tokens = _query_tokens(query)
+
+    if not tokens:
+        params: dict[str, Any] = {
+            "per_page": limit,
+            "offset": offset,
+            "orderby": "date",
+            "order": "desc",
+            "_fields": "id,link,date,modified,title,categories",
+        }
+        if query.strip():  # only stopwords/symbols: let WordPress decide
+            params["search"] = query
+        async with httpx.AsyncClient(
+            timeout=25.0, headers={"User-Agent": USER_AGENT}
+        ) as session:
+            posts, headers = await _get_api_json("posts", params, session=session)
+            categories = await _fetch_categories()
+        total_header = headers.get("X-WP-Total")
+        return {
+            "total": int(total_header) if total_header is not None else None,
+            "offset": offset,
+            "publicaciones": [_summarize_post(p, categories) for p in posts],
+        }
 
     async with httpx.AsyncClient(
         timeout=25.0, headers={"User-Agent": USER_AGENT}
     ) as session:
-        posts, headers = await _get_api_json("posts", params, session=session)
+        per_token = await asyncio.gather(*[_fetch_token_posts(t, session) for t in tokens])
         categories = await _fetch_categories()
 
-    total_header = headers.get("X-WP-Total")
-    results = [_summarize_post(p, categories) for p in posts]
+    candidates: dict[int, dict[str, Any]] = {}
+    for posts in per_token:
+        for post in posts:
+            candidates.setdefault(post["id"], post)
+
+    # Rarer tokens weigh more among posts matching the same number of tokens
+    # ("TIC" over "2025" in "ENEMDU TIC 2025"): weight = 1 / candidates it matches.
+    weight = {t: 1.0 / max(len(p), 1) for t, p in zip(tokens, per_token, strict=True)}
+    ranked: list[tuple[int, float, int, str, dict[str, Any]]] = []
+    for post in candidates.values():
+        title_words = _text_words(post.get("title", {}).get("rendered", ""))
+        body_words = _text_words(post.get("excerpt", {}).get("rendered", ""))
+        in_title = sum(_token_in_words(t, title_words) for t in tokens)
+        hits = [
+            t for t in tokens if _token_in_words(t, title_words) or _token_in_words(t, body_words)
+        ]
+        if hits:
+            ranked.append(
+                (len(hits), sum(weight[t] for t in hits), in_title, post.get("date") or "", post)
+            )
+    ranked.sort(key=lambda r: r[:4], reverse=True)
+
+    page = [r[4] for r in ranked[offset : offset + limit]]
     return {
-        "total": int(total_header) if total_header is not None else None,
+        "total": len(ranked),
         "offset": offset,
-        "publicaciones": results,
+        "publicaciones": [_summarize_post(p, categories) for p in page],
     }
 
 

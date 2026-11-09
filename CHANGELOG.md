@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+- **`search_inec_publicaciones`: word-boundary matching and ranking.**
+  WordPress's `search` is a substring match, so `TIC` returned 1,458 posts
+  (matching "estadísticas", "práctica", "tránsito"). Queries are now tokenized
+  (accent- and case-insensitive, stopwords dropped), each token is fetched and
+  re-checked against title and excerpt on word boundaries (prefix for tokens of
+  4+ characters, whole word for 3 or fewer), and results rank by tokens matched
+  (all first), then token rarity, title hits and recency. Empty query is
+  unchanged. Live: `TIC` 1,458 -> 22, led by the "Tecnologías de la Información
+  y Comunicación-TIC" posts. Body text beyond the excerpt is not searched.
+- **`get_cepalstat_indicador`: country resolution and series-break flag.**
+  `pais="Bolivia"` failed as ambiguous because CEPALSTAT also lists MERCOSUR
+  groupings whose names contain "Bolivia" (no alias table was involved). An
+  exact name, the name before a parenthetical, or an ISO3 code (`BOL`, `PER`)
+  now wins; aggregates (regional groupings, "A, B y C" lists) are chosen only
+  when named or when nothing else matches; real ambiguity still errors and
+  lists only real candidates. Percentage series with a year-over-year jump above
+  25 pp now carry `posible_quiebre_serie` (e.g. indicator 4891, Peru 2022 to
+  2023: Total 55.2 to 89.6).
 - **Census 2022: search inside the tabulados.** `search_archivos(fuente="censo")`
   matched only file names plus one hand-written ICT description. A committed
   index (`helpers/data/censo_tabulados_index.json`, 19 workbooks, 282 tables)

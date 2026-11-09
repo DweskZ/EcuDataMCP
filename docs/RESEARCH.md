@@ -6958,6 +6958,54 @@ catálogo (~4,3 s solo con `verificar_acceso=false`).
   hasta que se pida `verificar_acceso=true` o `get_anda_survey_info`. La
   exactitud de los 10 primeros no cambia.
 
+## Cuadragésima tercera pasada — coincidencia por palabra en `search_inec_publicaciones` y país ambiguo en CEPALSTAT (2026-11-09)
+
+**INEC.** `search_inec_publicaciones("TIC")` devolvía 1.458 resultados
+irrelevantes ("Desnutrición", "Siniestros de Tránsito", inflación). Causa: el
+parámetro `search` de la API REST de WordPress es una subcadena (`LIKE %tic%`)
+sobre título, contenido y extracto, así que "tic" entra en "estadísticas",
+"práctica" o "tránsito"; con varias palabras exige todas, sin ordenar por
+relevancia, y el orden era por fecha.
+- Ahora, con consulta, se pide a WordPress cada palabra por separado
+  (100 por página, páginas en paralelo, tope 20 páginas por palabra, caché de
+  30 min) y se re-filtra localmente sobre título + extracto: sin acentos ni
+  mayúsculas, por límite de palabra. Palabras de 4+ caracteres coinciden por
+  prefijo ("tecnolog" -> "tecnologías"); de 3 o menos solo como palabra entera
+  ("TIC"). Se ignoran palabras vacías ("de", "la", "y"...).
+- Orden: número de palabras coincidentes (todas primero), luego rareza de las
+  palabras coincidentes, luego coincidencias en el título, luego fecha. Sin
+  consulta, igual que antes (fecha descendente).
+- En vivo: `TIC` baja de 1.458 a 22 resultados (los cinco primeros son
+  "Tecnologías de la Información y Comunicación-TIC 2024/2023/2022/2020/2019").
+  `ENEMDU TIC 2025` (331) sigue empezando por ENEMDU 2025 (ninguna publicación
+  de TIC lleva "2025" ni "ENEMDU" en título o extracto: la TIC 2024 es la más
+  reciente), pero ya no entra ruido por subcadena.
+- Limitación: el contenido completo no se baja (pesa); una publicación que solo
+  menciona el término en el cuerpo y no en título o extracto queda fuera.
+- Mismo helper: `helpers/ant_client` (siniestros) llama a la misma función con
+  consultas fijas; recibe la corrección sin cambios de código. Las otras
+  búsquedas WordPress del repo (`ministerio_energia`, `msp_*`, `turismo`,
+  `centrosur`) usan un término fijo interno, no consultas libres, y no se
+  tocaron. Los demás `q in nombre` son subcadena documentada.
+
+**CEPALSTAT.** `get_cepalstat_indicador(4891, pais="Bolivia")` fallaba con
+"País ambiguo". No hay tabla de alias: la dimensión País del indicador trae, junto a
+`Bolivia (Estado Plurinacional de)`, dos agregados cuyo nombre contiene
+"Bolivia" (`Mercado Común del Sur (MERCOSUR)` y `Mercado Común del Sur
+(MERCOSUR), Bolivia (Estado Plurinacional de) y Chile`), y el mensaje los unía
+con ", " haciendo parecer que MERCOSUR coincidía con Bolivia.
+- Resolución nueva: (1) nombre exacto, nombre antes del paréntesis o texto del
+  paréntesis ("MERCOSUR"); (2) código ISO3 ("BOL", "PER"; los miembros de la
+  API no traen ISO3, así que hay una tabla de ~45 países); (3) coincidencia
+  parcial única entre países; los agregados (con coma, o con " y " que no sea
+  un país como "Trinidad y Tabago") solo si nada más coincide. La ambigüedad
+  real ("guin") sigue fallando y lista solo candidatos reales.
+- Quiebres de serie: en porcentajes, un salto interanual de más de 25 pp se
+  marca como `posible_quiebre_serie` (también en el texto). En vivo, 4891 Perú
+  2022->2023: Total 55,2 -> 89,6 (+34,4), Rural 20,1 -> 76,8 (+56,7), Urbano
+  64,6 -> 93,0 (+28,4); Bolivia 2019->2020 también (Total +32,2). Es una
+  alerta, no una corrección: las notas de la fuente explican el cambio.
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un
