@@ -472,7 +472,7 @@
     "tools": [
       {
         "name": "search_anda",
-        "description": "Search INEC's ANDA catalog of surveys and censuses (NADA/IHSN). Indicates whether each survey has downloadable microdata.",
+        "description": "Search INEC's ANDA catalog of surveys and censuses (NADA/IHSN). Indicates whether each survey's microdata can be obtained and how (tipo_acceso).",
         "params": [
           {
             "name": "query",
@@ -487,13 +487,19 @@
             "description": "Max results (default: 10, max: 50)"
           },
           {
+            "name": "verificar_acceso",
+            "type": "bool",
+            "default": "True",
+            "description": "Check each result's real download page (2 extra requests per result with microdata, cached 6 h); false trusts the catalog flag and is faster"
+          },
+          {
             "name": "format",
             "type": "Literal['text', 'json']",
             "default": "'text'",
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Search INEC's ANDA catalog (anda.inec.gob.ec) of surveys and censuses. ANDA runs on NADA (World Bank/IHSN), separate from datosabiertos.gob.ec. It catalogs 437+ INEC surveys/censuses with metadata (title, year, authoring entity). Not every entry has downloadable microdata — many are aggregate-only publications (e.g. price indices); each result says so. Follow up with get_anda_survey_info(idno) for full metadata on one survey."
+        "long_description": "Search INEC's ANDA catalog (anda.inec.gob.ec) of surveys and censuses. ANDA runs on NADA (World Bank/IHSN), separate from datosabiertos.gob.ec. It catalogs 437+ INEC surveys/censuses with metadata (title, year, authoring entity). Not every entry has downloadable microdata — many are aggregate-only publications (e.g. price indices); each result says so. microdatos_disponibles is checked against each study's real download page (verificar_acceso=true) and tipo_acceso says how: directo (files in ANDA), enlace_externo (ANDA only links to another site, e.g. the 2022 Census to censoecuador.gob.ec), registro (ANDA login), solicitud or ninguno. The catalog flag alone is unreliable: it marks the 2022 Census \"direct\" although no file is attached. If a check fails the result falls back to the catalog flag with tipo_acceso \"desconocido\". Follow up with get_anda_survey_info(idno) for full metadata on one survey."
       },
       {
         "name": "get_anda_survey_info",
@@ -512,11 +518,11 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Get full metadata for one ANDA (INEC) survey/census by its idno. Get the idno from search_anda results — it's the string identifier (e.g. \"IDD-ECU-INEC-CGTPE-DECON-ENESEM-2023-v1.3\"), not the numeric id. Returns scope/abstract, variable count, whether microdata is actually downloadable, confidentiality terms, and a contact email for requesting restricted data when it isn't."
+        "long_description": "Get full metadata for one ANDA (INEC) survey/census by its idno. Get the idno from search_anda results — it's the string identifier (e.g. \"IDD-ECU-INEC-CGTPE-DECON-ENESEM-2023-v1.3\"), not the numeric id. Returns scope/abstract, variable count, whether microdata is actually obtainable and how (tipo_acceso, checked on the real download page, with any external links; see download_anda_microdata), confidentiality terms, and a contact email for requesting restricted data when it isn't."
       },
       {
         "name": "download_anda_microdata",
-        "description": "Direct download links for an ANDA survey's microdata files.",
+        "description": "Download links for an ANDA survey's microdata, with its tipo_acceso (directo, enlace_externo, registro, solicitud, ninguno).",
         "params": [
           {
             "name": "idno",
@@ -531,7 +537,7 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Get direct download links for an ANDA survey's microdata files. Automates ANDA's one-click usage-terms step (research/statistical use only, no re-identifying respondents, cite the source — see get_anda_survey_info for the full text) to reveal the file list. Check get_anda_survey_info first: aggregate-only surveys (microdatos_disponibles false) have no files here. Returns direct URLs, not the file contents — the files are typically multi-MB ZIPs (SPSS .sav inside), too large to embed in a tool result. Download them with the returned URL."
+        "long_description": "Links to an ANDA survey's microdata and how it is served. Automates ANDA's one-click usage-terms step (research/statistical use only, no re-identifying respondents, cite the source — see get_anda_survey_info) to reveal the list. tipo_acceso is read from the real download page, not the catalog flag: directo (files hosted by ANDA, in `archivos`), enlace_externo (ANDA only links to another site, in `enlaces_externos`; the 2022 Census points to censoecuador.gob.ec), registro (ANDA login), solicitud (request to INEC) or ninguno. A study can be flagged \"direct\" in the catalog and have no attached file: total_archivos 0 with enlace_externo means the data lives elsewhere; follow `siguiente_paso` (e.g. search_archivos(fuente=\"censo\")). Returns URLs, not contents; ANDA files are usually multi-MB ZIPs."
       }
     ]
   },
@@ -2635,7 +2641,7 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Searches one institution's catalog of published files and returns direct links (title, URL, format), not contents. Sources: sri_datasets, sri_recaudacion, mef, senae, censo, minedec, senescyt, msp, cnig, trabajo_boletin, salarios, arcotel_boletines and arcotel_mensuales. Download with download_resource or read_pdf (5 MB cap). Source turismo: the monthly tourism figures bulletins (November 2025 on), now published by the Ministry of Production; PDF only, read_pdf extracts the tables. Source fedexpor: FEDEXPOR's monthly Expordata foreign-trade report from January 2026, on Google Drive (~30 MB, over read_pdf's cap; descarga_directa is the direct link). Source aeade: AEADE's monthly vehicle-sales bulletins (tipo boletin_ventas) and sector yearbooks (tipo anuario). New sources: arcotel_series (the newest XLSX of each of ARCOTEL's 25 statistical series, each with full history), msp_precios (medicine ceiling prices, every revision since 2016), mit_vias (MIT's daily state-road status report) and minedec_bases (AMIE registers by school year 2009-2010 to 2024-2025, start and end cuts, XLSX and CSV, plus thematic files)."
+        "long_description": "Searches one institution's catalog of published files and returns direct links (title, URL, format), not contents. Sources: sri_datasets, sri_recaudacion, mef, senae, censo, minedec, senescyt, msp, cnig, trabajo_boletin, salarios, arcotel_boletines and arcotel_mensuales. Source censo (censoecuador.gob.ec): ~100 files with `tipo` tabulado, microdatos, diccionario or documento; the results tabulados by theme (population, housing, household) as XLSX or CSV-in-ZIP — the household ICT one (cellphone, internet, computer, tablet by province and cantón) comes up with query \"internet\" or \"tic\" —, the microdata bases by cantón, sector and city block (CSV, SPSS, REDATAM) and the dictionaries. Download with download_resource or read_pdf (5 MB cap). Source turismo: the monthly tourism figures bulletins (November 2025 on), now published by the Ministry of Production; PDF only, read_pdf extracts the tables. Source fedexpor: FEDEXPOR's monthly Expordata foreign-trade report from January 2026, on Google Drive (~30 MB, over read_pdf's cap; descarga_directa is the direct link). Source aeade: AEADE's monthly vehicle-sales bulletins (tipo boletin_ventas) and sector yearbooks (tipo anuario). New sources: arcotel_series (the newest XLSX of each of ARCOTEL's 25 statistical series, each with full history), msp_precios (medicine ceiling prices, every revision since 2016), mit_vias (MIT's daily state-road status report) and minedec_bases (AMIE registers by school year 2009-2010 to 2024-2025, start and end cuts, XLSX and CSV, plus thematic files)."
       },
       {
         "name": "list_archivo_secciones",

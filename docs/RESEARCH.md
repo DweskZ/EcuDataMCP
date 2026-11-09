@@ -6809,6 +6809,77 @@ Gobierno 22, MIT 35, ARCOTEL 1362), que no responde desde Canadá; octubre
 latin-1) bajo download monitor. Una herramienta transversal no es viable
 desde aquí; hay que probar el portal de la Defensoría desde Ecuador.
 
+## Cuadragésima pasada — acceso a microdatos del Censo 2022 en ANDA y censoecuador.gob.ec (2026-11-08)
+
+Origen: una tesis sobre la brecha digital (internet, computadora y celular
+por provincia y cantón, Censo 2022) encontró que `search_anda` y
+`download_anda_microdata` se contradecían. Revisado en vivo con curl.
+
+**ANDA, catálogo 1085 (`ECU-INEC-CTIMA-CPV-2022-V1.6`).**
+- La API (`api/catalog/1085?id_format=id`) da `data_access_type: direct`;
+  el listado da `form_model: direct`. Ninguno distingue "archivo adjunto" de
+  "enlace externo".
+- `catalog/1085/get-microdata` es el formulario de términos (token `ncsrf`).
+  Tras aceptarlo (POST), "Archivos de datos" trae UN recurso, "Bases de
+  Datos CPV 2022", cuyo botón es `External link` hacia
+  `https://www.censoecuador.gob.ec/data-censo-ecuador/` (clase `download`,
+  pero el href no es `catalog/1085/download/N`). Eso es lo que el parser
+  viejo no veía. `related_materials` sí tiene 10 descargas ANDA reales (PDF
+  de metodología, cuestionario, dos ZIP de 418 KB), pero ninguna es una base.
+- Muestra de 44 estudios con `form_model != data_na`: la mayoría son `directo`
+  (archivos `catalog/N/download/M`); 1151 (camas hospitalarias) y 1324
+  (registro de empleo en la seguridad social) son enlace externo (a BIINEC
+  `aplicaciones3.ecuadorencifras.gob.ec/BIINEC-war/` y a
+  `ecuadorencifras.gob.ec/registro-empleo-seguridad-social`); los 3
+  `form_model: public` (351, 365, 389) son un muro de login ("Inicie sesión
+  para acceder a los datos"), sin formulario de términos; el 400 (IPI 2014,
+  `form_model` nulo) dice "Data Access Not Available". No se encontró en vivo
+  ningún estudio `licensed`/solicitud: ese tipo se detecta por texto
+  ("access-licensed", "request access", "solicitar acceso") sin haberlo visto.
+- Decisión: el cliente clasifica por la página real (`parse_microdata_page`),
+  no por el flag; `search_anda` verifica cada resultado con microdatos (2
+  solicitudes, caché 6 h).
+
+**censoecuador.gob.ec.** WordPress + Elementor, `robots.txt` con `Disallow:`
+vacío y sitemap de Yoast; `wp-json` abierto (la API de medios lista los
+uploads). El TLS verifica con el almacén del SO, no con certifi (ya tratado
+por `helpers/tls.py`). Dos páginas HTML estáticas tienen todo, sin API JSON
+detrás:
+- `/resultados-censo/`: presentaciones y fichas temáticas (PDF), **Tabulados**
+  en pestañas Población / Vivienda / Hogar, cada entrada "Nombre – Formato
+  Excel y Formato CSV" (XLSX y ZIP con CSV, 0,4-2 MB): estructura
+  poblacional, estado conyugal, etnia, migración, educación, trabajo,
+  dificultades funcionales, identidad de género, pobreza por NBI, inscripción
+  y cedulación, mortalidad (población); condiciones generales y servicios
+  básicos (vivienda); composición del hogar, condiciones de vida, prácticas
+  ambientales, **Uso de las Tecnologías de la Información y Comunicación**
+  (`wp-content/uploads/2023/12/03_2022_CPV_TIC.xlsx` / `.zip`) y mascotas
+  (hogar); serie histórica 1950-2022. Además las bases de datos y los
+  diccionarios.
+- `/data-censo-ecuador/`: bases 2022 por cantón, sector y manzana (CSV, SPSS,
+  REDATAM; en `ecuadorencifras.gob.ec/documentos/web-inec/bd-censo/...`, el
+  CSV cantonal pesa 692 MB), 2010 y 2001 recodificados a geografía 2022
+  (nivel sector/manzana en ecuadorencifras, nacional en
+  `censoecuador.gob.ec/public/*.zip|rar`), diccionarios (`dicc-censo/` y
+  `wp-content/uploads/2025/02/`), guía de usuario, cuestionario, manuales.
+- El libro `03_2022_CPV_TIC.xlsx` (verificado, 8 tablas). Población de 5+
+  años por uso de celular, internet, computadora/laptop y tablet en los
+  últimos 3 meses: 1 por provincia, área y sexo al nacer; 1.1 por cantón,
+  área y sexo; 1.2 por cantón y parroquia; 2 y 2.1 por provincia o cantón,
+  sexo y grupo quinquenal de edad. Hogares por disponibilidad de teléfono
+  convencional, celular, televisión pagada, internet y computadora: 3 por
+  provincia y área; 3.1 por cantón y área; 3.2 por cantón y parroquia.
+- No es parte de este servidor: Visualizador (`cubos.inec.gob.ec/
+  AppCensoEcuador/`, sin respuesta desde Canadá en esta pasada), Redatam
+  (`redatam.inec.gob.ec`, R+SP WebServer, consulta interactiva sin API
+  documentada) y el geovisualizador de CEPAL (`geo.cepal.org/censo-ecuador/`).
+- `/data-y-resultados/` (la URL que usaba `censo_client`) ahora es un 404
+  real ("Página no encontrada") con solo el menú; la tolerancia al 404 que
+  documentaba el cliente ocultaba que ya no había resultados ahí.
+
+Construido: `search_archivos(fuente="censo")` lee las dos páginas nuevas (ver
+ROADMAP § INEC).
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

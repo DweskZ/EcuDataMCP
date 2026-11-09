@@ -453,7 +453,7 @@
             "id": "inec-censo",
             "name": "Censo Ecuador 2022",
             "tag": "INEC",
-            "description": "Recursos, microdatos y documentos metodológicos del censo",
+            "description": "Tabulados de resultados (incl. TIC por provincia y cantón), microdatos y documentos metodológicos del censo",
             "coverage": "censoecuador.gob.ec",
             "url": "https://www.censoecuador.gob.ec",
             "status": "live"

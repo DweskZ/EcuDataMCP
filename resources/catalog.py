@@ -210,7 +210,7 @@ def _all_fuentes() -> dict:
             },
             {
                 "id": "inec-censo",
-                "nombre": "Censo Ecuador 2022 / INEC (microdatos completos del censo)",
+                "nombre": "Censo Ecuador 2022 / INEC (microdatos completos y tabulados de resultados)",
                 "base": "https://www.censoecuador.gob.ec/",
                 "tools": ["search_archivos"],
             },
