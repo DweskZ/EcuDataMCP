@@ -173,3 +173,22 @@ async def test_no_download_of_workbooks_at_query_time(httpx_mock, monkeypatch):
     censo_client._resources_cache.clear()
     urls = [str(r.url) for r in httpx_mock.get_requests()]
     assert sorted(urls) == sorted([censo_client.RESULTADOS_URL, censo_client.DATA_URL])
+
+
+@pytest.mark.asyncio
+async def test_search_archivos_text_lists_the_matching_tables(httpx_mock, monkeypatch):
+    from mcp.server.mcpserver import MCPServer
+
+    from tools.search_archivos import register_search_archivos_tool
+
+    _mock_pages(httpx_mock, monkeypatch)
+    censo_client._resources_cache.clear()
+    mcp = MCPServer("test")
+    register_search_archivos_tool(mcp)
+    fn = mcp._tool_manager.get_tool("search_archivos").fn
+
+    text = (await fn(fuente="censo", query="computadora", limit=1)).content[0].text
+    censo_client._resources_cache.clear()
+
+    assert "· hoja 1:" in text and "[provincia]" in text
+    assert "y " in text and "tabla(s) más" not in text or "más en este archivo" in text

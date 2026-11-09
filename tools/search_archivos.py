@@ -158,7 +158,7 @@ async def _search(
         total = len(items)
         items = items[offset : offset + limit]
 
-    nota = result.get("nota") or result.get("nota_cobertura")
+    nota = result.get("nota") or result.get("nota_cobertura") or result.get("aviso")
     return {
         "fuente": fuente,
         "nombre_fuente": result.get("source"),
@@ -323,6 +323,12 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
                 parts.append(f"   {a['url']}")
                 if a.get("contenido"):
                     parts.append(f"   {a['contenido']}")
+                for t in a.get("tablas_coincidentes") or []:
+                    niveles = f" [{', '.join(t['niveles'])}]" if t.get("niveles") else ""
+                    parts.append(f"   · hoja {t.get('hoja')}: {t.get('titulo')}{niveles}")
+                extra = a.get("tablas_coincidentes_total", 0) - len(a.get("tablas_coincidentes") or [])
+                if extra > 0:
+                    parts.append(f"   · … y {extra} tabla(s) más en este archivo")
             return "\n".join(parts)
 
         return render_structured(result, format, text_builder=to_text)
