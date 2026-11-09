@@ -72,17 +72,11 @@ STATUS_LABELS = {
     "en": {"live": "online", "offline": "offline", "build-local": "local build"},
 }
 
-# Strings the home page JavaScript needs (search results, terminal, labels).
+# Strings the home page JavaScript needs (chat, labels).
 # Placeholders in {braces} are filled in by home.js.
 HOME_UI = {
     "es": {
-        "found_one": "<b>{n}</b> fuente podría responder esto:",
-        "found_many": "<b>{n}</b> fuentes podrían responder esto:",
-        "none": "Ninguna fuente coincide con “{q}”.",
-        "explore_themes": "Explora los temas",
-        "see_example": "Ver cómo lo respondería tu asistente →",
-        "see_answer": "Ver la respuesta guardada →",
-        "cleared": "Búsqueda borrada.",
+        "thinking": "consultando fuentes oficiales",
         "src_consulted": "Fuente consultada: ",
         "pause": "Pausar ejemplos",
         "play": "Reanudar ejemplos",
@@ -91,13 +85,7 @@ HOME_UI = {
         "copy": "Copiar",
     },
     "en": {
-        "found_one": "<b>{n}</b> source could answer this:",
-        "found_many": "<b>{n}</b> sources could answer this:",
-        "none": "No source matches “{q}”.",
-        "explore_themes": "Explore the themes",
-        "see_example": "See how your assistant would answer it →",
-        "see_answer": "See the stored answer →",
-        "cleared": "Search cleared.",
+        "thinking": "consulting official sources",
         "src_consulted": "Source consulted: ",
         "pause": "Pause examples",
         "play": "Resume examples",
@@ -451,11 +439,10 @@ def atlas_dots(count: int, provinces: list[dict]) -> list[tuple[float, float]]:
 def build_home(lang: str, source_themes: list[dict], tool_count: int) -> dict:
     """Everything the home template and home.js derive from the data files:
     stats, the map, the theme explorer and the JSON island used by the
-    client-side search and the terminal."""
+    theme explorer and the example chat."""
     geo = load_provinces()
     answers_raw = load_json(lang, "stored_answers.json")
     transcripts = load_json(lang, "transcripts.json")
-    lexicon = load_json(lang, "search_lexicon.json")
     labels = STATUS_LABELS[lang]
 
     themes = []
@@ -512,12 +499,7 @@ def build_home(lang: str, source_themes: list[dict], tool_count: int) -> dict:
             }
             for e in flat
         ],
-        "answers": [
-            {"id": a["id"], "q": a["question"], "a": a["answer"], "tools": a["tools"], "src": a["source"]}
-            for a in answers
-        ],
         "transcripts": transcripts,
-        "lexicon": lexicon,
         "ui": HOME_UI[lang],
     }
     return {

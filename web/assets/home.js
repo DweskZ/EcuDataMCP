@@ -1,8 +1,7 @@
-/* Home page behavior: atlas map, honest client-side search, terminal
-   transcripts, theme explorer, stored answers, client tabs and the logo
-   carousel. Vanilla JS. Everything it needs (sources, themes, answers,
-   transcripts, search lexicon, UI strings) comes from the #home-data JSON
-   island that build.py derives from web/data/*.json. */
+/* Home page behavior: atlas map, chat-style example conversation, theme
+   explorer, client tabs and the logo carousel. Vanilla JS. Everything it
+   needs (sources, themes, transcripts, UI strings) comes from the
+   #home-data JSON island that build.py derives from web/data/*.json. */
 (function () {
   "use strict";
 
@@ -14,9 +13,6 @@
 
   function $(id) { return document.getElementById(id); }
   function all(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
-  function norm(t) {
-    return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-  }
   function scrollToEl(el, block) {
     el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: block || "start" });
   }
@@ -71,7 +67,6 @@
   var listEl = $("list");
   var listHead = $("listHead");
   var activeTheme = null; // theme currently filtering the map
-  var matchSet = null; // Set of source indexes highlighted by a search
 
   var SEC = {
     sources: $("fuentes") || $("sources"),
@@ -85,10 +80,8 @@
       var k = +d.getAttribute("data-k");
       var t = +d.getAttribute("data-t");
       var show = true;
-      if (matchSet) show = matchSet.has(k);
-      else if (activeTheme !== null) show = t === activeTheme;
+      if (activeTheme !== null) show = t === activeTheme;
       d.classList.toggle("dim", !show);
-      d.classList.toggle("match", !!matchSet && matchSet.has(k));
     });
   }
 
@@ -107,7 +100,6 @@
 
   // force=true selects the theme; otherwise clicking the active theme clears it.
   function setTheme(i, force) {
-    matchSet = null;
     activeTheme = !force && activeTheme === i ? null : i;
     chips.forEach(function (c) {
       c.setAttribute("aria-pressed", +c.getAttribute("data-i") === activeTheme ? "true" : "false");
@@ -174,7 +166,11 @@
     });
   });
 
-  /* ----------------------------------------------------------- terminal */
+  /* ------------------------------------------------------------ chat */
+
+  // The example is a timeline of small actions (type a char, show a chip,
+  // stream a word...). Pausing just stops the timeline; reduced motion and
+  // "paused" both run every action at once, with no delays.
 
   var tx = $("tx");
   var tsrc = $("tsrc");
@@ -183,81 +179,165 @@
   var toggleBtn = $("termToggle");
   var term = tx.closest(".term");
   var cur = 0; // current example
-  var shown = 0; // steps visible in the current example
-  var rendered = { ex: -1, n: 0 };
+  var queue = []; // timeline of {step, delay, fn}
+  var qi = 0; // next action to run
   var timer = 0;
   var userPaused = false; // the user pressed pause or took control
-  var hovering = false;
-  var caret = document.createElement("span");
-  caret.className = "caret mono";
-  caret.setAttribute("aria-hidden", "true");
-  caret.textContent = "▍";
+  var live = {}; // DOM nodes of the conversation being played
 
-  function stepNode(s) {
-    var d = document.createElement("div");
-    if (s.kind === "question") {
-      d.className = "q";
-      d.textContent = s.text;
-    } else if (s.kind === "call") {
-      d.className = "call";
-      var n = document.createElement("span");
-      n.className = "sn";
-      n.textContent = s.n;
-      d.appendChild(n);
-      d.appendChild(document.createTextNode("→ " + s.tool + "(" + s.args + ")"));
-      d.appendChild(document.createElement("br"));
-      var em = document.createElement("em");
-      em.textContent = "✓ " + s.result;
-      d.appendChild(em);
-    } else if (s.kind === "reason") {
-      d.className = "call reason";
-      var rn = document.createElement("span");
-      rn.className = "sn";
-      rn.textContent = s.n;
-      d.appendChild(rn);
-      d.appendChild(document.createTextNode(s.text));
+  function make(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text) n.textContent = text;
+    return n;
+  }
+  function appendText(parent, text, bold) {
+    var last = parent.lastChild;
+    if (bold) {
+      if (!last || last.nodeName !== "B") {
+        last = make("b");
+        last.appendChild(document.createTextNode(""));
+        parent.appendChild(last);
+      }
+      last.firstChild.appendData(text);
     } else {
-      d.className = "ans";
-      var an = document.createElement("span");
-      an.className = "sn y";
-      an.textContent = s.n;
-      d.appendChild(an);
-      richText(d, s.text);
-      d.appendChild(document.createTextNode(" "));
-      var cite = document.createElement("span");
-      cite.className = "cite";
-      cite.textContent = s.cite;
-      d.appendChild(cite);
+      if (!last || last.nodeType !== 3) {
+        last = document.createTextNode("");
+        parent.appendChild(last);
+      }
+      last.appendData(text);
     }
-    if (!reduce) d.classList.add("enter");
-    return d;
+  }
+  // Split "plain **bold** plain" into word tokens that keep their bold flag.
+  function wordTokens(text) {
+    var out = [];
+    text.split("**").forEach(function (part, i) {
+      (part.match(/\s*\S+\s*|\s+/g) || []).forEach(function (w) { out.push({ t: w, b: i % 2 === 1 }); });
+    });
+    return out;
+  }
+  function enter(node) {
+    if (!reduce) node.classList.add("enter");
+    return node;
+  }
+  function keepThinkingLast() {
+    if (live.think && live.think.parentNode) live.turn.appendChild(live.think);
   }
 
-  function paintTerminal() {
-    var ex = D.transcripts[cur];
-    var n = Math.max(0, Math.min(shown, ex.steps.length));
-    if (rendered.ex !== cur || n < rendered.n) {
-      tx.textContent = "";
-      rendered = { ex: cur, n: 0 };
+  function buildQueue(ex) {
+    var q = [];
+    function add(step, delay, fn) { q.push({ step: step, delay: delay, fn: fn }); }
+    var question = ex.steps[0].text;
+
+    add(-1, 0, function () {
+      live.userText = make("span", "ut");
+      live.caret = make("span", "caret mono", "▍");
+      live.caret.setAttribute("aria-hidden", "true");
+      var bubble = make("div", "bubble");
+      bubble.appendChild(live.userText);
+      bubble.appendChild(live.caret);
+      var msg = make("div", "msg user");
+      msg.appendChild(bubble);
+      tx.appendChild(msg);
+    });
+    for (var k = 1; k <= question.length; k++) {
+      (function (k) {
+        add(-1, 25 + ((k * 7) % 11), function () { live.userText.textContent = question.slice(0, k); });
+      })(k);
     }
-    if (caret.parentNode) caret.parentNode.removeChild(caret);
-    for (var i = rendered.n; i < n; i++) tx.appendChild(stepNode(ex.steps[i]));
-    rendered.n = n;
-    if (n < ex.steps.length) tx.appendChild(caret);
-    tx.scrollTop = tx.scrollHeight;
-    var st = n ? ex.steps[n - 1].step : -1;
+    add(-1, 400, function () {
+      if (live.caret.parentNode) live.caret.parentNode.removeChild(live.caret);
+      var who = make("div", "who");
+      who.appendChild(make("span", "av", "E"));
+      who.appendChild(make("span", "", "EcuDataMCP"));
+      live.turn = make("div", "turn");
+      live.think = make("div", "think");
+      live.think.appendChild(document.createTextNode(UI.thinking));
+      live.think.appendChild(make("span", "dots"));
+      live.turn.appendChild(live.think);
+      var msg = make("div", "msg bot");
+      msg.appendChild(who);
+      msg.appendChild(live.turn);
+      tx.appendChild(enter(msg));
+    });
+    add(-1, 750, function () {});
+
+    ex.steps.slice(1).forEach(function (s) {
+      if (s.kind === "call") {
+        add(s.step, 650, function () {
+          var d = enter(make("div", "call"));
+          d.appendChild(make("span", "sn", s.n));
+          d.appendChild(document.createTextNode(s.tool + "(" + s.args + ")"));
+          d.appendChild(document.createElement("br"));
+          live.res = make("em", "", "…");
+          d.appendChild(live.res);
+          live.turn.appendChild(d);
+          keepThinkingLast();
+        });
+        add(s.step, 450, function () { live.res.textContent = "✓ " + s.result; });
+      } else if (s.kind === "reason") {
+        add(s.step, 900, function () {
+          var d = enter(make("div", "call reason"));
+          d.appendChild(make("span", "sn", s.n));
+          d.appendChild(document.createTextNode(s.text));
+          live.turn.appendChild(d);
+          keepThinkingLast();
+        });
+      } else {
+        add(s.step, 150, function () {
+          if (live.think && live.think.parentNode) live.think.parentNode.removeChild(live.think);
+          live.ans = enter(make("div", "ans"));
+          live.turn.appendChild(live.ans);
+        });
+        wordTokens(s.text).forEach(function (tok, i) {
+          add(s.step, 30 + ((i * 13) % 21), function () { appendText(live.ans, tok.t, tok.b); });
+        });
+        add(s.step, 0, function () {
+          live.ans.appendChild(document.createTextNode(" "));
+          live.ans.appendChild(enter(make("span", "cite", s.cite)));
+        });
+      }
+    });
+    return q;
+  }
+
+  function setStep(st) {
     stepBtns.forEach(function (b, j) {
       b.classList.toggle("on", j === st);
       if (j === st) b.setAttribute("aria-current", "step");
       else b.removeAttribute("aria-current");
     });
     progBars.forEach(function (b, j) { b.classList.toggle("on", j <= st); });
+  }
+  function exec(a) {
+    a.fn();
+    setStep(a.step);
+    tx.scrollTop = tx.scrollHeight;
+  }
+  function reset() {
+    tx.textContent = "";
+    live = {};
+    qi = 0;
+    setStep(-1);
+    tx.scrollTop = 0;
+  }
+  function paintSource() {
+    var ex = D.transcripts[cur];
     tsrc.textContent = "";
     tsrc.appendChild(document.createTextNode(UI.src_consulted));
-    var strong = document.createElement("b");
-    strong.textContent = ex.source.name;
-    tsrc.appendChild(strong);
+    tsrc.appendChild(make("b", "", ex.source.name));
     tsrc.appendChild(document.createTextNode(" · " + ex.source.detail));
+  }
+  function finish() {
+    while (qi < queue.length) exec(queue[qi++]);
+    tx.scrollTop = 0;
+  }
+  // Show the conversation up to (and including) step j, instantly.
+  function seek(j) {
+    reset();
+    while (qi < queue.length && queue[qi].step <= j) exec(queue[qi++]);
+    if (qi < queue.length && live.think && live.think.parentNode) live.think.parentNode.removeChild(live.think);
+    tx.scrollTop = 0;
   }
 
   function setLive() {
@@ -265,59 +345,43 @@
     // is driving (paused, or reduced motion) updates are announced politely.
     tx.setAttribute("aria-live", userPaused || reduce ? "polite" : "off");
   }
-
   function clearTimer() { window.clearTimeout(timer); timer = 0; }
-  function running() { return !reduce && !userPaused && !hovering && !document.hidden; }
+  function running() { return !reduce && !userPaused && !document.hidden; }
 
-  function tick() {
+  function pump() {
     clearTimer();
-    paintTerminal();
     if (!running()) return;
-    var len = D.transcripts[cur].steps.length;
-    if (shown >= len) {
-      // dwell on the finished answer, then move to the next example
+    if (qi >= queue.length) {
+      // hold on the finished answer, then move to the next example
       timer = window.setTimeout(function () {
         exTabs.select((cur + 1) % D.transcripts.length, false, false);
-      }, 4800);
+      }, 4000);
       return;
     }
-    shown += 1;
-    timer = window.setTimeout(tick, 1500);
+    var a = queue[qi++];
+    exec(a);
+    timer = window.setTimeout(pump, a.delay);
   }
 
   function playExample(i) {
     clearTimer();
     cur = i;
-    rendered = { ex: -1, n: 0 };
-    if (reduce || userPaused) {
-      shown = D.transcripts[cur].steps.length;
-      paintTerminal();
-    } else {
-      shown = 1;
-      tick();
-    }
+    queue = buildQueue(D.transcripts[cur]);
+    reset();
+    paintSource();
+    if (reduce || userPaused) finish();
+    else pump();
   }
 
-  var exTabs = tablist($("exTabs"), function (i, user) {
-    if (user && !reduce && !userPaused) {
-      // picking an example by hand hands control to the user
-      userPaused = true;
-      syncToggle();
-    }
-    playExample(i);
-  });
+  var exTabs = tablist($("exTabs"), function (i) { playExample(i); });
 
   stepBtns.forEach(function (b, j) {
     b.addEventListener("click", function () {
       // jump to that step; the user is now in control
-      var steps = D.transcripts[cur].steps;
-      var n = 0;
-      steps.forEach(function (s, idx) { if (s.step <= j) n = idx + 1; });
       userPaused = true;
       syncToggle();
       clearTimer();
-      shown = Math.max(1, n);
-      paintTerminal();
+      seek(j);
     });
   });
 
@@ -336,167 +400,15 @@
       userPaused = !userPaused;
       syncToggle();
       if (userPaused) clearTimer();
-      else tick();
+      else pump();
     });
   }
-  term.addEventListener("pointerenter", function () { hovering = true; clearTimer(); });
-  term.addEventListener("pointerleave", function () { hovering = false; if (running()) tick(); });
-  term.addEventListener("focusin", function () { hovering = true; clearTimer(); });
-  term.addEventListener("focusout", function (e) {
-    if (!term.contains(e.relatedTarget)) { hovering = false; if (running()) tick(); }
-  });
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) clearTimer();
-    else if (running()) tick();
+    else pump();
   });
   setLive();
   playExample(0);
-
-  /* ------------------------------------------------------------- answers */
-
-  function openAnswer(id) {
-    var d = $("qa-" + id);
-    if (!d) return null;
-    d.open = true;
-    return d;
-  }
-
-  /* -------------------------------------------------------------- search */
-
-  var lex = D.lexicon;
-  var STOP = new Set(lex.stop.map(norm));
-  var SYN = {};
-  Object.keys(lex.synonyms).forEach(function (k) { SYN[norm(k)] = lex.synonyms[k].map(norm); });
-  var hay = D.sources.map(function (s) { return norm([s.n, s.i, s.d, themeName(s.t)].join(" ")); });
-  var ahay = D.answers.map(function (a) { return norm([a.q, a.a, a.tools.join(" "), a.src].join(" ")); });
-  var results = $("results");
-  var input = $("q");
-
-  function searchTerms(raw) {
-    var words = norm(raw).split(/[^a-z0-9.]+/).filter(function (w) { return w.length > 2 && !STOP.has(w); });
-    var weights = {};
-    function add(t, w) { if (!weights[t] || weights[t] < w) weights[t] = w; }
-    words.forEach(function (w) {
-      add(w, 2);
-      if (w.length > 4 && w.charAt(w.length - 1) === "s") add(w.slice(0, -1), 2);
-      (SYN[w] || []).forEach(function (s) { add(s, 1); });
-    });
-    return weights;
-  }
-  function score(text, weights) {
-    return Object.keys(weights).reduce(function (a, t) { return a + (text.indexOf(t) >= 0 ? weights[t] : 0); }, 0);
-  }
-  function fill(template, vars) {
-    return template.replace(/\{(\w+)\}/g, function (m, k) { return vars[k] !== undefined ? vars[k] : m; });
-  }
-  function link(text, href, id) {
-    var a = document.createElement("a");
-    a.href = href;
-    a.textContent = text;
-    if (id) a.id = id;
-    return a;
-  }
-
-  function runSearch(raw) {
-    results.textContent = "";
-    var weights = searchTerms(raw);
-    if (!Object.keys(weights).length) {
-      matchSet = null;
-      activeTheme = null;
-      chips.forEach(function (c) { c.setAttribute("aria-pressed", "false"); });
-      paintDots();
-      return;
-    }
-    var scored = [];
-    hay.forEach(function (h, k) {
-      var sc = score(h, weights);
-      if (sc > 0) scored.push({ k: k, score: sc });
-    });
-    scored.sort(function (a, b) { return b.score - a.score || a.k - b.k; });
-    activeTheme = null;
-    chips.forEach(function (c) { c.setAttribute("aria-pressed", "false"); });
-    matchSet = new Set(scored.map(function (x) { return x.k; }));
-    paintDots();
-
-    // stored answer: best-scoring question, only when a real word matched
-    var best = null;
-    ahay.forEach(function (h, i) {
-      var sc = score(h, weights);
-      if (sc >= 2 && (!best || sc > best.score)) best = { i: i, score: sc };
-    });
-    var qn = norm(raw).trim();
-    D.answers.forEach(function (a, i) { if (norm(a.q) === qn) best = { i: i, score: 99 }; });
-    var exId = null;
-    var nq = norm(raw);
-    lex.examples.some(function (pair) {
-      if (nq.indexOf(norm(pair[0])) >= 0) { exId = pair[1]; return true; }
-      return false;
-    });
-
-    if (!scored.length) {
-      var parts = UI.none.split("{q}");
-      results.appendChild(document.createTextNode(parts[0]));
-      var qEl = document.createElement("b");
-      qEl.textContent = raw;
-      results.appendChild(qEl);
-      results.appendChild(document.createTextNode(parts[1] || ""));
-      results.appendChild(document.createTextNode(" "));
-      results.appendChild(link(UI.explore_themes, "#" + SEC.sources.id));
-    } else {
-      var head = document.createElement("span");
-      head.innerHTML = fill(scored.length === 1 ? UI.found_one : UI.found_many, { n: scored.length });
-      results.appendChild(head);
-      results.appendChild(document.createElement("br"));
-      scored.slice(0, 6).forEach(function (x) {
-        var s = D.sources[x.k];
-        var b = document.createElement("button");
-        b.type = "button";
-        b.className = "hit";
-        var dot = document.createElement("i");
-        dot.style.background = D.themes[s.t].color;
-        b.appendChild(dot);
-        b.appendChild(document.createTextNode(s.n + " · " + s.i.replace(/\s*\(.*\)/, "")));
-        b.addEventListener("click", function () {
-          setTheme(s.t, true);
-          scrollToEl(SEC.sources);
-        });
-        results.appendChild(b);
-      });
-      if (scored.length > 6) {
-        var rest = document.createElement("span");
-        rest.className = "more";
-        rest.textContent = "+" + (scored.length - 6);
-        results.appendChild(rest);
-      }
-    }
-    var links = document.createElement("div");
-    links.className = "res-links";
-    results.appendChild(links);
-    if (exId) {
-      var idx = D.transcripts.findIndex(function (t) { return t.id === exId; });
-      if (idx >= 0) {
-        var ea = link(UI.see_example, "#" + SEC.how.id);
-        ea.addEventListener("click", function () { exTabs.select(idx, false, true); });
-        links.appendChild(ea);
-      }
-    }
-    if (best) {
-      var a = D.answers[best.i];
-      var aa = link(UI.see_answer, "#qa-" + a.id);
-      aa.addEventListener("click", function (e) {
-        e.preventDefault();
-        var d = openAnswer(a.id);
-        if (d) scrollToEl(d, "center");
-      });
-      links.appendChild(aa);
-    }
-  }
-
-  $("sform").addEventListener("submit", function (e) {
-    e.preventDefault();
-    runSearch(input.value);
-  });
-  input.addEventListener("input", function () { if (!input.value) runSearch(""); });
 
   /* ------------------------------------------------------------- connect */
 

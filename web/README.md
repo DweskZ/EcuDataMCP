@@ -42,10 +42,8 @@ para que un solo PR pueda actualizar el README del servidor y el sitio a la vez.
 - `data/stored_answers.json` (+ `en/data/`) — preguntas con respuestas reales guardadas, con
   `extracted_at` y `server_version`. Al refrescarlas, actualiza esos dos campos y los textos; no cambies
   cifras al traducir.
-- `data/transcripts.json` (+ `en/data/`) — los ejemplos de la terminal (llamadas reales a tools). Un paso
+- `data/transcripts.json` (+ `en/data/`) — los ejemplos del chat de la home (llamadas reales a tools). Un paso
   con `"kind": "reason"` no es una llamada a una tool y se muestra en cursiva gris.
-- `data/search_lexicon.json` (+ `en/data/`) — palabras vacías, sinónimos y enlaces a ejemplos de la
-  búsqueda del hero (sin acentos ni mayúsculas).
 - `data/clients.json` — snippets por cliente MCP; los `featured` son las pestañas de la home, el resto
   va en "Otros clientes". `alt` documenta la variante remota/HTTP por separado.
 - `data/org_logos.json` — logos del carrusel del backstage.

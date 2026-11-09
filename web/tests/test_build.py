@@ -127,6 +127,28 @@ def test_home_atlas_is_data_driven(site, lang):
     assert 'id="home-data"' in home
 
 
+@pytest.mark.parametrize("lang", ["es", "en"])
+def test_home_only_first_stored_answer_is_open_in_two_columns(site, lang):
+    home = (site / ("index.html" if lang == "es" else "en/index.html")).read_text(
+        encoding="utf-8"
+    )
+    cards = re.findall(r'<details class="qa"[^>]*>', home)
+    assert len(cards) == 8
+    assert [" open" in c for c in cards] == [True] + [False] * 7
+    assert home.count('class="qs-col"') == 2
+
+
+@pytest.mark.parametrize("lang", ["es", "en"])
+def test_home_has_no_hero_search(site, lang):
+    home = (site / ("index.html" if lang == "es" else "en/index.html")).read_text(
+        encoding="utf-8"
+    )
+    assert 'id="sform"' not in home
+    assert 'id="results"' not in home
+    assert "lexicon" not in home
+    assert 'class="chip"' in home
+
+
 def test_stored_answers_keep_the_same_ids_in_both_languages():
     es = build.load_json("es", "stored_answers.json")
     en = build.load_json("en", "stored_answers.json")
