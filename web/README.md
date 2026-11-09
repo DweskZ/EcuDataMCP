@@ -40,13 +40,48 @@ para que un solo PR pueda actualizar el README del servidor y el sitio a la vez.
   fuente: geoBoundaries, CC BY 4.0, simplificada, sin Galápagos). `build.py` dibuja el mapa y reparte un
   punto por fuente de forma determinista; la posición es ilustrativa.
 - `data/stored_answers.json` (+ `en/data/`) — preguntas con respuestas reales guardadas, con
-  `extracted_at` y `server_version`. Al refrescarlas, actualiza esos dos campos y los textos; no cambies
-  cifras al traducir.
+  `extracted_at` y `server_version`. Se regeneran con `scripts/refresh_answers.py` (ver abajo); si las
+  editas a mano, no cambies cifras al traducir.
 - `data/transcripts.json` (+ `en/data/`) — los ejemplos del chat de la home (llamadas reales a tools). Un paso
   con `"kind": "reason"` no es una llamada a una tool y se muestra en cursiva gris.
 - `data/clients.json` — snippets por cliente MCP; los `featured` son las pestañas de la home, el resto
   va en "Otros clientes". `alt` documenta la variante remota/HTTP por separado.
 - `data/org_logos.json` — logos del carrusel del backstage.
+
+## Refrescar las respuestas guardadas
+
+Las 8 respuestas de la home y los 3 transcripts envejecen (cifras de remesas, sismos, compras, cortes...).
+`scripts/refresh_answers.py` vuelve a ejecutar **las mismas llamadas a los tools**, en proceso (importa
+`tools/`, no necesita un servidor corriendo), y regenera ES y EN desde plantillas pequeñas con los valores
+extraídos. También actualiza `extracted_at` y `server_version` (de `pyproject.toml`).
+
+```bash
+# desde la raíz del repo, con el entorno del servidor (uv sync)
+uv run python web/scripts/refresh_answers.py --dry-run   # muestra el diff, no escribe
+uv run python web/scripts/refresh_answers.py             # escribe los 4 JSON
+```
+
+- Cada respuesta define sus llamadas, el parseo y sus plantillas ES/EN en el propio script. Las cifras
+  salen con el formato de cada idioma (`US$ 7.728 millones, 18,2 %` / `US$ 7,728 million, 18.2%`).
+- **Nunca escribe una respuesta a medias.** Si una llamada falla o un valor no se puede interpretar, esa
+  respuesta (y su transcript) queda exactamente como estaba, se avisa en el resumen (`kept-previous`) y
+  conserva su propio `extracted_at` por respuesta para que la fecha global no prometa más de lo verificado.
+- Las dos respuestas del Censo son estáticas: el script solo verifica que `search_archivos` siga devolviendo
+  `03_2022_CPV_TIC` y que los enlaces del INEC sigan ahí.
+- Los sismos se filtran por el texto del lugar (provincia ecuatoriana); las coordenadas solo deciden si el
+  texto no trae región. Los avisos de la EEASA muestran los dos próximos que aún no terminaron.
+- Código de salida: `0` refresco completo o parcial; `2` error inesperado (JSON roto, ES/EN desalineados);
+  `3` no se pudo refrescar nada.
+- Pruebas: `cd web && uv run --with pytest pytest -q tests` (con las llamadas simuladas, sin red).
+
+### Automatización y revisión humana
+
+`.github/workflows/refresh-answers.yml` corre cada lunes (12:00 UTC) y a demanda (`workflow_dispatch`),
+ejecuta el script y, si cambió algún archivo, abre o actualiza el PR `chore/refresh-stored-answers`
+(acción fijada por SHA). **No hay auto-merge: ese PR es la compuerta de revisión humana.** Quien lo revisa
+debe contrastar las cifras que cambiaron con la fuente oficial antes de aprobar; el cuerpo del PR lista qué
+respuestas se actualizaron y cuáles se quedaron con su versión anterior. Los PR abiertos con el
+`GITHUB_TOKEN` por defecto no disparan `ci.yml`: cierra y reabre el PR para correrlo.
 
 ## Cómo se genera
 
