@@ -209,10 +209,15 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
           TOTALES, 2012-2021 only. Arancelarios/ADVALOREM are the tariff
           alone, smaller than the press "recaudación aduanera" (which adds
           IVA and ICE at the border).
-        - censo: Census 2022 microsite (censoecuador.gob.ec): microdata by
-          sector, cantón and city block (CSV, SPSS, REDATAM), 2010/2001
-          recoded to 2022 geography, dictionaries, methodology. Files can be
-          hundreds of MB.
+        - censo: Census 2022 microsite (censoecuador.gob.ec), ~100 files, each
+          with `tipo` (tabulado, microdatos, diccionario, documento): results
+          tabulados by theme in XLSX or CSV-in-ZIP (población, vivienda, hogar;
+          the household ICT one is "Uso de las Tecnologías de la Información
+          y Comunicación": cellphone, internet, computer, tablet by province
+          and cantón; try query "internet" or "tic"), microdata by sector,
+          cantón and city block (CSV, SPSS, REDATAM), 2010/2001 recoded to
+          2022 geography, dictionaries, methodology. Microdata can be hundreds
+          of MB; tabulados are 0.5-2 MB (open XLSX with preview_resource_data).
         - minedec: MINEDEC basic-education enrollment registry 2009-present
           (start/end-of-year XLSX of 30-140 MB, metadata, dictionary).
         - senescyt: SENESCYT SIAU higher-education and CTI reports; "wpdm"
@@ -316,6 +321,8 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
                     + (f" ({contexto})" if contexto else "")
                 )
                 parts.append(f"   {a['url']}")
+                if a.get("contenido"):
+                    parts.append(f"   {a['contenido']}")
             return "\n".join(parts)
 
         return render_structured(result, format, text_builder=to_text)

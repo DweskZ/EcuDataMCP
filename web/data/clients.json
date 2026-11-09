@@ -2,22 +2,58 @@
   {
     "id": "claude-desktop",
     "name": "Claude Desktop",
-    "intro": "La forma más simple no necesita levantar ningún servidor: Claude Desktop ejecuta el paquete de PyPI con `uv`, así que puedes usar `\"command\": \"uvx\", \"args\": [\"ecuador-mcp\", \"--transport\", \"stdio\"]` o instalar el archivo `.mcpb` adjunto a cada release de GitHub como extensión de Claude Desktop. Agrega esto a tu archivo de configuración (`~/Library/Application Support/Claude/claude_desktop_config.json` en macOS, `%APPDATA%\\Claude\\claude_desktop_config.json` en Windows):",
+    "featured": true,
+    "intro": "Claude Desktop ejecuta el paquete de PyPI con `uv`, sin levantar ningún servidor. Agrega esto a `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) o `%APPDATA%\\Claude\\claude_desktop_config.json` (Windows) y reinicia Claude Desktop. También puedes instalar el archivo `.mcpb` adjunto a cada release de GitHub como extensión.",
     "steps": [],
     "lang": "json",
-    "code": "{\n  \"mcpServers\": {\n    \"ecuador-datos\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"mcp-remote\", \"http://localhost:8000/mcp\"]\n    }\n  }\n}"
+    "code": "{\n  \"mcpServers\": {\n    \"ecuador-datos\": {\n      \"command\": \"uvx\",\n      \"args\": [\"ecuador-mcp\", \"--transport\", \"stdio\"]\n    }\n  }\n}",
+    "alt": {
+      "label": "Alternativa: conectarte a un servidor HTTP que ya corre (requiere Node.js 18+ para `mcp-remote`)",
+      "lang": "json",
+      "code": "{\n  \"mcpServers\": {\n    \"ecuador-datos\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"mcp-remote\", \"http://localhost:8000/mcp\"]\n    }\n  }\n}"
+    }
+  },
+  {
+    "id": "claude-code",
+    "name": "Claude Code",
+    "featured": true,
+    "intro": "Un comando, y listo: Claude Code lanza el servidor por stdio con `uvx`. Reinicia la sesión para ver los tools.",
+    "steps": [],
+    "lang": "bash",
+    "code": "claude mcp add ecuador-datos -- uvx ecuador-mcp --transport stdio",
+    "alt": {
+      "label": "Alternativa: servidor HTTP que ya corre",
+      "lang": "bash",
+      "code": "claude mcp add --transport http ecuador-datos http://localhost:8000/mcp"
+    }
   },
   {
     "id": "cursor",
     "name": "Cursor",
-    "intro": "",
-    "steps": [
-      "Abre Cursor Settings",
-      "Busca \"MCP\"",
-      "Agrega un nuevo servidor MCP:"
-    ],
+    "featured": true,
+    "intro": "Abre Cursor Settings, busca \"MCP\" y agrega un servidor nuevo, o edita `~/.cursor/mcp.json` directamente:",
+    "steps": [],
     "lang": "json",
-    "code": "{\n  \"mcpServers\": {\n    \"ecuador-datos\": {\n      \"url\": \"http://localhost:8000/mcp\",\n      \"transport\": \"http\"\n    }\n  }\n}"
+    "code": "{\n  \"mcpServers\": {\n    \"ecuador-datos\": {\n      \"command\": \"uvx\",\n      \"args\": [\"ecuador-mcp\", \"--transport\", \"stdio\"]\n    }\n  }\n}",
+    "alt": {
+      "label": "Alternativa: servidor HTTP que ya corre",
+      "lang": "json",
+      "code": "{\n  \"mcpServers\": {\n    \"ecuador-datos\": {\n      \"url\": \"http://localhost:8000/mcp\",\n      \"transport\": \"http\"\n    }\n  }\n}"
+    }
+  },
+  {
+    "id": "http-docker",
+    "name": "HTTP / Docker",
+    "featured": true,
+    "intro": "Para clientes remotos o despliegues propios. Docker exige un token (`MCP_AUTH_TOKEN`); el endpoint queda en `http://localhost:8000/mcp`. Sin Docker, `uv run` lo levanta en el mismo puerto.",
+    "steps": [],
+    "lang": "bash",
+    "code": "MCP_AUTH_TOKEN=\"$(openssl rand -hex 32)\" docker compose up -d\n# o, sin Docker:\nuv sync && uv run python main.py --transport http --port 8000",
+    "alt": {
+      "label": "Comprueba que responde",
+      "lang": "bash",
+      "code": "curl http://localhost:8000/health"
+    }
   },
   {
     "id": "vscode",
@@ -25,7 +61,8 @@
     "intro": "Agrega a tu archivo `mcp.json` (ejecuta **MCP: Open User Configuration** desde la paleta de comandos):",
     "steps": [],
     "lang": "json",
-    "code": "{\n  \"servers\": {\n    \"ecuador-datos\": {\n      \"url\": \"http://localhost:8000/mcp\",\n      \"type\": \"http\"\n    }\n  }\n}"
+    "code": "{\n  \"servers\": {\n    \"ecuador-datos\": {\n      \"url\": \"http://localhost:8000/mcp\",\n      \"type\": \"http\"\n    }\n  }\n}",
+    "featured": false
   },
   {
     "id": "chatgpt",
@@ -38,15 +75,8 @@
       "Configura la URL: `http://localhost:8000/mcp`"
     ],
     "lang": null,
-    "code": null
-  },
-  {
-    "id": "claude-code",
-    "name": "Claude Code",
-    "intro": "",
-    "steps": [],
-    "lang": "bash",
-    "code": "claude mcp add --transport http ecuador-datos http://localhost:8000/mcp"
+    "code": null,
+    "featured": false
   },
   {
     "id": "codex",
@@ -54,7 +84,8 @@
     "intro": "Guarda la configuración en `~/.codex/config.toml` (bloque `[mcp_servers.ecuador-datos]` con `url`). Para usar el servidor por stdio en vez de HTTP: `codex mcp add ecuador-datos -- uvx ecuador-mcp --transport stdio`.",
     "steps": [],
     "lang": "bash",
-    "code": "codex mcp add ecuador-datos --url http://localhost:8000/mcp"
+    "code": "codex mcp add ecuador-datos --url http://localhost:8000/mcp",
+    "featured": false
   },
   {
     "id": "gemini-cli",
@@ -62,7 +93,8 @@
     "intro": "Agrega a `~/.gemini/settings.json`:",
     "steps": [],
     "lang": "json",
-    "code": "{\n  \"mcpServers\": {\n    \"ecuador-datos\": {\n      \"httpUrl\": \"http://localhost:8000/mcp\"\n    }\n  }\n}"
+    "code": "{\n  \"mcpServers\": {\n    \"ecuador-datos\": {\n      \"httpUrl\": \"http://localhost:8000/mcp\"\n    }\n  }\n}",
+    "featured": false
   },
   {
     "id": "le-chat",
@@ -74,7 +106,8 @@
       "Nombre: \"Ecuador Datos\" / URL: `http://localhost:8000/mcp`"
     ],
     "lang": null,
-    "code": null
+    "code": null,
+    "featured": false
   },
   {
     "id": "windsurf",
@@ -82,7 +115,8 @@
     "intro": "Agrega a `~/.codeium/windsurf/mcp_config.json`:",
     "steps": [],
     "lang": "json",
-    "code": "{\n  \"mcpServers\": {\n    \"ecuador-datos\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"mcp-remote\", \"http://localhost:8000/mcp\"]\n    }\n  }\n}"
+    "code": "{\n  \"mcpServers\": {\n    \"ecuador-datos\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"mcp-remote\", \"http://localhost:8000/mcp\"]\n    }\n  }\n}",
+    "featured": false
   },
   {
     "id": "huggingchat",
@@ -93,6 +127,7 @@
       "`Add Server` con nombre \"Ecuador Datos\" y URL `http://localhost:8000/mcp`"
     ],
     "lang": null,
-    "code": null
+    "code": null,
+    "featured": false
   }
 ]

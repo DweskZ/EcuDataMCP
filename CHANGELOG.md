@@ -2,6 +2,39 @@
 
 ## Unreleased
 
+- **ANDA: availability and download now agree.** `search_anda` said the 2022
+  Census (catalog 1085, `ECU-INEC-CTIMA-CPV-2022-V1.6`) had microdata and
+  `download_anda_microdata` returned `total_archivos: 0`. The catalog marks
+  it `direct`, but its "Obtener microdatos" page lists a single resource that
+  is an *External link* to `censoecuador.gob.ec/data-censo-ecuador/`; the old
+  parser only looked for ANDA-hosted `/download/` links and read that as
+  "nothing attached" (a few defunciones generales and hospital-beds studies
+  do the same). The three ANDA tools now classify the study from its real
+  download page:
+  - `tipo_acceso`: `directo` (files in ANDA), `enlace_externo` (ANDA only
+    links out), `registro` (ANDA login), `solicitud` (request to INEC),
+    `ninguno` (explicit "Data Access Not Available" or no resources), and
+    `desconocido` when the check fails and the catalog flag is all there is.
+  - `download_anda_microdata` returns `enlaces_externos` next to `archivos`,
+    a `motivo`, and a `siguiente_paso` pointing at `search_archivos(fuente=
+    "censo")` or `get_inec_estadistica_files`.
+  - `search_anda` verifies each result (2 requests per study with microdata,
+    6 h cache, 6 in parallel; `verificar_acceso=false` skips it) so
+    `microdatos_disponibles` means "there is a way to get it" and agrees with
+    the download tool. `get_anda_survey_info` reports the same fields.
+- **Census 2022 results tabulados via `search_archivos(fuente="censo")`.**
+  The source read `censoecuador.gob.ec/data-y-resultados/`, which is now a
+  real 404 page with only the site's navigation, so it listed ~36 unrelated
+  links and no tabulado. It now reads `/resultados-censo/` and
+  `/data-censo-ecuador/` (~100 files): the thematic tabulados in XLSX and
+  CSV-in-ZIP (población, vivienda, hogar, including *Uso de las Tecnologías de
+  la Información y Comunicación*: mobile phone, internet, computer/laptop and
+  tablet by province and cantón), microdata by cantón/sector/manzana (CSV,
+  SPSS, REDATAM) with the 2010 and 2001 censuses recoded to 2022 geography,
+  and the dictionaries. Each file carries `tipo`, `anio` and, for tabulados,
+  `tema`; every query word must match (so `internet` or `tabulado hogar`
+  work), and http links are normalised to https.
+
 ## 0.15.0 — 2026-11-07
 
 85 tools in the default profile (`get_resumen_compras` is new) and eleven

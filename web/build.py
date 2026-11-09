@@ -11,6 +11,7 @@ Usage: uv run python build.py
 
 import html as html_lib
 import json
+import math
 import re
 import shutil
 from pathlib import Path
@@ -42,8 +43,7 @@ TRANSLATIONS = {
         "search": "Buscar",
         "search_placeholder": "Buscar en el sitio…",
         "toggle_nav": "Mostrar u ocultar la navegación",
-        "theme_to_light": "Cambiar a modo claro",
-        "theme_to_dark": "Cambiar a modo oscuro",
+        "nav_label": "Principal",
         "copied": "¡Copiado!",
         "default_required": "requerido",
         "default_none": "ninguno",
@@ -55,8 +55,7 @@ TRANSLATIONS = {
         "search": "Search",
         "search_placeholder": "Search the site…",
         "toggle_nav": "Toggle navigation",
-        "theme_to_light": "Switch to light mode",
-        "theme_to_dark": "Switch to dark mode",
+        "nav_label": "Main",
         "copied": "Copied!",
         "default_required": "required",
         "default_none": "none",
@@ -64,6 +63,104 @@ TRANSLATIONS = {
         "search_no_results": "No results.",
         "skip_to_content": "Skip to content",
     },
+}
+
+# Source status labels on the home explorer (fuentes.html keeps using the
+# smaller STATUS_BADGES, which only flags the exceptions).
+STATUS_LABELS = {
+    "es": {"live": "en línea", "offline": "sin conexión", "build-local": "build local"},
+    "en": {"live": "online", "offline": "offline", "build-local": "local build"},
+}
+
+# Strings the home page JavaScript needs (search results, terminal, labels).
+# Placeholders in {braces} are filled in by home.js.
+HOME_UI = {
+    "es": {
+        "found_one": "<b>{n}</b> fuente podría responder esto:",
+        "found_many": "<b>{n}</b> fuentes podrían responder esto:",
+        "none": "Ninguna fuente coincide con “{q}”.",
+        "explore_themes": "Explora los temas",
+        "see_example": "Ver cómo lo respondería tu asistente →",
+        "see_answer": "Ver la respuesta guardada →",
+        "cleared": "Búsqueda borrada.",
+        "src_consulted": "Fuente consultada: ",
+        "pause": "Pausar ejemplos",
+        "play": "Reanudar ejemplos",
+        "theme_word": "tema",
+        "no_filter": "Mostrar todas las fuentes",
+        "copy": "Copiar",
+    },
+    "en": {
+        "found_one": "<b>{n}</b> source could answer this:",
+        "found_many": "<b>{n}</b> sources could answer this:",
+        "none": "No source matches “{q}”.",
+        "explore_themes": "Explore the themes",
+        "see_example": "See how your assistant would answer it →",
+        "see_answer": "See the stored answer →",
+        "cleared": "Search cleared.",
+        "src_consulted": "Source consulted: ",
+        "pause": "Pause examples",
+        "play": "Resume examples",
+        "theme_word": "theme",
+        "no_filter": "Show all sources",
+        "copy": "Copy",
+    },
+}
+
+FOOTER = {
+    "es": {
+        "cta_a": "Datos abiertos del Ecuador,",
+        "cta_b": "con tu asistente de IA favorito.",
+        "install": "Instalar",
+        "github": "Ver en GitHub",
+        "product": "Producto",
+        "project": "Proyecto",
+        "language": "Idioma",
+        "product_links": [
+            ("Cómo funciona", "index.html#como-funciona"),
+            ("Fuentes", "fuentes.html"),
+            ("Referencia de tools", "atlas.html"),
+            ("Ejemplos", "examples.html"),
+        ],
+        "project_links": [
+            ("Releases", "releases.html"),
+            ("Cómo colaborar", "colaborar.html"),
+            ("Acerca de", "about.html"),
+        ],
+        "install_href": "index.html#conectar",
+    },
+    "en": {
+        "cta_a": "Ecuador's open data,",
+        "cta_b": "with your favorite AI assistant.",
+        "install": "Install",
+        "github": "View on GitHub",
+        "product": "Product",
+        "project": "Project",
+        "language": "Language",
+        "product_links": [
+            ("How it works", "index.html#how-it-works"),
+            ("Sources", "fuentes.html"),
+            ("Tool reference", "atlas.html"),
+            ("Examples", "examples.html"),
+        ],
+        "project_links": [
+            ("Releases", "releases.html"),
+            ("Contribute", "colaborar.html"),
+            ("About", "about.html"),
+        ],
+        "install_href": "index.html#connect",
+    },
+}
+
+MONTHS = {
+    "es": [
+        "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
+        "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+    ],
+    "en": [
+        "January", "February", "March", "April", "May", "June", "July",
+        "August", "September", "October", "November", "December",
+    ],
 }
 
 NAV = {
@@ -122,7 +219,7 @@ PAGE_TITLES = {
 
 PAGE_DESCRIPTIONS = {
     "es": {
-        "index": "Servidor MCP de código abierto para explorar datos abiertos del gobierno de Ecuador desde tu asistente de IA.",
+        "index": "Servidor MCP de código abierto: {n_sources} fuentes oficiales y {n} tools para consultar los datos abiertos de Ecuador desde tu asistente de IA, con la fuente citada.",
         "atlas": "Los {n} tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.",
         "examples": "Once preguntas reales, respondidas con EcuDataMCP: sin inventar datos de Ecuador.",
         "releases": "Historial de versiones de EcuDataMCP y el ritmo real de los releases.",
@@ -131,7 +228,7 @@ PAGE_DESCRIPTIONS = {
         "fuentes": "Las {n_sources} fuentes oficiales de EcuDataMCP, agrupadas por tema e institución.",
     },
     "en": {
-        "index": "Open-source MCP server for exploring Ecuador's open government data from your AI assistant.",
+        "index": "Open-source MCP server: {n_sources} official sources and {n} tools to query Ecuador's open data from your AI assistant, with the source cited.",
         "atlas": "EcuDataMCP's {n} tools, with a full description and a direct link to each one.",
         "examples": "Eleven real questions, answered with EcuDataMCP: no invented data about Ecuador.",
         "releases": "EcuDataMCP's version history and the real pace of its releases.",
@@ -318,6 +415,128 @@ def complete_tool_catalog(
     return [*catalog, category]
 
 
+_NUM_RE = re.compile(r"-?\d+(?:\.\d+)?")
+
+
+def format_long_date(iso: str, lang: str) -> str:
+    """'2026-11-08' -> '8 de noviembre de 2026' / 'November 8, 2026'."""
+    year, month, day = (int(part) for part in iso.split("-"))
+    name = MONTHS[lang][month - 1]
+    return f"{day} de {name} de {year}" if lang == "es" else f"{name} {day}, {year}"
+
+
+def load_provinces() -> dict:
+    return json.loads((DATA / "ecuador_provinces.json").read_text(encoding="utf-8"))
+
+
+def atlas_dots(count: int, provinces: list[dict]) -> list[tuple[float, float]]:
+    """One illustrative position per source: each dot is spread around the
+    bounding-box centre of a province on a golden-angle spiral. Deterministic,
+    so the same catalog always renders the same map. The position carries no
+    geographic meaning (the page says so)."""
+    centres = []
+    for province in provinces:
+        nums = [float(n) for n in _NUM_RE.findall(province["d"])]
+        xs, ys = nums[0::2], nums[1::2]
+        centres.append(((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2))
+    dots = []
+    for k in range(count):
+        cx, cy = centres[(k * 7) % len(centres)]
+        angle = k * 2.399
+        radius = 7 + ((k * 13) % 22)
+        dots.append((round(cx + math.cos(angle) * radius, 1), round(cy + math.sin(angle) * radius, 1)))
+    return dots
+
+
+def build_home(lang: str, source_themes: list[dict], tool_count: int) -> dict:
+    """Everything the home template and home.js derive from the data files:
+    stats, the map, the theme explorer and the JSON island used by the
+    client-side search and the terminal."""
+    geo = load_provinces()
+    answers_raw = load_json(lang, "stored_answers.json")
+    transcripts = load_json(lang, "transcripts.json")
+    lexicon = load_json(lang, "search_lexicon.json")
+    labels = STATUS_LABELS[lang]
+
+    themes = []
+    flat = []
+    for idx, theme in enumerate(source_themes):
+        entries = []
+        for institution in theme["institutions"]:
+            for source in institution["sources"]:
+                entry = {
+                    "k": len(flat),
+                    "t": idx,
+                    "institution": institution["name"],
+                    "name": source["name"],
+                    "description": source["description"],
+                    "url": source.get("url", ""),
+                    "status": source["status"],
+                    "status_label": labels.get(source["status"], source["status"]),
+                    "theme": theme["theme"],
+                    "color": theme["color"],
+                }
+                flat.append(entry)
+                entries.append(entry)
+        themes.append(
+            {
+                "idx": idx,
+                "id": theme["id"],
+                "name": theme["theme"],
+                "color": theme["color"],
+                "count": len(entries),
+                "sources": entries,
+            }
+        )
+    by_size = sorted(themes, key=lambda th: -th["count"])
+
+    dots = atlas_dots(len(flat), geo["provinces"])
+    for entry, (x, y) in zip(flat, dots):
+        entry["x"], entry["y"] = x, y
+
+    online = sum(1 for entry in flat if entry["status"] == "live")
+    answers = answers_raw["answers"]
+    data = {
+        "themes": [
+            {"i": th["idx"], "name": th["name"], "color": th["color"], "n": th["count"]}
+            for th in themes
+        ],
+        "sources": [
+            {
+                "k": e["k"],
+                "t": e["t"],
+                "i": e["institution"],
+                "n": e["name"],
+                "d": e["description"],
+                "u": e["url"],
+            }
+            for e in flat
+        ],
+        "answers": [
+            {"id": a["id"], "q": a["question"], "a": a["answer"], "tools": a["tools"], "src": a["source"]}
+            for a in answers
+        ],
+        "transcripts": transcripts,
+        "lexicon": lexicon,
+        "ui": HOME_UI[lang],
+    }
+    return {
+        "geo": geo,
+        "themes": themes,
+        "themes_by_size": by_size,
+        "sources": flat,
+        "theme_count": len(themes),
+        "online_count": online,
+        "source_count": len(flat),
+        "tool_count": tool_count,
+        "answers": answers,
+        "extracted_label": format_long_date(answers_raw["extracted_at"], lang),
+        "server_version": answers_raw["server_version"],
+        "transcripts": transcripts,
+        "data": data,
+    }
+
+
 def build_env() -> jinja2.Environment:
     env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(str(TEMPLATES)),
@@ -359,11 +578,12 @@ def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
         load_json("es", "tool_signatures.json"),
         lang,
     )
-    questions = load_json(lang, "questions.json")
     releases = load_json(lang, "releases.json")
 
     tool_count = sum(len(cat["tools"]) for cat in tools)
     source_count = len(sources)
+
+    home = build_home(lang, source_themes, tool_count)
 
     search_entries = []
 
@@ -410,7 +630,9 @@ def render_lang(env: jinja2.Environment, lang: str) -> list[dict]:
             source_themes=source_themes,
             clients=clients,
             tools=tools,
-            questions=questions,
+            home=home,
+            status_labels=STATUS_LABELS[lang],
+            footer=FOOTER[lang],
             releases=releases,
             tool_count=tool_count,
             source_count=source_count,
@@ -447,6 +669,7 @@ def write_404(env: jinja2.Environment):
         lang_switch_href=f"{base}en/index.html",
         t=TRANSLATIONS["es"],
         status_badges=STATUS_BADGES["es"],
+        footer=FOOTER["es"],
         current_page="404",
         page_title="Página no encontrada / Page not found",
         page_description="La página que buscas no existe. / The page you are looking for does not exist.",

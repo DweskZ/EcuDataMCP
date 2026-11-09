@@ -1,0 +1,70 @@
+{
+  "extracted_at": "2026-11-08",
+  "server_version": "0.15.0",
+  "answers": [
+    {
+      "id": "pasaporte",
+      "question": "¿Qué necesito para sacar el pasaporte por primera vez?",
+      "answer": "Si eres mayor de 18 años: comprobante de pago (en línea, banco corresponsal o en la agencia) y cédula física o digital vigente; si renuevas, el pasaporte anterior. En Quito, Guayaquil y Cuenca lo entregan el mismo día; en otras agencias, en 24 a 72 horas.",
+      "tools": ["search_tramites", "get_tramite_info"],
+      "source": "gob.ec · Registro Civil",
+      "url": "https://www.gob.ec/dgrcic/tramites/emision-pasaporte-ordinario-primera-vez-renovacion-mayores-18-anos"
+    },
+    {
+      "id": "sismos",
+      "question": "¿Hubo temblores fuertes en Ecuador esta semana?",
+      "answer": "El más fuerte en territorio ecuatoriano fue de magnitud 4,8, a 45,7 km de Salinas (Santa Elena), el 7 de noviembre a las 17:17, a 2,4 km de profundidad. También hubo uno de 3,7 cerca de Pasaje (El Oro).",
+      "tools": ["search_sismos"],
+      "source": "IG-EPN · catálogo sísmico",
+      "url": "https://www.igepn.edu.ec/portal/eventos/www/events/igepn2026vvse/overview.html"
+    },
+    {
+      "id": "remesas",
+      "question": "¿Cuánto dinero envían los migrantes al Ecuador?",
+      "answer": "En 2025 ingresaron US$ 7.728 millones en remesas, 18,2 % más que en 2024 (US$ 6.540 millones). En el segundo trimestre de 2026 llegaron US$ 2.041 millones.",
+      "tools": ["search_indicadores_bce", "get_indicador_bce"],
+      "source": "Banco Central del Ecuador · Balanza de pagos",
+      "url": "https://contenido.bce.fin.ec/"
+    },
+    {
+      "id": "favorita",
+      "question": "¿Qué datos públicos hay de Corporación Favorita?",
+      "answer": "RUC 1790016919001. Sociedad anónima activa, constituida el 30 de noviembre de 1957 en Quito, con capital suscrito de US$ 900 millones. Actividad: comercio al por menor (CIIU G4711.01). Último balance presentado: 2025.",
+      "tools": ["search_companias"],
+      "source": "Superintendencia de Compañías · directorio",
+      "url": "https://mercadodevalores.supercias.gob.ec/"
+    },
+    {
+      "id": "manta-compras",
+      "question": "¿Cuánto contrató el sector público en Manta en 2025?",
+      "answer": "253 procesos por US$ 36,2 millones (valor adjudicado o estimado de 207 procesos con monto). Los mayores compradores fueron el Hospital General Manta (US$ 18,8 millones) y el Municipio de Manta (US$ 9,1 millones).",
+      "tools": ["get_resumen_compras"],
+      "source": "SERCOP · compras públicas (OCDS)",
+      "url": "https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/procedimientos"
+    },
+    {
+      "id": "cortes-luz",
+      "question": "¿Hay cortes de luz programados en Ambato o el Puyo?",
+      "answer": "Sí, 5 avisos vigentes. Por ejemplo: lunes 9 de noviembre, de 09:00 a 14:00, en el barrio Callate San Antonio (Píllaro); martes 10, de 10:00 a 14:00, en el barrio La Libertad del Puyo, por retiro de postes.",
+      "tools": ["search_cortes", "get_cortes_horarios"],
+      "source": "EEASA · trabajos programados",
+      "url": "https://www.eeasa.com.ec/trabajos-programados/"
+    },
+    {
+      "id": "manta-internet",
+      "question": "¿Qué porcentaje de hogares tiene internet en Manta?",
+      "answer": "Según el Censo 2022, el 65,0 % de los hogares de Manta dispone de internet fijo (66,6 % en el área urbana y 33,1 % en la rural), frente al 47,4 % de Manabí y el 60,9 % nacional.",
+      "tools": ["search_archivos"],
+      "source": "INEC · Censo 2022, tabulado TIC",
+      "url": "https://www.censoecuador.gob.ec/resultados-censo/"
+    },
+    {
+      "id": "censo-internet",
+      "question": "¿Dónde están los datos del Censo 2022 sobre internet en los hogares?",
+      "answer": "En el tabulado «Tecnologías de la información» del Censo 2022 (03_2022_CPV_TIC.xlsx), con hogares por disponibilidad de internet, computadora y celular por provincia, cantón y parroquia.",
+      "tools": ["search_anda", "download_anda_microdata", "search_archivos"],
+      "source": "INEC · censoecuador.gob.ec",
+      "url": "https://www.censoecuador.gob.ec/resultados-censo/"
+    }
+  ]
+}

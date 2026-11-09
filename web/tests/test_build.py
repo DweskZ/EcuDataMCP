@@ -112,3 +112,23 @@ def test_home_counts_match_data(site, lang):
     )
     assert str(tool_count) in nums
     assert str(source_count) in nums
+
+
+@pytest.mark.parametrize("lang", ["es", "en"])
+def test_home_atlas_is_data_driven(site, lang):
+    home = (site / ("index.html" if lang == "es" else "en/index.html")).read_text(
+        encoding="utf-8"
+    )
+    source_count = len(build.flatten_sources(build.load_json(lang, "sources.json")))
+    answers = build.load_json(lang, "stored_answers.json")
+    assert home.count('class="dot"') == source_count
+    assert home.count('class="qa"') == len(answers["answers"])
+    assert f"v{answers['server_version']}" in home
+    assert 'id="home-data"' in home
+
+
+def test_stored_answers_keep_the_same_ids_in_both_languages():
+    es = build.load_json("es", "stored_answers.json")
+    en = build.load_json("en", "stored_answers.json")
+    assert [a["id"] for a in es["answers"]] == [a["id"] for a in en["answers"]]
+    assert [a["url"] for a in es["answers"]] == [a["url"] for a in en["answers"]]

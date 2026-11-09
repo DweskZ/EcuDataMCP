@@ -22,13 +22,33 @@ para que un solo PR pueda actualizar el README del servidor y el sitio a la vez.
   parámetros con el código y muestra los tools nuevos en una categoría aparte, en inglés, hasta que se
   traduzcan a mano `description`/`long_description`/`params` en `data/tools.json` y `en/data/tools.json`.
 - `assets/og-image.png` — imagen social, regenerada con los conteos de `data/` por `scripts/make_og_image.py` (`uv run --with pillow python scripts/make_og_image.py`).
-- `assets/site.css` y `assets/atlas.css` — el CSS propio del sitio (`atlas.css` solo se carga en la página
-  del Atlas), en texto plano; edítalos directamente. `assets/styles.css` es la base compilada (estilos tipo
-  Bootstrap): no se recompila desde ningún SCSS del repo, así que los cambios de diseño van en `site.css`.
-  Las fuentes de Google Fonts se cargan con un `<link>` en `templates/base.html`, no con `@import`.
-- `assets/` — CSS compilado, `site.js` (toggle de navbar móvil, tabs de clientes MCP, panel de búsqueda,
-  botón de copiar), `fuse.min.js` (vendored, motor de la búsqueda), favicon, imagen OG. El ícono de
-  búsqueda del navbar es un SVG inline en `templates/base.html`, no una fuente de íconos.
+- `assets/site.css` (global: paleta blanca + acentos de la bandera, header, footer, páginas internas),
+  `assets/home.css` (solo la home) y `assets/atlas.css` (solo la Referencia): CSS propio en texto plano;
+  edítalos directamente. No hay Bootstrap ni modo oscuro. Las fuentes de Google Fonts (Inter, Playfair
+  Display, Source Serif 4, IBM Plex Mono) se cargan con un `<link>` en `templates/base.html`.
+- `assets/home.js` — comportamiento de la home (mapa, búsqueda real sobre el catálogo, terminal con
+  transcripts, explorador de fuentes, respuestas guardadas, tabs de clientes, carrusel). Lee todo de un
+  JSON embebido (`#home-data`) que arma `build.py` desde `data/*.json`; no tiene datos propios.
+- `assets/site.js` — navbar móvil, panel de búsqueda del sitio y botón de copiar; `assets/fuse.min.js`
+  (vendored) es el motor de esa búsqueda.
+
+### Datos de la home
+
+- `data/sources.json` — fuentes por tema/institución; cada tema lleva su `color` (el del punto en el mapa).
+  De aquí salen los conteos (fuentes, temas, en línea), el mapa y el explorador.
+- `data/ecuador_provinces.json` — geometría de las provincias continentales (rutas SVG ya proyectadas;
+  fuente: geoBoundaries, CC BY 4.0, simplificada, sin Galápagos). `build.py` dibuja el mapa y reparte un
+  punto por fuente de forma determinista; la posición es ilustrativa.
+- `data/stored_answers.json` (+ `en/data/`) — preguntas con respuestas reales guardadas, con
+  `extracted_at` y `server_version`. Al refrescarlas, actualiza esos dos campos y los textos; no cambies
+  cifras al traducir.
+- `data/transcripts.json` (+ `en/data/`) — los ejemplos de la terminal (llamadas reales a tools). Un paso
+  con `"kind": "reason"` no es una llamada a una tool y se muestra en cursiva gris.
+- `data/search_lexicon.json` (+ `en/data/`) — palabras vacías, sinónimos y enlaces a ejemplos de la
+  búsqueda del hero (sin acentos ni mayúsculas).
+- `data/clients.json` — snippets por cliente MCP; los `featured` son las pestañas de la home, el resto
+  va en "Otros clientes". `alt` documenta la variante remota/HTTP por separado.
+- `data/org_logos.json` — logos del carrusel del backstage.
 
 ## Cómo se genera
 

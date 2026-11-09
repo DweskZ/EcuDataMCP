@@ -1,0 +1,32 @@
+{
+  "stop": ["the", "and", "for", "how", "what", "which", "where", "who", "does", "are", "was", "were", "there", "any", "this", "that", "with", "from", "about", "into", "need", "get", "got", "much", "many", "have", "has", "had", "week", "year", "years", "country", "data", "first", "time", "can", "find", "show", "give", "tell"],
+  "synonyms": {
+    "passport": ["procedure", "civil registry"],
+    "passports": ["procedure", "civil registry"],
+    "earthquake": ["seismic", "igepn"],
+    "earthquakes": ["seismic", "igepn"],
+    "quake": ["seismic", "igepn"],
+    "tremor": ["seismic", "igepn"],
+    "inflation": ["price", "cpi", "inec"],
+    "prices": ["price", "cpi", "inec"],
+    "power": ["outage", "energy", "cnel"],
+    "outage": ["outage", "energy"],
+    "blackout": ["outage", "energy"],
+    "tender": ["sercop", "procure"],
+    "procurement": ["sercop", "procure"],
+    "contracts": ["sercop", "contract"],
+    "census": ["census", "inec"],
+    "confidence": ["confidence", "bce", "iem"],
+    "internet": ["census", "inec", "telecom"],
+    "migrants": ["remittance"],
+    "remesas": ["remittance"]
+  },
+  "examples": [
+    ["passport", "pasaporte"],
+    ["procedure", "pasaporte"],
+    ["earthquake", "sismos"],
+    ["seism", "sismos"],
+    ["quake", "sismos"],
+    ["census", "censo"]
+  ]
+}
