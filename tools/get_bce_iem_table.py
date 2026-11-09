@@ -39,7 +39,13 @@ def register_get_bce_iem_table_tool(mcp: MCPServer) -> None:
         Get table_id from search_bce_iem. Tables with the common BCE layout
         (periods across columns and variables down rows) return structured,
         date-filterable series. Other layouts return a faithful preview
-        rather than silently guessing columns. Always includes the BCE file
+        rather than silently guessing columns. One-observation-per-row tables
+        (formato "tabla_larga") flatten merged multi-row headers into one name
+        per column ("TOTAL NACIONAL — Confianza del Consumidor"), carry the
+        year down the month rows and merge year + month into a single
+        "Período" ("2024-01", "2024" for annual rows, "2022 Enero - Marzo" for
+        quarters); "Bloque" names the banner a row sits under (e.g.
+        "Porcentaje del PIB"). Footnotes are not returned. Always includes the BCE file
         and bulletin URLs for verification. Pass boletin_numero to retrieve
         a historical version returned by search_bce_iem(historico=true).
 
@@ -118,7 +124,9 @@ def register_get_bce_iem_table_tool(mcp: MCPServer) -> None:
             source_url=table["url"],
             freshness="archivo_oficial_del_boletin",
             schema_name="bce_iem_tabla_v1",
-            schema_fields=["tabla", "formato", "periodos", "bloques", "filas", "hojas"],
+            schema_fields=[
+                "tabla", "formato", "periodos", "bloques", "encabezados", "filas", "hojas",
+            ],
             published_at=(
                 f"{table.get('boletin_anio')}-{table.get('boletin_mes'):02d}"
                 if table.get("boletin_anio") and table.get("boletin_mes") else None
