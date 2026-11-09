@@ -45,6 +45,7 @@ from urllib.parse import unquote
 
 import httpx
 
+from helpers import censo_index
 from helpers.cache import TtlCache
 from helpers.csv_reader import download_bytes
 from helpers.logging import MAIN_LOGGER_NAME
@@ -80,8 +81,11 @@ _ALIASES = {
         "tic internet computadora laptop celular telefono tablet conectividad "
         "brecha digital acceso digital"
     ),
-    "servicios basicos": "agua luz electricidad alcantarillado basura",
+    "servicios basicos": "agua potable luz electricidad alcantarillado basura saneamiento",
     "condiciones de vida": "hacinamiento tenencia",
+    "dificultades funcionales": "discapacidad limitaciones",
+    "autoidentificacion": "etnia indigena afroecuatoriano montubio",
+    "mortalidad": "defunciones fallecidos muertes",
 }
 _CONTENIDO = {
     "tecnologias de la informacion": (
@@ -90,6 +94,9 @@ _CONTENIDO = {
         "por disponibilidad de bienes y servicios TIC."
     ),
 }
+
+# Tables listed per file when a query matches inside its workbook.
+MAX_MATCHED_TABLES = 8
 
 # The census files are refreshed rarely; a day balances staleness against
 # not re-fetching two 200+ KB pages on every call.
@@ -213,6 +220,10 @@ def _enrich(entry: dict[str, Any]) -> dict[str, Any]:
     for needle, contenido in _CONTENIDO.items():
         if needle in key:
             entry["contenido"] = contenido
+    if entry.get("tipo") == "tabulado":
+        sheets = censo_index.sheets_for(entry["url"], entry["label"])
+        if sheets:
+            entry["_hojas"] = sheets
     return entry
 
 
@@ -233,24 +244,44 @@ async def _fetch_page(url: str) -> str:
     return content.decode("utf-8", errors="replace")
 
 
-async def _fetch_resources() -> list[dict[str, Any]]:
-    cached = _resources_cache.get("resources")
-    if cached is not None:
-        return cached
-
+async def fetch_live_resources() -> list[dict[str, Any]]:
+    """Every file linked from the two census pages (no cache, no enrichment)."""
     seen: dict[str, dict[str, Any]] = {}
     for page_url in _PAGES:
         for entry in parse_page(await _fetch_page(page_url)):
             seen.setdefault(entry["url"], entry)
-
-    resources = [_enrich(e) for e in seen.values()]
-    if not resources:
+    if not seen:
         raise ValueError(
             "No se encontraron archivos en las páginas de resultados del censo "
             "(puede haber cambiado de estructura)"
         )
+    return list(seen.values())
+
+
+def _unreachable(exc: BaseException) -> bool:
+    """A network failure, not a verdict from the site (403/404 stay errors)."""
+    if isinstance(exc, httpx.TransportError):
+        return True
+    cause = exc.__cause__
+    return isinstance(cause, httpx.HTTPStatusError) and cause.response.status_code >= 500
+
+
+async def _fetch_resources() -> tuple[list[dict[str, Any]], str | None]:
+    """The enriched file list and, when it came from the committed index instead
+    of the live site, the reason why."""
+    cached = _resources_cache.get("resources")
+    if cached is not None:
+        return cached, None
+    try:
+        resources = [_enrich(e) for e in await fetch_live_resources()]
+    except Exception as exc:
+        offline = censo_index.indexed_resources()
+        if not offline or not _unreachable(exc):
+            raise
+        logger.warning("censoecuador.gob.ec unreachable, serving the committed index: %s", exc)
+        return [_enrich(e) for e in offline], str(exc)
     _resources_cache.set("resources", resources)
-    return resources
+    return resources, None
 
 
 async def search_censo_recursos(query: str = "", limit: int = 30, offset: int = 0) -> dict[str, Any]:
@@ -264,25 +295,69 @@ async def search_censo_recursos(query: str = "", limit: int = 30, offset: int = 
 
     Args:
         query: Free text; every word must match (accent-insensitive) the
-            file's label, tipo, tema or search aliases, e.g. "internet",
-            "tabulado hogar", "manzana", "diccionario", "2010", "spss". Empty
-            returns every resource found.
+            file's label, tipo, tema or search aliases, or the tables inside a
+            tabulado (titles, sheet names, geographic levels and column
+            headers from the committed index), e.g. "internet", "computadora",
+            "discapacidad", "agua potable", "parroquia", "tabulado hogar",
+            "manzana", "diccionario", "2010", "spss". Matching tabulados list
+            the matching tables in `tablas_coincidentes`. Empty returns every
+            resource found.
         limit: Max results returned.
         offset: Pagination offset over the matched set.
     """
-    resources = await _fetch_resources()
+    resources, offline_reason = await _fetch_resources()
     words = _strip_accents(query).split()
 
-    def blob(r: dict[str, Any]) -> str:
+    def head(r: dict[str, Any]) -> str:
         parts = (r["label"], r.get("tipo"), r.get("tema"), r.get("anio"), r.get("palabras_clave"))
         return _strip_accents(" ".join(str(p) for p in parts if p))
 
-    matched = [r for r in resources if all(w in blob(r) for w in words)]
-    page = matched[offset : offset + limit]
-    return {
+    def table_texts(r: dict[str, Any]) -> list[tuple[dict[str, Any], str]]:
+        return [(h, censo_index.sheet_text(h)) for h in r.get("_hojas", [])]
+
+    ranked: list[tuple[int, int, dict[str, Any], list[dict[str, Any]]]] = []
+    for r in resources:
+        h = head(r)
+        tables = table_texts(r)
+        whole = h + " " + " ".join(t for _, t in tables)
+        if not all(w in whole for w in words):
+            continue
+        hits = [
+            (sum(w in t for w in words), sheet)
+            for sheet, t in tables
+            if any(w in t for w in words)
+        ]
+        hits.sort(key=lambda x: -x[0])
+        in_head = sum(w in h for w in words)
+        ranked.append((in_head, len(hits), r, [sheet for _, sheet in hits]))
+    if words:
+        ranked.sort(key=lambda x: (-x[0], -x[1]))
+
+    def present(r: dict[str, Any], hits: list[dict[str, Any]]) -> dict[str, Any]:
+        out = {k: v for k, v in r.items() if k != "_hojas"}
+        total = len(r.get("_hojas", []))
+        if total:
+            out["tablas_total"] = total
+        if words and hits:
+            out["tablas_coincidentes"] = [
+                {k: v for k, v in sheet.items() if k in ("hoja", "titulo", "niveles", "columnas")}
+                for sheet in hits[:MAX_MATCHED_TABLES]
+            ]
+            if len(hits) > MAX_MATCHED_TABLES:
+                out["tablas_coincidentes_total"] = len(hits)
+        return out
+
+    page = ranked[offset : offset + limit]
+    result: dict[str, Any] = {
         "source_url": RESULTADOS_URL,
-        "total": len(matched),
+        "total": len(ranked),
         "total_recursos": len(resources),
         "offset": offset,
-        "recursos": page,
+        "recursos": [present(r, hits) for _, _, r, hits in page],
     }
+    if offline_reason:
+        result["aviso"] = (
+            "censoecuador.gob.ec no respondió; se muestran solo los tabulados XLSX del índice "
+            f"incluido en el servidor (puede estar desactualizado). Causa: {offline_reason}"
+        )
+    return result
