@@ -37,10 +37,11 @@
     {
       "id": "manta-compras",
       "question": "How much did the public sector contract in Manta in 2025?",
-      "answer": "253 procedures worth US$ 42.5 million (awarded or estimated value of 214 procedures with an amount). The largest buyers were the Manta General Hospital (US$ 19.2 million) and the Municipality of Manta (US$ 12.1 million).",
+      "answer": "253 procedures worth US$ 34.7 million (awarded or estimated value of 211 procedures with an amount). The largest buyers were the Manta General Hospital (US$ 16.6 million) and the Municipality of Manta (US$ 9.4 million).",
       "tools": ["get_resumen_compras"],
       "source": "SERCOP · public procurement (OCDS)",
-      "url": "https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/procedimientos"
+      "url": "https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/procedimientos",
+      "extracted_at": "2026-11-09"
     },
     {
       "id": "cortes-luz",
