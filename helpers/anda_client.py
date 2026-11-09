@@ -129,16 +129,25 @@ async def search_catalog_all(
     max_pages: int = 5,
     session: httpx.AsyncClient | None = None,
 ) -> list[dict[str, Any]]:
-    """Every catalog row matching `query`, paging through the whole result set."""
-    rows: list[dict[str, Any]] = []
-    for page in range(1, max_pages + 1):
-        result = await search_catalog(
-            query=query, limit=MAX_PAGE_SIZE, page=page, session=session
+    """Every catalog row matching `query`, paging through the whole result set.
+
+    The first page says how many rows exist (`found`), so the remaining pages
+    are fetched concurrently instead of one after another.
+    """
+    first = await search_catalog(query=query, limit=MAX_PAGE_SIZE, page=1, session=session)
+    rows: list[dict[str, Any]] = list(first.get("rows", []))
+    found = int(first.get("found") or 0)
+    if not rows or len(rows) >= found:
+        return rows
+    last_page = min(max_pages, -(-found // len(rows)))
+    rest = await asyncio.gather(
+        *(
+            search_catalog(query=query, limit=MAX_PAGE_SIZE, page=p, session=session)
+            for p in range(2, last_page + 1)
         )
-        batch = result.get("rows", [])
-        rows.extend(batch)
-        if not batch or len(rows) >= int(result.get("found") or 0):
-            break
+    )
+    for result in rest:
+        rows.extend(result.get("rows", []))
     return rows
 
 
@@ -163,7 +172,34 @@ ACCESS_UNKNOWN = "desconocido"
 # Obtainable at all (even if it takes an account or a request).
 _OBTAINABLE = {ACCESS_DIRECT, ACCESS_EXTERNAL, ACCESS_REGISTRATION, ACCESS_REQUEST}
 
+# Two layers: an in-memory 6 h cache (fast path, keyed by study id) and a
+# persistent per-study store on disk, so a new session does not re-probe the
+# same studies. The persistent key carries the catalog's `changed` timestamp,
+# so an edited study is probed again; the TTL bounds how long an unchanged
+# study is trusted (ANDA can switch a study to a login wall without touching
+# `changed`).
 _access_cache = TtlCache(ttl_seconds=6 * 3600.0, max_entries=1024)
+_access_store = TtlCache(ttl_seconds=7 * 86400.0, max_entries=2048, persist="anda_access")
+
+# Concurrent probes against anda.inec.gob.ec; it answered 8 at once without
+# throttling in the live benchmark (RESEARCH, Cuadragésima segunda pasada).
+VERIFY_CONCURRENCY = 8
+# `verificar_acceso="auto"` probes only this many results (the top of the page).
+AUTO_VERIFY_TOP = 10
+
+# Catalog `form_model` values that fully decide the access type without a
+# probe. "public" is ANDA's login wall (351, 365, 389 all read "Inicie sesión
+# para acceder a los datos"). "direct" is NOT reliable (CPV 2022 is "direct"
+# with only an external link) and "remote"/"licensed" were never seen live, so
+# those still go through the real download page.
+_FORM_MODEL_ACCESS = {
+    "public": {
+        "tipo_acceso": ACCESS_REGISTRATION,
+        "archivos": [],
+        "enlaces_externos": [],
+        "nota": "ANDA exige iniciar sesión (cuenta gratuita); inferido del catálogo (form_model=public).",
+    },
+}
 
 
 def _squash(text: str) -> str:
@@ -313,31 +349,65 @@ async def list_microdata_files(
     return access["archivos"]
 
 
+def catalog_access(row: dict[str, Any]) -> dict[str, Any] | None:
+    """Access decided by the catalog flag alone, when that is reliable (else None)."""
+    if not has_microdata(row):
+        return None
+    return _FORM_MODEL_ACCESS.get(str(row.get("form_model")))
+
+
+def _store_key(survey_id: str, row: dict[str, Any]) -> str:
+    return f"{survey_id}|{row.get('changed') or ''}"
+
+
 async def verify_access(
     rows: list[dict[str, Any]],
-    concurrency: int = 6,
+    concurrency: int = VERIFY_CONCURRENCY,
+    top: int | None = None,
 ) -> dict[str, dict[str, Any] | None]:
     """Real access type for catalog rows flagged as having microdata.
 
     Keyed by the row's numeric id. Rows ANDA marks `data_na` are skipped (no
     microdata by definition); a lookup that fails maps to None so callers fall
-    back to the catalog flag instead of failing the whole search. Results are
-    cached for a few hours per study.
+    back to the catalog flag instead of failing the whole search. Per study the
+    answer comes from, in order: the catalog flag when it is reliable
+    (`form_model=public`), the 6 h memory cache, the persistent store (keyed by
+    id + the catalog's `changed`), and finally the real download page, probed
+    with up to `concurrency` requests at once. `top` limits the work to the
+    first N rows; the rest are absent from the result.
     """
-    targets = [str(r["id"]) for r in rows if r.get("id") and has_microdata(r)]
+    candidates = [r for r in rows if r.get("id") and has_microdata(r)]
+    if top is not None:
+        candidates = candidates[:top]
     out: dict[str, dict[str, Any] | None] = {}
-    sem = asyncio.Semaphore(concurrency)
+    pending: list[dict[str, Any]] = []
+    for row in candidates:
+        survey_id = str(row["id"])
+        decided = catalog_access(row)
+        if decided is not None:
+            out[survey_id] = decided
+            continue
+        cached = _access_cache.get(survey_id)
+        if cached is None:
+            stored = _access_store.get(_store_key(survey_id, row))
+            if stored is not None:
+                cached = _access_cache_from_store(stored)
+                _access_cache.set(survey_id, cached)
+        if cached is not None:
+            out[survey_id] = cached
+        else:
+            pending.append(row)
+    if not pending:
+        return out
 
+    sem = asyncio.Semaphore(concurrency)
     async with httpx.AsyncClient(
         headers={"User-Agent": USER_AGENT},
         proxy=proxy_for(env_config.get_base_url("anda_site")),
     ) as session:
 
-        async def one(survey_id: str) -> None:
-            cached = _access_cache.get(survey_id)
-            if cached is not None:
-                out[survey_id] = cached
-                return
+        async def one(row: dict[str, Any]) -> None:
+            survey_id = str(row["id"])
             async with sem:
                 try:
                     access = await get_microdata_access(survey_id, session=session)
@@ -346,10 +416,19 @@ async def verify_access(
                     out[survey_id] = None
                     return
             _access_cache.set(survey_id, access)
+            _access_store.set(
+                _store_key(survey_id, row),
+                {"tipo_acceso": access["tipo_acceso"], "nota": access.get("nota")},
+            )
             out[survey_id] = access
 
-        await asyncio.gather(*(one(t) for t in targets))
+        await asyncio.gather(*(one(r) for r in pending))
     return out
+
+
+def _access_cache_from_store(stored: dict[str, Any]) -> dict[str, Any]:
+    """The persistent store keeps only the classification, not the file lists."""
+    return {"archivos": [], "enlaces_externos": [], **stored}
 
 
 def access_summary(row: dict[str, Any], access: dict[str, Any] | None) -> dict[str, Any]:

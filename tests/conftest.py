@@ -39,6 +39,16 @@ def _no_disk_cache(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 @pytest.fixture(autouse=True)
+def _fresh_anda_access_caches() -> Iterator[None]:
+    """The ANDA access caches are module-level; start every test empty."""
+    from helpers import anda_client
+
+    anda_client._access_cache.clear()
+    anda_client._access_store.clear()
+    yield
+
+
+@pytest.fixture(autouse=True)
 def _offline_dns(monkeypatch: pytest.MonkeyPatch) -> None:
     """Resolve every host to a public address instead of asking real DNS.
 

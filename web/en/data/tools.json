@@ -488,9 +488,9 @@
           },
           {
             "name": "verificar_acceso",
-            "type": "bool",
-            "default": "True",
-            "description": "Check each result's real download page (2 extra requests per result with microdata, cached 6 h); false trusts the catalog flag and is faster"
+            "type": "bool | Literal['auto']",
+            "default": "'auto'",
+            "description": "auto (default) = check the real download page of the first 10 results; true = check all of them (2 extra requests each, 8 in parallel); false = trust the catalog flag (fastest). Checks are cached per study (6 h memory, 7 days disk)"
           },
           {
             "name": "format",

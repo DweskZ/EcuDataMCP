@@ -526,7 +526,7 @@
       }
     ],
     "description": "One IEM XLSX table (table_id from search_bce_iem): date-filterable series for the standard layout, a faithful preview otherwise. boletin_numero selects a past bulletin.",
-    "summary": "Inspect one official XLSX table from the latest BCE IEM bulletin. Get table_id from search_bce_iem. Tables with the common BCE layout (periods across columns and variables down rows) return structured, date-filterable series. Other layouts return a faithful preview rather than silently guessing columns. Always includes the BCE file and bulletin URLs for verification. Pass boletin_numero to retrieve a historical version returned by search_bce_iem(historico=true).",
+    "summary": "Inspect one official XLSX table from the latest BCE IEM bulletin. Get table_id from search_bce_iem. Tables with the common BCE layout (periods across columns and variables down rows) return structured, date-filterable series. Other layouts return a faithful preview rather than silently guessing columns. One-observation-per-row tables (formato \"tabla_larga\") flatten merged multi-row headers into one name per column (\"TOTAL NACIONAL — Confianza del Consumidor\"), carry the year down the month rows and merge year + month into a single \"Período\" (\"2024-01\", \"2024\" for annual rows, \"2022 Enero - Marzo\" for quarters); \"Bloque\" names the banner a row sits under (e.g. \"Porcentaje del PIB\"). Footnotes are not returned. Always includes the BCE file and bulletin URLs for verification. Pass boletin_numero to retrieve a historical version returned by search_bce_iem(historico=true).",
     "args_doc": {
       "table_id": "A table_id from search_bce_iem.",
       "desde": "Earliest period to include, as YYYY, YYYY-MM or a month-year label.",
@@ -1765,8 +1765,8 @@
       },
       {
         "name": "verificar_acceso",
-        "type": "bool",
-        "default": "True"
+        "type": "bool | Literal['auto']",
+        "default": "'auto'"
       },
       {
         "name": "format",
@@ -1775,12 +1775,12 @@
       }
     ],
     "description": "Search INEC's ANDA catalog of 437+ surveys and censuses; the broadest INEC index. Entries without microdata point to search_inec_estadisticas. Next: get_anda_survey_info.",
-    "summary": "Search INEC's ANDA catalog (anda.inec.gob.ec) of surveys and censuses. ANDA runs on NADA (World Bank/IHSN), separate from datosabiertos.gob.ec. It catalogs 437+ INEC surveys/censuses with metadata (title, year, authoring entity). Not every entry has downloadable microdata — many are aggregate-only publications (e.g. price indices); each result says so. Start any INEC search here — it's the broadest index. When a result shows microdatos_disponibles=false, the operation exists but its actual published data lives on ecuadorencifras.gob.ec instead: try search_inec_estadisticas with the same query. microdatos_disponibles is checked against each study's real download page (verificar_acceso=true), and tipo_acceso says how: directo (files in ANDA), enlace_externo (ANDA only links to another site, e.g. the 2022 Census to censoecuador.gob.ec), registro (ANDA login), solicitud or ninguno. The catalog flag alone is unreliable: it marks the 2022 Census \"direct\" although no file is attached. If a check fails the result falls back to the catalog flag with tipo_acceso \"desconocido\". Studies hosted elsewhere: get_inec_estadistica_files or search_archivos(fuente=\"censo\"). Follow up with get_anda_survey_info(idno) for full metadata on one survey. The numeric \"id\" also works as the identifier in the follow-up tools.",
+    "summary": "Search INEC's ANDA catalog (anda.inec.gob.ec) of surveys and censuses. ANDA runs on NADA (World Bank/IHSN), separate from datosabiertos.gob.ec. It catalogs 437+ INEC surveys/censuses with metadata (title, year, authoring entity). Not every entry has downloadable microdata — many are aggregate-only publications (e.g. price indices); each result says so. Start any INEC search here — it's the broadest index. When a result shows microdatos_disponibles=false, the operation exists but its actual published data lives on ecuadorencifras.gob.ec instead: try search_inec_estadisticas with the same query. microdatos_disponibles is checked against each study's real download page (verificar_acceso), and tipo_acceso says how: directo (files in ANDA), enlace_externo (ANDA only links to another site, e.g. the 2022 Census to censoecuador.gob.ec), registro (ANDA login), solicitud or ninguno. The catalog flag alone is unreliable: it marks the 2022 Census \"direct\" although no file is attached. If a check fails the result falls back to the catalog flag with tipo_acceso \"desconocido\". verificar_acceso=\"auto\" (default) checks only the first 10 results of the page and marks the rest \"desconocido\" (with a hint); true checks them all (slower on a long page: up to 2 requests per result, 8 at a time); false trusts the catalog flag. Verified answers are cached per study on disk, so repeated searches get faster. Studies hosted elsewhere: get_inec_estadistica_files or search_archivos(fuente=\"censo\"). Follow up with get_anda_survey_info(idno) for full metadata on one survey. The numeric \"id\" also works as the identifier in the follow-up tools.",
     "args_doc": {
       "query": "Search keywords (e.g. \"empleo\", \"REEM\", \"censo agropecuario\")",
       "limit": "Results per page (default: 10, max: 50)",
       "page": "Page of results, 1-based (default: 1); see total/total_pages",
-      "verificar_acceso": "Check each result's real download page (2 extra requests per result with microdata, cached 6 h); false trusts the catalog flag and is faster",
+      "verificar_acceso": "auto (default) = check the real download page of the first 10 results; true = check all of them (2 extra requests each, 8 in parallel); false = trust the catalog flag (fastest). Checks are cached per study (6 h memory, 7 days disk)",
       "format": "text | json"
     }
   },

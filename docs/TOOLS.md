@@ -42,7 +42,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 
 | Tool | Descripción |
 |------|-------------|
-| `search_anda` | Buscar encuestas y censos en el catálogo ANDA del INEC (NADA/IHSN). Indica si cada encuesta tiene microdatos descargables. |
+| `search_anda` | Buscar encuestas y censos en el catálogo ANDA del INEC (NADA/IHSN). Indica si cada encuesta tiene microdatos descargables. `verificar_acceso="auto"` (default) comprueba la página de descarga real de los 10 primeros resultados; `true` de todos; `false` usa el flag del catálogo. |
 | `get_anda_survey_info` | Metadata completa de una encuesta ANDA: resumen, variables, confidencialidad y contacto. |
 | `download_anda_microdata` | Enlaces a los microdatos de una encuesta ANDA con su `tipo_acceso` (directo, enlace externo, registro, solicitud, ninguno). |
 
@@ -123,7 +123,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `get_inec_estadistica_files` | Lista los enlaces directos a archivos publicados en una página de tema estadístico del INEC. |
 | `get_inec_publicacion_archivos` | Lista los enlaces directos a archivos (PDF/XLSX/CSV/ZIP) incrustados en una publicación del INEC encontrada vía search_inec_publicaciones. |
 | `search_biinec_extras` | Revisa el BIINEC ("Banco de Datos Abiertos") del INEC en busca de datos que no aparecen en search_anda ni en search_inec_estadisticas. |
-| `search_archivos` (`fuente="censo"`) | Busca en el micrositio dedicado del Censo 2022 del INEC (censoecuador.gob.ec) enlaces directos a los tabulados de resultados (XLSX/CSV, incl. TIC de hogares), microdatos (CSV/SPSS/REDATAM), diccionarios y metodología. |
+| `search_archivos` (`fuente="censo"`) | Busca en el micrositio dedicado del Censo 2022 del INEC (censoecuador.gob.ec) enlaces directos a los tabulados de resultados (XLSX/CSV, incl. TIC de hogares), microdatos (CSV/SPSS/REDATAM), diccionarios y metodología. Una consulta también busca dentro de los tabulados (títulos de tabla, niveles geográficos y columnas, de un índice incluido) y devuelve `tablas_coincidentes`. |
 | `search_inec_estadisticas` | Busca en las páginas de temas estadísticos del INEC (ecuadorencifras.gob.ec). |
 | `search_inec_publicaciones` | Busca en todas las publicaciones del INEC en Ecuador en Cifras, vía su API REST pública de WordPress -- siempre actualizada, más recientes primero. |
 
