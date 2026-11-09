@@ -41,7 +41,8 @@ def register_get_anda_survey_info_tool(mcp: MCPServer) -> None:
         numeric id when idnos repeat across years or contain spaces.
 
         Returns scope/abstract, variable count, whether microdata is actually
-        downloadable, confidentiality terms, and a contact email for requesting
+        obtainable and how (tipo_acceso, checked on the real download page, with
+        any external links; see download_anda_microdata), confidentiality terms, and a contact email for requesting
         restricted data when it isn't.
 
         Args:
@@ -52,6 +53,14 @@ def register_get_anda_survey_info_tool(mcp: MCPServer) -> None:
             dataset = await anda_client.get_survey(idno)
         except Exception as e:
             raise ToolError(f"Error al obtener la encuesta: {e}") from e
+
+        access = None
+        if dataset.get("id") and anda_client.has_microdata(dataset):
+            try:
+                access = await anda_client.get_microdata_access(str(dataset["id"]))
+            except Exception:
+                access = None
+        acceso = anda_client.access_summary(dataset, access)
 
         metadata = dataset.get("metadata") or {}
         study_desc = metadata.get("study_desc") or {}
@@ -68,7 +77,8 @@ def register_get_anda_survey_info_tool(mcp: MCPServer) -> None:
             "anio_inicio": dataset.get("year_start"),
             "anio_fin": dataset.get("year_end"),
             "entidad": dataset.get("authoring_entity"),
-            "microdatos_disponibles": anda_client.has_microdata(dataset),
+            **acceso,
+            "enlaces_externos": access["enlaces_externos"] if access else [],
             "variables": dataset.get("varcount"),
             "vistas": dataset.get("total_views"),
             "descargas": dataset.get("total_downloads"),
@@ -100,7 +110,9 @@ def register_get_anda_survey_info_tool(mcp: MCPServer) -> None:
                 parts.append(f"Entidad: {data['entidad']}")
 
             microdatos = "sí" if data["microdatos_disponibles"] else "no (solo agregados)"
-            parts.append(f"Microdatos disponibles: {microdatos}")
+            parts.append(f"Microdatos disponibles: {microdatos} (tipo_acceso: {data['tipo_acceso']})")
+            for link in data.get("enlaces_externos") or []:
+                parts.append(f"Enlace externo: {link['nombre']} — {link['url']}")
             if data.get("variables"):
                 parts.append(f"Variables documentadas: {data['variables']}")
             if data.get("vistas") or data.get("descargas"):

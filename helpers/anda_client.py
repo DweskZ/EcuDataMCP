@@ -1,11 +1,14 @@
+import asyncio
 import logging
 import re
+from html import unescape
 from typing import Any
 from urllib.parse import quote
 
 import httpx
 
 from helpers import env_config
+from helpers.cache import TtlCache
 from helpers.geo_proxy import proxy_for
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.user_agent import USER_AGENT
@@ -139,24 +142,129 @@ async def search_catalog_all(
     return rows
 
 
-async def list_microdata_files(
+_RESOURCE_SPLIT_RE = re.compile(r'<div class="resource"')
+_RESOURCE_NAME_RE = re.compile(r'<span class="resource-info"[^>]*>(.*?)</span>', re.DOTALL)
+_ANCHOR_RE = re.compile(r"<a\s([^>]*)>(.*?)</a>", re.DOTALL)
+_HREF_RE = re.compile(r'href="([^"]+)"')
+_TITLE_RE = re.compile(r'title="([^"]*)"')
+_CATALOG_DOWNLOAD_RE = re.compile(r"/catalog/\d+/download/\d+")
+_TAG_RE = re.compile(r"<[^>]+>")
+
+# How the microdata of one study can be obtained, as seen on its get-microdata
+# page (not as flagged by the catalog, which is unreliable: CPV 2022 is
+# "direct" in the catalog but has no attached file, only an external link).
+ACCESS_DIRECT = "directo"
+ACCESS_EXTERNAL = "enlace_externo"
+ACCESS_REGISTRATION = "registro"
+ACCESS_REQUEST = "solicitud"
+ACCESS_NONE = "ninguno"
+ACCESS_UNKNOWN = "desconocido"
+
+# Obtainable at all (even if it takes an account or a request).
+_OBTAINABLE = {ACCESS_DIRECT, ACCESS_EXTERNAL, ACCESS_REGISTRATION, ACCESS_REQUEST}
+
+_access_cache = TtlCache(ttl_seconds=6 * 3600.0, max_entries=1024)
+
+
+def _squash(text: str) -> str:
+    return re.sub(r"\s+", " ", unescape(_TAG_RE.sub(" ", text))).strip()
+
+
+def parse_microdata_page(html: str) -> dict[str, Any]:
+    """Classify a get-microdata page (after the terms step) by how data is served.
+
+    Returns `tipo_acceso`, `archivos` (files hosted by ANDA), `enlaces_externos`
+    (files that ANDA only links to) and a `nota`. Direct files win over external
+    links when a study has both; a page showing neither is "ninguno" when ANDA
+    says so explicitly, and a ValueError otherwise (an unrecognised page is not
+    evidence that there is nothing to download).
+    """
+    files: dict[str, str] = {}
+    for link, filename in _DOWNLOAD_LINK_RE.findall(html):
+        files[link] = filename
+
+    external: dict[str, str] = {}
+    for block in _RESOURCE_SPLIT_RE.split(html)[1:]:
+        name_match = _RESOURCE_NAME_RE.search(block)
+        name = _squash(name_match.group(1)) if name_match else ""
+        for attrs, _inner in _ANCHOR_RE.findall(block):
+            href_match = _HREF_RE.search(attrs)
+            if not href_match or 'class="download' not in attrs:
+                continue
+            href = unescape(href_match.group(1))
+            if _CATALOG_DOWNLOAD_RE.search(href):
+                continue
+            title_match = _TITLE_RE.search(attrs)
+            external.setdefault(href, name or (title_match.group(1) if title_match else href))
+
+    external_links = [{"nombre": n, "url": u} for u, n in external.items()]
+    direct_files = [{"filename": n, "url": u} for u, n in files.items()]
+    text = _squash(re.sub(r"<(script|style).*?</\1>", "", html, flags=re.DOTALL | re.IGNORECASE)).lower()
+
+    if direct_files:
+        return {
+            "tipo_acceso": ACCESS_DIRECT,
+            "archivos": direct_files,
+            "enlaces_externos": external_links,
+            "nota": None,
+        }
+    if external_links:
+        return {
+            "tipo_acceso": ACCESS_EXTERNAL,
+            "archivos": [],
+            "enlaces_externos": external_links,
+            "nota": (
+                "ANDA no aloja los archivos: solo enlaza a otro sitio (el catálogo la "
+                "marca como acceso 'direct' aunque no haya archivos adjuntos)."
+            ),
+        }
+    if "inicie sesión" in text or "regístrese" in text or "log in to access" in text:
+        return {
+            "tipo_acceso": ACCESS_REGISTRATION,
+            "archivos": [],
+            "enlaces_externos": [],
+            "nota": "ANDA exige iniciar sesión (cuenta gratuita) para ver los archivos.",
+        }
+    if "data access not available" in text:
+        return {
+            "tipo_acceso": ACCESS_NONE,
+            "archivos": [],
+            "enlaces_externos": [],
+            "nota": "ANDA indica 'Data Access Not Available' para este estudio.",
+        }
+    if re.search(r"access-licensed|solicitar (el )?acceso|request access|/request", html, re.IGNORECASE):
+        return {
+            "tipo_acceso": ACCESS_REQUEST,
+            "archivos": [],
+            "enlaces_externos": [],
+            "nota": "El acceso a los microdatos requiere enviar una solicitud al INEC.",
+        }
+    if "data-files" in html or 'class="resources' in html:
+        return {
+            "tipo_acceso": ACCESS_NONE,
+            "archivos": [],
+            "enlaces_externos": [],
+            "nota": "La página de descarga no lista archivos ni enlaces.",
+        }
+    raise ValueError("No se reconoció la página get-microdata de ANDA; puede haber cambiado")
+
+
+async def get_microdata_access(
     survey_id: str,
     session: httpx.AsyncClient | None = None,
-) -> list[dict[str, str]]:
-    """Discover direct download links for a survey's microdata files.
+) -> dict[str, Any]:
+    """How a survey's microdata can really be obtained (see parse_microdata_page).
 
     ANDA gates the file list behind a one-click usage-terms form (research/
     statistical use only, no re-identifying respondents, cite the source) on
     the "get-microdata" page before showing download links. This walks that
-    flow — GET the page for its CSRF token, POST acceptance — to reveal them.
+    flow — GET the page for its CSRF token, POST acceptance — and classifies
+    what it reveals. Pages without the form (login wall, "Data Access Not
+    Available") are classified from the first response.
 
-    The download URLs themselves turned out to require no session or cookie
-    at all once known: a plain GET from a fresh client with no prior request
-    returns the file directly. So nothing from this session needs to carry
-    over to actually fetch a file — these links work on their own.
-
-    Takes the survey's numeric id (not its idno) since that's what the
-    get-microdata URL is keyed on; get it from get_survey()'s "id" field.
+    Direct download URLs need no session or cookie once known: a plain GET from
+    a fresh client returns the file. Takes the survey's numeric id (not its
+    idno), since that is what the get-microdata URL is keyed on.
     """
     own = session is None
     if own:
@@ -171,12 +279,15 @@ async def list_microdata_files(
         page.raise_for_status()
         token_match = _CSRF_RE.search(page.text)
         if not token_match:
-            # An anti-bot or geoblock page has no form either; returning []
-            # here would read downstream as "this survey has no files".
-            raise ValueError(
-                "No se encontró el token CSRF en la página get-microdata de ANDA; "
-                "la página puede estar bloqueada o haber cambiado"
-            )
+            try:
+                return parse_microdata_page(page.text)
+            except ValueError:
+                # An anti-bot or geoblock page has no form either; reading that
+                # as "no files" would be a false negative.
+                raise ValueError(
+                    "No se encontró el token CSRF en la página get-microdata de ANDA; "
+                    "la página puede estar bloqueada o haber cambiado"
+                ) from None
         resp = await session.post(
             url,
             data={"ncsrf": token_match.group(1), "accept": "Aceptar"},
@@ -184,16 +295,79 @@ async def list_microdata_files(
             follow_redirects=True,
         )
         resp.raise_for_status()
-        files: dict[str, str] = {}
-        for link, filename in _DOWNLOAD_LINK_RE.findall(resp.text):
-            files[link] = filename
-        return [{"filename": name, "url": link} for link, name in files.items()]
+        return parse_microdata_page(resp.text)
     except httpx.HTTPError as exc:
-        logger.error("ANDA microdata file listing failed for id=%s: %s", survey_id, exc)
+        logger.error("ANDA microdata access lookup failed for id=%s: %s", survey_id, exc)
         raise
     finally:
         if own:
             await session.aclose()
+
+
+async def list_microdata_files(
+    survey_id: str,
+    session: httpx.AsyncClient | None = None,
+) -> list[dict[str, str]]:
+    """Direct download links for a survey's microdata (empty if ANDA only links out)."""
+    access = await get_microdata_access(survey_id, session=session)
+    return access["archivos"]
+
+
+async def verify_access(
+    rows: list[dict[str, Any]],
+    concurrency: int = 6,
+) -> dict[str, dict[str, Any] | None]:
+    """Real access type for catalog rows flagged as having microdata.
+
+    Keyed by the row's numeric id. Rows ANDA marks `data_na` are skipped (no
+    microdata by definition); a lookup that fails maps to None so callers fall
+    back to the catalog flag instead of failing the whole search. Results are
+    cached for a few hours per study.
+    """
+    targets = [str(r["id"]) for r in rows if r.get("id") and has_microdata(r)]
+    out: dict[str, dict[str, Any] | None] = {}
+    sem = asyncio.Semaphore(concurrency)
+
+    async with httpx.AsyncClient(
+        headers={"User-Agent": USER_AGENT},
+        proxy=proxy_for(env_config.get_base_url("anda_site")),
+    ) as session:
+
+        async def one(survey_id: str) -> None:
+            cached = _access_cache.get(survey_id)
+            if cached is not None:
+                out[survey_id] = cached
+                return
+            async with sem:
+                try:
+                    access = await get_microdata_access(survey_id, session=session)
+                except Exception as exc:
+                    logger.warning("ANDA access check skipped for %s: %s", survey_id, exc)
+                    out[survey_id] = None
+                    return
+            _access_cache.set(survey_id, access)
+            out[survey_id] = access
+
+        await asyncio.gather(*(one(t) for t in targets))
+    return out
+
+
+def access_summary(row: dict[str, Any], access: dict[str, Any] | None) -> dict[str, Any]:
+    """`tipo_acceso` + `microdatos_disponibles` for a catalog row or survey record.
+
+    `microdatos_disponibles` is true when there is a way to obtain the data
+    (direct file, external link, login or request), false when ANDA offers
+    none; without a verified lookup it falls back to the catalog flag, with
+    `tipo_acceso` "desconocido".
+    """
+    if not has_microdata(row):
+        return {"tipo_acceso": ACCESS_NONE, "microdatos_disponibles": False}
+    if access is None:
+        return {"tipo_acceso": ACCESS_UNKNOWN, "microdatos_disponibles": True}
+    return {
+        "tipo_acceso": access["tipo_acceso"],
+        "microdatos_disponibles": access["tipo_acceso"] in _OBTAINABLE,
+    }
 
 
 def has_microdata(row: dict[str, Any]) -> bool:

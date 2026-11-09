@@ -43,6 +43,7 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
         query: str = "",
         limit: int = 10,
         page: int = 1,
+        verificar_acceso: bool = True,
         format: Literal["text", "json"] = "text",
     ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
@@ -57,10 +58,15 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
         published data lives on ecuadorencifras.gob.ec instead: try
         search_inec_estadisticas with the same query.
 
-        microdatos_disponibles=true means ANDA flags the study as having
-        microdata, not that files are attached: some studies (e.g. general
-        deaths 2012, 2017-2019) list none and host them on ecuadorencifras.gob.ec
-        — see get_inec_estadistica_files.
+        microdatos_disponibles is checked against each study's real download
+        page (verificar_acceso=true), and tipo_acceso says how: directo (files
+        in ANDA), enlace_externo (ANDA only links to another site, e.g. the
+        2022 Census to censoecuador.gob.ec), registro (ANDA login), solicitud
+        or ninguno. The catalog flag alone is unreliable: it marks the 2022
+        Census "direct" although no file is attached. If a check fails the
+        result falls back to the catalog flag with tipo_acceso "desconocido".
+        Studies hosted elsewhere: get_inec_estadistica_files or
+        search_archivos(fuente="censo").
 
         Follow up with get_anda_survey_info(idno) for full metadata on one survey.
         The numeric "id" also works as the identifier in the follow-up tools.
@@ -69,6 +75,9 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
             query: Search keywords (e.g. "empleo", "REEM", "censo agropecuario")
             limit: Results per page (default: 10, max: 50)
             page: Page of results, 1-based (default: 1); see total/total_pages
+            verificar_acceso: Check each result's real download page (2 extra
+                requests per result with microdata, cached 6 h); false trusts
+                the catalog flag and is faster
             format: text | json
         """
         limit = min(max(limit, 1), 50)
@@ -92,6 +101,12 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
         # without one the server paged it for us.
         total = total_catalog
         shown = matched[(page - 1) * limit : page * limit] if query else matched
+        accesses: dict = {}
+        if verificar_acceso and shown:
+            try:
+                accesses = await anda_client.verify_access(shown)
+            except Exception:
+                accesses = {}
         payload = {
             "query": query,
             "total": total,
@@ -105,7 +120,9 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
                     "titulo": r.get("title"),
                     "anio": r.get("year_start"),
                     "entidad": r.get("authoring_entity"),
-                    "microdatos_disponibles": anda_client.has_microdata(r),
+                    **anda_client.access_summary(
+                        r, accesses.get(str(r.get("id"))) if verificar_acceso else None
+                    ),
                     "url": r.get("url"),
                 }
                 for r in shown
@@ -125,7 +142,9 @@ def register_search_anda_tool(mcp: MCPServer) -> None:
                 parts.append(f"   ID: {r.get('id')} · idno: {r.get('idno')}")
                 parts.append(f"   Entidad: {r.get('entidad')}")
                 microdatos = "sí" if r.get("microdatos_disponibles") else "no (solo agregados)"
-                parts.append(f"   Microdatos disponibles: {microdatos}")
+                parts.append(
+                    f"   Microdatos disponibles: {microdatos} (tipo_acceso: {r.get('tipo_acceso')})"
+                )
                 parts.append(f"   URL: {r.get('url')}")
                 parts.append("")
             return "\n".join(parts)
