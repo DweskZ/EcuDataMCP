@@ -7005,6 +7005,36 @@ con ", " haciendo parecer que MERCOSUR coincidía con Bolivia.
   2022->2023: Total 55,2 -> 89,6 (+34,4), Rural 20,1 -> 76,8 (+56,7), Urbano
   64,6 -> 93,0 (+28,4); Bolivia 2019->2020 también (Total +32,2). Es una
   alerta, no una corrección: las notas de la fuente explican el cambio.
+## Cuadragésima cuarta pasada — `search_ocds` no tiene orden estable y `get_resumen_compras` cambiaba de total (2026-11-09)
+
+**Síntoma.** `get_resumen_compras("Manta", 2025)` daba USD 32,4 a 42,5 M y 207 o
+214 `procesos_con_monto` en ejecuciones idénticas, siempre con `parcial=false` y
+253 procesos leídos de 253.
+
+**Causa raíz (medida en vivo).** La misma `page` de `search_ocds` devuelve
+filas distintas en cada llamada (`/PLATAFORMA/api/search_ocds?year=2025&search=Manta&buyer=Manta&page=3`
+tres veces: tres conjuntos de 10 ids distintos). Los parámetros `sort`, `order`,
+`orderBy`, `per_page`, `limit` y `size` se ignoran. Un barrido de las 26 páginas
+dio 253 filas pero solo 210 ids distintos: las duplicadas ocupaban el lugar de
+las no vistas, así que el conteo coincidía con `total` y el resumen se declaraba
+completo con un subconjunto distinto cada vez. Los 429 agravaban la lentitud
+(cada barrido tardaba 70-80 s) pero no eran la causa. No es un problema de
+campos: `amount` es el único monto sumado (valor adjudicado si el proceso lo
+tiene, si no el estimado), `budget` va aparte.
+
+**Corrección.** `summarize_buyer` barre las páginas varias veces sin la caché de
+páginas, deduplica por OCID, suma en orden de OCID, para si el host entra en
+enfriamiento por 429, limita solicitudes (6 barridos) y tiempo (150 s), con
+concurrencia 2, y marca `parcial=true` salvo que haya tantos procesos distintos
+como `total_en_fuente`. Devuelve `paginas_fallidas` y `solicitudes`. Las filas
+distintas se guardan 15 min en memoria para que una repetición continúe donde
+quedó la anterior.
+
+**Medición tras el arreglo** (Manta 2025, tres llamadas seguidas en un proceso,
+espaciadas 30 s): 251 → 252 → 253 procesos leídos; las dos primeras `parcial=true`,
+la tercera `parcial=false` con USD 34.713.874,47 y 211 procesos con monto. Coste:
+~150 s por llamada cuando SERCOP está limitando (429), porque completar el
+conjunto exige varias pasadas sobre un muestreo aleatorio.
 
 ## Notas históricas
 

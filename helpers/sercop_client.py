@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import time
 from datetime import datetime
 from typing import Any
 
@@ -182,7 +183,15 @@ async def get_contract_record(
 # summary to a few seconds and well under SERCOP's rate limit; past it the
 # summary says it is partial.
 SUMMARY_MAX_PAGES = 30
-_SUMMARY_CONCURRENCY = 3
+_SUMMARY_CONCURRENCY = 2
+# Request budget as a multiple of the page count: the source samples rows at
+# random per request, so completing needs several passes.
+_SUMMARY_SWEEPS = 6
+# Wall-clock cap so a rate-limited source cannot hold a tool call for minutes.
+_SUMMARY_DEADLINE_SECONDS = 150.0
+# Distinct rows already collected for a (buyer, search, year, total): a repeat
+# call resumes from them, so successive runs converge on the same full set.
+_summary_rows_cache = TtlCache(ttl_seconds=900.0, max_entries=32)
 _SUMMARY_TOP_BUYERS = 10
 _SUMMARY_TOP_SUPPLIERS = 10
 
@@ -283,54 +292,136 @@ def summarize_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return result
 
 
+def _row_key(row: dict[str, Any]) -> str:
+    """Identity of a search row: the OCID, else the numeric process id."""
+    return str(row.get("ocid") or row.get("id") or "")
+
+
+def _stable_rows(by_key: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
+    """Unique rows in a fixed order, so the sums never depend on arrival order."""
+    return [by_key[k] for k in sorted(by_key)]
+
+
 async def summarize_buyer(
     buyer: str,
     year: int,
     query: str = "",
     max_pages: int = SUMMARY_MAX_PAGES,
+    max_requests: int | None = None,
 ) -> dict[str, Any]:
-    """Page through search_ocds for one buyer keyword and summarize it.
+    """Collect one buyer's search_ocds rows and summarize them.
 
     The API needs a search keyword of at least 3 characters; the buyer
     keyword doubles as it unless ``query`` narrows the topic. ``buyer`` is a
     keyword, so several institutions can match: each is summarized on its own.
+
+    search_ocds has no stable ordering: the same ``page`` returns a different
+    set of rows on each call (``sort``/``order`` are ignored), so one pass
+    over pages 1..N repeats some processes and misses others while the row
+    count still equals ``total``. The pages are therefore swept repeatedly
+    (uncached) and the rows de-duplicated by OCID until every distinct
+    process has been seen or the request budget runs out. Rows are summed in
+    OCID order. The result is ``parcial`` unless as many distinct processes
+    as the source reports were collected.
     """
     buyer = (buyer or "").strip()
     if len(buyer) < 3:
         raise ValueError("comprador debe tener al menos 3 caracteres")
     search = (query or "").strip() or buyer
+    budget = max_requests if max_requests is not None else max_pages * _SUMMARY_SWEEPS
 
-    first = await search_contracts(search=search, year=year, page=1, buyer=buyer)
-    total = int(first.get("total") or 0)
-    pages = int(first.get("pages") or 0)
-    rows: list[dict[str, Any]] = list(first.get("data") or [])
-    to_read = min(pages, max_pages)
-
-    failed: list[int] = []
+    by_key: dict[str, dict[str, Any]] = {}
+    failed: set[int] = set()
+    requests_made = 0
+    stop_reason = ""
+    deadline = time.monotonic() + _SUMMARY_DEADLINE_SECONDS
     semaphore = asyncio.Semaphore(_SUMMARY_CONCURRENCY)
 
-    async def fetch(page: int) -> list[dict[str, Any]]:
-        async with semaphore:
-            try:
-                result = await search_contracts(search=search, year=year, page=page, buyer=buyer)
-            except Exception as exc:  # one bad page must not sink the summary
-                logger.warning("SERCOP resumen: página %d falló: %s", page, exc)
-                failed.append(page)
-                return []
-            return list(result.get("data") or [])
+    def absorb(result: dict[str, Any]) -> None:
+        for row in result.get("data") or []:
+            if isinstance(row, dict):
+                key = _row_key(row)
+                if key:
+                    by_key.setdefault(key, row)
 
-    for chunk in await asyncio.gather(*(fetch(p) for p in range(2, to_read + 1))):
-        rows.extend(chunk)
+    session = new_client(_sercop_url("search_ocds"), headers={"Accept": "application/json"})
+    try:
 
+        async def fetch(page: int) -> dict[str, Any]:
+            return await _get_json(
+                _sercop_url("search_ocds"),
+                params={"year": year, "search": search, "page": page, "buyer": buyer},
+                session=session,
+            )
+
+        first = await fetch(1)
+        requests_made = 1
+        if not isinstance(first, dict):
+            first = {}
+        total = int(first.get("total") or 0)
+        pages = int(first.get("pages") or 0)
+        absorb(first)
+        memo_key = (search.lower(), year, buyer.lower(), total)
+        remembered = _summary_rows_cache.get(memo_key)
+        if isinstance(remembered, dict):
+            for key, row in remembered.items():
+                by_key.setdefault(key, row)
+        to_read = min(pages, max_pages)
+        # Past the page cap the summary is partial by design; never collect
+        # more than the cap so the output size stays bounded.
+        goal = min(total, to_read * 10) if pages else 0
+
+        async def fetch_guarded(page: int) -> None:
+            nonlocal requests_made, stop_reason
+            def exhausted() -> bool:
+                return bool(stop_reason) or requests_made >= budget or time.monotonic() > deadline
+
+            if exhausted():
+                return
+            async with semaphore:
+                if exhausted():
+                    return
+                requests_made += 1
+                try:
+                    absorb(await fetch(page))
+                except SercopRateLimitError as exc:
+                    # The host is cooling down; hammering it only extends the block.
+                    logger.warning("SERCOP resumen: página %d limitada: %s", page, exc)
+                    failed.add(page)
+                    stop_reason = "rate_limited"
+                except Exception as exc:  # one bad page must not sink the summary
+                    logger.warning("SERCOP resumen: página %d falló: %s", page, exc)
+                    failed.add(page)
+
+        sweep = 0
+        while len(by_key) < goal and requests_made < budget and not stop_reason:
+            if time.monotonic() > deadline:
+                break
+            # Sweep 0 reads pages 2..N once; later sweeps re-draw every page,
+            # since a page is a random sample of the not-yet-seen rows too.
+            first_page = 2 if sweep == 0 else 1
+            before = len(by_key)
+            await asyncio.gather(*(fetch_guarded(p) for p in range(first_page, to_read + 1)))
+            sweep += 1
+            if sweep > 1 and len(by_key) == before and failed:
+                break
+    finally:
+        await session.aclose()
+
+    if by_key:
+        _summary_rows_cache.set(memo_key, dict(by_key))
+    rows = _stable_rows(by_key)
     compradores = summarize_rows(rows)
+    complete = len(rows) >= total and not (pages > max_pages)
     return {
         "comprador": buyer,
         "query": search,
         "year": year,
         "total_en_fuente": total,
         "procesos_leidos": len(rows),
-        "parcial": len(rows) < total,
+        "parcial": not complete,
         "paginas_fallidas": sorted(failed),
+        "solicitudes": requests_made,
         "monto_total": round(sum(c["monto_total"] for c in compradores), 2),
         "procesos_con_monto": sum(c["procesos_con_monto"] for c in compradores),
         "compradores": compradores[:_SUMMARY_TOP_BUYERS],

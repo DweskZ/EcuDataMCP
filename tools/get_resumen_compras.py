@@ -48,10 +48,14 @@ def register_get_resumen_compras_tool(mcp: MCPServer) -> None:
         first, top 10.
 
         Limits: reads at most 300 processes (30 pages); past that the summary
-        is marked `parcial` with `total_en_fuente`. Processes without an
-        amount are counted but add nothing (`procesos_con_monto`). Supplier
-        names are only present on some search rows. SERCOP rate-limits busy
-        clients; a page that fails is listed in `paginas_fallidas`. For one
+        is marked `parcial` with `total_en_fuente`. SERCOP returns a different
+        sample of rows for the same page on every call, so the pages are swept
+        repeatedly and de-duplicated by OCID; `parcial` is true unless as many
+        distinct processes as `total_en_fuente` were collected (a rate-limited
+        or slow source can leave it short; `solicitudes` counts the calls).
+        Processes without an amount are counted but add nothing
+        (`procesos_con_monto`). Supplier names are only present on some search
+        rows. A page that fails is listed in `paginas_fallidas`. For one
         process's full record use get_contrato_info(ocid).
 
         Args:
@@ -86,7 +90,10 @@ def register_get_resumen_compras_tool(mcp: MCPServer) -> None:
             "url_fuente": f"{site}/procedimientos",
             "nota": (
                 "Montos según el campo amount de la búsqueda OCDS (valor adjudicado o "
-                "estimado); los procesos sin monto se cuentan pero no suman."
+                "estimado; el valor adjudicado tiene prioridad sobre el estimado, y el "
+                "presupuesto se suma aparte); los procesos sin monto se cuentan pero no suman. "
+                "La fuente devuelve filas distintas para la misma página, así que se "
+                "deduplica por OCID; si faltan procesos el resultado es parcial."
             ),
         }
 
@@ -94,7 +101,12 @@ def register_get_resumen_compras_tool(mcp: MCPServer) -> None:
             parts = [
                 f"Compras públicas (SERCOP) — comprador '{p['comprador']}' — {p['year']}",
                 f"Procesos leídos: {p['procesos_leidos']} de {p['total_en_fuente']}"
-                + (f" (parcial: máximo {SUMMARY_MAX_PAGES * 10})" if p["parcial"] else ""),
+                + (
+                    f" (PARCIAL: faltan procesos; máximo {SUMMARY_MAX_PAGES * 10}, "
+                    "repite la consulta más tarde)"
+                    if p["parcial"]
+                    else ""
+                ),
                 (
                     f"Monto total: {_usd(p['monto_total'])} "
                     f"({p['procesos_con_monto']} procesos con monto)"
