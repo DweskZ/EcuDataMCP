@@ -41,7 +41,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#334155"
   },
   {
     "id": "tramites-contratacion",
@@ -85,7 +86,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#854d0e"
   },
   {
     "id": "riesgos",
@@ -161,7 +163,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#7c3aed"
   },
   {
     "id": "economia-finanzas",
@@ -412,7 +415,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#0033a0"
   },
   {
     "id": "estadisticas-demografia",
@@ -580,7 +584,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#ef3340"
   },
   {
     "id": "agricultura",
@@ -610,7 +615,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#4d7c0f"
   },
   {
     "id": "energia",
@@ -755,7 +761,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#c2410c"
   },
   {
     "id": "trabajo-empleo",
@@ -831,7 +838,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#047857"
   },
   {
     "id": "control-transparencia",
@@ -852,7 +860,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#9f1239"
   },
   {
     "id": "justicia",
@@ -873,7 +882,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#78716c"
   },
   {
     "id": "transporte-aviacion",
@@ -931,7 +941,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#0e7490"
   },
   {
     "id": "salud",
@@ -984,7 +995,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#db2777"
   },
   {
     "id": "telecomunicaciones",
@@ -1014,7 +1026,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#0369a1"
   },
   {
     "id": "fuentes-internacionales",
@@ -1058,6 +1071,7 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#64748b"
   }
 ]

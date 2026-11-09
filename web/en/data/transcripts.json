@@ -1,0 +1,36 @@
+[
+  {
+    "id": "pasaporte",
+    "label": "Procedures",
+    "source": {"name": "gob.ec", "detail": "Civil Registry"},
+    "steps": [
+      {"kind": "question", "step": -1, "text": "What do I need to get a passport for the first time?"},
+      {"kind": "call", "step": 0, "n": "01", "tool": "search_tramites", "args": "query=\"pasaporte\", institution_id=\"23\"", "result": "2 procedures · adults and minors under 18"},
+      {"kind": "call", "step": 1, "n": "02", "tool": "get_tramite_info", "args": "tramite_id=\"11761\"", "result": "requirements · procedure · fee"},
+      {"kind": "answer", "step": 3, "n": "04", "text": "For adults over 18 you need: **1)** the proof of payment (online, at a partner bank, or at the office), **2)** your valid physical or digital ID card and, if you are renewing, your previous passport. In Quito, Guayaquil and Cuenca it is issued the same day; at other offices, within 24 to 72 hours.", "cite": "gob.ec/dgrcic/tramites · Civil Registry"}
+    ]
+  },
+  {
+    "id": "sismos",
+    "label": "Earthquakes",
+    "source": {"name": "IG-EPN", "detail": "seismic catalog"},
+    "steps": [
+      {"kind": "question", "step": -1, "text": "Were there any strong earthquakes in Ecuador this week?"},
+      {"kind": "call", "step": 0, "n": "01", "tool": "search_sismos", "args": "dias=7, magnitud_minima=3.5", "result": "6 events · IG-EPN catalog"},
+      {"kind": "reason", "step": 2, "n": "03", "text": "the assistant keeps only the events inside Ecuador and sorts them by magnitude"},
+      {"kind": "answer", "step": 3, "n": "04", "text": "The strongest in Ecuador was **magnitude 4.8**, 45.7 km from Salinas (Santa Elena), on November 7 at 17:17, at a depth of 2.4 km. There was also a 3.7 near Pasaje (El Oro).", "cite": "igepn.edu.ec · event igepn2026vvse"}
+    ]
+  },
+  {
+    "id": "censo",
+    "label": "Research",
+    "source": {"name": "INEC · ANDA", "detail": "censoecuador.gob.ec"},
+    "steps": [
+      {"kind": "question", "step": -1, "text": "Where can I find the 2022 Census data on household internet access?"},
+      {"kind": "call", "step": 0, "n": "01", "tool": "search_anda", "args": "query=\"censo poblacion vivienda 2022\"", "result": "VIII Population and VII Housing Census 2022 · microdata: enlace_externo"},
+      {"kind": "call", "step": 1, "n": "02", "tool": "download_anda_microdata", "args": "idno=\"ECU-INEC-CTIMA-CPV-2022-V1.6\"", "result": "tipo_acceso: enlace_externo → censoecuador.gob.ec/data-censo-ecuador"},
+      {"kind": "call", "step": 2, "n": "03", "tool": "search_archivos", "args": "fuente=\"censo\", query=\"internet\"", "result": "03_2022_CPV_TIC.xlsx · 8 tables (province, canton, parish)"},
+      {"kind": "answer", "step": 3, "n": "04", "text": "INEC publishes the **Information technologies tabulation of the 2022 Census**, with households by internet, computer and cell phone availability down to parish level.", "cite": "censoecuador.gob.ec · 03_2022_CPV_TIC.xlsx"}
+    ]
+  }
+]

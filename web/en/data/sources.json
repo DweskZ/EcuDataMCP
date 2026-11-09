@@ -41,7 +41,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#334155"
   },
   {
     "id": "procedures-procurement",
@@ -85,7 +86,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#854d0e"
   },
   {
     "id": "risk-hazards",
@@ -161,7 +163,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#7c3aed"
   },
   {
     "id": "economy-finance",
@@ -412,7 +415,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#0033a0"
   },
   {
     "id": "statistics-demographics",
@@ -580,7 +584,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#ef3340"
   },
   {
     "id": "agriculture",
@@ -610,7 +615,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#4d7c0f"
   },
   {
     "id": "energy",
@@ -755,7 +761,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#c2410c"
   },
   {
     "id": "labour-employment",
@@ -831,7 +838,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#047857"
   },
   {
     "id": "oversight-transparency",
@@ -852,7 +860,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#9f1239"
   },
   {
     "id": "justice",
@@ -873,7 +882,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#78716c"
   },
   {
     "id": "transport-aviation",
@@ -931,7 +941,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#0e7490"
   },
   {
     "id": "health",
@@ -984,7 +995,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#db2777"
   },
   {
     "id": "telecommunications",
@@ -1014,7 +1026,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#0369a1"
   },
   {
     "id": "international-sources",
@@ -1058,6 +1071,7 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#64748b"
   }
 ]
