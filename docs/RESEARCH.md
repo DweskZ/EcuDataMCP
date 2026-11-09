@@ -6880,6 +6880,38 @@ detrás:
 Construido: `search_archivos(fuente="censo")` lee las dos páginas nuevas (ver
 ROADMAP § INEC).
 
+## Cuadragésima primera pasada — encabezados múltiples y filas de meses en las tablas IEM (2026-11-08)
+
+Síntoma real: `get_bce_iem_table(table_id="iem-451-e", desde="2024-08")`
+(confianza del consumidor, boletín 2095) devolvía `tabla_larga` con
+encabezados casi vacíos (`["Período (5)(6)\\Variable","","TOTAL NACIONAL","",
+"","URBANO",...]`) y solo las filas de enero.
+
+- Diseño del XLSX (verificado, `IEM-451-e.xlsx`): fila 8 = grupos con celdas
+  combinadas (`TOTAL NACIONAL` | `URBANO` | `RURAL`, 3 columnas cada uno; solo
+  la primera celda del grupo trae texto), fila 9 = subencabezados (`Situación
+  Presente (3)`, `Situación Futura (4)`, `Confianza del Consumidor`), columna A
+  = año **solo en la fila de enero**, columna B = mes, sin encabezado; el
+  pie de página son notas largas en una celda combinada que mencionan años.
+- Causa raíz: `_extract_long_table` usaba solo la primera fila como encabezado
+  y la columna A como período, así que las filas con A vacía (febrero a
+  diciembre) no tenían período y se descartaban, y la nota al pie contaba
+  como fila si su texto traía un año.
+- Misma forma en ~40 de las 78 tablas del boletín 2095 (tasas y volúmenes de
+  crédito 1.10/1.11, finanzas públicas 2.4, comercio exterior 3.x, petróleo
+  4.1, precios 4.2, empleo 4.2.5, construcción 4.5.3, 4.5.4). Variantes
+  vistas: año en la primera fila con mes en la columna B; `2024 Enero` en la
+  columna A seguido de `Febrero` sin año (3.2.3, 3.3.x, 3.4.x); rangos
+  trimestrales `Enero - Marzo` (4.2.5a, 4.5.1a, 4.5.2); filas semanales
+  debajo de cada mes (1.10.1, 1.11.1); varios bloques con el mismo año bajo
+  rótulos de una celda (`Porcentaje del PIB`, `A diciembre`).
+- Distinto y sin cambio: `4.2.3` (meses en columnas, solo años en filas) y
+  las 33 tablas `series_ancho`/`series_matriz`, que no pasan por este
+  parser. `3.2.1` (períodos en columnas bajo una fila de encabezado sin
+  etiqueta en A) pasó de `tabla_larga` con 1 fila a `series_matriz`.
+- Construido: ver CHANGELOG (encabezados aplanados con ` — `, `Período`
+  normalizado, `Bloque`, notas al pie excluidas).
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

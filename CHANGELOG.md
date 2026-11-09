@@ -2,6 +2,27 @@
 
 ## Unreleased
 
+- **`get_bce_iem_table`: multi-row headers and month rows in "tabla_larga".**
+  `iem-451-e` (consumer confidence, bulletin 2095) returned headers such as
+  `["Período (5)(6)\\Variable","","TOTAL NACIONAL","","","URBANO",...]` and only
+  the January rows. The parser took the first header row as the whole header
+  and read the year column as the period, but the source puts the year only on
+  each January row (months below, in an unnamed column) and spreads group names
+  over merged cells. Fixed for the ~40 IEM tables that share this shape
+  (loans/rates, foreign trade, oil, prices, employment, public finance,
+  construction, confidence):
+  - Merged header rows are flattened (`"TOTAL NACIONAL — Confianza del
+    Consumidor"`, footnote markers like `(3)` dropped, extra key
+    `niveles_encabezado`).
+  - Year and month columns merge into one `Período` (`2024-01`; `2024` for
+    annual rows; `2022 Enero - Marzo` for quarter ranges); `Febrero`-only rows
+    after `2026 Enero` inherit the year. `desde`/`hasta` and `rows` now apply
+    to those periods.
+  - Footnote rows are excluded and one-cell banners (`Porcentaje del PIB`,
+    `A diciembre`) become a `Bloque` column when a table has several blocks.
+  - Unchanged: `formato`, `filas`, `filas_totales`, `truncada`, and cell
+    values. Only the header names and the leading period cell(s) changed.
+
 - **ANDA: availability and download now agree.** `search_anda` said the 2022
   Census (catalog 1085, `ECU-INEC-CTIMA-CPV-2022-V1.6`) had microdata and
   `download_anda_microdata` returned `total_archivos: 0`. The catalog marks

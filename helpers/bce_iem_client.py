@@ -1026,14 +1026,126 @@ def _extract_wide_series(
     }
 
 
+_FOOTNOTE_RE = re.compile(r"^\s*(\(\w{1,4}\)|fuente\b|nota\b|notas\b|elaboraci)", re.IGNORECASE)
+_HEADER_MARKER_RE = re.compile(
+    r"(?:\s*\(\s*(?:\d+|p|prel|sd|e)\s*\))+\s*$", re.IGNORECASE
+)
+_YEAR_ONLY_RE = re.compile(r"\s*(\d{4})(?:\s*\(\s*\w{1,5}\s*\))?\s*$")
+_MAX_HEADER_ROWS = 4
+_HEADER_JOINER = " — "
+
+
+def _is_number(value: Any) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _year_only(value: Any) -> int | None:
+    """Return the year when the cell is just a year (2024, "2024", "2024 (p)")."""
+    if value is None or isinstance(value, (bool, datetime)):
+        return None
+    if isinstance(value, float):
+        value = int(value) if value.is_integer() else None
+    match = _YEAR_ONLY_RE.match(str(value)) if value is not None else None
+    if match is None:
+        return None
+    year = int(match.group(1))
+    return year if _MIN_YEAR <= year <= _max_year() else None
+
+
+def _month_name(value: Any) -> int | None:
+    if not isinstance(value, str):
+        return None
+    return _MONTHS.get(_strip(value).strip().replace(".", "").strip())
+
+
+_MONTH_RANGE_RE = re.compile(r"^([^\W\d_.]+\.?)\s*[-–]\s*([^\W\d_.]+\.?)$")
+
+
+def _month_range(value: Any) -> tuple[int, str] | None:
+    """Return (first month, cleaned label) for "Enero - Marzo" style cells."""
+    if not isinstance(value, str):
+        return None
+    text = _WS_RE.sub(" ", value).strip()
+    match = _MONTH_RANGE_RE.match(text)
+    if match is None:
+        return None
+    first, last = _month_name(match.group(1)), _month_name(match.group(2))
+    return (first, text) if first and last else None
+
+
+_PERIOD_HEADER_TOKENS = ("period", "ano", "fecha", "mes", "variable")
+
+
+def _clean_header_part(value: Any) -> str:
+    text = _WS_RE.sub(" ", _cell(value)).strip()
+    return _HEADER_MARKER_RE.sub("", text).strip()
+
+
+def _is_subheader_row(row: tuple[Any, ...], period_index: int) -> bool:
+    """A header continuation: text-only, no period/number, period column blank."""
+    if period_index < len(row) and _cell(row[period_index]).strip():
+        # The period column may repeat its own caption ("Período") on a
+        # continuation row; anything else there is data.
+        caption = _strip(_cell(row[period_index]))
+        if not any(token in caption for token in _PERIOD_HEADER_TOKENS) or any(
+            ch.isdigit() for ch in caption
+        ):
+            return False
+    cells = [value for position, value in enumerate(row) if position != period_index]
+    next_cell = row[period_index + 1] if period_index + 1 < len(row) else None
+    if _month_name(next_cell) is not None or _month_range(next_cell) is not None:
+        return False  # a continuation month row of the body, not a header
+    # Whole numbers can be header labels (tenor "30", "90", "180"); anything
+    # fractional or a date is a data value.
+    if any(
+        isinstance(value, datetime)
+        or (_is_number(value) and not (isinstance(value, int) or float(value).is_integer()))
+        for value in cells
+    ):
+        return False
+    return any(isinstance(value, str) and value.strip() for value in cells)
+
+
+def _flatten_headers(levels: list[tuple[Any, ...]], width: int) -> list[str]:
+    """Join stacked header rows into one name per column.
+
+    Upper levels are forward-filled horizontally (merged cells only carry a
+    value in their first cell) over columns that have any header text of their
+    own; the deepest level is never filled.
+    """
+    grid = [[_clean_header_part(row[i]) if i < len(row) else "" for i in range(width)]
+            for row in levels]
+    active = [any(level[i] for level in grid) for i in range(width)]
+    for level in grid[:-1]:
+        carry = ""
+        for i in range(width):
+            if level[i]:
+                carry = level[i]
+            elif active[i] and carry:
+                level[i] = carry
+    names = []
+    for i in range(width):
+        parts: list[str] = []
+        for level in grid:
+            if level[i] and (not parts or parts[-1] != level[i]):
+                parts.append(level[i])
+        names.append(_HEADER_JOINER.join(parts))
+    return names
+
+
 def _extract_long_table(
     worksheet: Any, desde: str, hasta: str, max_rows: int
 ) -> dict[str, Any] | None:
     """Read a second common shape: one observation per row.
 
     This handles tables whose header has columns such as Año/Período,
-    Variable and Valor. It keeps the original column names and cell values;
-    it does not rename fields because IEM labels are part of the source.
+    Variable and Valor.  Multi-row (merged) headers are flattened into one
+    name per column (levels joined with " — "), a year that appears only on
+    the first month row is carried down the month rows, and blank-header
+    month columns are merged into a normalized ``Período`` ("2024-01", or
+    "2024" for annual rows).  Footnotes end the table; one-cell banner rows
+    ("Porcentaje del PIB") become a ``Bloque`` column.  Cell values are never
+    altered.
     """
     all_rows = list(worksheet.iter_rows(values_only=True))
     header_index = None
@@ -1062,30 +1174,182 @@ def _extract_long_table(
 
     start, end = _period_bounds(desde, hasta)
 
-    headers = _trim_trailing_blanks([_cell(value) for value in header])
-    rows: list[list[str]] = []
-    total_rows = 0
-    for raw_row in all_rows[header_index + 1 :]:
-        row = [_cell(value) for value in raw_row[: len(headers)]]
-        if not any(row):
-            continue
-        period = _period_key(
-            raw_row[period_index] if period_index < len(raw_row) else None
+    levels = [header]
+    if period_index > 0 and not any(
+        _cell(header[i]).strip() for i in range(min(period_index, len(header)))
+    ):
+        # The caption matched a later column ("Fecha Final") while the real
+        # period columns (year, month) to its left have no header at all.
+        lead = [r for r in all_rows[header_index + 1 : header_index + 60] if r]
+        if (
+            sum(_year_only(r[0]) is not None for r in lead) >= 1
+            and sum(len(r) > 1 and _month_name(r[1]) is not None for r in lead) >= 2
+        ):
+            period_index = 0
+            top = header_index
+            while top > 0 and _is_subheader_row(all_rows[top - 1], 0):
+                top -= 1
+                levels.insert(0, all_rows[top])
+    body_start = header_index + 1
+    while (
+        len(levels) < _MAX_HEADER_ROWS
+        and body_start < len(all_rows)
+        and _is_subheader_row(all_rows[body_start], period_index)
+    ):
+        levels.append(all_rows[body_start])
+        body_start += 1
+    body = all_rows[body_start:]
+
+    if len(levels) == 1:
+        names = _trim_trailing_blanks([_cell(value) for value in header])
+    else:
+        width = max(
+            (
+                i + 1
+                for row in levels
+                for i, value in enumerate(row)
+                if _cell(value).strip()
+            ),
+            default=0,
         )
+        names = _flatten_headers(levels, width)
+        # Unnamed columns that do carry data stay addressable.
+        carries_data = {
+            i
+            for row in body
+            for i, value in enumerate(row[:width])
+            if value is not None and _cell(value).strip()
+        }
+        names = [
+            name or (f"Columna {_column_letter(i)}" if i in carries_data else "")
+            for i, name in enumerate(names)
+        ]
+        names = _trim_trailing_blanks(names)
+
+    # A blank-header column right of the period column holding month names
+    # means "year in column A (first row only), month in column B".
+    month_col = period_index + 1
+    composite = False
+    if month_col < len(names) or month_col < max((len(r) for r in levels), default=0):
+        header_blank = not any(
+            _cell(row[month_col]).strip() for row in levels if month_col < len(row)
+        )
+        month_hits = 0
+        for row in body:
+            if _FOOTNOTE_RE.match(_cell(row[period_index]) if period_index < len(row) else ""):
+                break
+            if month_col < len(row) and (
+                _month_name(row[month_col]) is not None
+                or _month_range(row[month_col]) is not None
+            ):
+                month_hits += 1
+        composite = header_blank and month_hits >= 2
+
+    period_header = "Período"
+    first_data_col = month_col + 1 if composite else 0
+    out_headers = (
+        [period_header, *names[first_data_col:]] if composite else list(names)
+    )
+
+    year: int | None = None
+    month: int | None = None
+    month_text = ""
+    section = ""
+    saw_section = False
+    banner_run = False
+    seen_data = False
+    parsed: list[tuple[str, list[str]]] = []
+    for raw_row in body:
+        first = _cell(raw_row[period_index]).strip() if period_index < len(raw_row) else ""
+        if seen_data and (
+            _FOOTNOTE_RE.match(first)
+            or (len(first) > 150 and not any(_cell(v).strip() for v in raw_row[period_index + 1 :]))
+        ):
+            break
+        others = [
+            _cell(value).strip()
+            for position, value in enumerate(raw_row)
+            if position != period_index and not (composite and position == month_col)
+        ]
+        if not any(others):
+            # Banner row ("Porcentaje del PIB"), not data and not a footnote.
+            if first and _period_key(first) is None and not _FOOTNOTE_RE.match(first):
+                section = f"{section} — {first}" if banner_run and section else first
+                banner_run = True
+                saw_section = True
+            continue
+        if composite:
+            new_year = _year_only(raw_row[period_index] if period_index < len(raw_row) else None)
+            if new_year is not None:
+                year, month, month_text = new_year, None, ""
+            elif first and year is None:
+                continue
+            month_cell = raw_row[month_col] if month_col < len(raw_row) else None
+            if _cell(month_cell).strip():
+                month = _month_name(month_cell)
+                month_text = ""
+                if month is None:
+                    ranged = _month_range(month_cell)
+                    month, month_text = ranged or (None, _cell(month_cell).strip())
+            if year is None:
+                continue
+            period = (year, month or 0)
+            label = (
+                f"{year} {month_text}" if month_text
+                else f"{year}-{month:02d}" if month
+                else str(year)
+            )
+            cells = [_cell(value) for value in raw_row[first_data_col : len(names)]]
+        else:
+            cell = raw_row[period_index] if period_index < len(raw_row) else None
+            cells = [_cell(value) for value in raw_row[: len(names)]]
+            bare_month = _month_name(cell)
+            if bare_month is not None and year is not None:
+                # "2024 Enero" is followed by bare "Febrero", "Marzo"... rows.
+                period = (year, bare_month)
+                cells[period_index] = f"{year} {_cell(cell).strip()}"
+            else:
+                period = _period_key(cell)
+                if period is not None:
+                    year = period[0]
+            label = ""
+        seen_data = True
+        banner_run = False
         if period is None or not _period_in_bounds(period, start, end):
             continue
-        total_rows += 1
-        if len(rows) < max_rows:
-            rows.append(_trim_trailing_blanks(row))
-    if not rows:
+        parsed.append((section, [label, *cells] if composite else cells))
+
+    if not parsed:
         return None
-    return {
+    with_sections = saw_section and any(sec for sec, _ in parsed)
+    if with_sections:
+        insert_at = 1 if composite else period_index + 1
+        out_headers = [*out_headers[:insert_at], "Bloque", *out_headers[insert_at:]]
+    rows: list[list[str]] = []
+    for sec, cells in parsed[:max_rows]:
+        if with_sections:
+            insert_at = 1 if composite else period_index + 1
+            cells = [*cells[:insert_at], sec, *cells[insert_at:]]
+        rows.append(_trim_trailing_blanks(cells))
+    result: dict[str, Any] = {
         "formato": "tabla_larga",
-        "encabezados": headers,
+        "encabezados": out_headers,
         "filas": rows,
-        "filas_totales": total_rows,
-        "truncada": total_rows > len(rows),
+        "filas_totales": len(parsed),
+        "truncada": len(parsed) > len(rows),
     }
+    if len(levels) > 1:
+        result["niveles_encabezado"] = len(levels)
+    return result
+
+
+def _column_letter(index: int) -> str:
+    letters = ""
+    index += 1
+    while index:
+        index, remainder = divmod(index - 1, 26)
+        letters = chr(65 + remainder) + letters
+    return letters
 
 
 def _extract_matrix_series(
