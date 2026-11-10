@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- **Smoke run failures of 2026-11-09 and 2026-11-10.**
+  `query_sut_indicador` let a Power BI `ReadTimeout` escape, so clients saw
+  only "Error executing tool query_sut_indicador"; it and
+  `get_sut_indicador_schema` now name the exception. The Supercías financials
+  build resumes a dropped download with a `Range` request (up to 3 times,
+  restarting from zero if the server ignores `Range`) instead of failing the
+  whole build; the runner had lost `bi_ranking.csv` at 274 of 374 MB.
+  `search_cortes` reports a non-JSON answer (Emelnorte's HTTP 202 with an empty
+  body on the runner) as a clear error. The smoke classifier treats that
+  Emelnorte block, an ElecGalápagos 503 and an IESS certificate
+  `ConnectTimeout` as known upstream degradation.
 - **`search_inec_publicaciones`: word-boundary matching and ranking.**
   WordPress's `search` is a substring match, so `TIC` returned 1,458 posts
   (matching "estadísticas", "práctica", "tránsito"). Queries are now tokenized
