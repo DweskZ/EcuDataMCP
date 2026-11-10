@@ -59,7 +59,8 @@ def register_get_sut_indicador_schema_tool(mcp: MCPServer) -> None:
             raise ToolError(str(e)) from e
         except Exception as e:
             raise ToolError(
-                f"Error al consultar el esquema del indicador en Power BI: {e}"
+                "Error al consultar el esquema del indicador en Power BI: "
+                f"{type(e).__name__} {e}".strip()
             ) from e
 
         def to_text(data: dict) -> str:

@@ -702,3 +702,21 @@ async def test_typed_filter_emits_typed_literal_and_no_hint(httpx_mock):
 
     assert "aviso" not in result
     assert _where_literal(httpx_mock) == "2024L"
+
+
+async def test_query_tool_names_a_timeout_instead_of_an_empty_error(monkeypatch):
+    import httpx
+    from mcp.server.mcpserver import MCPServer
+    from mcp.server.mcpserver.exceptions import ToolError
+
+    from tools.query_sut_indicador import register_query_sut_indicador_tool
+
+    async def timeout(*args, **kwargs):
+        raise httpx.ReadTimeout("")
+
+    monkeypatch.setattr(sut, "query_indicador", timeout)
+    server = MCPServer("test")
+    register_query_sut_indicador_tool(server)
+
+    with pytest.raises(ToolError, match="ReadTimeout"):
+        await server.call_tool("query_sut_indicador", {"indicador": "x", "campos": ["a"]})

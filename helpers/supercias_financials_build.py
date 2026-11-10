@@ -128,32 +128,67 @@ def _download_to(
     print(f"Descargando {name}...", flush=True)
     t0 = time.time()
     total = 0
-    try:
-        with client.stream("GET", url) as resp:
-            resp.raise_for_status()
-            with open(dest, "wb") as f:
-                for chunk in resp.iter_bytes(chunk_size=1024 * 1024):
-                    if time.time() > deadline:
-                        raise TimeoutError(
-                            f"Descarga de {name} excedió el plazo total "
-                            f"({_DOWNLOAD_DEADLINE_SECONDS // 60} min)"
-                        )
-                    total += len(chunk)
-                    if total > _MAX_FILE_BYTES:
-                        raise RuntimeError(
-                            f"Descarga de {name} superó {_MAX_FILE_BYTES // (1024 * 1024)} MB; "
-                            "no parece ser la exportación de Supercías"
-                        )
-                    f.write(chunk)
-                    if total % (20 * 1024 * 1024) < len(chunk):
-                        print(f"  {total / (1024 * 1024):.0f} MB...", flush=True)
-    except (httpx.ConnectError, httpx.ConnectTimeout) as exc:
-        # Recorded as the build's ultimo_error, which get_financials shows.
-        raise RuntimeError(
-            f"No se pudo conectar a {httpx.URL(url).host} "
-            f"({type(exc).__name__}). " + unreachable_hint(url)
-        ) from exc
+    attempt = 0
+    while True:
+        try:
+            total = _stream_once(client, name, url, dest, deadline, total)
+            break
+        except (httpx.ConnectError, httpx.ConnectTimeout) as exc:
+            # Recorded as the build's ultimo_error, which get_financials shows.
+            raise RuntimeError(
+                f"No se pudo conectar a {httpx.URL(url).host} "
+                f"({type(exc).__name__}). " + unreachable_hint(url)
+            ) from exc
+        except (httpx.RemoteProtocolError, httpx.ReadError, httpx.ReadTimeout) as exc:
+            # Seen 2026-11-10 on the runner: the server closed bi_ranking.csv
+            # at 274 of 374 MB. Resume from the bytes already written rather
+            # than failing the whole 15-minute build.
+            attempt += 1
+            if attempt > _RESUME_ATTEMPTS:
+                raise
+            total = dest.stat().st_size if dest.exists() else 0
+            print(
+                f"  {name}: conexión cortada en {total / (1024 * 1024):.0f} MB "
+                f"({type(exc).__name__}); reanudando ({attempt}/{_RESUME_ATTEMPTS})",
+                flush=True,
+            )
     print(f"  {name}: {total / (1024 * 1024):.1f} MB en {time.time() - t0:.0f}s", flush=True)
+
+
+_RESUME_ATTEMPTS = 3
+
+
+def _stream_once(
+    client: httpx.Client, name: str, url: str, dest: Path, deadline: float, offset: int
+) -> int:
+    """Stream ``url`` into ``dest`` from byte ``offset``; return bytes written.
+
+    A server that ignores the Range header answers 200 with the whole file,
+    so the file is then rewritten from the start instead of appended to.
+    """
+    headers = {"Range": f"bytes={offset}-"} if offset else {}
+    with client.stream("GET", url, headers=headers) as resp:
+        resp.raise_for_status()
+        if offset and resp.status_code != 206:
+            offset = 0
+        total = offset
+        with open(dest, "ab" if offset else "wb") as f:
+            for chunk in resp.iter_bytes(chunk_size=1024 * 1024):
+                if time.time() > deadline:
+                    raise TimeoutError(
+                        f"Descarga de {name} excedió el plazo total "
+                        f"({_DOWNLOAD_DEADLINE_SECONDS // 60} min)"
+                    )
+                total += len(chunk)
+                if total > _MAX_FILE_BYTES:
+                    raise RuntimeError(
+                        f"Descarga de {name} superó {_MAX_FILE_BYTES // (1024 * 1024)} MB; "
+                        "no parece ser la exportación de Supercías"
+                    )
+                f.write(chunk)
+                if total % (20 * 1024 * 1024) < len(chunk):
+                    print(f"  {total / (1024 * 1024):.0f} MB...", flush=True)
+    return total
 
 
 def _column_type(name: str, int_cols: set[str], text_cols: set[str]) -> str:

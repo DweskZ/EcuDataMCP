@@ -267,3 +267,38 @@ def test_classifies_minedec_connect_failure_as_geoblocked():
 
     assert assessment.status == "degraded"
     assert assessment.source == "minedec_geoblock"
+
+
+def test_classifies_iess_certificate_connect_timeout_as_degraded():
+    text = (
+        "Error executing tool get_certificado_cumplimiento_patronal: Error al "
+        "consultar el certificado de cumplimiento patronal del IESS: "
+        "ConnectTimeout (la fuente no respondió a tiempo; reintenta en unos minutos)"
+    )
+
+    assessment = assess_response(text, [], is_error=True)
+
+    assert assessment.source == "iess_certificado_timeout"
+
+
+def test_classifies_emelnorte_bot_block_as_degraded():
+    text = (
+        "Error executing tool search_cortes: Error al consultar el archivo de "
+        "cortes de emelnorte: El sitio de emelnorte devolvió una respuesta "
+        "vacía o no válida en lugar de la lista de avisos"
+    )
+
+    assessment = assess_response(text, [], is_error=True)
+
+    assert assessment.status == "degraded"
+    assert assessment.source == "emelnorte_bot_block"
+
+
+def test_classifies_elecgalapagos_503_as_degraded():
+    text = (
+        "Error executing tool search_cortes: Error al consultar el archivo de "
+        "cortes de elecgalapagos: Server error '503 Service Unavailable' for url "
+        "'https://www.elecgalapagos.com.ec/wp-json/wp/v2/posts?categories=77'"
+    )
+
+    assert assess_response(text, [], is_error=True).status == "degraded"

@@ -91,6 +91,28 @@ _DEGRADED_SOURCES = (
         "readtimeout",
     ),
     (
+        # Seen 2026-11-09 and 2026-11-10 on the runner: the same IESS form,
+        # this time failing at the TCP handshake instead of mid-response.
+        "iess_certificado_timeout",
+        "certificado de cumplimiento patronal del iess",
+        "connecttimeout",
+    ),
+    (
+        # Seen 2026-11-10 on the runner: Emelnorte's WordPress answered the
+        # posts API with HTTP 202 and an empty body, while the same URL gave
+        # JSON from a home connection. A bot challenge for datacenter IPs.
+        "emelnorte_bot_block",
+        "cortes de emelnorte",
+        "respuesta vacía o no válida",
+    ),
+    (
+        # Seen 2026-11-09 on the runner: ElecGalápagos' WordPress returned
+        # 503 on the posts API; it answered normally the next day.
+        "elecgalapagos_down",
+        "elecgalapagos.com.ec",
+        "503 service unavailable",
+    ),
+    (
         # Seen 2026-10-23 and 2026-10-24 on the runner: infoMIES never
         # completes the TCP handshake from datacenter IPs (30 s timeout), the
         # same block Render hits. A geo block, not a regression.

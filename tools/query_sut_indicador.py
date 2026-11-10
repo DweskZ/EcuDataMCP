@@ -76,6 +76,15 @@ def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
             )
         except ValueError as e:
             raise ToolError(str(e)) from e
+        except Exception as e:
+            # httpx timeouts stringify to "", so name the exception type too;
+            # without this a Power BI ReadTimeout reached the client as a bare
+            # "Error executing tool query_sut_indicador".
+            raise ToolError(
+                "Error al consultar el indicador en Power BI: "
+                f"{type(e).__name__} {e}".strip()
+                + " (reintenta en unos minutos)"
+            ) from e
 
         def to_text(data: dict) -> str:
             filas = data.get("filas") or []
