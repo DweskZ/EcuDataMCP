@@ -74,6 +74,7 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 _BASE = "https://wabi-south-central-us-c-primary-api.analysis.windows.net"
 _TIMEOUT = 30.0
+_QUERY_RETRIES = 1  # Two read-only attempts stay under the MCP's 90 s call timeout.
 _DEFAULT_ROW_LIMIT = 20000
 # Hard cap on the DataReduction window: a wider request would never fit the
 # client's context anyway and gives Power BI a reason to answer with an
@@ -777,6 +778,31 @@ def _decode_dsr(data: dict[str, Any]) -> list[dict[str, Any]]:
     return rows
 
 
+async def _post_querydata_with_retry(
+    session: httpx.AsyncClient, url: str, body: dict[str, Any]
+) -> dict[str, Any]:
+    """Retry transient transport/5xx failures of a read-only Power BI query.
+
+    Querydata is read-only, so a timeout may safely be retried with exactly
+    the same body and resource-key header. Do not retry 4xx responses or
+    HTTP-200 semantic query errors, which indicate invalid queries.
+    """
+    for attempt in range(_QUERY_RETRIES + 1):
+        try:
+            resp = await session.post(url, json=body, timeout=_TIMEOUT)
+            resp.raise_for_status()
+            return resp.json()
+        except (httpx.TimeoutException, httpx.NetworkError, httpx.RemoteProtocolError):
+            if attempt == _QUERY_RETRIES:
+                raise
+        except httpx.HTTPStatusError as exc:
+            if attempt == _QUERY_RETRIES or exc.response.status_code not in {502, 503, 504}:
+                raise
+        logger.warning("Power BI querydata: error temporal; reintento %s", attempt + 1)
+        await asyncio.sleep(1.0)
+    raise AssertionError("unreachable")
+
+
 async def query_indicador(
     indicador: str,
     campos: list[str],
@@ -898,9 +924,9 @@ async def query_indicador(
             "X-PowerBI-ResourceKey": info["resource_key"],
         }
     ) as session:
-        resp = await session.post(f"{base}/public/reports/querydata?synchronous=true", json=body, timeout=_TIMEOUT)
-        resp.raise_for_status()
-        payload = resp.json()
+        payload = await _post_querydata_with_retry(
+            session, f"{base}/public/reports/querydata?synchronous=true", body
+        )
 
     _raise_on_query_error(payload)
     result = payload["results"][0]["result"]

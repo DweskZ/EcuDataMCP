@@ -717,11 +717,24 @@ async def chain_contraloria(client: httpx.AsyncClient) -> None:
 
 
 async def chain_arconel(client: httpx.AsyncClient) -> None:
-    tipo = await first_item(client, "list_catalogo", {"fuente": "arconel"}, "tipos")
+    listing = json.loads(
+        await call_chain_step(
+            client, "list_catalogo", {"fuente": "arconel", "format": "json"}
+        )
+    )
+    tipos = listing.get("tipos") or []
+    if not tipos:
+        raise AssertionError("ARCONEL no devolvió tipos de reporte")
+    # A catalog's first item may be a very large report (currently
+    # Medidores Catastro), not a representative lightweight smoke check.
+    tipo = next(
+        (t for t in tipos if t.get("tipo", "").casefold() == "balance energía"),
+        tipos[0],
+    )
     await call_chain_step(
         client,
         "get_arconel_reporte",
-        {"tipo": tipo["tipo"], "anio": 2024, "max_paginas": 1, "format": "json"},
+        {"tipo": tipo["tipo"], "anio": 2023, "max_paginas": 1, "format": "json"},
     )
 
 

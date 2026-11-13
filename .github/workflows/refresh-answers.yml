@@ -5,8 +5,11 @@ name: Refresh stored answers
 # government sources, and opens a PR with the result. It never merges: the PR
 # is a human review gate, so a reviewer reads the numbers before they go live.
 #
-# Heads up: PRs opened with the default GITHUB_TOKEN do not trigger other
-# workflows (ci.yml). Close and reopen the PR, or push to it, to run CI.
+# PRs opened with the default GITHUB_TOKEN do not trigger ci.yml.
+# Repository admins must also enable Settings > Actions > General >
+# Workflow permissions > "Allow GitHub Actions to create and approve pull
+# requests". The pull-requests: write permission below is not sufficient
+# if that repository-level setting is disabled.
 
 on:
   schedule:
@@ -43,6 +46,8 @@ jobs:
           uv run python scripts/extract_tool_signatures.py
           uv run python build.py
       - name: Open or update the pull request
+        id: create_pr
+        continue-on-error: true
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           branch: chore/refresh-stored-answers
@@ -56,3 +61,19 @@ jobs:
             web/en/data/stored_answers.json
             web/en/data/transcripts.json
           sign-commits: false
+      - name: Explain blocked PR creation
+        if: steps.create_pr.outcome == 'failure'
+        shell: bash
+        run: |
+          {
+            echo "## Stored-answers PR could not be opened"
+            echo ""
+            echo "The refreshed branch may have been pushed successfully."
+            echo "Check the action log for the underlying error and, if it says"
+            echo "'GitHub Actions is not permitted to create or approve pull requests',"
+            echo "ask a repository admin to enable that option under:"
+            echo "**Settings > Actions > General > Workflow permissions**."
+            echo ""
+            echo "Manual PR: https://github.com/${GITHUB_REPOSITORY}/compare/main...chore/refresh-stored-answers?expand=1"
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 1
