@@ -26,6 +26,10 @@ _MAX_RETRIES = 4
 _negative_cache = TtlCache(ttl_seconds=90.0, max_entries=64)
 
 
+class SercopResponseError(RuntimeError):
+    """SERCOP returned an unexpected response instead of usable API data."""
+
+
 class SercopRateLimitError(RateLimitedError):
     """Raised when SERCOP keeps returning HTTP 429 after retries."""
 
@@ -74,8 +78,23 @@ async def _get_json(
                 "conectando desde una VPN con salida en algún país de "
                 "la región."
             ) from exc
-        resp.raise_for_status()
-        return resp.json()
+        try:
+            resp.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            raise SercopResponseError(
+                f"SERCOP devolvió HTTP {resp.status_code}; no se pudieron obtener los datos."
+            ) from exc
+        content_type = resp.headers.get("content-type", "").split(";", 1)[0].strip().lower()
+        if content_type != "application/json" and not content_type.endswith("+json"):
+            redirected = " tras una redirección" if resp.history else ""
+            raise SercopResponseError(
+                f"SERCOP devolvió contenido inesperado ({content_type or 'sin Content-Type'})"
+                f"{redirected}; se esperaba JSON. La fuente podría no estar disponible."
+            )
+        try:
+            return resp.json()
+        except ValueError as exc:
+            raise SercopResponseError("SERCOP devolvió JSON inválido; no se pudieron obtener los datos.") from exc
     finally:
         if own:
             await session.aclose()
@@ -142,8 +161,13 @@ async def search_contracts(
             result = await _get_json(
                 _sercop_url("search_ocds"), params=params, session=session
             )
-            if not isinstance(result, dict):
-                continue
+            if not isinstance(result, dict) or not isinstance(result.get("data"), list) or not all(
+                isinstance(row, dict) for row in result["data"]
+            ):
+                raise SercopResponseError(
+                    "SERCOP devolvió una respuesta de búsqueda con estructura inesperada; "
+                    "no se pudieron obtener los contratos."
+                )
             last = result
             last["_resolved_year"] = y
             if result.get("data"):
@@ -171,10 +195,13 @@ async def get_contract_record(
     result = await _get_json(
         _sercop_url("record"), params={"ocid": ocid}, session=session
     )
-    if isinstance(result, dict):
-        sercop_search_cache.set(cache_key, result)
-        return result
-    return {}
+    if not isinstance(result, dict) or not isinstance(result.get("records"), list):
+        raise SercopResponseError(
+            "SERCOP devolvió un registro con estructura inesperada; "
+            "no se pudo obtener el contrato."
+        )
+    sercop_search_cache.set(cache_key, result)
+    return result
 
 
 # -- per-buyer summary ----------------------------------------------------------

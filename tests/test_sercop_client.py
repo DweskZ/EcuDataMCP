@@ -124,3 +124,48 @@ async def test_search_contracts_fallback_year(httpx_mock):
     )
     assert result["_resolved_year"] == 2025
     assert result["data"][0]["ocid"] == "ocds-2025"
+
+
+@pytest.mark.asyncio
+async def test_search_rejects_redirect_to_html_without_caching(httpx_mock):
+    url = "https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/api/search_ocds?year=2024&search=agua&page=1"
+    target = "https://datosabiertos.compraspublicas.gob.ec/ProcesoContratacion/app/webroot/compras/index.php"
+    httpx_mock.add_response(url=url, status_code=302, headers={"Location": target})
+    httpx_mock.add_response(url=target, html="<html>Portal de compras</html>")
+    httpx_mock.add_response(url=url, json={"total": 0, "page": "1", "pages": 0, "data": []})
+
+    with pytest.raises(sercop_client.SercopResponseError, match="redirección.*JSON"):
+        await sercop_client.search_contracts("agua", 2024, fallback_years=1)
+    result = await sercop_client.search_contracts("agua", 2024)
+    assert result["data"] == []
+    assert len(httpx_mock.get_requests()) == 3
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("payload", [[], {}, {"data": None}, {"data": ["invalid"]}])
+async def test_search_rejects_unexpected_schema(httpx_mock, payload):
+    httpx_mock.add_response(json=payload)
+    with pytest.raises(sercop_client.SercopResponseError, match="estructura inesperada"):
+        await sercop_client.search_contracts("agua", 2024, fallback_years=1)
+    assert len(httpx_mock.get_requests()) == 1
+
+
+@pytest.mark.asyncio
+async def test_search_rejects_invalid_json(httpx_mock):
+    httpx_mock.add_response(content=b"{broken", headers={"content-type": "application/json"})
+    with pytest.raises(sercop_client.SercopResponseError, match="JSON inválido"):
+        await sercop_client.search_contracts("agua", 2024)
+
+
+@pytest.mark.asyncio
+async def test_search_reports_http_error(httpx_mock):
+    httpx_mock.add_response(status_code=404)
+    with pytest.raises(sercop_client.SercopResponseError, match="HTTP 404"):
+        await sercop_client.search_contracts("agua", 2024)
+
+
+@pytest.mark.asyncio
+async def test_record_rejects_unexpected_schema(httpx_mock):
+    httpx_mock.add_response(json={"error": "unavailable"})
+    with pytest.raises(sercop_client.SercopResponseError, match="estructura inesperada"):
+        await sercop_client.get_contract_record("ocds-5wno2w-demo")
