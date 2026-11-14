@@ -168,3 +168,54 @@ async def test_get_indicador_refuses_absurd_page_count(httpx_mock):
 
     with pytest.raises(ValueError, match="acota el rango"):
         await client.get_indicador("EG.ELC.ACCS.ZS")
+
+
+async def test_transient_timeout_retries_and_returns_series(httpx_mock, monkeypatch):
+    import httpx
+
+    async def no_wait(_):
+        pass
+
+    monkeypatch.setattr(client.asyncio, "sleep", no_wait)
+    url = f"{_SERIES_URL}?format=json&per_page=1000"
+    httpx_mock.add_exception(httpx.ReadTimeout("slow"), url=url)
+    httpx_mock.add_response(url=url, json=_SERIES)
+    result = await client.get_indicador("EG.ELC.ACCS.ZS")
+    assert result["total_registros"] == 2
+    assert len(httpx_mock.get_requests()) == 2
+
+
+async def test_persistent_timeout_is_not_hidden(httpx_mock, monkeypatch):
+    import httpx
+
+    async def no_wait(_):
+        pass
+
+    monkeypatch.setattr(client.asyncio, "sleep", no_wait)
+    for _ in range(2):
+        httpx_mock.add_exception(httpx.ReadTimeout("slow"))
+    with pytest.raises(httpx.ReadTimeout):
+        await client.get_indicador("EG.ELC.ACCS.ZS")
+    assert len(httpx_mock.get_requests()) == 2
+
+
+@pytest.mark.parametrize("status", [400, 404])
+async def test_client_errors_are_not_retried(httpx_mock, status):
+    import httpx
+
+    httpx_mock.add_response(status_code=status)
+    with pytest.raises(httpx.HTTPStatusError):
+        await client.get_indicador("EG.ELC.ACCS.ZS")
+    assert len(httpx_mock.get_requests()) == 1
+
+
+async def test_transient_server_error_retries(httpx_mock, monkeypatch):
+    async def no_wait(_):
+        pass
+
+    monkeypatch.setattr(client.asyncio, "sleep", no_wait)
+    httpx_mock.add_response(status_code=503)
+    httpx_mock.add_response(json=_SERIES)
+    result = await client.get_indicador("EG.ELC.ACCS.ZS")
+    assert result["total_registros"] == 2
+    assert len(httpx_mock.get_requests()) == 2
