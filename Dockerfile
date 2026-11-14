@@ -51,7 +51,7 @@ USER appuser
 
 # stdio by default, like any MCP server image: clients (and Glama's build
 # checks) start it with `docker run -i --rm <image>` and speak JSON-RPC over
-# stdin/stdout. docker-compose.yml sets MCP_TRANSPORT=http for the hosted
+# stdin/stdout. docker-compose.yml sets MCP_TRANSPORT=http for the HTTP
 # deployment, which is what EXPOSE refers to.
 ENV MCP_TRANSPORT=stdio
 EXPOSE ${MCP_PORT:-8000}
