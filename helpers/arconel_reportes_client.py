@@ -97,6 +97,10 @@ class ArconelError(Exception):
     """A report request the server rejected or answered unexpectedly."""
 
 
+class ArconelTransientError(ArconelError):
+    """The remote ASP.NET/SSRS server returned a retryable 5xx error."""
+
+
 # --- MS AJAX delta ---------------------------------------------------------
 
 
@@ -282,8 +286,18 @@ class _Session:
         for typ, id_, content in blocks:
             if typ == "hiddenField":
                 self.hidden[id_] = content
-            elif typ == "error" or typ == "pageRedirect":
-                raise ArconelError(f"el servidor respondió {typ}: {content[:200]}")
+            elif typ == "error":
+                # MS AJAX uses the block id for the HTTP status code. In
+                # particular, '0|error|500||' has an empty content field, so
+                # the old message hid the actual upstream failure.
+                detail = f"el servidor respondió error HTTP {id_}"
+                if content:
+                    detail += f": {content[:200]}"
+                if id_ in {"500", "502", "503", "504"}:
+                    raise ArconelTransientError(detail)
+                raise ArconelError(detail)
+            elif typ == "pageRedirect":
+                raise ArconelError(f"el servidor redirigió la sesión: {content[:200]}")
             for name, value in _RV_INPUT_RE.findall(content):
                 self.viewer[name] = html.unescape(value)
         return blocks
@@ -405,10 +419,25 @@ async def get_arconel_reporte(
     if cached is not None:
         return cached
 
-    async with _report_lock, _client() as client:
-        result = await _run_report(
-            client, tipo_real, anio_str, mes_str, grupo_value, max_paginas
-        )
+    # SSRS can invalidate its ASP.NET session with an error|500 delta
+    # while generating or loading a report. Replaying a single POST in
+    # that session is unsafe: postbacks mutate VIEWSTATE. Restart the
+    # entire read-only report flow once with a fresh client instead.
+    async with _report_lock:
+        for attempt in range(2):
+            async with _client() as client:
+                try:
+                    result = await _run_report(
+                        client, tipo_real, anio_str, mes_str, grupo_value, max_paginas
+                    )
+                    break
+                except ArconelTransientError:
+                    if attempt:
+                        raise
+                    logger.warning(
+                        "ARCONEL: fallo temporal del visor; reintentando con nueva sesión"
+                    )
+            await asyncio.sleep(1.0)
 
     result.update(
         {

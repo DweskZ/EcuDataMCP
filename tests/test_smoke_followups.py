@@ -102,3 +102,22 @@ def test_infomies_connect_timeout_is_a_known_geoblock():
     assert degraded_source(text) == "infomies_geoblock"
     assert "infomies_geoblock" in GEOBLOCKED_SOURCES
     assert assess_response(text, [], is_error=True).status == "degraded"
+
+
+async def test_chain_arconel_prefers_known_sample_over_catalog_first(monkeypatch):
+    from scripts import smoke_e2e as smoke
+
+    calls = []
+
+    async def fake_call_chain_step(client, name, args, required=None):
+        calls.append((name, args))
+        if name == "list_catalogo":
+            return '{"tipos": [{"tipo": "Medidores Catastro"}, {"tipo": "Balance Energía"}]}'
+        return '{"filas": []}'
+
+    monkeypatch.setattr(smoke, "call_chain_step", fake_call_chain_step)
+    await smoke.chain_arconel(object())
+
+    assert calls[-1][0] == "get_arconel_reporte"
+    assert calls[-1][1]["tipo"] == "Balance Energía"
+    assert calls[-1][1]["anio"] == 2023

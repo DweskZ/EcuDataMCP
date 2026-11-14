@@ -1,5 +1,6 @@
 import json
 
+import httpx
 import pytest
 
 from helpers import sut_powerbi_client as sut
@@ -720,3 +721,40 @@ async def test_query_tool_names_a_timeout_instead_of_an_empty_error(monkeypatch)
 
     with pytest.raises(ToolError, match="ReadTimeout"):
         await server.call_tool("query_sut_indicador", {"indicador": "x", "campos": ["a"]})
+
+@pytest.mark.asyncio
+async def test_querydata_retries_read_timeout_then_succeeds(httpx_mock):
+    url = f"{sut._BASE}/public/reports/querydata?synchronous=true"
+    httpx_mock.add_exception(httpx.ReadTimeout("slow source"), url=url, method="POST")
+    httpx_mock.add_response(url=url, method="POST", json={"results": []})
+
+    async with httpx.AsyncClient() as session:
+        result = await sut._post_querydata_with_retry(session, url, {"queries": []})
+
+    assert result == {"results": []}
+    assert len(httpx_mock.get_requests(method="POST")) == 2
+
+
+@pytest.mark.asyncio
+async def test_querydata_does_not_retry_invalid_query(httpx_mock):
+    url = f"{sut._BASE}/public/reports/querydata?synchronous=true"
+    httpx_mock.add_response(url=url, method="POST", status_code=400)
+
+    async with httpx.AsyncClient() as session:
+        with pytest.raises(httpx.HTTPStatusError):
+            await sut._post_querydata_with_retry(session, url, {"queries": []})
+
+    assert len(httpx_mock.get_requests(method="POST")) == 1
+
+
+@pytest.mark.asyncio
+async def test_querydata_retries_only_one_time(httpx_mock):
+    url = f"{sut._BASE}/public/reports/querydata?synchronous=true"
+    for _ in range(2):
+        httpx_mock.add_exception(httpx.ReadTimeout("still slow"), url=url, method="POST")
+
+    async with httpx.AsyncClient() as session:
+        with pytest.raises(httpx.ReadTimeout):
+            await sut._post_querydata_with_retry(session, url, {"queries": []})
+
+    assert len(httpx_mock.get_requests(method="POST")) == 2
