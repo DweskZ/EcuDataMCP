@@ -68,7 +68,7 @@ _MAX_GRID_AUDIT_COMBINATIONS = 500
 
 # The catalog tree is small (~98 nodes) and rarely changes; a day balances
 # staleness against not re-fetching it on every search.
-_tree_cache = TtlCache(ttl_seconds=86400.0, max_entries=1)
+_tree_cache = TtlCache(ttl_seconds=86400.0, max_entries=1, persist="bcedata_tree")
 # Bundles (per-group metadata) change even less often than the tree itself.
 _bundle_cache = TtlCache(ttl_seconds=86400.0, max_entries=256)
 # The tree's leaf groups enriched with their series labels (see
@@ -131,6 +131,17 @@ async def _get_json(
 
 
 async def _fetch_tree() -> list[dict[str, Any]]:
+    """Fresh fetch, or the last good copy when the source fails (see TtlCache.serve_stale)."""
+    try:
+        return await _fetch_tree_fresh()
+    except Exception as exc:
+        stale = _tree_cache.serve_stale("tree", exc)
+        if stale is None:
+            raise
+        return stale
+
+
+async def _fetch_tree_fresh() -> list[dict[str, Any]]:
     cached = _tree_cache.get("tree")
     if cached is not None:
         return cached

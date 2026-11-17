@@ -1,6 +1,6 @@
 # Herramientas disponibles
 
-Referencia detallada de las 84 herramientas MCP del perfil público (por defecto)
+Referencia detallada de las 85 herramientas MCP del perfil público (por defecto)
 de EcuDataMCP, más 2 herramientas de mantenimiento (`audit_bce_catalog` y
 `compare_bce_sources`) que solo se registran con otro `MCP_PROFILE`. Casi todas
 aceptan `format="json"` además de texto.
@@ -24,7 +24,7 @@ aceptan `format="json"` además de texto.
 | `download_resource` | Baja el archivo crudo de un recurso en base64 (máx. 5 MB), para formatos que no se pueden previsualizar como tabla (.rar, .tar.gz, etc.). |
 | `query_resource_data` | Consulta tabular vía CKAN DataStore (filtros, texto, paginación) sin descargar el archivo. |
 | `detect_series_pattern` | Para datasets con un archivo por período: determina si cada archivo nuevo reemplaza a los anteriores (acumulado) o los complementa (incremental). |
-| `search_archivos` (`fuente="sri_datasets"`) | Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN: catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables. |
+| `search_archivos` (`fuente="sri_datasets"`) | Buscar entre ~130 archivos del SRI publicados fuera del portal CKAN: catastro RUC por provincia, recaudación, ventas/compras, vehículos, CEL, diccionarios de variables. Incluye `fuente="turismo"`: boletines mensuales de cifras de turismo (PDF, noviembre 2025 en adelante). `fuente="fedexpor"`: informes mensuales Expordata de comercio exterior (Google Drive, ~30 MB). `fuente="aeade"`: boletines mensuales de ventas de vehículos y anuarios. Más: `arcotel_series` (25 series XLSX de ARCOTEL, la más reciente por código, con historia completa), `msp_precios` (precios techo de medicamentos 2016+), `mit_vias` (informe diario de la Red Vial Estatal) y `minedec_bases` (registros AMIE por año lectivo 2009-2025 en XLSX/CSV y archivos temáticos). |
 
 Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca"` o `source="latacunga"` (portales municipales), o `source="iadb"` (data.iadb.org, el portal de datos abiertos del BID — NO exclusivo de Ecuador, un catálogo regional/global: Latin Macro Watch e indicadores del Banco Mundial/BID).
 
@@ -42,9 +42,9 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 
 | Tool | Descripción |
 |------|-------------|
-| `search_anda` | Buscar encuestas y censos en el catálogo ANDA del INEC (NADA/IHSN). Indica si cada encuesta tiene microdatos descargables. |
+| `search_anda` | Buscar encuestas y censos en el catálogo ANDA del INEC (NADA/IHSN). Indica si cada encuesta tiene microdatos descargables. `verificar_acceso="auto"` (default) comprueba la página de descarga real de los 10 primeros resultados; `true` de todos; `false` usa el flag del catálogo. |
 | `get_anda_survey_info` | Metadata completa de una encuesta ANDA: resumen, variables, confidencialidad y contacto. |
-| `download_anda_microdata` | Links directos de descarga de los archivos de microdatos de una encuesta ANDA. |
+| `download_anda_microdata` | Enlaces a los microdatos de una encuesta ANDA con su `tipo_acceso` (directo, enlace externo, registro, solicitud, ninguno). |
 
 ## Macroeconomía (BCE)
 
@@ -72,6 +72,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `get_regulacion_info` | Detalle de una regulación + enlace al PDF. |
 | `search_contratos` | Buscar procedimientos de contratación pública (SERCOP/OCDS). |
 | `get_contrato_info` | Expediente OCDS: comprador, licitación, adjudicaciones, contratos. |
+| `get_resumen_compras` | Resumen de las compras de un comprador en un año: procesos, monto total, por tipo de procedimiento, por mes y principales proveedores (hasta 300 procesos; marca `parcial` si hay más). |
 
 ## Riesgos y sismos
 
@@ -84,7 +85,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `get_sgr_sitrep_archivos` | Reportes SITREP en PDF de un evento adverso de la SGR. |
 | `list_archivo_secciones` (`fuente="sgr"`) | Categorías de la biblioteca documental de la SGR (~1660 documentos). |
 | `get_archivo_seccion` (`fuente="sgr"`) | Documentos de una categoría de la biblioteca de la SGR. |
-| `search_capas_geo` (`fuente="inamhi"`) | Catálogo de capas del geoportal de INAMHI (meteorología e hidrología). |
+| `search_capas_geo` (`fuente="inamhi"`) | Catálogo de capas del geoportal de INAMHI (meteorología e hidrología). Incluye `fuente="igm"`: 737 capas WFS de cartografía oficial del IGM (1:1M, 1:50.000, 1:25.000; `categoria` elige la escala). `fuente="msp"`: 9 capas ArcGIS del MSP (establecimientos de la red pública, indicadores de salud sexual y reproductiva por cantón, atenciones y egresos por establecimiento). |
 | `get_capa_geo_datos` (`fuente="inamhi"`) | Muestra de atributos reales de una capa del geoportal de INAMHI. |
 
 ## Exploración
@@ -107,7 +108,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `list_catalogo` (`fuente="bce_diarios"|"arconel"|"contraloria"|"iess"|"sut"|"judicatura"`) | Catálogo previo al `get_*` de cada fuente: widgets diarios/mensuales del BCE (Riesgo País desde 2004), reportes de ARCONEL, informes de Contraloría, colecciones del IESS, tableros del SUT y tableros del Consejo de la Judicatura. |
 | `search_archivos` (`fuente="bce_remesas"|"bce_precios_comex"|"bce_publicaciones"`) | Enlaces a archivos de remesas, índices de precios de comercio exterior y las publicaciones recientes del BCE. |
 | `get_aviso_aeronautico` (`tipo="metar"|"notam"|"sigmet"`) | METAR/SPECI y NOTAM de un aeródromo (código ICAO) y SIGMET activos del FIR ecuatoriano, desde DGAC/AIS. |
-| `get_serie_internacional` (`fuente="wdi"|"irena"|"xm"`) | Series con Ecuador del Banco Mundial (WDI), IRENA (capacidad y generación) y XM Colombia (flujos horarios Colombia-Ecuador desde 2003). |
+| `get_serie_internacional` (`fuente="wdi"|"irena"|"xm"`) | Series con Ecuador del Banco Mundial (WDI), IRENA (capacidad y generación) y XM Colombia (flujos horarios Colombia-Ecuador desde 2003). Incluye `fuente="ember"`: mix eléctrico de Ember vía Our World in Data, anual o mensual (2019+), por fuente, demanda, importaciones netas e intensidad de carbono. |
 | `search_bce_iem` | Busca tablas individuales de Excel en el último boletín IEM del BCE. |
 | `search_bce_paginas` (`catalogo="indices"`) | Catálogo de páginas "índice" del BCE con archivo histórico por serie. |
 | `get_bce_pagina_archivos` (`catalogo="indices"`) | Archivo de archivos de una página "índice" del BCE. |
@@ -122,7 +123,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `get_inec_estadistica_files` | Lista los enlaces directos a archivos publicados en una página de tema estadístico del INEC. |
 | `get_inec_publicacion_archivos` | Lista los enlaces directos a archivos (PDF/XLSX/CSV/ZIP) incrustados en una publicación del INEC encontrada vía search_inec_publicaciones. |
 | `search_biinec_extras` | Revisa el BIINEC ("Banco de Datos Abiertos") del INEC en busca de datos que no aparecen en search_anda ni en search_inec_estadisticas. |
-| `search_archivos` (`fuente="censo"`) | Busca en el micrositio dedicado del Censo 2022 del INEC (censoecuador.gob.ec) enlaces directos a archivos de microdatos/metodología. |
+| `search_archivos` (`fuente="censo"`) | Busca en el micrositio dedicado del Censo 2022 del INEC (censoecuador.gob.ec) enlaces directos a los tabulados de resultados (XLSX/CSV, incl. TIC de hogares), microdatos (CSV/SPSS/REDATAM), diccionarios y metodología. Una consulta también busca dentro de los tabulados (títulos de tabla, niveles geográficos y columnas, de un índice incluido) y devuelve `tablas_coincidentes`. |
 | `search_inec_estadisticas` | Busca en las páginas de temas estadísticos del INEC (ecuadorencifras.gob.ec). |
 | `search_inec_publicaciones` | Busca en todas las publicaciones del INEC en Ecuador en Cifras, vía su API REST pública de WordPress -- siempre actualizada, más recientes primero. |
 
@@ -165,10 +166,9 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `search_cortes` (`distribuidora="eeq"`\|`"centrosur"`) | Archivo de PDFs de cortes de luz programados de EEQ (Quito, crisis 2023-2024) o Centrosur (Azuay, Cañar, Morona Santiago, 2023 en adelante). |
 | `search_cortes` (`distribuidora="emelnorte"`\|`"elecgalapagos"`\|`"eeasa"`) | Avisos vigentes de cortes por mantenimiento: los 100 más recientes de Emelnorte (Imbabura, Carchi, norte de Pichincha) y ElecGalápagos (por isla), y los trabajos programados de los próximos días de EEASA (Tungurahua, Pastaza). |
 | `get_cortes_horarios` | Convierte un PDF o aviso de cortes en filas: fecha, bloques horarios sin luz, ubicación (subestación, provincia/cantón/zona o isla), sectores y, en los avisos de mantenimiento, el motivo. |
-| `get_energia_ecuador_snapshot` | Snapshot (2024-04-24, Wayback Machine) del portal nacional de horarios de apagones energia-ecuador.com; solo sobrevivió la rotación de EEQ. |
 | `get_informe_igepn` | Descarga y extrae el texto de un informe del IG-EPN encontrado vía search_informes_igepn. |
 | `get_sut_indicador_schema` | Lista las columnas/medidas/niveles de fecha consultables de un tablero Power BI del SUT o de la Judicatura (`fuente`), descubiertos desde la definición propia del reporte (la consulta subyacente de cada visual), no por adivinanza. |
-| `query_sut_indicador` | Ejecuta una consulta en vivo contra el modelo de datos subyacente de un tablero Power BI del SUT o de la Judicatura (`fuente`) — cualquier combinación de sus campos, ej. mes y provincia juntos. |
+| `query_sut_indicador` | Ejecuta una consulta en vivo contra el modelo de datos subyacente de un tablero Power BI del SUT o de la Judicatura (`fuente`) — cualquier combinación de sus campos, ej. mes y provincia juntos. `fuente="cfn"`: tablero de estadísticas de la Corporación Financiera Nacional (crédito por provincia, estados financieros mensuales, garantías del FNG). |
 | `search_informes_igepn` | Busca en el archivo de informes PDF del IG-EPN (Instituto Geofísico): boletines sísmicos diarios/semanales/mensuales/especiales, alertas volcánicas "IG Al Instante", informes de campo/anuales, etc. |
 
 ## Utilidades de investigación
@@ -177,6 +177,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 |------|-------------|
 | `investigate_dataset` | Atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de "encuéntrame datos sobre X y muéstrame qué hay dentro" |
 | `list_zip_contents` | Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo. |
+| `read_zip_member` | Lee como tabla un archivo (CSV/TSV/TXT, XLSX/XLS/XLSB/ODS) dentro de un .zip remoto, bajando solo los bytes de ese miembro vía HTTP Range. Tope: 5 MB comprimido por miembro. Detecta el encabezado bajo el bloque de título de los tabulados y omite columnas vacías. |
 | `read_pdf` | Extrae texto de un documento PDF en una URL directa. |
 
 ## SEPS y economía popular

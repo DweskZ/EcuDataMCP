@@ -1,7 +1,7 @@
 import asyncio
 from collections.abc import Coroutine
 from functools import partial
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -12,6 +12,7 @@ from helpers.ecuador_time import today_ecuador
 from helpers.format_out import render_structured
 from helpers.gobec_client import _clean_html
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoBusqueda
 from helpers.text_utils import strip_accents
 from helpers.tool_meta import READ_ONLY
 
@@ -41,7 +42,7 @@ def register_search_ecuador_tool(mcp: MCPServer) -> None:
     @log_tool
     async def search_ecuador(
         query: str, limit: int = 5, format: Literal["text", "json"] = "text"
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         Unified search across Ecuador open data, trámites, regulations, contracts
         and risk events.

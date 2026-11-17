@@ -16,14 +16,14 @@ async def test_missing_csrf_token_is_a_tool_error_not_an_empty_listing(monkeypat
     async def fake_get_survey(idno, session=None):
         return {"id": 1153, "title": "ENEMDU 2024", "data_access_type": "public"}
 
-    async def fake_list_files(survey_id, session=None):
+    async def fake_get_access(survey_id, session=None):
         raise ValueError(
             "No se encontró el token CSRF en la página get-microdata de ANDA; "
             "la página puede estar bloqueada o haber cambiado"
         )
 
     monkeypatch.setattr(anda_client, "get_survey", fake_get_survey)
-    monkeypatch.setattr(anda_client, "list_microdata_files", fake_list_files)
+    monkeypatch.setattr(anda_client, "get_microdata_access", fake_get_access)
 
     tool = _make_tool()
     with pytest.raises(ToolError, match="token CSRF"):

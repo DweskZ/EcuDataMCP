@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import sut_powerbi_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoSerie
 from helpers.tool_meta import READ_ONLY
 
 _TEXT_ROW_CAP = 200
@@ -24,9 +25,9 @@ def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
         campos: list[str],
         filtros: dict[str, str] | None = None,
         limite: int = 500,
-        fuente: Literal["sut", "judicatura"] = "sut",
+        fuente: Literal["sut", "judicatura", "cfn"] = "sut",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoSerie]:
         """
         Run a live query against one SUT Power BI dashboard's underlying
         data model — any combination of its fields, e.g. month AND
@@ -39,6 +40,12 @@ def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
         fuente="judicatura" queries the Consejo de la Judicatura dashboards
         (e.g. audiencias by year and province: campos "CUB EST_CUB_AUDIENCIAS.
         Periodo [Año]" and "CUB EST_CUB_AUDIENCIAS.Contador [suma]").
+
+        fuente="cfn" queries the Corporación Financiera Nacional report, e.g.
+        guarantees by province: campos "Garantias FNG.nombre_provincia" and
+        "Medidas FNG.Monto Garantizado (USD) [medida]". Combine fields of one
+        table, or a column with a [medida]; some cross-table [suma]
+        combinations come back without column names and raise an error.
 
         Get valid campos from get_sut_indicador_schema(indicador) first —
         an unrecognized field name raises an error naming the tool to
@@ -60,7 +67,7 @@ def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
             limite: Row cap applied server-side by the query itself
                 (clamped to 20000; the result carries truncado=true when
                 the cap was reached).
-            fuente: sut (default) | judicatura
+            fuente: sut (default) | judicatura | cfn
             format: text | json
         """
         try:
@@ -69,6 +76,15 @@ def register_query_sut_indicador_tool(mcp: MCPServer) -> None:
             )
         except ValueError as e:
             raise ToolError(str(e)) from e
+        except Exception as e:
+            # httpx timeouts stringify to "", so name the exception type too;
+            # without this a Power BI ReadTimeout reached the client as a bare
+            # "Error executing tool query_sut_indicador".
+            raise ToolError(
+                "Error al consultar el indicador en Power BI: "
+                f"{type(e).__name__} {e}".strip()
+                + " (reintenta en unos minutos)"
+            ) from e
 
         def to_text(data: dict) -> str:
             filas = data.get("filas") or []

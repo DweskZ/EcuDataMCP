@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import sut_powerbi_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoFicha
 from helpers.tool_meta import READ_ONLY
 
 
@@ -22,9 +23,9 @@ def register_get_sut_indicador_schema_tool(mcp: MCPServer) -> None:
     @log_tool
     async def get_sut_indicador_schema(
         indicador: str,
-        fuente: Literal["sut", "judicatura"] = "sut",
+        fuente: Literal["sut", "judicatura", "cfn"] = "sut",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoFicha]:
         """
         List the queryable columns/measures/date-levels for one SUT
         Power BI dashboard, discovered from the report's own layout
@@ -49,7 +50,7 @@ def register_get_sut_indicador_schema_tool(mcp: MCPServer) -> None:
 
         Args:
             indicador: A key from list_catalogo(fuente=<fuente>).
-            fuente: sut (default) | judicatura
+            fuente: sut (default) | judicatura | cfn
             format: text | json
         """
         try:
@@ -58,7 +59,8 @@ def register_get_sut_indicador_schema_tool(mcp: MCPServer) -> None:
             raise ToolError(str(e)) from e
         except Exception as e:
             raise ToolError(
-                f"Error al consultar el esquema del indicador en Power BI: {e}"
+                "Error al consultar el esquema del indicador en Power BI: "
+                f"{type(e).__name__} {e}".strip()
             ) from e
 
         def to_text(data: dict) -> str:

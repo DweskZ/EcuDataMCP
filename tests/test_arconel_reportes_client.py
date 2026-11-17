@@ -212,8 +212,46 @@ async def test_get_reporte_rejects_unknown_tipo(httpx_mock):
 
 async def test_server_error_block_raises(httpx_mock):
     httpx_mock.add_response(method="GET", url=client._URL, text=_INITIAL_PAGE)
-    httpx_mock.add_response(method="GET", url=client._URL, text=_INITIAL_PAGE)
-    httpx_mock.add_response(method="POST", url=client._URL, text="0|error|500||")
+    for _ in range(2):
+        httpx_mock.add_response(method="GET", url=client._URL, text=_INITIAL_PAGE)
+        httpx_mock.add_response(method="POST", url=client._URL, text="0|error|500||")
 
-    with pytest.raises(client.ArconelError, match="error"):
+    with pytest.raises(client.ArconelTransientError, match="error HTTP 500"):
         await client.get_arconel_reporte("Balance Energía", 2023)
+
+
+async def test_get_reporte_restarts_full_session_after_ssrs_500(httpx_mock):
+    httpx_mock.add_response(method="GET", url=client._URL, text=_INITIAL_PAGE)
+    for attempt in range(2):
+        httpx_mock.add_response(method="GET", url=client._URL, text=_INITIAL_PAGE)
+        for n in range(3):
+            httpx_mock.add_response(
+                method="POST",
+                url=client._URL,
+                text=_delta(
+                    *_hidden(n + 1), ("updatePanel", "UpdatePanel1", _form())
+                ),
+            )
+        httpx_mock.add_response(method="POST", url=client._URL, text=_delta(*_hidden(5)))
+        httpx_mock.add_response(
+            method="POST",
+            url=client._URL,
+            text="0|error|500||" if attempt == 0 else _page(_PAGE1, 1, 1, False),
+        )
+
+    result = await client.get_arconel_reporte("Balance Energía", 2023)
+
+    assert result["completo"] is True
+    assert result["total_filas"] == 2
+    assert len(httpx_mock.get_requests(method="GET")) == 3
+
+
+async def test_nontransient_arconel_error_is_not_retried(httpx_mock):
+    httpx_mock.add_response(method="GET", url=client._URL, text=_INITIAL_PAGE)
+    httpx_mock.add_response(method="GET", url=client._URL, text=_INITIAL_PAGE)
+    httpx_mock.add_response(method="POST", url=client._URL, text="0|error|400||")
+
+    with pytest.raises(client.ArconelError, match="HTTP 400"):
+        await client.get_arconel_reporte("Balance Energía", 2023)
+
+    assert len(httpx_mock.get_requests(method="GET")) == 2

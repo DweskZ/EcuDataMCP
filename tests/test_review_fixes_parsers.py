@@ -236,3 +236,53 @@ async def test_investigate_dataset_bounds_content_type_sniffs(monkeypatch):
     assert result.structured_content["error"] == "sin_recurso_previsualizable"
     assert len(sniffed) == investigate_dataset_module._MAX_SNIFFED_RESOURCES
     assert max_in_flight <= investigate_dataset_module._SNIFF_CONCURRENCY
+
+
+class _CutStream(httpx.SyncByteStream):
+    """Yields ``data`` then drops the connection, like the server did."""
+
+    def __init__(self, data: bytes) -> None:
+        self.data = data
+
+    def __iter__(self):
+        yield self.data
+        raise httpx.RemoteProtocolError("peer closed connection")
+
+
+def test_download_to_resumes_after_a_dropped_connection(tmp_path):
+    # Bigger than the 1 MB write chunk, so part of it is on disk at the cut.
+    full = bytes(range(256)) * 12_000
+    ranges = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        ranges.append(request.headers.get("range"))
+        if not ranges[-1]:
+            return httpx.Response(200, stream=_CutStream(full[:2_000_000]))
+        start = int(ranges[-1].removeprefix("bytes=").rstrip("-"))
+        return httpx.Response(206, content=full[start:])
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    dest = tmp_path / "bi_ranking.csv"
+
+    build_script._download_to(client, "bi_ranking.csv", dest, deadline=1e12)
+
+    assert ranges == [None, f"bytes={1024 * 1024}-"]
+    assert dest.read_bytes() == full
+
+
+def test_download_to_restarts_when_range_is_ignored(tmp_path):
+    full = b"abcdefghij" * 50
+    calls = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(request.headers.get("range"))
+        if len(calls) == 1:
+            return httpx.Response(200, stream=_CutStream(full[:100]))
+        return httpx.Response(200, content=full)
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    dest = tmp_path / "bi_ranking.csv"
+
+    build_script._download_to(client, "bi_ranking.csv", dest, deadline=1e12)
+
+    assert dest.read_bytes() == full

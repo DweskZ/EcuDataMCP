@@ -472,7 +472,7 @@
     "tools": [
       {
         "name": "search_anda",
-        "description": "Search INEC's ANDA catalog of surveys and censuses (NADA/IHSN). Indicates whether each survey has downloadable microdata.",
+        "description": "Search INEC's ANDA catalog of surveys and censuses (NADA/IHSN). Indicates whether each survey's microdata can be obtained and how (tipo_acceso).",
         "params": [
           {
             "name": "query",
@@ -487,13 +487,19 @@
             "description": "Max results (default: 10, max: 50)"
           },
           {
+            "name": "verificar_acceso",
+            "type": "bool | Literal['auto']",
+            "default": "'auto'",
+            "description": "auto (default) = check the real download page of the first 10 results; true = check all of them (2 extra requests each, 8 in parallel); false = trust the catalog flag (fastest). Checks are cached per study (6 h memory, 7 days disk)"
+          },
+          {
             "name": "format",
             "type": "Literal['text', 'json']",
             "default": "'text'",
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Search INEC's ANDA catalog (anda.inec.gob.ec) of surveys and censuses. ANDA runs on NADA (World Bank/IHSN), separate from datosabiertos.gob.ec. It catalogs 437+ INEC surveys/censuses with metadata (title, year, authoring entity). Not every entry has downloadable microdata — many are aggregate-only publications (e.g. price indices); each result says so. Follow up with get_anda_survey_info(idno) for full metadata on one survey."
+        "long_description": "Search INEC's ANDA catalog (anda.inec.gob.ec) of surveys and censuses. ANDA runs on NADA (World Bank/IHSN), separate from datosabiertos.gob.ec. It catalogs 437+ INEC surveys/censuses with metadata (title, year, authoring entity). Not every entry has downloadable microdata — many are aggregate-only publications (e.g. price indices); each result says so. microdatos_disponibles is checked against each study's real download page (verificar_acceso=true) and tipo_acceso says how: directo (files in ANDA), enlace_externo (ANDA only links to another site, e.g. the 2022 Census to censoecuador.gob.ec), registro (ANDA login), solicitud or ninguno. The catalog flag alone is unreliable: it marks the 2022 Census \"direct\" although no file is attached. If a check fails the result falls back to the catalog flag with tipo_acceso \"desconocido\". Follow up with get_anda_survey_info(idno) for full metadata on one survey."
       },
       {
         "name": "get_anda_survey_info",
@@ -512,11 +518,11 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Get full metadata for one ANDA (INEC) survey/census by its idno. Get the idno from search_anda results — it's the string identifier (e.g. \"IDD-ECU-INEC-CGTPE-DECON-ENESEM-2023-v1.3\"), not the numeric id. Returns scope/abstract, variable count, whether microdata is actually downloadable, confidentiality terms, and a contact email for requesting restricted data when it isn't."
+        "long_description": "Get full metadata for one ANDA (INEC) survey/census by its idno. Get the idno from search_anda results — it's the string identifier (e.g. \"IDD-ECU-INEC-CGTPE-DECON-ENESEM-2023-v1.3\"), not the numeric id. Returns scope/abstract, variable count, whether microdata is actually obtainable and how (tipo_acceso, checked on the real download page, with any external links; see download_anda_microdata), confidentiality terms, and a contact email for requesting restricted data when it isn't."
       },
       {
         "name": "download_anda_microdata",
-        "description": "Direct download links for an ANDA survey's microdata files.",
+        "description": "Download links for an ANDA survey's microdata, with its tipo_acceso (directo, enlace_externo, registro, solicitud, ninguno).",
         "params": [
           {
             "name": "idno",
@@ -531,7 +537,7 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Get direct download links for an ANDA survey's microdata files. Automates ANDA's one-click usage-terms step (research/statistical use only, no re-identifying respondents, cite the source — see get_anda_survey_info for the full text) to reveal the file list. Check get_anda_survey_info first: aggregate-only surveys (microdatos_disponibles false) have no files here. Returns direct URLs, not the file contents — the files are typically multi-MB ZIPs (SPSS .sav inside), too large to embed in a tool result. Download them with the returned URL."
+        "long_description": "Links to an ANDA survey's microdata and how it is served. Automates ANDA's one-click usage-terms step (research/statistical use only, no re-identifying respondents, cite the source — see get_anda_survey_info) to reveal the list. tipo_acceso is read from the real download page, not the catalog flag: directo (files hosted by ANDA, in `archivos`), enlace_externo (ANDA only links to another site, in `enlaces_externos`; the 2022 Census points to censoecuador.gob.ec), registro (ANDA login), solicitud (request to INEC) or ninguno. A study can be flagged \"direct\" in the catalog and have no attached file: total_archivos 0 with enlace_externo means the data lives elsewhere; follow `siguiente_paso` (e.g. search_archivos(fuente=\"censo\")). Returns URLs, not contents; ANDA files are usually multi-MB ZIPs."
       }
     ]
   },
@@ -931,6 +937,37 @@
           }
         ],
         "long_description": "Get the full OCDS record for a public procurement procedure (SERCOP). Returns buyer, tender, awards, contracts and useful links when available. Get the ocid from search_contratos."
+      },
+      {
+        "name": "get_resumen_compras",
+        "description": "Summarizes one buyer's public procurement in a year: processes, amount, procedure types, months and suppliers.",
+        "params": [
+          {
+            "name": "comprador",
+            "type": "str",
+            "default": null,
+            "description": "Buyer or institution keyword, min 3 characters (e.g. \"Municipio de Quito\", \"IESS\")."
+          },
+          {
+            "name": "year",
+            "type": "int",
+            "default": "0",
+            "description": "Year of the processes (2015 on). 0 = current year."
+          },
+          {
+            "name": "query",
+            "type": "str",
+            "default": "''",
+            "description": "Optional topic keyword (min 3 characters); empty uses the buyer keyword."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Summarizes the public procurement of one buyer (institution) in a year, from SERCOP's OCDS open data. It pages through the same search search_contratos uses, filtered by buyer, and totals what it reads: number of processes, total amount (the OCDS amount, awarded or estimated value) and budget, by procedure type, by month and by supplier, with first and last dates. The buyer is a keyword, so several institutions can match (\"agua\" brings every water utility): each is summarized separately, largest amount first, top 10. Reads up to 300 processes (30 pages); past that the summary is marked partial with total_en_fuente. Processes without an amount are counted but add nothing (procesos_con_monto), and a page that fails is listed in paginas_fallidas. For one process's full record use get_contrato_info."
       }
     ]
   },
@@ -1870,7 +1907,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Run a live query against one SUT Power BI dashboard's underlying data model — any combination of its fields, e.g. month AND industry together for \"contratos\" (a real monthly time series since 2015 by CIIU industry, province, gender, contract status — none of this is in the ministerio-del-trabajo CKAN datasets, which are a single current-snapshot stock count with no time dimension). Get valid campos from get_sut_indicador_schema(indicador) first — an unrecognized field name raises an error naming the tool to call instead of guessing. filtros only accepts plain-column fields (not \"[medida]\"/hierarchy-level fields) and matches exact text equality, e.g. {\"public contratos.Estado contrato\": \"Vigente\"}. Rows can run into the thousands for a wide breakdown (e.g. every month x every industry) — narrow with filtros or fewer campos rather than raising limite past what's actually needed; format \"json\" is exact but still subject to the same limite cap. fuente=\"judicatura\" queries the Consejo de la Judicatura dashboards (e.g. hearings by year and province: campos \"CUB EST_CUB_AUDIENCIAS.Periodo [Año]\" and \"CUB EST_CUB_AUDIENCIAS.Contador [suma]\")."
+        "long_description": "Run a live query against one SUT Power BI dashboard's underlying data model — any combination of its fields, e.g. month AND industry together for \"contratos\" (a real monthly time series since 2015 by CIIU industry, province, gender, contract status — none of this is in the ministerio-del-trabajo CKAN datasets, which are a single current-snapshot stock count with no time dimension). Get valid campos from get_sut_indicador_schema(indicador) first — an unrecognized field name raises an error naming the tool to call instead of guessing. filtros only accepts plain-column fields (not \"[medida]\"/hierarchy-level fields) and matches exact text equality, e.g. {\"public contratos.Estado contrato\": \"Vigente\"}. Rows can run into the thousands for a wide breakdown (e.g. every month x every industry) — narrow with filtros or fewer campos rather than raising limite past what's actually needed; format \"json\" is exact but still subject to the same limite cap. fuente=\"judicatura\" queries the Consejo de la Judicatura dashboards (e.g. hearings by year and province: campos \"CUB EST_CUB_AUDIENCIAS.Periodo [Año]\" and \"CUB EST_CUB_AUDIENCIAS.Contador [suma]\"). With fuente cfn it queries the CFN report, e.g. guarantees by province with fields \"Garantias FNG.nombre_provincia\" and \"Medidas FNG.Monto Garantizado (USD) [medida]\"."
       },
       {
         "name": "search_informes_igepn",
@@ -1908,25 +1945,6 @@
           }
         ],
         "long_description": "Search the IG-EPN PDF report archive (Instituto Geofísico): daily/weekly/monthly/special seismic bulletins, volcanic \"IG Al Instante\" alerts, field/annual reports, etc. Different from search_sismos, which reads the raw earthquake catalog feed -- this searches the narrative/PDF report archive instead. Use get_informe_igepn afterwards to download and read one report's text."
-      },
-      {
-        "name": "get_energia_ecuador_snapshot",
-        "description": "2024 blackout schedules from energia-ecuador.com, recovered from the Wayback Machine.",
-        "params": [
-          {
-            "name": "query",
-            "type": "str",
-            "default": "''",
-            "description": "Free text matched against canton or sectors, accent-insensitive. Empty returns all rows."
-          },
-          {
-            "name": "format",
-            "type": "Literal['text', 'json']",
-            "default": "'text'",
-            "description": "Output format: `text` (default) or `json`."
-          }
-        ],
-        "long_description": "Recovers, via the Wayback Machine, the national blackout-schedule aggregator the Ministry of Energy ran during the 2024 crisis (the domain is now dead). Only the Empresa Eléctrica Quito page was archived: a frozen 2024-04-24 snapshot of Pichincha's rotation by province, canton, and sector. Not a live series."
       },
       {
         "name": "search_cortes",
@@ -2092,7 +2110,50 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List a .zip archive's member files (name, size) from a direct URL, without downloading the archive. Reads only the End Of Central Directory record and the central directory via HTTP Range requests, so it works for archives far larger than the 5 MB preview_resource_data/download_resource cap -- e.g. INEC or censo microdata ZIPs of multiple hundred MB. Requires the server to honor Range requests; fails with a clear error otherwise. Does not support ZIP64 archives. Listing names is cheap this way, but previewing a specific member's rows is not (still needs decompressing from that member's offset onward) -- this tool only lists metadata."
+        "long_description": "List a .zip archive's member files (name, size) from a direct URL, without downloading the archive. Reads only the End Of Central Directory record and the central directory via HTTP Range requests, so it works for archives far larger than the 5 MB preview_resource_data/download_resource cap -- e.g. INEC or censo microdata ZIPs of multiple hundred MB. Requires the server to honor Range requests; fails with a clear error otherwise. ZIP64 archives (past 4 GB or 65535 entries) are supported. Listing names is cheap this way, but previewing a specific member's rows is not (still needs decompressing from that member's offset onward) -- this tool only lists metadata; to read one member's rows use read_zip_member, which fetches only that file's bytes."
+      },
+      {
+        "name": "read_zip_member",
+        "description": "Read one file (CSV/TSV/TXT or XLSX/XLS/XLSB/ODS) inside a remote .zip as a table, fetching only that member's bytes.",
+        "params": [
+          {
+            "name": "url",
+            "type": "str",
+            "default": null,
+            "description": "Direct URL to the .zip (the same one given to list_zip_contents)."
+          },
+          {
+            "name": "member",
+            "type": "str",
+            "default": null,
+            "description": "Member path inside the zip, as listed by list_zip_contents."
+          },
+          {
+            "name": "rows",
+            "type": "int",
+            "default": "50",
+            "description": "Data rows to return (default 50, max 500)."
+          },
+          {
+            "name": "offset",
+            "type": "int",
+            "default": "0",
+            "description": "Data rows to skip before returning, for pagination."
+          },
+          {
+            "name": "skip_rows",
+            "type": "int",
+            "default": "-1",
+            "description": "Rows above the column header; -1 (default) detects them, 0 keeps row 1."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Reads the rows of ONE file inside a remote .zip without downloading the .zip. Run list_zip_contents first to get the member's exact name. It reads the archive's central directory, then fetches only that member's local header and compressed bytes via HTTP Range requests, so it works inside archives far larger than the 5 MB cap of preview_resource_data/download_resource -- e.g. the 90 CSV tables of INEC's ENDI R3. Limits: the server must honor HTTP Range (answer 206); the member must be at most 5 MB compressed; CSV/TSV/TXT output stops at 5 MB decompressed (marked truncated) and spreadsheets must fit in 20 MB decompressed since they can't be opened partially; only stored or deflate members, no encryption; ZIP64 is supported. Formats: .csv, .tsv, .txt, .xlsx, .xls, .xlsb, .ods (first sheet). The CRC32 is checked whenever the member is read in full. Matching tries the exact name, then a unique case-insensitive or basename match; otherwise the error suggests close names. For report tables with a title block on top (INEC, BCE) it detects the real header row (the first at least half as full as the fullest of the first 30), returns the title rows as preamble and drops empty columns; skip_rows=0 keeps row 1 and skip_rows=n skips n rows."
       },
       {
         "name": "read_pdf",
@@ -2532,7 +2593,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "Fetches a series from an international source, filtered to Ecuador. wdi: World Bank World Development Indicators (1,400+ yearly series); with indicador (e.g. EG.ELC.ACCS.ZS access to electricity) returns the series, with only query (English) searches the catalog; years without a value are dropped and counted. irena: IRENASTAT installed capacity (MW) and generation (GWh) by technology, 2000 on, on/off-grid. xm: XM's hourly energy on the Colombia-Ecuador interconnection, summed by day or month since 2003; needs desde and hasta (at most 366 days); days without flow show as 0 GWh, so the October 2024 suspension appears as zeros. comtrade: Ecuador's merchandise trade with one partner in USD (UN Comtrade public preview, no key): one period per call (periodo), capped at 500 rows, a ~1 call per 2 s rate limit that is retried automatically, and codes only (no names); socio 0 = World, cmd = TOTAL or an HS code. imf: IMF statistics via SDMX (190 flows: prices, balance of payments, exchange rates, fiscal, monetary and banking); indicador is the flow id (empty with query lists flows) and clave the SDMX key, whose dimension order differs per flow and is returned in the response; without clave it returns the whole country, latest observations. who: WHO Global Health Observatory (~3,000 yearly indicators by sex and age, e.g. WHOSIS_000001 life expectancy at birth); empty with query searches indicators. ilo: ILOSTAT labour statistics (1,200+ flows, e.g. UNE_DEAP_SEX_AGE_RT unemployment by sex and age); short keys are padded with wildcards. unhcr: refugees and asylum seekers hosted in Ecuador by year, from desde/hasta; socio = origin country (VEN) or 'todos' for one row per origin."
+        "long_description": "Fetches a series from an international source, filtered to Ecuador. wdi: World Bank World Development Indicators (1,400+ yearly series); with indicador (e.g. EG.ELC.ACCS.ZS access to electricity) returns the series, with only query (English) searches the catalog; years without a value are dropped and counted. irena: IRENASTAT installed capacity (MW) and generation (GWh) by technology, 2000 on, on/off-grid. xm: XM's hourly energy on the Colombia-Ecuador interconnection, summed by day or month since 2003; needs desde and hasta (at most 366 days); days without flow show as 0 GWh, so the October 2024 suspension appears as zeros. comtrade: Ecuador's merchandise trade with one partner in USD (UN Comtrade public preview, no key): one period per call (periodo), capped at 500 rows, a ~1 call per 2 s rate limit that is retried automatically, and codes only (no names); socio 0 = World, cmd = TOTAL or an HS code. imf: IMF statistics via SDMX (190 flows: prices, balance of payments, exchange rates, fiscal, monetary and banking); indicador is the flow id (empty with query lists flows) and clave the SDMX key, whose dimension order differs per flow and is returned in the response; without clave it returns the whole country, latest observations. who: WHO Global Health Observatory (~3,000 yearly indicators by sex and age, e.g. WHOSIS_000001 life expectancy at birth); empty with query searches indicators. ilo: ILOSTAT labour statistics (1,200+ flows, e.g. UNE_DEAP_SEX_AGE_RT unemployment by sex and age); short keys are padded with wildcards. unhcr: refugees and asylum seekers hosted in Ecuador by year, from desde/hasta; socio = origin country (VEN) or 'todos' for one row per origin. Source ember: Ember's electricity data via Our World in Data (CC BY 4.0), yearly or monthly from 2019: generation and share by source, per capita, demand, net imports and carbon intensity; indicador = metric/source (generation/hydro, by_source/total, carbon_intensity)."
       }
     ]
   },
@@ -2580,7 +2641,7 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Searches one institution's catalog of published files and returns direct links (title, URL, format), not contents. Sources: sri_datasets, sri_recaudacion, mef, senae, censo, minedec, senescyt, msp, cnig, trabajo_boletin, salarios, arcotel_boletines and arcotel_mensuales. Download with download_resource or read_pdf (5 MB cap)."
+        "long_description": "Searches one institution's catalog of published files and returns direct links (title, URL, format), not contents. Sources: sri_datasets, sri_recaudacion, mef, senae, censo, minedec, senescyt, msp, cnig, trabajo_boletin, salarios, arcotel_boletines and arcotel_mensuales. Source censo (censoecuador.gob.ec): ~100 files with `tipo` tabulado, microdatos, diccionario or documento; the results tabulados by theme (population, housing, household) as XLSX or CSV-in-ZIP — the household ICT one (cellphone, internet, computer, tablet by province and cantón) comes up with query \"internet\" or \"tic\" —, the microdata bases by cantón, sector and city block (CSV, SPSS, REDATAM) and the dictionaries. Download with download_resource or read_pdf (5 MB cap). Source turismo: the monthly tourism figures bulletins (November 2025 on), now published by the Ministry of Production; PDF only, read_pdf extracts the tables. Source fedexpor: FEDEXPOR's monthly Expordata foreign-trade report from January 2026, on Google Drive (~30 MB, over read_pdf's cap; descarga_directa is the direct link). Source aeade: AEADE's monthly vehicle-sales bulletins (tipo boletin_ventas) and sector yearbooks (tipo anuario). New sources: arcotel_series (the newest XLSX of each of ARCOTEL's 25 statistical series, each with full history), msp_precios (medicine ceiling prices, every revision since 2016), mit_vias (MIT's daily state-road status report) and minedec_bases (AMIE registers by school year 2009-2010 to 2024-2025, start and end cuts, XLSX and CSV, plus thematic files)."
       },
       {
         "name": "list_archivo_secciones",
@@ -2643,7 +2704,7 @@
             "description": "text | json"
           }
         ],
-        "long_description": "List the catalog of one source that has no filters, the step before its get tool. arconel: electricity report types by section, years (1998 on) and company groups; then get_arconel_reporte. bce_diarios: BCE daily/monthly indicator widgets outside BCEData (daily riesgo país since 2004, gold, WTI, bonds, payments, reserves, fiscal and external series); a codigo only means one thing within its archivo; then get_bce_indicador_diario(archivo, codigo). contraloria: quarterly CSVs of approved audit reports and annual control plans; then get_contraloria_informe. iess: IESS document collections (statistical bulletins, actuarial studies, audit reports) with years and counts; then get_iess_archivos(coleccion, anio). sut: Ministerio del Trabajo Power BI dashboards (contracts since 2015, labor demand, gender policy); then get_sut_indicador_schema and query_sut_indicador. judicatura: Power BI dashboards of the Consejo de la Judicatura's Portal de Estadística Judicial (hearings, arrest warrants, training, dismissals, filings, mediation, notaries, judge productivity, judicial auctions, SUPA child-support); then get_sut_indicador_schema(indicador, fuente=\"judicatura\") and query_sut_indicador."
+        "long_description": "List the catalog of one source that has no filters, the step before its get tool. arconel: electricity report types by section, years (1998 on) and company groups; then get_arconel_reporte. bce_diarios: BCE daily/monthly indicator widgets outside BCEData (daily riesgo país since 2004, gold, WTI, bonds, payments, reserves, fiscal and external series); a codigo only means one thing within its archivo; then get_bce_indicador_diario(archivo, codigo). contraloria: quarterly CSVs of approved audit reports and annual control plans; then get_contraloria_informe. iess: IESS document collections (statistical bulletins, actuarial studies, audit reports) with years and counts; then get_iess_archivos(coleccion, anio). sut: Ministerio del Trabajo Power BI dashboards (contracts since 2015, labor demand, gender policy); then get_sut_indicador_schema and query_sut_indicador. judicatura: Power BI dashboards of the Consejo de la Judicatura's Portal de Estadística Judicial (hearings, arrest warrants, training, dismissals, filings, mediation, notaries, judge productivity, judicial auctions, SUPA child-support); then get_sut_indicador_schema(indicador, fuente=\"judicatura\") and query_sut_indicador. Source cfn: the Corporación Financiera Nacional statistics Power BI report (credit lines, disbursements and operations by province, financial inclusion, monthly financial statements, investments, Fondo Nacional de Garantías guarantees)."
       }
     ]
   },
@@ -2685,7 +2746,7 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Searches one geoportal's layer catalog: inamhi (precipitation normals, anomalies, WRF grids, watersheds), mag (agro-ecological zoning, land cover, agricultural censuses, rural cadastre), arconel (energy balance and losses by distributor and month 1999-Apr 2024, billing, collection, subsidies and customers 1999-2025, plants, lines, substations, service areas) or celec (CELEC's plants and the March 2025 SNT transmission network; Survey123 layers are excluded on purpose). Each layer carries `capa`, the id get_capa_geo_datos takes."
+        "long_description": "Searches one geoportal's layer catalog: inamhi (precipitation normals, anomalies, WRF grids, watersheds), mag (agro-ecological zoning, land cover, agricultural censuses, rural cadastre), arconel (energy balance and losses by distributor and month 1999-Apr 2024, billing, collection, subsidies and customers 1999-2025, plants, lines, substations, service areas) or celec (CELEC's plants and the March 2025 SNT transmission network; Survey123 layers are excluded on purpose). Each layer carries `capa`, the id get_capa_geo_datos takes. Source igm: 737 WFS layers of official cartography from the Military Geographic Institute (68 national 1:1M from 2024, 505 at 1:50,000 and 164 at 1:25,000; the reserved igm_reservada workspace is left out); categoria picks the scale (nacional, 50k or 25k). Source msp: 9 ArcGIS Online layers of the Ministry of Public Health (6,411 public-network facilities, MSP facilities, 18 sexual and reproductive health indicators by canton 2018-2026, visits and discharges by facility since 2019, fertility, COVID vaccination by canton, EAIS areas, districts)."
       },
       {
         "name": "get_capa_geo_datos",
@@ -2728,7 +2789,7 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Fetches the attributes of a layer from search_capas_geo, geometry coordinates dropped. For inamhi and mag it is a WFS GetFeature sample with no filters; layers without WFS return an error. For arconel and celec it is an ArcGIS REST query: `filtro` is a SQL where clause on the layer's fields (listed in `campos`), e.g. \"Anio = 2024 AND IdMes = 4\" or \"Empresa LIKE 'CNEL%'\"; `total_features_en_capa` counts the rows matching it and `hay_mas` says whether to page on with `offset`. Dates come back as ISO dates."
+        "long_description": "Fetches the attributes of a layer from search_capas_geo, geometry coordinates dropped. For inamhi and mag it is a WFS GetFeature sample with no filters; layers without WFS return an error. For arconel and celec it is an ArcGIS REST query: `filtro` is a SQL where clause on the layer's fields (listed in `campos`), e.g. \"Anio = 2024 AND IdMes = 4\" or \"Empresa LIKE 'CNEL%'\"; `total_features_en_capa` counts the rows matching it and `hay_mas` says whether to page on with `offset`. Dates come back as ISO dates. For igm the sample carries attributes only (DescribeFeatureType then GetFeature with propertyName), no geometry: one province weighs ~1.5 MB."
       }
     ]
   }

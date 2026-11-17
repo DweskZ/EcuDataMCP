@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 import httpx
 from mcp.server.mcpserver import MCPServer
@@ -9,6 +9,7 @@ from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.pdf_reader import MAX_PAGES_PER_CALL
 from helpers.pdf_reader import read_pdf as extract_pdf_text
+from helpers.result_types import ResultadoFicha
 from helpers.tool_meta import READ_ONLY
 
 
@@ -26,7 +27,7 @@ def register_read_pdf_tool(mcp: MCPServer) -> None:
         url: str,
         pages: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoFicha]:
         """
         Extract text from a PDF document at a direct URL.
 

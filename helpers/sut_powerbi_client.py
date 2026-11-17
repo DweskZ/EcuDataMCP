@@ -74,6 +74,7 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 _BASE = "https://wabi-south-central-us-c-primary-api.analysis.windows.net"
 _TIMEOUT = 30.0
+_QUERY_RETRIES = 1  # Two read-only attempts stay under the MCP's 90 s call timeout.
 _DEFAULT_ROW_LIMIT = 20000
 # Hard cap on the DataReduction window: a wider request would never fit the
 # client's context anyway and gives Power BI a reason to answer with an
@@ -87,7 +88,12 @@ _MAX_ROW_LIMIT = 20000
 # 401 UnableToFindKeyInDBorCacheException), so each registry entry may carry
 # its own `base`; entries without one use _BASE.
 _JUDICATURA_BASE = "https://wabi-paas-1-scus-api.analysis.windows.net"
-_FUENTES = ("sut", "judicatura")
+# Corporación Financiera Nacional's statistics page (cfn.fin.ec/estadisticas/)
+# embeds one "publish to web" report on yet another cluster: the tenant's
+# routing (/public/routing/cluster/{tenant}) answers wabi-south-central-us
+# (checked 2026-11-07); the other two bases return 401 for its key.
+_CFN_BASE = "https://wabi-south-central-us-api.analysis.windows.net"
+_FUENTES = ("sut", "judicatura", "cfn")
 
 # Power BI AggregateFunction codes seen live on the Judicatura dashboards and
 # worth exposing as fields; other codes (min/max/count) are skipped.
@@ -190,12 +196,27 @@ _JUDICATURA_INDICADORES: list[dict[str, str]] = [
         "resource_key": "6a820389-fb8b-44c1-b93d-d1d29bbe58af",
     },
 ]
+_CFN_INDICADORES: list[dict[str, str]] = [
+    {
+        "indicador": "estadisticas",
+        "nombre": (
+            "CFN — estadísticas institucionales: líneas de crédito, operaciones y monto "
+            "por provincia, inclusión financiera, estados financieros, inversiones y "
+            "garantías del Fondo Nacional de Garantías (FNG)"
+        ),
+        "resource_key": "bd2e40e9-243f-4d44-94b9-720388d3a408",
+    },
+]
 for _entry in _INDICADORES:
     _entry["fuente"] = "sut"
 for _entry in _JUDICATURA_INDICADORES:
     _entry["fuente"] = "judicatura"
     _entry["base"] = _JUDICATURA_BASE
+for _entry in _CFN_INDICADORES:
+    _entry["fuente"] = "cfn"
+    _entry["base"] = _CFN_BASE
 _INDICADORES.extend(_JUDICATURA_INDICADORES)
+_INDICADORES.extend(_CFN_INDICADORES)
 _INDICADORES_BY_KEY = {i["indicador"]: i for i in _INDICADORES if i["fuente"] == "sut"}
 _INDICADORES_BY_FUENTE_KEY = {(i["fuente"], i["indicador"]): i for i in _INDICADORES}
 
@@ -757,6 +778,31 @@ def _decode_dsr(data: dict[str, Any]) -> list[dict[str, Any]]:
     return rows
 
 
+async def _post_querydata_with_retry(
+    session: httpx.AsyncClient, url: str, body: dict[str, Any]
+) -> dict[str, Any]:
+    """Retry transient transport/5xx failures of a read-only Power BI query.
+
+    Querydata is read-only, so a timeout may safely be retried with exactly
+    the same body and resource-key header. Do not retry 4xx responses or
+    HTTP-200 semantic query errors, which indicate invalid queries.
+    """
+    for attempt in range(_QUERY_RETRIES + 1):
+        try:
+            resp = await session.post(url, json=body, timeout=_TIMEOUT)
+            resp.raise_for_status()
+            return resp.json()
+        except (httpx.TimeoutException, httpx.NetworkError, httpx.RemoteProtocolError):
+            if attempt == _QUERY_RETRIES:
+                raise
+        except httpx.HTTPStatusError as exc:
+            if attempt == _QUERY_RETRIES or exc.response.status_code not in {502, 503, 504}:
+                raise
+        logger.warning("Power BI querydata: error temporal; reintento %s", attempt + 1)
+        await asyncio.sleep(1.0)
+    raise AssertionError("unreachable")
+
+
 async def query_indicador(
     indicador: str,
     campos: list[str],
@@ -878,14 +924,24 @@ async def query_indicador(
             "X-PowerBI-ResourceKey": info["resource_key"],
         }
     ) as session:
-        resp = await session.post(f"{base}/public/reports/querydata?synchronous=true", json=body, timeout=_TIMEOUT)
-        resp.raise_for_status()
-        payload = resp.json()
+        payload = await _post_querydata_with_retry(
+            session, f"{base}/public/reports/querydata?synchronous=true", body
+        )
 
     _raise_on_query_error(payload)
     result = payload["results"][0]["result"]
     if "data" not in result or "dsr" not in result.get("data", {}):
         filas: list[dict[str, Any]] = []
+    elif "descriptor" not in result["data"]:
+        # Seen on the CFN report (2026-11-07): some field combinations (e.g. a
+        # column with a [suma] of a table the visuals never aggregate) come
+        # back with rows but no descriptor to name them. Say so instead of a
+        # KeyError deep in the decoder.
+        raise ValueError(
+            "Power BI no devolvió la descripción de columnas para esa combinación de "
+            "campos. Prueba con campos de la misma tabla o con una [medida] en lugar "
+            "de un [suma] (ver get_sut_indicador_schema)."
+        )
     else:
         filas = _decode_dsr(result["data"])
 

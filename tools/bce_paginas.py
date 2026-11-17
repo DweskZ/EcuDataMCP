@@ -7,7 +7,7 @@ archive. Files are normalized to titulo/url/formato; the índices' own
 year/period fields are kept.
 """
 
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -16,6 +16,7 @@ from mcp.types import CallToolResult
 from helpers import bce_cuentas_nacionales_client, bce_indices_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoArchivos, ResultadoBusqueda
 from helpers.tool_meta import READ_ONLY
 
 Catalogo = Literal["indices", "cuentas_nacionales"]
@@ -71,7 +72,7 @@ def register_bce_paginas_tools(mcp: MCPServer) -> None:
         catalogo: Catalogo,
         query: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         List the BCE's page-based publication archives of one catalog.
 
@@ -142,7 +143,7 @@ def register_bce_paginas_tools(mcp: MCPServer) -> None:
         anio: int = 0,
         max_archivos: int = 30,
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoArchivos]:
         """
         Read one BCE publication page's file list.
 

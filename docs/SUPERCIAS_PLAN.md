@@ -32,10 +32,10 @@ Open decision — where the prebuilt DB comes from:
 |---|---|---|
 | A. Keep building locally in each server (status quo) | No new infrastructure | Slow first start; every host hits Supercías |
 | B. Scheduled GitHub Actions build, publish DB as a Release asset | Seconds to install; Supercías outages invisible to users | Depends on Actions runners reaching Supercías (legacy TLS, 13-min download); CI maintenance; not yet validated |
-| C. Build on the hosted server only, expose the DB file for download | No Actions; one build for all clients | Needs the hosted endpoint to exist first |
+| C. Build on a single long-running server, expose the DB file for download | No Actions; one build for all clients | Needs that server to exist first |
 
 Recommendation: do the packaging/data-dir work now (needed for PyPI in any
-case); defer the A/B/C choice until the hosted endpoint exists, then prefer C.
+case); defer the A/B/C choice until that server exists, then prefer C.
 
 ## Phase 2 — keep the full history (done 2026-10-22)
 

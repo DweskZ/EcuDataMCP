@@ -12,7 +12,7 @@ and keeps any source-specific fields beside them.
 """
 
 from collections.abc import Awaitable, Callable
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -25,16 +25,21 @@ from helpers import (
     bce_remesas_client,
     censo_client,
     cnig_client,
+    gremios_client,
     mef_fiscal_client,
     minedec_client,
-    msp_gacetas_inmunoprevenibles_client,
+    mit_client,
+    msp_gacetas_client,
+    msp_precios_client,
     salarios_sectoriales_client,
     senescyt_client,
     sri_client,
     trabajo_boletin_anual_client,
+    turismo_client,
 )
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoBusqueda
 from helpers.text_utils import strip_accents
 from helpers.tool_meta import READ_ONLY
 
@@ -55,6 +60,13 @@ Fuente = Literal[
     "bce_remesas",
     "bce_precios_comex",
     "bce_publicaciones",
+    "turismo",
+    "fedexpor",
+    "aeade",
+    "arcotel_series",
+    "msp_precios",
+    "mit_vias",
+    "minedec_bases",
 ]
 
 # Clients that paginate themselves; the rest return every match and are
@@ -69,7 +81,7 @@ _UNPAGINATED: dict[str, Callable[..., Awaitable[dict[str, Any]]]] = {
     "senae": mef_fiscal_client.search_senae_tributos,
     "minedec": minedec_client.search_matricula,
     "senescyt": senescyt_client.search_estadisticas,
-    "msp": msp_gacetas_inmunoprevenibles_client.search_gacetas_inmunoprevenibles,
+    "msp": msp_gacetas_client.search_gacetas,
     "cnig": cnig_client.search_femicidios,
     "trabajo_boletin": trabajo_boletin_anual_client.search_boletines,
     "arcotel_boletines": arcotel_client.search_boletines_estadisticos,
@@ -77,6 +89,13 @@ _UNPAGINATED: dict[str, Callable[..., Awaitable[dict[str, Any]]]] = {
     "bce_remesas": bce_remesas_client.search_archivos,
     "bce_precios_comex": bce_precios_comex_client.search_archivos,
     "bce_publicaciones": bce_publicaciones_client.search_publicaciones,
+    "turismo": turismo_client.search_boletines,
+    "fedexpor": gremios_client.search_expordata,
+    "aeade": gremios_client.search_aeade,
+    "arcotel_series": arcotel_client.search_series_estadisticas,
+    "msp_precios": msp_precios_client.search_precios,
+    "mit_vias": mit_client.search_estado_vias,
+    "minedec_bases": minedec_client.search_bases,
 }
 
 # Keys the clients use for the same three things, first match wins.
@@ -139,7 +158,7 @@ async def _search(
         total = len(items)
         items = items[offset : offset + limit]
 
-    nota = result.get("nota") or result.get("nota_cobertura")
+    nota = result.get("nota") or result.get("nota_cobertura") or result.get("aviso")
     return {
         "fuente": fuente,
         "nombre_fuente": result.get("source"),
@@ -157,7 +176,7 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
         description=(
             "File links from one institution's catalog, filtered by text: SRI, MEF, "
             "SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and "
-            "BCE (remesas, comex prices, latest publications). Links, not contents."
+            "BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status. Links, not contents."
         ),
         annotations=READ_ONLY,
     )
@@ -169,7 +188,7 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
         offset: int = 0,
         formato: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         Search one institution's catalog of published files (direct links).
 
@@ -190,16 +209,29 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
           TOTALES, 2012-2021 only. Arancelarios/ADVALOREM are the tariff
           alone, smaller than the press "recaudación aduanera" (which adds
           IVA and ICE at the border).
-        - censo: Census 2022 microsite (censoecuador.gob.ec): microdata by
-          sector, cantón and city block (CSV, SPSS, REDATAM), 2010/2001
-          recoded to 2022 geography, dictionaries, methodology. Files can be
-          hundreds of MB.
+        - censo: Census 2022 microsite (censoecuador.gob.ec), ~100 files, each
+          with `tipo` (tabulado, microdatos, diccionario, documento): results
+          tabulados by theme in XLSX or CSV-in-ZIP (población, vivienda, hogar;
+          the household ICT one is "Uso de las Tecnologías de la Información
+          y Comunicación": cellphone, internet, computer, tablet by province
+          and cantón; try query "internet" or "tic"), microdata by sector,
+          cantón and city block (CSV, SPSS, REDATAM), 2010/2001 recoded to
+          2022 geography, dictionaries, methodology. Microdata can be hundreds
+          of MB; tabulados are 0.5-2 MB (open XLSX with preview_resource_data).
         - minedec: MINEDEC basic-education enrollment registry 2009-present
           (start/end-of-year XLSX of 30-140 MB, metadata, dictionary).
         - senescyt: SENESCYT SIAU higher-education and CTI reports; "wpdm"
           links have no extension (formato DESCONOCIDO).
-        - msp: MSP weekly vaccine-preventable disease gazettes, 2019 to date;
-          `tipo` separates the general bulletin from disease companions.
+        - msp: MSP's weekly epidemiological gazettes, 18 series, ~3,500
+          PDFs 2013 to date: inmunoprevenibles, vectoriales (dengue,
+          malaria...), piel_reemergentes, indicadores, general, etas, irag,
+          brotes, efectos_toxicos, respiratorias, zoonoticas, muerte_materna,
+          muerte_neonatal, tuberculosis, desnutricion, vih, fiebre_amarilla,
+          sive_alerta. Every file has `serie`, `anio`, `mes`, `semana` (the
+          last week of cumulative files, with `semana_desde`) and `tipo`
+          (disease companions such as tosferina or fiebre_amarilla). Name
+          the series in `query` ("vectoriales 2026") or the first call
+          fetches all ~110 archive pages.
         - cnig: CNIG gender-violence PDFs incl. the femicide matrix (snapshot
           to April 2023, not a live feed).
         - trabajo_boletin: Ministerio del Trabajo annual labor-market
@@ -219,6 +251,32 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
         - bce_publicaciones: BCE's ~30 most recent reports and bulletins
           (rolling window, newest first, with `fecha`); an editorial feed, not
           data series.
+        - turismo: monthly tourism bulletins ("Boletín de Cifras del Sector
+          Turismo"), November 2025 on, now published by the Ministerio de
+          Producción: arrivals and departures by nationality, holiday
+          occupancy, protected-area visits, establishment register. PDF only
+          (read_pdf extracts the tables); files carry `anio`, `mes`, `periodo`.
+        - fedexpor: FEDEXPOR's monthly "Reporte Estadístico Expordata" (foreign
+          trade, the detail SENAE does not publish openly), January 2026 on.
+          Hosted on Google Drive, ~30 MB each (over read_pdf's 5 MB cap):
+          `descarga_directa` is the direct-download link.
+        - aeade: AEADE vehicle-sales press bulletins (monthly PDF, `tipo`
+          boletin_ventas) and the sector yearbooks (`tipo` anuario).
+        - arcotel_series: ARCOTEL's statistical XLSX series, the newest file
+          per indicator code (1.1.1 active lines, 1.2 base stations, 1.3.1
+          portability, 3.1.1 internet accounts, 4.1.1 pay TV, 8.1.x radio/TV
+          concessions, 14.1 complaints...): each file holds the full
+          history (lines from 2008, internet from 2010). Open with
+          preview_resource_data.
+        - msp_precios: MSP medicine ceiling prices (Consejo Nacional de
+          Fijación de Precios), every revision 2016 on (`tipo`
+          precios_techo or segmentos_mercado, `fecha_corte`); the first is
+          the one in force.
+        - mit_vias: today's MIT state-road status report (closed and
+          restricted roads by province, PDF; earlier days are removed).
+        - minedec_bases: MINEDEC per-school-year registers 2009-2010 to
+          2024-2025 (Inicio/Fin, XLSX and CSV twins, dictionaries,
+          metadata), thematic files and the 1993-2007 statistics.
 
         Args:
             fuente: Catalog to search; see the list above.
@@ -263,6 +321,14 @@ def register_search_archivos_tool(mcp: MCPServer) -> None:
                     + (f" ({contexto})" if contexto else "")
                 )
                 parts.append(f"   {a['url']}")
+                if a.get("contenido"):
+                    parts.append(f"   {a['contenido']}")
+                for t in a.get("tablas_coincidentes") or []:
+                    niveles = f" [{', '.join(t['niveles'])}]" if t.get("niveles") else ""
+                    parts.append(f"   · hoja {t.get('hoja')}: {t.get('titulo')}{niveles}")
+                extra = a.get("tablas_coincidentes_total", 0) - len(a.get("tablas_coincidentes") or [])
+                if extra > 0:
+                    parts.append(f"   · … y {extra} tabla(s) más en este archivo")
             return "\n".join(parts)
 
         return render_structured(result, format, text_builder=to_text)

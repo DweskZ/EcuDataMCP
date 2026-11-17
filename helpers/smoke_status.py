@@ -64,11 +64,67 @@ _DEGRADED_SOURCES = (
         "no se pudo conectar",
     ),
     (
+        # Seen 2026-11-04 from a home connection in Ecuador: the SRI's public
+        # RUC page answers every RUC with its own "Error en el Sistema"
+        # page and HTTP 500 (tried 1790016919001 and 0990004196001 by
+        # hand). The SRI's system, not this repo.
+        "sri_ficha_ruc_down",
+        "ruc-establec.jspa",
+        "500 internal server error",
+    ),
+    (
+        # Seen 2026-11-04 from a home connection in Ecuador: the ASP.NET
+        # report site answered its own landing page with a 500, so
+        # list_catalogo(fuente='arconel') and get_arconel_reporte both fail.
+        # The site is down, not this repo.
+        "arconel_reportes_down",
+        "reportes.arconel.gob.ec",
+        "500 internal server error",
+    ),
+    (
+        # Seen 2026-11-05 to 2026-11-07 on the runner: the IESS certificate
+        # form never answers in time, while the same call from Render (no
+        # proxy for iess.gob.ec) returned the certificate on 2026-11-07. The
+        # IESS host throttling datacenter IPs, not a regression.
+        "iess_certificado_timeout",
+        "certificado de cumplimiento patronal del iess",
+        "readtimeout",
+    ),
+    (
+        # Seen 2026-11-09 and 2026-11-10 on the runner: the same IESS form,
+        # this time failing at the TCP handshake instead of mid-response.
+        "iess_certificado_timeout",
+        "certificado de cumplimiento patronal del iess",
+        "connecttimeout",
+    ),
+    (
+        # Seen 2026-11-10 on the runner: Emelnorte's WordPress answered the
+        # posts API with HTTP 202 and an empty body, while the same URL gave
+        # JSON from a home connection. A bot challenge for datacenter IPs.
+        "emelnorte_bot_block",
+        "cortes de emelnorte",
+        "respuesta vacía o no válida",
+    ),
+    (
+        # Seen 2026-11-09 on the runner: ElecGalápagos' WordPress returned
+        # 503 on the posts API; it answered normally the next day.
+        "elecgalapagos_down",
+        "elecgalapagos.com.ec",
+        "503 service unavailable",
+    ),
+    (
         # Seen 2026-10-23 and 2026-10-24 on the runner: infoMIES never
         # completes the TCP handshake from datacenter IPs (30 s timeout), the
         # same block Render hits. A geo block, not a regression.
         "infomies_geoblock",
         "info.desarrollohumano.gob.ec",
+        "no se pudo conectar",
+    ),
+    (
+        # Seen 2026-11-07 on the runner and from Canada: educacion.gob.ec
+        # never completes the TCP handshake from outside Ecuador.
+        "minedec_geoblock",
+        "educacion.gob.ec",
         "no se pudo conectar",
     ),
     (
@@ -119,6 +175,28 @@ _DEGRADED_SOURCES = (
         "superbancos",
         "unable to get local issuer certificate",
     ),
+    (
+        # Seen 2026-11-16 on the runner and from a local machine: both SGR
+        # ArcGIS services (COE2 and SAT) answer HTTP 200 with
+        # {"error": {"code": 500, "message": "9017$SITE_NOT_INITIALIZED"}},
+        # i.e. the ArcGIS site itself is not running. The day before it was a
+        # bare ConnectError, which stays a failure on purpose. SGR's server,
+        # not this repo.
+        "sgr_arcgis_down",
+        "sgr (arcgis)",
+        "site_not_initialized",
+    ),
+    (
+        # Seen on the runner 2026-11-12, 11-14, 11-15 and 11-16, and from a
+        # local machine 2026-11-16: api.worldbank.org answers its metadata
+        # endpoints in ~0.2 s but never returns the /country/{iso}/indicator/
+        # data endpoint (30-60 s without a byte, for ECU and COL and several
+        # indicators). wdi_client already bounds each attempt at 35 s and
+        # retries, so this is the source, not a missing retry.
+        "wdi_data_timeout",
+        "error al consultar wdi",
+        "readtimeout",
+    ),
 )
 
 # Sources blocked by country or datacenter IP. Without a LatAm egress
@@ -133,6 +211,7 @@ GEOBLOCKED_SOURCES = frozenset(
         "gobec_geoblock",
         "supercias_geoblock",
         "infomies_geoblock",
+        "minedec_geoblock",
     }
 )
 

@@ -878,3 +878,160 @@ def test_check_xlsx_container_size_rejects_expanding_xlsx(monkeypatch):
 
     with pytest.raises(ValueError, match="bomba de descompresión"):
         bce_iem_client._check_xlsx_container_size(buf.getvalue())
+
+
+# --- multi-row headers, year forward-fill, footnotes (real IEM layouts) -----
+
+
+def _sheet(rows: list[list]) -> object:
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    for row in rows:
+        worksheet.append(row)
+    stream = io.BytesIO()
+    workbook.save(stream)
+    loaded = openpyxl.load_workbook(io.BytesIO(stream.getvalue()), read_only=True, data_only=True)
+    return loaded.active
+
+
+_FOOTNOTE = "(1) Nota larga sobre la metodología que menciona 2022 y 2024.\nFuente: BCE."
+
+
+def _icc_rows() -> list[list]:
+    """Trimmed IEM-451-e: merged group header, sub-header, year on Jan only."""
+    return [
+        [None] * 11,
+        ["4.5.1 ÍNDICE DE CONFIANZA DEL CONSUMIDOR: NACIONAL, URBANO Y RURAL (1)"],
+        ["Índice"],
+        [],
+        ["Período (5)(6)\\Variable", None, "TOTAL NACIONAL", None, None, "URBANO", None, None],
+        [None, None, "Situación Presente (3)", "Situación Futura (4)", "Confianza del Consumidor ",
+         "Situación Presente (3)", "Situación Futura (4)", "Confianza del Consumidor "],
+        [2024, "Enero", 35.1, 38.2, 36.5, 35.4, 38.1, 36.3],
+        [None, "Febrero ", 37.1, 39.6, 37.9, 36.9, 39.8, 37.9],
+        [None, "Marzo", 36.7, 37.9, 37.1, 36.6, 38.2, 37.1],
+        [2025, "Enero", 36.0, 38.0, 36.9, 35.0, 37.5, 36.0],
+        [None, "Febrero", 36.5, 38.1, 37.0, 35.5, 37.5, 36.1],
+        [],
+        [_FOOTNOTE],
+    ]
+
+
+def test_extract_long_table_flattens_multirow_headers_and_fills_years():
+    result = bce_iem_client._extract_long_table(_sheet(_icc_rows()), "", "", 50)
+
+    assert result["formato"] == "tabla_larga"
+    assert result["niveles_encabezado"] == 2
+    assert result["encabezados"] == [
+        "Período",
+        "TOTAL NACIONAL — Situación Presente",
+        "TOTAL NACIONAL — Situación Futura",
+        "TOTAL NACIONAL — Confianza del Consumidor",
+        "URBANO — Situación Presente",
+        "URBANO — Situación Futura",
+        "URBANO — Confianza del Consumidor",
+    ]
+    assert [row[0] for row in result["filas"]] == [
+        "2024-01", "2024-02", "2024-03", "2025-01", "2025-02",
+    ]
+    # Footnote row excluded, values untouched.
+    assert result["filas_totales"] == 5
+    assert result["filas"][0][3] == "36.5"
+
+
+def test_extract_long_table_filters_forward_filled_months_by_period():
+    sheet = _sheet(_icc_rows())
+    result = bce_iem_client._extract_long_table(sheet, "2024-03", "2025-01", 50)
+    assert [row[0] for row in result["filas"]] == ["2024-03", "2025-01"]
+
+    sheet = _sheet(_icc_rows())
+    result = bce_iem_client._extract_long_table(sheet, "2025", "", 50)
+    assert [row[0] for row in result["filas"]] == ["2025-01", "2025-02"]
+
+
+def test_extract_long_table_truncates_after_filtering():
+    result = bce_iem_client._extract_long_table(_sheet(_icc_rows()), "2024-02", "", 2)
+
+    assert [row[0] for row in result["filas"]] == ["2024-02", "2024-03"]
+    assert result["filas_totales"] == 4
+    assert result["truncada"] is True
+
+
+def test_extract_long_table_keeps_annual_rows_blocks_and_unit_banners():
+    rows = [
+        ["Período \\ Variable", None, "TOTAL EXPORTACIONES", "PRIMARIOS", None],
+        [None, None, None, "Petróleo Crudo ", "Banano y plátano "],
+        ["Millones de USD"],
+        ["2023", None, 31.1, 7.8, 3.7],
+        ["2024", None, 34.4, 8.6, 3.8],
+        ["Porcentaje del PIB (5)"],
+        ["2023", None, 1.5, 0.4, 0.2],
+        ["2024", "Enero", 2.6, 0.7, 0.3],
+        [None, "Febrero", 2.7, 0.6, 0.3],
+        ["Fuente: BCE. 2024"],
+    ]
+    result = bce_iem_client._extract_long_table(_sheet(rows), "", "", 50)
+
+    assert result["encabezados"] == [
+        "Período", "Bloque", "TOTAL EXPORTACIONES", "PRIMARIOS — Petróleo Crudo",
+        "PRIMARIOS — Banano y plátano",
+    ]
+    assert [(r[0], r[1]) for r in result["filas"]] == [
+        ("2023", "Millones de USD"),
+        ("2024", "Millones de USD"),
+        ("2023", "Porcentaje del PIB (5)"),
+        ("2024-01", "Porcentaje del PIB (5)"),
+        ("2024-02", "Porcentaje del PIB (5)"),
+    ]
+
+
+def test_extract_long_table_carries_year_from_combined_month_label():
+    rows = [
+        ["Período \\ Variable", "EXPORTACIONES FOB", None],
+        [None, "Total", "Petroleras"],
+        ["2025", 37.1, 7.7],
+        ["2026 Enero", 3.1, 0.6],
+        ["Febrero", 3.2, 0.7],
+        ["Marzo", 3.3, 0.8],
+        ["(1) Nota"],
+    ]
+    result = bce_iem_client._extract_long_table(_sheet(rows), "2026-02", "", 50)
+
+    assert result["encabezados"][1:] == [
+        "EXPORTACIONES FOB — Total", "EXPORTACIONES FOB — Petroleras",
+    ]
+    assert [row[0] for row in result["filas"]] == ["2026 Febrero", "2026 Marzo"]
+
+
+def test_extract_long_table_carries_year_over_quarter_ranges():
+    rows = [
+        ["Período\\Variable", None, "TOTAL NACIONAL", None],
+        ["Período", None, "Situación Presente", "Situación Futura"],
+        ["2022", "Enero - Marzo ", 27.1, 34.5],
+        [None, "Abril - Junio", 34.9, 38.1],
+        ["2023", "Enero - Marzo", 35.5, 36.6],
+    ]
+    result = bce_iem_client._extract_long_table(_sheet(rows), "2022-04", "2022-12", 50)
+
+    assert result["encabezados"][1:] == [
+        "TOTAL NACIONAL — Situación Presente", "TOTAL NACIONAL — Situación Futura",
+    ]
+    assert [row[0] for row in result["filas"]] == ["2022 Abril - Junio"]
+
+
+def test_extract_long_table_standard_layout_still_ignores_footnotes():
+    rows = [
+        ["Año", "Indicador", "Valor"],
+        [2024, "PIB", 100],
+        [2025, "PIB", 110],
+        ["Fuente: BCE 2025"],
+    ]
+    result = bce_iem_client._extract_long_table(_sheet(rows), "", "", 20)
+
+    assert result == {
+        "formato": "tabla_larga",
+        "encabezados": ["Año", "Indicador", "Valor"],
+        "filas": [["2024", "PIB", "100"], ["2025", "PIB", "110"]],
+        "filas_totales": 2,
+        "truncada": False,
+    }

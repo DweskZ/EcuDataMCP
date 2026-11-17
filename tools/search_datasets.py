@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import ckan_client
 from helpers.format_out import cap_rows, render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoBusqueda
 from helpers.tool_meta import READ_ONLY
 
 MAX_RESPONSE_BYTES = 60_000
@@ -52,7 +53,7 @@ def register_search_datasets_tool(mcp: MCPServer) -> None:
         compact: bool = False,
         fields: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         Search for datasets on Ecuador's open data portal (www.datosabiertos.gob.ec).
 

@@ -341,13 +341,44 @@ async def test_fetch_categories_paginates_until_a_short_page(httpx_mock):
     assert categories[200] == "Economía Laboral"
 
 
+def _wp_post(pid, title, date, excerpt="", categories=()):
+    return {
+        "id": pid,
+        "link": f"https://www.ecuadorencifras.gob.ec/p{pid}/",
+        "date": f"{date}T10:00:00",
+        "modified": f"{date}T10:00:00",
+        "title": {"rendered": title},
+        "excerpt": {"rendered": f"<p>{excerpt}</p>"},
+        "categories": list(categories),
+    }
+
+
+def _mock_token_search(httpx_mock, token, posts):
+    httpx_mock.add_response(
+        url=(
+            f"{_API_BASE}/posts?per_page=100&orderby=date&order=desc"
+            f"&_fields=id%2Clink%2Cdate%2Cmodified%2Ctitle%2Cexcerpt%2Ccategories"
+            f"&search={token}&page=1"
+        ),
+        json=posts,
+        headers={"X-WP-TotalPages": "1"},
+    )
+
+
+@pytest.fixture(autouse=True)
+def _clear_pub_token_cache():
+    inec_client._pub_token_cache.clear()
+    yield
+    inec_client._pub_token_cache.clear()
+
+
 @pytest.mark.asyncio
-async def test_search_publicaciones_reports_total_and_resolves_categories(httpx_mock):
+async def test_search_publicaciones_empty_query_keeps_newest_first_listing(httpx_mock):
     _mock_categories(httpx_mock)
     httpx_mock.add_response(
         url=(
             f"{_API_BASE}/posts?per_page=5&offset=0&orderby=date&order=desc"
-            "&_fields=id%2Clink%2Cdate%2Cmodified%2Ctitle%2Ccategories&search=enemdu"
+            "&_fields=id%2Clink%2Cdate%2Cmodified%2Ctitle%2Ccategories"
         ),
         json=[
             {
@@ -362,7 +393,7 @@ async def test_search_publicaciones_reports_total_and_resolves_categories(httpx_
         headers={"X-WP-Total": "17"},
     )
 
-    result = await inec_client.search_publicaciones(query="enemdu", limit=5)
+    result = await inec_client.search_publicaciones(query="", limit=5)
 
     assert result["total"] == 17
     assert result["offset"] == 0
@@ -371,6 +402,88 @@ async def test_search_publicaciones_reports_total_and_resolves_categories(httpx_
     assert post["titulo"] == "Empleo Mayo 2026"
     assert post["fecha_publicacion"] == "2026-06-22"
     assert post["categorias"] == ["Economía Laboral"]
+
+
+@pytest.mark.asyncio
+async def test_search_publicaciones_short_token_matches_whole_words_only(httpx_mock):
+    _mock_categories(httpx_mock)
+    # WordPress's substring search returns everything containing "tic".
+    _mock_token_search(
+        httpx_mock,
+        "tic",
+        [
+            _wp_post(1, "Siniestros de Tránsito 2025", "2026-03-01", "Estadísticas de tránsito"),
+            _wp_post(2, "Encuesta Nacional de Desnutrición", "2026-02-01", "práctica clínica"),
+            _wp_post(3, "Tecnologías de la Información y Comunicación-TIC 2024", "2025-10-28"),
+            _wp_post(4, "Acceso a internet", "2025-05-01", "Indicadores TIC del hogar"),
+        ],
+    )
+
+    result = await inec_client.search_publicaciones(query="TIC")
+
+    assert result["total"] == 2
+    assert [p["id"] for p in result["publicaciones"]] == [3, 4]  # title hit first
+
+
+@pytest.mark.asyncio
+async def test_search_publicaciones_long_token_matches_word_prefix_ignoring_accents(httpx_mock):
+    _mock_categories(httpx_mock)
+    _mock_token_search(
+        httpx_mock,
+        "tecnolog",
+        [
+            _wp_post(1, "Tecnologías de la Información", "2025-10-28"),
+            _wp_post(2, "Metrotecnologia", "2025-10-01"),  # substring only
+        ],
+    )
+
+    result = await inec_client.search_publicaciones(query="TECNOLOG")
+
+    assert [p["id"] for p in result["publicaciones"]] == [1]
+
+
+@pytest.mark.asyncio
+async def test_search_publicaciones_ranks_by_tokens_matched_then_recency(httpx_mock):
+    _mock_categories(httpx_mock)
+    _mock_token_search(
+        httpx_mock,
+        "enemdu",
+        [
+            _wp_post(10, "ENEMDU IV Trimestre", "2026-04-27"),
+            _wp_post(11, "ENEMDU TIC 2024", "2025-10-28"),
+            _wp_post(12, "ENEMDU TIC anual", "2025-12-01"),
+        ],
+    )
+    _mock_token_search(
+        httpx_mock,
+        "tic",
+        [
+            _wp_post(11, "ENEMDU TIC 2024", "2025-10-28"),
+            _wp_post(12, "ENEMDU TIC anual", "2025-12-01"),
+            _wp_post(13, "Indicadores TIC", "2026-01-01"),
+        ],
+    )
+
+    result = await inec_client.search_publicaciones(query="ENEMDU TIC")
+
+    # Both tokens first (newer of them first), then single-token matches by recency.
+    assert [p["id"] for p in result["publicaciones"]] == [12, 11, 10, 13]
+    assert result["total"] == 4
+
+
+@pytest.mark.asyncio
+async def test_search_publicaciones_paginates_matched_set_and_offsets(httpx_mock):
+    _mock_categories(httpx_mock)
+    _mock_token_search(
+        httpx_mock,
+        "censo",
+        [_wp_post(i, f"Censo {i}", f"2025-01-{i:02d}") for i in range(1, 6)],
+    )
+
+    result = await inec_client.search_publicaciones(query="censo", limit=2, offset=1)
+
+    assert result["total"] == 5
+    assert [p["id"] for p in result["publicaciones"]] == [4, 3]
 
 
 @pytest.mark.asyncio

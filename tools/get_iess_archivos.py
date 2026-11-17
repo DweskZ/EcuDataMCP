@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import iess_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoArchivos
 from helpers.tool_meta import READ_ONLY
 
 _COLECCIONES = ("boletines", "estudios_actuariales", "informes_auditoria")
@@ -27,7 +28,7 @@ def register_get_iess_archivos_tool(mcp: MCPServer) -> None:
         anio: int | None = None,
         query: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoArchivos]:
         """
         List one IESS (Instituto Ecuatoriano de Seguridad Social) document
         collection's actual documents, each resolved to a direct download

@@ -30,9 +30,6 @@ from tools.get_compania_info import register_get_compania_info_tool
 from tools.get_contraloria_informe import register_get_contraloria_informe_tool
 from tools.get_contrato_info import register_get_contrato_info_tool
 from tools.get_dataset_info import register_get_dataset_info_tool
-from tools.get_energia_ecuador_snapshot import (
-    register_get_energia_ecuador_snapshot_tool,
-)
 from tools.get_financials import register_get_financials_tool
 from tools.get_iess_archivos import register_get_iess_archivos_tool
 from tools.get_indicador_bce import register_get_indicador_bce_tool
@@ -45,6 +42,7 @@ from tools.get_institucion_info import register_get_institucion_info_tool
 from tools.get_organization_info import register_get_organization_info_tool
 from tools.get_regulacion_info import register_get_regulacion_info_tool
 from tools.get_resource_info import register_get_resource_info_tool
+from tools.get_resumen_compras import register_get_resumen_compras_tool
 from tools.get_sgr_sitrep_archivos import register_get_sgr_sitrep_archivos_tool
 from tools.get_sipa_resumen_indicadores import (
     register_get_sipa_resumen_indicadores_tool,
@@ -66,6 +64,7 @@ from tools.preview_resource_data import register_preview_resource_data_tool
 from tools.query_resource_data import register_query_resource_data_tool
 from tools.query_sut_indicador import register_query_sut_indicador_tool
 from tools.read_pdf import register_read_pdf_tool
+from tools.read_zip_member import register_read_zip_member_tool
 from tools.search_anda import register_search_anda_tool
 from tools.search_archivos import register_search_archivos_tool
 from tools.search_auditores import register_search_auditores_tool
@@ -133,6 +132,7 @@ def register_tools(mcp: MCPServer) -> None:
     register_search_sri_ruc_tool(mcp)
     register_read_pdf_tool(mcp)
     register_list_zip_contents_tool(mcp)
+    register_read_zip_member_tool(mcp)
     register_investigate_dataset_tool(mcp)
 
     register_search_tramites_tool(mcp)
@@ -178,6 +178,7 @@ def register_tools(mcp: MCPServer) -> None:
 
     register_search_contratos_tool(mcp)
     register_get_contrato_info_tool(mcp)
+    register_get_resumen_compras_tool(mcp)
 
     register_search_indicadores_bce_tool(mcp)
     register_get_indicador_bce_tool(mcp)
@@ -190,7 +191,6 @@ def register_tools(mcp: MCPServer) -> None:
     register_get_cenace_boletin_tool(mcp)
     register_get_arconel_reporte_tool(mcp)
     register_cortes_tools(mcp)
-    register_get_energia_ecuador_snapshot_tool(mcp)
     register_archivo_secciones_tools(mcp)
     register_geoportal_tools(mcp)
     register_search_archivos_tool(mcp)

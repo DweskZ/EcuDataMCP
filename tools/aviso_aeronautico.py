@@ -4,7 +4,7 @@ METAR/SPECI weather, NOTAM and SIGMET were three tools over one site with
 the same raw-text-plus-fields shape; `tipo` now picks the notice.
 """
 
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -13,6 +13,7 @@ from mcp.types import CallToolResult
 from helpers import aviacion_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoFicha
 from helpers.tool_meta import READ_ONLY
 
 
@@ -79,7 +80,7 @@ def register_aviso_aeronautico_tool(mcp: MCPServer) -> None:
         tipo: Literal["metar", "notam", "sigmet"],
         designador: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoFicha]:
         """
         Fetch aeronautical notices from DGAC's IFIS site
         (ais.aviacioncivil.gob.ec), publicly queryable with no login.

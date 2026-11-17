@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import cepalstat_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoBusqueda
 from helpers.tool_meta import READ_ONLY
 
 
@@ -25,7 +26,7 @@ def register_search_cepalstat_indicadores_tool(mcp: MCPServer) -> None:
         query: str = "",
         lang: Literal["es", "en"] = "es",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         Search CEPALSTAT (CEPAL/ECLAC's public statistics API,
         api-cepalstat.cepal.org) for an indicator by name — 2,059

@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 import httpx
 from mcp.server.mcpserver import MCPServer
@@ -10,6 +10,7 @@ from helpers.csv_reader import run_parser_off_loop
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.pdf_reader import MAX_PAGES_PER_CALL, extract_text_from_bytes
+from helpers.result_types import ResultadoFicha
 from helpers.tool_meta import READ_ONLY
 
 
@@ -31,7 +32,7 @@ def register_get_informe_igepn_tool(mcp: MCPServer) -> None:
         anio: int = 0,
         pages: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoFicha]:
         """
         Download and extract text from one IG-EPN report found via
         search_informes_igepn. IG-EPN has no stable per-report URL (each

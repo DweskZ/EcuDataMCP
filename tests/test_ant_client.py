@@ -40,6 +40,7 @@ def clear_caches():
         ant_client._cache,
         inec_client._categories_cache,
         inec_client._publicacion_files_cache,
+        inec_client._pub_token_cache,
     ):
         cache.clear()
     yield

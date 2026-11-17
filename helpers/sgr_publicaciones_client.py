@@ -106,8 +106,8 @@ _BIBLIOTECA_URL = f"{_BASE}/biblioteca/"
 # event starts — infrequent. Biblioteca's category list is similarly
 # hand-maintained. Both get a long TTL, matching
 # helpers/bce_remesas_client.py / helpers/cnig_client.py's rationale.
-_sitrep_index_cache = TtlCache(ttl_seconds=21600.0, max_entries=1)
-_biblioteca_cache = TtlCache(ttl_seconds=21600.0, max_entries=1)
+_sitrep_index_cache = TtlCache(ttl_seconds=21600.0, max_entries=1, persist="sgr_sitrep_index")
+_biblioteca_cache = TtlCache(ttl_seconds=21600.0, max_entries=1, persist="sgr_biblioteca")
 # One active event's own page (e.g. "Época Lluviosa 2026") can gain a new
 # SITREP every few days while it's EN CURSO -- a much shorter TTL than the
 # index, keyed per event URL since many event pages can be requested.
@@ -196,6 +196,17 @@ def _parse_sitrep_index(html: str) -> list[dict[str, Any]]:
 
 
 async def _fetch_sitrep_index() -> list[dict[str, Any]]:
+    """Fresh fetch, or the last good copy when the source fails (see TtlCache.serve_stale)."""
+    try:
+        return await _fetch_sitrep_index_fresh()
+    except Exception as exc:
+        stale = _sitrep_index_cache.serve_stale("eventos", exc)
+        if stale is None:
+            raise
+        return stale
+
+
+async def _fetch_sitrep_index_fresh() -> list[dict[str, Any]]:
     cached = _sitrep_index_cache.get("eventos")
     if cached is not None:
         return cached
@@ -446,6 +457,17 @@ def _categoria_archivos(html: str, categoria: dict[str, Any]) -> list[dict[str, 
 
 
 async def _fetch_biblioteca_html() -> str:
+    """Fresh fetch, or the last good copy when the source fails (see TtlCache.serve_stale)."""
+    try:
+        return await _fetch_biblioteca_html_fresh()
+    except Exception as exc:
+        stale = _biblioteca_cache.serve_stale("html", exc)
+        if stale is None:
+            raise
+        return stale
+
+
+async def _fetch_biblioteca_html_fresh() -> str:
     cached = _biblioteca_cache.get("html")
     if cached is not None:
         return cached

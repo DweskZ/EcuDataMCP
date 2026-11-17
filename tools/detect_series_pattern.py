@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Literal
+from typing import Annotated, Literal
 
 import httpx
 from mcp.server.mcpserver import MCPServer
@@ -12,6 +12,7 @@ from helpers.format_out import render_structured
 from helpers.geo_proxy import proxy_for
 from helpers.logging import log_tool
 from helpers.preview_dispatch import preview_by_kind
+from helpers.result_types import ResultadoFicha
 from helpers.text_utils import strip_accents
 from helpers.tool_meta import READ_ONLY
 from helpers.user_agent import USER_AGENT
@@ -198,7 +199,7 @@ def register_detect_series_pattern_tool(mcp: MCPServer) -> None:
         resource_id_old: str | None = None,
         source: ckan_client.CkanSource = "nacional",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoFicha]:
         """
         Tell whether a dataset's periodic files (one per week/month/etc) replace
         each other (cumulative -- only the newest file matters) or complement

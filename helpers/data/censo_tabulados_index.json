@@ -1,0 +1,5270 @@
+{
+ "version": 1,
+ "generado": "2026-11-09",
+ "fuente": "https://www.censoecuador.gob.ec/resultados-censo/",
+ "max_mb": 25,
+ "omitidos": [],
+ "archivos": [
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2024/04/01_2022_CPV_Estructura_poblacional.xlsx",
+   "label": "Estructura poblacional – Excel",
+   "tema": "poblacion",
+   "formato": "XLSX",
+   "bytes": 1498977,
+   "sha256": "7e7d0d5ad13b8c5ec93bfacce5bc518984e591ce1b3f3abe2095326ea6bbafcd",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia",
+    "cantón",
+    "parroquia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Población por sexo al nacer, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Población por sexo al nacer, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "1.2",
+     "titulo": "Población por sexo al nacer según provincia, cantón y parroquia de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Población por sexo al nacer, según provincia de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "2.1",
+     "titulo": "Población por sexo al nacer, según provincia, cantón, parroquia de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Población por sexo al nacer, según provincia de residencia y edades simples",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "4",
+     "titulo": "Densidad poblacional, según provincia de residencia",
+     "niveles": [
+      "provincia"
+     ]
+    },
+    {
+     "hoja": "4.1",
+     "titulo": "Densidad poblacional, según cantón de residencia",
+     "niveles": [
+      "cantón"
+     ]
+    },
+    {
+     "hoja": "4.2",
+     "titulo": "Densidad poblacional según parroquia de residencia",
+     "niveles": [
+      "parroquia"
+     ]
+    },
+    {
+     "hoja": "5",
+     "titulo": "Tasa de crecimiento promedio anual 2010-2022, según provincia de residencia",
+     "niveles": [
+      "provincia"
+     ]
+    },
+    {
+     "hoja": "5.1",
+     "titulo": "Tasa de crecimiento promedio anual 2010-2022, según cantón de residencia",
+     "niveles": [
+      "cantón"
+     ]
+    },
+    {
+     "hoja": "5.2",
+     "titulo": "Tasa de crecimiento promedio anual 2010-2022, según parroquia de residencia",
+     "niveles": [
+      "parroquia"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2023/12/03_2022_CPV_Estado_conyugal.xlsx",
+   "label": "Estado conyugal – Excel",
+   "tema": "poblacion",
+   "formato": "XLSX",
+   "bytes": 982915,
+   "sha256": "83e204d07e1cf96fa00517869177ea4f4d029e44c78bc6073361009688826a4b",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia",
+    "cantón",
+    "parroquia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Población de 12 años o más por estado conyugal, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Estado conyugal",
+      "Unida/o",
+      "Separada/o",
+      "Divorciada/o",
+      "Viuda/o",
+      "Casada/o",
+      "Soltera/o"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Población de 12 años o más por estado conyugal, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Estado conyugal",
+      "Unida/o",
+      "Separada/o",
+      "Divorciada/o",
+      "Viuda/o",
+      "Casada/o",
+      "Soltera/o"
+     ]
+    },
+    {
+     "hoja": "1.2",
+     "titulo": "Población de 12 años o más por estado conyugal y sexo al nacer, según provincia, cantón y parroquia de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Estado conyugal",
+      "Unida/o",
+      "Separada/o",
+      "Divorciada/o",
+      "Viuda/o",
+      "Casada/o",
+      "Soltera/o",
+      "Sexo al nacer",
+      "Hombres"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Población de 12 años o más por estado conyugal y sexo al nacer, según provincia de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Estado conyugal",
+      "Unida/o",
+      "Separada/o",
+      "Divorciada/o",
+      "Viuda/o",
+      "Casada/o",
+      "Soltera/o",
+      "Sexo al nacer",
+      "Hombres"
+     ]
+    },
+    {
+     "hoja": "2.1",
+     "titulo": "Población de 12 años o más por estado conyugal y sexo al nacer, según provincia, cantón de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Estado conyugal",
+      "Unida/o",
+      "Separada/o",
+      "Divorciada/o",
+      "Viuda/o",
+      "Casada/o",
+      "Soltera/o",
+      "Sexo al nacer",
+      "Hombres"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2024/02/2022_CPV_Autoidentificacion_Cultura.xlsx",
+   "label": "Etnia – Excel",
+   "tema": "poblacion",
+   "formato": "XLSX",
+   "bytes": 6079434,
+   "sha256": "6c8ad99ef98e71e09977708f49b262bff1b00e2f65b4cc6fe67ae4c319ef3a7e",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "nacional",
+    "provincia",
+    "cantón",
+    "parroquia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Población por autoidentificación según cultura y costumbres, según provincia, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Autoidentificación según cultura y costumbres",
+      "Indigena",
+      "Afroecuatoriano/a o Afrodescendiente",
+      "Negra/o",
+      "Mulata/o",
+      "Montubia/o",
+      "Mestiza/o",
+      "Blanca/o",
+      "Otro"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Población por autoidentificación según cultura y costumbres, según provincia, cantón, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Autoidentificación según cultura y costumbres",
+      "Indigena",
+      "Afroecuatoriano/a o Afrodescendiente",
+      "Negra/o",
+      "Mulata/o",
+      "Montubia/o",
+      "Mestiza/o",
+      "Blanca/o",
+      "Otro"
+     ]
+    },
+    {
+     "hoja": "1.2",
+     "titulo": "Población por autoidentificación según cultura y costumbres, según provincia, cantón, parroquia de residencia y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Autoidentificación según cultura y costumbres",
+      "Indigena",
+      "Afroecuatoriano/a o Afrodescendiente",
+      "Negra/o",
+      "Mulata/o",
+      "Montubia/o",
+      "Mestiza/o",
+      "Blanca/o",
+      "Otro"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Población por autoidentificación según cultura y costumbres, según provincia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Autoidentificación según cultura y costumbres",
+      "Indigena",
+      "Afroecuatoriano/a o Afrodescendiente",
+      "Negra/o",
+      "Mulata/o",
+      "Montubia/o",
+      "Mestiza/o",
+      "Blanca/o",
+      "Otro"
+     ]
+    },
+    {
+     "hoja": "2.1",
+     "titulo": "Población por autoidentificación según cultura y costumbres, según provincia, cantón, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Autoidentificación según cultura y costumbres",
+      "Indigena",
+      "Afroecuatoriano/a o Afrodescendiente",
+      "Negra/o",
+      "Mulata/o",
+      "Montubia/o",
+      "Mestiza/o",
+      "Blanca/o",
+      "Otro"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Población indígena por sexo al nacer, según provincia de residencia y nacionalidad o pueblo indígena al que pertenece",
+     "niveles": [
+      "nacional",
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas que se autoidentificaron como indígenas",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "4",
+     "titulo": "Población indígena por sexo al nacer, según nacionalidad o pueblo indígena al que pertenece y grupos quinquenales de edad",
+     "niveles": [
+      "nacional",
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas que se autoidentificaron como indígenas",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "5",
+     "titulo": "Población de 1 año o más por número de idiomas o lenguas que habla, según provincia, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas de 1 año o más",
+      "Número de idiomas o lenguas que habla o se comunica",
+      "Solo idioma o lengua indígena",
+      "Solo castellano o español",
+      "Solo idioma extranjero",
+      "Solo Lengua de señas ecuatoriana",
+      "Idioma o lengua indígena y castellano o español",
+      "Idioma o lengua indígena e idioma extranjero",
+      "Idioma o lengua indígena y lengua de señas ecuatoriana",
+      "Castellano o español e idioma extranjero"
+     ]
+    },
+    {
+     "hoja": "5.1",
+     "titulo": "Población de 1 año o más por número de idiomas o lenguas que habla, según provincia, cantón, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas de 1 año o más",
+      "Número de idiomas o lenguas que habla o se comunica",
+      "Solo idioma o lengua indígena",
+      "Solo castellano o español",
+      "Solo idioma extranjero",
+      "Solo Lengua de señas ecuatoriana",
+      "Idioma o lengua indígena y castellano o español",
+      "Idioma o lengua indígena e idioma extranjero",
+      "Idioma o lengua indígena y lengua de señas ecuatoriana",
+      "Castellano o español e idioma extranjero"
+     ]
+    },
+    {
+     "hoja": "6",
+     "titulo": "Población de 1 año o más por autoidentificación según cultura y costumbres y número de idiomas o lenguas que habla, según provincia de residencia, sexo y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas de 1 año o más",
+      "Número de idiomas o lenguas que habla o se comunica",
+      "Solo idioma o lengua indígena",
+      "Solo castellano o español",
+      "Solo idioma extranjero",
+      "Solo Lengua de señas ecuatoriana",
+      "Idioma o lengua indígena y castellano o español",
+      "Idioma o lengua indígena e idioma extranjero",
+      "Idioma o lengua indígena y lengua de señas ecuatoriana",
+      "Castellano o español e idioma extranjero"
+     ]
+    },
+    {
+     "hoja": "6.1",
+     "titulo": "Población de 1 año o más por autoidentificación según cultura y costumbres y número de idiomas o lenguas que habla, según provincia, cantón de residencia, sexo y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas de 1 año o más",
+      "Número de idiomas o lenguas que habla o se comunica",
+      "Solo idioma o lengua indígena",
+      "Solo castellano o español",
+      "Solo idioma extranjero",
+      "Solo Lengua de señas ecuatoriana",
+      "Idioma o lengua indígena y castellano o español",
+      "Idioma o lengua indígena e idioma extranjero",
+      "Idioma o lengua indígena y lengua de señas ecuatoriana",
+      "Castellano o español e idioma extranjero"
+     ]
+    },
+    {
+     "hoja": "7",
+     "titulo": "Población de 1 año o más por idioma o lengua que habla, según provincia, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Idiomas o lenguas que habla o se comunica*",
+      "Idioma o lengua indígena",
+      "Castellano o Español",
+      "Idioma extranjero",
+      "Lengua de señas ecuatoriana",
+      "No habla/No se comunica"
+     ]
+    },
+    {
+     "hoja": "7.1",
+     "titulo": "Población de 1 año o más por idioma o lengua que habla, según provincia, cantón, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Idiomas o lenguas que habla o se comunica*",
+      "Idioma o lengua indígena",
+      "Castellano o Español",
+      "Idioma extranjero",
+      "Lengua de señas ecuatoriana",
+      "No habla/No se comunica"
+     ]
+    },
+    {
+     "hoja": "8",
+     "titulo": "Población de 1 año o más por idioma o lengua que habla, según provincia de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Idiomas o lenguas que habla o se comunica*",
+      "Idioma o lengua indígena",
+      "Castellano o Español",
+      "Idioma extranjero",
+      "Lengua de señas ecuatoriana",
+      "No habla/No se comunica"
+     ]
+    },
+    {
+     "hoja": "8.1",
+     "titulo": "Población de 1 año o más por idioma o lengua que habla, según provincia, cantón de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Idiomas o lenguas que habla o se comunica*",
+      "Idioma o lengua indígena",
+      "Castellano o Español",
+      "Idioma extranjero",
+      "Lengua de señas ecuatoriana",
+      "No habla/No se comunica"
+     ]
+    },
+    {
+     "hoja": "9",
+     "titulo": "Población de 1 año o más por idioma o lengua que habla, según provincia de residencia, habla de lengua indígena de la mamá y el papá y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Idiomas o lenguas que habla o se comunica*",
+      "Idioma o lengua indígena",
+      "Castellano o Español",
+      "Idioma extranjero",
+      "Lengua de señas ecuatoriana",
+      "No habla/No se comunica"
+     ]
+    },
+    {
+     "hoja": "10",
+     "titulo": "Población de 1 año o más que hablan idioma o lengua indígena por idioma o lengua indígena que habla, según provincia de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas de 1 año o más que hablan idioma o lengua indígena",
+      "Idioma o lengua indígena que habla",
+      "A´Ingae",
+      "Achuar Chicham",
+      "Andwa Pukwano",
+      "Awapit",
+      "Bai Coca",
+      "Chaa´palaa",
+      "Kichwa",
+      "Otras Lenguas Indigenas"
+     ]
+    },
+    {
+     "hoja": "10.1",
+     "titulo": "Población de 1 año o más que hablan idioma o lengua indígena por idioma o lengua indígena que habla, según provincia, cantón de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas de 1 año o más que hablan idioma o lengua indígena",
+      "Idioma o lengua indígena que habla",
+      "A´Ingae",
+      "Achuar Chicham",
+      "Andwa Pukwano",
+      "Awapit",
+      "Bai Coca",
+      "Chaa´palaa",
+      "Kichwa",
+      "Otras Lenguas Indigenas"
+     ]
+    },
+    {
+     "hoja": "11",
+     "titulo": "Población indígena de 1 año o más que hablan idioma o lengua indígena por idioma o lengua indígena que habla, según provincia de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas de 1 año o más que hablan idioma o lengua indígena",
+      "Idioma o lengua indígena que habla",
+      "A´Ingae",
+      "Achuar Chicham",
+      "Andwa Pukwano",
+      "Awapit",
+      "Bai Coca",
+      "Chaa´palaa",
+      "Kichwa",
+      "Otras Lenguas Indigenas"
+     ]
+    },
+    {
+     "hoja": "11.1",
+     "titulo": "Población indígena de 1 año o más que hablan idioma o lengua indígena por idioma o lengua indígena que habla, según provincia, cantón de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas de 1 año o más que hablan idioma o lengua indígena",
+      "Idioma o lengua indígena que habla",
+      "A´Ingae",
+      "Achuar Chicham",
+      "Andwa Pukwano",
+      "Awapit",
+      "Bai Coca",
+      "Chaa´palaa",
+      "Kichwa",
+      "Otras Lenguas Indigenas"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2024/02/2022_CPV_Migracion.xlsx",
+   "label": "Migración – Excel",
+   "tema": "poblacion",
+   "formato": "XLSX",
+   "bytes": 6832840,
+   "sha256": "9c49f5a6303294b32714e6732a80500299246283282d248628d45eb61a9e233d",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia",
+    "cantón",
+    "parroquia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Población por lugar de nacimiento y sexo al nacer, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Lugar de nacimiento",
+      "En esta cuidad o parroquia rural",
+      "En otro lugar del país",
+      "En otro país",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas que nacieron en esta ciudad o parroquia rural",
+      "Número total de personas que nacieron en otro lugar del país"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Población por lugar de nacimiento y sexo al nacer, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Lugar de nacimiento",
+      "En esta cuidad o parroquia rural",
+      "En otro lugar del país",
+      "En otro país",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas que nacieron en esta ciudad o parroquia rural",
+      "Número total de personas que nacieron en otro lugar del país"
+     ]
+    },
+    {
+     "hoja": "1.2",
+     "titulo": "Población por lugar de nacimiento y sexo al nacer, según provincia, cantón y parroquia de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Lugar de nacimiento",
+      "En esta cuidad o parroquia rural",
+      "En otro lugar del país",
+      "En otro país",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas que nacieron en esta ciudad o parroquia rural",
+      "Número total de personas que nacieron en otro lugar del país"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Población por lugar de nacimiento y sexo al nacer, según provincia, área de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Lugar de nacimiento",
+      "En esta cuidad o parroquia rural",
+      "En otro lugar del país",
+      "En otro país",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas que nacieron en otro lugar del país",
+      "Número total de personas que nacieron en otro país"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Población de 5 años o más por lugar de residencia 5 años antes del censo y sexo al nacer, según provincia y área de residencia actual",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número de personas de 5 años o más",
+      "Lugar de residencia hace 5 años",
+      "En esta cuidad o parroquia rural",
+      "En otro lugar del país",
+      "En otro país",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número de personas de 5 años o más que residían en esta ciudad o parroquia rural hace 5 años",
+      "Número de personas de 5 años o más que residían en otro lugar del país hace 5 años"
+     ]
+    },
+    {
+     "hoja": "3.1",
+     "titulo": "Población de 5 años o más por lugar de residencia 5 años antes del censo y sexo al nacer, según provincia, cantón y área de residencia actual",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número de personas de 5 años o más",
+      "Lugar de residencia hace 5 años",
+      "En esta cuidad o parroquia rural",
+      "En otro lugar del país",
+      "En otro país",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número de personas de 5 años o más que residían en esta ciudad o parroquia rural hace 5 años",
+      "Número de personas de 5 años o más que residían en otro lugar del país hace 5 años"
+     ]
+    },
+    {
+     "hoja": "3.2",
+     "titulo": "Población de 5 años o más por lugar de residencia 5 años antes del censo y sexo al nacer, según provincia, cantón y parroquia de residencia actual",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número de personas de 5 años o más",
+      "Lugar de residencia hace 5 años",
+      "En esta cuidad o parroquia rural",
+      "En otro lugar del país",
+      "En otro país",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número de personas de 5 años o más que residían en esta ciudad o parroquia rural hace 5 años",
+      "Número de personas de 5 años o más que residían en otro lugar del país hace 5 años"
+     ]
+    },
+    {
+     "hoja": "4",
+     "titulo": "Población de 5 años o más por lugar de residencia 5 años antes del censo y sexo al nacer, según provincia, área de residencia actual y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número de personas de 5 años o más",
+      "Lugar de residencia hace 5 años",
+      "En esta cuidad o parroquia rural",
+      "En otro lugar del país",
+      "En otro país",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número de personas de 5 años o más que residían en esta ciudad o parroquia rural hace 5 años",
+      "Número de personas de 5 años o más que residían en otro lugar del país hace 5 años"
+     ]
+    },
+    {
+     "hoja": "5",
+     "titulo": "Población nacida y residente en el país por provincia de nacimiento, según provincia de residencia actual y sexo al nacer",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número de personas nacidas y residentes en el país",
+      "Provincia de nacimiento",
+      "Azuay",
+      "Bolívar",
+      "Cañar",
+      "Carchi",
+      "Cotopaxi",
+      "Chimborazo",
+      "El Oro",
+      "Esmeraldas"
+     ]
+    },
+    {
+     "hoja": "6",
+     "titulo": "Población de 5 años o más por provincia de residencia 5 años antes del censo, según provincia de residencia actual y sexo al nacer",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número de personas de 5 años o más",
+      "Provincia de residencia hace 5 años",
+      "Azuay",
+      "Bolívar",
+      "Cañar",
+      "Carchi",
+      "Cotopaxi",
+      "Chimborazo",
+      "El Oro",
+      "Esmeraldas"
+     ]
+    },
+    {
+     "hoja": "7",
+     "titulo": "Población nacida en el extranjero por país de nacimiento, según provincia, área de origen y año de entrada al país",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número de personas residentes en Ecuador y nacidas en otro país",
+      "País de nacimiento",
+      "Afganistan",
+      "Albania",
+      "Alemania",
+      "Andorra",
+      "Angola",
+      "Anguila",
+      "Antigua y Barbuda",
+      "Antillas Neerlandesas (Antillas Holandesas)"
+     ]
+    },
+    {
+     "hoja": "8",
+     "titulo": "Población nacida en el extranjero por país de nacimiento, según provincia de residencia actual y sexo al nacer",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número de personas residentes en Ecuador y nacidas en otro país",
+      "País de nacimiento",
+      "Afganistan",
+      "Albania",
+      "Alemania",
+      "Andorra",
+      "Angola",
+      "Anguila",
+      "Antigua y Barbuda",
+      "Antillas Neerlandesas (Antillas Holandesas)"
+     ]
+    },
+    {
+     "hoja": "9",
+     "titulo": "Población emigrante a partir de noviembre del año 2010 por sexo, según provincia, área de origen y grupos quinquenales de edad al salir del país",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de emigrantes",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "9.1",
+     "titulo": "Población emigrante a partir de noviembre del año 2010 por sexo, según cantón, área de origen y grupos quinquenales de edad al salir del país",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de emigrantes",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "10",
+     "titulo": "Población emigrante a partir de noviembre del año 2010 por país actual de residencia, según provincia, área de origen y año de salida del país",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de emigrantes",
+      "País de residencia actual",
+      "Afganistan",
+      "Albania",
+      "Alemania",
+      "Andorra",
+      "Angola",
+      "Anguila",
+      "Antigua y Barbuda",
+      "Antillas Neerlandesas (Antillas Holandesas)"
+     ]
+    },
+    {
+     "hoja": "10.1",
+     "titulo": "Población emigrante a partir de noviembre del año 2010 por país actual de residencia, según provincia, cantón, área de origen y año de salida del país",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de emigrantes",
+      "País de residencia actual",
+      "Afganistan",
+      "Albania",
+      "Alemania",
+      "Andorra",
+      "Angola",
+      "Anguila",
+      "Antigua y Barbuda",
+      "Antillas Neerlandesas (Antillas Holandesas)"
+     ]
+    },
+    {
+     "hoja": "11",
+     "titulo": "Hogares por existencia y número de miembros del hogar que emigraron a otro país a partir del año 2010, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Existencia de miembros del hogar que emigraron a otro país",
+      "Si",
+      "No",
+      "No sabe/No responde",
+      "Número de miembros del hogar que emigraron a otro país a partir del 2010",
+      "1 persona",
+      "2 personas",
+      "3 personas",
+      "4 personas"
+     ]
+    },
+    {
+     "hoja": "11.1",
+     "titulo": "Hogares por existencia y número de miembros del hogar que emigraron a otro país a partir del año 2010, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Existencia de miembros del hogar que emigraron a otro país",
+      "Si",
+      "No",
+      "No sabe/No responde",
+      "Número de miembros del hogar que emigraron a otro país a partir del 2010",
+      "1 persona",
+      "2 personas",
+      "3 personas",
+      "4 personas"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2024/04/2022_CPV_Educacion.xlsx",
+   "label": "Educación – Excel",
+   "tema": "poblacion",
+   "formato": "XLSX",
+   "bytes": 8928475,
+   "sha256": "dbf390b6b21d6588a68e94d5c45c79098a4e686b5ad9a0978113e56fd7241967",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia",
+    "cantón",
+    "parroquia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Población por asistencia a un establecimiento de enseñanza regular o formal y sexo al nacer, según provincia, área de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Asistencia a un establecimiento de enseñanza regular o formal",
+      "Sí",
+      "No",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas que asisten a un establecimiento de enseñanza regular o formal",
+      "Número total de personas que no asisten a un establecimiento de enseñanza regular o formal"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Población por asistencia a un establecimiento de enseñanza regular o formal y sexo al nacer, según provincia, cantón, área de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Asistencia a un establecimiento de enseñanza regular o formal",
+      "Sí",
+      "No",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas que asisten a un establecimiento de enseñanza regular o formal",
+      "Número total de personas que no asisten a un establecimiento de enseñanza regular o formal"
+     ]
+    },
+    {
+     "hoja": "1.2",
+     "titulo": "Población por asistencia a un establecimiento de enseñanza regular o formal y sexo al nacer, según provincia, cantón, parroquia de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Asistencia a un establecimiento de enseñanza regular o formal",
+      "Sí",
+      "No",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas que asisten a un establecimiento de enseñanza regular o formal",
+      "Número total de personas que no asisten a un establecimiento de enseñanza regular o formal"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Población de 5 a 29 años, por asistencia a un establecimiento de enseñanza regular o formal y sexo al nacer, según provincia de residencia y edades simples",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Asistencia a la educación regular o formal",
+      "Sí",
+      "No",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas que asisten a un establecimiento de enseñanza regular o formal",
+      "Número total de personas que no asisten a un establecimiento de enseñanza regular o formal"
+     ]
+    },
+    {
+     "hoja": "2.1",
+     "titulo": "Población de 5 a 29 años, por asistencia a un establecimiento de enseñanza regular o formal y sexo al nacer, según provincia, cantón de residencia y edades simples",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Asistencia a la educación regular o formal",
+      "Sí",
+      "No",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas que asisten a un establecimiento de enseñanza regular o formal",
+      "Número total de personas que no asisten a un establecimiento de enseñanza regular o formal"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Población por nivel de instrucción al que asiste o asistió y años aprobados, según provincia, área de residencia y condición de asistencia a un establecimiento de enseñanza regular o formal",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Ninguno",
+      "Centro de Desarrollo Infantil/Creciendo con nuestros hijos/Guardería",
+      "Educación inicial",
+      "Alfabetización",
+      "Educación General Básica",
+      "Bachillerato",
+      "Ciclo Posbachillerato (No superior)",
+      "Educación Técnica o Tecnológica Superior (Institutos superiores técnicos y tecnológicos)",
+      "Educación Superior (universidades, escuelas politécnicas)"
+     ]
+    },
+    {
+     "hoja": "3.1",
+     "titulo": "Población por nivel de instrucción al que asiste o asistió y años aprobados, según provincia, cantón, área de residencia y condición de asistencia a un establecimiento de enseñanza regular o formal",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Ninguno",
+      "Centro de Desarrollo Infantil/Creciendo con nuestros hijos/Guardería",
+      "Educación inicial",
+      "Alfabetización",
+      "Educación General Básica",
+      "Bachillerato",
+      "Ciclo Posbachillerato (No superior)",
+      "Educación Técnica o Tecnológica Superior (Institutos superiores técnicos y tecnológicos",
+      "Educación Técnica o Tecnológica Superior (Institutos superiores técnicos y tecnológicos)"
+     ]
+    },
+    {
+     "hoja": "3.2",
+     "titulo": "Población por nivel de instrucción al que asiste o asistió y años aprobados, según provincia, cantón, parroquia de residencia y condición de asistencia a un establecimiento de enseñanza regular o formal",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Ninguno",
+      "Centro de Desarrollo Infantil/Creciendo con nuestros hijos/Guardería",
+      "Educación inicial",
+      "Alfabetización",
+      "Educación General Básica",
+      "Bachillerato",
+      "Ciclo Posbachillerato (No superior)",
+      "Educación Técnica o Tecnológica Superior (Institutos superiores técnicos y tecnológicos",
+      "Educación Técnica o Tecnológica Superior (Institutos superiores técnicos y tecnológicos)"
+     ]
+    },
+    {
+     "hoja": "4",
+     "titulo": "Población por nivel de instrucción al que asiste o asistió y años aprobados, según provincia de residencia, condición de asistencia a un establecimiento de enseñanza regular o formal y sexo al nacer",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Ninguno",
+      "Centro de Desarrollo Infantil/Creciendo con nuestros hijos/Guardería",
+      "Educación inicial",
+      "Alfabetización",
+      "Educación General Básica",
+      "Bachillerato",
+      "Ciclo Posbachillerato (No superior)",
+      "Educación Técnica o Tecnológica Superior (Institutos superiores técnicos y tecnológicos)",
+      "Educación Superior (universidades, escuelas politécnicas)"
+     ]
+    },
+    {
+     "hoja": "4.1",
+     "titulo": "Población por nivel de instrucción al que asiste o asistió y años aprobados, según provincia, cantón de residencia, condición de asistencia a un establecimiento de enseñanza regular o formal y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Ninguno",
+      "Centro de Desarrollo Infantil/Creciendo con nuestros hijos/Guardería",
+      "Educación inicial",
+      "Alfabetización",
+      "Educación General Básica",
+      "Bachillerato",
+      "Ciclo Posbachillerato (No superior)",
+      "Educación Técnica o Tecnológica Superior (Institutos superiores técnicos y tecnológicos)",
+      "Educación Superior (universidades, escuelas politécnicas)"
+     ]
+    },
+    {
+     "hoja": "5",
+     "titulo": "Población por nivel de instrucción al que asiste o asistió y años aprobados, según provincia de residencia, condición de asistencia a un establecimiento de enseñanza regular o formal y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Ninguno",
+      "Centro de Desarrollo Infantil/Creciendo con nuestros hijos/Guardería",
+      "Educación inicial",
+      "Alfabetización",
+      "Educación General Básica",
+      "Bachillerato",
+      "Ciclo Posbachillerato (No superior)",
+      "Educación Técnica o Tecnológica Superior (Institutos superiores técnicos y tecnológicos)",
+      "Educación Superior (universidades, escuelas politécnicas)"
+     ]
+    },
+    {
+     "hoja": "5.1",
+     "titulo": "Población por nivel de instrucción al que asiste o asistió y años aprobados, según provincia, cantón de residencia, condición de asistencia a un establecimiento de enseñanza regular o formal y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Ninguno",
+      "Centro de Desarrollo Infantil/Creciendo con nuestros hijos/Guardería",
+      "Educación inicial",
+      "Alfabetización",
+      "Educación General Básica",
+      "Bachillerato",
+      "Ciclo Posbachillerato (No superior)",
+      "Educación Técnica o Tecnológica Superior (Institutos superiores técnicos y tecnológicos)",
+      "Educación Superior (universidades, escuelas politécnicas)"
+     ]
+    },
+    {
+     "hoja": "6",
+     "titulo": "Población de 15 años o más por condición de analfabetismo y sexo al nacer, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas de 15 años o más",
+      "Condición de analfabetismo",
+      "Alfabeta",
+      "Analfabeta",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas alfabetas",
+      "Número total de personas analfabetas"
+     ]
+    },
+    {
+     "hoja": "6.1",
+     "titulo": "Población de 15 años o más por condición de analfabetismo y sexo al nacer, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas de 15 años o más",
+      "Condición de analfabetismo",
+      "Alfabeta",
+      "Analfabeta",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas alfabetas",
+      "Número total de personas analfabetas"
+     ]
+    },
+    {
+     "hoja": "6.2",
+     "titulo": "Población de 15 años o más por condición de analfabetismo y sexo al nacer, según provincia, cantón, parroquia y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas de 15 años o más",
+      "Condición de analfabetismo",
+      "Alfabeta",
+      "Analfabeta",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas alfabetas",
+      "Número total de personas analfabetas"
+     ]
+    },
+    {
+     "hoja": "7",
+     "titulo": "Población de 15 años o más por condición de analfabetismo y sexo al nacer, según provincia de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas de 15 años o más",
+      "Condición de analfabetismo",
+      "Alfabeta",
+      "Analfabeta",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas alfabetas",
+      "Número total de personas analfabetas"
+     ]
+    },
+    {
+     "hoja": "7.1",
+     "titulo": "Población de 15 años o más por condición de analfabetismo y sexo al nacer, según provincia, cantón de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas de 15 años o más",
+      "Condición de analfabetismo",
+      "Alfabeta",
+      "Analfabeta",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas alfabetas",
+      "Número total de personas analfabetas"
+     ]
+    },
+    {
+     "hoja": "8",
+     "titulo": "Población de 24 años o más por tenencia de título en ciclo postbachillerato, educación técnica o tecnológica superior, educación superior, maestría/postgrado, PHD/Doctorado y sexo al nacer, según provincia de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas de 24 años o más",
+      "Tenencia de título en ciclo postbachillerato, Educación Técnica o Tecnológica, Educación Superior, Maestría/posgrado, PHD/Doctorado",
+      "Sí",
+      "No",
+      "No sabe/no responde",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas que tienen título",
+      "Número total de personas que no tienen título"
+     ]
+    },
+    {
+     "hoja": "8.1",
+     "titulo": "Población de 24 años o más por tenencia de título en ciclo postbachillerato, educación técnica o tecnológica superior, educación superior, maestría/postgrado, PHD/Doctorado y sexo al nacer,según provincia, cantón de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas de 24 años o más",
+      "Tenencia de título en ciclo postbachillerato, Educación Técnica o Tecnológica, Educación Superior, Maestría/posgrado, PHD/Doctorado",
+      "Sí",
+      "No",
+      "No sabe/no responde",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas que tienen título",
+      "Número total de personas que no tienen título"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2024/04/2022_CPV_Trabajo.xlsx",
+   "label": "Trabajo – Excel",
+   "tema": "poblacion",
+   "formato": "XLSX",
+   "bytes": 6801475,
+   "sha256": "ab5cb4a3c5be9bdfadffb6f4f9205fc4493df9e9b3d3f0a78fa4547561bf3a33",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia",
+    "cantón",
+    "parroquia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Población de 5 años o más por actividad realizada la semana pasada, según provincia, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas de 5 años o más",
+      "La semana pasada (…):",
+      "Trabajó al menos una hora para generar un ingreso?",
+      "Realizó algún trabajo ocasional (cachuelo o chaucha) por un pago?",
+      "Atendió un negocio propio?",
+      "Ayudó en algún negocio o empleo de algún miembro de su hogar?",
+      "No trabajó, pero SI tiene un trabajo al que seguro va a volver? (por vacaciones, enfermedad, etc.)",
+      "Hizo o ayudó en labores agrícolas, cría de animales o pesca?",
+      "No trabajó"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Población de 5 años o más por actividad realizada la semana pasada, según provincia, cantón, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas de 5 años o más",
+      "La semana pasada (…):",
+      "Trabajó al menos una hora para generar un ingreso?",
+      "Realizó algún trabajo ocasional (cachuelo o chaucha) por un pago?",
+      "Atendió un negocio propio?",
+      "Ayudó en algún negocio o empleo de algún miembro de su hogar?",
+      "No trabajó, pero SI tiene un trabajo al que seguro va a volver? (por vacaciones, enfermedad, etc.)",
+      "Hizo o ayudó en labores agrícolas, cría de animales o pesca?",
+      "No trabajó"
+     ]
+    },
+    {
+     "hoja": "1.2",
+     "titulo": "Población de 5 años o más por actividad realizada la semana pasada, según provincia, cantón, parroquia de residencia y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas de 5 años o más",
+      "La semana pasada (…):",
+      "Trabajó al menos una hora para generar un ingreso?",
+      "Realizó algún trabajo ocasional (cachuelo o chaucha) por un pago?",
+      "Atendió un negocio propio?",
+      "Ayudó en algún negocio o empleo de algún miembro de su hogar?",
+      "No trabajó, pero SI tiene un trabajo al que seguro va a volver? (por vacaciones, enfermedad, etc.)",
+      "Hizo o ayudó en labores agrícolas, cría de animales o pesca?",
+      "No trabajó"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Población de 5 años o más por actividad realizada la semana pasada, según provincia de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas de 5 años o más",
+      "La semana pasada (…):",
+      "Trabajó al menos una hora para generar un ingreso?",
+      "Realizó algún trabajo ocasional (cachuelo o chaucha) por un pago?",
+      "Atendió un negocio propio?",
+      "Ayudó en algún negocio o empleo de algún miembro de su hogar?",
+      "No trabajó, pero SI tiene un trabajo al que seguro va a volver? (por vacaciones, enfermedad, etc.)",
+      "Hizo o ayudó en labores agrícolas, cría de animales o pesca?",
+      "No trabajó"
+     ]
+    },
+    {
+     "hoja": "2.1",
+     "titulo": "Población de 5 años o más por actividad realizada la semana pasada, según provincia, cantón de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas de 5 años o más",
+      "La semana pasada (…):",
+      "Trabajó al menos una hora para generar un ingreso?",
+      "Realizó algún trabajo ocasional (cachuelo o chaucha) por un pago?",
+      "Atendió un negocio propio?",
+      "Ayudó en algún negocio o empleo de algún miembro de su hogar?",
+      "No trabajó, pero SI tiene un trabajo al que seguro va a volver? (por vacaciones, enfermedad, etc.)",
+      "Hizo o ayudó en labores agrícolas, cría de animales o pesca?",
+      "No trabajó"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Población de 15 años o más por condición de actividad y de ocupación, según provincia, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas de 15 años o más",
+      "Condición de actividad",
+      "En la fuerza de trabajo",
+      "Fuera de la fuerza de trabajo",
+      "Condición de ocupación",
+      "Ocupada",
+      "Desocupada"
+     ]
+    },
+    {
+     "hoja": "3.1",
+     "titulo": "Población de 15 años o más por condición de actividad y de ocupación, según provincia, cantón, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas de 15 años o más",
+      "Condición de actividad",
+      "En la fuerza de trabajo",
+      "Fuera de la fuerza de trabajo",
+      "Condición de ocupación",
+      "Ocupada",
+      "Desocupada"
+     ]
+    },
+    {
+     "hoja": "3.2",
+     "titulo": "Población de 15 años o más por condición de actividad y de ocupación, según provincia, cantón, parroquia de residencia y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas de 15 años o más",
+      "Condición de actividad",
+      "En la fuerza de trabajo",
+      "Fuera de la fuerza de trabajo",
+      "Condición de ocupación",
+      "Ocupada",
+      "Desocupada"
+     ]
+    },
+    {
+     "hoja": "4",
+     "titulo": "Población de 15 años o más por condición de actividad y de ocupación, según provincia de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas de 15 años o más",
+      "Condición de actividad",
+      "En la fuerza de trabajo",
+      "Fuera de la fuerza de trabajo",
+      "Condición de ocupación",
+      "Ocupada",
+      "Desocupada"
+     ]
+    },
+    {
+     "hoja": "4.1",
+     "titulo": "Población de 15 años o más por condición de actividad y de ocupación, según provincia, cantón de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas de 15 años o más",
+      "Condición de actividad",
+      "En la fuerza de trabajo",
+      "Fuera de la fuerza de trabajo",
+      "Condición de ocupación",
+      "Ocupada",
+      "Desocupada"
+     ]
+    },
+    {
+     "hoja": "5",
+     "titulo": "Población de 15 años o más ocupada por rama de actividad, según provincia de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas ocupadas de 15 años o más",
+      "Rama de actividad",
+      "Agricultura, ganadería, silvicultura y pesca",
+      "Explotación de minas y canteras",
+      "Industrias manufactureras",
+      "Suministro de electricidad, gas, vapor y aire acondicionado",
+      "Distribución de agua, alcantarillado, gestión de desechos y actividades de saneamiento",
+      "Construcción",
+      "Comercio al por mayor y al por menor",
+      "Transporte y almacenamiento"
+     ]
+    },
+    {
+     "hoja": "5.1",
+     "titulo": "Población de 15 años o más ocupada por rama de actividad, según provincia, cantón de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas ocupadas de 15 años o más",
+      "Rama de actividad",
+      "Agricultura, ganadería, silvicultura y pesca",
+      "Explotación de minas y canteras",
+      "Industrias manufactureras",
+      "Suministro de electricidad, gas, vapor y aire acondicionado",
+      "Distribución de agua, alcantarillado, gestión de desechos y actividades de saneamiento",
+      "Construcción",
+      "Comercio al por mayor y al por menor",
+      "Transporte y almacenamiento"
+     ]
+    },
+    {
+     "hoja": "6",
+     "titulo": "Población de 15 años o más ocupada por grupo de ocupación a 1 dígito, según provincia de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas ocupadas de 15 años o más",
+      "Grupo de ocupación",
+      "Ocupaciones militares",
+      "Directores y gerentes",
+      "Profesionales científicos e intelectuales",
+      "Técnicos y profesionales del medio nivel",
+      "Personal de apoyo y administrativo",
+      "Trabajadores de los servicios y vendedores",
+      "Agricultores y trabajadores calificados agropecuarios, forestales y pesqueros",
+      "Oficiales, operarios y artesanos de artes mecánicas y otros oficios"
+     ]
+    },
+    {
+     "hoja": "6.1",
+     "titulo": "Población de 15 años o más ocupada por grupo de ocupación a 1 dígito, según provincia, cantón de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas ocupadas de 15 años o más",
+      "Grupo de ocupación",
+      "Ocupaciones militares",
+      "Directores y gerentes",
+      "Profesionales científicos e intelectuales",
+      "Técnicos y profesionales del medio nivel",
+      "Personal de apoyo y administrativo",
+      "Trabajadores de los servicios y vendedores",
+      "Agricultores y trabajadores calificados agropecuarios, forestales y pesqueros",
+      "Oficiales, operarios y artesanos de artes mecánicas y otros oficios"
+     ]
+    },
+    {
+     "hoja": "7",
+     "titulo": "Población de 15 años o más fuera de la fuerza de trabajo por actividad que realiza, según provincia de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas de 15 años o más fuera de la fuerza de trabajo",
+      "Actividad que realiza",
+      "Es rentista?",
+      "Es jubilada/o o pensionista?",
+      "Es estudiante?",
+      "Realiza quehaceres del hogar?",
+      "Le impide trabajar su discapacidad?",
+      "Otro?"
+     ]
+    },
+    {
+     "hoja": "7.1",
+     "titulo": "Población de 15 años o más fuera de la fuerza de trabajo por actividad que realiza, según provincia, cantón de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas de 15 años o más fuera de la fuerza de trabajo",
+      "Actividad que realiza",
+      "Es rentista?",
+      "Es jubilada/o o pensionista?",
+      "Es estudiante?",
+      "Realiza quehaceres del hogar?",
+      "Le impide trabajar su discapacidad?",
+      "Otro?"
+     ]
+    },
+    {
+     "hoja": "8",
+     "titulo": "Población de 15 años o más ocupada por categorías de situación en la ocupación, según provincia, área de residencia y afiliación a la seguridad social",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas de 15 años o más ocupada",
+      "Categoría de ocupación",
+      "Empleada/o u obrera/o privado?",
+      "Empleada/o u obrera/o del Estado, Gobierno, Municipio, Consejo Provincial, Junta Parroquial?",
+      "Jornalera/o o peón?",
+      "Empleada/o doméstica/o?",
+      "Patrona/o?",
+      "Cuenta propia?",
+      "Socia/o?",
+      "Trabajadora/or familiar no remunerada/o?"
+     ]
+    },
+    {
+     "hoja": "8.1",
+     "titulo": "Población de 15 años o más ocupada por categorías de situación en la ocupación, según provincia, cantón, área de residencia y afiliación a la seguridad social",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas de 15 años o más ocupada",
+      "Categoría de ocupación",
+      "Empleada/o u obrera/o privado?",
+      "Empleada/o u obrera/o del Estado, Gobierno, Municipio, Consejo Provincial, Junta Parroquial?",
+      "Jornalera/o o peón?",
+      "Empleada/o doméstica/o?",
+      "Patrona/o?",
+      "Cuenta propia?",
+      "Socia/o?",
+      "Trabajadora/or familiar no remunerada/o?"
+     ]
+    },
+    {
+     "hoja": "9",
+     "titulo": "Población de 15 años o más por condición de actividad económica y de ocupación, según provincia de residencia, sexo al nacer y nivel de instrucción",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas de 15 años o más",
+      "Condición de actividad",
+      "En la fuerza de trabajo",
+      "Fuera de la fuerza de trabajo",
+      "Condición de ocupación",
+      "Ocupada",
+      "Desocupada"
+     ]
+    },
+    {
+     "hoja": "9.1",
+     "titulo": "Población de 15 años o más por condición de actividad económica y de ocupación, según provincia, cantón de residencia, sexo al nacer y nivel de instrucción",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas de 15 años o más",
+      "Condición de actividad",
+      "En la fuerza de trabajo",
+      "Fuera de la fuerza de trabajo",
+      "Condición de ocupación",
+      "Ocupada",
+      "Desocupada"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2024/04/2022_Censo_Dificultades_Funcionales.xlsx",
+   "label": "Dificultades funcionales – Excel",
+   "tema": "poblacion",
+   "formato": "XLSX",
+   "bytes": 4812904,
+   "sha256": "a22adac9bffdaadc4bb86c0d80cc981a70a08d4ef822725a3cfe5e6067993da4",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia",
+    "cantón",
+    "parroquia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Población de 5 años o más por esfera de funcionamiento y grado de dificultad funcional permanente, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Esfera de funcionamiento",
+      "Caminar, o subir o bajar gradas/escaleras",
+      "Bañarse, vestirse, alimentarse por sí mismo",
+      "Hablar, comunicarse o conversar",
+      "Oír, aún usando aparado auditivo",
+      "Ver, aun usando lentes",
+      "Recordar, entender o concentrarse",
+      "Grado de dificultad funcional permanente",
+      "No tiene dificultad",
+      "Alguna dificultad"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Población de 5 años o más por esfera de funcionamiento y grado de dificultad funcional permanente, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Esfera de funcionamiento",
+      "Caminar, o subir o bajar gradas/escaleras",
+      "Bañarse, vestirse, alimentarse por sí mismo",
+      "Hablar, comunicarse o conversar",
+      "Oír, aún usando aparado auditivo",
+      "Ver, aun usando lentes",
+      "Recordar, entender o concentrarse",
+      "Grado de dificultad funcional permanente",
+      "No tiene dificultad",
+      "Alguna dificultad"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Población de 5 años o más por condición de dificultad funcional permanente y sexo al nacer, según provincia, área de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Condición de dificultad funcional permanente",
+      "Sin dificultad funcional permanente",
+      "Con dificultad funcional permanente",
+      "No especificado",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas sin dificultad o limitación permanente",
+      "Número total de personas con mucha o total dificultad o limitación permanente en una o más esferas de funcionamiento"
+     ]
+    },
+    {
+     "hoja": "2.1",
+     "titulo": "Población de 5 años o más por condición de dificultad funcional permanente y sexo al nacer, según provincia, cantón, área de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Condición de dificultad funcional permanente",
+      "Sin dificultad funcional permanente",
+      "Con dificultad funcional permanente",
+      "No especificado",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas sin dificultad o limitación permanente",
+      "Número total de personas con mucha o total dificultad o limitación permanente en una o más esferas de funcionamiento"
+     ]
+    },
+    {
+     "hoja": "2.2",
+     "titulo": "Población de 5 años o más por condición de dificultad funcional permanente y sexo al nacer, según provincia, cantón, parroquia de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Condición de dificultad funcional permanente",
+      "Sin dificultad funcional permanente",
+      "Con dificultad funcional permanente",
+      "No especificado",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres",
+      "Número total de personas sin dificultad o limitación permanente",
+      "Número total de personas con mucha o total dificultad o limitación permanente en una o más esferas de funcionamiento"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Población de 5 años o más por condición de dificultad funcional permanente y número y esferas de funcionamiento, según provincia, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Condición de dificultad funcional permanente",
+      "Sin dificultad funcional permanente",
+      "Con dificultad funcional permanente",
+      "No especificado",
+      "Número y esferas de funcionamiento",
+      "Solo para camitar, o subir o bajar gradas/escaleras",
+      "Solo para bañarse, vestirse, alimentarse por sí mismo",
+      "Solo para hablar,comunicarse o conversar",
+      "Solo para oír, aún usando aparado auditivo"
+     ]
+    },
+    {
+     "hoja": "3.1",
+     "titulo": "Población de 5 años o más por condición de dificultad funcional permanente y número y esferas de funcionamiento, según provincia, cantón, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Condición de dificultad funcional permanente",
+      "Sin dificultad funcional permanente",
+      "Con dificultad funcional permanente",
+      "No especificado",
+      "Número y esferas de funcionamiento",
+      "Solo para camitar, o subir o bajar gradas/escaleras",
+      "Solo para bañarse, vestirse, alimentarse por sí mismo",
+      "Solo para hablar,comunicarse o conversar",
+      "Solo para oír, aún usando aparado auditivo"
+     ]
+    },
+    {
+     "hoja": "3.2",
+     "titulo": "Población de 5 años o más por condición de dificultad funcional permanente y número y esferas de funcionamiento, según provincia, cantón, parroquia de residencia y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Condición de dificultad funcional permanente",
+      "Sin dificultad funcional permanente",
+      "Con dificultad funcional permanente",
+      "No especificado",
+      "Número y esferas de funcionamiento",
+      "Solo para camitar, o subir o bajar gradas/escaleras",
+      "Solo para bañarse, vestirse, alimentarse por sí mismo",
+      "Solo para hablar,comunicarse o conversar",
+      "Solo para oír, aún usando aparado auditivo"
+     ]
+    },
+    {
+     "hoja": "4",
+     "titulo": "Población de 5 años o más por condición de dificultad funcional permanente en cada esfera de funcionamiento, según provincia, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Esfera de funcionamiento",
+      "Caminar, o subir o bajar gradas/escaleras",
+      "Bañarse, vestirse, alimentarse por sí mismo",
+      "Hablar, cominicarse o conversar",
+      "Oír, aun usando aparato auditivo",
+      "Ver, aun usando lentes",
+      "Recordar, entender o concentrarse",
+      "Condición de dificultad funcional permanente",
+      "Sin dificultad funcional permanente",
+      "Con dificultad funcional permanente"
+     ]
+    },
+    {
+     "hoja": "4.1",
+     "titulo": "Población de 5 años o más por condición de dificultad funcional permanente en cada esfera de funcionamiento, según provincia, cantón, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Esfera de funcionamiento",
+      "Caminar, o subir o bajar gradas/escaleras",
+      "Bañarse, vestirse, alimentarse por sí mismo",
+      "Hablar, cominicarse o conversar",
+      "Oír, aun usando aparato auditivo",
+      "Ver, aun usando lentes",
+      "Recordar, entender o concentrarse",
+      "Condición de dificultad funcional permanente",
+      "Sin dificultad funcional permanente",
+      "Con dificultad funcional permanente"
+     ]
+    },
+    {
+     "hoja": "4.2",
+     "titulo": "Población de 5 años o más por condición de dificultad funcional permanente en cada esfera de funcionamiento, según provincia, cantón, parroquia de residencia y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Esfera de funcionamiento",
+      "Caminar, o subir o bajar gradas/escaleras",
+      "Bañarse, vestirse, alimentarse por sí mismo",
+      "Hablar, cominicarse o conversar",
+      "Oír, aun usando aparato auditivo",
+      "Ver, aun usando lentes",
+      "Recordar, entender o concentrarse",
+      "Condición de dificultad funcional permanente",
+      "Sin dificultad funcional permanente",
+      "Con dificultad funcional permanente"
+     ]
+    },
+    {
+     "hoja": "5",
+     "titulo": "Población de 5 años o más por condición de dificultad funcional permanente en cada esfera de funcionamiento, según provincia, área de residencia y asistencia a un establecimiento de educación especial para personas con discapacidad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Esfera de funcionamiento",
+      "Caminar, o subir o bajar gradas/escaleras",
+      "Bañarse, vestirse, alimentarse por sí mismo",
+      "Hablar, cominicarse o conversar",
+      "Oír, aun usando aparato auditivo",
+      "Ver, aun usando lentes",
+      "Recordar, entender o concentrarse",
+      "Condición de dificultad funcional permanente",
+      "Sin dificultad funcional permanente",
+      "Con dificultad funcional permanente"
+     ]
+    },
+    {
+     "hoja": "5.1",
+     "titulo": "Población de 5 años o más por condición de dificultad funcional permanente en cada esfera de funcionamiento, según provincia, cantón, área de residencia y asistencia a un establecimiento de educación especial para personas con discapacidad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Esfera de funcionamiento",
+      "Caminar, o subir o bajar gradas/escaleras",
+      "Bañarse, vestirse, alimentarse por sí mismo",
+      "Hablar, cominicarse o conversar",
+      "Oír, aun usando aparato auditivo",
+      "Ver, aun usando lentes",
+      "Recordar, entender o concentrarse",
+      "Condición de dificultad funcional permanente",
+      "Sin dificultad funcional permanente",
+      "Con dificultad funcional permanente"
+     ]
+    },
+    {
+     "hoja": "6",
+     "titulo": "Población de 5 años o más por condición de dificultad funcional permanente en cada esfera de funcionamiento, según provincia de residencia, sexo al nacer y asistencia a un establecimiento de educación especial para personas con discapacidad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Esfera de funcionamiento",
+      "Caminar, o subir o bajar gradas/escaleras",
+      "Bañarse, vestirse, alimentarse por sí mismo",
+      "Hablar, cominicarse o conversar",
+      "Oír, aun usando aparato auditivo",
+      "Ver, aun usando lentes",
+      "Recordar, entender o concentrarse",
+      "Condición de dificultad funcional permanente",
+      "Sin dificultad funcional permanente",
+      "Con dificultad funcional permanente"
+     ]
+    },
+    {
+     "hoja": "7",
+     "titulo": "Población de 5 años por condición de dificultad funcional permanente en cada esfera de funcionamiento, según provincia de residencia, sexo al nacer y condición de analfabetismo",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Esfera de funcionamiento",
+      "Caminar, o subir o bajar gradas/escaleras",
+      "Bañarse, vestirse, alimentarse por sí mismo",
+      "Hablar, cominicarse o conversar",
+      "Oír, aun usando aparato auditivo",
+      "Ver, aun usando lentes",
+      "Recordar, entender o concentrarse",
+      "Condición de dificultad funcional permanente",
+      "Sin dificultad funcional permanente",
+      "Con dificultad funcional permanente"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2024/05/15_2022_CPV_IdGenero_OSexual.xlsx",
+   "label": "Identidad de género y orientación sexual – Excel",
+   "tema": "poblacion",
+   "formato": "XLSX",
+   "bytes": 4804069,
+   "sha256": "82db36c66b26feabe422648b26f376545230fac29fcbd80bf197daeda378c0e3",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia",
+    "cantón",
+    "parroquia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Población de 18 años y más según Identidad de Género y sexo al nacer, por provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas de 18 años y más censadas",
+      "Identidad de género",
+      "Femenino/a",
+      "Masculino",
+      "Trans masculino",
+      "Trans femenina",
+      "No binario",
+      "No sabe/No responde",
+      "Sexo al nacer",
+      "Hombres"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Población de 18 años y más según Identidad de Género y sexo al nacer, por provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas de 18 años y más censadas",
+      "Identidad de género",
+      "Femenino/a",
+      "Masculino",
+      "Trans masculino",
+      "Trans femenina",
+      "No binario",
+      "No sabe/No responde",
+      "Sexo al nacer",
+      "Hombres"
+     ]
+    },
+    {
+     "hoja": "1.2",
+     "titulo": "Población de 18 años y más según Identidad de Género y sexo al nacer, por provincia, cantón, parroquia y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Número total de personas de 18 años y más censadas",
+      "Identidad de género",
+      "Femenino/a",
+      "Masculino",
+      "Trans masculino",
+      "Trans femenina",
+      "No binario",
+      "No sabe/No responde",
+      "Sexo al nacer"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Población de 18 años y más según Orientación Sexual y sexo al nacer, por provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas de 18 años y más censadas",
+      "Orientación sexual",
+      "Hombres",
+      "Mujeres",
+      "Por hombres y mujeres",
+      "Otro",
+      "No sabe/No responde",
+      "Sexo al nacer"
+     ]
+    },
+    {
+     "hoja": "2.1",
+     "titulo": "Población de 18 años y más según Orientación Sexual y sexo al nacer, por provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas de 18 años y más censadas",
+      "Orientación sexual",
+      "Hombres",
+      "Mujeres",
+      "Por hombres y mujeres",
+      "Otro",
+      "No sabe/No responde",
+      "Sexo al nacer"
+     ]
+    },
+    {
+     "hoja": "2.2",
+     "titulo": "Población de 18 años y más según Orientación Sexual y sexo al nacer, por provincia, cantón, parroquia y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Número total de personas de 18 años y más censadas",
+      "Orientación sexual",
+      "Hombres",
+      "Mujeres",
+      "Por hombres y mujeres",
+      "Otro",
+      "No sabe/No responde",
+      "Sexo al nacer"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Población de 18 años y más LGBTI+ según orientación sexual y/o identidad de género y sexo al nacer, por provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas LGBTI+ de 18 años y más",
+      "Orientación sexual y/o identidad de género",
+      "LGB+",
+      "Trans",
+      "LGB+ y Trans",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "3.1",
+     "titulo": "Población de 18 años y más LGBTI+ según orientación sexual y/o identidad de género y sexo al nacer, por provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas LGBTI+ de 18 años y más",
+      "Orientación sexual y/o identidad de género",
+      "LGB+",
+      "Trans",
+      "LGB+ y Trans",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "3.2",
+     "titulo": "Población de 18 años y más LGBTI+ según orientación sexual y/o identidad de género y sexo al nacer, por provincia, cantón, parroquia y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas LGBTI+ de 18 años y más",
+      "Orientación sexual y/o identidad de género",
+      "LGB+",
+      "Trans",
+      "LGB+ y Trans",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "4",
+     "titulo": "Población de 18 años y más LGBTI+ según orientación sexual y/o identidad de género y sexo al nacer, por provincia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas LGBTI+ de 18 años y más",
+      "Orientación sexual y/o identidad de género",
+      "LGB+",
+      "Trans",
+      "LGB+ y Trans",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "4.1",
+     "titulo": "Población de 18 años y más LGBTI+ según orientación sexual y/o identidad de género y sexo al nacer, por provincia, cantón de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas LGBTI+ de 18 años y más",
+      "Orientación sexual y/o identidad de género",
+      "LGB+",
+      "Trans",
+      "LGB+ y Trans",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "4.2",
+     "titulo": "Población de 18 años y más LGBTI+ según orientación sexual y/o identidad de género y sexo al nacer, por provincia, cantón, parroquia de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas LGBTI+ de 18 años y más",
+      "Orientación sexual y/o identidad de género",
+      "LGB+",
+      "Trans",
+      "LGB+ y Trans",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "5",
+     "titulo": "Población LGB+ de 18 años y más según orientación sexual y sexo al nacer, por provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas LGB+ de 18 años y más",
+      "Orientación sexual",
+      "Gays",
+      "Lesbianas",
+      "Bisexuales",
+      "Otros(pansexuales, asexuales, entre otros)",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "5.1",
+     "titulo": "Población LGB+ de 18 años y más según orientación sexual y sexo al nacer, por provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas LGB+ de 18 años y más",
+      "Orientación sexual",
+      "Gays",
+      "Lesbianas",
+      "Bisexuales",
+      "Otros(pansexuales, asexuales, entre otros)",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "5.2",
+     "titulo": "Población LGB+ de 18 años y más según orientación sexual y sexo al nacer, por provincia, cantón, parroquia y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas LGB+ de 18 años y más",
+      "Orientación sexual",
+      "Gays",
+      "Lesbianas",
+      "Bisexuales",
+      "Otros(pansexuales, asexuales, entre otros)",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "6",
+     "titulo": "Población LGB+ de 18 años y más según orientación sexual y sexo al nacer, por provincia de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas LGB+ de 18 años y más",
+      "Orientación sexual",
+      "Gays",
+      "Lesbianas",
+      "Bisexuales",
+      "Otros(pansexuales, asexuales, entre otros)",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "6.1",
+     "titulo": "Población LGB+ de 18 años y más según orientación sexual y sexo al nacer, por provincia, cantón de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas LGB+ de 18 años y más",
+      "Orientación sexual",
+      "Gays",
+      "Lesbianas",
+      "Bisexuales",
+      "Otros(pansexuales, asexuales, entre otros)",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "6.2",
+     "titulo": "Población LGB+ de 18 años y más según orientación sexual y sexo al nacer, por provincia, cantón, parroquia de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas LGB+ de 18 años y más",
+      "Orientación sexual",
+      "Gays",
+      "Lesbianas",
+      "Bisexuales",
+      "Otros(pansexuales, asexuales, entre otros)",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "7",
+     "titulo": "Población Trans de 18 años y más según identidad de género y sexo al nacer, por provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas Trans de 18 años y más",
+      "Identidad de género",
+      "Trans femenina",
+      "Trans masculino",
+      "No binario",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "7.1",
+     "titulo": "Población Trans de 18 años y más según identidad de género y sexo al nacer, por provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas Trans de 18 años y más",
+      "Identidad de género",
+      "Trans femenina",
+      "Trans masculino",
+      "No binario",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "7.2",
+     "titulo": "Población Trans de 18 años y más según identidad de género y sexo al nacer, por provincia, cantón, parroquia y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas Trans de 18 años y más",
+      "Identidad de género",
+      "Trans femenina",
+      "Trans masculino",
+      "No binario",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "8",
+     "titulo": "Población Trans de 18 años y más según identidad de género y sexo al nacer, por provincia de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas Trans de 18 años y más",
+      "Identidad de género",
+      "Trans femenina",
+      "Trans masculino",
+      "No binario",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "8.1",
+     "titulo": "Población Trans de 18 años y más según identidad de género y sexo al nacer, por provincia, cantón de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas Trans de 18 años y más",
+      "Identidad de género",
+      "Trans femenina",
+      "Trans masculino",
+      "No binario",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "8.2",
+     "titulo": "Población Trans de 18 años y más según identidad de género y sexo al nacer, por provincia, cantón, parroquia de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas Trans de 18 años y más",
+      "Identidad de género",
+      "Trans femenina",
+      "Trans masculino",
+      "No binario",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2024/05/2022_CPV_Pobreza-por-NBI.xlsx",
+   "label": "Pobreza por Necesidades Básicas Insatisfechas – Excel",
+   "tema": "poblacion",
+   "formato": "XLSX",
+   "bytes": 5456965,
+   "sha256": "cb5f988cc18987a63eca6dcbe9f5745baa59f5cbb984918ed0eb2d4cafcb60d4",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia",
+    "cantón",
+    "parroquia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Población en viviendas particulares por condición de pobreza por NBI y sexo al nacer, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Total No pobres",
+      "Pobres",
+      "Total Pobres",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Población en viviendas particulares por condición de pobreza por NBI y sexo al nacer, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Total No pobres",
+      "Pobres",
+      "Total Pobres",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "1.2",
+     "titulo": "Población en viviendas particulares por condición de pobreza por NBI y sexo al nacer, según provincia, cantón, parroquia y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Total No pobres",
+      "Pobres",
+      "Total Pobres",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Población en viviendas particulares por condición de pobreza por NBI y sexo al nacer, según provincia y autoidentificación étnica",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Pobres",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "2.1",
+     "titulo": "Población en viviendas particulares por condición de pobreza por NBI y sexo al nacer, según provincia, cantón y autoidentificación étnica",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Pobres",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "2.2",
+     "titulo": "Población en viviendas particulares por condición de pobreza por NBI y sexo al nacer, según provincia, cantón, parroquia y autoidentificación étnica",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Pobres",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Población en viviendas particulares por condición de pobreza por NBI y sexo al nacer, según provincia de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Pobres",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "3.1",
+     "titulo": "Población en viviendas particulares por condición de pobreza por NBI y sexo al nacer, según provincia, cantón de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Pobres",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "3.2",
+     "titulo": "Población en viviendas particulares por condición de pobreza por NBI y sexo al nacer, según provincia, cantón, parroquia de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Pobres",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "4",
+     "titulo": "Población en viviendas particulares por condición de pobreza extrema por NBI y sexo al nacer, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza Extrema por Necesidades Básicas Insatisfechas NBI",
+      "No en pobreza extrema",
+      "Total población No en pobreza extrema",
+      "En pobreza extrema",
+      "Total población En extrema pobreza",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "4.1",
+     "titulo": "Población en viviendas particulares por condición de pobreza extrema por NBI y sexo al nacer, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No en pobreza extrema",
+      "Total población No en pobreza extrema",
+      "En pobreza extrema",
+      "Total población En extrema pobreza",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "4.2",
+     "titulo": "Población en viviendas particulares por condición de pobreza extrema por NBI y sexo al nacer, según provincia, cantón, parroquia y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No en pobreza extrema",
+      "Total población No en pobreza extrema",
+      "En pobreza extrema",
+      "Total población En extrema pobreza",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "5",
+     "titulo": "Población en viviendas particulares por condición de pobreza extrema por NBI y sexo al nacer, según provincia y autoidentificación étnica",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza Extrema por Necesidades Básicas Insatisfechas NBI",
+      "No en pobreza extrema",
+      "En pobreza extrema",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "5.1",
+     "titulo": "Población en viviendas particulares por condición de pobreza extrema por NBI y sexo al nacer, según provincia, cantón y autoidentificación étnica",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza Extrema por Necesidades Básicas Insatisfechas NBI",
+      "No en pobreza extrema",
+      "En pobreza extrema",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "5.2",
+     "titulo": "Población en viviendas particulares por condición de pobreza extrema por NBI y sexo al nacer, según provincia, cantón, parroquia y autoidentificación étnica",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza Extrema por Necesidades Básicas Insatisfechas NBI",
+      "No en pobreza extrema",
+      "En pobreza extrema",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "6",
+     "titulo": "Población en viviendas particulares por condición de pobreza extrema por NBI y sexo al nacer, según provincia de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza Extrema por Necesidades Básicas Insatisfechas NBI",
+      "No en pobreza extrema",
+      "En pobreza extrema",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "6.1",
+     "titulo": "Población en viviendas particulares por condición de pobreza extrema por NBI y sexo al nacer, según provincia, cantón de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza Extrema por Necesidades Básicas Insatisfechas NBI",
+      "No en pobreza extrema",
+      "En pobreza extrema",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "6.2",
+     "titulo": "Población en viviendas particulares por condición de pobreza extrema por NBI y sexo al nacer, según provincia, cantón, parroquia de residencia y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza Extrema por Necesidades Básicas Insatisfechas NBI",
+      "No en pobreza extrema",
+      "En pobreza extrema",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "7",
+     "titulo": "Población en viviendas particulares por composición del NBI, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Pobres",
+      "Composición de la pobreza por NBI",
+      "Pobre solo por dependencia económica",
+      "Pobre solo por no asistencia a clases de niños en edad escolar",
+      "Pobre solo por características físicas inadecuadas de la vivienda",
+      "Pobre solo por no disponibilidad de servicios básicos de la vivienda",
+      "Pobre solo por estado de hacinamiento del hogar"
+     ]
+    },
+    {
+     "hoja": "7.1",
+     "titulo": "Población en viviendas particulares por composición del NBI, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Pobres",
+      "Composición de la pobreza por NBI",
+      "Pobre solo por dependencia económica",
+      "Pobre solo por no asistencia a clases de niños en edad escolar",
+      "Pobre solo por características físicas inadecuadas de la vivienda",
+      "Pobre solo por no disponibilidad de servicios básicos de la vivienda",
+      "Pobre solo por estado de hacinamiento del hogar"
+     ]
+    },
+    {
+     "hoja": "7.2",
+     "titulo": "Población en viviendas particulares por composición del NBI, según provincia, cantón, parroquia y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas en viviendas particulares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Pobres",
+      "Composición de la pobreza por NBI",
+      "Pobre solo por dependencia económica",
+      "Pobre solo por no asistencia a clases de niños en edad escolar",
+      "Pobre solo por características físicas inadecuadas de la vivienda",
+      "Pobre solo por no disponibilidad de servicios básicos de la vivienda",
+      "Pobre solo por estado de hacinamiento del hogar"
+     ]
+    },
+    {
+     "hoja": "8",
+     "titulo": "Hogares por condición de pobreza por NBI, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Pobres"
+     ]
+    },
+    {
+     "hoja": "8.1",
+     "titulo": "Hogares por condición de pobreza por NBI, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Pobres"
+     ]
+    },
+    {
+     "hoja": "8.2",
+     "titulo": "Hogares por condición de pobreza por NBI según provincia, cantón, parroquia y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Pobres"
+     ]
+    },
+    {
+     "hoja": "9",
+     "titulo": "Hogares por condición de pobreza extrema por NBI, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Condición de Pobreza Extrema por Necesidades Básicas Insatisfechas NBI",
+      "No en pobreza extrema",
+      "En pobreza extrema"
+     ]
+    },
+    {
+     "hoja": "9.1",
+     "titulo": "Hogares por condición de pobreza extrema por NBI, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Condición de Pobreza Extrema por Necesidades Básicas Insatisfechas NBI",
+      "No en pobreza extrema",
+      "En pobreza extrema"
+     ]
+    },
+    {
+     "hoja": "9.2",
+     "titulo": "Hogares por condición de pobreza extrema por NBI según provincia, cantón, parroquia y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Condición de Pobreza Extrema por Necesidades Básicas Insatisfechas NBI",
+      "No en pobreza extrema",
+      "En pobreza extrema"
+     ]
+    },
+    {
+     "hoja": "10",
+     "titulo": "Hogares por composición del NBI, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Pobres",
+      "Composición de la pobreza por NBI",
+      "Pobre solo por dependencia económica",
+      "Pobre solo por no asistencia a clases de niños en edad escolar",
+      "Pobre solo por características físicas inadecuadas de la vivienda",
+      "Pobre solo por no disponibilidad de servicios básicos de la vivienda",
+      "Pobre solo por estado de hacinamiento del hogar"
+     ]
+    },
+    {
+     "hoja": "10.1",
+     "titulo": "Hogares por composición del NBI, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Pobres",
+      "Composición de la pobreza por NBI",
+      "Pobre solo por dependencia económica",
+      "Pobre solo por no asistencia a clases de niños en edad escolar",
+      "Pobre solo por características físicas inadecuadas de la vivienda",
+      "Pobre solo por no disponibilidad de servicios básicos de la vivienda",
+      "Pobre solo por estado de hacinamiento del hogar"
+     ]
+    },
+    {
+     "hoja": "10.2",
+     "titulo": "Hogares por composición del NBI según provincia, cantón, parroquia y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Condición de Pobreza por Necesidades Básicas Insatisfechas NBI",
+      "No pobres",
+      "Pobres",
+      "Composición de la pobreza por NBI",
+      "Pobre solo por dependencia económica",
+      "Pobre solo por no asistencia a clases de niños en edad escolar",
+      "Pobre solo por características físicas inadecuadas de la vivienda",
+      "Pobre solo por no disponibilidad de servicios básicos de la vivienda",
+      "Pobre solo por estado de hacinamiento del hogar"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2024/05/2022_CPV_Inscripcion_Cedulacion.xlsx",
+   "label": "Inscripción y cedulación – Excel",
+   "tema": "poblacion",
+   "formato": "XLSX",
+   "bytes": 1450104,
+   "sha256": "a3780666b46f506753e872d4c8036b8d8e1b4c717c19de218364c4bc2c44d481",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia",
+    "cantón",
+    "parroquia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Población por inscripción en registro civil ecuatoriano y tenencia de número de cédula de ciudadanía o identidad ecuatoriana, según provincia, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Inscripción en el registro civil ecuatoriano",
+      "Si",
+      "No",
+      "Tenencia de cédula de ciudadanía o identidad ecuatoriana",
+      "Número total de personas inscritas en el registro civil ecuatoriano",
+      "Número total de personas no inscritas en el registro civil ecuatoriano"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Población por inscripción en registro civil ecuatoriano y tenencia de número de cédula de ciudadanía o identidad ecuatoriana, según, provincia, cantón, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Inscripción en el registro civil ecuatoriano",
+      "Si",
+      "No",
+      "Tenencia de cédula de ciudadanía o identidad ecuatoriana",
+      "Número total de personas inscritas en el registro civil ecuatoriano",
+      "Número total de personas no inscritas en el registro civil ecuatoriano"
+     ]
+    },
+    {
+     "hoja": "1.2",
+     "titulo": "Población por inscripción en registro civil ecuatoriano y tenencia de número de cédula de ciudadanía o identidad ecuatoriana, según, provincia, cantón, parroquia de residencia y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Inscripción en el registro civil ecuatoriano",
+      "Si",
+      "No",
+      "Tenencia de cédula de ciudadanía o identidad ecuatoriana",
+      "Número total de personas inscritas en el registro civil ecuatoriano",
+      "Número total de personas no inscritas en el registro civil ecuatoriano"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Población por inscripción en registro civil ecuatoriano y tenencia de cédula de ciudadanía o identidad ecuatoriana, según provincia de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Inscripción en el registro civil ecuatoriano",
+      "Si",
+      "No",
+      "Tenencia de cédula de ciudadanía o identidad ecuatoriana",
+      "Número total de personas inscritas en el registro civil ecuatoriano",
+      "Número total de personas no inscritas en el registro civil ecuatoriano"
+     ]
+    },
+    {
+     "hoja": "2.1",
+     "titulo": "Población por inscripción en registro civil ecuatoriano y tenencia de cédula de ciudadanía o identidad ecuatoriana, según, provincia, cantón de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Inscripción en el registro civil ecuatoriano",
+      "Si",
+      "No",
+      "Tenencia de cédula de ciudadanía o identidad ecuatoriana",
+      "Número total de personas inscritas en el registro civil ecuatoriano",
+      "Número total de personas no inscritas en el registro civil ecuatoriano"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Población extranjera residente en el país por tenencia de número de cédula o identidad ecuatoriana, otros documentos, según provincia, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Tenencia de número de cédula de ciudadanía e identidad ecuatoriana",
+      "Si",
+      "No",
+      "Número total de personas que no tienen número de cédula de ciudadanía e identidad ecuatoriana",
+      "Otros documentos",
+      "Pasaporte, visa u otro documento de extranjería",
+      "No tiene documento alguno"
+     ]
+    },
+    {
+     "hoja": "4",
+     "titulo": "Población extranjera residente en el país por tenencia de número de cédula o identidad ecuatoriana, otros documentos, según provincia de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas",
+      "Tenencia de número de cédula de ciudadanía e identidad ecuatoriana",
+      "Si",
+      "No",
+      "Número total de personas que no tienen número de cédula de ciudadanía e identidad ecuatoriana",
+      "Otros documentos",
+      "Pasaporte, visa u otro documento de extranjería",
+      "No tiene documento alguno"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2024/05/2022_CPV_Mortalidad_2024.xlsx",
+   "label": "Mortalidad – Excel",
+   "tema": "poblacion",
+   "formato": "XLSX",
+   "bytes": 358217,
+   "sha256": "6b25791562e13d63ca1806e83259b115d249080433028084194a44b91d9ce6fc",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Hogares con uno o más miembros del hogar fallecidos en los ultimos tres años por número de fallecidos, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares con uno o más miembros del hogar fallecidos en los últimos tres años",
+      "Número de fallecidos en el hogar",
+      "1 persona",
+      "2 personas",
+      "3 personas",
+      "4 personas",
+      "5 personas o más"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Personas fallecidas en los ultimos tres años por sexo del fallecido y causa de muerte, según provincia, área de residencia del hogar y grupos quinquenales de edad al fallecimiento",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas fallecidas en los últimos 3 años",
+      "Sexo",
+      "Hombres",
+      "Mujeres",
+      "Causa de muerte",
+      "Accidente, suicidio o asesinato",
+      "COVID-19",
+      "Otros? (Ej: Enfermedad, causa natural)",
+      "Se ignora",
+      "Número total de hombres fallecidos en los últimos 3 años"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Personas fallecidas en los ultimos tres años por sexo del fallecido y causa de muerte, según provincia, área de residencia del hogar y año de fallecimiento",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas fallecidas en los últimos 3 años",
+      "Sexo",
+      "Hombres",
+      "Mujeres",
+      "Causa de muerte",
+      "Accidente, suicidio o asesinato",
+      "COVID-19",
+      "Otros? (Ej: Enfermedad, causa natural)",
+      "Se ignora",
+      "Número total de hombres fallecidos en los últimos 3 años"
+     ]
+    },
+    {
+     "hoja": "4",
+     "titulo": "Mujeres de 10 a 50 años fallecidas en los ultimos tres años por fallecimiento estando embarazada, en el parto o dentro de los 42 días posteriores al parto, según provincia, área de residencia del hogar y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de mujeres de 10 a 50 años fallecidas en los últimos 3 años",
+      "Murió estando embarazada, en el parto o dentro de los 42 días posteriores al parto",
+      "Sí",
+      "No",
+      "No responde"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2023/12/05_2022_CPV_Condiciones_generales_vivienda.xlsx",
+   "label": "Condición general de vivienda – Excel",
+   "tema": "vivienda",
+   "formato": "XLSX",
+   "bytes": 6510661,
+   "sha256": "c84c84b311246320f8d641d6b13ede9b7cec78e6c0ae4f33fc1c7be11fab0cde",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia",
+    "cantón",
+    "parroquia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Viviendas por tipo de vivienda (particulares y colectivas) y condición de ocupación, según provincia y área",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de viviendas",
+      "Tipo de vivienda",
+      "Viviendas particulares",
+      "Viviendas colectivas",
+      "Ocupada con personas presentes",
+      "Ocupada con personas ausentes",
+      "De temporada o vacacional",
+      "Desocupada",
+      "En construcción",
+      "Total viviendas particulares"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Viviendas por tipo de vivienda (particulares y colectivas) y condición de ocupación, según provincia, cantón y área",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de viviendas",
+      "Tipo de vivienda",
+      "Viviendas particulares",
+      "Viviendas colectivas",
+      "Ocupada con personas presentes",
+      "Ocupada con personas ausentes",
+      "De temporada o vacacional",
+      "Desocupada",
+      "En construcción",
+      "Total viviendas particulares"
+     ]
+    },
+    {
+     "hoja": "1.2",
+     "titulo": "Viviendas por tipo de vivienda (particulares y colectivas) y condición de ocupación, según provincia, cantón y parroquia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de viviendas",
+      "Tipo de vivienda",
+      "Viviendas particulares",
+      "Viviendas colectivas",
+      "Ocupada con personas presentes",
+      "Ocupada con personas ausentes",
+      "De temporada o vacacional",
+      "Desocupada",
+      "En construcción",
+      "Total viviendas particulares"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Personas sin vivienda por sexo al nacer, según provincia y área",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de personas sin vivienda",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "2.1",
+     "titulo": "Personas sin vivienda por sexo al nacer, según provincia cantón y área",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de personas sin vivienda",
+      "Sexo al nacer",
+      "Hombres",
+      "Mujeres"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Viviendas particulares por tipo de vivienda, según provincia y área",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "3.1",
+     "titulo": "Viviendas particulares por tipo de vivienda, según provincia, cantón y área",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "3.2",
+     "titulo": "Viviendas particulares por tipo de vivienda, según provincia, cantón y parroquia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "4",
+     "titulo": "Viviendas particulares ocupadas por tipo de vivienda, según provincia, área y material predominante del techo",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "4.1",
+     "titulo": "Viviendas particulares ocupadas por tipo de vivienda, según provincia, cantón, área y material predominante del techo",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "4.2",
+     "titulo": "Viviendas particulares ocupadas por tipo de vivienda, según provincia, cantón, parroquia y material predominante del techo",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "5",
+     "titulo": "Viviendas particulares ocupadas por tipo de vivienda, según provincia, área y material predominante de las paredes exteriores",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "5.1",
+     "titulo": "Viviendas particulares ocupadas por tipo de vivienda, según provincia, cantón, área y material predominante de las paredes exteriores",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "5.2",
+     "titulo": "Viviendas particulares ocupadas por tipo de vivienda, según provincia, cantón, parroquia y material predominante de las paredes exteriores",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "6",
+     "titulo": "Viviendas particulares ocupadas por tipo de vivienda, según provincia, área y material predominante del piso",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "6.1",
+     "titulo": "Viviendas particulares ocupadas por tipo de vivienda, según provincia, cantón, área y material predominante del piso",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "6.2",
+     "titulo": "Viviendas particulares ocupadas por tipo de vivienda, según provincia, cantón, parroquia y material predominante del piso",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "7",
+     "titulo": "Viviendas particulares ocupadas con personas presentes por material predominante del techo, según provincia, área y estado del techo",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "7.1",
+     "titulo": "Viviendas particulares ocupadas con personas presentes por material predominante del techo, según provincia, cantón, área y estado del techo",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "7.2",
+     "titulo": "Viviendas particulares ocupadas con personas presentes por material predominante del techo, según provincia, cantón, parroquia y estado del techo",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "8",
+     "titulo": "Viviendas particulares ocupadas con personas presentes por material predominante de las paredes exteriores de la vivienda, según provincia, área y estado de las paredes exteriores",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "8.1",
+     "titulo": "Viviendas particulares ocupadas con personas presentes por material predominante de las paredes exteriores de la vivienda, según provincia, cantón, área y estado de las paredes exteriores",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "8.2",
+     "titulo": "Viviendas particulares ocupadas con personas presentes por material predominante de las paredes exteriores de la vivienda, según provincia, cantón, parroquia y estado de las paredes exteriores",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "9",
+     "titulo": "Viviendas particulares ocupadas con personas presentes por material predominante del piso de la vivienda, según provincia, área y estado del piso",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "9.1",
+     "titulo": "Viviendas particulares ocupadas con personas presentes por material predominante del piso de la vivienda, según provincia, cantón, área y estado del piso",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "9.2",
+     "titulo": "Viviendas particulares ocupadas con personas presentes por material predominante del piso de la vivienda, según provincia, cantón, parroquia y estado del piso",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "10",
+     "titulo": "Viviendas particulares ocupadas por tipo de vivienda, según provincia, área y número de hogares en la vivienda",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "10.1",
+     "titulo": "Viviendas particulares ocupadas por tipo de vivienda, según provincia, cantón, área y número de hogares en la vivienda",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "10.2",
+     "titulo": "Viviendas particulares ocupadas por tipo de vivienda, según provincia, cantón, parroquia y número de hogares en la vivienda",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de vivienda",
+      "Casa o villa",
+      "Departamento en casa o edificio",
+      "Cuarto/s en casa de inquilinato",
+      "Mediagua",
+      "Rancho",
+      "Covacha",
+      "Choza",
+      "Otra vivienda particular"
+     ]
+    },
+    {
+     "hoja": "11",
+     "titulo": "Viviendas particulares ocupadas por número de cuartos en la vivienda, según provincia, área y número de ocupantes",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Número de cuartos en la vivienda",
+      "1 cuarto",
+      "2 cuartos",
+      "3 cuartos",
+      "4 cuartos",
+      "5 cuartos",
+      "6 cuartos",
+      "7 cuartos",
+      "8 cuartos"
+     ]
+    },
+    {
+     "hoja": "11.1",
+     "titulo": "Viviendas particulares ocupadas por número de cuartos en la vivienda, según provincia, cantón, área y número de ocupantes",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Número de cuartos en la vivienda",
+      "1 cuarto",
+      "2 cuartos",
+      "3 cuartos",
+      "4 cuartos",
+      "5 cuartos",
+      "6 cuartos",
+      "7 cuartos",
+      "8 cuartos"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2023/12/06_2022_CPV_Servicios_basicos_vivienda.xlsx",
+   "label": "Servicios básicos de vivienda – Excel",
+   "tema": "vivienda",
+   "formato": "XLSX",
+   "bytes": 2269722,
+   "sha256": "edda41b8d035aaf1f49295838edfba862f23604ba59608d2c9dbea10e0388c76",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia",
+    "cantón",
+    "parroquia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Viviendas particulares ocupadas por acceso a servicios básicos según provincia y área",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Acceso a servicios básicos",
+      "Agua por red pública (a)",
+      "Recolección de basura (b)",
+      "Red pública de alcantarillado (c)",
+      "Energía eléctrica de red pública"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Viviendas particulares ocupadas por acceso a servicios básicos según, provincia, cantón y área",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Acceso a servicios básicos",
+      "Agua por red pública (a)",
+      "Recolección de basura (b)",
+      "Red pública de alcantarillado (c)",
+      "Energía eléctrica de red pública"
+     ]
+    },
+    {
+     "hoja": "1.2",
+     "titulo": "Viviendas particulares ocupadas por acceso a servicios básicos según provincia, cantón y parroquia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Acceso a servicios básicos",
+      "Agua por red pública (a)",
+      "Recolección de basura (b)",
+      "Red pública de alcantarillado (c)",
+      "Energía eléctrica de red pública"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Viviendas particulares ocupadas por fuente de abastecimiento de agua, según provincia, área y forma de recepción del agua en la vivienda",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Fuente de abastecimiento de agua",
+      "Empresa pública/Municipio",
+      "Juntas de agua/Organizaciones comunitarias/GAD parroquial",
+      "Pozo",
+      "Carro o tanquero repartidor",
+      "Otras fuentes (río, vertiente, acequia, canal o grieta o agua lluvia)"
+     ]
+    },
+    {
+     "hoja": "2.1",
+     "titulo": "Viviendas particulares ocupadas por fuente de abastecimiento de agua, según provincia, cantón, área y forma de recepción del agua en la vivienda",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Fuente de abastecimiento de agua",
+      "Empresa pública/Municipio",
+      "Juntas de agua/Organizaciones comunitarias/GAD parroquial",
+      "Pozo",
+      "Carro o tanquero repartidor",
+      "Otras fuentes (río, vertiente, acequia, canal o grieta o agua lluvia)"
+     ]
+    },
+    {
+     "hoja": "2.2",
+     "titulo": "Viviendas particulares ocupadas por fuente de abastecimiento de agua, según provincia, cantón, parroquia y forma de recepción del agua en la vivienda",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Fuente de abastecimiento de agua",
+      "Empresa pública/Municipio",
+      "Juntas de agua/Organizaciones comunitarias/GAD parroquial",
+      "Pozo",
+      "Carro o tanquero repartidor",
+      "Otras fuentes (río, vertiente, acequia, canal o grieta o agua lluvia)"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Viviendas particulares ocupadas por tipo de servicio higiénico de la vivienda, según provincia y área",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de servicio higiénico en la vivienda",
+      "Inodoro o escusado, conectado a red pública de alcaltarillado",
+      "Inodoro o escusado, conectado a pozo séptico",
+      "Inodoro o escusado, conectado a biodigestor",
+      "Inodoro o escusado, conectado a pozo ciego",
+      "Inodoro o escusado, con descarga directa al mar, río, lago o quebrada",
+      "Letrina",
+      "No tiene"
+     ]
+    },
+    {
+     "hoja": "3.1",
+     "titulo": "Viviendas particulares ocupadas por tipo de servicio higiénico de la vivienda, según provincia, cantón y área",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de servicio higiénico en la vivienda",
+      "Inodoro o escusado, conectado a red pública de alcaltarillado",
+      "Inodoro o escusado, conectado a pozo séptico",
+      "Inodoro o escusado, conectado a biodigestor",
+      "Inodoro o escusado, conectado a pozo ciego",
+      "Inodoro o escusado, con descarga directa al mar, río, lago o quebrada",
+      "Letrina",
+      "No tiene"
+     ]
+    },
+    {
+     "hoja": "3.2",
+     "titulo": "Viviendas particulares ocupadas por tipo de servicio higiénico de la vivienda, según provincia, cantón y parroquia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Tipo de servicio higiénico en la vivienda",
+      "Inodoro o escusado, conectado a red pública de alcaltarillado",
+      "Inodoro o escusado, conectado a pozo séptico",
+      "Inodoro o escusado, conectado a biodigestor",
+      "Inodoro o escusado, conectado a pozo ciego",
+      "Inodoro o escusado, con descarga directa al mar, río, lago o quebrada",
+      "Letrina",
+      "No tiene"
+     ]
+    },
+    {
+     "hoja": "4",
+     "titulo": "Viviendas particulares ocupadas por disponibilidad de energía eléctrica proveniente de la red pública, según provincia y área",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Energía eléctrica proveniente de la red pública",
+      "Si",
+      "No"
+     ]
+    },
+    {
+     "hoja": "4.1",
+     "titulo": "Viviendas particulares ocupadas por disponibilidad de energía eléctrica proveniente de la red pública, según provincia, cantón y área",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Energía eléctrica proveniente de la red pública",
+      "Si",
+      "No"
+     ]
+    },
+    {
+     "hoja": "4.2",
+     "titulo": "Viviendas particulares ocupadas por disponibilidad de energía eléctrica proveniente de la red pública, según provincia, cantón y parroquia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Energía eléctrica proveniente de la red pública",
+      "Si",
+      "No"
+     ]
+    },
+    {
+     "hoja": "5",
+     "titulo": "Viviendas particulares ocupadas por disponibilidad de energía eléctrica proveniente de la red pública, según provincia, área y disponibilidad de energia distinta a la red pública",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Energía eléctrica proveniente de la red pública",
+      "Si",
+      "No"
+     ]
+    },
+    {
+     "hoja": "5.1",
+     "titulo": "Viviendas particulares ocupadas por disponibilidad de energía eléctrica proveniente de la red pública, según provincia, cantón, área y disponibilidad de energia distinta a la red pública",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Energía eléctrica proveniente de la red pública",
+      "Si",
+      "No"
+     ]
+    },
+    {
+     "hoja": "6",
+     "titulo": "Viviendas particulares ocupadas por forma de eliminación de basura, según provincia y área",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Forma de eliminación de basura",
+      "Por carro recolector",
+      "Por contenedor municipal",
+      "La arroja en terreno baldío",
+      "La quema",
+      "La entierra",
+      "La arroja al río, acequia, canal o quebrada",
+      "De otra forma"
+     ]
+    },
+    {
+     "hoja": "6.1",
+     "titulo": "Viviendas particulares ocupadas por forma de eliminación de basura, según provincia, cantón y área",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Forma de eliminación de basura",
+      "Por carro recolector",
+      "Por contenedor municipal",
+      "La arroja en terreno baldío",
+      "La quema",
+      "La entierra",
+      "La arroja al río, acequia, canal o quebrada",
+      "De otra forma"
+     ]
+    },
+    {
+     "hoja": "6.2",
+     "titulo": "Viviendas particulares ocupadas por forma de eliminación de basura, según provincia, cantón y parroquia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Forma de eliminación de basura",
+      "Por carro recolector",
+      "Por contenedor municipal",
+      "La arroja en terreno baldío",
+      "La quema",
+      "La entierra",
+      "La arroja al río, acequia, canal o quebrada",
+      "De otra forma"
+     ]
+    },
+    {
+     "hoja": "7",
+     "titulo": "Viviendas particulares ocupadas por fuente de abastecimiento de agua, según provincia, área y tipo de servicio higiénico",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Fuente de abastecimiento de agua",
+      "Empresa pública/Municipio",
+      "Juntas de agua/Organizaciones comunitarias/GAD parroquial",
+      "Pozo",
+      "Carro o tanquero repartidor",
+      "Otras fuentes (río, vertiente, acequia, canal o grieta o agua lluvia)"
+     ]
+    },
+    {
+     "hoja": "7.1",
+     "titulo": "Viviendas particulares ocupadas por fuente de abastecimiento de agua, según provincia, cantón, área y tipo de servicio higiénico",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Fuente de abastecimiento de agua",
+      "Empresa pública/Municipio",
+      "Juntas de agua/Organizaciones comunitarias/GAD parroquial",
+      "Pozo",
+      "Carro o tanquero repartidor",
+      "Otras fuentes (río, vertiente, acequia, canal o grieta o agua lluvia)"
+     ]
+    },
+    {
+     "hoja": "7.2",
+     "titulo": "Viviendas particulares ocupadas por fuente de abastecimiento de agua, según provincia, cantón, parroquia y tipo de servicio higiénico",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de viviendas particulares ocupadas",
+      "Fuente de abastecimiento de agua",
+      "Empresa pública/Municipio",
+      "Juntas de agua/Organizaciones comunitarias/GAD parroquial",
+      "Pozo",
+      "Carro o tanquero repartidor",
+      "Otras fuentes (río, vertiente, acequia, canal o grieta o agua lluvia)"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2023/12/04_2022_CPV_Composicion_hogar.xlsx",
+   "label": "Composición y hogar – Excel",
+   "tema": "hogar",
+   "formato": "XLSX",
+   "bytes": 827511,
+   "sha256": "947641c9a9d065b09350be1dba90a7cca2217ef242a37a143255683654a29c4c",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia",
+    "cantón",
+    "parroquia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Hogares por número de miembros del hogar, según provinicia y área",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Número de miembros del hogar",
+      "1 persona",
+      "2 personas",
+      "3 personas",
+      "4 personas",
+      "5 personas o más"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Hogares por número de miembros del hogar, según provincia, cantón y área",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Número de miembros del hogar",
+      "1 persona",
+      "2 personas",
+      "3 personas",
+      "4 personas",
+      "5 personas o más"
+     ]
+    },
+    {
+     "hoja": "1.2",
+     "titulo": "Hogares por número de miembros del hogar, según provincia, cantón y parroquia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Número de miembros del hogar",
+      "1 persona",
+      "2 personas",
+      "3 personas",
+      "4 personas",
+      "5 personas o más"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Hogares por número de miembros del hogar, según provincia, área y sexo del representante del hogar",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Número de miembros del hogar",
+      "1 persona",
+      "2 personas",
+      "3 personas",
+      "4 personas",
+      "5 personas o más"
+     ]
+    },
+    {
+     "hoja": "2.1",
+     "titulo": "Hogares por número de miembros del hogar, según provincia, cantón, área y sexo del representante del hogar",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Número de miembros del hogar",
+      "1 persona",
+      "2 personas",
+      "3 personas",
+      "4 personas",
+      "5 personas o más"
+     ]
+    },
+    {
+     "hoja": "2.2",
+     "titulo": "Hogares por número de miembros del hogar, según provincia, cantón, parroquia y sexo del representante del hogar",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Número de miembros del hogar",
+      "1 persona",
+      "2 personas",
+      "3 personas",
+      "4 personas",
+      "5 personas o más"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Hogares por tipologías de hogar, según provincia, área y sexo del representante del hogar",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Tipologías de hogar",
+      "Unipersonal",
+      "Nuclear",
+      "Extenso",
+      "Compuesto",
+      "Sin núcleo"
+     ]
+    },
+    {
+     "hoja": "3.1",
+     "titulo": "Hogares por tipologías de hogar, según provincia, cantón, área y sexo del representante del hogar",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Tipologías de hogar",
+      "Unipersonal",
+      "Nuclear",
+      "Extenso",
+      "Compuesto",
+      "Sin núcleo"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2023/12/01_2022_CPV_CONDICIONES_DE_VIDA.xlsx",
+   "label": "Condiciones de vida – Excel",
+   "tema": "hogar",
+   "formato": "XLSX",
+   "bytes": 3065280,
+   "sha256": "0c2a310d8d0878d5ce62bfea3bed4faf8eb5cc3de2fc20df3375f8e4dc5250ad",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia",
+    "cantón",
+    "parroquia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Hogares por número de personas por cuarto exclusivo para dormir, según provincia, área de residencia y sexo del representante del hogar",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Número de personas por cuarto exclusivo para dormir",
+      "Hogares con 0 cuartos",
+      "1 persona por cuarto o menos",
+      "Más de 1 y hasta 3 personas por cuarto",
+      "Más de 3 y hasta 5 personas por cuarto",
+      "Más de 5 personas por cuarto"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Hogares por número de personas por cuarto exclusivo para dormir, según provincia, cantón, área de residencia y sexo del representante del hogar",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Número de personas por cuarto exclusivo para dormir",
+      "Hogares con 0 cuartos",
+      "1 persona por cuarto o menos",
+      "Más de 1 y hasta 3 personas por cuarto",
+      "Más de 3 y hasta 5 personas por cuarto",
+      "Más de 5 personas por cuarto"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Hogares por número de personas por cuarto exclusivo para dormir, según provincia, área de residencia y condición de tenencia de la vivienda",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Número de personas por cuarto exclusivo para dormir",
+      "Hogares con 0 cuartos",
+      "1 persona por cuarto o menos",
+      "Más de 1 y hasta 3 personas por cuarto",
+      "Más de 3 y hasta 5 personas por cuarto",
+      "Más de 5 personas por cuarto"
+     ]
+    },
+    {
+     "hoja": "2.1",
+     "titulo": "Hogares por número de personas por cuarto exclusivo para dormir, según provincia, cantón, área de residencia y condición de tenencia de la vivienda",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Número de personas por cuarto exclusivo para dormir",
+      "Hogares con 0 cuartos",
+      "1 persona por cuarto o menos",
+      "Más de 1 y hasta 3 personas por cuarto",
+      "Más de 3 y hasta 5 personas por cuarto",
+      "Más de 5 personas por cuarto"
+     ]
+    },
+    {
+     "hoja": "2.2",
+     "titulo": "Hogares por número de personas por cuarto exclusivo para dormir, según provincia, cantón, parroquia de residencia y condición de tenencia de la vivienda",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Número de personas por cuarto exclusivo para dormir",
+      "Hogares con 0 cuartos",
+      "1 persona por cuarto o menos",
+      "Más de 1 y hasta 3 personas por cuarto",
+      "Más de 3 y hasta 5 personas por cuarto",
+      "Más de 5 personas por cuarto"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Hogares por disponibilidad de cuarto o espacio exclusivo para cocinar y principal combustible o energía que utiliza para cocinar, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Disponibilidad de cuarto o espacio exclusivo para cocinar",
+      "Si",
+      "No",
+      "Principal combustible o energía que utiliza para cocinar",
+      "Gas de tanque o cilindro",
+      "Gas centralizado (por tubería)",
+      "Electricidad",
+      "Leña o carbón",
+      "Biogás (residuos vegetales y/o animales, etc.)"
+     ]
+    },
+    {
+     "hoja": "3.1",
+     "titulo": "Hogares por disponibilidad de cuarto o espacio exclusivo para cocinar y principal combustible o energía que utiliza para cocinar, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Disponibilidad de cuarto o espacio exclusivo para cocinar",
+      "Si",
+      "No",
+      "Principal combustible o energía que utiliza para cocinar",
+      "Gas de tanque o cilindro",
+      "Gas centralizado (por tubería)",
+      "Electricidad",
+      "Leña o carbón",
+      "Biogás (residuos vegetales y/o animales, etc.)"
+     ]
+    },
+    {
+     "hoja": "3.2",
+     "titulo": "Hogares por disponibilidad de cuarto o espacio exclusivo para cocinar y principal combustible o energía que utiliza para cocinar, según provincia, cantón y parroquia de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Disponibilidad de cuarto o espacio exclusivo para cocinar",
+      "Si",
+      "No",
+      "Principal combustible o energía que utiliza para cocinar",
+      "Gas de tanque o cilindro",
+      "Gas centralizado (por tubería)",
+      "Electricidad",
+      "Leña o carbón",
+      "Biogás (residuos vegetales y/o animales, etc.)"
+     ]
+    },
+    {
+     "hoja": "4",
+     "titulo": "Hogares por tipo de servicio higiénico de la vivienda, según provincia, área de residencia y condición de exclusividad del servicio higiénico",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Tipo de servicio higiénico disponible en la vivienda",
+      "Inodoro o escusado, conectado a red pública de alcantarillado",
+      "Inodoro o escusado, conectado a pozo séptico",
+      "Inodoro o escusado, conectado a biodigestor",
+      "Inodoro o escusado, conectado a pozo ciego",
+      "Inodoro o escusado con descarga directa al mar, río, lago o quebrada",
+      "Letrina",
+      "No tiene"
+     ]
+    },
+    {
+     "hoja": "4.1",
+     "titulo": "Hogares por tipo de servicio higiénico de la vivienda, según provincia, cantón, área de residencia y condición de exclusividad del servicio higiénico",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Tipo de servicio higiénico disponible en la vivienda",
+      "Inodoro o escusado, conectado a red pública de alcantarillado",
+      "Inodoro o escusado, conectado a pozo séptico",
+      "Inodoro o escusado, conectado a biodigestor",
+      "Inodoro o escusado, conectado a pozo ciego",
+      "Inodoro o escusado con descarga directa al mar, río, lago o quebrada",
+      "Letrina",
+      "No tiene"
+     ]
+    },
+    {
+     "hoja": "4.2",
+     "titulo": "Hogares por tipo de servicio higiénico de la vivienda, según provincia, cantón, parroquia de residencia y condición de exclusividad del servicio higiénico",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Tipo de servicio higiénico disponible en la vivienda",
+      "Inodoro o escusado, conectado a red pública de alcantarillado",
+      "Inodoro o escusado, conectado a pozo séptico",
+      "Inodoro o escusado, conectado a biodigestor",
+      "Inodoro o escusado, conectado a pozo ciego",
+      "Inodoro o escusado con descarga directa al mar, río, lago o quebrada",
+      "Letrina",
+      "No tiene"
+     ]
+    },
+    {
+     "hoja": "5",
+     "titulo": "Hogares por condición de exclusividad del servicio higienico o escusado, según provincia, área de residencia y condición de exclusividad de las instalaciones y/o ducha para bañarse",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Condición de exclusividad del servicio higiénico, inodoro o escusado",
+      "De uso exclusivo del hogar",
+      "Compartido con varios hogares",
+      "No tiene"
+     ]
+    },
+    {
+     "hoja": "5.1",
+     "titulo": "Hogares por condición de exclusividad del servicio higienico o escusado, según provincia, cantón, área de residencia y condición de exclusividad de las instalaciones y/o ducha para bañarse",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Condición de exclusividad del servicio higiénico, inodoro o escusado",
+      "De uso exclusivo del hogar",
+      "Compartido con varios hogares",
+      "No tiene"
+     ]
+    },
+    {
+     "hoja": "5.2",
+     "titulo": "Hogares por condición de exclusividad del servicio higienico o escusado, según provincia, cantón, parroquia de residencia y condición de exclusividad de las instalaciones y/o ducha para bañarse",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Condición de exclusividad del servicio higiénico, inodoro o escusado",
+      "De uso exclusivo del hogar",
+      "Compartido con varios hogares",
+      "No tiene"
+     ]
+    },
+    {
+     "hoja": "6",
+     "titulo": "Hogares por fuente de abastecimiento de agua de la vivienda, según provincia, área de residencia y tratamiento que realizan al agua para beber",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Fuente de abastecimiento de agua de la vivienda",
+      "Empresa pública/Municipio",
+      "Juntas de agua/Organizaciones comunitarias/GAD parroquial",
+      "Pozo",
+      "Carro o tanquero repartidor",
+      "Otras fuentes (río, vertiente, canal, grieta o agua lluvia)"
+     ]
+    },
+    {
+     "hoja": "6.1",
+     "titulo": "Hogares por fuente de abastecimiento de agua de la vivienda, según provincia, cantón, área de residencia y tratamiento que realizan al agua para beber",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Fuente de abastecimiento de agua de la vivienda",
+      "Empresa pública/Municipio",
+      "Juntas de agua/Organizaciones comunitarias/GAD parroquial",
+      "Pozo",
+      "Carro o tanquero repartidor",
+      "Otras fuentes (río, vertiente, canal, grieta o agua lluvia)"
+     ]
+    },
+    {
+     "hoja": "6.2",
+     "titulo": "Hogares por fuente de abastecimiento de agua de la vivienda, según provincia, cantón, parroquia de residencia y tratamiento que realizan al agua para beber",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Fuente de abastecimiento de agua de la vivienda",
+      "Empresa pública/Municipio",
+      "Juntas de agua/Organizaciones comunitarias/GAD parroquial",
+      "Pozo",
+      "Carro o tanquero repartidor",
+      "Otras fuentes (río, vertiente, canal, grieta o agua lluvia)"
+     ]
+    },
+    {
+     "hoja": "7",
+     "titulo": "Hogares por disponibilidad de bienes, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Disponibilidad de bienes",
+      "Refrigeradora",
+      "Máquina lavadora de ropa",
+      "Máquina secadora de ropa",
+      "Horno microondas",
+      "Máquina extractora de olores",
+      "Automóvil, camioneta, para uso exclusivo del hogar",
+      "Motocicleta, para uso exclusivo del hogar",
+      "Si",
+      "No"
+     ]
+    },
+    {
+     "hoja": "7.1",
+     "titulo": "Hogares por disponibilidad de bienes, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Disponibilidad de bienes",
+      "Refrigeradora",
+      "Máquina lavadora de ropa",
+      "Máquina secadora de ropa",
+      "Horno microondas",
+      "Máquina extractora de olores",
+      "Automóvil, camioneta, para uso exclusivo del hogar",
+      "Motocicleta, para uso exclusivo del hogar",
+      "Si",
+      "No"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2023/12/02_2022_CPV_PRACTICAS_AMBIENTALES.xlsx",
+   "label": "Prácticas ambientales – Excel",
+   "tema": "hogar",
+   "formato": "XLSX",
+   "bytes": 269106,
+   "sha256": "9fd0c139abd46360fb8008ce993c37cfb67b244c63a743ee68d5aa106584537e",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia",
+    "cantón"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Hogares que separan residuos, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Hogares que separan residuos",
+      "Si",
+      "No"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Hogares que separan residuos, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Hogares que separan residuos",
+      "Si",
+      "No"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Hogares por forma de separación de residuos, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Forma de separación de residuos",
+      "Separa basura en orgánica e inorgánica",
+      "Separa desperdicios par dar a los animales o a las plantas",
+      "Separa papel, cartón, plástico o vidrio para vender, regalar o reutilizar",
+      "Si",
+      "No"
+     ]
+    },
+    {
+     "hoja": "2.1",
+     "titulo": "Hogares por forma de separación de residuos, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Forma de separación de residuos",
+      "Separa basura en orgánica e inorgánica",
+      "Separa desperdicios par dar a los animales o a las plantas",
+      "Separa papel, cartón, plástico o vidrio para vender, regalar o reutilizar",
+      "Si",
+      "No"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2023/12/03_2022_CPV_TIC.xlsx",
+   "label": "Uso de las Tecnologías de la Información y Comunicación – Excel",
+   "tema": "hogar",
+   "formato": "XLSX",
+   "bytes": 1828187,
+   "sha256": "ecd5e6d33e688f9865e80a919dae806ae19b583d4a27d37f62ec27fd888a1e89",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia",
+    "cantón",
+    "parroquia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Población de 5 años o más por uso de TIC en los últimos 3 meses, según provincia, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Uso de TIC en los últimos 3 meses",
+      "Uso de teléfono celular",
+      "Uso de internet",
+      "Uso de computadora o laptop",
+      "Uso de tablet",
+      "Sí",
+      "No"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Población de 5 años o más por uso de TIC en los últimos 3 meses, según cantón, área de residencia y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Uso de TIC en los últimos 3 meses",
+      "Uso de teléfono celular",
+      "Uso de internet",
+      "Uso de computadora o laptop",
+      "Uso de tablet",
+      "Sí",
+      "No"
+     ]
+    },
+    {
+     "hoja": "1.2",
+     "titulo": "Población de 5 años o más por uso de TIC en los últimos 3 meses, según cantón, parroquia de residencia y sexo al nacer",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Uso de TIC en los últimos 3 meses",
+      "Uso de teléfono celular",
+      "Uso de internet",
+      "Uso de computadora o laptop",
+      "Uso de tablet",
+      "Sí",
+      "No"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Población de 5 años o más por uso de TIC en los últimos 3 meses, según provincia de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Uso de TIC en los últimos 3 meses",
+      "Uso de telefono celular",
+      "Uso de internet",
+      "Uso de computadora o laptop",
+      "Uso de tablet",
+      "Sí",
+      "No"
+     ]
+    },
+    {
+     "hoja": "2.1",
+     "titulo": "Población de 5 años o más por uso de TIC en los últimos 3 meses, según cantón de residencia, sexo al nacer y grupos quinquenales de edad",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Uso de TIC en los últimos 3 meses",
+      "Uso de telefono celular",
+      "Uso de internet",
+      "Uso de computadora o laptop",
+      "Uso de tablet",
+      "Sí",
+      "No"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Hogares por disponibilidad de bienes y servicios TIC (teléfono convencional, celular, televisión pagada, internet, computadora de escritorio o laptop), según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Disponibilidad de bienes y servicios TIC",
+      "Teléfono convencional",
+      "Teléfono celular",
+      "Televisión pagada",
+      "Internet fijo",
+      "Computadora (de escritorio o laptop)",
+      "Sí",
+      "No"
+     ]
+    },
+    {
+     "hoja": "3.1",
+     "titulo": "Hogares por disponibilidad de bienes y servicios TIC (teléfono convencional, celular, televisión pagada, internet, computadora de escritorio o laptop), según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Disponibilidad de bienes y servicios TIC",
+      "Teléfono convencional",
+      "Teléfono celular",
+      "Televisión pagada",
+      "Internet fijo",
+      "Computadora (de escritorio o laptop)",
+      "Sí",
+      "No"
+     ]
+    },
+    {
+     "hoja": "3.2",
+     "titulo": "Hogares según disponibilidad de bienes y servicios TIC (teléfono convencional, celular, televisión pagada, internet o computadora de escritorio o laptop), según provincia, cantón y parroquia de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Disponibilidad de bienes y servicios TIC",
+      "Teléfono convencional",
+      "Teléfono celular",
+      "Televisión pagada",
+      "Internet fijo",
+      "Computadora (de escritorio o laptop)",
+      "Sí",
+      "No"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2024/05/2022_CPV_Mascotas.xlsx",
+   "label": "Mascotas – Excel",
+   "tema": "hogar",
+   "formato": "XLSX",
+   "bytes": 656745,
+   "sha256": "70ae6283485a61b6dc9a39a797e0e44053d57326416efa23e93ed620c479d5c3",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "provincia",
+    "cantón",
+    "parroquia"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Hogares por tenencia de mascotas (perros y/o gatos), según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Tenencia de mascotas",
+      "Si tiene perros y/o gatos",
+      "No tiene perros ni gatos",
+      "Tiene perros y gatos",
+      "Solo perros",
+      "Solo gatos",
+      "Total hogares que tienen perros y/o gatos"
+     ]
+    },
+    {
+     "hoja": "1.1",
+     "titulo": "Hogares por tenencia de mascotas (perros y/o gatos), según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Tenencia de mascotas",
+      "Tiene perros y gatos",
+      "Solo perros",
+      "Solo gatos",
+      "No tiene perros ni gatos"
+     ]
+    },
+    {
+     "hoja": "1.2",
+     "titulo": "Hogares por tenencia de mascotas (perros y/o gatos), según provincia, cantón y parroquia de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Tenencia de mascotas",
+      "Tiene perros y gatos",
+      "Solo perros",
+      "Solo gatos",
+      "No tiene perros ni gatos"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Hogares por tenencia y número de perros por hogar, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Tenencia de perros",
+      "Si",
+      "No",
+      "Número de perros por hogar",
+      "1 perro",
+      "2 perros",
+      "3 perros",
+      "4 perros",
+      "5 perros o más"
+     ]
+    },
+    {
+     "hoja": "2.1",
+     "titulo": "Hogares por tenencia y número de perros por hogar, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Tenencia de perros",
+      "Si",
+      "No",
+      "Número de perros por hogar",
+      "1 perro",
+      "2 perros",
+      "3 perros",
+      "4 perros",
+      "5 perros o más"
+     ]
+    },
+    {
+     "hoja": "2.2",
+     "titulo": "Hogares por tenencia y número de perros por hogar, según provincia, cantón y parroquia de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Tenencia de perros",
+      "Si",
+      "No",
+      "Número de perros por hogar",
+      "1 perro",
+      "2 perros",
+      "3 perros",
+      "4 perros",
+      "5 perros o más"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Hogares por tenencia y número de gatos por hogar, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Tenencia de gatos",
+      "Si",
+      "No",
+      "Número de gatos por hogar",
+      "1 gato",
+      "2 gatos",
+      "3 gatos",
+      "4 gatos",
+      "5 gatos o más"
+     ]
+    },
+    {
+     "hoja": "3.1",
+     "titulo": "Hogares por tenencia y número de gatos por hogar, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Tenencia de gatos",
+      "Si",
+      "No",
+      "Número de gatos por hogar",
+      "1 gato",
+      "2 gatos",
+      "3 gatos",
+      "4 gatos",
+      "5 gatos o más"
+     ]
+    },
+    {
+     "hoja": "3.2",
+     "titulo": "Hogares por tenencia y número de gatos por hogar, según provincia, cantón y parroquia de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de hogares",
+      "Tenencia de gatos",
+      "Si",
+      "No",
+      "Número de gatos por hogar",
+      "1 gato",
+      "2 gatos",
+      "3 gatos",
+      "4 gatos",
+      "5 gatos o más"
+     ]
+    },
+    {
+     "hoja": "4",
+     "titulo": "Total de mascotas, perros y gatos, según provincia y área de residencia",
+     "niveles": [
+      "provincia"
+     ],
+     "columnas": [
+      "Número total de mascotas (perros y/o gatos)",
+      "Número de perros y/o gatos",
+      "Perros",
+      "Gatos"
+     ]
+    },
+    {
+     "hoja": "4.1",
+     "titulo": "Total de mascotas, perros y gatos, según provincia, cantón y área de residencia",
+     "niveles": [
+      "provincia",
+      "cantón"
+     ],
+     "columnas": [
+      "Número total de mascotas (perros y/o gatos)",
+      "Número de perros y/o gatos",
+      "Perros",
+      "Gatos"
+     ]
+    },
+    {
+     "hoja": "4.2",
+     "titulo": "Total de mascotas, perros y gatos, según provincia, cantón y parroquia de residencia",
+     "niveles": [
+      "provincia",
+      "cantón",
+      "parroquia"
+     ],
+     "columnas": [
+      "Número total de mascotas (perros y/o gatos)",
+      "Número de perros y/o gatos",
+      "Perros",
+      "Gatos"
+     ]
+    }
+   ]
+  },
+  {
+   "url": "https://www.censoecuador.gob.ec/wp-content/uploads/2024/12/Serie-Historica-1950-2022.xlsx",
+   "label": "Serie Histórica – Excel",
+   "tema": null,
+   "formato": "XLSX",
+   "bytes": 350365,
+   "sha256": "ebde21ea8a7e7e27cae9e8f27883d612f9a4a43fd681e965f01b754b554e5b45",
+   "extraido": "2026-11-09",
+   "niveles": [
+    "nacional",
+    "provincia",
+    "cantón"
+   ],
+   "hojas": [
+    {
+     "hoja": "1",
+     "titulo": "Población total y tasa de crecimiento promedio anual 1950-2022, nacional y según provincia de empadronamiento",
+     "niveles": [
+      "nacional",
+      "provincia"
+     ]
+    },
+    {
+     "hoja": "2",
+     "titulo": "Población por área, nacional y según provincia de empadronamiento",
+     "niveles": [
+      "nacional",
+      "provincia"
+     ]
+    },
+    {
+     "hoja": "3",
+     "titulo": "Población por sexo al nacer y tasa de crecimiento promedio anual, nacional y según cantón de empadronamiento",
+     "niveles": [
+      "nacional",
+      "cantón"
+     ]
+    },
+    {
+     "hoja": "4",
+     "titulo": "Población por sexo y grandes grupos etarios, nacional y según provincia de empadronamiento",
+     "niveles": [
+      "nacional",
+      "provincia"
+     ]
+    },
+    {
+     "hoja": "5",
+     "titulo": "Edad promedio de la población, nacional y según cantón de empadronamiento",
+     "niveles": [
+      "nacional",
+      "cantón"
+     ]
+    },
+    {
+     "hoja": "6",
+     "titulo": "Razón de masculinidad y feminidad, nacional y según cantón de empadronamiento",
+     "niveles": [
+      "nacional",
+      "cantón"
+     ]
+    }
+   ]
+  }
+ ]
+}

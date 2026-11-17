@@ -66,7 +66,7 @@ _SOURCE_NAME = "Banco Central del Ecuador — Índices de publicaciones"
 # often as weekly. 6h matches the TTL other publication-list clients in
 # this project use (helpers/bce_publicaciones_client.py, sri_client.py).
 _PAGE_FETCH_CONCURRENCY = 6
-_catalog_cache = TtlCache(ttl_seconds=21600.0, max_entries=1)
+_catalog_cache = TtlCache(ttl_seconds=21600.0, max_entries=1, persist="bce_indices_catalog")
 _fetch_lock = asyncio.Lock()
 
 _WS_RE = re.compile(r"\s+")
@@ -310,6 +310,17 @@ async def _discover_paginas() -> list[dict[str, str]]:
 
 
 async def _fetch_catalog() -> tuple[list[dict[str, Any]], list[str]]:
+    """Fresh fetch, or the last good copy when the source fails (see TtlCache.serve_stale)."""
+    try:
+        return await _fetch_catalog_fresh()
+    except Exception as exc:
+        stale = _catalog_cache.serve_stale("catalog", exc)
+        if stale is None:
+            raise
+        return stale, []
+
+
+async def _fetch_catalog_fresh() -> tuple[list[dict[str, Any]], list[str]]:
     """The catalog plus the URLs of pages that failed to download.
 
     A page without a recognized widget is a valid "not an índice page"

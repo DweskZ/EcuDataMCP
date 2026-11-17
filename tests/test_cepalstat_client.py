@@ -189,7 +189,7 @@ async def test_get_indicador_ambiguous_partial_country_match_raises(httpx_mock):
         url=client._build_url("/indicator/4788/dimensions", lang="es"), json=dimensions
     )
 
-    with pytest.raises(ValueError, match="Guinea, Guinea Ecuatorial"):
+    with pytest.raises(ValueError, match="Guinea; Guinea Ecuatorial"):
         await client.get_indicador(4788, pais="guin")
 
 
@@ -242,3 +242,113 @@ async def test_thematic_tree_is_cached_across_calls(httpx_mock):
     second = await client.search_indicadores(query="pobreza")
 
     assert first["total_catalogo"] == second["total_catalogo"] == 3
+
+
+_BOLIVIA_DIMENSIONS = [
+    {
+        "name": "País__ESTANDAR",
+        "members": [
+            {"name": "Bolivia (Estado Plurinacional de)", "id": 221},
+            {"name": "Mercado Común del Sur (MERCOSUR)", "id": 31809},
+            {
+                "name": "Mercado Común del Sur (MERCOSUR), Bolivia (Estado Plurinacional de) y Chile",
+                "id": 46573,
+            },
+            {"name": "Perú", "id": 244},
+            {"name": "Trinidad y Tabago", "id": 300},
+            {"name": "Guinea", "id": 1},
+            {"name": "Guinea Ecuatorial", "id": 2},
+        ],
+    }
+]
+
+
+@pytest.mark.parametrize("pais", ["Bolivia", "bolivia", "BOL", "Bolivia (Estado Plurinacional de)"])
+def test_find_pais_member_bolivia_ignores_aggregates_that_mention_it(pais):
+    assert client._find_pais_member(_BOLIVIA_DIMENSIONS, pais)["id"] == 221
+
+
+@pytest.mark.parametrize("pais", ["Peru", "perú", "PER"])
+def test_find_pais_member_peru_accent_and_iso3(pais):
+    assert client._find_pais_member(_BOLIVIA_DIMENSIONS, pais)["id"] == 244
+
+
+def test_find_pais_member_aggregate_only_when_named():
+    assert client._find_pais_member(_BOLIVIA_DIMENSIONS, "MERCOSUR")["id"] == 31809
+    assert client._find_pais_member(_BOLIVIA_DIMENSIONS, "Mercado Común del Sur")["id"] == 31809
+    full = "Mercado Común del Sur (MERCOSUR), Bolivia (Estado Plurinacional de) y Chile"
+    assert client._find_pais_member(_BOLIVIA_DIMENSIONS, full)["id"] == 46573
+
+
+def test_find_pais_member_keeps_real_countries_with_y_in_the_name():
+    assert client._find_pais_member(_BOLIVIA_DIMENSIONS, "tabago")["id"] == 300
+
+
+def test_find_pais_member_genuine_ambiguity_lists_only_real_candidates():
+    with pytest.raises(ValueError, match="Guinea; Guinea Ecuatorial") as exc:
+        client._find_pais_member(_BOLIVIA_DIMENSIONS, "guin")
+    assert "MERCOSUR" not in str(exc.value)
+
+
+def test_find_pais_member_ambiguous_aggregates_when_only_they_match():
+    dims = [
+        {
+            "name": "País",
+            "members": [
+                {"name": "Grupo Sur, Bolivia y Chile", "id": 1},
+                {"name": "Grupo Sur, Perú y Chile", "id": 2},
+            ],
+        }
+    ]
+    with pytest.raises(ValueError, match="ambiguo"):
+        client._find_pais_member(dims, "grupo sur")
+
+
+async def test_get_indicador_flags_possible_series_break(httpx_mock):
+    dims = {
+        "header": {},
+        "body": {"dimensions": _BOLIVIA_DIMENSIONS + [{"name": "Años", "members": []}]},
+        "footer": {},
+    }
+    httpx_mock.add_response(
+        url=client._build_url("/indicator/4891/dimensions", lang="es"), json=dims
+    )
+    data = {
+        "header": {},
+        "body": {
+            "metadata": {"unit": "Porcentaje sobre el total de hogares"},
+            "dimensions": [
+                {"id": 208, "name": "País__ESTANDAR", "members": [{"id": 244, "name": "Perú"}]},
+                {
+                    "id": 29117,
+                    "name": "Años__ESTANDAR",
+                    "members": [{"id": 1, "name": "2022"}, {"id": 2, "name": "2023"}],
+                },
+            ],
+            "data": [
+                {"value": "55.2", "dim_208": 244, "dim_29117": 1},
+                {"value": "89.6", "dim_208": 244, "dim_29117": 2},
+            ],
+        },
+        "footer": {},
+    }
+    httpx_mock.add_response(
+        url=client._build_url("/indicator/4891/data", lang="es", format="json", members=244),
+        json=data,
+    )
+
+    result = await client.get_indicador(4891, pais="PER")
+
+    (quiebre,) = result["posible_quiebre_serie"]
+    assert (quiebre["desde"], quiebre["hasta"], quiebre["salto_pp"]) == (2022, 2023, 34.4)
+
+
+def test_detectar_quiebres_ignores_small_moves_and_non_percentage_units():
+    rows = [
+        {"País": "Perú", "Años": "2022", "valor": "50"},
+        {"País": "Perú", "Años": "2023", "valor": "60"},
+    ]
+    assert client._detectar_quiebres(rows, "Porcentaje") == []
+    big = [{**rows[0], "valor": "10"}, {**rows[1], "valor": "90"}]
+    assert client._detectar_quiebres(big, "Millones de dólares") == []
+    assert len(client._detectar_quiebres(big, "Porcentaje")) == 1

@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -15,6 +15,7 @@ from helpers.geo_data import (
     list_provincias,
 )
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoFicha
 from helpers.tool_meta import READ_ONLY
 
 
@@ -36,7 +37,7 @@ def register_lookup_ubicacion_tool(mcp: MCPServer) -> None:
         canton: str = "",
         nivel: Literal["auto", "provincia", "canton", "parroquia"] = "auto",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoFicha]:
         """
         Look up Ecuador DPA geography: provinces, cantons and parroquias (INEC codes).
 

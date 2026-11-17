@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -8,6 +8,7 @@ from helpers import sercop_client
 from helpers.ecuador_time import today_ecuador
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoBusqueda
 from helpers.sercop_client import SercopRateLimitError
 from helpers.tool_meta import READ_ONLY
 
@@ -29,7 +30,7 @@ def register_search_contratos_tool(mcp: MCPServer) -> None:
         buyer: str = "",
         supplier: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         Search Ecuador public procurement procedures (SERCOP / OCDS open data).
 

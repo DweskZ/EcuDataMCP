@@ -283,7 +283,21 @@ async def _fetch(distribuidora: str) -> Any:
         if truncated:
             raise ValueError(f"La respuesta de {distribuidora} superó el límite de descarga.")
         text = content.decode("utf-8", errors="replace")
-        data = _parse_eeasa(text) if distribuidora == "eeasa" else json.loads(text)
+        if distribuidora == "eeasa":
+            data = _parse_eeasa(text)
+        else:
+            try:
+                data = json.loads(text)
+            except json.JSONDecodeError as e:
+                # Seen 2026-11-10 on the GitHub runner: Emelnorte's WordPress
+                # answered the posts API with HTTP 202 and an empty body (a
+                # bot challenge for datacenter IPs) while the same URL
+                # returned JSON from a home connection.
+                raise ValueError(
+                    f"El sitio de {distribuidora} devolvió una respuesta vacía o "
+                    "no válida en lugar de la lista de avisos (posible bloqueo "
+                    "de bots); reintenta en unos minutos."
+                ) from e
         _cache.set(distribuidora, data)
         return data
 

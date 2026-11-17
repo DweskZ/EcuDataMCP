@@ -195,3 +195,11 @@ async def test_tool_text_shows_motive_without_placeholder(feeds):
     text = got.content[0].text
     assert "Motivo: CAMBIO ESTRUCTURAS MV" in text
     assert "ubicación no reconocida" not in text
+
+
+async def test_non_json_answer_raises_a_clear_error(httpx_mock):
+    # The runner got HTTP 202 with an empty body from Emelnorte (bot challenge).
+    httpx_mock.add_response(url=client._FUENTES["emelnorte"]["url"], status_code=202, content=b"")
+
+    with pytest.raises(ValueError, match="respuesta vacía o no válida"):
+        await client.search("emelnorte")

@@ -1,5 +1,5 @@
 import json
-from typing import Literal
+from typing import Annotated, Literal
 
 import httpx
 from mcp.server.mcpserver import MCPServer
@@ -10,6 +10,7 @@ from helpers import ckan_client
 from helpers.csv_reader import format_table
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoTabla
 from helpers.tool_meta import READ_ONLY
 
 
@@ -33,7 +34,7 @@ def register_query_resource_data_tool(mcp: MCPServer) -> None:
         sort: str = "",
         source: ckan_client.CkanSource = "nacional",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoTabla]:
         """
         Query a tabular resource via CKAN DataStore without downloading the full file.
 

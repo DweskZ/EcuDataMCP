@@ -1,6 +1,7 @@
 import asyncio
 import codecs
 import csv
+import difflib
 import io
 import json
 import logging
@@ -884,17 +885,28 @@ async def preview_ods(
     return await run_parser_off_loop(_parse_ods_bytes, raw, max_rows, truncated)
 
 
-def _gunzip_capped(raw: bytes, cap: int = _MAX_DECOMPRESSED_BYTES) -> tuple[bytes, bool]:
-    """Decompress gzip bytes, stopping once `cap` output bytes are produced.
+def _gunzip_capped(
+    raw: bytes, cap: int = _MAX_DECOMPRESSED_BYTES
+) -> tuple[bytes, bool]:
+    """Decompress gzip bytes, stopping once `cap` output bytes are produced."""
+    return _inflate_capped(raw, 16 + zlib.MAX_WBITS, cap)
+
+
+def _inflate_capped(raw: bytes, wbits: int, cap: int) -> tuple[bytes, bool]:
+    """Decompress zlib-family bytes, stopping once `cap` output bytes are produced.
+
+    `wbits` picks the container: 16 + MAX_WBITS for gzip (.tar.gz), -MAX_WBITS
+    for the raw deflate stream inside a .zip member. Returns (output,
+    truncated).
 
     Bounds memory use against a decompression bomb: a small, highly
-    compressible .tar.gz (already capped at MAX_DOWNLOAD_BYTES on the wire)
+    compressible input (already capped at MAX_DOWNLOAD_BYTES on the wire)
     could otherwise expand to gigabytes once decompressed. Passing
     max_length to decompress() is essential here -- a single 64 KB
     compressed chunk can still expand far past `cap` in one call, so the
     cap must be enforced *within* a chunk, not just checked between chunks.
     """
-    decompressor = zlib.decompressobj(16 + zlib.MAX_WBITS)
+    decompressor = zlib.decompressobj(wbits)
     out = bytearray()
     chunk_size = 64 * 1024
     pos = 0
@@ -1065,9 +1077,9 @@ async def preview_zip(
 # A .zip's central directory lives at the end of the file and lists every
 # member's name/size without decompressing anything, so it can be listed via
 # HTTP Range requests for archives far larger than MAX_DOWNLOAD_BYTES (e.g.
-# INEC/censo multi-hundred-MB microdata ZIPs). Previewing a specific member's
-# *rows* still needs a full download (preview_zip, above) -- listing names is
-# cheap this way, reading content generally isn't.
+# INEC/censo multi-hundred-MB microdata ZIPs). The central directory also
+# gives each member's local header offset, so read_zip_member (below) can
+# Range-fetch one member's bytes without the rest of the archive.
 _EOCD_SIGNATURE = b"PK\x05\x06"
 _CD_HEADER_SIGNATURE = b"PK\x01\x02"
 _EOCD_TAIL_BYTES = 65557 + 22  # max comment (65535) + EOCD record, plus slack
@@ -1173,12 +1185,73 @@ def _parse_eocd(tail: bytes) -> tuple[int, int, int]:
         struct.unpack_from("<4sHHHHIIH", tail, idx)
     )
     if total_entries == 0xFFFF or cd_offset == 0xFFFFFFFF or cd_size == 0xFFFFFFFF:
-        raise ValueError(
-            "Este .zip usa ZIP64 (más de 65535 archivos o directorio central "
-            "de más de 4 GB); el listado por HTTP Range todavía no lo "
-            "soporta. Usa download_resource o el enlace directo."
-        )
+        raise _Zip64Required(idx)
     return cd_offset, cd_size, total_entries
+
+
+class _Zip64Required(ValueError):
+    """The classic EOCD holds ZIP64 sentinels; the real values live in the
+    ZIP64 end-of-central-directory record found through its locator."""
+
+    def __init__(self, eocd_index: int) -> None:
+        super().__init__(
+            "Este .zip usa ZIP64 (más de 65535 archivos o más de 4 GB) y no "
+            "trae el registro ZIP64 que lo describe; parece corrupto."
+        )
+        self.eocd_index = eocd_index
+
+
+_ZIP64_LOCATOR_SIGNATURE = b"PK\x06\x07"
+_ZIP64_EOCD_SIGNATURE = b"PK\x06\x06"
+
+
+async def _read_zip64_eocd(
+    url: str,
+    tail: bytes,
+    tail_start: int,
+    eocd_index: int,
+    session: httpx.AsyncClient | None,
+) -> tuple[int, int, int]:
+    """Return (cd_offset, cd_size, total_entries) from the ZIP64 EOCD record."""
+    loc = eocd_index - 20
+    if loc < 0 or tail[loc : loc + 4] != _ZIP64_LOCATOR_SIGNATURE:
+        raise _Zip64Required(eocd_index)
+    _sig, _disk, record_offset, _disks = struct.unpack_from("<4sIQI", tail, loc)
+
+    if tail_start <= record_offset and record_offset + 56 <= tail_start + len(tail):
+        record = tail[record_offset - tail_start : record_offset - tail_start + 56]
+    else:
+        record, headers, status = await _fetch_range(
+            url, f"bytes={record_offset}-{record_offset + 55}", cap=56, session=session
+        )
+        _check_partial(status, headers, record_offset)
+    if len(record) < 56 or record[:4] != _ZIP64_EOCD_SIGNATURE:
+        raise _Zip64Required(eocd_index)
+    (_sig, _size, _made, _needed, _disk, _cd_disk, _entries_disk, total_entries,
+     cd_size, cd_offset) = struct.unpack_from("<4sQHHIIQQQQ", record, 0)
+    return cd_offset, cd_size, total_entries
+
+
+def _apply_zip64_extra(extra: bytes, sizes: dict[str, int]) -> None:
+    """Replace 0xFFFFFFFF sizes/offset with the 8-byte values of extra field 0x0001.
+
+    The ZIP64 extra field lists only the fields whose 32-bit slot holds the
+    sentinel, in a fixed order: uncompressed size, compressed size, local
+    header offset.
+    """
+    pos = 0
+    while pos + 4 <= len(extra):
+        header_id, size = struct.unpack_from("<HH", extra, pos)
+        body = extra[pos + 4 : pos + 4 + size]
+        pos += 4 + size
+        if header_id != 0x0001:
+            continue
+        cursor = 0
+        for key in ("uncompressed_size", "compressed_size", "local_header_offset"):
+            if sizes[key] == 0xFFFFFFFF and cursor + 8 <= len(body):
+                (sizes[key],) = struct.unpack_from("<Q", body, cursor)
+                cursor += 8
+        return
 
 
 def _parse_central_directory(data: bytes, expected_entries: int) -> list[dict[str, Any]]:
@@ -1197,7 +1270,7 @@ def _parse_central_directory(data: bytes, expected_entries: int) -> list[dict[st
             compression,
             _mtime,
             _mdate,
-            _crc32,
+            crc32,
             compressed_size,
             uncompressed_size,
             name_len,
@@ -1206,12 +1279,23 @@ def _parse_central_directory(data: bytes, expected_entries: int) -> list[dict[st
             _disk_start,
             _internal_attrs,
             _external_attrs,
-            _local_offset,
+            local_offset,
         ) = struct.unpack_from("<4sHHHHHHIIIHHHHHII", data, pos)
         pos += 46
         name = data[pos : pos + name_len].decode(
             "utf-8" if flags & 0x0800 else "cp437", errors="replace"
         )
+        sizes = {
+            "uncompressed_size": uncompressed_size,
+            "compressed_size": compressed_size,
+            "local_header_offset": local_offset,
+        }
+        if 0xFFFFFFFF in sizes.values():
+            extra = data[pos + name_len : pos + name_len + extra_len]
+            _apply_zip64_extra(extra, sizes)
+            uncompressed_size = sizes["uncompressed_size"]
+            compressed_size = sizes["compressed_size"]
+            local_offset = sizes["local_header_offset"]
         pos += name_len + extra_len + comment_len
         members.append(
             {
@@ -1219,25 +1303,38 @@ def _parse_central_directory(data: bytes, expected_entries: int) -> list[dict[st
                 "is_dir": name.endswith("/"),
                 "compressed_size": compressed_size,
                 "uncompressed_size": uncompressed_size,
-                "compression": {0: "stored", 8: "deflate"}.get(compression, str(compression)),
+                "compression": {0: "stored", 8: "deflate"}.get(
+                    compression, str(compression)
+                ),
+                # Internal fields for read_zip_member; list_zip_contents
+                # projects them out (_PUBLIC_MEMBER_KEYS).
+                "compression_method": compression,
+                "flags": flags,
+                "crc32": crc32,
+                "local_header_offset": local_offset,
             }
         )
     return members
 
 
-async def list_zip_contents(
-    url: str, session: httpx.AsyncClient | None = None
-) -> dict[str, Any]:
-    """
-    List a .zip archive's members (name, size, compression) via HTTP Range
-    requests, without downloading the archive itself.
+_PUBLIC_MEMBER_KEYS = (
+    "name",
+    "is_dir",
+    "compressed_size",
+    "uncompressed_size",
+    "compression",
+)
+_RANGE_UNSUPPORTED = (
+    "El servidor no respondió con el rango pedido (HTTP 206 con el mismo "
+    "inicio) -- no soporta HTTP Range requests, así que este .zip no se "
+    "puede leer sin descargarlo completo."
+)
 
-    Works for archives far past MAX_DOWNLOAD_BYTES since only the End Of
-    Central Directory record and the central directory itself are fetched --
-    both tiny relative to the archive, proportional to entry count rather
-    than entry content. Requires the server to honor Range requests (returns
-    HTTP 206); raises ValueError otherwise. Does not support ZIP64 archives.
-    """
+
+async def _fetch_central_directory(
+    url: str, session: httpx.AsyncClient | None = None
+) -> tuple[list[dict[str, Any]], int, int]:
+    """Return (members with internal fields, total_size, total_entries) via Range requests."""
     tail, tail_headers, tail_status = await _fetch_range(
         url, f"bytes=-{_EOCD_TAIL_BYTES}", cap=_EOCD_TAIL_BYTES, session=session
     )
@@ -1249,7 +1346,12 @@ async def list_zip_contents(
         )
     tail_start, total_size = _parse_content_range(tail_headers)
 
-    cd_offset, cd_size, total_entries = _parse_eocd(tail)
+    try:
+        cd_offset, cd_size, total_entries = _parse_eocd(tail)
+    except _Zip64Required as zip64:
+        cd_offset, cd_size, total_entries = await _read_zip64_eocd(
+            url, tail, tail_start, zip64.eocd_index, session
+        )
 
     if cd_offset >= tail_start:
         cd_data = tail[cd_offset - tail_start : cd_offset - tail_start + cd_size]
@@ -1273,12 +1375,307 @@ async def list_zip_contents(
                 "listar este .zip sin descargarlo completo."
             )
 
-    members = _parse_central_directory(cd_data, total_entries)
+    return _parse_central_directory(cd_data, total_entries), total_size, total_entries
+
+
+async def list_zip_contents(
+    url: str, session: httpx.AsyncClient | None = None
+) -> dict[str, Any]:
+    """
+    List a .zip archive's members (name, size, compression) via HTTP Range
+    requests, without downloading the archive itself.
+
+    Works for archives far past MAX_DOWNLOAD_BYTES since only the End Of
+    Central Directory record and the central directory itself are fetched --
+    both tiny relative to the archive, proportional to entry count rather
+    than entry content. Requires the server to honor Range requests (returns
+    HTTP 206); raises ValueError otherwise. Reads ZIP64 end records and
+    extra fields, so archives past 4 GB or 65535 entries list too.
+    """
+    members, total_size, total_entries = await _fetch_central_directory(url, session)
     return {
         "url": url,
         "total_size_bytes": total_size,
         "total_entries": total_entries,
-        "members": members,
+        "members": [{k: m[k] for k in _PUBLIC_MEMBER_KEYS} for m in members],
+    }
+
+
+_ZIP_TEXT_EXTS = (".csv", ".tsv", ".txt")
+_ZIP_SHEET_PARSERS: dict[str, Callable[[bytes, int, bool], dict[str, Any]]] = {
+    ".xlsx": _parse_xlsx_bytes,
+    ".xls": _parse_xls_bytes,
+    ".xlsb": _parse_xlsb_bytes,
+    ".ods": _parse_ods_bytes,
+}
+_LOCAL_HEADER_SIGNATURE = b"PK\x03\x04"
+_LOCAL_HEADER_SLACK = 1024  # room for a local name/extra longer than the CD's
+
+
+def _resolve_member(members: list[dict[str, Any]], member: str) -> dict[str, Any]:
+    """Exact name, then a unique case-insensitive or basename match, else ValueError."""
+    by_name = {m["name"]: m for m in members}
+    if member in by_name:
+        return by_name[member]
+
+    wanted = member.casefold()
+    for candidates in (
+        [m for m in members if m["name"].casefold() == wanted],
+        [
+            m
+            for m in members
+            if m["name"].rsplit("/", 1)[-1].casefold() == wanted.rsplit("/", 1)[-1]
+        ],
+    ):
+        if len(candidates) == 1:
+            return candidates[0]
+
+    names = [m["name"] for m in members if not m["is_dir"]]
+    close = difflib.get_close_matches(member, names, n=5, cutoff=0.5)
+    hint = ", ".join(close) if close else ", ".join(names[:5])
+    raise ValueError(
+        f"No hay ningún archivo '{member}' dentro del .zip. "
+        f"¿Quisiste decir: {hint}? Usa list_zip_contents para ver los nombres exactos."
+    )
+
+
+def _check_partial(status: int, headers: httpx.Headers, expected_start: int) -> None:
+    """Require a 206 whose Content-Range starts where we asked."""
+    if status != 206:
+        raise ValueError(_RANGE_UNSUPPORTED)
+    start, _total = _parse_content_range(headers)
+    if start != expected_start:
+        raise ValueError(_RANGE_UNSUPPORTED)
+
+
+async def read_zip_member(
+    url: str,
+    member: str,
+    max_rows: int = 50,
+    session: httpx.AsyncClient | None = None,
+    skip_rows: int = -1,
+) -> dict[str, Any]:
+    """Read one member of a remote .zip by fetching only that member's bytes.
+
+    `skip_rows`: rows above the column header (-1 detects it, see
+    _tidy_report_table). Empty columns are dropped from the result.
+
+    Uses the central directory (as list_zip_contents does) to locate the
+    member, then Range-fetches its local header and compressed data. Caps:
+    compressed size <= MAX_DOWNLOAD_BYTES; CSV/text output stops at
+    MAX_DOWNLOAD_BYTES (marked truncated); spreadsheets must fit in
+    _MAX_DECOMPRESSED_BYTES since their parsers need the whole file. Only
+    stored and deflate members, no encryption; ZIP64 is supported.
+    """
+    members, total_size, _entries = await _fetch_central_directory(url, session)
+    info = _resolve_member(members, member)
+    name = info["name"]
+
+    if info["is_dir"]:
+        raise ValueError(f"'{name}' es una carpeta dentro del .zip, no un archivo.")
+    if info["flags"] & 0x1:
+        raise ValueError(f"'{name}' está cifrado con contraseña; no se puede leer.")
+    method = info["compression_method"]
+    if method not in (0, 8):
+        raise ValueError(
+            f"'{name}' usa un método de compresión no soportado ({method}); "
+            "solo se leen miembros sin comprimir (stored) o deflate."
+        )
+    if 0xFFFFFFFF in (
+        info["compressed_size"],
+        info["uncompressed_size"],
+        info["local_header_offset"],
+    ):
+        raise ValueError(
+            f"'{name}': el .zip está corrupto (tamaño ZIP64 sin su campo extra)."
+        )
+    compressed_size = info["compressed_size"]
+    if compressed_size > MAX_DOWNLOAD_BYTES:
+        raise ValueError(
+            f"'{name}' pesa {compressed_size} bytes comprimido, por encima del "
+            f"límite de {MAX_DOWNLOAD_BYTES // (1024 * 1024)} MB. Descarga el .zip "
+            "directamente."
+        )
+
+    ext = (
+        "." + name.rsplit(".", 1)[-1].lower() if "." in name.rsplit("/", 1)[-1] else ""
+    )
+    if ext not in _ZIP_TEXT_EXTS and ext not in _ZIP_SHEET_PARSERS:
+        supported = ", ".join((*_ZIP_TEXT_EXTS, *_ZIP_SHEET_PARSERS))
+        raise ValueError(
+            f"'{name}' no tiene un formato legible ({ext or 'sin extensión'}). "
+            f"Formatos soportados: {supported}."
+        )
+    is_sheet = ext in _ZIP_SHEET_PARSERS
+    if is_sheet and info["uncompressed_size"] > _MAX_DECOMPRESSED_BYTES:
+        raise ValueError(
+            f"'{name}' se expande a {info['uncompressed_size']} bytes, por encima "
+            f"del límite de {_MAX_DECOMPRESSED_BYTES // (1024 * 1024)} MB para hojas "
+            "de cálculo."
+        )
+
+    # One request: local header, the central directory's name/extra length
+    # plus slack (the local extra field can differ), and the data itself.
+    start = info["local_header_offset"]
+    if start + 30 > total_size:
+        raise ValueError(f"'{name}': el .zip está corrupto (offset fuera del archivo).")
+    guess_len = 30 + len(name.encode("utf-8")) + _LOCAL_HEADER_SLACK + compressed_size
+    end = min(start + guess_len, total_size) - 1
+    buf, headers, status = await _fetch_range(
+        url, f"bytes={start}-{end}", cap=end - start + 1, session=session
+    )
+    _check_partial(status, headers, start)
+    if len(buf) < 30 or buf[:4] != _LOCAL_HEADER_SIGNATURE:
+        raise ValueError(f"'{name}': el .zip está corrupto (cabecera local inválida).")
+    local_name_len, local_extra_len = struct.unpack_from("<HH", buf, 26)
+    data_start = start + 30 + local_name_len + local_extra_len
+    data_end = data_start + compressed_size
+
+    if data_end <= start + len(buf):
+        data = buf[data_start - start : data_end - start]
+    else:
+        data, headers, status = await _fetch_range(
+            url,
+            f"bytes={data_start}-{data_end - 1}",
+            cap=compressed_size,
+            session=session,
+        )
+        _check_partial(status, headers, data_start)
+    if len(data) != compressed_size:
+        raise ValueError(f"'{name}': el .zip está corrupto (datos incompletos).")
+
+    cap = _MAX_DECOMPRESSED_BYTES if is_sheet else MAX_DOWNLOAD_BYTES
+    if method == 0:
+        out, truncated = data[:cap], len(data) > cap
+    else:
+        try:
+            out, truncated = _inflate_capped(data, -zlib.MAX_WBITS, cap)
+        except zlib.error as e:
+            raise ValueError(f"'{name}': el .zip está corrupto ({e}).") from e
+
+    complete = not truncated and len(out) == info["uncompressed_size"]
+    if not truncated and not complete:
+        raise ValueError(
+            f"'{name}': el .zip está corrupto (tamaño descomprimido inesperado)."
+        )
+    if complete and zlib.crc32(out) != info["crc32"]:
+        raise ValueError(f"'{name}': el .zip está corrupto (CRC32 no coincide).")
+    if is_sheet and not complete:
+        raise ValueError(
+            f"'{name}' supera el límite de {_MAX_DECOMPRESSED_BYTES // (1024 * 1024)} MB "
+            "descomprimido; una hoja de cálculo no se puede abrir incompleta."
+        )
+
+    # Read past max_rows so a title block above the real header still leaves
+    # max_rows data rows once it is skipped.
+    parse_rows = max_rows + (_HEADER_SCAN_ROWS if skip_rows < 0 else skip_rows)
+    if is_sheet:
+        result = await run_parser_off_loop(
+            _ZIP_SHEET_PARSERS[ext], out, parse_rows, False
+        )
+    else:
+        result = _parse_csv_bytes(out, parse_rows, truncated=truncated)
+        result["format"] = ext.lstrip(".")
+
+    more = result["truncated"]
+    tidy = _tidy_report_table([result["headers"], *result["rows"]], skip_rows)
+    rows = tidy["rows"]
+    result.update(
+        {
+            "headers": tidy["headers"],
+            "rows": rows[:max_rows],
+            "total_rows_in_preview": min(len(rows), max_rows),
+            "truncated": more or len(rows) > max_rows,
+            "header_row": tidy["header_row"],
+            "preamble": tidy["preamble"],
+            "dropped_empty_columns": tidy["dropped_empty_columns"],
+            "member_name": name,
+            "compressed_size": compressed_size,
+            "uncompressed_size": info["uncompressed_size"],
+            "url": url,
+        }
+    )
+    return result
+
+
+_HEADER_SCAN_ROWS = 30
+_PREAMBLE_MAX_ROWS = 10
+
+
+def _unwrap_quoted_line(row: list[str]) -> list[str]:
+    """Split a row whose whole line was quoted into one cell.
+
+    INEC's tabulados (ENDI R3, 2026-11-07) quote some entire lines, e.g.
+    the line for Nacional starts with a quote and keeps its own thousands
+    ("4,288") as doubled quotes inside, so the CSV reader returns the
+    line as a single cell. Re-parse that cell when it clearly holds several
+    fields; a lone title with a comma ("..., que están") is left alone.
+    """
+    cells = [c for c in row if c.strip()]
+    if len(cells) != 1 or row[0] != cells[0]:
+        return row
+    text = cells[0]
+    delimiter = _sniff_delimiter(text)
+    if delimiter not in text:
+        return row
+    try:
+        fields = next(csv.reader([text], delimiter=delimiter))
+    except (csv.Error, StopIteration):
+        return row
+    filled = [f for f in fields if f.strip()]
+    if len(filled) >= 3 or (len(filled) >= 2 and '"' in text):
+        return fields
+    return row
+
+
+def _tidy_report_table(table: list[list[str]], skip_rows: int) -> dict[str, Any]:
+    """Find the real header in a report-style table and drop empty columns.
+
+    Statistical tabulados (INEC, BCE) open with a title block -- table
+    number, indicator, population, source -- before the column header, and
+    often carry hundreds of empty trailing columns. `skip_rows` < 0 detects
+    the header as the first row at least half as full as the fullest of the
+    first _HEADER_SCAN_ROWS rows; 0 keeps row 1; n skips n rows. A normal
+    CSV, whose first row is already the fullest, comes back unchanged.
+    """
+    table = [_unwrap_quoted_line(row) for row in table]
+    if skip_rows >= 0:
+        header_row = min(skip_rows, max(len(table) - 1, 0))
+    else:
+        counts = [sum(1 for c in row if c.strip()) for row in table[:_HEADER_SCAN_ROWS]]
+        fullest = max(counts, default=0)
+        header_row = 0
+        if fullest >= 2 and counts[0] * 2 < fullest:
+            header_row = next(i for i, n in enumerate(counts) if n * 2 >= fullest)
+
+    preamble = [
+        " | ".join(c.strip() for c in row if c.strip())[:300]
+        for row in table[:header_row]
+        if any(c.strip() for c in row)
+    ][:_PREAMBLE_MAX_ROWS]
+    body = table[header_row:]
+    if not body:
+        return {
+            "headers": [],
+            "rows": [],
+            "header_row": header_row,
+            "preamble": preamble,
+            "dropped_empty_columns": 0,
+        }
+
+    width = max(len(row) for row in body)
+    keep = [
+        i
+        for i in range(width)
+        if any(i < len(row) and row[i].strip() for row in body)
+    ]
+    trimmed = [[row[i] if i < len(row) else "" for i in keep] for row in body]
+    return {
+        "headers": trimmed[0],
+        "rows": trimmed[1:],
+        "header_row": header_row,
+        "preamble": preamble,
+        "dropped_empty_columns": width - len(keep),
     }
 
 

@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import cenace_boletin_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoTabla
 from helpers.tool_meta import READ_ONLY
 
 
@@ -26,7 +27,7 @@ def register_get_cenace_boletin_tool(mcp: MCPServer) -> None:
         mes: str = "",
         anio: int | None = None,
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoTabla]:
         """
         Read CENACE's "Boletín y Estadística Mensual de Transacciones
         Comerciales", the monthly report of Ecuador's electricity market

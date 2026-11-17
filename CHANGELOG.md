@@ -2,6 +2,360 @@
 
 ## Unreleased
 
+- **Smoke run failures of 2026-11-15 and 2026-11-16.** Two live sources are
+  down, not this repo. SGR's ArcGIS site answers every query with
+  `9017$SITE_NOT_INITIALIZED` (HTTP 200 with an `error` body), so
+  `search_eventos_riesgo` and `list_sat_tsunami` fail until SGR restarts it.
+  The World Bank API answers its metadata endpoints in ~0.2 s but never returns
+  the `/country/{iso}/indicator/{id}` data endpoint (30-60 s with no bytes, for
+  ECU and COL and several indicators), so `get_serie_internacional(fuente='wdi')`
+  times out on the 35 s per-attempt bound. The smoke classifier now reports both
+  as known upstream degradation instead of a failed run; a bare SGR
+  `ConnectError`, as seen on 2026-11-15, still fails.
+- **Smoke run failures of 2026-11-09 and 2026-11-10.**
+  `query_sut_indicador` let a Power BI `ReadTimeout` escape, so clients saw
+  only "Error executing tool query_sut_indicador"; it and
+  `get_sut_indicador_schema` now name the exception. The Supercías financials
+  build resumes a dropped download with a `Range` request (up to 3 times,
+  restarting from zero if the server ignores `Range`) instead of failing the
+  whole build; the runner had lost `bi_ranking.csv` at 274 of 374 MB.
+  `search_cortes` reports a non-JSON answer (Emelnorte's HTTP 202 with an empty
+  body on the runner) as a clear error. The smoke classifier treats that
+  Emelnorte block, an ElecGalápagos 503 and an IESS certificate
+  `ConnectTimeout` as known upstream degradation.
+- **`search_inec_publicaciones`: word-boundary matching and ranking.**
+  WordPress's `search` is a substring match, so `TIC` returned 1,458 posts
+  (matching "estadísticas", "práctica", "tránsito"). Queries are now tokenized
+  (accent- and case-insensitive, stopwords dropped), each token is fetched and
+  re-checked against title and excerpt on word boundaries (prefix for tokens of
+  4+ characters, whole word for 3 or fewer), and results rank by tokens matched
+  (all first), then token rarity, title hits and recency. Empty query is
+  unchanged. Live: `TIC` 1,458 -> 22, led by the "Tecnologías de la Información
+  y Comunicación-TIC" posts. Body text beyond the excerpt is not searched.
+- **`get_cepalstat_indicador`: country resolution and series-break flag.**
+  `pais="Bolivia"` failed as ambiguous because CEPALSTAT also lists MERCOSUR
+  groupings whose names contain "Bolivia" (no alias table was involved). An
+  exact name, the name before a parenthetical, or an ISO3 code (`BOL`, `PER`)
+  now wins; aggregates (regional groupings, "A, B y C" lists) are chosen only
+  when named or when nothing else matches; real ambiguity still errors and
+  lists only real candidates. Percentage series with a year-over-year jump above
+  25 pp now carry `posible_quiebre_serie` (e.g. indicator 4891, Peru 2022 to
+  2023: Total 55.2 to 89.6).
+- **`get_resumen_compras`: totals no longer change between identical runs.**
+  `search_ocds` has no stable ordering: the same `page` returns a different
+  sample of rows on every call (`sort`/`order`/`limit` are ignored), so one pass
+  over pages 1..N repeated some processes and missed others while
+  `procesos_leidos` still equalled `total_en_fuente` and `parcial` stayed
+  `false` (Manta 2025 gave USD 32.4-42.5 M across runs; a pass held ~210
+  distinct processes out of 253). The summary now sweeps the pages repeatedly
+  without the page cache, de-duplicates by OCID, sums in OCID order and reports
+  `parcial=true` unless as many distinct processes as `total_en_fuente` were
+  collected. Concurrency drops to 2, a rate-limited host stops the sweep (the
+  429 `Retry-After` is still honoured by the shared retry), requests are capped
+  (6 passes, 150 s), `paginas_fallidas` / `solicitudes` are returned, and the
+  distinct rows already collected are kept 15 min in memory so a repeat call
+  resumes from them and converges on the full set.
+  `monto_total` sums the OCDS `amount` (awarded value when the process has one,
+  else the estimated value); `presupuesto_total` sums `budget` separately.
+- **Census 2022: search inside the tabulados.** `search_archivos(fuente="censo")`
+  matched only file names plus one hand-written ICT description. A committed
+  index (`helpers/data/censo_tabulados_index.json`, 19 workbooks, 282 tables)
+  now records, per sheet, the table title, geographic levels (provincia,
+  cantón, parroquia) and column headers, with each file's URL, SHA-256, size
+  and extraction date. Queries such as `computadora`, `discapacidad`, `agua
+  potable`, `tablet` or `parroquia` match on those and the results carry
+  `tablas_coincidentes` (sheet, title, levels, columns) and `tablas_total`;
+  files whose label matches rank first. If censoecuador.gob.ec is unreachable
+  (network error or HTTP 5xx) the tabulado list comes from the index with an
+  `aviso`; 403/404 still raise. No workbook is downloaded at query time.
+  Refresh with `uv run python scripts/build_censo_index.py` (also
+  `python -m helpers.censo_index_build`; workbooks above `--max-mb`, default
+  25, are skipped and listed under `omitidos`).
+- **`search_anda`: faster access checks, new default `verificar_acceso="auto"`.**
+  The check of each result's real download page (up to 2 requests each) made a
+  50-result search ~70 requests. Now: catalog pages are fetched concurrently,
+  probes run 8 at a time, answers are cached per study on disk for 7 days
+  (keyed by id + the catalog's `changed` date; the 6 h memory cache stays), and
+  `form_model=public` (ANDA's login wall) is classified from the catalog
+  without a probe. `"auto"` (default) verifies only the first 10 results and
+  marks the rest `tipo_acceso: "desconocido"` with `nota_acceso` and a top-level
+  `aviso_verificacion`; `true` verifies all of them, `false` trusts the catalog
+  flag (both unchanged). Live, `search_anda("encuesta", limit=50)`: 5.1-5.4 s and
+  71 requests before; auto 3.4 s / 23 requests cold and 2.8 s / 3 warm; `true`
+  4.0 s / 69 cold.
+
+- **`get_bce_iem_table`: multi-row headers and month rows in "tabla_larga".**
+  `iem-451-e` (consumer confidence, bulletin 2095) returned headers such as
+  `["Período (5)(6)\\Variable","","TOTAL NACIONAL","","","URBANO",...]` and only
+  the January rows. The parser took the first header row as the whole header
+  and read the year column as the period, but the source puts the year only on
+  each January row (months below, in an unnamed column) and spreads group names
+  over merged cells. Fixed for the ~40 IEM tables that share this shape
+  (loans/rates, foreign trade, oil, prices, employment, public finance,
+  construction, confidence):
+  - Merged header rows are flattened (`"TOTAL NACIONAL — Confianza del
+    Consumidor"`, footnote markers like `(3)` dropped, extra key
+    `niveles_encabezado`).
+  - Year and month columns merge into one `Período` (`2024-01`; `2024` for
+    annual rows; `2022 Enero - Marzo` for quarter ranges); `Febrero`-only rows
+    after `2026 Enero` inherit the year. `desde`/`hasta` and `rows` now apply
+    to those periods.
+  - Footnote rows are excluded and one-cell banners (`Porcentaje del PIB`,
+    `A diciembre`) become a `Bloque` column when a table has several blocks.
+  - Unchanged: `formato`, `filas`, `filas_totales`, `truncada`, and cell
+    values. Only the header names and the leading period cell(s) changed.
+
+- **ANDA: availability and download now agree.** `search_anda` said the 2022
+  Census (catalog 1085, `ECU-INEC-CTIMA-CPV-2022-V1.6`) had microdata and
+  `download_anda_microdata` returned `total_archivos: 0`. The catalog marks
+  it `direct`, but its "Obtener microdatos" page lists a single resource that
+  is an *External link* to `censoecuador.gob.ec/data-censo-ecuador/`; the old
+  parser only looked for ANDA-hosted `/download/` links and read that as
+  "nothing attached" (a few defunciones generales and hospital-beds studies
+  do the same). The three ANDA tools now classify the study from its real
+  download page:
+  - `tipo_acceso`: `directo` (files in ANDA), `enlace_externo` (ANDA only
+    links out), `registro` (ANDA login), `solicitud` (request to INEC),
+    `ninguno` (explicit "Data Access Not Available" or no resources), and
+    `desconocido` when the check fails and the catalog flag is all there is.
+  - `download_anda_microdata` returns `enlaces_externos` next to `archivos`,
+    a `motivo`, and a `siguiente_paso` pointing at `search_archivos(fuente=
+    "censo")` or `get_inec_estadistica_files`.
+  - `search_anda` verifies each result (2 requests per study with microdata,
+    6 h cache, 6 in parallel; `verificar_acceso=false` skips it) so
+    `microdatos_disponibles` means "there is a way to get it" and agrees with
+    the download tool. `get_anda_survey_info` reports the same fields.
+- **Census 2022 results tabulados via `search_archivos(fuente="censo")`.**
+  The source read `censoecuador.gob.ec/data-y-resultados/`, which is now a
+  real 404 page with only the site's navigation, so it listed ~36 unrelated
+  links and no tabulado. It now reads `/resultados-censo/` and
+  `/data-censo-ecuador/` (~100 files): the thematic tabulados in XLSX and
+  CSV-in-ZIP (población, vivienda, hogar, including *Uso de las Tecnologías de
+  la Información y Comunicación*: mobile phone, internet, computer/laptop and
+  tablet by province and cantón), microdata by cantón/sector/manzana (CSV,
+  SPSS, REDATAM) with the 2010 and 2001 censuses recoded to 2022 geography,
+  and the dictionaries. Each file carries `tipo`, `anio` and, for tabulados,
+  `tema`; every query word must match (so `internet` or `tabulado hogar`
+  work), and http links are normalised to https.
+- **Supercías financials build survives the client closing the session**: on
+  Windows, closing a stdio client killed the 15-20 minute rebuild, and the
+  lock it left blocked every retry for 45 minutes. The server now launches the
+  build detached (its own session on POSIX; outside the client's job object
+  on Windows when the job allows it, otherwise detached only, with a
+  warning). The lock already held the build's PID; it is now read, and a lock
+  whose PID is no longer running is reclaimed at once, by the server's status
+  check and by the next build.
+- **Sector quartiles replace Supercías' sector means**: `indicadores_sector.csv`
+  holds plain means that a few extreme filings dominate (manufacturing 2023:
+  current ratio 23.7 against a median of 1.48, gross margin -1,245 against
+  0.41) and only covers 2018-2023, so it is no longer downloaded. The build
+  computes p25/median/p75 of every ratio per CIIU level-1 sector and year from
+  the ranking itself (table `cuartiles_sector`, sectors with at least 5
+  filings). `get_financials` adds `cuartiles_sector` to each year for the main
+  ratios (shown next to each ratio in the text view), and `search_ranking`
+  with `ciiu_n1` returns them for every ratio; `get_sector_benchmark` (not
+  used by any tool before) returns them too.
+- **Ratios Supercías could not calculate are NULL, not 0**: 85% of trade
+  companies "had" a 0 operating margin in 2023. A 0 becomes NULL when the row
+  has no ratios at all, when the ratio's denominator (sales, assets or
+  equity) is 0, or for ratios with no real zero for an operating company
+  (current ratio, acid test, turnovers, coverage, leverage, gross and
+  operating margin, collection and payment days). Ratios that can really be 0
+  (long-term debt, financial-cost burden, a profit rounding to 0.00) keep it.
+  `margen_operacional`, `per_med_cobranza` and `per_med_pago` also have no
+  consistent scale, even at the sector median, and no conversion recovers
+  them; they are kept as published and flagged in the tool descriptions,
+  `get_sector_benchmark` and `search_ranking` notes. Schema version 4: a
+  version-2 or 3 DB keeps being served, flagged, while the new build runs.
+- `helpers/tls.py`: the "valid through 2026-11-05" note is datosabiertos.gob.ec's
+  certificate (still correct); the comment now says so and adds
+  mercadodevalores' separate `*.supercias.gob.ec` certificate (valid to
+  2027-03-05), both checked live.
+
+## 0.15.0 — 2026-11-07
+
+85 tools in the default profile (`get_resumen_compras` is new) and eleven
+new sources behind existing selectors; every structured response now has a
+size ceiling, a common pagination block and file links, and cached catalogs
+answer with their last good copy when the source is down.
+
+- **Ministry sources, no new tools.**
+  - `search_capas_geo` / `get_capa_geo_datos` gain `fuente="msp"`: nine
+    curated layers of the Ministry of Public Health's ArcGIS Online org
+    (6,411 public-network facilities, 18 sexual and reproductive health
+    indicators by canton 2018-2026, visits and discharges by facility,
+    fertility, COVID vaccination by canton...), with filters and grouped sums.
+  - `search_archivos` gains `msp_precios` (every medicine ceiling-price
+    revision since 2016), `arcotel_series` (the newest XLSX of each of 25
+    ARCOTEL statistical series, each with full history), `mit_vias` (MIT's
+    daily state-road status report) and `minedec_bases` (AMIE registers by
+    school year 2009-2025 in XLSX and CSV, plus thematic files).
+  - RESEARCH and ROADMAP record what stays out: MSP's Nextcloud shares and
+    LOTAIP's national portal (unreachable from outside Ecuador), MSP's
+    Power BI reports (unlicensed), Interior's statistics site (Incapsula),
+    and housing (moved into MIT, API behind a login, CKAN frozen in 2021).
+
+- **CFN, FEDEXPOR and AEADE as sources, no new tools.**
+  - `list_catalogo` / `get_sut_indicador_schema` / `query_sut_indicador`
+    gain `fuente="cfn"`: the Corporación Financiera Nacional's public Power
+    BI report (credit lines, disbursements and operations by province,
+    monthly financial statements, investments, Fondo Nacional de Garantías
+    guarantees), 167 fields, on its own cluster. A query whose rows come
+    back without a column descriptor now raises a clear error instead of a
+    `KeyError`.
+  - `search_archivos` gains `fuente="fedexpor"` (the monthly Expordata
+    foreign-trade report, Google Drive links with a direct-download form)
+    and `fuente="aeade"` (73 monthly vehicle-sales bulletins and the sector
+    yearbooks).
+
+- **Three new sources, no new tools.**
+  - `search_capas_geo` / `get_capa_geo_datos` gain `fuente="igm"`: the
+    Instituto Geográfico Militar's GeoServer, 737 open WFS layers of official
+    cartography (68 national 1:1M from 2024, 505 at 1:50,000, 164 at
+    1:25,000; the reserved workspace is left out). `categoria` picks the
+    scale; samples carry attributes only, since one province is ~1.5 MB.
+  - `search_archivos` gains `fuente="turismo"`: the monthly tourism figures
+    bulletins (12 PDFs, November 2025 to October 2026), listed from
+    produccion.gob.ec's WordPress media API since the Ministerio de Turismo
+    domains no longer resolve.
+  - `get_serie_internacional` gains `fuente="ember"`: Ember's electricity
+    data through Our World in Data's electricity-mix explorer (no key; CC BY
+    4.0), 56 metric/source views, yearly or monthly from 2019. The monthly
+    by-source view is empty upstream, so it is assembled from the
+    single-source series.
+  - The Registro Oficial stays out of scope; the ROADMAP says so.
+
+- **New tool `get_resumen_compras`** (85 tools in the default profile): one
+  buyer's SERCOP procurement in a year, summarized. It pages through the
+  OCDS search filtered by buyer (up to 300 processes, marked `parcial` past
+  that) and totals processes, amount and budget per institution, by
+  procedure type, by month and by supplier. Per-buyer summaries were the
+  main procurement gap against other Ecuadorian MCP servers. The smoke run
+  summarizes the buyer of the contract it already checks.
+- **Uniform response contract (MCP_ARCHITECTURE Fase 6).** Every tool's
+  structured response now has a byte ceiling (`ECUADOR_MCP_MAX_RESPONSE_BYTES`,
+  200 KB by default): past it the main list is trimmed and the cut is
+  declared in `metadatos.truncado`. `metadatos.paginacion` states the next
+  page in one shape (`estilo` offset or page, `actual`, `total`, `hay_mas`,
+  `siguiente`) whenever a tool's payload says how it pages. File lists
+  (`archivos`, `files`, `resources`) also come back as MCP `resource_link`
+  blocks after the text block; the JSON is unchanged.
+- **Last good copy when a source is down.** Cache entries now outlive their
+  TTL by up to 7 days; `get` still ignores them, but when a refresh fails
+  the persisted catalogs (BCE indices, IEM and BCEData tree, CEPALSTAT tree,
+  INEC topics and categories, SGR SITREP index and library, Superbancos
+  sections) answer from that copy and say so: `metadatos.frescura` becomes
+  `"obsoleta"` and `metadatos.respuesta_obsoleta` gives the copy's date, the
+  catalog and the failure.
+
+## 0.14.0 — 2026-11-07
+
+84 tools in the default profile: `read_zip_member` and `get_cenace_boletin`
+are new, `get_energia_ecuador_snapshot` is removed.
+
+- **New tool `read_zip_member`** (84 tools in the default profile). It reads
+  one CSV/TSV/TXT or XLSX/XLS/XLSB/ODS file inside a remote .zip as a table,
+  fetching only that member's bytes through HTTP Range requests, so an agent
+  can open, say, one of the 90 CSV tables in INEC's ENDI R3 tabulados ZIP
+  without the server downloading the archive. Caps: 5 MB compressed per
+  member, 5 MB decompressed for text (marked truncated), 20 MB for
+  spreadsheets; stored and deflate only, no encryption. Every
+  Range answer must be a 206 starting at the requested offset, and the
+  CRC32 is checked when the member is read in full. `list_zip_contents` and
+  `read_zip_member` share the central-directory fetch; the listing's output
+  is unchanged. The smoke run chains the two on the first member.
+- **`read_zip_member` reads report tables as tables.** INEC's tabulados open
+  with a title block and carry hundreds of empty columns; ENDI R3's T1_i1
+  has its header on row 8 and 663 empty columns. The header is now the
+  first row at least half as full as the fullest of the first 30 (the
+  title rows come back as `preamble`), lines the source quoted whole are
+  split back into fields, and empty columns are dropped. `skip_rows=0`
+  keeps row 1 as the header; a plain CSV comes back unchanged.
+- **ZIP64 in `list_zip_contents` and `read_zip_member`.** Archives past 4 GB
+  or 65535 entries used to be refused; both tools now read the ZIP64 end
+  record (fetching it separately when it falls outside the tail) and the
+  ZIP64 extra field of each member.
+- `get_inec_estadistica_files` and `get_inec_publicacion_archivos` point to
+  `list_zip_contents` → `read_zip_member` when a result has ZIP links, and
+  the Examples page gains the ENDI case.
+- **Smoke run back to green.** The IESS certificate timing out on GitHub
+  runners is classed as degraded (`iess_certificado_timeout`); the CKAN chain
+  accepts the documented "sin DataStore" answer; the Superbancos check no
+  longer pins a year; the SERCOP chain picks a search hit with a title.
+  `get_contrato_info` reads release packages too and, when the record API
+  returns neither, names the keys it did return. `.mcpbignore` drops
+  `.mypy_cache/`.
+
+- **Every tool now publishes an `outputSchema` and returns a `metadatos`
+  block.** Each tool's return is typed with one of six result families
+  (`helpers/result_types.py`: búsqueda, listado, archivos, serie, tabla,
+  ficha), so the SDK publishes the schema and validates `structuredContent`
+  against it. Tools that did not build `metadatos` themselves get it from
+  what the response already says (`source`, `url_fuente`), with the tool
+  name as `esquema.nombre`; unknown dates stay `null`. The published schema
+  is compact so `tools/list` stays inside its budget (97k of 110k
+  characters).
+- **Shared HTTP layer and a disk cache.** `helpers/http_client.py` gives
+  one client factory (timeout by profile, User-Agent, geo proxy) and one
+  retry policy (429/5xx with capped `Retry-After`, per-host cooldown).
+  SERCOP is the first client on it. `TtlCache(persist=...)` keeps expensive
+  catalogs in `data/cache/` across restarts: BCE index pages, the BCEData
+  tree, the IEM catalog, the SGR library and SITREP index, the Superbancos
+  sections, INEC topics and the CEPALSTAT tree. `ECUADOR_MCP_DISK_CACHE=0`
+  turns it off.
+- **The daily smoke run calls all 83 public tools** (59 before). Tools that
+  need an id are reached through list → get chains with ids found live; a
+  fixed public RUC covers the SRI, IESS and Supercías lookups. ARCONEL's
+  report site answering 500 is now classed as a known upstream outage.
+
+- **Removed `get_energia_ecuador_snapshot`** (83 tools in the default
+  profile). It read the 2024 rationing schedules of energia-ecuador.com from
+  one Wayback Machine capture, and the Wayback Machine stopped returning that
+  snapshot. The EEQ and Centrosur archives in `search_cortes` cover the same
+  2024 crisis from the utilities' own files.
+- **ARCONEL's own ArcGIS server** in `search_capas_geo`/`get_capa_geo_datos`
+  (`fuente="arconel"`, 12 layers now): it answers again, so the catalog adds
+  monthly gross/net production and fuel use by plant (220,121 rows each,
+  January 1999 to August 2026; May-December 2024 is missing at the source),
+  public-lighting luminaires by distributor, province and lamp type
+  (1999-2026), the 730-plant SISDAT register, distribution substations and
+  subtransmission lines. `get_capa_geo_datos` gains `sumar` and `agrupar`
+  for server-side sums by group (ArcGIS `outStatistics`), so yearly
+  national production is one call instead of hundreds of 500-row pages.
+  The server's own billing and loss layers answer every query with 400, so
+  the Esri-cloud copies stay.
+- **Every MSP epidemiological gazette series** in
+  `search_archivos(fuente="msp")`: 18 series and about 3,500 PDFs from 2013
+  on (inmunoprevenibles, vectoriales, piel/reemergentes, indicadores,
+  general, ETAS, IRAG, brotes, efectos tóxicos, respiratorias, zoonóticas,
+  muerte materna and neonatal, tuberculosis, desnutrición, VIH, fiebre
+  amarilla, SIVE-Alerta), instead of inmunoprevenibles only. One paged
+  WordPress search finds the ~110 archive pages and each is classified by
+  slug; files carry `serie`, and `semana` now reads every naming convention
+  MSP has used, reporting the last week of cumulative files with
+  `semana_desde`. A series named in `query` limits which pages are fetched,
+  and a page that fails is reported in `paginas_con_error` instead of
+  failing the call. `helpers/msp_gacetas_inmunoprevenibles_client.py` is
+  replaced by `helpers/msp_gacetas_client.py`.
+- **Superbancos: eight more sections** in `list_archivo_secciones`/
+  `get_archivo_seccion` (`fuente="superbancos"`, 12 now):
+  `indicadores_solidez` (CAMEL, morosidad, liquidez, solvencia and IMF FSI
+  tables, monthly since 2003), `volumen_credito`, `boletines_series`,
+  `boletines_otras_entidades`, `cartera_depositos` (CAPCOL),
+  `finanzas_verdes`, `seguridad_social` (IESS, ISSFA, ISSPOL, SCPN, closed
+  pension funds, BIESS) and `estudios` (~580 PDFs). The OneDrive crawl now
+  follows lazily revealed subfolders to any depth and retries a folder
+  once on a 502 or timeout.
+- **Fix: Superbancos OneDrive folders were empty.** The site's plugin began
+  answering 200 with an empty body unless the request carries the site's
+  `Origin` or the page as `Referer`, which had silently cut
+  `boletines_financieros` and `servicios_financieros` back to their static
+  tables (`servicios_financieros`: 39 files instead of 663). Both headers
+  are sent now.
+- **Smithery dropped**: `scripts/publish_smithery.py` is gone and the docs no
+  longer list Smithery as a channel. It stopped accepting updates on
+  2026-10-17, so releases go to PyPI, the MCP Registry, the `.mcpb` asset,
+  LobeHub and Glama only.
 - **ARCONEL and CELEC ArcGIS layers** in `search_capas_geo`/`get_capa_geo_datos`
   (`fuente="arconel"`, `fuente="celec"`): the distributor energy balance and
   losses by month (January 1999 to April 2024), billing, collection,
@@ -74,40 +428,6 @@
   first and are flagged in `get_financials`. `metadatos.base_local` gains
   `anios_disponibles` and `actualizacion_pendiente`. Schema version 3: a
   version-2 DB keeps being served, flagged, while the full-history build runs.
-- **Supercías financials build survives the client closing the session**: on
-  Windows, closing a stdio client killed the 15-20 minute rebuild, and the
-  lock it left blocked every retry for 45 minutes. The server now launches the
-  build detached (its own session on POSIX; outside the client's job object
-  on Windows when the job allows it, otherwise detached only, with a
-  warning). The lock already held the build's PID; it is now read, and a lock
-  whose PID is no longer running is reclaimed at once, by the server's status
-  check and by the next build.
-- **Sector quartiles replace Supercías' sector means**: `indicadores_sector.csv`
-  holds plain means that a few extreme filings dominate (manufacturing 2023:
-  current ratio 23.7 against a median of 1.48, gross margin -1,245 against
-  0.41) and only covers 2018-2023, so it is no longer downloaded. The build
-  computes p25/median/p75 of every ratio per CIIU level-1 sector and year from
-  the ranking itself (table `cuartiles_sector`, sectors with at least 5
-  filings). `get_financials` adds `cuartiles_sector` to each year for the main
-  ratios (shown next to each ratio in the text view), and `search_ranking`
-  with `ciiu_n1` returns them for every ratio; `get_sector_benchmark` (not
-  used by any tool before) returns them too.
-- **Ratios Supercías could not calculate are NULL, not 0**: 85% of trade
-  companies "had" a 0 operating margin in 2023. A 0 becomes NULL when the row
-  has no ratios at all, when the ratio's denominator (sales, assets or
-  equity) is 0, or for ratios with no real zero for an operating company
-  (current ratio, acid test, turnovers, coverage, leverage, gross and
-  operating margin, collection and payment days). Ratios that can really be 0
-  (long-term debt, financial-cost burden, a profit rounding to 0.00) keep it.
-  `margen_operacional`, `per_med_cobranza` and `per_med_pago` also have no
-  consistent scale, even at the sector median, and no conversion recovers
-  them; they are kept as published and flagged in the tool descriptions,
-  `get_sector_benchmark` and `search_ranking` notes. Schema version 4: a
-  version-2 or 3 DB keeps being served, flagged, while the new build runs.
-- `helpers/tls.py`: the "valid through 2026-11-05" note is datosabiertos.gob.ec's
-  certificate (still correct); the comment now says so and adds
-  mercadodevalores' separate `*.supercias.gob.ec` certificate (valid to
-  2027-03-05), both checked live.
 
 ## 0.13.0 — 2026-10-17
 

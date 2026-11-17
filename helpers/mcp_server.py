@@ -26,6 +26,7 @@ from mcp.server.mcpserver import MCPServer
 from mcp.types import Tool as MCPTool
 
 from helpers.logging import TOOL_DOCS
+from helpers.response_contract import CONTRACT_VERSION
 
 # Parameters shared by many tools get one short wording; the server
 # instructions explain them in full once.
@@ -109,6 +110,51 @@ def document_parameters(schema: dict[str, Any], doc: str) -> dict[str, Any]:
     return schema
 
 
+def compact_output_schema(schema: Any) -> Any:
+    """Shrink a derived outputSchema to what an agent needs to read the result.
+
+    tools/list is paid for in every conversation (docs/MCP_ARCHITECTURE.md
+    § Fase 4), and pydantic's schema for helpers/result_types repeats a
+    ~800-character ``$defs`` block per tool. This keeps the contract
+    (``metadatos`` is always there and carries ``contrato``; the family's
+    shared keys are named) and drops the rest: descriptions, titles, the
+    default ``additionalProperties: true`` and the nested field types of
+    ``metadatos``, which helpers/result_types.py documents in full and the
+    server still validates against.
+    """
+    defs = schema.get("$defs", {}) if isinstance(schema, dict) else {}
+
+    def walk(node: Any) -> Any:
+        if isinstance(node, list):
+            return [walk(item) for item in node]
+        if not isinstance(node, dict):
+            return node
+        if "$ref" in node:
+            return walk(defs.get(node["$ref"].rsplit("/", 1)[-1], {}))
+        out: dict[str, Any] = {}
+        for key, value in node.items():
+            if key in ("$defs", "title", "description"):
+                continue
+            if key == "additionalProperties" and value is True:
+                continue
+            if key == "properties":
+                out[key] = {name: walk(sub) for name, sub in value.items()}
+            else:
+                out[key] = walk(value)
+        return out
+
+    compact = walk(schema)
+    metadatos = compact.get("properties", {}).get("metadatos")
+    if isinstance(metadatos, dict):
+        compact["properties"]["metadatos"] = {
+            "type": "object",
+            "required": ["contrato"],
+            "properties": {"contrato": {"const": CONTRACT_VERSION}},
+        }
+    # Body keys are typed Any on purpose; their bare names are enough.
+    return compact
+
+
 class EcuadorMCPServer(MCPServer):
     async def list_tools(self) -> list[MCPTool]:
         tools = await super().list_tools()
@@ -116,5 +162,5 @@ class EcuadorMCPServer(MCPServer):
             schema = strip_schema_titles(tool.input_schema)
             tool.input_schema = document_parameters(schema, TOOL_DOCS.get(tool.name, ""))
             if tool.output_schema is not None:
-                tool.output_schema = strip_schema_titles(tool.output_schema)
+                tool.output_schema = compact_output_schema(tool.output_schema)
         return tools

@@ -41,7 +41,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#334155"
   },
   {
     "id": "tramites-contratacion",
@@ -85,7 +86,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#854d0e"
   },
   {
     "id": "riesgos",
@@ -161,7 +163,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#7c3aed"
   },
   {
     "id": "economia-finanzas",
@@ -298,7 +301,7 @@
             "id": "superbancos",
             "name": "Superbancos",
             "tag": "Banca",
-            "description": "Boletines financieros mensuales, servicios financieros, información histórica y calendario estadístico",
+            "description": "Boletines financieros y de series, indicadores de solidez (CAMEL, morosidad, liquidez), volumen de crédito, captaciones y colocaciones, seguridad social y estudios",
             "coverage": "superbancos.gob.ec",
             "url": "https://www.superbancos.gob.ec/estadisticas/portalestudios",
             "status": "live"
@@ -360,8 +363,60 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Ministerio de Producción (Turismo)",
+        "sources": [
+          {
+            "id": "turismo-boletin",
+            "name": "Boletín de Cifras del Sector Turismo",
+            "tag": "Turismo",
+            "description": "Boletines mensuales en PDF: llegadas por nacionalidad, ocupación, áreas protegidas, catastro (nov 2025+)",
+            "coverage": "produccion.gob.ec",
+            "url": "https://www.produccion.gob.ec/boletin-de-cifras-sector-turismo/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Corporación Financiera Nacional (CFN)",
+        "sources": [
+          {
+            "id": "cfn-powerbi",
+            "name": "Estadísticas CFN",
+            "tag": "Power BI",
+            "description": "Crédito y desembolsos por provincia, estados financieros mensuales, inversiones y garantías del FNG",
+            "coverage": "cfn.fin.ec/estadisticas",
+            "url": "https://www.cfn.fin.ec/estadisticas/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Gremios privados",
+        "sources": [
+          {
+            "id": "fedexpor-expordata",
+            "name": "FEDEXPOR — Expordata",
+            "tag": "FEDEXPOR",
+            "description": "Informe mensual de comercio exterior (PDF en Google Drive)",
+            "coverage": "fedexpor.com",
+            "url": "https://www.fedexpor.com/inteligencia-comercial/reporte-expordata/",
+            "status": "live"
+          },
+          {
+            "id": "aeade-ventas",
+            "name": "AEADE — ventas de vehículos",
+            "tag": "AEADE",
+            "description": "Boletines mensuales de ventas de vehículos y anuarios del sector automotor",
+            "coverage": "aeade.net",
+            "url": "https://www.aeade.net/boletines-de-prensa-venta-de-vehiculos/",
+            "status": "live"
+          }
+        ]
       }
-    ]
+    ],
+    "color": "#0033a0"
   },
   {
     "id": "estadisticas-demografia",
@@ -402,7 +457,7 @@
             "id": "inec-censo",
             "name": "Censo Ecuador 2022",
             "tag": "INEC",
-            "description": "Recursos, microdatos y documentos metodológicos del censo",
+            "description": "Tabulados de resultados (incl. TIC por provincia y cantón), microdatos y documentos metodológicos del censo",
             "coverage": "censoecuador.gob.ec",
             "url": "https://www.censoecuador.gob.ec",
             "status": "live"
@@ -437,6 +492,15 @@
             "description": "Registro administrativo histórico de matrícula K-12, 2009 en adelante",
             "coverage": "educacion.gob.ec",
             "url": "https://educacion.gob.ec/datos-abiertos-minedec/",
+            "status": "live"
+          },
+          {
+            "id": "minedec-bases",
+            "name": "Registros AMIE por año lectivo",
+            "tag": "CSV/XLSX",
+            "description": "2009-2010 a 2024-2025, corte Inicio y Fin, con diccionario; archivos temáticos",
+            "coverage": "educacion.gob.ec",
+            "url": "https://educacion.gob.ec/base-de-datos/",
             "status": "live"
           }
         ]
@@ -505,8 +569,23 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Instituto Geográfico Militar (IGM)",
+        "sources": [
+          {
+            "id": "igm-geoportal",
+            "name": "Geoportal IGM",
+            "tag": "IGM",
+            "description": "737 capas WFS de cartografía oficial: límites, poblados, vías, ríos (1:1M, 1:50.000, 1:25.000)",
+            "coverage": "www.geoportaligm.gob.ec",
+            "url": "https://www.geoportaligm.gob.ec",
+            "status": "live"
+          }
+        ]
       }
-    ]
+    ],
+    "color": "#ef3340"
   },
   {
     "id": "agricultura",
@@ -536,7 +615,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#4d7c0f"
   },
   {
     "id": "energia",
@@ -567,15 +647,6 @@
             "description": "Programación de cortes de luz de Centrosur (Azuay, Cañar, Morona Santiago), 2023 en adelante, incluida la crisis de 2024",
             "coverage": "centrosur.gob.ec",
             "url": "https://www.centrosur.gob.ec",
-            "status": "live"
-          },
-          {
-            "id": "energia-ecuador",
-            "name": "energia-ecuador.com (archivo)",
-            "tag": "Energía",
-            "description": "Horarios de racionamiento de 2024 de la EEQ, recuperados del Wayback Machine (foto fija)",
-            "coverage": "web.archive.org",
-            "url": "https://web.archive.org/web/2024/https://energia-ecuador.com/",
             "status": "live"
           },
           {
@@ -690,7 +761,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#c2410c"
   },
   {
     "id": "trabajo-empleo",
@@ -766,7 +838,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#047857"
   },
   {
     "id": "control-transparencia",
@@ -787,7 +860,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#9f1239"
   },
   {
     "id": "justicia",
@@ -808,7 +882,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#78716c"
   },
   {
     "id": "transporte-aviacion",
@@ -851,8 +926,23 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Ministerio de Infraestructura y Tecnología (MIT)",
+        "sources": [
+          {
+            "id": "mit-red-vial",
+            "name": "Estado de la Red Vial Estatal",
+            "tag": "PDF",
+            "description": "Informe diario: vías cerradas y con paso restringido por provincia",
+            "coverage": "mit.gob.ec",
+            "url": "https://www.mit.gob.ec/",
+            "status": "live"
+          }
+        ]
       }
-    ]
+    ],
+    "color": "#0e7490"
   },
   {
     "id": "salud",
@@ -877,17 +967,36 @@
         "name": "Ministerio de Salud Pública (MSP)",
         "sources": [
           {
-            "id": "msp-gacetas-inmunoprevenibles",
-            "name": "Gacetas de Inmunoprevenibles",
+            "id": "msp-gacetas",
+            "name": "Gacetas epidemiológicas",
             "tag": "MSP",
-            "description": "Boletines semanales de vigilancia de enfermedades prevenibles por vacunación, 2019-presente",
+            "description": "Boletines semanales de vigilancia del MSP, 18 series (inmunoprevenibles, vectoriales, ETAS, IRAG, brotes, muerte materna, tuberculosis...), 2013-presente",
             "coverage": "salud.gob.ec",
-            "url": "https://www.salud.gob.ec/gacetas-inmunoprevenibles/",
+            "url": "https://www.salud.gob.ec/gacetas-epidemiologicas/",
+            "status": "live"
+          },
+          {
+            "id": "msp-precios",
+            "name": "Precios techo de medicamentos",
+            "tag": "XLSX",
+            "description": "Cada revisión del Consejo de Fijación de Precios desde 2016",
+            "coverage": "salud.gob.ec",
+            "url": "https://www.salud.gob.ec/consejo-nacional-de-fijacion-y-revision-de-precios-de-medicamentos/",
+            "status": "live"
+          },
+          {
+            "id": "msp-arcgis",
+            "name": "Capas ArcGIS del MSP",
+            "tag": "ArcGIS",
+            "description": "Establecimientos de la red pública, indicadores de salud sexual y reproductiva por cantón, atenciones y egresos",
+            "coverage": "services7.arcgis.com",
+            "url": "https://www.salud.gob.ec/",
             "status": "live"
           }
         ]
       }
-    ]
+    ],
+    "color": "#db2777"
   },
   {
     "id": "telecomunicaciones",
@@ -905,10 +1014,20 @@
             "coverage": "arcotel.gob.ec",
             "url": "https://www.arcotel.gob.ec",
             "status": "live"
+          },
+          {
+            "id": "arcotel-series",
+            "name": "Series estadísticas XLSX",
+            "tag": "XLSX",
+            "description": "25 indicadores (líneas activas, radiobases, internet, TV pagada, concesiones, reclamos) con historia completa",
+            "coverage": "arcotel.gob.ec",
+            "url": "https://www.arcotel.gob.ec/estadisticas-de-telecomunicaciones2/",
+            "status": "live"
           }
         ]
       }
-    ]
+    ],
+    "color": "#0369a1"
   },
   {
     "id": "fuentes-internacionales",
@@ -929,9 +1048,9 @@
           },
           {
             "id": "series-internacionales",
-            "name": "Series internacionales (WDI, IRENA, XM, Comtrade, FMI, OMS, OIT, ACNUR)",
+            "name": "Series internacionales (WDI, IRENA, Ember, XM, Comtrade, FMI, OMS, OIT, ACNUR)",
             "tag": "Internacional",
-            "description": "Banco Mundial WDI, IRENA, flujos Colombia-Ecuador de XM, comercio bilateral de UN Comtrade, series del FMI, salud de la OMS, empleo de la OIT y refugio del ACNUR; Ecuador por defecto",
+            "description": "Banco Mundial WDI, IRENA, el mix eléctrico mensual de Ember, flujos Colombia-Ecuador de XM, comercio bilateral de UN Comtrade, series del FMI, salud de la OMS, empleo de la OIT y refugio del ACNUR; Ecuador por defecto",
             "coverage": "api.worldbank.org, pxweb.irena.org, servapibi.xm.com.co, comtradeapi.un.org, api.imf.org, ghoapi.azureedge.net, sdmx.ilo.org, api.unhcr.org",
             "url": "https://databank.worldbank.org/source/world-development-indicators",
             "status": "live"
@@ -952,6 +1071,7 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#64748b"
   }
 ]

@@ -1,6 +1,6 @@
 import re
 from datetime import date
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -9,6 +9,7 @@ from mcp.types import CallToolResult
 from helpers import bce_indicadores_diarios_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoSerie
 from helpers.tool_meta import READ_ONLY
 
 _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -45,7 +46,7 @@ def register_get_bce_indicador_diario_tool(mcp: MCPServer) -> None:
         desde: str = "",
         hasta: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoSerie]:
         """
         Fetch one BCE daily/monthly indicator's time series (e.g. Riesgo
         País), bounded to a window — never the full series (some run

@@ -6629,6 +6629,481 @@ con aviso en el log), y un lock cuyo PID ya no corre se libera al instante.
 `*.supercias.gob.ec` de Sectigo, válido del 2026-08-19 al 2027-03-05; ambos
 revisados en vivo.
 
+## Trigésimo sexta pasada — ARCONEL ArcGIS, gacetas del MSP y Superbancos (2026-11-04)
+
+**ARCONEL, servidor propio.** `geoportal.arconel.gob.ec:6443/arcgis/rest/services`
+(ArcGIS 10.91) vuelve a responder, anónimo, maxRecordCount 1000, paginación y
+estadísticas soportadas; texto en UTF-8 limpio. Falta el intermedio TLS (ya
+cubierto por `arconel.gob.ec` en `_OS_TRUST_HOST_SUFFIXES`). En
+`ServDashboards`: `CENTRALES_PRODUCCION` y `CENTRALES_COMBUSTIBLES` (capa 1,
+HISTORICO, 220.121 filas, ene 1999-ago 2026; la capa 0 tiene el mismo
+esquema con menos centrales antes de 2018). Mayo-diciembre de 2024 falta en
+ambas copias. El año se llama `AnioProduccion` en producción y `Anio` en
+combustibles y alumbrado. `LUMINARIAS/2` (52.837 filas, códigos de empresa y
+provincia sin nombres), `CENTRALES/0` (730), `DISTRIBUCION_INFRAESTRUCTURA/0`
+y `/1` (568 subestaciones, 428 líneas). `DISTRIBUCION_TRANSACCIONES` (0, 2, 3,
+4) y `RESUMEN_FACTURACION/0` cargan metadatos pero responden 400 a toda
+consulta, también en MapServer: las copias de `services3.arcgis.com` siguen
+siendo la fuente de facturación y balance. `SERVMAE` y `portal` solo
+duplican capas de mapa. `outStatistics` con `groupByFieldsForStatistics`
+funciona: neto nacional 2025 = 37,8 TWh en una consulta.
+
+**MSP, todas las gacetas.** `/wp-json/wp/v2/pages` no devuelve nada; con
+`/posts?search=gaceta` paginado (124 resultados, 2 páginas) salen las 110
+páginas de archivo de todas las series, sin necesidad de otros términos.
+Cada serie usó dos o tres familias de slug, así que se clasifica con una
+regex por serie. 18 series, ~3.500 PDF tras deduplicar por URL; 126 enlaces
+apuntan a `instituciones.msp.gob.ec`, que no responde (la página 2012 de
+Indicadores queda vacía y SIVE-Alerta pierde la mitad). Convenciones de
+semana vistas: `SE-NN`, `SENN`, `SE_-NN`, `SEM-NN`, `SEMANA-NN`, `S20`,
+`gaceta_brotesSE31`, número suelto (`ETV_Gaceta_42`, `5.-Gaceta-brotes-41`,
+`ETAS-52`), año abreviado al final (`VECTORES-10_20`), sufijo de duplicado
+pegado (`SE-341` = 34) y rangos acumulados (`SE-01-53`, `SE-01-SE45`,
+`Lepra-SE-01-03`). Hay rutas `/wp-content/uploads/downloads/AAAA/MM/` y dos
+enlaces `//www.salud.gob.ec/...`. El sitio devuelve 503 tras una ráfaga de
+pedidos: concurrencia 3 y un reintento por página.
+
+**Superbancos, resto del portal.** La API WordPress lista 59 páginas. Desde
+esta fecha `admin-ajax.php?action=shareonedrive-get-filelist` responde 200
+vacío salvo con `Origin: https://www.superbancos.gob.ec` o `Referer` de la
+página; sin eso las secciones OneDrive ya construidas volvían solo con sus
+tablas estáticas. El árbol del widget es perezoso: las subcarpetas de
+segundo nivel (CAPCOL: año → CAPTACIONES/COLOCACIONES) aparecen solo en la
+respuesta de su carpeta padre. Secciones nuevas: Indicadores de Solidez
+(`/volumen-de-credito-2/`: un XLSX acumulado por año, ~9 MB, hojas BAL, PYG,
+INDIC CARTERA, INDICAD, CAMEL, tablas FSI del FMI, ~293 columnas mensuales
+desde 2003), Volumen de Crédito (con rama por género, ZIP de 4-27 MB, un
+XLSB), Boletines de Series (8 páginas por tipo de entidad), boletines
+mensuales de otras entidades (6 páginas, estático 2000-2021 + OneDrive),
+CAPCOL (3 páginas), Finanzas Verdes, Seguridad Social (2 páginas) y
+Estudios (10 widgets dentro de pestañas "advanced tabs" de Essential
+Addons: el título del widget es el de la pestaña). `/visualizadores/` solo
+tiene embeds Power BI; balances generales y patrimonio técnico son
+formularios PrimeFaces (`bsf.jsf`, `bss.jsf`, `efpt.jsf`) en
+`appweb.superbancos.gob.ec`. La mayoría de los archivos de series pasa de
+5 MB.
+
+## Trigésimo séptima pasada — formularios de Superbancos, Turismo, IGM y Registro Oficial (2026-11-04)
+
+**Superbancos, balances y patrimonio técnico: descartado por captcha.** Las
+páginas WordPress `balances-generales`, `balances-generales-3` y
+`patrimonio-tecnico` incrustan
+`appweb.superbancos.gob.ec/gen/publico/reportes/{bsf,bss,efpt}.jsf`. Los tres
+son PrimeFaces con `javax.faces.ViewState` y combos en cascada por AJAX
+(`tipoInstitucion` → `institucion` → `anio` → `mes` → `formato`, PDF o
+`application/vnd.ms-excel`; en `efpt` el orden es año → mes → tipo). `bsf`
+lista 19 tipos de institución (bancos privados nacionales `3`, cooperativas
+`19`, mutualistas `14`, públicas `1`…), `bss` 4 de seguridad social y `efpt`
+años 2002-2026. El botón Descargar va detrás de un widget reCAPTCHA v2
+(`form:captcha`, sitekey de Google) en los tres formularios. Por la misma
+política que SERCOP y SENESCYT, no se automatiza; los indicadores de
+solidez y los boletines ya construidos cubren buena parte del contenido.
+
+**Ministerio de Turismo: el dominio ya no existe.** `servicios.turismo.gob.ec`,
+`turismo.gob.ec` y `www.turismo.gob.ec` dan NXDOMAIN (8.8.8.8, 1.1.1.1 y el
+resolvedor local); el ministerio se fusionó con Producción (Decreto 60,
+2025) y el trámite de gob.ec todavía enlaza la URL muerta. El sucesor es
+`https://www.produccion.gob.ec/boletin-de-cifras-sector-turismo/` (post
+15593): boletines mensuales en PDF de noviembre 2025 a septiembre 2026
+(~33 páginas: barómetro ONU Turismo, entradas y salidas con tabla por
+nacionalidad, ocupación en feriados, visitas a áreas protegidas, catastro
+de 36.017 establecimientos, más cifras del BCE, INEC y SRI). Sin XLSX ni
+CSV. La API de medios de WordPress enumera los PDFs con su URL real
+(`/wp-json/wp/v2/media?search=turismo&per_page=30&_fields=date,source_url,mime_type`),
+mejor que el post, cuyos enlaces pasan por acortadores (goo.su,
+acortar.link, lix.li, este último con TLS roto). HEAD de un boletín: 200,
+`application/pdf`, ~2,3 MB. Construible como listado de archivos +
+`read_pdf`; las tablas habría que sacarlas del PDF.
+
+**IGM Geoportal: geoservicios abiertos, GeoServer.** El host es
+`www.geoportaligm.gob.ec` (no existen `geoportal.igm.gob.ec` ni
+`www.igm.gob.ec`). WFS 2.0.0 con salida `application/json`, `SHAPE-ZIP` y
+`csv`, sin login:
+
+| Endpoint | Capas | Espacios de trabajo |
+|---|---|---|
+| `/nacional/wfs` (y `/nacional/wms`) | 68 | `nacional_2024` (37: límites, poblados, vías, ríos, curvas de nivel, ZEE…), `igm` (31) |
+| `/50k/wfs` (y `/50k/wms`) | 629 | `actualizada` 207, `galapagos50k` 168, `igm` 130, `igm_reservada` 124 |
+| `/25k/wfs` | 164 | `igm` |
+| `/geoserver/ows` | WMS 15, WFS 1 | solo `fiscalizacion:fiscalizacion` |
+
+`igm_reservada:*` responde 401 (reservada); 1:50.000 y 1:25.000 son
+abiertas; lo catastral solo aparece como huellas de contratos. Ejemplo:
+`/nacional/wfs?service=WFS&version=2.0.0&request=GetFeature&typeNames=nacional_2024:poblado_p_2024&count=1&outputFormat=application/json`
+→ 200 JSON, `numberMatched: 1340`. CRS nativo EPSG:32717;
+`srsName=EPSG:4326` funciona. Una sola provincia pesa 1,5 MB, así que hace
+falta tope de tamaño. Los WMS en cascada de `/geoserver` (`mapabase:*`)
+fallan en GetMap (el servidor no se alcanza a sí mismo); los teselas WMTS
+cacheadas sí responden. Las descargas libres 1:1M del portal son `.rar`
+(descartado). Encaja en `search_capas_geo`/`get_capa_geo_datos` como
+cliente WFS, igual que INAMHI/SIPA.
+
+**Registro Oficial: listado por AJAX abierto.** WordPress 6.7 + Divi, sin
+WAF ni captcha; la API REST pide autorización (401) pero
+`POST /wp-admin/admin-ajax.php` con `action=get_term_post_kilur_con_imagen`
+responde sin sesión. Parámetros: `year_id` (2026=2002, 2025=2000; mapeo en
+`data-year-id` de la página de producto, 26 años desde 2001), `mes_id`
+(octubre=1988, noviembre=1989, compartido entre años), `name_folder`,
+`page` (12 por página) e `id_carpeta` por tipo: 1954 Registro Oficial, 1991
+Suplementos (todos los niveles), 1992 Edición Especial, 1995 Constitucional,
+1994 Jurídica, 1993 Índice Mensual. Devuelve `{"success":true,"data":"<html>"}`
+con tipo, número ("Año II - Nº 381"), fecha, páginas y enlace. No hay filtro
+por día: se pide el mes y se pagina (los suplementos de octubre 2026 son
+11 páginas). Para 2026-10-01: RO Nº 381 (49 pp.), Primer a Sexto Suplemento
+y Ediciones Especiales 1673-1675. El PDF vive en
+`esacc.corteconstitucional.gob.ec/storage/api/v1/10_DWL_FL/<base64({"carpeta":"ro","uuid":"<uuid>.pdf"})>`:
+200, `application/pdf`, sin login, sin `Content-Length` y sin soporte de
+Range (el tope de 5 MB se aplica descargando). La búsqueda propia del sitio
+(`?s=`) no se probó.
+
+## Trigésimo octava pasada — fuentes económicas candidatas (2026-11-07)
+
+Revisión en vivo de siete pistas económicas que no figuraban en el ROADMAP,
+desde una conexión residencial en Canadá (sin proxy).
+
+**CFN (Corporación Financiera Nacional): construible.** `cfn.fin.ec/estadisticas/`
+no publica archivos: es un Power BI público ("publish to web",
+`app.powerbi.com/view?r=...`, recurso `bd2e40e9-243f-4d44-94b9-720388d3a408`,
+tenant `17888ad5-...`). La clave no resuelve en los clústeres del SUT ni de
+la Judicatura (401 `UnableToFindKeyInDBorCacheException`); la ruta
+`/public/routing/cluster/{tenant}` en `wabi-south-central-us-api` devuelve
+`FixedClusterUri` = `wabi-south-central-us-redirect`, y
+`modelsAndExploration` responde 200 en `wabi-south-central-us-api`. Doce
+páginas: Inicio, Ubicación, Líneas de crédito, Operaciones y monto por
+provincia, Inclusión, Estados financieros (2), Inversiones, Garantías
+otorgadas y cuatro del Fondo Nacional de Garantías (FNG). Encaja como
+`fuente="cfn"` en `list_catalogo`/`get_sut_indicador_schema`/
+`query_sut_indicador` reutilizando `helpers/sut_powerbi_client.py` con su
+propio clúster. La biblioteca de medios de WordPress solo tiene un PDF suelto
+("FNG ESTADISTICA Marzo 2025").
+
+**FEDEXPOR "Reporte Estadístico Expordata": construible, confirmado de
+nuevo.** `fedexpor.com/inteligencia-comercial/reporte-expordata/` responde
+200 y lista 16 informes mensuales en Google Drive (`drive.google.com/file/d/...`),
+sin login. Es comercio exterior mensual que SENAE no publica abierto.
+Listado de archivos + `read_pdf` sobre el PDF de Drive (habría que pasar el
+enlace de vista a descarga directa, `uc?export=download&id=`).
+
+**AEADE: construible, confirmado de nuevo.** Boletines mensuales de venta de
+vehículos en `aeade.net/boletines-de-prensa-venta-de-vehiculos/`: 73 descargas
+por el plugin Simple Download Monitor (`?sdm_process_download=1&download_id=`).
+Anuarios en PDF directos en `/anuario/` (2020, 2021, 2022, 2024, 2025). El
+"Boletín de facturación del sector automotor" ya no enlaza archivos.
+
+**Enterprise Surveys (Banco Mundial): bajo valor.** La API del Banco Mundial
+la expone como fuente 13 (115 indicadores: soborno, crédito, mujeres en la
+propiedad, exportación...), así que entraría en `get_serie_internacional`
+con el cliente WDI cambiando `source`. Pero la fuente se actualizó por
+última vez el 2022-03-25: para Ecuador solo trae la ronda 2017 y muchos
+indicadores vacíos; la ronda 2024 está en el sitio, no en la API.
+
+**BCE cuentas regionales: ya cubiertas.** `search_bce_paginas(catalogo=
+"cuentas_nacionales", query="provincial")` devuelve "Cuentas Nacionales
+Regionales — serie histórica provincial y cantonal" y los cuadros anuales
+regionales. El listado de directorio `contenido.bce.fin.ec/.../CuentasProvinciales/`
+da 403, pero no hace falta.
+
+**BDE (Banco de Desarrollo del Ecuador): bloqueado.** `bde.fin.ec` responde
+con el desafío de Imperva/Incapsula (`_Incapsula_Resource`) a cualquier
+petición, también a la API de WordPress. Igual que con los captchas, no se
+automatiza.
+
+**PRO ECUADOR: sin datos estructurados.** El sitio tiene estudios de
+inteligencia comercial y fichas, no series; la biblioteca de medios solo
+devuelve imágenes con "estadística" en el nombre (2019). Las estadísticas
+de comercio exterior ya llegan por Comtrade, BCE y, si se construye, FEDEXPOR.
+
+**SCPM (Superintendencia de Control del Poder de Mercado): fuera de línea.**
+`www.scpm.gob.ec` y `scpm.gob.ec` resuelven a `127.0.0.1`/`::1` también en
+8.8.8.8 y 1.1.1.1: el DNS público apunta a localhost, así que no hay sitio
+que leer hasta que lo corrijan.
+
+## Trigésimo novena pasada — ministerios: MSP, MINEDEC, MIT, vivienda, Gobierno, Interior, ARCOTEL y LOTAIP (2026-11-07)
+
+Tres revisiones en paralelo desde Canadá (curl, más el navegador para
+Interior). Lo construido está en el ROADMAP (§ Ministerios: segunda pasada).
+
+**MSP.** El sitio no está "vacío fuera de CKAN", como decía una nota de
+2023: tiene (1) los precios techo de medicamentos del Consejo de Fijación
+de Precios, ~110 revisiones en XLSX desde 2016, listadas por la API de
+medios; (2) su propia organización de ArcGIS Online (dueño `mps_unfpa`,
+org `mrexCE3lvn5U08zq`, 204 ítems públicos) con el registro de
+establecimientos de la red pública e indicadores de salud sexual y
+reproductiva por cantón; (3) recursos Nextcloud "Datos Abiertos" en
+`almacenamiento.msp.gob.ec` (COVID, consulta externa, vacunas, emergencias,
+laboratorio) que no responden desde Canadá, posiblemente la fuente más rica.
+Los 7 Power BI de `informacion-de-salud/` dan PowerBINotLicensedException
+(seis en el tenant `d1031f2d…`) o UnableToFindKeyInDBorCacheException
+(ECTS). GeoSalud en Cifras volvió a existir, pero su Power BI tiene la
+misma licencia vencida.
+
+**MINEDEC.** `educacion.gob.ec` no responde desde Canadá ni desde los runners de GitHub (TCP en ~21 s; queda en la lista del proxy geográfico);
+se leyó la copia de enero 2026 de Wayback. `/base-de-datos/` tiene el
+registro AMIE por año lectivo (2009-2010 a 2024-2025, Inicio y Fin, XLSX
+y CSV con diccionario y metadato), seis archivos temáticos por download
+monitor y las estadísticas 1993-2007 con sus boletines.
+`/publicaciones-estadistica-educativa/` solo tiene anuarios en PDF.
+
+**MIT (ex MTOP) y vivienda.** `obraspublicas.gob.ec` ya falla en DNS. No
+hay conteos de tráfico (TPDA), peajes ni SIG vial abiertos: geoportal, sig
+y datos.mit.gob.ec fallan; `sitop.mit.gob.ec` responde 503. Sí hay un
+informe diario de la Red Vial Estatal en PDF. Vivienda pasó al MIT; la API
+de `prd-sitop.mit.gob.ec` pide token, y los archivos sueltos (proyectos
+VIS/VIP a marzo 2025) son una foto con datos de contacto de promotores.
+`habitatyvivienda.gob.ec` sigue con TLS roto.
+
+**Gobierno.** Solo el CKAN `mdg` (organización territorial de CONALI,
+vigente) y PDFs metodológicos del indicador PND; las tablas de migración
+por nacionalidad y puerto de su biblioteca de medios terminan en 2020.
+
+**Interior.** `cifras.ministeriodelinterior.gob.ec` responde 403 de
+Incapsula también al navegador desde Canadá. El CKAN
+`ministerio-del-interior` está vigente (seis paquetes con archivo histórico
+y enero-septiembre 2026, actualizados entre el 13 y el 20 de octubre de
+2026) y ECU 911 publica su base de emergencias mensual hasta septiembre
+2026 (algunos recursos declarados CSV son XLSX). Ambos alcanzables con los
+tools CKAN.
+
+**ARCOTEL.** La biblioteca de medios tiene 3.074 XLSX, 974 XLS, 106 CSV y
+67 ZIP. Los XLSX siguen el patrón `{código}-{Indicador}_{mes}_{año}` y
+cada archivo mensual trae la serie completa (1.1.1 desde 2008, 3.1.1 desde
+2010). Sin Power BI. MINTEL tiene 5 paquetes CKAN (madurez de ciudades
+inteligentes, habilidades digitales 2023).
+
+**LOTAIP.** Desde ~febrero 2025 los sitios institucionales solo redirigen
+al portal nacional de la Defensoría (`transparencia.dpe.gob.ec/entidades/{id}`,
+Gobierno 22, MIT 35, ARCOTEL 1362), que no responde desde Canadá; octubre
+2024-enero 2025 queda en cada sitio como CSV por numeral (separador `;`,
+latin-1) bajo download monitor. Una herramienta transversal no es viable
+desde aquí; hay que probar el portal de la Defensoría desde Ecuador.
+
+## Cuadragésima pasada — acceso a microdatos del Censo 2022 en ANDA y censoecuador.gob.ec (2026-11-08)
+
+Origen: una tesis sobre la brecha digital (internet, computadora y celular
+por provincia y cantón, Censo 2022) encontró que `search_anda` y
+`download_anda_microdata` se contradecían. Revisado en vivo con curl.
+
+**ANDA, catálogo 1085 (`ECU-INEC-CTIMA-CPV-2022-V1.6`).**
+- La API (`api/catalog/1085?id_format=id`) da `data_access_type: direct`;
+  el listado da `form_model: direct`. Ninguno distingue "archivo adjunto" de
+  "enlace externo".
+- `catalog/1085/get-microdata` es el formulario de términos (token `ncsrf`).
+  Tras aceptarlo (POST), "Archivos de datos" trae UN recurso, "Bases de
+  Datos CPV 2022", cuyo botón es `External link` hacia
+  `https://www.censoecuador.gob.ec/data-censo-ecuador/` (clase `download`,
+  pero el href no es `catalog/1085/download/N`). Eso es lo que el parser
+  viejo no veía. `related_materials` sí tiene 10 descargas ANDA reales (PDF
+  de metodología, cuestionario, dos ZIP de 418 KB), pero ninguna es una base.
+- Muestra de 44 estudios con `form_model != data_na`: la mayoría son `directo`
+  (archivos `catalog/N/download/M`); 1151 (camas hospitalarias) y 1324
+  (registro de empleo en la seguridad social) son enlace externo (a BIINEC
+  `aplicaciones3.ecuadorencifras.gob.ec/BIINEC-war/` y a
+  `ecuadorencifras.gob.ec/registro-empleo-seguridad-social`); los 3
+  `form_model: public` (351, 365, 389) son un muro de login ("Inicie sesión
+  para acceder a los datos"), sin formulario de términos; el 400 (IPI 2014,
+  `form_model` nulo) dice "Data Access Not Available". No se encontró en vivo
+  ningún estudio `licensed`/solicitud: ese tipo se detecta por texto
+  ("access-licensed", "request access", "solicitar acceso") sin haberlo visto.
+- Decisión: el cliente clasifica por la página real (`parse_microdata_page`),
+  no por el flag; `search_anda` verifica cada resultado con microdatos (2
+  solicitudes, caché 6 h).
+
+**censoecuador.gob.ec.** WordPress + Elementor, `robots.txt` con `Disallow:`
+vacío y sitemap de Yoast; `wp-json` abierto (la API de medios lista los
+uploads). El TLS verifica con el almacén del SO, no con certifi (ya tratado
+por `helpers/tls.py`). Dos páginas HTML estáticas tienen todo, sin API JSON
+detrás:
+- `/resultados-censo/`: presentaciones y fichas temáticas (PDF), **Tabulados**
+  en pestañas Población / Vivienda / Hogar, cada entrada "Nombre – Formato
+  Excel y Formato CSV" (XLSX y ZIP con CSV, 0,4-2 MB): estructura
+  poblacional, estado conyugal, etnia, migración, educación, trabajo,
+  dificultades funcionales, identidad de género, pobreza por NBI, inscripción
+  y cedulación, mortalidad (población); condiciones generales y servicios
+  básicos (vivienda); composición del hogar, condiciones de vida, prácticas
+  ambientales, **Uso de las Tecnologías de la Información y Comunicación**
+  (`wp-content/uploads/2023/12/03_2022_CPV_TIC.xlsx` / `.zip`) y mascotas
+  (hogar); serie histórica 1950-2022. Además las bases de datos y los
+  diccionarios.
+- `/data-censo-ecuador/`: bases 2022 por cantón, sector y manzana (CSV, SPSS,
+  REDATAM; en `ecuadorencifras.gob.ec/documentos/web-inec/bd-censo/...`, el
+  CSV cantonal pesa 692 MB), 2010 y 2001 recodificados a geografía 2022
+  (nivel sector/manzana en ecuadorencifras, nacional en
+  `censoecuador.gob.ec/public/*.zip|rar`), diccionarios (`dicc-censo/` y
+  `wp-content/uploads/2025/02/`), guía de usuario, cuestionario, manuales.
+- El libro `03_2022_CPV_TIC.xlsx` (verificado, 8 tablas). Población de 5+
+  años por uso de celular, internet, computadora/laptop y tablet en los
+  últimos 3 meses: 1 por provincia, área y sexo al nacer; 1.1 por cantón,
+  área y sexo; 1.2 por cantón y parroquia; 2 y 2.1 por provincia o cantón,
+  sexo y grupo quinquenal de edad. Hogares por disponibilidad de teléfono
+  convencional, celular, televisión pagada, internet y computadora: 3 por
+  provincia y área; 3.1 por cantón y área; 3.2 por cantón y parroquia.
+- No es parte de este servidor: Visualizador (`cubos.inec.gob.ec/
+  AppCensoEcuador/`, sin respuesta desde Canadá en esta pasada), Redatam
+  (`redatam.inec.gob.ec`, R+SP WebServer, consulta interactiva sin API
+  documentada) y el geovisualizador de CEPAL (`geo.cepal.org/censo-ecuador/`).
+- `/data-y-resultados/` (la URL que usaba `censo_client`) ahora es un 404
+  real ("Página no encontrada") con solo el menú; la tolerancia al 404 que
+  documentaba el cliente ocultaba que ya no había resultados ahí.
+
+Construido: `search_archivos(fuente="censo")` lee las dos páginas nuevas (ver
+ROADMAP § INEC).
+
+## Cuadragésima primera pasada — encabezados múltiples y filas de meses en las tablas IEM (2026-11-08)
+
+Síntoma real: `get_bce_iem_table(table_id="iem-451-e", desde="2024-08")`
+(confianza del consumidor, boletín 2095) devolvía `tabla_larga` con
+encabezados casi vacíos (`["Período (5)(6)\\Variable","","TOTAL NACIONAL","",
+"","URBANO",...]`) y solo las filas de enero.
+
+- Diseño del XLSX (verificado, `IEM-451-e.xlsx`): fila 8 = grupos con celdas
+  combinadas (`TOTAL NACIONAL` | `URBANO` | `RURAL`, 3 columnas cada uno; solo
+  la primera celda del grupo trae texto), fila 9 = subencabezados (`Situación
+  Presente (3)`, `Situación Futura (4)`, `Confianza del Consumidor`), columna A
+  = año **solo en la fila de enero**, columna B = mes, sin encabezado; el
+  pie de página son notas largas en una celda combinada que mencionan años.
+- Causa raíz: `_extract_long_table` usaba solo la primera fila como encabezado
+  y la columna A como período, así que las filas con A vacía (febrero a
+  diciembre) no tenían período y se descartaban, y la nota al pie contaba
+  como fila si su texto traía un año.
+- Misma forma en ~40 de las 78 tablas del boletín 2095 (tasas y volúmenes de
+  crédito 1.10/1.11, finanzas públicas 2.4, comercio exterior 3.x, petróleo
+  4.1, precios 4.2, empleo 4.2.5, construcción 4.5.3, 4.5.4). Variantes
+  vistas: año en la primera fila con mes en la columna B; `2024 Enero` en la
+  columna A seguido de `Febrero` sin año (3.2.3, 3.3.x, 3.4.x); rangos
+  trimestrales `Enero - Marzo` (4.2.5a, 4.5.1a, 4.5.2); filas semanales
+  debajo de cada mes (1.10.1, 1.11.1); varios bloques con el mismo año bajo
+  rótulos de una celda (`Porcentaje del PIB`, `A diciembre`).
+- Distinto y sin cambio: `4.2.3` (meses en columnas, solo años en filas) y
+  las 33 tablas `series_ancho`/`series_matriz`, que no pasan por este
+  parser. `3.2.1` (períodos en columnas bajo una fila de encabezado sin
+  etiqueta en A) pasó de `tabla_larga` con 1 fila a `series_matriz`.
+- Construido: ver CHANGELOG (encabezados aplanados con ` — `, `Período`
+  normalizado, `Bloque`, notas al pie excluidas).
+
+## Cuadragésima segunda pasada — índice del contenido de los tabulados del Censo 2022 y velocidad de `search_anda` (2026-11-08)
+
+**Tabulados.** Los 19 XLSX de `/resultados-censo/` (los 18 de las pestañas
+Población/Vivienda/Hogar más la Serie histórica 1950-2022; 0,3-8,9 MB, ninguno
+sobre el umbral de 25 MB) comparten diseño: hoja `Índice` (`Tabla.N°` /
+`Contenido`) y una hoja por tabla donde la fila 4 dice `Nombre de la tabla:` (a
+veces `Cuadro N°`), y la fila `Índice` abre el encabezado (columna B = geografía,
+siguientes = variables). Hay 282 tablas. Las hojas `N`, `N.1`, `N.2` repiten la
+misma tabla a nivel provincia, cantón y parroquia, así que los niveles se
+leen del título y del encabezado de geografía, no del nombre de la hoja.
+- Construido: `helpers/censo_index_build.py` (script `scripts/build_censo_index.py`)
+  lee solo las primeras 16 filas de cada hoja (openpyxl `read_only`), descarga
+  con tope (`--max-mb`) y guarda `helpers/data/censo_tabulados_index.json`
+  (~160 KB) con URL, SHA-256, tamaño y fecha por archivo. El servidor solo lee
+  ese JSON.
+- Qué no está en el índice: "migración" y "agua potable" no aparecen como
+  palabras en los títulos (son "lugar de nacimiento", "agua por red pública"),
+  así que se añadieron alias (`potable`, `discapacidad`, `etnia`, `defunciones`).
+  Es un recurso estático: si INEC republica un XLSX hay que reconstruirlo; el
+  SHA-256 permite saber qué cambió.
+- Los CSV comparten las tablas de su XLSX (mismo rótulo base de la página).
+
+**ANDA.** Medido en vivo (`search_anda("encuesta", limit=50)`, 50 resultados, 35
+con microdatos): ya antes de esta pasada las sondas corrían 6 a la vez, así que
+el costo real no era la secuencialidad de las sondas sino el volumen (71
+solicitudes: 3 de catálogo + 2 por estudio) y la paginación secuencial del
+catálogo (~4,3 s solo con `verificar_acceso=false`).
+| Variante | Tiempo | Solicitudes |
+|---|---|---|
+| antes (verificar todo, 6 a la vez) | 5,1-5,4 s | 71 |
+| `auto`, frío | 3,4 s | 23 |
+| `auto`, caché en disco | 2,8 s | 3 |
+| `true`, frío (8 a la vez, páginas en paralelo) | 4,0 s | 69 |
+| `true`, caché en disco | 2,8 s | 3 |
+| `false` | 2,9-4,3 s | 3 |
+- El listado trae `changed` (fecha de modificación del estudio): se usa en la
+  clave del caché persistente junto con un TTL de 7 días, porque ANDA puede
+  cambiar el acceso sin tocar `changed`.
+- `form_model` fiable para saltarse la sonda: solo `public` (login; 351, 365,
+  389). `direct` no lo es (CPV 2022) y `remote`/`licensed` nunca se vieron en vivo
+  (de 100 filas de "encuesta": `data_na` 57, `direct` 40, `public` 2, nulo 1), así que
+  esos siguen sondeándose.
+- Compromiso de `auto`: los resultados 11+ de una página quedan `desconocido`
+  hasta que se pida `verificar_acceso=true` o `get_anda_survey_info`. La
+  exactitud de los 10 primeros no cambia.
+
+## Cuadragésima tercera pasada — coincidencia por palabra en `search_inec_publicaciones` y país ambiguo en CEPALSTAT (2026-11-09)
+
+**INEC.** `search_inec_publicaciones("TIC")` devolvía 1.458 resultados
+irrelevantes ("Desnutrición", "Siniestros de Tránsito", inflación). Causa: el
+parámetro `search` de la API REST de WordPress es una subcadena (`LIKE %tic%`)
+sobre título, contenido y extracto, así que "tic" entra en "estadísticas",
+"práctica" o "tránsito"; con varias palabras exige todas, sin ordenar por
+relevancia, y el orden era por fecha.
+- Ahora, con consulta, se pide a WordPress cada palabra por separado
+  (100 por página, páginas en paralelo, tope 20 páginas por palabra, caché de
+  30 min) y se re-filtra localmente sobre título + extracto: sin acentos ni
+  mayúsculas, por límite de palabra. Palabras de 4+ caracteres coinciden por
+  prefijo ("tecnolog" -> "tecnologías"); de 3 o menos solo como palabra entera
+  ("TIC"). Se ignoran palabras vacías ("de", "la", "y"...).
+- Orden: número de palabras coincidentes (todas primero), luego rareza de las
+  palabras coincidentes, luego coincidencias en el título, luego fecha. Sin
+  consulta, igual que antes (fecha descendente).
+- En vivo: `TIC` baja de 1.458 a 22 resultados (los cinco primeros son
+  "Tecnologías de la Información y Comunicación-TIC 2024/2023/2022/2020/2019").
+  `ENEMDU TIC 2025` (331) sigue empezando por ENEMDU 2025 (ninguna publicación
+  de TIC lleva "2025" ni "ENEMDU" en título o extracto: la TIC 2024 es la más
+  reciente), pero ya no entra ruido por subcadena.
+- Limitación: el contenido completo no se baja (pesa); una publicación que solo
+  menciona el término en el cuerpo y no en título o extracto queda fuera.
+- Mismo helper: `helpers/ant_client` (siniestros) llama a la misma función con
+  consultas fijas; recibe la corrección sin cambios de código. Las otras
+  búsquedas WordPress del repo (`ministerio_energia`, `msp_*`, `turismo`,
+  `centrosur`) usan un término fijo interno, no consultas libres, y no se
+  tocaron. Los demás `q in nombre` son subcadena documentada.
+
+**CEPALSTAT.** `get_cepalstat_indicador(4891, pais="Bolivia")` fallaba con
+"País ambiguo". No hay tabla de alias: la dimensión País del indicador trae, junto a
+`Bolivia (Estado Plurinacional de)`, dos agregados cuyo nombre contiene
+"Bolivia" (`Mercado Común del Sur (MERCOSUR)` y `Mercado Común del Sur
+(MERCOSUR), Bolivia (Estado Plurinacional de) y Chile`), y el mensaje los unía
+con ", " haciendo parecer que MERCOSUR coincidía con Bolivia.
+- Resolución nueva: (1) nombre exacto, nombre antes del paréntesis o texto del
+  paréntesis ("MERCOSUR"); (2) código ISO3 ("BOL", "PER"; los miembros de la
+  API no traen ISO3, así que hay una tabla de ~45 países); (3) coincidencia
+  parcial única entre países; los agregados (con coma, o con " y " que no sea
+  un país como "Trinidad y Tabago") solo si nada más coincide. La ambigüedad
+  real ("guin") sigue fallando y lista solo candidatos reales.
+- Quiebres de serie: en porcentajes, un salto interanual de más de 25 pp se
+  marca como `posible_quiebre_serie` (también en el texto). En vivo, 4891 Perú
+  2022->2023: Total 55,2 -> 89,6 (+34,4), Rural 20,1 -> 76,8 (+56,7), Urbano
+  64,6 -> 93,0 (+28,4); Bolivia 2019->2020 también (Total +32,2). Es una
+  alerta, no una corrección: las notas de la fuente explican el cambio.
+## Cuadragésima cuarta pasada — `search_ocds` no tiene orden estable y `get_resumen_compras` cambiaba de total (2026-11-09)
+
+**Síntoma.** `get_resumen_compras("Manta", 2025)` daba USD 32,4 a 42,5 M y 207 o
+214 `procesos_con_monto` en ejecuciones idénticas, siempre con `parcial=false` y
+253 procesos leídos de 253.
+
+**Causa raíz (medida en vivo).** La misma `page` de `search_ocds` devuelve
+filas distintas en cada llamada (`/PLATAFORMA/api/search_ocds?year=2025&search=Manta&buyer=Manta&page=3`
+tres veces: tres conjuntos de 10 ids distintos). Los parámetros `sort`, `order`,
+`orderBy`, `per_page`, `limit` y `size` se ignoran. Un barrido de las 26 páginas
+dio 253 filas pero solo 210 ids distintos: las duplicadas ocupaban el lugar de
+las no vistas, así que el conteo coincidía con `total` y el resumen se declaraba
+completo con un subconjunto distinto cada vez. Los 429 agravaban la lentitud
+(cada barrido tardaba 70-80 s) pero no eran la causa. No es un problema de
+campos: `amount` es el único monto sumado (valor adjudicado si el proceso lo
+tiene, si no el estimado), `budget` va aparte.
+
+**Corrección.** `summarize_buyer` barre las páginas varias veces sin la caché de
+páginas, deduplica por OCID, suma en orden de OCID, para si el host entra en
+enfriamiento por 429, limita solicitudes (6 barridos) y tiempo (150 s), con
+concurrencia 2, y marca `parcial=true` salvo que haya tantos procesos distintos
+como `total_en_fuente`. Devuelve `paginas_fallidas` y `solicitudes`. Las filas
+distintas se guardan 15 min en memoria para que una repetición continúe donde
+quedó la anterior.
+
+**Medición tras el arreglo** (Manta 2025, tres llamadas seguidas en un proceso,
+espaciadas 30 s): 251 → 252 → 253 procesos leídos; las dos primeras `parcial=true`,
+la tercera `parcial=false` con USD 34.713.874,47 y 211 procesos con monto. Coste:
+~150 s por llamada cuando SERCOP está limitando (429), porque completar el
+conjunto exige varias pasadas sobre un muestreo aleatorio.
+
 ## Notas históricas
 
 **Corrección de diagnóstico (2026-08-13):** el 403 de CKAN que se creía un

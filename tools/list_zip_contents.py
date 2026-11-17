@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers.csv_reader import list_zip_contents as _list_zip_contents
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoArchivos
 from helpers.tool_meta import READ_ONLY
 
 
@@ -24,7 +25,7 @@ def register_list_zip_contents_tool(mcp: MCPServer) -> None:
         title="Listar el contenido de un archivo ZIP",
         description=(
             "List a remote ZIP's members (name, size) via HTTP Range requests, "
-            "without downloading it; works for archives far beyond 5 MB. No ZIP64."
+            "without downloading it; works for archives far beyond 5 MB, ZIP64 included."
         ),
         annotations=READ_ONLY,
     )
@@ -34,7 +35,7 @@ def register_list_zip_contents_tool(mcp: MCPServer) -> None:
         limit: int = 200,
         offset: int = 0,
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoArchivos]:
         """
         List a .zip archive's member files (name, size) from a direct URL,
         without downloading the archive.
@@ -43,10 +44,10 @@ def register_list_zip_contents_tool(mcp: MCPServer) -> None:
         directory via HTTP Range requests, so it works for archives far
         larger than the 5 MB preview_resource_data/download_resource cap -- e.g. INEC
         or censo microdata ZIPs of multiple hundred MB. Requires the server
-        to honor Range requests; fails with a clear error otherwise. Does
-        not support ZIP64 archives. Listing names is cheap this way, but
-        previewing a specific member's rows is not (still needs decompressing
-        from that member's offset onward) -- this tool only lists metadata.
+        to honor Range requests; fails with a clear error otherwise. ZIP64
+        archives (past 4 GB or 65535 entries) are supported. This tool only
+        lists metadata; to read one member's rows, pass its name to
+        read_zip_member, which fetches only that member's bytes.
 
         Args:
             url: Direct URL to a .zip file (from another tool's result, e.g.

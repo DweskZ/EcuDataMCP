@@ -41,7 +41,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#334155"
   },
   {
     "id": "procedures-procurement",
@@ -85,7 +86,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#854d0e"
   },
   {
     "id": "risk-hazards",
@@ -161,7 +163,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#7c3aed"
   },
   {
     "id": "economy-finance",
@@ -298,7 +301,7 @@
             "id": "superbancos",
             "name": "Superbancos",
             "tag": "Banking",
-            "description": "Monthly financial bulletins, financial services, historical information and statistical calendar",
+            "description": "Financial and series bulletins, soundness indicators (CAMEL, NPLs, liquidity), credit volume, deposits and loans, social security and studies",
             "coverage": "superbancos.gob.ec",
             "url": "https://www.superbancos.gob.ec/estadisticas/portalestudios",
             "status": "live"
@@ -360,8 +363,60 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Ministry of Production (Tourism)",
+        "sources": [
+          {
+            "id": "turismo-boletin",
+            "name": "Tourism figures bulletin",
+            "tag": "Tourism",
+            "description": "Monthly PDF bulletins: arrivals by nationality, occupancy, protected areas, establishment register (Nov 2025+)",
+            "coverage": "produccion.gob.ec",
+            "url": "https://www.produccion.gob.ec/boletin-de-cifras-sector-turismo/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Corporación Financiera Nacional (CFN)",
+        "sources": [
+          {
+            "id": "cfn-powerbi",
+            "name": "CFN statistics",
+            "tag": "Power BI",
+            "description": "Credit and disbursements by province, monthly financial statements, investments and FNG guarantees",
+            "coverage": "cfn.fin.ec/estadisticas",
+            "url": "https://www.cfn.fin.ec/estadisticas/",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "name": "Private trade associations",
+        "sources": [
+          {
+            "id": "fedexpor-expordata",
+            "name": "FEDEXPOR — Expordata",
+            "tag": "FEDEXPOR",
+            "description": "Monthly foreign-trade report (PDF on Google Drive)",
+            "coverage": "fedexpor.com",
+            "url": "https://www.fedexpor.com/inteligencia-comercial/reporte-expordata/",
+            "status": "live"
+          },
+          {
+            "id": "aeade-ventas",
+            "name": "AEADE — vehicle sales",
+            "tag": "AEADE",
+            "description": "Monthly vehicle-sales bulletins and automotive yearbooks",
+            "coverage": "aeade.net",
+            "url": "https://www.aeade.net/boletines-de-prensa-venta-de-vehiculos/",
+            "status": "live"
+          }
+        ]
       }
-    ]
+    ],
+    "color": "#0033a0"
   },
   {
     "id": "statistics-demographics",
@@ -402,7 +457,7 @@
             "id": "inec-censo",
             "name": "Ecuador 2022 Census",
             "tag": "INEC",
-            "description": "Census resources, microdata and methodology documents",
+            "description": "Results tabulados (incl. household ICT by province and canton), microdata and methodology documents",
             "coverage": "censoecuador.gob.ec",
             "url": "https://www.censoecuador.gob.ec",
             "status": "live"
@@ -437,6 +492,15 @@
             "description": "Historical administrative K-12 enrollment registry, 2009-present",
             "coverage": "educacion.gob.ec",
             "url": "https://educacion.gob.ec/datos-abiertos-minedec/",
+            "status": "live"
+          },
+          {
+            "id": "minedec-bases",
+            "name": "AMIE registers by school year",
+            "tag": "CSV/XLSX",
+            "description": "2009-2010 to 2024-2025, start and end cuts, with dictionaries; thematic files",
+            "coverage": "educacion.gob.ec",
+            "url": "https://educacion.gob.ec/base-de-datos/",
             "status": "live"
           }
         ]
@@ -505,8 +569,23 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Military Geographic Institute (IGM)",
+        "sources": [
+          {
+            "id": "igm-geoportal",
+            "name": "IGM geoportal",
+            "tag": "IGM",
+            "description": "737 WFS layers of official cartography: boundaries, settlements, roads, rivers (1:1M, 1:50k, 1:25k)",
+            "coverage": "www.geoportaligm.gob.ec",
+            "url": "https://www.geoportaligm.gob.ec",
+            "status": "live"
+          }
+        ]
       }
-    ]
+    ],
+    "color": "#ef3340"
   },
   {
     "id": "agriculture",
@@ -536,7 +615,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#4d7c0f"
   },
   {
     "id": "energy",
@@ -567,15 +647,6 @@
             "description": "Centrosur's scheduled power cuts (Azuay, Cañar, Morona Santiago), 2023 onward, including the 2024 crisis",
             "coverage": "centrosur.gob.ec",
             "url": "https://www.centrosur.gob.ec",
-            "status": "live"
-          },
-          {
-            "id": "energia-ecuador",
-            "name": "energia-ecuador.com (archive)",
-            "tag": "Energy",
-            "description": "EEQ's 2024 blackout schedules, recovered from the Wayback Machine (frozen snapshot)",
-            "coverage": "web.archive.org",
-            "url": "https://web.archive.org/web/2024/https://energia-ecuador.com/",
             "status": "live"
           },
           {
@@ -690,7 +761,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#c2410c"
   },
   {
     "id": "labour-employment",
@@ -766,7 +838,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#047857"
   },
   {
     "id": "oversight-transparency",
@@ -787,7 +860,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#9f1239"
   },
   {
     "id": "justice",
@@ -808,7 +882,8 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#78716c"
   },
   {
     "id": "transport-aviation",
@@ -851,8 +926,23 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Ministry of Infrastructure and Technology (MIT)",
+        "sources": [
+          {
+            "id": "mit-red-vial",
+            "name": "State road network status",
+            "tag": "PDF",
+            "description": "Daily report: closed and restricted roads by province",
+            "coverage": "mit.gob.ec",
+            "url": "https://www.mit.gob.ec/",
+            "status": "live"
+          }
+        ]
       }
-    ]
+    ],
+    "color": "#0e7490"
   },
   {
     "id": "health",
@@ -877,17 +967,36 @@
         "name": "Ministry of Public Health (MSP)",
         "sources": [
           {
-            "id": "msp-gacetas-inmunoprevenibles",
-            "name": "Vaccine-preventable-disease gazettes",
+            "id": "msp-gacetas",
+            "name": "Epidemiological gazettes",
             "tag": "MSP",
-            "description": "Weekly vaccine-preventable-disease surveillance bulletins, 2019-present",
+            "description": "MSP weekly surveillance bulletins, 18 series (vaccine-preventable, vector-borne, food and water-borne, SARI, outbreaks, maternal deaths, tuberculosis...), 2013-present",
             "coverage": "salud.gob.ec",
-            "url": "https://www.salud.gob.ec/gacetas-inmunoprevenibles/",
+            "url": "https://www.salud.gob.ec/gacetas-epidemiologicas/",
+            "status": "live"
+          },
+          {
+            "id": "msp-precios",
+            "name": "Medicine ceiling prices",
+            "tag": "XLSX",
+            "description": "Every revision of the price-setting council since 2016",
+            "coverage": "salud.gob.ec",
+            "url": "https://www.salud.gob.ec/consejo-nacional-de-fijacion-y-revision-de-precios-de-medicamentos/",
+            "status": "live"
+          },
+          {
+            "id": "msp-arcgis",
+            "name": "MSP ArcGIS layers",
+            "tag": "ArcGIS",
+            "description": "Public-network health facilities, sexual and reproductive health indicators by canton, visits and discharges",
+            "coverage": "services7.arcgis.com",
+            "url": "https://www.salud.gob.ec/",
             "status": "live"
           }
         ]
       }
-    ]
+    ],
+    "color": "#db2777"
   },
   {
     "id": "telecommunications",
@@ -905,10 +1014,20 @@
             "coverage": "arcotel.gob.ec",
             "url": "https://www.arcotel.gob.ec",
             "status": "live"
+          },
+          {
+            "id": "arcotel-series",
+            "name": "XLSX statistical series",
+            "tag": "XLSX",
+            "description": "25 indicators (active lines, base stations, internet, pay TV, concessions, complaints) with full history",
+            "coverage": "arcotel.gob.ec",
+            "url": "https://www.arcotel.gob.ec/estadisticas-de-telecomunicaciones2/",
+            "status": "live"
           }
         ]
       }
-    ]
+    ],
+    "color": "#0369a1"
   },
   {
     "id": "international-sources",
@@ -929,9 +1048,9 @@
           },
           {
             "id": "series-internacionales",
-            "name": "International series (WDI, IRENA, XM, Comtrade, IMF, WHO, ILO, UNHCR)",
+            "name": "International series (WDI, IRENA, Ember, XM, Comtrade, IMF, WHO, ILO, UNHCR)",
             "tag": "International",
-            "description": "World Bank WDI, IRENA, XM Colombia-Ecuador flows, UN Comtrade bilateral trade, IMF series, WHO health, ILO labour and UNHCR displacement; Ecuador by default",
+            "description": "World Bank WDI, IRENA, Ember's monthly power mix, XM Colombia-Ecuador flows, UN Comtrade bilateral trade, IMF series, WHO health, ILO labour and UNHCR displacement; Ecuador by default",
             "coverage": "api.worldbank.org, pxweb.irena.org, servapibi.xm.com.co, comtradeapi.un.org, api.imf.org, ghoapi.azureedge.net, sdmx.ilo.org, api.unhcr.org",
             "url": "https://databank.worldbank.org/source/world-development-indicators",
             "status": "live"
@@ -952,6 +1071,7 @@
           }
         ]
       }
-    ]
+    ],
+    "color": "#64748b"
   }
 ]

@@ -22,13 +22,66 @@ para que un solo PR pueda actualizar el README del servidor y el sitio a la vez.
   parámetros con el código y muestra los tools nuevos en una categoría aparte, en inglés, hasta que se
   traduzcan a mano `description`/`long_description`/`params` en `data/tools.json` y `en/data/tools.json`.
 - `assets/og-image.png` — imagen social, regenerada con los conteos de `data/` por `scripts/make_og_image.py` (`uv run --with pillow python scripts/make_og_image.py`).
-- `assets/site.css` y `assets/atlas.css` — el CSS propio del sitio (`atlas.css` solo se carga en la página
-  del Atlas), en texto plano; edítalos directamente. `assets/styles.css` es la base compilada (estilos tipo
-  Bootstrap): no se recompila desde ningún SCSS del repo, así que los cambios de diseño van en `site.css`.
-  Las fuentes de Google Fonts se cargan con un `<link>` en `templates/base.html`, no con `@import`.
-- `assets/` — CSS compilado, `site.js` (toggle de navbar móvil, tabs de clientes MCP, panel de búsqueda,
-  botón de copiar), `fuse.min.js` (vendored, motor de la búsqueda), favicon, imagen OG. El ícono de
-  búsqueda del navbar es un SVG inline en `templates/base.html`, no una fuente de íconos.
+- `assets/site.css` (global: paleta blanca + acentos de la bandera, header, footer, páginas internas),
+  `assets/home.css` (solo la home) y `assets/atlas.css` (solo la Referencia): CSS propio en texto plano;
+  edítalos directamente. No hay Bootstrap ni modo oscuro. Las fuentes de Google Fonts (Inter, Playfair
+  Display, Source Serif 4, IBM Plex Mono) se cargan con un `<link>` en `templates/base.html`.
+- `assets/home.js` — comportamiento de la home (mapa, búsqueda real sobre el catálogo, terminal con
+  transcripts, explorador de fuentes, respuestas guardadas, tabs de clientes, carrusel). Lee todo de un
+  JSON embebido (`#home-data`) que arma `build.py` desde `data/*.json`; no tiene datos propios.
+- `assets/site.js` — navbar móvil, panel de búsqueda del sitio y botón de copiar; `assets/fuse.min.js`
+  (vendored) es el motor de esa búsqueda.
+
+### Datos de la home
+
+- `data/sources.json` — fuentes por tema/institución; cada tema lleva su `color` (el del punto en el mapa).
+  De aquí salen los conteos (fuentes, temas, en línea), el mapa y el explorador.
+- `data/ecuador_provinces.json` — geometría de las provincias continentales (rutas SVG ya proyectadas;
+  fuente: geoBoundaries, CC BY 4.0, simplificada, sin Galápagos). `build.py` dibuja el mapa y reparte un
+  punto por fuente de forma determinista; la posición es ilustrativa.
+- `data/stored_answers.json` (+ `en/data/`) — preguntas con respuestas reales guardadas, con
+  `extracted_at` y `server_version`. Se regeneran con `scripts/refresh_answers.py` (ver abajo); si las
+  editas a mano, no cambies cifras al traducir.
+- `data/transcripts.json` (+ `en/data/`) — los ejemplos del chat de la home (llamadas reales a tools). Un paso
+  con `"kind": "reason"` no es una llamada a una tool y se muestra en cursiva gris.
+- `data/clients.json` — snippets por cliente MCP; los `featured` son las pestañas de la home, el resto
+  va en "Otros clientes". `alt` documenta la variante remota/HTTP por separado.
+- `data/org_logos.json` — logos del carrusel del backstage.
+
+## Refrescar las respuestas guardadas
+
+Las 8 respuestas de la home y los 3 transcripts envejecen (cifras de remesas, sismos, compras, cortes...).
+`scripts/refresh_answers.py` vuelve a ejecutar **las mismas llamadas a los tools**, en proceso (importa
+`tools/`, no necesita un servidor corriendo), y regenera ES y EN desde plantillas pequeñas con los valores
+extraídos. También actualiza `extracted_at` y `server_version` (de `pyproject.toml`).
+
+```bash
+# desde la raíz del repo, con el entorno del servidor (uv sync)
+uv run python web/scripts/refresh_answers.py --dry-run   # muestra el diff, no escribe
+uv run python web/scripts/refresh_answers.py             # escribe los 4 JSON
+```
+
+- Cada respuesta define sus llamadas, el parseo y sus plantillas ES/EN en el propio script. Las cifras
+  salen con el formato de cada idioma (`US$ 7.728 millones, 18,2 %` / `US$ 7,728 million, 18.2%`).
+- **Nunca escribe una respuesta a medias.** Si una llamada falla o un valor no se puede interpretar, esa
+  respuesta (y su transcript) queda exactamente como estaba, se avisa en el resumen (`kept-previous`) y
+  conserva su propio `extracted_at` por respuesta para que la fecha global no prometa más de lo verificado.
+- Las dos respuestas del Censo son estáticas: el script solo verifica que `search_archivos` siga devolviendo
+  `03_2022_CPV_TIC` y que los enlaces del INEC sigan ahí.
+- Los sismos se filtran por el texto del lugar (provincia ecuatoriana); las coordenadas solo deciden si el
+  texto no trae región. Los avisos de la EEASA muestran los dos próximos que aún no terminaron.
+- Código de salida: `0` refresco completo o parcial; `2` error inesperado (JSON roto, ES/EN desalineados);
+  `3` no se pudo refrescar nada.
+- Pruebas: `cd web && uv run --with pytest pytest -q tests` (con las llamadas simuladas, sin red).
+
+### Automatización y revisión humana
+
+`.github/workflows/refresh-answers.yml` corre cada lunes (12:00 UTC) y a demanda (`workflow_dispatch`),
+ejecuta el script y, si cambió algún archivo, abre o actualiza el PR `chore/refresh-stored-answers`
+(acción fijada por SHA). **No hay auto-merge: ese PR es la compuerta de revisión humana.** Quien lo revisa
+debe contrastar las cifras que cambiaron con la fuente oficial antes de aprobar; el cuerpo del PR lista qué
+respuestas se actualizaron y cuáles se quedaron con su versión anterior. Los PR abiertos con el
+`GITHUB_TOKEN` por defecto no disparan `ci.yml`: cierra y reabre el PR para correrlo.
 
 ## Cómo se genera
 

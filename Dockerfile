@@ -1,7 +1,7 @@
 # Not digest-pinned here: dependabot's `docker` ecosystem (.github/
 # dependabot.yml) should own the `python:3.14-slim@sha256:...` pin so the
 # digest is bumped by PR instead of hand-edited.
-FROM python:3.14-slim
+FROM python:3.15-slim
 
 # Runs as this instead of root -- the server only reads outbound HTTP and
 # holds in-memory caches, no reason for it to run with root's filesystem
@@ -51,7 +51,7 @@ USER appuser
 
 # stdio by default, like any MCP server image: clients (and Glama's build
 # checks) start it with `docker run -i --rm <image>` and speak JSON-RPC over
-# stdin/stdout. docker-compose.yml sets MCP_TRANSPORT=http for the hosted
+# stdin/stdout. docker-compose.yml sets MCP_TRANSPORT=http for the HTTP
 # deployment, which is what EXPOSE refers to.
 ENV MCP_TRANSPORT=stdio
 EXPOSE ${MCP_PORT:-8000}

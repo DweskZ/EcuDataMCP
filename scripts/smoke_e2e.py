@@ -23,6 +23,7 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 MCP_URL = "http://127.0.0.1:8000/mcp"
 HEALTH_URL = "http://127.0.0.1:8000/health"
+FIXED_RUC = "1790016919001"
 
 
 def parse_sse(text: str) -> dict | None:
@@ -271,6 +272,17 @@ async def main() -> int:
                 {"fuente": "arconel", "capa": "balance_energia", "filtro": "Anio = 2024"},
                 ["EnergiaDisponibleSistema"],
             ),
+            (
+                "get_capa_geo_datos",
+                {
+                    "fuente": "arconel",
+                    "capa": "produccion_centrales",
+                    "sumar": "EnergiaNeta",
+                    "agrupar": "AnioProduccion",
+                    "filtro": "AnioProduccion >= 2025",
+                },
+                ["suma_EnergiaNeta"],
+            ),
             ("search_capas_geo", {"fuente": "celec"}, ["snt_linea_transmision"]),
             ("search_cortes", {"distribuidora": "elecgalapagos"}, ["Mantenimientos"]),
             ("search_cortes", {"distribuidora": "emelnorte"}, ["Suspensión"]),
@@ -284,6 +296,15 @@ async def main() -> int:
             ("search_ranking", {"limit": 3}, []),
             ("list_archivo_secciones", {"fuente": "sipa"}, ["SIPA", "economico"]),
             ("list_archivo_secciones", {"fuente": "superbancos"}, ["boletines_financieros"]),
+            (
+                "get_archivo_seccion",
+                {"fuente": "superbancos", "seccion": "indicadores_solidez"},
+                # Any year folder proves the OneDrive tree was crawled; a
+                # fixed year flakes while the site rebuilds that folder and
+                # rots every January.
+                ["Año 20"],
+            ),
+            ("search_archivos", {"fuente": "msp", "query": "vectoriales 2026", "limit": 3}, []),
             ("get_archivo_seccion", {"fuente": "bvg", "seccion": "historicos"}, ["BVG_Acciones"]),
             ("list_archivo_secciones", {"fuente": "bvq"}, ["cotizaciones_historicas"]),
             ("list_catalogo", {"fuente": "sut"}, ["indicador"]),
@@ -302,13 +323,55 @@ async def main() -> int:
             ("search_bce_calendario", {"limit": 3}, []),
             ("search_capas_geo", {"fuente": "inamhi", "format": "json"}, []),
             ("search_capas_geo", {"fuente": "mag", "format": "json"}, []),
+            ("search_capas_geo", {"fuente": "igm", "query": "poblado"}, ["nacional_2024:poblado_p_2024"]),
+            (
+                "get_capa_geo_datos",
+                {"fuente": "igm", "capa": "nacional_2024:poblado_p_2024", "count": 2},
+                ["poblado"],
+            ),
+            ("search_archivos", {"fuente": "turismo", "limit": 3}, ["Turismo"]),
+            ("search_archivos", {"fuente": "fedexpor", "limit": 3}, ["Expordata"]),
+            ("search_archivos", {"fuente": "arcotel_series", "query": "1.1.1"}, ["Lineas activas"]),
+            ("search_archivos", {"fuente": "msp_precios", "limit": 2}, ["precios"]),
+            ("search_archivos", {"fuente": "mit_vias"}, ["mit.gob.ec"]),
+            ("search_archivos", {"fuente": "minedec_bases", "query": "csv 2024-2025"}, ["2024-2025"]),
+            ("search_capas_geo", {"fuente": "msp"}, ["indicadores_ssr"]),
+            (
+                "get_capa_geo_datos",
+                {"fuente": "msp", "capa": "egresos_hospitalarios", "sumar": "EGRESOS", "agrupar": "AÑO"},
+                ["suma_EGRESOS"],
+            ),
+            ("search_archivos", {"fuente": "aeade", "query": "ventas", "limit": 3}, ["ventas"]),
+            ("list_catalogo", {"fuente": "cfn"}, ["estadisticas"]),
+            (
+                "query_sut_indicador",
+                {
+                    "fuente": "cfn",
+                    "indicador": "estadisticas",
+                    "campos": ["Garantias FNG.nombre_provincia", "Medidas FNG.Monto Garantizado (USD) [medida]"],
+                    "limite": 5,
+                    "format": "json",
+                },
+                ["nombre_provincia"],
+            ),
+            (
+                "get_serie_internacional",
+                {
+                    "fuente": "ember",
+                    "indicador": "by_source/total",
+                    "frecuencia": "M",
+                    "desde": "2024-09",
+                    "hasta": "2024-12",
+                    "format": "json",
+                },
+                ["Hydropower"],
+            ),
             ("search_cepalstat_indicadores", {"query": "poblacion"}, []),
             ("search_cortes", {"distribuidora": "eeq", "format": "json"}, []),
             ("search_cortes", {"distribuidora": "centrosur", "format": "json"}, []),
             ("search_infomies_bases_mensuales", {"serie": "anc", "format": "json"}, []),
             ("search_infomies_boletines_zonales", {"format": "json"}, []),
             ("search_sgr_sitreps", {"format": "json"}, []),
-            ("get_energia_ecuador_snapshot", {"format": "json"}, []),
             ("get_category_info", {"category": "sal", "format": "json"}, []),
             ("get_iess_archivos", {"coleccion": "boletines", "format": "json"}, []),
             (
@@ -316,6 +379,18 @@ async def main() -> int:
                 {"fuente": "wdi", "indicador": "NY.GDP.MKTP.CD", "ultimos": 3, "format": "json"},
                 [],
             ),
+            ("get_sipa_resumen_indicadores", {"anio": 2024, "format": "json"}, []),
+            # -- fixed public RUC (Corporación Favorita, a large company that
+            # is in every registry these tools read), so the lookups never
+            # depend on a search ranking that shifts over time.
+            ("get_sri_ruc_info", {"ruc": FIXED_RUC, "format": "json"}, [FIXED_RUC]),
+            (
+                "get_certificado_cumplimiento_patronal",
+                {"identificacion": FIXED_RUC, "format": "json"},
+                [],
+            ),
+            ("get_compania_info", {"ruc": FIXED_RUC, "format": "json"}, []),
+            ("get_financials", {"expediente_or_ruc": FIXED_RUC, "desde": 2023, "format": "json"}, []),
         ]
 
         print("== tools ==")
@@ -349,6 +424,20 @@ async def main() -> int:
             ("tramites: search -> info -> estadisticas", chain_tramites(client)),
             ("instituciones: list -> info", chain_instituciones(client)),
             ("organizations: search -> info", chain_organizations(client)),
+            ("ckan: search -> series pattern -> download", chain_ckan_download(client)),
+            ("bce: search -> indicador", chain_bce_indicador(client)),
+            ("bce: iem -> table", chain_bce_iem(client)),
+            ("bce: diarios -> indicador", chain_bce_diario(client)),
+            ("bce: paginas -> archivos", chain_bce_paginas(client)),
+            ("cepalstat: search -> indicador", chain_cepalstat(client)),
+            ("contraloria: list -> informe", chain_contraloria(client)),
+            ("arconel: list -> reporte", chain_arconel(client)),
+            ("inec: estadistica -> files -> zip", chain_inec_estadistica(client)),
+            ("inec: publicacion -> archivos", chain_inec_publicacion(client)),
+            ("sgr: sitreps -> archivos -> pdf", chain_sgr_pdf(client)),
+            ("anda: search -> info -> microdata", chain_anda(client)),
+            ("supercias: auditores -> auditor", chain_auditor(client)),
+            ("sercop: search -> contrato", chain_contrato(client)),
         ]:
             chains += 1
             try:
@@ -377,8 +466,18 @@ async def chain_sut(client: httpx.AsyncClient) -> None:
         await call_chain_step(client, "list_catalogo", {"fuente": "sut", "format": "json"})
     )
     indicador = listing["indicadores"][0]["indicador"]
+    schema = json.loads(
+        await call_chain_step(
+            client, "get_sut_indicador_schema", {"indicador": indicador, "format": "json"}
+        )
+    )
+    campos = schema.get("campos") or []
+    if not campos:
+        raise AssertionError(f"get_sut_indicador_schema returned no fields for {indicador}")
     await call_chain_step(
-        client, "get_sut_indicador_schema", {"indicador": indicador, "format": "json"}
+        client,
+        "query_sut_indicador",
+        {"indicador": indicador, "campos": campos[:1], "limite": 3, "format": "json"},
     )
 
 
@@ -493,7 +592,15 @@ async def chain_ckan_info(client: httpx.AsyncClient) -> None:
         raise AssertionError(f"dataset {dataset_id} has no resources")
     resource_id = resources[0]["id"]
     await call_chain_step(client, "get_resource_info", {"resource_id": resource_id, "format": "json"})
-    await call_chain_step(client, "query_resource_data", {"resource_id": resource_id, "rows": 3, "format": "json"})
+
+    # Most CKAN uploads are never loaded into the DataStore. The resource was
+    # just confirmed to exist, so the tool's "sin DataStore" refusal (pointing
+    # to preview_resource_data) is the documented answer, not a failure.
+    text, is_error = await call_tool(
+        client, "query_resource_data", {"resource_id": resource_id, "rows": 3, "format": "json"}
+    )
+    if not (is_error and "sin DataStore" in text):
+        chain_step(text, is_error=is_error)
 
 
 async def chain_tramites(client: httpx.AsyncClient) -> None:
@@ -510,6 +617,222 @@ async def chain_instituciones(client: httpx.AsyncClient) -> None:
 async def chain_organizations(client: httpx.AsyncClient) -> None:
     organization_id = await first_result(client, "search_organizations", {"query": "sri", "page_size": 3}, "name")
     await call_chain_step(client, "get_organization_info", {"organization_id": organization_id, "format": "json"})
+
+
+async def first_item(
+    client: httpx.AsyncClient, name: str, args: dict, list_key: str
+) -> dict:
+    """Call a tool and return the first element of ``list_key``, failing if empty."""
+    data = json.loads(await call_chain_step(client, name, {**args, "format": "json"}))
+    rows = data.get(list_key) or []
+    if not rows:
+        raise AssertionError(f"{name} returned no '{list_key}' for {args}")
+    return rows[0]
+
+
+async def chain_ckan_download(client: httpx.AsyncClient) -> None:
+    dataset_id = await first_result(
+        client, "search_datasets", {"query": "SRI recaudacion", "page_size": 3}, "name"
+    )
+    # "sin_serie_detectada" is a valid answer for a single-year dataset, not
+    # a failure, so it is accepted before the generic classifier sees its
+    # "error" key.
+    text, is_error = await call_tool(
+        client, "detect_series_pattern", {"dataset_id": dataset_id, "format": "json"}
+    )
+    try:
+        no_series = json.loads(text).get("error") == "sin_serie_detectada"
+    except (json.JSONDecodeError, AttributeError):
+        no_series = False
+    if not no_series:
+        chain_step(text, is_error=is_error)
+    resource = await first_item(
+        client, "list_dataset_resources", {"dataset_id": dataset_id}, "resources"
+    )
+    # The SRI files are often over the 5 MB cap; refusing them with the
+    # direct link is the tool working as documented, not a failure.
+    text, is_error = await call_tool(
+        client, "download_resource", {"resource_id": resource["id"], "format": "json"}
+    )
+    if not (is_error and "supera el límite de 5 MB" in text):
+        chain_step(text, is_error=is_error)
+
+
+async def chain_bce_indicador(client: httpx.AsyncClient) -> None:
+    indicador = await first_item(
+        client, "search_indicadores_bce", {"query": "inflacion", "limit": 1}, "indicadores"
+    )
+    await call_chain_step(
+        client,
+        "get_indicador_bce",
+        {"id_grupo": int(indicador["id_grupo"]), "desde": "2025-01", "format": "json"},
+    )
+
+
+async def chain_bce_iem(client: httpx.AsyncClient) -> None:
+    tabla = await first_item(
+        client, "search_bce_iem", {"query": "inflacion", "limit": 1}, "tablas"
+    )
+    await call_chain_step(
+        client, "get_bce_iem_table", {"table_id": tabla["table_id"], "rows": 3, "format": "json"}
+    )
+
+
+async def chain_bce_diario(client: httpx.AsyncClient) -> None:
+    serie = await first_item(client, "list_catalogo", {"fuente": "bce_diarios"}, "catalogo")
+    await call_chain_step(
+        client,
+        "get_bce_indicador_diario",
+        {"archivo": serie["archivo"], "codigo": serie["codigo"], "ultimos_n": 3, "format": "json"},
+    )
+
+
+async def chain_bce_paginas(client: httpx.AsyncClient) -> None:
+    pagina = await first_item(
+        client, "search_bce_paginas", {"catalogo": "indices", "query": "petrolero"}, "paginas"
+    )
+    await call_chain_step(
+        client,
+        "get_bce_pagina_archivos",
+        {"catalogo": "indices", "pagina_id": pagina["pagina_id"], "max_archivos": 3, "format": "json"},
+    )
+
+
+async def chain_cepalstat(client: httpx.AsyncClient) -> None:
+    indicador = await first_item(
+        client, "search_cepalstat_indicadores", {"query": "poblacion total"}, "indicadores"
+    )
+    await call_chain_step(
+        client,
+        "get_cepalstat_indicador",
+        {"indicator_id": int(indicador["indicator_id"]), "format": "json"},
+    )
+
+
+async def chain_contraloria(client: httpx.AsyncClient) -> None:
+    informe = await first_item(client, "list_catalogo", {"fuente": "contraloria"}, "informes")
+    await call_chain_step(
+        client, "get_contraloria_informe", {"informe_id": informe["id"], "rows": 3, "format": "json"}
+    )
+
+
+async def chain_arconel(client: httpx.AsyncClient) -> None:
+    listing = json.loads(
+        await call_chain_step(
+            client, "list_catalogo", {"fuente": "arconel", "format": "json"}
+        )
+    )
+    tipos = listing.get("tipos") or []
+    if not tipos:
+        raise AssertionError("ARCONEL no devolvió tipos de reporte")
+    # A catalog's first item may be a very large report (currently
+    # Medidores Catastro), not a representative lightweight smoke check.
+    tipo = next(
+        (t for t in tipos if t.get("tipo", "").casefold() == "balance energía"),
+        tipos[0],
+    )
+    await call_chain_step(
+        client,
+        "get_arconel_reporte",
+        {"tipo": tipo["tipo"], "anio": 2023, "max_paginas": 1, "format": "json"},
+    )
+
+
+async def chain_inec_estadistica(client: httpx.AsyncClient) -> None:
+    tema = await first_item(
+        client, "search_inec_estadisticas", {"query": "empleo", "limit": 1}, "temas"
+    )
+    files = json.loads(
+        await call_chain_step(
+            client, "get_inec_estadistica_files", {"url": tema["url"], "format": "json"}
+        )
+    )
+    zips = [a["url"] for a in files.get("archivos") or [] if a["url"].lower().endswith(".zip")]
+    if not zips:
+        raise AssertionError(f"no ZIP among the files of {tema['url']}")
+    listing = json.loads(
+        await call_chain_step(
+            client, "list_zip_contents", {"url": zips[0], "limit": 5, "format": "json"}
+        )
+    )
+    members = [m["name"] for m in listing.get("members") or [] if not m["is_dir"]]
+    if not members:
+        raise AssertionError(f"list_zip_contents returned no files for {zips[0]}")
+
+    # Not every member is tabular (PDF manuals, .sav microdata): a refusal
+    # naming the supported formats is the tool working, not a failure.
+    text, is_error = await call_tool(
+        client,
+        "read_zip_member",
+        {"url": zips[0], "member": members[0], "rows": 3, "format": "json"},
+    )
+    if not (is_error and "Formatos soportados" in text):
+        chain_step(text, is_error=is_error)
+
+
+async def chain_inec_publicacion(client: httpx.AsyncClient) -> None:
+    publicacion = await first_item(
+        client, "search_inec_publicaciones", {"query": "empleo", "limit": 1}, "publicaciones"
+    )
+    await call_chain_step(
+        client, "get_inec_publicacion_archivos", {"post": str(publicacion["id"]), "format": "json"}
+    )
+
+
+async def chain_sgr_pdf(client: httpx.AsyncClient) -> None:
+    evento = await first_item(client, "search_sgr_sitreps", {}, "eventos")
+    archivos = json.loads(
+        await call_chain_step(
+            client, "get_sgr_sitrep_archivos", {"evento_url": evento["url"], "format": "json"}
+        )
+    )
+    pdfs = [a["url"] for a in archivos.get("archivos") or [] if a.get("formato") == "PDF"]
+    if not pdfs:
+        raise AssertionError(f"no PDF among the SITREPs of {evento['url']}")
+    await call_chain_step(client, "read_pdf", {"url": pdfs[0], "pages": "1", "format": "json"})
+
+
+async def chain_anda(client: httpx.AsyncClient) -> None:
+    encuesta = await first_item(client, "search_anda", {"query": "empleo", "limit": 1}, "results")
+    await call_chain_step(client, "get_anda_survey_info", {"idno": encuesta["idno"], "format": "json"})
+    await call_chain_step(client, "download_anda_microdata", {"idno": encuesta["idno"], "format": "json"})
+
+
+async def chain_auditor(client: httpx.AsyncClient) -> None:
+    auditor = await first_item(client, "search_auditores", {"query": "AUDIT", "limit": 1}, "auditores")
+    await call_chain_step(
+        client, "get_auditor_info", {"identificacion": auditor["identificacion"], "format": "json"}
+    )
+
+
+async def chain_contrato(client: httpx.AsyncClient) -> None:
+    search = json.loads(
+        await call_chain_step(
+            client, "search_contratos", {"query": "agua", "year": 2024, "format": "json"}
+        )
+    )
+    # SERCOP's search index also lists stub processes (title and method null)
+    # whose OCDS record was never published, so `record` finds nothing for
+    # them. Only a fully described row is expected to have a record.
+    contrato = next(
+        (r for r in search.get("results") or [] if r.get("ocid") and r.get("title")),
+        None,
+    )
+    if contrato is None:
+        raise AssertionError("search_contratos returned no row with an ocid and a title")
+    await call_chain_step(client, "get_contrato_info", {"ocid": contrato["ocid"], "format": "json"})
+    # The per-buyer summary on that same row's buyer: the search found it, so
+    # the summary must find at least one process.
+    if contrato.get("buyer"):
+        summary = json.loads(
+            await call_chain_step(
+                client,
+                "get_resumen_compras",
+                {"comprador": contrato["buyer"][:60], "year": 2024, "format": "json"},
+            )
+        )
+        if not summary.get("procesos_leidos"):
+            raise AssertionError(f"get_resumen_compras found nothing for {contrato['buyer']!r}")
 
 
 if __name__ == "__main__":

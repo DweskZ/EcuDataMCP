@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -7,6 +7,7 @@ from mcp.types import CallToolResult
 from helpers import ant_client
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
+from helpers.result_types import ResultadoBusqueda
 from helpers.tool_meta import READ_ONLY
 
 
@@ -27,7 +28,7 @@ def register_search_siniestros_ant_tool(mcp: MCPServer) -> None:
         limit: int = 10,
         con_archivos: int = 2,
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoBusqueda]:
         """
         Search siniestros de tránsito (road crashes, deaths, injuries) whose
         source is the Agencia Nacional de Tránsito. ant.gob.ec itself does not

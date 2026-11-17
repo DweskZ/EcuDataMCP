@@ -21,6 +21,8 @@ from datetime import UTC, datetime
 from typing import Any
 from urllib.parse import urlencode
 
+import httpx
+
 from helpers.cache import TtlCache
 from helpers.csv_reader import download_bytes
 from helpers.logging import MAIN_LOGGER_NAME
@@ -46,7 +48,21 @@ async def _fetch_json(path: str, **params: Any) -> Any:
     query = urlencode({k: v for k, v in params.items() if v is not None})
     url = f"{_BASE}{path}?{query}"
     logger.info("WDI GET %s", url)
-    content, truncated = await download_bytes(url)
+    # The streaming downloader has a 30 s inactivity timeout. Bound each
+    # complete attempt as well, so two attempts fit within the MCP timeout.
+    for attempt in range(2):
+        try:
+            async with asyncio.timeout(35):
+                content, truncated = await download_bytes(url)
+            break
+        except (TimeoutError, httpx.TimeoutException, httpx.NetworkError, httpx.RemoteProtocolError):
+            if attempt:
+                raise
+        except httpx.HTTPStatusError as exc:
+            if attempt or exc.response.status_code not in {502, 503, 504}:
+                raise
+        logger.warning("WDI: fallo temporal; reintentando una vez")
+        await asyncio.sleep(0.5)
     if truncated:
         raise ValueError(f"La respuesta de {url} superó el límite de descarga.")
     return json.loads(content)

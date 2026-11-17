@@ -1,5 +1,5 @@
 import logging
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
@@ -8,6 +8,7 @@ from mcp.types import CallToolResult
 from helpers import bce_client
 from helpers.format_out import render_structured
 from helpers.logging import MAIN_LOGGER_NAME, log_tool
+from helpers.result_types import ResultadoSerie
 from helpers.tool_meta import READ_ONLY
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
@@ -31,7 +32,7 @@ def register_get_indicador_bce_tool(mcp: MCPServer) -> None:
         frecuencia: Literal["", "Semanal", "Mensual", "Trimestral", "Anual"] = "",
         unidad: str = "",
         format: Literal["text", "json"] = "text",
-    ) -> CallToolResult:
+    ) -> Annotated[CallToolResult, ResultadoSerie]:
         """
         Time series data for one Banco Central del Ecuador (BCE) indicator group.
 
