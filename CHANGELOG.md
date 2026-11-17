@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **A hung Supercías build is now killed on Windows too.** The server ends a
+  build it launched once it passes the 45-minute timeout, but on Windows a
+  venv's `python.exe` is a launcher that runs the real interpreter as its
+  child, so `Popen.kill()` ended only the launcher and the build kept running.
+  It now runs `taskkill /T /F` on the whole tree (other platforms are
+  unchanged). Reproduced with a real parent and child process: after a plain
+  `kill()` the child was still alive; after the fix both are gone. The build's
+  lock then holds a dead PID, which the next build reclaims at once.
 - **Smoke run failures of 2026-11-15 and 2026-11-16.** Two live sources are
   down, not this repo. SGR's ArcGIS site answers every query with
   `9017$SITE_NOT_INITIALIZED` (HTTP 200 with an `error` body), so
