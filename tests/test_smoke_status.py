@@ -294,6 +294,50 @@ def test_classifies_emelnorte_bot_block_as_degraded():
     assert assessment.source == "emelnorte_bot_block"
 
 
+def test_classifies_sgr_arcgis_site_not_initialized_as_degraded():
+    text = (
+        "Error executing tool list_sat_tsunami: Error al listar estaciones SAT: "
+        "SGR (ArcGIS) devolvió un error: {'code': 500, "
+        "'message': '9017$SITE_NOT_INITIALIZED', 'details': []}"
+    )
+
+    assessment = assess_response(text, [], is_error=True)
+
+    assert assessment.status == "degraded"
+    assert assessment.source == "sgr_arcgis_down"
+
+
+def test_sgr_connect_error_stays_a_failure():
+    text = (
+        "Error executing tool search_eventos_riesgo: "
+        "Error al consultar eventos SGR: ConnectError"
+    )
+
+    assert degraded_source(text) is None
+    assert assess_response(text, [], is_error=True).status == "failed"
+
+
+def test_classifies_wdi_read_timeout_as_degraded():
+    text = (
+        "Error executing tool get_serie_internacional: Error al consultar wdi: "
+        "ReadTimeout (la fuente no respondió a tiempo; reintenta en unos minutos)"
+    )
+
+    assessment = assess_response(text, [], is_error=True)
+
+    assert assessment.status == "degraded"
+    assert assessment.source == "wdi_data_timeout"
+
+
+def test_other_source_read_timeout_is_not_classified_as_wdi():
+    text = (
+        "Error executing tool query_sut_indicador: Error al consultar el "
+        "indicador en Power BI: ReadTimeout (reintenta en unos minutos)"
+    )
+
+    assert degraded_source(text) is None
+
+
 def test_classifies_elecgalapagos_503_as_degraded():
     text = (
         "Error executing tool search_cortes: Error al consultar el archivo de "

@@ -175,6 +175,28 @@ _DEGRADED_SOURCES = (
         "superbancos",
         "unable to get local issuer certificate",
     ),
+    (
+        # Seen 2026-11-16 on the runner and from a local machine: both SGR
+        # ArcGIS services (COE2 and SAT) answer HTTP 200 with
+        # {"error": {"code": 500, "message": "9017$SITE_NOT_INITIALIZED"}},
+        # i.e. the ArcGIS site itself is not running. The day before it was a
+        # bare ConnectError, which stays a failure on purpose. SGR's server,
+        # not this repo.
+        "sgr_arcgis_down",
+        "sgr (arcgis)",
+        "site_not_initialized",
+    ),
+    (
+        # Seen on the runner 2026-11-12, 11-14, 11-15 and 11-16, and from a
+        # local machine 2026-11-16: api.worldbank.org answers its metadata
+        # endpoints in ~0.2 s but never returns the /country/{iso}/indicator/
+        # data endpoint (30-60 s without a byte, for ECU and COL and several
+        # indicators). wdi_client already bounds each attempt at 35 s and
+        # retries, so this is the source, not a missing retry.
+        "wdi_data_timeout",
+        "error al consultar wdi",
+        "readtimeout",
+    ),
 )
 
 # Sources blocked by country or datacenter IP. Without a LatAm egress

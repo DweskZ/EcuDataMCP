@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **Smoke run failures of 2026-11-15 and 2026-11-16.** Two live sources are
+  down, not this repo. SGR's ArcGIS site answers every query with
+  `9017$SITE_NOT_INITIALIZED` (HTTP 200 with an `error` body), so
+  `search_eventos_riesgo` and `list_sat_tsunami` fail until SGR restarts it.
+  The World Bank API answers its metadata endpoints in ~0.2 s but never returns
+  the `/country/{iso}/indicator/{id}` data endpoint (30-60 s with no bytes, for
+  ECU and COL and several indicators), so `get_serie_internacional(fuente='wdi')`
+  times out on the 35 s per-attempt bound. The smoke classifier now reports both
+  as known upstream degradation instead of a failed run; a bare SGR
+  `ConnectError`, as seen on 2026-11-15, still fails.
 - **Smoke run failures of 2026-11-09 and 2026-11-10.**
   `query_sut_indicador` let a Power BI `ReadTimeout` escape, so clients saw
   only "Error executing tool query_sut_indicador"; it and
