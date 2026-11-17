@@ -104,6 +104,7 @@ es obligatoria salvo `MCP_AUTH_TOKEN` cuando `MCP_REQUIRE_AUTH=1`.
 | `ECUADOR_MCP_GEO_PROXY` | URL `http://`, `https://` o `socks5://` de un egress dentro de LatAm por el que salen las peticiones a los hosts geobloqueados (ver [GEOBLOCK_PLAN.md](GEOBLOCK_PLAN.md)) | vacío (conexión directa) |
 | `ECUADOR_MCP_GEO_HOSTS` | Lista separada por comas de hosts que usan ese proxy; sustituye la lista por defecto de `helpers/geo_proxy.py` (datosabiertos.gob.ec, www.gob.ec, ANDA, ARCONEL, SERCOP, Supercías, …) | lista interna |
 | `ECUADOR_MCP_HIDE_GEOBLOCKED` | `1` retira de `tools/list` las tools cuya única fuente rechaza tráfico fuera de la región (ANDA y Supercías) cuando no hay proxy | vacío |
+| `ECUADOR_MCP_HIDE_TOOLS` | Nombres de tools separados por comas (o espacios) que se retiran de `tools/list`, además de las de `ECUADOR_MCP_HIDE_GEOBLOCKED`. Para un host que llega a unas fuentes y a otras no (p. ej. una VM en Bogotá llega a ANDA y Supercías pero no a SERCOP ni a infoMIES). Un nombre que no corresponde a ninguna tool se avisa en el log | vacío |
 | `CKAN_INSECURE_TLS` | `1` permite un único reintento sin verificar TLS contra los portales de datos abiertos en la lista de `helpers/tls.py`, solo ante un error real de certificado | `0` |
 
 ### URLs base de las fuentes

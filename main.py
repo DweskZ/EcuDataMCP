@@ -19,7 +19,7 @@ from helpers.env_config import (
     get_mcp_ssl_keyfile,
     get_transport,
 )
-from helpers.geo_proxy import hide_geoblocked
+from helpers.geo_proxy import hidden_tools
 from helpers.http_security import with_http_security
 from helpers.logging import (
     MAIN_LOGGER_NAME,
@@ -193,9 +193,10 @@ def main(argv: list[str] | None = None) -> None:
     # `run -i` each start a fresh one), so starting a ~356 MB download there
     # on every launch wasted it on sessions that never ask for financials.
     # Over stdio the first financials query starts the build instead
-    # (supercias_financials._check_db_fresh). Skipped when the financials
-    # tools are hidden as geoblocked: the download could only fail there.
-    if not hide_geoblocked():
+    # (supercias_financials._check_db_fresh). Skipped when get_financials is
+    # hidden (geoblocked host, or named in ECUADOR_MCP_HIDE_TOOLS): nobody
+    # could query the DB, so the download would be wasted.
+    if "get_financials" not in hidden_tools():
         ensure_financials_db_fresh()
 
     host = args.host if args.host is not None else get_mcp_host()

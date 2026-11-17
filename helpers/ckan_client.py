@@ -16,6 +16,30 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 _TIMEOUT = 20.0
 
+_NATIONAL_PORTAL_HOST = "datosabiertos.gob.ec"
+
+
+def _forbidden_message(host: str) -> str:
+    """What a 403 from `host` means, in words a caller can act on.
+
+    The national portal sits behind a CDN that answers 403 to every request
+    from outside Ecuador (seen 2026-11-17 from Render, Oracle Bogota, GitHub
+    runners and Azure, whatever the host name, user agent or HTTP version),
+    while the other portals still answer there, so the message says which
+    `source` values to try instead of only blaming the network.
+    """
+    if host.endswith(_NATIONAL_PORTAL_HOST):
+        return (
+            "El portal de Datos Abiertos (datosabiertos.gob.ec) rechazó la "
+            "conexión (403). Esto suele pasar cuando el servidor se conecta "
+            "desde fuera de Latinoamérica. Si el problema persiste, prueba "
+            "conectando desde una VPN con salida en algún país de la región. "
+            "Mientras tanto, los otros portales (source='iadb', 'latacunga' o "
+            "'cuenca') pueden responder desde fuera de Ecuador."
+        )
+    return f"El portal {host} rechazó la conexión (403)."
+
+
 # Closed set of CKAN catalogs this client can talk to -- shared by every
 # tools/*.py CKAN tool's `source` parameter so a client sees the valid
 # values in the schema itself, not only in a docstring.
@@ -66,12 +90,7 @@ async def _fetch_json(
             # callers a message that points at the likely cause instead of a
             # bare "403 Forbidden".
             logger.warning("CKAN request to %s got 403 Forbidden", url)
-            raise RuntimeError(
-                "El portal de Datos Abiertos (datosabiertos.gob.ec) rechazó la "
-                "conexión (403). Esto suele pasar cuando el servidor se conecta "
-                "desde fuera de Latinoamérica. Si el problema persiste, prueba "
-                "conectando desde una VPN con salida en algún país de la región."
-            )
+            raise RuntimeError(_forbidden_message(httpx.URL(url).host))
         resp.raise_for_status()
         data = resp.json()
         if not data.get("success"):

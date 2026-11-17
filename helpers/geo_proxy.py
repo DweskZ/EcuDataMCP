@@ -9,6 +9,7 @@ unchanged. See docs/GEOBLOCK_PLAN.md.
 from __future__ import annotations
 
 import os
+import re
 from urllib.parse import urlsplit
 
 # Confirmed blocked from Render's network on 2026-09-30 (CKAN 403, ANDA 403,
@@ -73,8 +74,23 @@ def hide_geoblocked() -> bool:
     return flag in {"1", "true", "yes", "on"} and get_geo_proxy() is None
 
 
+HIDE_TOOLS_ENV = "ECUADOR_MCP_HIDE_TOOLS"
+
+
+def explicit_hidden_tools() -> frozenset[str]:
+    """Tool names listed in ECUADOR_MCP_HIDE_TOOLS (commas or whitespace).
+
+    ECUADOR_MCP_HIDE_GEOBLOCKED hides a fixed set for a host that reaches
+    none of the region's sources. A host that reaches some of them (the Oracle
+    Bogota instance reaches ANDA and Supercias but not SERCOP or infoMIES)
+    needs to say which tools cannot work there, so this names them directly.
+    """
+    return frozenset(name for name in re.split(r"[,\s]+", os.getenv(HIDE_TOOLS_ENV, "")) if name)
+
+
 def hidden_tools() -> frozenset[str]:
-    return GEOBLOCKED_TOOLS if hide_geoblocked() else frozenset()
+    hidden = explicit_hidden_tools()
+    return hidden | GEOBLOCKED_TOOLS if hide_geoblocked() else hidden
 
 
 def get_geo_proxy() -> str | None:
