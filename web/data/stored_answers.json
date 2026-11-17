@@ -1,5 +1,5 @@
 {
-  "extracted_at": "2026-11-09",
+  "extracted_at": "2026-11-17",
   "server_version": "0.15.0",
   "answers": [
     {
@@ -13,10 +13,10 @@
     {
       "id": "sismos",
       "question": "¿Hubo temblores fuertes en Ecuador esta semana?",
-      "answer": "El más fuerte en territorio ecuatoriano fue de magnitud 4,8, a 45,7 km de Salinas (Santa Elena), el 7 de noviembre a las 17:17, a 2,4 km de profundidad. También hubo uno de 3,7 cerca de Pasaje (El Oro).",
+      "answer": "El más fuerte en territorio ecuatoriano fue de magnitud 4,1, a 48,6 km de La Libertad (Santa Elena), el 11 de noviembre a las 00:54, a 34,0 km de profundidad. También hubo uno de 3,6 cerca de Tena (Napo).",
       "tools": ["search_sismos"],
       "source": "IG-EPN · catálogo sísmico",
-      "url": "https://www.igepn.edu.ec/portal/eventos/www/events/igepn2026vvse/overview.html"
+      "url": "https://www.igepn.edu.ec/portal/eventos/www/events/igepn2026wbtt/overview.html"
     },
     {
       "id": "remesas",
@@ -46,7 +46,7 @@
     {
       "id": "cortes-luz",
       "question": "¿Hay cortes de luz programados en Ambato o el Puyo?",
-      "answer": "Sí, 3 avisos vigentes. Por ejemplo: lunes 9 de noviembre, de 09:00 a 14:00, en el barrio Callate San Antonio (Píllaro); martes 10, de 10:00 a 14:00, en el barrio La Libertad (Puyo).",
+      "answer": "No hay avisos de trabajos programados vigentes de la EEASA (Tungurahua, Pastaza, Napo y Morona Santiago) en este momento.",
       "tools": ["search_cortes", "get_cortes_horarios"],
       "source": "EEASA · trabajos programados",
       "url": "https://www.eeasa.com.ec/trabajos-programados/"
