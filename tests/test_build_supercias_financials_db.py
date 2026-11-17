@@ -21,7 +21,8 @@ def _valid_db(path: Path) -> None:
     conn.execute("CREATE TABLE segmentos (id_segmento INTEGER, segmento TEXT)")
     conn.execute("CREATE TABLE ciiu (ciiu TEXT, descripcion TEXT)")
     conn.execute(
-        "CREATE TABLE indicadores_sector (anio INTEGER, ciiu_n1 TEXT)"
+        "CREATE TABLE cuartiles_sector (anio INTEGER, ciiu_n1 TEXT, "
+        "indicador TEXT, mediana REAL)"
     )
     conn.commit()
     conn.close()
@@ -84,7 +85,10 @@ def test_verify_build_rejects_empty_ranking_table(tmp_path):
     conn.execute("INSERT INTO companias VALUES (1, '1790013731001', 'ACME')")
     conn.execute("CREATE TABLE segmentos (id_segmento INTEGER, segmento TEXT)")
     conn.execute("CREATE TABLE ciiu (ciiu TEXT, descripcion TEXT)")
-    conn.execute("CREATE TABLE indicadores_sector (anio INTEGER, ciiu_n1 TEXT)")
+    conn.execute(
+        "CREATE TABLE cuartiles_sector (anio INTEGER, ciiu_n1 TEXT, "
+        "indicador TEXT, mediana REAL)"
+    )
     conn.commit()
     conn.close()
 
@@ -105,7 +109,10 @@ def test_verify_build_rejects_empty_companias_table(tmp_path):
     )
     conn.execute("CREATE TABLE segmentos (id_segmento INTEGER, segmento TEXT)")
     conn.execute("CREATE TABLE ciiu (ciiu TEXT, descripcion TEXT)")
-    conn.execute("CREATE TABLE indicadores_sector (anio INTEGER, ciiu_n1 TEXT)")
+    conn.execute(
+        "CREATE TABLE cuartiles_sector (anio INTEGER, ciiu_n1 TEXT, "
+        "indicador TEXT, mediana REAL)"
+    )
     conn.commit()
     conn.close()
 
@@ -125,7 +132,10 @@ def test_verify_build_rejects_missing_required_column(tmp_path):
     conn.execute("INSERT INTO companias VALUES (1, '1790013731001', 'ACME')")
     conn.execute("CREATE TABLE segmentos (id_segmento INTEGER, segmento TEXT)")
     conn.execute("CREATE TABLE ciiu (ciiu TEXT, descripcion TEXT)")
-    conn.execute("CREATE TABLE indicadores_sector (anio INTEGER, ciiu_n1 TEXT)")
+    conn.execute(
+        "CREATE TABLE cuartiles_sector (anio INTEGER, ciiu_n1 TEXT, "
+        "indicador TEXT, mediana REAL)"
+    )
     conn.commit()
     conn.close()
 
@@ -141,7 +151,7 @@ def test_verify_build_rejects_missing_table(tmp_path):
         "posicion_general INTEGER, n_empleados INTEGER)"
     )
     conn.execute("INSERT INTO ranking VALUES (2025, 1, 10, 5)")
-    # 'companias', 'segmentos', 'ciiu', 'indicadores_sector' never created.
+    # 'companias', 'segmentos', 'ciiu', 'cuartiles_sector' never created.
     # PRAGMA table_info on a missing table returns no rows rather than
     # erroring, so this surfaces as "missing all required columns", not a
     # distinct "no such table" error -- either way, _verify_build must
@@ -193,7 +203,7 @@ def test_main_skips_when_lock_held(isolated_state, monkeypatch):
     monkeypatch.setattr(build_script, "_build", lambda: built.append(True))
     lock = isolated_state.lock_path()
     lock.parent.mkdir(parents=True)
-    lock.write_text("1")
+    lock.write_text(str(os.getpid()))  # a live build
 
     build_script.main()
 
@@ -303,8 +313,6 @@ def mocked_export(httpx_mock, isolated_state, monkeypatch):
         "bi_compania.csv": b"expediente,ruc,nombre\n1,1790013731001,ACME\n",
         "bi_segmento.csv": b"id_segmento,segmento\n1,GRANDE\n",
         "bi_ciiu.csv": b"ciiu,descripcion\nC,Manufactura\n",
-        "indicadores_sector.csv": b"anio,ciiu_n1,descripcion,roe\n2018,C,Manufactura,0.1\n"
-        b"2023,C,Manufactura,0.2\n",
     }
     for name, body in files.items():
         httpx_mock.add_response(url=build_script._RESOURCES_BASE + name, content=body)
@@ -316,13 +324,13 @@ def test_build_keeps_every_published_year(mocked_export):
 
     conn = sqlite3.connect(mocked_export)
     years = [r[0] for r in conn.execute("SELECT DISTINCT anio FROM ranking ORDER BY anio")]
-    sector_years = [
-        r[0] for r in conn.execute("SELECT DISTINCT anio FROM indicadores_sector ORDER BY anio")
-    ]
+    tables = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     version = conn.execute("PRAGMA user_version").fetchone()[0]
     conn.close()
     assert years == list(range(2008, 2026))
-    assert sector_years == [2018, 2023]
+    # Sector benchmarks come from the ranking itself, not indicadores_sector.csv.
+    assert "cuartiles_sector" in tables
+    assert "indicadores_sector" not in tables
     assert version == build_script.SCHEMA_VERSION
 
 
@@ -332,10 +340,8 @@ def test_build_honours_retention_setting(mocked_export, monkeypatch):
 
     conn = sqlite3.connect(mocked_export)
     years = [r[0] for r in conn.execute("SELECT DISTINCT anio FROM ranking ORDER BY anio")]
-    sector_years = [r[0] for r in conn.execute("SELECT DISTINCT anio FROM indicadores_sector")]
     conn.close()
     assert years == [2023, 2024, 2025]
-    assert sector_years == [2023]
 
 
 @pytest.mark.parametrize("value", ["0", "-2", "cinco"])
@@ -379,3 +385,91 @@ def test_check_not_shrunk_compares_only_the_new_year_range(tmp_path):
         conn.close()
 
     build_script._check_not_shrunk(new, previous)
+
+
+def test_main_reclaims_lock_of_dead_build(isolated_state, monkeypatch):
+    # A build killed with its stdio session never removes its lock; a dead
+    # PID must free it at once, not after the 45-minute timeout.
+    built: list[bool] = []
+    monkeypatch.setattr(build_script, "_build", lambda: built.append(True))
+    monkeypatch.setattr(isolated_state, "_pid_alive", lambda pid: False)
+    lock = isolated_state.lock_path()
+    lock.parent.mkdir(parents=True)
+    lock.write_text("999999")
+
+    build_script.main()
+
+    assert built == [True]
+    assert not lock.exists()
+
+
+def test_acquire_lock_records_own_pid(isolated_state):
+    assert build_script._acquire_lock() is True
+    assert isolated_state.read_lock_pid() == os.getpid()
+    assert build_script._acquire_lock() is False  # held by a live process
+
+
+def _ratio_db(rows: list[tuple]) -> sqlite3.Connection:
+    conn = sqlite3.connect(":memory:")
+    conn.execute(
+        "CREATE TABLE ranking (anio INTEGER, ciiu_n1 TEXT, "
+        "id_estado_financiero INTEGER, ingresos_ventas REAL, activos REAL, "
+        "patrimonio REAL, liquidez_corriente REAL, margen_operacional REAL, "
+        "end_largo_plazo REAL, roe REAL)"
+    )
+    conn.executemany("INSERT INTO ranking VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
+    return conn
+
+
+def test_null_uncalculated_ratios():
+    conn = _ratio_db(
+        [
+            # Operating company: margen_operacional 0 is Supercías' "not
+            # calculated"; end_largo_plazo 0 (no long-term debt) is real.
+            (2023, "G", 1, 100.0, 50.0, 20.0, 1.5, 0.0, 0.0, 0.12),
+            # No sales: sales-based ratios are undefined, the rest stay.
+            (2023, "G", 2, 0.0, 50.0, 20.0, 1.2, 0.0, 0.1, 0.0),
+            # Every ratio 0: none was calculated.
+            (2023, "G", 3, 100.0, 50.0, 20.0, 0.0, 0.0, 0.0, 0.0),
+            # No financial statement that year.
+            (2023, "G", None, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+            # Equity 0: roe undefined.
+            (2023, "G", 5, 100.0, 50.0, 0.0, 2.0, 0.05, 0.3, 0.0),
+        ]
+    )
+
+    build_script._null_uncalculated_ratios(conn)
+
+    rows = conn.execute(
+        "SELECT liquidez_corriente, margen_operacional, end_largo_plazo, roe "
+        "FROM ranking ORDER BY rowid"
+    ).fetchall()
+    assert rows == [
+        (1.5, None, 0.0, 0.12),
+        (1.2, None, 0.1, 0.0),
+        (None, None, None, None),
+        (None, None, None, None),
+        (2.0, 0.05, 0.3, None),
+    ]
+
+
+def test_build_sector_quartiles_uses_quartiles_not_means():
+    # One extreme filing would drag a mean to ~200; the quartiles ignore it.
+    values = [0.5, 1.0, 1.5, 2.0, 1000.0]
+    conn = _ratio_db(
+        [
+            (2023, "C", i, 100.0, 50.0, 20.0, v, None, None, None)
+            for i, v in enumerate(values, 1)
+        ]
+        # Too few filings for a benchmark.
+        + [(2023, "A", 9, 100.0, 50.0, 20.0, 1.0, None, None, None)]
+        # Ratios not calculated don't count as filings.
+        + [(2023, "C", 10, 100.0, 50.0, 20.0, None, None, None, None)]
+    )
+
+    build_script._build_sector_quartiles(conn)
+
+    rows = conn.execute(
+        "SELECT anio, ciiu_n1, indicador, n, p25, mediana, p75 FROM cuartiles_sector"
+    ).fetchall()
+    assert rows == [(2023, "C", "liquidez_corriente", 5, 1.0, 1.5, 2.0)]

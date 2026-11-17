@@ -1,13 +1,19 @@
 """Build/refresh the Supercías financials SQLite DB from the ranking export.
 
 Downloads bi_ranking.csv (~356 MB, ~1.7M rows, fiscal years 2008-present)
-plus the small lookup tables (bi_compania.csv, bi_segmento.csv, bi_ciiu.csv,
-indicadores_sector.csv) from
-https://appscvsmovil.supercias.gob.ec/ranking/reporte.html and loads them into
-a local SQLite database. Every fiscal year in the export is kept, so the
-tools can query the full history (see docs/RESEARCH.md for which columns each
-year carries: ratios only from 2018, CIIU from 2009). A host short on disk can
-keep only the last N years with ECUADOR_MCP_SUPERCIAS_YEARS=N.
+plus the small lookup tables (bi_compania.csv, bi_segmento.csv, bi_ciiu.csv)
+from https://appscvsmovil.supercias.gob.ec/ranking/reporte.html and loads
+them into a local SQLite database. Every fiscal year in the export is kept,
+so the tools can query the full history (see docs/RESEARCH.md for which
+columns each year carries: ratios only from 2018, CIIU from 2009). A host
+short on disk can keep only the last N years with
+ECUADOR_MCP_SUPERCIAS_YEARS=N.
+
+Ratios Supercías could not calculate arrive as 0 and are stored as NULL
+(`_null_uncalculated_ratios`). Sector benchmarks are quartiles computed from
+the ranking itself (`cuartiles_sector`); the export's own
+indicadores_sector.csv is no longer downloaded, since its plain means are
+dominated by a few extreme filings and only cover 2018-2023.
 
 Launched automatically as a background subprocess by
 helpers/supercias_financials.py (`_trigger_background_build`), both at
@@ -16,7 +22,10 @@ never needs to run this by hand, though it is safe to run directly for a
 manual/CI refresh. A lock file next to the DB (`supercias_build.lock`)
 makes a second concurrent build -- from another server, the maintenance
 container or a manual run -- exit immediately instead of racing this one;
-a lock older than BUILD_TIMEOUT_SECONDS is treated as abandoned. Every run
+the lock records this process's PID, and a lock whose PID is no longer
+running, or older than BUILD_TIMEOUT_SECONDS, is treated as abandoned. The
+server launches this detached from its own session, so closing a stdio
+client does not kill a build halfway through. Every run
 records its outcome in `supercias_build.state.json`, which the server uses
 to back off after failures and to report status. Takes ~15-20 minutes (the
 356 MB download dominates); the server starts a refresh once the DB is
@@ -44,9 +53,11 @@ Usage:
 from __future__ import annotations
 
 import csv
+import itertools
 import os
 import shutil
 import sqlite3
+import statistics
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -84,8 +95,41 @@ _RANKING_INT_COLUMNS = {
 }
 _RANKING_TEXT_COLUMNS = {"ciiu_n1", "ciiu_n6"}
 
-_SECTOR_INT_COLUMNS = {"anio"}
-_SECTOR_TEXT_COLUMNS = {"ciiu_n1", "descripcion"}
+# Supercías writes 0 for a ratio it could not calculate, which makes it
+# indistinguishable from a real 0 and drags every mean and comparison toward
+# zero (2023: 85% of trade companies "had" a 0 operating margin). A 0 is
+# turned into NULL when it cannot be a real value:
+# - the whole row has no ratios (no statement, or every ratio is 0);
+# - the ratio's denominator in the row is 0 (sales, assets or equity);
+# - the ratio has no real zero for an operating company (current ratio,
+#   turnover, margins, days): among 2023 filers with sales, assets and equity
+#   above 0, margen_operacional was 0 for 80%, per_med_cobranza for 85%.
+# Ratios with a real zero (no long-term debt, no financial costs, a profit
+# rounding to 0.00) keep it.
+_RATIO_DENOMINATORS = {
+    "ingresos_ventas": (
+        "margen_bruto", "margen_operacional", "rent_neta_ventas",
+        "per_med_cobranza", "impac_gasto_a_v", "impac_carga_finan",
+        "rent_neta_activo", "rent_ope_activo",
+    ),
+    "activos": (
+        "end_activo", "rot_ventas", "rent_neta_activo", "rent_ope_activo",
+        "roa",
+    ),
+    "patrimonio": (
+        "end_patrimonial", "apalancamiento", "end_patrimonial_ct",
+        "end_patrimonial_nct", "rent_ope_patrimonio", "roe",
+    ),
+}
+_ZERO_MEANS_MISSING = (
+    "liquidez_corriente", "prueba_acida", "end_activo_fijo",
+    "cobertura_interes", "apalancamiento", "apalancamiento_financiero",
+    "rot_cartera", "rot_activo_fijo", "rot_ventas", "per_med_cobranza",
+    "per_med_pago", "margen_bruto", "margen_operacional",
+)
+# Fewer filings than this in a sector and year give no quartiles: three or
+# four companies are not a sector benchmark.
+_MIN_SECTOR_FILINGS = 5
 
 _COMPANIA_INT_COLUMNS = {"expediente"}
 _COMPANIA_TEXT_COLUMNS = {"ruc", "nombre", "tipo", "pro_codigo", "provincia"}
@@ -283,6 +327,90 @@ def _load_csv_table(
     return header
 
 
+def _null_uncalculated_ratios(conn: sqlite3.Connection) -> None:
+    """Store ratios Supercías could not calculate as NULL instead of 0.
+
+    One UPDATE with a CASE per ratio, not one UPDATE per rule: each rule as
+    its own statement rewrote the table ~17 times (2 minutes for 5 years).
+    """
+    present = _ranking_columns(conn)
+    ratios = [col for col in supercias_financials.RATIO_COLUMNS if col in present]
+    if not ratios:
+        return
+    no_ratios = "(" + " AND ".join(f"{col} = 0" for col in ratios) + ")"
+    if "id_estado_financiero" in present:
+        no_ratios = f"id_estado_financiero IS NULL OR {no_ratios}"
+    assignments = []
+    for col in ratios:
+        conditions = [no_ratios]
+        conditions += [
+            f"COALESCE({denominator}, 0) = 0"
+            for denominator, columns in _RATIO_DENOMINATORS.items()
+            if col in columns and denominator in present
+        ]
+        if col in _ZERO_MEANS_MISSING:
+            conditions.append(f"{col} = 0")
+        assignments.append(
+            f"{col} = CASE WHEN {' OR '.join(conditions)} THEN NULL ELSE {col} END"
+        )
+    # Years without ratios (before 2018) have nothing to clear.
+    # The trailing NULL keeps COALESCE valid with a single ratio column.
+    has_ratio = f"COALESCE({', '.join(ratios)}, NULL) IS NOT NULL"
+    conn.execute(f"UPDATE ranking SET {', '.join(assignments)} WHERE {has_ratio}")
+    conn.commit()
+
+
+def _ranking_columns(conn: sqlite3.Connection) -> set[str]:
+    return {row[1] for row in conn.execute("PRAGMA table_info(ranking)")}
+
+
+def _quartiles(values: list[float]) -> tuple[float, float, float]:
+    """p25, median, p75 (linear interpolation between order statistics)."""
+    p25, median, p75 = statistics.quantiles(values, n=4, method="inclusive")
+    return p25, median, p75
+
+
+def _build_sector_quartiles(conn: sqlite3.Connection) -> None:
+    """Per-sector, per-year quartiles of every ratio, from the ranking itself.
+
+    Replaces indicadores_sector.csv: Supercías' sector figures are plain
+    means, which a handful of extreme filings dominate (manufacturing 2023:
+    current ratio 23.7 against a median of 1.48, gross margin -1,245 against
+    0.41). Runs after _null_uncalculated_ratios, so 0 placeholders don't
+    count as filings. A single scan grouped by year and sector; each group
+    (at most ~35k filings) is sorted in memory.
+    """
+    conn.execute("DROP TABLE IF EXISTS cuartiles_sector")
+    conn.execute(
+        "CREATE TABLE cuartiles_sector (anio INTEGER, ciiu_n1 TEXT, "
+        "indicador TEXT, n INTEGER, p25 REAL, mediana REAL, p75 REAL)"
+    )
+    present = _ranking_columns(conn)
+    ratios = [col for col in supercias_financials.RATIO_COLUMNS if col in present]
+    rows: list[tuple] = []
+    if ratios and "ciiu_n1" in present:
+        cur = conn.execute(
+            f"SELECT anio, ciiu_n1, {', '.join(ratios)} FROM ranking "
+            f"WHERE ciiu_n1 IS NOT NULL AND COALESCE({', '.join(ratios)}, NULL) "
+            "IS NOT NULL ORDER BY anio, ciiu_n1"
+        )
+        for (anio, ciiu_n1), group in itertools.groupby(cur, key=lambda r: r[:2]):
+            filings = list(group)
+            for i, col in enumerate(ratios, start=2):
+                values = sorted(r[i] for r in filings if r[i] is not None)
+                if len(values) < _MIN_SECTOR_FILINGS:
+                    continue
+                rows.append((anio, ciiu_n1, col, len(values), *_quartiles(values)))
+    conn.executemany(
+        "INSERT INTO cuartiles_sector VALUES (?, ?, ?, ?, ?, ?, ?)", rows
+    )
+    conn.execute(
+        "CREATE INDEX idx_cuartiles_anio_ciiu ON cuartiles_sector(anio, ciiu_n1)"
+    )
+    conn.commit()
+    print(f"  cuartiles_sector: {len(rows)} filas", flush=True)
+
+
 def _check_not_shrunk(new_path: Path, previous_path: Path) -> None:
     """Reject a build whose ranking table shrank sharply vs. the live DB.
 
@@ -319,11 +447,16 @@ def _acquire_lock() -> bool:
     """Create the cross-process build lock; False if another build holds it."""
     path = supercias_financials.lock_path()
     path.parent.mkdir(parents=True, exist_ok=True)
-    try:
-        if time.time() - path.stat().st_mtime > BUILD_TIMEOUT_SECONDS:
-            path.unlink(missing_ok=True)  # abandoned by a crashed/killed build
-    except OSError:
-        pass
+    # Abandoned by a crashed/killed build: its PID is gone, or it is older
+    # than the timeout. Re-reading the PID right before unlinking keeps a
+    # concurrent build that just reclaimed the lock from losing it.
+    stale_pid = supercias_financials.read_lock_pid()
+    if supercias_financials.lock_is_stale():
+        try:
+            if supercias_financials.read_lock_pid() == stale_pid:
+                path.unlink(missing_ok=True)
+        except OSError:
+            pass
     try:
         fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
     except FileExistsError:
@@ -367,7 +500,7 @@ def _verify_build(db_path: Path) -> None:
             ("companias", {"expediente", "ruc", "nombre"}),
             ("segmentos", {"id_segmento", "segmento"}),
             ("ciiu", {"ciiu", "descripcion"}),
-            ("indicadores_sector", {"anio", "ciiu_n1"}),
+            ("cuartiles_sector", {"anio", "ciiu_n1", "indicador", "mediana"}),
         ):
             cols = {
                 row[1] for row in conn.execute(f"PRAGMA table_info({_quote_ident(table)})")
@@ -442,7 +575,6 @@ def _build() -> None:
     compania_csv = tmp_dir / "bi_compania.csv"
     segmento_csv = tmp_dir / "bi_segmento.csv"
     ciiu_csv = tmp_dir / "bi_ciiu.csv"
-    sector_csv = tmp_dir / "indicadores_sector.csv"
     deadline = time.time() + _DOWNLOAD_DEADLINE_SECONDS
     try:
         with _client() as client:
@@ -451,7 +583,6 @@ def _build() -> None:
                 ("bi_compania.csv", compania_csv),
                 ("bi_segmento.csv", segmento_csv),
                 ("bi_ciiu.csv", ciiu_csv),
-                ("indicadores_sector.csv", sector_csv),
             ):
                 _download_to(client, name, dest, deadline)
     except BaseException:
@@ -491,23 +622,18 @@ def _build() -> None:
         print("Cargando bi_ciiu.csv (tabla 'ciiu')...", flush=True)
         _load_csv_table(conn, ciiu_csv, "ciiu", set(), {"ciiu", "descripcion"})
 
-        print("Cargando indicadores_sector.csv (tabla 'indicadores_sector')...", flush=True)
-        _load_csv_table(
-            conn, sector_csv, "indicadores_sector", _SECTOR_INT_COLUMNS, _SECTOR_TEXT_COLUMNS
-        )
-        if cutoff is not None:
-            conn.execute("DELETE FROM indicadores_sector WHERE anio < ?", (cutoff,))
-            conn.commit()
+        print("Ratios no calculados por Supercías (0) -> NULL...", flush=True)
+        _null_uncalculated_ratios(conn)
 
         print("Creando índices...", flush=True)
         conn.execute("CREATE INDEX idx_ranking_expediente ON ranking(expediente)")
         conn.execute("CREATE INDEX idx_ranking_anio ON ranking(anio)")
         conn.execute("CREATE INDEX idx_ranking_ciiu_anio ON ranking(ciiu_n1, anio)")
-        conn.execute(
-            "CREATE INDEX idx_sector_anio_ciiu ON indicadores_sector(anio, ciiu_n1)"
-        )
         conn.execute("CREATE INDEX idx_companias_expediente ON companias(expediente)")
         conn.execute("CREATE INDEX idx_companias_ruc ON companias(ruc)")
+
+        print("Calculando cuartiles por sector (tabla 'cuartiles_sector')...", flush=True)
+        _build_sector_quartiles(conn)
         conn.execute(f"PRAGMA user_version = {int(SCHEMA_VERSION)}")
         conn.commit()
 
@@ -537,7 +663,7 @@ def _build() -> None:
     # 15-20 minute build because a get_financials call overlapped the rename.
     _replace_with_retry(build_path, DB_PATH)
 
-    for f in (ranking_csv, compania_csv, segmento_csv, ciiu_csv, sector_csv):
+    for f in (ranking_csv, compania_csv, segmento_csv, ciiu_csv):
         f.unlink(missing_ok=True)
     tmp_dir.rmdir()
 

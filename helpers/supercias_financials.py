@@ -25,7 +25,15 @@ A missing DB raises `FinancialsDbUnavailable`; a stale one keeps being
 served, flagged through `financials_status()`, while the refresh runs.
 Failed builds back off (1h/6h/24h, recorded in supercias_build.state.json)
 and the build script's lock file keeps concurrent processes from building
-at the same time.
+at the same time. The build runs detached from the server (own session on
+POSIX, outside the client's job object on Windows when allowed), and its
+lock holds its PID, so a build killed anyway frees the lock at once instead
+of blocking retries until the 45-minute timeout.
+
+The build also turns ratios Supercías could not calculate (stored as 0)
+into NULL and precomputes per-sector quartiles (`cuartiles_sector`), which
+replace Supercías' own sector means (`indicadores_sector.csv`): those are
+plain means that a few extreme filings dominate.
 
 Company names/RUCs are resolved from this same SQLite DB's own `companias`
 table (loaded from bi_compania.csv by the build script), not by calling into
@@ -42,6 +50,7 @@ helpers.supercias_client.
 from __future__ import annotations
 
 import asyncio
+import ctypes
 import json
 import logging
 import os
@@ -78,12 +87,31 @@ _RETRY_BACKOFF_SECONDS = (3600, 6 * 3600, 24 * 3600)
 # Stamped into the built DB as PRAGMA user_version. Bump it whenever a build
 # script fix changes the data, so existing DBs are rebuilt on first use
 # instead of serving the old data until they age out. 2 = n_empleados fix,
-# 3 = full history (2008-present) instead of the last five years.
-SCHEMA_VERSION = 3
-# Oldest build still served while the rebuild runs: a version-2 DB has the
-# same tables and columns, only fewer years, so refusing it would make the
-# tools unavailable for 15-20 minutes for no reason.
+# 3 = full history (2008-present) instead of the last five years, 4 = ratios
+# Supercías could not calculate stored as NULL instead of 0, and sector
+# quartiles (cuartiles_sector) instead of its sector means.
+SCHEMA_VERSION = 4
+# Oldest build still served while the rebuild runs: version-2/3 DBs have the
+# same ranking columns, only fewer years or zeros for NULLs (and no sector
+# quartiles), so refusing them would make the tools unavailable for 15-20
+# minutes for no reason.
 _MIN_SERVED_SCHEMA_VERSION = 2
+_FULL_HISTORY_SCHEMA_VERSION = 3
+
+# Win32 constants for _pid_alive (OpenProcess / GetExitCodeProcess).
+_PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+_ERROR_ACCESS_DENIED = 5
+_STILL_ACTIVE = 259
+# The build must outlive the server: a stdio client that closes its session
+# kills the server's process tree (on Windows, the job object it runs in),
+# and with it a build that is 15 minutes into a 20-minute run. Breaking away
+# from the job needs the job to allow it, so _spawn_build falls back to the
+# plain detached flags when Windows refuses.
+_WINDOWS_DETACHED_FLAGS = (
+    getattr(subprocess, "DETACHED_PROCESS", 0x00000008)
+    | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0x00000200)
+)
+_WINDOWS_BREAKAWAY_FLAG = getattr(subprocess, "CREATE_BREAKAWAY_FROM_JOB", 0x01000000)
 
 # Guards the in-process launcher only. Cross-process exclusion (two servers,
 # the maintenance container, a manual run) is the build script's lock file.
@@ -108,6 +136,36 @@ _RANKING_COLUMNS = (
     "gastos_financieros", "gastos_admin_ventas", "depreciaciones",
     "amortizaciones", "costos_ventas_prod", "deuda_total",
     "deuda_total_c_plazo", "total_gastos",
+)
+
+# The ratio columns (2018 onwards); the rest of _RANKING_COLUMNS are ids,
+# codes and amounts.
+RATIO_COLUMNS = (
+    "liquidez_corriente", "prueba_acida", "end_activo", "end_patrimonial",
+    "end_activo_fijo", "end_corto_plazo", "end_largo_plazo",
+    "cobertura_interes", "apalancamiento", "apalancamiento_financiero",
+    "end_patrimonial_ct", "end_patrimonial_nct", "apalancamiento_c_l_plazo",
+    "rot_cartera", "rot_activo_fijo", "rot_ventas", "per_med_cobranza",
+    "per_med_pago", "impac_gasto_a_v", "impac_carga_finan",
+    "rent_neta_activo", "margen_bruto", "margen_operacional",
+    "rent_neta_ventas", "rent_ope_patrimonio", "rent_ope_activo", "roe",
+    "roa", "fortaleza_patrimonial",
+)
+# Not on one scale even at the sector median (checked 2021-2025):
+# margen_operacional is a fraction in 2021 (median 0.07) but spans about
+# -25 to 90 from 2022, and the two "days" ratios have medians of ~1,000
+# (cobranza) and ~18,000 (pago), with no fixed factor against 365 /
+# rot_cartera. No conversion recovers them, so they are kept as published
+# and flagged wherever they are shown.
+UNRELIABLE_RATIOS = ("margen_operacional", "per_med_cobranza", "per_med_pago")
+UNRELIABLE_RATIOS_NOTE = (
+    "margen_operacional, per_med_cobranza y per_med_pago no tienen una escala "
+    "coherente en la fuente (ni en la mediana del sector): úsalos con cautela."
+)
+# Ratios compared against the sector in get_financials (one entry per year).
+COMPARISON_COLUMNS = (
+    "liquidez_corriente", "prueba_acida", "end_activo", "end_patrimonial",
+    "margen_bruto", "rent_neta_ventas", "roe", "roa",
 )
 
 # Qualified with the "r." alias used in search_ranking's JOIN query, so an
@@ -146,13 +204,67 @@ def write_build_state(state: dict[str, Any]) -> None:
     os.replace(tmp, path)
 
 
-def _lock_is_held() -> bool:
-    """True while any process holds a build lock younger than the timeout."""
+def _pid_alive(pid: int) -> bool:
+    """True if a process with this PID is still running."""
+    if pid <= 0:
+        return False
+    if sys.platform == "win32":
+        # os.kill(pid, 0) would *terminate* the process on Windows.
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel32.OpenProcess.restype = ctypes.c_void_p
+        kernel32.GetExitCodeProcess.argtypes = (
+            ctypes.c_void_p, ctypes.POINTER(ctypes.c_ulong),
+        )
+        kernel32.CloseHandle.argtypes = (ctypes.c_void_p,)
+        handle = kernel32.OpenProcess(_PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+        if not handle:
+            # Access denied means it exists but belongs to another user.
+            return ctypes.get_last_error() == _ERROR_ACCESS_DENIED
+        try:
+            code = ctypes.c_ulong()
+            if not kernel32.GetExitCodeProcess(handle, ctypes.byref(code)):
+                return True
+            return code.value == _STILL_ACTIVE
+        finally:
+            kernel32.CloseHandle(handle)
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+def read_lock_pid() -> int | None:
+    """PID recorded in the build lock, or None if missing/unreadable."""
+    try:
+        return int(lock_path().read_text(encoding="utf-8").strip())
+    except (OSError, ValueError):
+        return None
+
+
+def lock_is_stale() -> bool:
+    """True if the lock exists but its build is gone (dead PID or too old).
+
+    A build killed along with its session (a stdio client closing on
+    Windows) never reaches the `finally` that removes the lock, so its age
+    alone would block every retry for BUILD_TIMEOUT_SECONDS.
+    """
     try:
         age = time.time() - lock_path().stat().st_mtime
     except OSError:
         return False
-    return age < BUILD_TIMEOUT_SECONDS
+    if age > BUILD_TIMEOUT_SECONDS:
+        return True
+    pid = read_lock_pid()
+    # No PID yet: the lock was created a moment ago and is still being written.
+    return pid is not None and not _pid_alive(pid)
+
+
+def _lock_is_held() -> bool:
+    """True while a live build process holds a lock younger than the timeout."""
+    return lock_path().exists() and not lock_is_stale()
 
 
 def _in_backoff(state: dict[str, Any]) -> bool:
@@ -196,6 +308,35 @@ def _build_in_progress() -> bool:
     return True
 
 
+def _spawn_build(log_file: Any) -> subprocess.Popen:
+    """Launch the build detached from this process's session and job."""
+    kwargs: dict[str, Any] = {
+        "cwd": _PACKAGE_ROOT,
+        "stdin": subprocess.DEVNULL,
+        "stdout": log_file,
+        "stderr": subprocess.STDOUT,
+        "close_fds": True,
+    }
+    args = [sys.executable, "-m", _BUILD_MODULE]
+    if sys.platform != "win32":
+        # Own session: no SIGHUP when the client's terminal/session goes away.
+        return subprocess.Popen(args, start_new_session=True, **kwargs)
+    try:
+        return subprocess.Popen(
+            args,
+            creationflags=_WINDOWS_DETACHED_FLAGS | _WINDOWS_BREAKAWAY_FLAG,
+            **kwargs,
+        )
+    except PermissionError:
+        # The client's job object forbids breakaway; the build still runs
+        # detached, but dies if that job is closed.
+        logger.warning(
+            "No se pudo separar el build de Supercías del job del cliente; "
+            "cerrar la sesión puede interrumpirlo"
+        )
+        return subprocess.Popen(args, creationflags=_WINDOWS_DETACHED_FLAGS, **kwargs)
+
+
 def _trigger_background_build() -> None:
     """Start helpers/supercias_financials_build.py in the background.
 
@@ -221,13 +362,7 @@ def _trigger_background_build() -> None:
         log_path = DB_PATH.parent / "supercias_build.log"
         log_path.parent.mkdir(parents=True, exist_ok=True)
         with open(log_path, "wb") as log_file:
-            _build_process = subprocess.Popen(
-                [sys.executable, "-m", _BUILD_MODULE],
-                cwd=_PACKAGE_ROOT,
-                stdin=subprocess.DEVNULL,
-                stdout=log_file,
-                stderr=subprocess.STDOUT,
-            )
+            _build_process = _spawn_build(log_file)
         _build_started_at = time.time()
         logger.info(
             "Construyendo/refrescando la base financiera de Supercías en "
@@ -327,7 +462,8 @@ def _year_not_loaded(anio: int, years: list[int]) -> YearNotLoaded:
     # Before the full-history build replaces a version-2 DB, only the last
     # five years are there; say the rest is coming instead of implying the
     # year doesn't exist.
-    if _db_schema_version(DB_PATH) != SCHEMA_VERSION:
+    version = _db_schema_version(DB_PATH)
+    if version is not None and version < _FULL_HISTORY_SCHEMA_VERSION:
         message += (
             " La base se está reconstruyendo con el histórico completo "
             "(desde 2008) -- vuelve a intentar en unos minutos."
@@ -413,9 +549,12 @@ def stale_warning_lines(data: dict[str, Any]) -> list[str]:
     if status.get("actualizacion_pendiente"):
         return [
             (
-                "Aviso: la base local solo tiene los años "
-                f"{format_years(status.get('anios_disponibles') or [])}; se está "
-                "reconstruyendo con el histórico completo de Supercías (desde 2008)."
+                "Aviso: la base local (años "
+                f"{format_years(status.get('anios_disponibles') or [])}) es de una "
+                "versión anterior y se está reconstruyendo: la nueva trae el "
+                "histórico completo (desde 2008), deja vacíos los ratios que "
+                "Supercías no pudo calcular (hoy figuran como 0) y añade los "
+                "cuartiles por sector."
             )
         ]
     if not status.get("desactualizada"):
@@ -547,6 +686,16 @@ def _query_get_financials(
             (expediente, in_range[0], in_range[-1]),
         )
         years = [_row_to_dict(r) for r in cur.fetchall()]
+        # Quartiles of the company's own sector that year, so a ratio can be
+        # read against peers rather than against Supercías' skewed means.
+        if _has_quartiles(conn):
+            for year in years:
+                if year.get("ciiu_n1"):
+                    quartiles = _sector_quartiles(
+                        conn, year["anio"], year["ciiu_n1"], COMPARISON_COLUMNS
+                    )
+                    if quartiles:
+                        year["cuartiles_sector"] = quartiles
 
         return {
             "expediente": expediente,
@@ -565,7 +714,9 @@ def _query_search_ranking(
     descending: bool,
     limit: int,
     offset: int,
-) -> tuple[int | None, int, list[dict[str, Any]], list[str]]:
+) -> tuple[
+    int | None, int, list[dict[str, Any]], list[str], dict[str, Any] | None
+]:
     if order_by not in _ORDERABLE_COLUMNS:
         disponibles = ", ".join(sorted(_ORDERABLE_COLUMNS))
         raise ValueError(f"order_by inválido '{order_by}'. Disponibles: {disponibles}")
@@ -636,20 +787,68 @@ def _query_search_ranking(
                 "en 2018): solo ingresos, activos, patrimonio, utilidad, "
                 "impuesto a la renta y empleados."
             )
-        return anio, total, rows, notas
+        if order_by in UNRELIABLE_RATIOS:
+            notas.append(UNRELIABLE_RATIOS_NOTE)
+        cuartiles = None
+        if anio is not None and ciiu_n1 and _has_quartiles(conn):
+            cuartiles = _sector_quartiles(conn, anio, ciiu_n1.strip().upper()) or None
+        return anio, total, rows, notas, cuartiles
     finally:
         conn.close()
 
 
+def _has_quartiles(conn: sqlite3.Connection) -> bool:
+    # Builds before schema 4 (still served while rebuilding) don't have it.
+    row = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'cuartiles_sector'"
+    ).fetchone()
+    return row is not None
+
+
+def _sector_quartiles(
+    conn: sqlite3.Connection,
+    anio: int,
+    ciiu_n1: str,
+    columns: tuple[str, ...] = RATIO_COLUMNS,
+) -> dict[str, dict[str, Any]]:
+    """{indicador: {n, p25, mediana, p75}} for one fiscal year and sector."""
+    placeholders = ", ".join("?" for _ in columns)
+    cur = conn.execute(
+        "SELECT indicador, n, p25, mediana, p75 FROM cuartiles_sector "
+        f"WHERE anio = ? AND ciiu_n1 = ? AND indicador IN ({placeholders})",
+        (anio, ciiu_n1, *columns),
+    )
+    found = {
+        row["indicador"]: {
+            "n": row["n"],
+            "p25": row["p25"],
+            "mediana": row["mediana"],
+            "p75": row["p75"],
+        }
+        for row in cur.fetchall()
+    }
+    return {col: found[col] for col in columns if col in found}
+
+
 def _query_sector_benchmark(anio: int, ciiu_n1: str) -> dict[str, Any] | None:
+    sector = ciiu_n1.strip().upper()
     conn = _connect()
     try:
-        cur = conn.execute(
-            "SELECT * FROM indicadores_sector WHERE anio = ? AND ciiu_n1 = ?",
-            (anio, ciiu_n1.strip().upper()),
-        )
-        row = cur.fetchone()
-        return _row_to_dict(row) if row else None
+        if not _has_quartiles(conn):
+            return None
+        indicadores = _sector_quartiles(conn, anio, sector)
+        if not indicadores:
+            return None
+        row = conn.execute(
+            "SELECT descripcion FROM ciiu WHERE ciiu = ?", (sector,)
+        ).fetchone()
+        return {
+            "anio": anio,
+            "ciiu_n1": sector,
+            "descripcion": row["descripcion"] if row else None,
+            "indicadores": indicadores,
+            "nota": UNRELIABLE_RATIOS_NOTE,
+        }
     finally:
         conn.close()
 
@@ -699,7 +898,7 @@ async def search_ranking(
         limit: Max results.
         offset: Pagination offset.
     """
-    anio, total, rows, notas = await asyncio.to_thread(
+    anio, total, rows, notas, cuartiles = await asyncio.to_thread(
         _query_search_ranking, anio, ciiu_n1, order_by, descending, limit, offset
     )
     result: dict[str, Any] = {
@@ -708,11 +907,16 @@ async def search_ranking(
         "offset": offset,
         "companias": rows,
     }
+    if cuartiles:
+        result["cuartiles_sector"] = cuartiles
     if notas:
         result["notas"] = notas
     return result
 
 
 async def get_sector_benchmark(anio: int, ciiu_n1: str) -> dict[str, Any] | None:
-    """Sector-level average of the same ratios, for one fiscal year + CIIU level-1."""
+    """Sector quartiles (p25/median/p75) of every ratio, for one year + CIIU level-1.
+
+    None when the sector/year has no quartiles, or the DB predates them.
+    """
     return await asyncio.to_thread(_query_sector_benchmark, anio, ciiu_n1)

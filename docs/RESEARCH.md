@@ -6561,6 +6561,74 @@ cambió desde 2026-09-29, verificado desde una IP residencial de Canadá:
   enlace); los mapas se agrupan por tema (generación, transmisión,
   distribución), no por año.
 
+## Supercías — promedios sectoriales, ratios en cero y escala (2026-10-27)
+
+**Pregunta.** Un proyecto derivado reportó que los promedios sectoriales
+guardados no sirven, que los ratios no calculados aparecen como 0 y que tres
+ratios no tienen una escala coherente. Se verificó sobre la base local
+(años 2021-2025, construida el 2026-10-05 desde `bi_ranking.csv`).
+
+**Promedios sectoriales.** `indicadores_sector.csv` trae medias simples. En
+manufactura (C) 2023: liquidez corriente 23,70 y margen bruto -1.245,28, contra
+medianas de 1,48 y 0,41 entre las 8.863 compañías del sector con ratios (sin
+contar los ceros). Unas pocas compañías con valores extremos dominan la media.
+El build ya no descarga ese archivo y calcula p25/mediana/p75 de cada ratio
+por sector CIIU nivel 1 y año (tabla `cuartiles_sector`, mínimo 5 compañías).
+Con las reglas de abajo, C 2023 queda en liquidez corriente 0,96 / 1,48 / 3,23
+(n = 6.396) y margen bruto 0,23 / 0,41 / 0,81 (n = 5.875).
+
+**Ceros que significan "no calculado".** En comercio (G) 2023 el 85,5% de las
+compañías tiene `margen_operacional` = 0; en C, el 81,2%. Entre las compañías de
+2023 con ventas, activos y patrimonio mayores a 0 (72.991), la proporción de
+ceros va del 0% (`apalancamiento`, siempre ≥ 1) al 85% (`per_med_cobranza`),
+con `margen_operacional` en 80% y `margen_bruto` en 1,4%. Hay ceros reales:
+`end_largo_plazo` es 0 en el 64% (compañías sin deuda de largo plazo) e
+`impac_carga_finan` en el 78% (sin gastos financieros o redondeados a 0,00:
+Supercías publica los ratios con dos decimales). Por eso no se anulan todos los
+ceros. Un 0 pasa a NULL cuando:
+
+- la fila no tiene ningún ratio (sin estado financiero, o todos los ratios en
+  0: 1.736 filas en 2023);
+- el denominador del ratio en la fila es 0 (ventas, activos o patrimonio);
+- el ratio no puede valer 0 en una compañía en operación: liquidez corriente,
+  prueba ácida, endeudamiento del activo fijo, cobertura de intereses,
+  apalancamiento y apalancamiento financiero, las tres rotaciones, períodos
+  medios de cobranza y pago, margen bruto y margen operacional.
+
+Con eso, el 85,6% de `margen_operacional` de G 2023 queda en NULL. Las dos
+pasadas (NULL y cuartiles) tardan 24 s y 12 s sobre cinco años.
+
+**Escala de tres ratios.** Ni siquiera la mediana es coherente:
+
+| Ratio (valores ≠ 0) | 2021 | 2022-2025 |
+|---|---|---|
+| `margen_operacional` | p25/mediana/p75 0,03 / 0,07 / 0,19 (fracción) | cerca de -25 / 2-3 / 70-90 |
+| `per_med_cobranza` ("días") | mediana 18.607 | mediana 735-1.041 |
+| `per_med_pago` ("días") | mediana 36.887 | mediana ~17.200-17.900 |
+
+`margen_operacional` cambia de escala en 2022, pero no a porcentaje: el margen
+recalculado con ventas, costo de ventas y gastos de administración y ventas da
+un p75 de ~0,11 en 2023, no 0,70, y en grandes compañías de comercio valores
+como -33,99 o -320,08 corresponden a márgenes operativos positivos de 6-7%. Los
+dos períodos tampoco guardan un factor fijo con 365 / `rot_cartera` (la razón
+entre ambos va de 2 a 56 entre el p25 y el p75). No hay conversión que los
+recupere: se conservan como los publica Supercías y se marcan en la
+descripción de los tools, en `get_sector_benchmark` y en las notas de
+`search_ranking` al ordenar por ellos.
+
+**Reconstrucción interrumpida.** El build se lanzaba con `subprocess.Popen`
+sin desacoplar, así que cerrar un cliente stdio en Windows lo mataba junto al
+servidor; el lock ya guardaba el PID, pero solo se miraba su antigüedad
+(45 min). Ahora el build se lanza en su propia sesión (POSIX) o fuera del job
+object del cliente (Windows, si el job lo permite; si no, solo desacoplado y
+con aviso en el log), y un lock cuyo PID ya no corre se libera al instante.
+
+**Certificado de mercadodevalores.** El "válido hasta 2026-11-05" de
+`helpers/tls.py` es el de `datosabiertos.gob.ec` (2026-08-07 a
+2026-11-05, correcto). `mercadodevalores.supercias.gob.ec` usa otro,
+`*.supercias.gob.ec` de Sectigo, válido del 2026-08-19 al 2027-03-05; ambos
+revisados en vivo.
+
 ## Trigésimo sexta pasada — ARCONEL ArcGIS, gacetas del MSP y Superbancos (2026-11-04)
 
 **ARCONEL, servidor propio.** `geoportal.arconel.gob.ec:6443/arcgis/rest/services`

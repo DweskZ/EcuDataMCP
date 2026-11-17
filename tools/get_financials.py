@@ -55,6 +55,13 @@ def register_get_financials_tool(mcp: MCPServer) -> None:
         latest may still be incomplete). Ratios start in 2018 and CIIU in
         2009; earlier years only have revenue, assets, equity, profit, income
         tax and employees. A year with no financial statement shows as such.
+        Ratios Supercías could not calculate are empty (null), not 0. Each
+        year with a CIIU sector also carries `cuartiles_sector`: p25, median
+        and p75 of the main ratios across that sector's filings that year,
+        computed from the ranking itself (Supercías' own sector means are
+        dominated by a few extreme filings and are not used).
+        margen_operacional, per_med_cobranza and per_med_pago have no
+        consistent scale in the source; read them with caution.
         If a RUC maps to several companies, the error lists their expedientes.
         Complements get_compania_info, which has legal/registry data but no
         financials.
@@ -122,10 +129,19 @@ def register_get_financials_tool(mcp: MCPServer) -> None:
                 # Unranked rows (2008-2018 mostly) carry zeros, not figures.
                 if y.get("id_estado_financiero") is None:
                     parts.append("  Sin estado financiero presentado ese año.")
+                cuartiles = y.get("cuartiles_sector") or {}
                 for key, label in _DISPLAY_FIELDS:
                     value = y.get(key)
                     if value is not None:
-                        parts.append(f"  {label}: {value}")
+                        line = f"  {label}: {value}"
+                        if key in cuartiles:
+                            q = cuartiles[key]
+                            line += (
+                                f" (sector {y.get('ciiu_n1')}: p25 {q['p25']:.2f}"
+                                f" · mediana {q['mediana']:.2f}"
+                                f" · p75 {q['p75']:.2f}, n={q['n']})"
+                            )
+                        parts.append(line)
                 parts.append("")
             return "\n".join(parts).rstrip()
 
