@@ -1,5 +1,5 @@
 # Not digest-pinned here: dependabot's `docker` ecosystem (.github/
-# dependabot.yml) should own the `python:3.14-slim@sha256:...` pin so the
+# dependabot.yml) should own the `python:3.15-slim@sha256:...` pin so the
 # digest is bumped by PR instead of hand-edited.
 FROM python:3.15-slim
 
