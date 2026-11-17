@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import subprocess
 import sys
 import time
 
@@ -197,6 +198,11 @@ def test_build_in_progress_kills_hung_build(monkeypatch):
             # kill() alone leaves a zombie on POSIX; the child must be reaped.
             waited.append(timeout)
 
+    # On Windows the kill runs `taskkill /PID <pid>`; the fake PID 4242 could be
+    # a real process on the machine running the tests, so never let it run.
+    monkeypatch.setattr(
+        supercias_financials.subprocess, "run", lambda *args, **kwargs: None
+    )
     monkeypatch.setattr(supercias_financials, "_build_process", _HungProcess())
     monkeypatch.setattr(
         supercias_financials,
@@ -208,6 +214,98 @@ def test_build_in_progress_kills_hung_build(monkeypatch):
     assert killed == [True]
     assert waited == [5]
     assert supercias_financials._build_process is None
+
+
+class _FakeBuild:
+    """Stands in for a build Popen; the PID is never signalled for real."""
+
+    pid = 4242
+
+    def __init__(self) -> None:
+        self.killed = False
+
+    def kill(self) -> None:
+        self.killed = True
+
+
+def test_kill_build_takes_the_whole_tree_on_windows(monkeypatch):
+    calls: list[tuple[list[str], dict]] = []
+
+    def fake_run(args, **kwargs):
+        calls.append((args, kwargs))
+
+    monkeypatch.setattr(supercias_financials.sys, "platform", "win32")
+    monkeypatch.setattr(supercias_financials.subprocess, "run", fake_run)
+    build = _FakeBuild()
+
+    supercias_financials._kill_build(build)
+
+    # /T: the venv launcher's child (the real build) dies with it; /F: no prompt.
+    assert [args for args, _ in calls] == [["taskkill", "/PID", "4242", "/T", "/F"]]
+    assert calls[0][1]["check"] is False
+    assert build.killed
+
+
+def test_kill_build_still_kills_when_taskkill_fails(monkeypatch, caplog):
+    def broken_run(args, **kwargs):
+        raise OSError("taskkill not found")
+
+    monkeypatch.setattr(supercias_financials.sys, "platform", "win32")
+    monkeypatch.setattr(supercias_financials.subprocess, "run", broken_run)
+    build = _FakeBuild()
+
+    with caplog.at_level("WARNING", logger=supercias_financials.logger.name):
+        supercias_financials._kill_build(build)
+
+    assert build.killed
+    assert "taskkill" in caplog.text
+
+
+def test_kill_build_does_not_use_taskkill_off_windows(monkeypatch):
+    def forbidden_run(args, **kwargs):
+        raise AssertionError("taskkill is Windows-only")
+
+    monkeypatch.setattr(supercias_financials.sys, "platform", "linux")
+    monkeypatch.setattr(supercias_financials.subprocess, "run", forbidden_run)
+    build = _FakeBuild()
+
+    supercias_financials._kill_build(build)
+
+    assert build.killed
+
+
+@pytest.mark.skipif(
+    sys.platform != "win32", reason="the launcher-plus-child tree is Windows-only"
+)
+def test_kill_build_ends_a_real_process_tree_on_windows():
+    parent_code = (
+        "import subprocess, sys, time\n"
+        "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(120)'])\n"
+        "print(child.pid, flush=True)\n"
+        "time.sleep(120)\n"
+    )
+    parent = subprocess.Popen(
+        [sys.executable, "-c", parent_code], stdout=subprocess.PIPE, text=True
+    )
+    child_pid = int(parent.stdout.readline())
+    try:
+        assert supercias_financials._pid_alive(child_pid)
+
+        supercias_financials._kill_build(parent)
+        parent.wait(timeout=10)
+
+        deadline = time.time() + 10
+        while supercias_financials._pid_alive(child_pid) and time.time() < deadline:
+            time.sleep(0.1)
+        assert not supercias_financials._pid_alive(child_pid)
+    finally:
+        parent.stdout.close()
+        if supercias_financials._pid_alive(child_pid):
+            subprocess.run(
+                ["taskkill", "/PID", str(child_pid), "/F"],
+                capture_output=True,
+                check=False,
+            )
 
 
 def test_missing_db_message_reports_last_failure(tmp_path, no_real_build):

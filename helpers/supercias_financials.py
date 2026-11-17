@@ -276,6 +276,31 @@ def _in_backoff(state: dict[str, Any]) -> bool:
     return time.time() - float(last_attempt) < wait
 
 
+def _kill_build(process: subprocess.Popen) -> None:
+    """Kill a build subprocess and anything it started.
+
+    On Windows a venv's python.exe is a launcher that runs the real
+    interpreter as its child, so `Popen.kill()` ends only the launcher: the
+    build keeps running, still holding its lock. `taskkill /T` takes the whole
+    tree. Elsewhere the build is the process itself and `kill()` is enough.
+    """
+    if sys.platform == "win32":
+        try:
+            subprocess.run(
+                ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                capture_output=True,
+                check=False,
+                timeout=10,
+            )
+        except (OSError, subprocess.SubprocessError) as exc:
+            logger.warning(
+                "taskkill no pudo terminar el árbol del build (PID %d): %s",
+                process.pid, exc,
+            )
+    # Also covers a missing taskkill, and is harmless on an exited process.
+    process.kill()
+
+
 def _build_in_progress() -> bool:
     """True while this process's own build subprocess is still running.
 
@@ -294,7 +319,7 @@ def _build_in_progress() -> bool:
             "Build de Supercías (PID %d) superó %d min; se termina",
             _build_process.pid, BUILD_TIMEOUT_SECONDS // 60,
         )
-        _build_process.kill()
+        _kill_build(_build_process)
         # Reap it, or a killed POSIX child lingers as a zombie until exit.
         try:
             _build_process.wait(timeout=5)
