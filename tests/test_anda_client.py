@@ -78,13 +78,94 @@ async def test_get_survey(httpx_mock):
 
 @pytest.mark.asyncio
 async def test_get_survey_not_found(httpx_mock):
+    base = "https://anda.inec.gob.ec/anda5/index.php/api/catalog"
     httpx_mock.add_response(
-        url="https://anda.inec.gob.ec/anda5/index.php/api/catalog/NOPE",
+        url=f"{base}/NOPE",
         status_code=400,
         json={"status": "failed", "message": "IDNO-NOT-FOUND"},
     )
+    # The id fallback looks for the idno (search, then a whole-catalog scan)
+    # before giving up; neither finds it.
+    httpx_mock.add_response(
+        url=f"{base}?ps=100&sk=NOPE", json={"result": {"found": "0", "rows": []}}
+    )
+    httpx_mock.add_response(
+        url=f"{base}?ps=100",
+        json={"result": {"found": "1", "rows": [{"id": "7", "idno": "OTHER"}]}},
+    )
     with pytest.raises(ValueError, match="No se encontró"):
         await anda_client.get_survey("NOPE")
+
+
+@pytest.mark.asyncio
+async def test_get_survey_falls_back_to_the_catalog_id_when_the_idno_route_misses(
+    httpx_mock,
+):
+    # Live ANDA answers IDNO-NOT-FOUND for some idnos with spaces in every
+    # encoding, while the same study answers by its numeric id.
+    base = "https://anda.inec.gob.ec/anda5/index.php/api/catalog"
+    idno = "ECU-INEC-DIES-ENEMDU JUNIO 2011 RONDA XXXII - 2012 - v1.0"
+    httpx_mock.add_response(
+        url=f"{base}/{idno.replace(' ', '%20')}",
+        status_code=400,
+        json={"status": "failed", "message": "IDNO-NOT-FOUND"},
+    )
+    httpx_mock.add_response(
+        url=f"{base}?ps=100&sk={idno.replace(' ', '%20')}",
+        json={
+            "result": {
+                "found": "2",
+                "rows": [
+                    {"id": "101", "idno": "ECU-INEC-DIES-ENEMDU JUNIO 2011 - v1.0"},
+                    {"id": "102", "idno": idno},
+                ],
+            }
+        },
+    )
+    httpx_mock.add_response(
+        url=f"{base}/102?id_format=id",
+        json={"status": "success", "dataset": {"id": "102", "idno": idno}},
+    )
+
+    dataset = await anda_client.get_survey(idno)
+
+    assert dataset["id"] == "102"
+    assert dataset["idno"] == idno
+
+
+@pytest.mark.asyncio
+async def test_get_survey_scans_the_whole_catalog_when_the_search_misses(httpx_mock):
+    base = "https://anda.inec.gob.ec/anda5/index.php/api/catalog"
+    httpx_mock.add_response(
+        url=f"{base}/A%20B", status_code=400, json={"status": "failed", "message": "IDNO-NOT-FOUND"}
+    )
+    httpx_mock.add_response(
+        url=f"{base}?ps=100&sk=A%20B", json={"result": {"found": "0", "rows": []}}
+    )
+    httpx_mock.add_response(
+        url=f"{base}?ps=100",
+        json={"result": {"found": "2", "rows": [{"id": "1", "idno": "C"}, {"id": "9", "idno": "a b"}]}},
+    )
+    httpx_mock.add_response(
+        url=f"{base}/9?id_format=id", json={"status": "success", "dataset": {"id": "9"}}
+    )
+
+    # The idno match ignores case and surrounding whitespace.
+    dataset = await anda_client.get_survey(" A B ")
+
+    assert dataset["id"] == "9"
+
+
+@pytest.mark.asyncio
+async def test_get_survey_numeric_id_not_found_does_not_search(httpx_mock):
+    httpx_mock.add_response(
+        url="https://anda.inec.gob.ec/anda5/index.php/api/catalog/999?id_format=id",
+        status_code=400,
+        json={"status": "failed", "message": "IDNO-NOT-FOUND"},
+    )
+
+    with pytest.raises(ValueError, match="No se encontró"):
+        await anda_client.get_survey("999")
 
 
 @pytest.mark.asyncio
