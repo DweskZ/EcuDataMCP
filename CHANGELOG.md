@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **`get_contrato_info`: processes SERCOP answers as a release package.** For
+  some ocids (seen with `CDC-...`) SERCOP's `record` endpoint returns a release
+  package (top-level `releases`) instead of a record package (`records`).
+  `get_contrato_info` already read that shape, but `get_contract_record`
+  rejected it first with "estructura inesperada", so the tool failed for
+  processes `search_contratos` had just returned. The client now accepts both.
+  No test covered the two together (the tool's test mocked the client, and the
+  client's only rejection test used plain garbage); one does now. Found by
+  running the smoke test from a Colombian VPN exit, since SERCOP is unreachable
+  from the GitHub runners and from the Oracle VM.
 - **`ECUADOR_MCP_HIDE_TOOLS`: hide only the tools that cannot work on a host.**
   `ECUADOR_MCP_HIDE_GEOBLOCKED` hides a fixed set for a host that reaches none
   of the region's sources, which does not fit one that reaches some (the Oracle

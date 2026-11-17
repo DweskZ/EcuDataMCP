@@ -40,3 +40,18 @@ async def test_names_the_response_keys_when_no_record(server, monkeypatch):
 
     with pytest.raises(ToolError, match="claves: uri, version"):
         await server.call_tool("get_contrato_info", {"ocid": _OCID})
+
+
+async def test_reads_a_release_package_straight_from_the_endpoint(server, httpx_mock):
+    # The two layers together: a release package from the real client path,
+    # not a mocked get_contract_record. This is what live SERCOP returns for
+    # some ocids, and it failed with "estructura inesperada".
+    ocid = "ocds-5wno2w-CDC-EPMAPA-PVM-2024-001-312352"
+    httpx_mock.add_response(
+        url=f"https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/api/record?ocid={ocid}",
+        json={"version": "1.1", "releases": [{**_RELEASE, "ocid": ocid}]},
+    )
+
+    result = await server.call_tool("get_contrato_info", {"ocid": ocid, "format": "json"})
+
+    assert "GAD PICHINCHA" in str(result)

@@ -184,7 +184,13 @@ async def search_contracts(
 async def get_contract_record(
     ocid: str, session: httpx.AsyncClient | None = None
 ) -> dict[str, Any]:
-    """Fetch full OCDS record package for a procedure OCID."""
+    """Fetch the OCDS package for a procedure OCID.
+
+    For some processes (seen 2026-11-17 with a `CDC-...` ocid) the endpoint
+    answers with a release package, a top-level `releases` list, instead of a
+    record package with `records`. Both are valid and get_contrato_info reads
+    either, so both are accepted here.
+    """
     ocid = (ocid or "").strip()
     if not ocid:
         raise ValueError("ocid es obligatorio")
@@ -195,7 +201,9 @@ async def get_contract_record(
     result = await _get_json(
         _sercop_url("record"), params={"ocid": ocid}, session=session
     )
-    if not isinstance(result, dict) or not isinstance(result.get("records"), list):
+    if not isinstance(result, dict) or not (
+        isinstance(result.get("records"), list) or isinstance(result.get("releases"), list)
+    ):
         raise SercopResponseError(
             "SERCOP devolvió un registro con estructura inesperada; "
             "no se pudo obtener el contrato."

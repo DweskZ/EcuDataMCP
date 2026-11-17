@@ -169,3 +169,27 @@ async def test_record_rejects_unexpected_schema(httpx_mock):
     httpx_mock.add_response(json={"error": "unavailable"})
     with pytest.raises(sercop_client.SercopResponseError, match="estructura inesperada"):
         await sercop_client.get_contract_record("ocds-5wno2w-demo")
+
+
+@pytest.mark.asyncio
+async def test_record_accepts_a_release_package(httpx_mock):
+    # Live SERCOP answers some ocids (e.g. CDC-...) with `releases` and no
+    # `records`; the tool reads that shape, so the client must not reject it.
+    ocid = "ocds-5wno2w-CDC-EPMAPA-PVM-2024-001-312352"
+    package = {
+        "version": "1.1",
+        "releases": [{"id": "CDC-EPMAPA-PVM-2024-001-312352-compiled", "tag": ["tender", "award"]}],
+    }
+    httpx_mock.add_response(
+        url=f"https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/api/record?ocid={ocid}",
+        json=package,
+    )
+
+    assert await sercop_client.get_contract_record(ocid) == package
+
+
+@pytest.mark.asyncio
+async def test_record_rejects_a_package_whose_lists_are_not_lists(httpx_mock):
+    httpx_mock.add_response(json={"records": "none", "releases": {"id": "x"}})
+    with pytest.raises(sercop_client.SercopResponseError, match="estructura inesperada"):
+        await sercop_client.get_contract_record("ocds-5wno2w-demo")
