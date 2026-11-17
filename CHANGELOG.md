@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **`get_anda_survey_info` and `download_anda_microdata`: surveys whose idno
+  has spaces.** ANDA's idno route answers `IDNO-NOT-FOUND` for some idnos with
+  spaces in every encoding (`ECU-INEC-DIES-ENEMDU JUNIO 2011 RONDA XXXII -
+  2012 - v1.0`, `ECU-INEC-DIES-ENTRADAS Y SALIDAS INTERNACIONALES-2012-v1.9`),
+  although `search_anda` returns them and the same studies answer by numeric
+  id. After that answer the lookup now retries by catalog id, found by
+  searching the catalog for the exact idno (and scanning the catalog if the
+  search misses); idnos that worked before take the same single request. Found
+  by running the smoke test from the Oracle Bogotá VM: ANDA is geo-blocked on
+  the GitHub runners, so CI never exercised this chain.
 - **A hung Supercías build is now killed on Windows too.** The server ends a
   build it launched once it passes the 45-minute timeout, but on Windows a
   venv's `python.exe` is a launcher that runs the real interpreter as its
