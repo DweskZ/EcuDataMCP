@@ -1,12 +1,19 @@
 import pytest
 
-from helpers.geo_proxy import GEOBLOCKED_TOOLS, get_geo_hosts, hidden_tools, proxy_for
+from helpers.geo_proxy import (
+    GEOBLOCKED_TOOLS,
+    explicit_hidden_tools,
+    get_geo_hosts,
+    hidden_tools,
+    proxy_for,
+)
 
 
 @pytest.fixture(autouse=True)
 def _clean_env(monkeypatch):
     monkeypatch.delenv("ECUADOR_MCP_GEO_PROXY", raising=False)
     monkeypatch.delenv("ECUADOR_MCP_GEO_HOSTS", raising=False)
+    monkeypatch.delenv("ECUADOR_MCP_HIDE_TOOLS", raising=False)
 
 
 def test_no_proxy_configured_means_direct():
@@ -53,3 +60,27 @@ def test_geoblocked_tools_hidden_only_when_flag_set_without_proxy(monkeypatch):
     # With an egress in the region the sources work again.
     monkeypatch.setenv("ECUADOR_MCP_GEO_PROXY", "socks5://127.0.0.1:1080")
     assert hidden_tools() == frozenset()
+
+
+def test_explicit_hidden_tools_parses_commas_and_whitespace(monkeypatch):
+    assert explicit_hidden_tools() == frozenset()
+
+    monkeypatch.setenv(
+        "ECUADOR_MCP_HIDE_TOOLS", " search_contratos,get_contrato_info\n get_resumen_compras , "
+    )
+
+    assert explicit_hidden_tools() == {
+        "search_contratos",
+        "get_contrato_info",
+        "get_resumen_compras",
+    }
+
+
+def test_explicit_hidden_tools_work_without_the_geoblocked_flag(monkeypatch):
+    # A host that reaches some sources names only the tools that cannot work there.
+    monkeypatch.setenv("ECUADOR_MCP_HIDE_TOOLS", "search_contratos")
+    assert hidden_tools() == {"search_contratos"}
+
+    # With the geoblocked flag as well, both sets apply.
+    monkeypatch.setenv("ECUADOR_MCP_HIDE_GEOBLOCKED", "1")
+    assert hidden_tools() == GEOBLOCKED_TOOLS | {"search_contratos"}

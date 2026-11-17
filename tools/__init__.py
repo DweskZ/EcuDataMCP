@@ -1,6 +1,10 @@
-from mcp.server.mcpserver import MCPServer
+import logging
 
-from helpers.geo_proxy import hide_geoblocked
+from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
+
+from helpers.geo_proxy import GEOBLOCKED_TOOLS, explicit_hidden_tools, hide_geoblocked
+from helpers.logging import MAIN_LOGGER_NAME
 from tools.archivo_secciones import register_archivo_secciones_tools
 from tools.arconel_reportes import (
     register_get_arconel_reporte_tool,
@@ -98,6 +102,26 @@ from tools.search_sismos import register_search_sismos_tool
 from tools.search_sri_ruc import register_search_sri_ruc_tool
 from tools.search_tramites import register_search_tramites_tool
 from tools.serie_internacional import register_serie_internacional_tools
+
+logger = logging.getLogger(MAIN_LOGGER_NAME)
+
+
+def _remove_explicitly_hidden_tools(mcp: MCPServer) -> None:
+    """Drop the tools named in ECUADOR_MCP_HIDE_TOOLS (helpers/geo_proxy).
+
+    A name that matches no registered tool is almost always a typo, which
+    would leave a broken tool visible without a word; say so in the log.
+    Tools already skipped as geoblocked are not unknown.
+    """
+    already_hidden = GEOBLOCKED_TOOLS if hide_geoblocked() else frozenset()
+    unknown = []
+    for name in sorted(explicit_hidden_tools() - already_hidden):
+        try:
+            mcp.remove_tool(name)
+        except ToolError:
+            unknown.append(name)
+    if unknown:
+        logger.warning("ECUADOR_MCP_HIDE_TOOLS names no registered tool: %s", ", ".join(unknown))
 
 
 def register_tools(mcp: MCPServer) -> None:
@@ -207,6 +231,8 @@ def register_tools(mcp: MCPServer) -> None:
     register_search_cepalstat_indicadores_tool(mcp)
     register_get_cepalstat_indicador_tool(mcp)
     register_serie_internacional_tools(mcp)
+
+    _remove_explicitly_hidden_tools(mcp)
 
 
 

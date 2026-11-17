@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+- **`ECUADOR_MCP_HIDE_TOOLS`: hide only the tools that cannot work on a host.**
+  `ECUADOR_MCP_HIDE_GEOBLOCKED` hides a fixed set for a host that reaches none
+  of the region's sources, which does not fit one that reaches some (the Oracle
+  Bogotá instance reaches ANDA and Supercías but not SERCOP or infoMIES, and
+  would have lost the tools that work). Set `ECUADOR_MCP_HIDE_TOOLS` to a list
+  of tool names to remove them from `tools/list`; names that match no tool are
+  logged, and the startup financials download is skipped if `get_financials`
+  is hidden.
+- **National CKAN 403 now says what still works.** The portal sits behind a
+  CDN that answers 403 to every request from outside Ecuador (checked
+  2026-11-17 from Render, Oracle Bogotá, GitHub runners and Azure, whatever the
+  host name, user agent or HTTP version), while `source='iadb'`,
+  `'latacunga'` and (from some networks) `'cuenca'` still answer there. The
+  error now names those sources, and a 403 from another portal names that
+  portal, not `datosabiertos.gob.ec`.
 - **`get_anda_survey_info` and `download_anda_microdata`: surveys whose idno
   has spaces.** ANDA's idno route answers `IDNO-NOT-FOUND` for some idnos with
   spaces in every encoding (`ECU-INEC-DIES-ENEMDU JUNIO 2011 RONDA XXXII -

@@ -283,3 +283,31 @@ async def test_search_datasets_does_not_touch_plain_string_titles_on_national_po
     result = await ckan_client.search_datasets(query="salud")
 
     assert result["results"][0]["title"] == "Dataset de Salud"
+
+
+async def test_national_403_points_at_the_portals_that_still_answer(httpx_mock):
+    from helpers.smoke_status import degraded_source
+
+    url = "https://www.datosabiertos.gob.ec/api/3/action/package_search"
+    httpx_mock.add_response(url=url, status_code=403, html="<html>cloudfront</html>")
+
+    with pytest.raises(RuntimeError) as excinfo:
+        await ckan_client._fetch_json(url)
+
+    text = str(excinfo.value)
+    assert "(datosabiertos.gob.ec) rechazó la conexión (403)" in text
+    assert "source='iadb', 'latacunga' o 'cuenca'" in text
+    # The smoke run keys on this wording to report the source as degraded.
+    assert degraded_source(text) == "datos_abiertos_ckan"
+
+
+async def test_a_municipal_portal_403_names_its_own_host(httpx_mock):
+    url = "https://datosabiertos.latacunga.gob.ec/api/3/action/package_search"
+    httpx_mock.add_response(url=url, status_code=403, html="<html>no</html>")
+
+    with pytest.raises(RuntimeError) as excinfo:
+        await ckan_client._fetch_json(url)
+
+    text = str(excinfo.value)
+    assert "datosabiertos.latacunga.gob.ec" in text
+    assert "(datosabiertos.gob.ec)" not in text
