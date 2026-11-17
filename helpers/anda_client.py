@@ -113,7 +113,16 @@ async def get_survey(
             except ValueError:
                 message = ""
             if message == "IDNO-NOT-FOUND":
-                raise ValueError(f"No se encontró ninguna encuesta con idno '{idno}' en ANDA.")
+                numeric_id = None if by_numeric_id else await _numeric_id_for_idno(idno, session)
+                if numeric_id is None:
+                    raise ValueError(f"No se encontró ninguna encuesta con idno '{idno}' en ANDA.")
+                logger.debug("ANDA idno route missed %r; retrying by catalog id %s", idno, numeric_id)
+                resp = await session.get(
+                    _anda_url(f"catalog/{numeric_id}"),
+                    params={"id_format": "id"},
+                    timeout=_TIMEOUT,
+                    follow_redirects=True,
+                )
         resp.raise_for_status()
         return resp.json().get("dataset", {})
     except httpx.HTTPError as exc:
@@ -122,6 +131,24 @@ async def get_survey(
     finally:
         if own:
             await session.aclose()
+
+
+async def _numeric_id_for_idno(idno: str, session: httpx.AsyncClient) -> str | None:
+    """Catalog id of the survey whose idno is exactly `idno`, or None.
+
+    ANDA's idno route cannot match some idnos in any encoding (seen live on
+    2026-11-17 with `...ENEMDU JUNIO 2011 RONDA XXXII - 2012 - v1.0` and
+    `...ENTRADAS Y SALIDAS INTERNACIONALES-2012-v1.9`: IDNO-NOT-FOUND, even
+    with `id_format=idno`), while the same study answers by its numeric id.
+    Searching for the idno finds the row in one request; scanning the whole
+    catalog is the fallback if the keyword search misses it.
+    """
+    wanted = idno.strip().casefold()
+    for query in (idno.strip(), ""):
+        for row in await search_catalog_all(query=query, max_pages=10, session=session):
+            if str(row.get("idno") or "").strip().casefold() == wanted and row.get("id") is not None:
+                return str(row["id"])
+    return None
 
 
 async def search_catalog_all(
