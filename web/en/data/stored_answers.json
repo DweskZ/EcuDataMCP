@@ -1,5 +1,5 @@
 {
-  "extracted_at": "2026-11-17",
+  "extracted_at": "2026-11-18",
   "server_version": "0.15.0",
   "answers": [
     {
@@ -13,10 +13,10 @@
     {
       "id": "sismos",
       "question": "Were there any strong earthquakes in Ecuador this week?",
-      "answer": "The strongest within Ecuadorian territory was magnitude 4.1, 48.6 km from La Libertad (Santa Elena), on November 11 at 00:54, at a depth of 34.0 km. There was also a 3.6 near Tena (Napo).",
+      "answer": "The strongest within Ecuadorian territory was magnitude 3.6, 32.9 km from Tena (Napo), on November 15 at 05:53, at a depth of 5.0 km.",
       "tools": ["search_sismos"],
       "source": "IG-EPN · seismic catalog",
-      "url": "https://www.igepn.edu.ec/portal/eventos/www/events/igepn2026wbtt/overview.html"
+      "url": "https://www.igepn.edu.ec/portal/eventos/www/events.csv"
     },
     {
       "id": "remesas",
