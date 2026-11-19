@@ -83,6 +83,17 @@ año del Ranking de Compañías) y registro de auditores externos
 Hecho: tool `search_sismos` sobre el catálogo sísmico público, con caché TTL
 y parseo tolerante del CSV.
 
+**Sin enlace por evento (verificado 2026-11-18).** El export estático de
+páginas de evento (`/portal/eventos/www/events/<id>/overview.html`, y las
+variantes `/events/<id>/`, `/index.html` y `/overview`) está congelado desde
+el 13 de junio de 2026: el índice `/portal/eventos/www/` solo lista eventos
+hasta `igepn2026lmib`, cuya página sí responde 200, mientras `events.csv`
+sigue actualizándose (última modificación 15 de noviembre). Todo id posterior
+(`igepn2026wjlq`, `igepn2026wgpo`, `igepn2026wbtt`) da 404, así que
+`search_sismos` ya no devuelve `url` por evento y apunta al feed
+(`url_fuente`). Si el IG-EPN reactiva el export, basta con volver a armar la
+URL con el id.
+
 ### Ecuador en Cifras / portal BI del INEC
 
 **Construido 2026-08-29:** `helpers/inec_client.py` +

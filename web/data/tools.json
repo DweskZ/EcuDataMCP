@@ -1077,7 +1077,7 @@
             "description": "Formato de salida: `text` (default) o `json`."
           }
         ],
-        "long_description": "Busca sismos recientes en Ecuador del Instituto Geofísico (IG-EPN). Devuelve el feed del catálogo sísmico del IG-EPN: magnitud, profundidad, coordenadas, hora local/UTC, estado de revisión y descripción del lugar más cercano, con enlace a la página de cada evento. Los datos se cachean ~2 minutos."
+        "long_description": "Busca sismos recientes en Ecuador del Instituto Geofísico (IG-EPN). Devuelve el feed del catálogo sísmico del IG-EPN: magnitud, profundidad, coordenadas, hora local/UTC, estado de revisión y descripción del lugar más cercano. Los eventos traen el id del IG-EPN pero no un enlace a su página: las páginas estáticas por evento del IG-EPN no se actualizan desde junio de 2026, así que los enlaces a eventos recientes devuelven 404. La fuente es el feed de `url_fuente`. Los datos se cachean ~2 minutos."
       },
       {
         "name": "search_sgr_sitreps",

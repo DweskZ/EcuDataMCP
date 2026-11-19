@@ -36,9 +36,6 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 _TIMEOUT = 35.0
 _EVENTS_CSV_URL = "https://www.igepn.edu.ec/portal/eventos/www/events.csv"
-_EVENT_PAGE_TEMPLATE = (
-    "https://www.igepn.edu.ec/portal/eventos/www/events/{event_id}/overview.html"
-)
 _ECUADOR_TZ = timezone(timedelta(hours=-5))
 _DEFAULT_COLUMNS = ("latitude", "longitude", "mag", "depth", "time", "status", "id", "place")
 _TIME_FORMATS = ("%Y/%m/%d %H:%M:%S", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S")
@@ -160,7 +157,9 @@ def parse_events_csv(text: str) -> list[dict[str, Any]]:
         status = record.get("status", "")
         event["estado"] = "" if status.lower() == "none" else status
         event["localizacion"] = " ".join(record.get("place", "").split())
-        event["url"] = _EVENT_PAGE_TEMPLATE.format(event_id=event["id"])
+        # No per-event page link: IG-EPN's static export of event pages
+        # (.../www/events/<id>/overview.html) has been frozen since 2026-06-13
+        # while events.csv keeps updating, so every newer id returns 404.
         events.append(event)
 
     events.sort(key=lambda ev: ev["tiempo_utc"], reverse=True)

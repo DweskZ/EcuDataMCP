@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **`search_sismos`: no more per-event links that 404.** Each event carried a
+  `url` built as `.../portal/eventos/www/events/<id>/overview.html`. IG-EPN's
+  static export of those pages has not been updated since 2026-06-13 (the
+  index lists events only up to `igepn2026lmib`), while `events.csv` keeps
+  updating, so every event after that date answered 404 (checked 2026-11-18
+  on `igepn2026wjlq`, `igepn2026wgpo` and `igepn2026wbtt`; the `/events/<id>/`,
+  `/index.html` and `/overview` variants 404 too). Events no longer have a
+  `url`; the text output prints the event id instead of a "Detalle" link, and
+  both outputs point at the live feed (`url_fuente`). The data itself was
+  never affected.
 - **`get_contrato_info`: processes SERCOP answers as a release package.** For
   some ocids (seen with `CDC-...`) SERCOP's `record` endpoint returns a release
   package (top-level `releases`) instead of a record package (`records`).
