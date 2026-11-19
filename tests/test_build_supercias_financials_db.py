@@ -409,6 +409,65 @@ def test_acquire_lock_records_own_pid(isolated_state):
     assert build_script._acquire_lock() is False  # held by a live process
 
 
+def test_reclaiming_the_lock_of_a_dead_build_says_so_in_the_log(
+    isolated_state, monkeypatch, capsys
+):
+    # A build that vanishes leaves no traceback and no state: the next run's
+    # log is the only place that records it happened.
+    monkeypatch.setattr(isolated_state, "_pid_alive", lambda pid: False)
+    lock = isolated_state.lock_path()
+    lock.parent.mkdir(parents=True)
+    lock.write_text("31337")
+
+    assert build_script._acquire_lock() is True
+
+    out = capsys.readouterr().out
+    assert "PID 31337" in out and "no liberó el lock" in out
+
+
+def test_a_fresh_lock_acquisition_prints_nothing(isolated_state, capsys):
+    assert build_script._acquire_lock() is True
+    assert capsys.readouterr().out == ""
+
+
+class _FakeKernel32:
+    def __init__(self):
+        self.states: list[int] = []
+
+    def SetThreadExecutionState(self, flags):
+        self.states.append(flags)
+
+
+def test_keep_awake_holds_and_releases_the_system_required_state_on_windows(monkeypatch):
+    kernel32 = _FakeKernel32()
+    fake_ctypes = type("C", (), {"windll": type("W", (), {"kernel32": kernel32})})
+    monkeypatch.setattr(build_script, "ctypes", fake_ctypes)
+    monkeypatch.setattr(build_script.sys, "platform", "win32")
+
+    with build_script._keep_awake():
+        assert kernel32.states == [0x80000001]  # ES_CONTINUOUS | ES_SYSTEM_REQUIRED
+    assert kernel32.states == [0x80000001, 0x80000000]
+
+
+def test_keep_awake_releases_the_state_when_the_build_fails(monkeypatch):
+    kernel32 = _FakeKernel32()
+    fake_ctypes = type("C", (), {"windll": type("W", (), {"kernel32": kernel32})})
+    monkeypatch.setattr(build_script, "ctypes", fake_ctypes)
+    monkeypatch.setattr(build_script.sys, "platform", "win32")
+
+    with pytest.raises(RuntimeError), build_script._keep_awake():
+        raise RuntimeError("boom")
+
+    assert kernel32.states[-1] == 0x80000000
+
+
+def test_keep_awake_does_nothing_off_windows(monkeypatch):
+    monkeypatch.setattr(build_script.sys, "platform", "linux")
+
+    with build_script._keep_awake():
+        pass  # no windll on this platform; touching it would raise
+
+
 def _ratio_db(rows: list[tuple]) -> sqlite3.Connection:
     conn = sqlite3.connect(":memory:")
     conn.execute(

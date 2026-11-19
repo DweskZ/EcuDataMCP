@@ -73,6 +73,10 @@ def isolated_data_dir(tmp_path, monkeypatch):
         supercias_financials, "DB_PATH", tmp_path / "data" / "financials.sqlite3"
     )
     monkeypatch.setattr(supercias_financials, "_build_started_at", None)
+    # On Windows the launcher asks WMI first, and a real WMI launch here would
+    # start a real build (a 356 MB download) outside pytest's control. The
+    # launch path has its own tests in test_supercias_wmi_launch.py.
+    monkeypatch.setattr(supercias_financials, "_spawn_via_wmi", lambda log_path: None)
 
 
 @pytest.fixture

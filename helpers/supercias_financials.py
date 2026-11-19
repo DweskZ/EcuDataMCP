@@ -54,6 +54,7 @@ import ctypes
 import json
 import logging
 import os
+import shutil
 import sqlite3
 import subprocess
 import sys
@@ -104,19 +105,35 @@ _ERROR_ACCESS_DENIED = 5
 _STILL_ACTIVE = 259
 # The build must outlive the server: a stdio client that closes its session
 # kills the server's process tree (on Windows, the job object it runs in),
-# and with it a build that is 15 minutes into a 20-minute run. Breaking away
-# from the job needs the job to allow it, so _spawn_build falls back to the
-# plain detached flags when Windows refuses.
+# and with it a build that is 15 minutes into a 20-minute run. A process this
+# one creates stays in that job unless the job permits breakaway, and the
+# check is silent: CREATE_BREAKAWAY_FROM_JOB is accepted when the *immediate*
+# job (the venv launcher's) allows it, while the child still lands in an outer
+# job that does not, so no error ever tells us the build is killable. Only a
+# process another service creates is outside every job of ours, so
+# _spawn_build asks WMI first and uses the detached/breakaway flags only when
+# WMI is unavailable.
 _WINDOWS_DETACHED_FLAGS = (
     getattr(subprocess, "DETACHED_PROCESS", 0x00000008)
     | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0x00000200)
 )
 _WINDOWS_BREAKAWAY_FLAG = getattr(subprocess, "CREATE_BREAKAWAY_FROM_JOB", 0x01000000)
+_WINDOWS_NO_WINDOW_FLAG = getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000)
+# A process WMI creates gets the WMI service's environment, not ours, so the
+# variables the build reads are handed over in a file (see
+# helpers/supercias_detached_launch.py).
+_DETACHED_LAUNCH_MODULE = "helpers.supercias_detached_launch"
+_DETACHED_ENV_PREFIXES = ("ECUADOR_MCP_",)
+_DETACHED_ENV_NAMES = frozenset({
+    "CKAN_INSECURE_TLS", "SSL_CERT_FILE", "SSL_CERT_DIR", "REQUESTS_CA_BUNDLE",
+    "HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "NO_PROXY",
+})
+_WMI_LAUNCH_SECONDS = 30
 
 # Guards the in-process launcher only. Cross-process exclusion (two servers,
 # the maintenance container, a manual run) is the build script's lock file.
 _build_lock = threading.Lock()
-_build_process: subprocess.Popen | None = None
+_build_process: subprocess.Popen | _WmiBuild | None = None
 _build_started_at: float | None = None
 
 _RANKING_COLUMNS = (
@@ -276,7 +293,7 @@ def _in_backoff(state: dict[str, Any]) -> bool:
     return time.time() - float(last_attempt) < wait
 
 
-def _kill_build(process: subprocess.Popen) -> None:
+def _kill_build(process: subprocess.Popen | _WmiBuild) -> None:
     """Kill a build subprocess and anything it started.
 
     On Windows a venv's python.exe is a launcher that runs the real
@@ -333,7 +350,127 @@ def _build_in_progress() -> bool:
     return True
 
 
-def _spawn_build(log_file: Any) -> subprocess.Popen:
+def _process_creation_time(pid: int) -> int | None:
+    """Creation time (FILETIME ticks) of a Windows process, None if unreadable.
+
+    A PID can be reused once its process ends; the creation time tells the
+    process we started from a later one that got the same number.
+    """
+    from ctypes import wintypes
+
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel32.OpenProcess.restype = ctypes.c_void_p
+    kernel32.GetProcessTimes.argtypes = (ctypes.c_void_p,) + (ctypes.POINTER(wintypes.FILETIME),) * 4
+    kernel32.CloseHandle.argtypes = (ctypes.c_void_p,)
+    handle = kernel32.OpenProcess(_PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+    if not handle:
+        return None
+    try:
+        created, exited, kernel, user = (wintypes.FILETIME() for _ in range(4))
+        if not kernel32.GetProcessTimes(
+            handle, ctypes.byref(created), ctypes.byref(exited),
+            ctypes.byref(kernel), ctypes.byref(user),
+        ):
+            return None
+        return (created.dwHighDateTime << 32) | created.dwLowDateTime
+    finally:
+        kernel32.CloseHandle(handle)
+
+
+class _WmiBuild:
+    """Stand-in for the Popen of a build that WMI started on our behalf.
+
+    The build is not our child, so there is no exit status and no handle to
+    wait on: liveness is the PID plus its creation time, so a reused PID is
+    never mistaken for the build (or killed by `_kill_build`).
+    """
+
+    def __init__(self, pid: int) -> None:
+        self.pid = pid
+        self.returncode: int | None = None
+        self._created = _process_creation_time(pid)
+
+    def poll(self) -> int | None:
+        if self.returncode is None:
+            same_process = (
+                _pid_alive(self.pid)
+                and _process_creation_time(self.pid) == self._created
+            )
+            if not same_process:
+                self.returncode = -1  # ended; WMI gives no exit status
+        return self.returncode
+
+    def wait(self, timeout: float | None = None) -> int:
+        deadline = None if timeout is None else time.monotonic() + timeout
+        while self.poll() is None:
+            if deadline is not None and time.monotonic() >= deadline:
+                raise subprocess.TimeoutExpired("supercias build", timeout)
+            time.sleep(0.2)
+        return self.returncode if self.returncode is not None else -1
+
+    def kill(self) -> None:
+        if self.poll() is None:
+            subprocess.run(
+                ["taskkill", "/PID", str(self.pid), "/F"],
+                capture_output=True, check=False, timeout=10,
+            )
+
+
+def _spawn_via_wmi(log_path: Path) -> _WmiBuild | None:
+    """Start the build through the WMI service, outside every job of ours.
+
+    `Win32_Process.Create` makes WMI the parent, so the build survives a
+    client that closes its session and tears down the job the server runs in
+    (a controlled test showed a plain detached child dying with the job while
+    the WMI-created one lived on). Returns None, leaving the caller to fall
+    back to a plain detached Popen, when PowerShell or WMI is unavailable.
+    """
+    powershell = shutil.which("powershell")
+    if powershell is None:
+        return None
+    env_path = log_path.with_name("supercias_build.env.json")
+    handed_over = {
+        key: value for key, value in os.environ.items()
+        if key.upper().startswith(_DETACHED_ENV_PREFIXES)
+        or key.upper() in _DETACHED_ENV_NAMES
+    }
+    command_line = subprocess.list2cmdline(
+        [sys.executable, "-m", _DETACHED_LAUNCH_MODULE, str(env_path), str(log_path)]
+    )
+    script = (
+        "$r = Invoke-CimMethod -ClassName Win32_Process -MethodName Create "
+        "-Arguments @{CommandLine = $env:ECUADOR_MCP_WMI_COMMAND; "
+        "CurrentDirectory = $env:ECUADOR_MCP_WMI_CWD}; "
+        "if ($r.ReturnValue -ne 0) { exit 1 }; $r.ProcessId"
+    )
+    try:
+        env_path.write_text(json.dumps(handed_over), encoding="utf-8")
+        done = subprocess.run(
+            [powershell, "-NoProfile", "-NonInteractive", "-Command", script],
+            env={
+                **os.environ,
+                "ECUADOR_MCP_WMI_COMMAND": command_line,
+                "ECUADOR_MCP_WMI_CWD": str(_PACKAGE_ROOT),
+            },
+            capture_output=True, text=True, check=False,
+            timeout=_WMI_LAUNCH_SECONDS, creationflags=_WINDOWS_NO_WINDOW_FLAG,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        env_path.unlink(missing_ok=True)
+        logger.warning("No se pudo lanzar el build de Supercías por WMI: %s", exc)
+        return None
+    pid = done.stdout.strip()
+    if done.returncode != 0 or not pid.isdigit():
+        env_path.unlink(missing_ok=True)
+        logger.warning(
+            "WMI no lanzó el build de Supercías (código %d): %s",
+            done.returncode, (done.stderr or done.stdout).strip()[:200],
+        )
+        return None
+    return _WmiBuild(int(pid))
+
+
+def _spawn_build(log_file: Any) -> subprocess.Popen | _WmiBuild:
     """Launch the build detached from this process's session and job."""
     kwargs: dict[str, Any] = {
         "cwd": _PACKAGE_ROOT,
@@ -346,6 +483,9 @@ def _spawn_build(log_file: Any) -> subprocess.Popen:
     if sys.platform != "win32":
         # Own session: no SIGHUP when the client's terminal/session goes away.
         return subprocess.Popen(args, start_new_session=True, **kwargs)
+    via_wmi = _spawn_via_wmi(Path(log_file.name))
+    if via_wmi is not None:
+        return via_wmi
     try:
         return subprocess.Popen(
             args,

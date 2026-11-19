@@ -52,13 +52,17 @@ Usage:
 
 from __future__ import annotations
 
+import contextlib
 import csv
+import ctypes
 import itertools
 import os
 import shutil
 import sqlite3
 import statistics
+import sys
 import time
+from collections.abc import Iterator
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -443,6 +447,30 @@ def _check_not_shrunk(new_path: Path, previous_path: Path) -> None:
         )
 
 
+_ES_CONTINUOUS = 0x80000000
+_ES_SYSTEM_REQUIRED = 0x00000001
+
+
+@contextlib.contextmanager
+def _keep_awake() -> Iterator[None]:
+    """On Windows, ask the system not to sleep from idleness during the build.
+
+    A laptop that sleeps (Modern Standby) freezes the build with everything
+    else: one build sat frozen for 17 minutes in its index step and was gone
+    when the machine woke. This does not stop a closed lid or the power
+    button from suspending it, which no process can prevent.
+    """
+    if sys.platform != "win32":
+        yield
+        return
+    kernel32 = ctypes.windll.kernel32
+    kernel32.SetThreadExecutionState(_ES_CONTINUOUS | _ES_SYSTEM_REQUIRED)
+    try:
+        yield
+    finally:
+        kernel32.SetThreadExecutionState(_ES_CONTINUOUS)
+
+
 def _acquire_lock() -> bool:
     """Create the cross-process build lock; False if another build holds it."""
     path = supercias_financials.lock_path()
@@ -455,6 +483,13 @@ def _acquire_lock() -> bool:
         try:
             if supercias_financials.read_lock_pid() == stale_pid:
                 path.unlink(missing_ok=True)
+                if stale_pid is not None:
+                    print(
+                        f"El build anterior (PID {stale_pid}) no liberó el lock: "
+                        "lo detuvieron desde fuera (cierre de sesión, suspensión "
+                        "del equipo) o superó el tiempo máximo. Se reinicia.",
+                        flush=True,
+                    )
         except OSError:
             pass
     try:
@@ -692,7 +727,8 @@ def main() -> None:
         return
     started = time.time()
     try:
-        _build()
+        with _keep_awake():
+            _build()
     except BaseException as e:
         _record_outcome(started, e)
         raise
