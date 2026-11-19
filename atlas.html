@@ -1029,13 +1029,13 @@
 </div>
 </details>
 
-<details class="atlas-tool" id="tool-search_sismos" data-search="search_sismos sismos recientes del catálogo del instituto geofísico (ig-epn): magnitud, profundidad, ubicación y estado de revisión. busca sismos recientes en ecuador del instituto geofísico (ig-epn). devuelve el feed del catálogo sísmico del ig-epn: magnitud, profundidad, coordenadas, hora local/utc, estado de revisión y descripción del lugar más cercano, con enlace a la página de cada evento. los datos se cachean ~2 minutos. query texto libre sobre ubicación/id (ej. &quot;quito&quot;, &quot;esmeraldas&quot;) magnitud_minima magnitud mínima (ej. 4.0) dias solo eventos de los últimos n días (0 = todos los disponibles) limit máximo de eventos a devolver (default 15, máx. 100) format formato de salida: `text` (default) o `json`.">
+<details class="atlas-tool" id="tool-search_sismos" data-search="search_sismos sismos recientes del catálogo del instituto geofísico (ig-epn): magnitud, profundidad, ubicación y estado de revisión. busca sismos recientes en ecuador del instituto geofísico (ig-epn). devuelve el feed del catálogo sísmico del ig-epn: magnitud, profundidad, coordenadas, hora local/utc, estado de revisión y descripción del lugar más cercano. los eventos traen el id del ig-epn pero no un enlace a su página: las páginas estáticas por evento del ig-epn no se actualizan desde junio de 2026, así que los enlaces a eventos recientes devuelven 404. la fuente es el feed de `url_fuente`. los datos se cachean ~2 minutos. query texto libre sobre ubicación/id (ej. &quot;quito&quot;, &quot;esmeraldas&quot;) magnitud_minima magnitud mínima (ej. 4.0) dias solo eventos de los últimos n días (0 = todos los disponibles) limit máximo de eventos a devolver (default 15, máx. 100) format formato de salida: `text` (default) o `json`.">
 <summary class="atlas-tool-summary">
 <code class="atlas-tool-name">search_sismos</code>
 <span class="atlas-tool-desc">Sismos recientes del catálogo del Instituto Geofísico (IG-EPN): magnitud, profundidad, ubicación y estado de revisión.</span>
 </summary>
 <div class="atlas-tool-body">
-<p class="atlas-tool-long">Busca sismos recientes en Ecuador del Instituto Geofísico (IG-EPN). Devuelve el feed del catálogo sísmico del IG-EPN: magnitud, profundidad, coordenadas, hora local/UTC, estado de revisión y descripción del lugar más cercano, con enlace a la página de cada evento. Los datos se cachean ~2 minutos.</p>
+<p class="atlas-tool-long">Busca sismos recientes en Ecuador del Instituto Geofísico (IG-EPN). Devuelve el feed del catálogo sísmico del IG-EPN: magnitud, profundidad, coordenadas, hora local/UTC, estado de revisión y descripción del lugar más cercano. Los eventos traen el id del IG-EPN pero no un enlace a su página: las páginas estáticas por evento del IG-EPN no se actualizan desde junio de 2026, así que los enlaces a eventos recientes devuelven 404. La fuente es el feed de `url_fuente`. Los datos se cachean ~2 minutos.</p>
 
 <table class="atlas-params">
 <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
