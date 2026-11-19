@@ -30,7 +30,9 @@ def test_parse_events_csv_fields():
     # Local time (UTC-5) converted to UTC
     assert ev["tiempo_local"] == "2026-06-30T06:02:05-05:00"
     assert ev["tiempo_utc"] == "2026-06-30T11:02:05+00:00"
-    assert ev["url"].endswith("/events/igepn2026mrim/overview.html")
+    # IG-EPN's per-event pages (events/<id>/overview.html) stopped updating in
+    # June 2026 and 404 for newer ids, so no page link is emitted
+    assert "url" not in ev
 
 
 def test_parse_events_csv_without_header_and_bad_rows():

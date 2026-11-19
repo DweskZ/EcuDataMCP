@@ -1077,7 +1077,7 @@
             "description": "Output format: `text` (default) or `json`."
           }
         ],
-        "long_description": "Search recent earthquakes in Ecuador from the Instituto Geofísico (IG-EPN). Returns the IG-EPN seismic catalog feed: magnitude, depth, coordinates, local/UTC time, review status and nearest-place description, with a link to each event page. Data is cached ~2 minutes."
+        "long_description": "Search recent earthquakes in Ecuador from the Instituto Geofísico (IG-EPN). Returns the IG-EPN seismic catalog feed: magnitude, depth, coordinates, local/UTC time, review status and nearest-place description. Events carry the IG-EPN event id but no page link: IG-EPN's static per-event pages have not been updated since June 2026, so links to recent events return 404. The source is the feed in `url_fuente`. Data is cached ~2 minutes."
       },
       {
         "name": "search_sgr_sitreps",

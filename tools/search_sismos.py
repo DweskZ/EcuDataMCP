@@ -39,8 +39,11 @@ def register_search_sismos_tool(mcp: MCPServer) -> None:
         Search recent earthquakes in Ecuador from the Instituto Geofísico (IG-EPN).
 
         Returns the IG-EPN seismic catalog feed: magnitude, depth, coordinates,
-        local/UTC time, review status and nearest-place description, with a link
-        to each event page. Data is cached ~2 minutes.
+        local/UTC time, review status and nearest-place description. Events
+        carry the IG-EPN event id but no page link: IG-EPN's static per-event
+        pages have not been updated since June 2026, so links to recent events
+        return 404. The source is the feed in `url_fuente`. Data is cached ~2
+        minutes.
 
         Args:
             query: Free text over location/id (e.g. "Quito", "Esmeraldas")
@@ -87,12 +90,11 @@ def register_search_sismos_tool(mcp: MCPServer) -> None:
                     f"lat={ev.get('latitud')}, lon={ev.get('longitud')} — "
                     f"estado: {estado}"
                 )
-                if ev.get("url"):
-                    parts.append(f"   Detalle: {ev['url']}")
+                parts.append(f"   ID: {ev.get('id')}")
                 parts.append("")
             parts.append(
-                "Fuente: IG-EPN (www.igepn.edu.ec). Información pública de apoyo; "
-                "no sustituye los canales oficiales de alerta."
+                f"Fuente: IG-EPN, {data.get('url_fuente')}. Información pública de "
+                "apoyo; no sustituye los canales oficiales de alerta."
             )
             return "\n".join(parts)
 
