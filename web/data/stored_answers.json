@@ -1,5 +1,5 @@
 {
-  "extracted_at": "2026-11-18",
+  "extracted_at": "2026-11-19",
   "server_version": "0.15.0",
   "answers": [
     {
@@ -13,7 +13,7 @@
     {
       "id": "sismos",
       "question": "¿Hubo temblores fuertes en Ecuador esta semana?",
-      "answer": "El más fuerte en territorio ecuatoriano fue de magnitud 3,6, a 32,9 km de Tena (Napo), el 15 de noviembre a las 05:53, a 5,0 km de profundidad.",
+      "answer": "El más fuerte en territorio ecuatoriano fue de magnitud 5,5 (valor automático del IG-EPN, aún sin revisar), a 25,5 km de Guayaquil (Guayas), el 19 de noviembre a las 00:49, a 22,1 km de profundidad. También hubo uno de 4,2 cerca de Salinas (Santa Elena).",
       "tools": ["search_sismos"],
       "source": "IG-EPN · catálogo sísmico",
       "url": "https://www.igepn.edu.ec/portal/eventos/www/events.csv"
@@ -46,7 +46,7 @@
     {
       "id": "cortes-luz",
       "question": "¿Hay cortes de luz programados en Ambato o el Puyo?",
-      "answer": "No hay avisos de trabajos programados vigentes de la EEASA (Tungurahua, Pastaza, Napo y Morona Santiago) en este momento.",
+      "answer": "Sí, 3 avisos vigentes. Por ejemplo: jueves 19 de noviembre, de 10:00 a 15:30, en Tamboloma, Mulanleo, Chiquicahua de la Parroquia Pilahuin, Santa Ana de Calamaca y San Fernando del Cantón Ambato; viernes 20, de 14:30 a 16:30, en Ciudadela del Chofer, Av. 20 de Julio, Entre Washington Mason y Av. Eloy Alfaro (paso Lateral; Puyo-pastaza).",
       "tools": ["search_cortes", "get_cortes_horarios"],
       "source": "EEASA · trabajos programados",
       "url": "https://www.eeasa.com.ec/trabajos-programados/"

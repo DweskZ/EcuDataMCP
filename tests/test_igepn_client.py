@@ -27,9 +27,10 @@ def test_parse_events_csv_fields():
     assert ev["longitud"] == -77.6736
     # Unquoted commas in place are re-joined
     assert ev["localizacion"] == "a 53.97 km de Macas, Morona Santiago"
-    # Local time (UTC-5) converted to UTC
-    assert ev["tiempo_local"] == "2026-06-30T06:02:05-05:00"
-    assert ev["tiempo_utc"] == "2026-06-30T11:02:05+00:00"
+    # The feed's unlabeled `time` column is UTC (it matches USGS's origin
+    # times); local time is that instant at UTC-5
+    assert ev["tiempo_utc"] == "2026-06-30T06:02:05+00:00"
+    assert ev["tiempo_local"] == "2026-06-30T01:02:05-05:00"
     # IG-EPN's per-event pages (events/<id>/overview.html) stopped updating in
     # June 2026 and 404 for newer ids, so no page link is emitted
     assert "url" not in ev
@@ -105,9 +106,7 @@ async def test_list_earthquakes_filters(monkeypatch):
 
 
 async def test_list_earthquakes_days_filter(monkeypatch):
-    recent = (datetime.now(UTC) - timedelta(days=1)).astimezone(
-        igepn_client._ECUADOR_TZ
-    )
+    recent = datetime.now(UTC) - timedelta(days=1)
     csv = (
         "latitude,longitude,mag,depth,time,status,id,place\n"
         f"-2.1,-77.6,4.0,10,{recent.strftime('%Y/%m/%d %H:%M:%S')},confirmed,igreciente,Macas\n"
@@ -142,15 +141,31 @@ async def test_list_earthquakes_uses_cache(monkeypatch):
 @pytest.mark.parametrize(
     "raw,expected_utc",
     [
-        ("2026/06/30 06:02:05", "2026-06-30T11:02:05+00:00"),
-        ("2026-06-30 06:02:05", "2026-06-30T11:02:05+00:00"),
-        ("2026-06-30T06:02:05", "2026-06-30T11:02:05+00:00"),
+        ("2026/06/30 06:02:05", "2026-06-30T06:02:05+00:00"),
+        ("2026-06-30 06:02:05", "2026-06-30T06:02:05+00:00"),
+        ("2026-06-30T06:02:05", "2026-06-30T06:02:05+00:00"),
     ],
 )
 def test_parse_time_formats(raw, expected_utc):
     parsed = igepn_client._parse_time(raw)
     assert parsed is not None
+    assert parsed[0] == "2026-06-30T01:02:05-05:00"
     assert parsed[1] == expected_utc
+
+
+def test_feed_time_is_utc_like_usgs():
+    # 2026-11-19: IG-EPN's feed listed this Guayaquil event at 05:49:27 and
+    # USGS lists the same event at 05:49:26 UTC, so the feed's time is UTC and
+    # the local time in Ecuador was 00:49.
+    body = (
+        "latitude,longitude,mag,depth,time,status,id,place\n"
+        "-2.3937,-79.8643,5.47,22.1018,2026/11/19 05:49:27,,igepn2026wqtn,"
+        "a 25.46 km de Guayaquil, Guayas\n"
+    )
+    ev = igepn_client.parse_events_csv(body)[0]
+    assert ev["tiempo_utc"] == "2026-11-19T05:49:27+00:00"
+    assert ev["tiempo_local"] == "2026-11-19T00:49:27-05:00"
+    assert ev["estado"] == ""
 
 
 def test_parse_time_invalid():

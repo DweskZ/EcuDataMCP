@@ -427,6 +427,10 @@ def _event_facts(ev: dict) -> dict:
         "lugar": place,
         "fecha": when.date().isoformat(),
         "hora": when.strftime("%H:%M"),
+        # IG-EPN publishes an automatic solution first and revises it once an
+        # analyst reviews it (a 3.55 became 3.20, a 5.47 is 4.8 at USGS), so an
+        # event with no review status is a preliminary value, not a fact.
+        "preliminar": (ev.get("estado") or "").strip().lower() in ("", "automatic"),
         "id": ev.get("id"),
         "url": ev.get("url"),
     }
@@ -471,6 +475,8 @@ def render_sismos(f: dict, lang: str, *, bold: bool = False) -> dict:
     depth = fmt_number(s["profundidad"], 1, lang)
     if lang == "es":
         mag_txt = f"**magnitud {mag}**" if bold else f"magnitud {mag}"
+        if s["preliminar"]:
+            mag_txt += " (valor automático del IG-EPN, aún sin revisar)"
         where = (
             f"a {fmt_number(s['distancia'].replace(',', '.'), 1, lang)} km de {s['lugar']}"
             if s["distancia"]
@@ -485,6 +491,8 @@ def render_sismos(f: dict, lang: str, *, bold: bool = False) -> dict:
             text += f" También hubo uno de {fmt_number(second['magnitud'], 1, lang)} cerca de {second['lugar']}."
     else:
         mag_txt = f"**magnitude {mag}**" if bold else f"magnitude {mag}"
+        if s["preliminar"]:
+            mag_txt += " (automatic IG-EPN value, not yet reviewed)"
         where = (
             f"{fmt_number(s['distancia'], 1, lang)} km from {s['lugar']}"
             if s["distancia"]
