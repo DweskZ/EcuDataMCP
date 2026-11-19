@@ -1,5 +1,5 @@
 {
-  "extracted_at": "2026-11-18",
+  "extracted_at": "2026-11-19",
   "server_version": "0.15.0",
   "answers": [
     {
@@ -13,7 +13,7 @@
     {
       "id": "sismos",
       "question": "Were there any strong earthquakes in Ecuador this week?",
-      "answer": "The strongest within Ecuadorian territory was magnitude 3.6, 32.9 km from Tena (Napo), on November 15 at 05:53, at a depth of 5.0 km.",
+      "answer": "The strongest within Ecuadorian territory was magnitude 5.5 (automatic IG-EPN value, not yet reviewed), 25.5 km from Guayaquil (Guayas), on November 19 at 00:49, at a depth of 22.1 km. There was also a 4.2 near Salinas (Santa Elena).",
       "tools": ["search_sismos"],
       "source": "IG-EPN · seismic catalog",
       "url": "https://www.igepn.edu.ec/portal/eventos/www/events.csv"
@@ -46,7 +46,7 @@
     {
       "id": "cortes-luz",
       "question": "Are there scheduled power outages in Ambato or Puyo?",
-      "answer": "There are no active scheduled-work notices from EEASA (Tungurahua, Pastaza, Napo and Morona Santiago) at the moment.",
+      "answer": "Yes, 3 active notices. For example: Thursday, November 19, from 10:00 to 15:30, in Tamboloma, Mulanleo, Chiquicahua de la Parroquia Pilahuin, Santa Ana de Calamaca y San Fernando del Cantón Ambato; Friday, November 20, from 14:30 to 16:30, in Ciudadela del Chofer, Av. 20 de Julio, Entre Washington Mason y Av. Eloy Alfaro (paso Lateral; Puyo-pastaza).",
       "tools": ["search_cortes", "get_cortes_horarios"],
       "source": "EEASA · scheduled works",
       "url": "https://www.eeasa.com.ec/trabajos-programados/"

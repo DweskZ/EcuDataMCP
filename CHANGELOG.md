@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- **`search_sismos`: the feed's times are UTC, not Ecuador local time.** The
+  client read `events.csv`'s unlabeled `time` column as UTC-05:00, so every
+  `tiempo_utc` was five hours late and every `tiempo_local` equal to the UTC
+  clock time. Checked against USGS on 2026-11-19: four events appear in both
+  catalogs with origin times within 9 seconds of the raw feed value (the
+  Guayaquil event listed at `05:49:27` is USGS's `05:49:26 UTC`; local time
+  was 00:49). `tiempo_utc` is now the feed value and `tiempo_local` the same
+  instant at UTC-05:00; the `dias` window follows. The Examples page had
+  carried the wrong hour ("15 de noviembre a las 05:53" was 00:53).
+  Separately, IG-EPN publishes an automatic solution first and revises it
+  (a 3.55 became 3.20 after confirmation; the 5.47 above is 4.8 at USGS), so
+  the Examples refresh now words an event with no review status as "valor
+  automático del IG-EPN, aún sin revisar" instead of stating it as settled.
 - **`search_sismos`: no more per-event links that 404.** Each event carried a
   `url` built as `.../portal/eventos/www/events/<id>/overview.html`. IG-EPN's
   static export of those pages has not been updated since 2026-06-13 (the

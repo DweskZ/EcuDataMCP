@@ -34,11 +34,11 @@ def run(coro):
 # --------------------------------------------------------------------------
 
 
-def ev(id_, mag, depth, lat, lon, local, loc):
+def ev(id_, mag, depth, lat, lon, local, loc, estado="confirmed"):
     return {
         "id": id_, "magnitud": mag, "profundidad_km": depth, "latitud": lat,
         "longitud": lon, "tiempo_local": local, "tiempo_utc": local,
-        "localizacion": loc, "url": f"https://www.igepn.edu.ec/e/{id_}",
+        "localizacion": loc, "estado": estado,
     }  # fmt: skip
 
 
@@ -357,6 +357,36 @@ def test_sismos_picks_strongest_inside_ecuador_and_renders_both_languages():
         "(Santa Elena), on November 7 at 17:17, at a depth of 2.4 km. "
         "There was also a 3.7 near Pasaje (El Oro)."
     )
+
+
+def test_sismos_marks_an_automatic_solution_as_preliminary():
+    # No review status = IG-EPN's automatic solution, later revised (the
+    # 2026-11-19 Guayaquil event: 5.47 automatic, 4.8 at USGS).
+    events = [
+        ev("n1", 5.47, 22.1, -2.39, -79.86, "2026-11-19T00:49:27-05:00", "a 25.46 km de Guayaquil, Guayas", estado=""),
+    ]
+    tools = FakeTools(search_sismos={**SISMOS, "total": 1, "events": events})
+    f = run(ra.fetch_sismos(tools, CTX))
+    assert f["strongest"]["preliminar"] is True
+    assert ra.render_sismos(f, "es")["answer"] == (
+        "El más fuerte en territorio ecuatoriano fue de magnitud 5,5 (valor automático del "
+        "IG-EPN, aún sin revisar), a 25,5 km de Guayaquil (Guayas), el 19 de noviembre a las "
+        "00:49, a 22,1 km de profundidad."
+    )
+    assert ra.render_sismos(f, "en")["answer"] == (
+        "The strongest within Ecuadorian territory was magnitude 5.5 (automatic IG-EPN value, "
+        "not yet reviewed), 25.5 km from Guayaquil (Guayas), on November 19 at 00:49, at a "
+        "depth of 22.1 km."
+    )
+    assert ra.render_sismos(f, "es", bold=True)["answer"].startswith(
+        "El más fuerte en Ecuador fue de **magnitud 5,5** (valor automático"
+    )
+
+
+def test_sismos_reviewed_event_carries_no_preliminary_note():
+    f = run(ra.fetch_sismos(FakeTools(), CTX))
+    assert f["strongest"]["preliminar"] is False
+    assert "sin revisar" not in ra.render_sismos(f, "es")["answer"]
 
 
 def test_sismos_no_events_template():

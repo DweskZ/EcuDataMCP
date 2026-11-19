@@ -94,6 +94,23 @@ sigue actualizándose (última modificación 15 de noviembre). Todo id posterior
 (`url_fuente`). Si el IG-EPN reactiva el export, basta con volver a armar la
 URL con el id.
 
+**Hora del feed: UTC (verificado 2026-11-19).** La columna `time` de
+`events.csv` no dice su zona, y el cliente la leía como hora continental de
+Ecuador (UTC-05:00), con lo que toda hora salía cinco horas corrida. Contra el
+catálogo del USGS, cuatro eventos aparecen en ambos con la hora de origen a
+menos de 9 segundos del valor crudo del feed (el de Guayaquil: feed
+`2026/11/19 05:49:27`, USGS `05:49:26 UTC`; en Ecuador eran las 00:49), así que
+la columna es UTC. Con la consulta del USGS (`fdsnws/event/1/query`, caja
+lat -8..3, lon -84..-74) se puede repetir la comprobación.
+
+**Solución automática vs. revisada.** El feed trae primero una solución
+automática (`status` vacío) y la revisa después (`confirmed` o `reviewed`), y
+los valores cambian: el sismo de Tena del 15 de noviembre pasó de 3,55 a 3,20
+al confirmarse, y el de Guayaquil del 19 de noviembre figuraba como 5,47
+automático mientras el USGS lo daba en 4,8 (mww, revisado) a 69 km de
+profundidad. Una respuesta guardada que cite un evento sin revisar debe
+decirlo.
+
 ### Ecuador en Cifras / portal BI del INEC
 
 **Construido 2026-08-29:** `helpers/inec_client.py` +

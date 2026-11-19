@@ -4,15 +4,17 @@ The IG-EPN publishes machine-readable earthquake exports as flat CSV, but the
 exact column names/order are not documented and have been observed to differ
 across sources: the live map feed at
 https://www.igepn.edu.ec/portal/eventos/www/events.csv is expected to use
-`latitude,longitude,mag,depth,time,status,id,place` (unlabeled time, assumed
-Ecuador local UTC-05:00), while an archived historical export uses
-`Mag,Lat,Long,Prof,Region,Hora UTC,Update,ID` (explicitly UTC). Neither of
-these could be verified against the live server from this codebase's CI
-environment (network egress to igepn.edu.ec is blocked here), so the parser
-below is header-driven: it recognizes common column name variants (accent/
-case-insensitive) in whatever order they appear, and only falls back to the
-`events.csv` column guess above when no header row is detected. If the real
-feed uses yet another header spelling, add it to `_COLUMN_SYNONYMS` below.
+`latitude,longitude,mag,depth,time,status,id,place`, while an archived
+historical export uses `Mag,Lat,Long,Prof,Region,Hora UTC,Update,ID`. The
+time column is UTC in both, although the live feed's header only says `time`:
+its origin times match USGS's for the same events to within seconds (four
+events checked on 2026-11-19, e.g. the 2026-11-19 05:49:27 Guayaquil event is
+USGS's 05:49:26 UTC), so reading it as Ecuador local time (UTC-05:00) put every
+event five hours off. The parser is header-driven: it recognizes common column
+name variants (accent/case-insensitive) in whatever order they appear, and
+only falls back to the `events.csv` column guess above when no header row is
+detected. If the real feed uses yet another header spelling, add it to
+`_COLUMN_SYNONYMS` below.
 
 A `place`-like column is not quoted in any known source, so a comma inside a
 place name (e.g. "a 53 km de Macas, Morona Santiago") spills into extra CSV
@@ -77,39 +79,35 @@ async def _get_text(url: str) -> str:
         return resp.text
 
 
-def _parse_time(raw: str, already_utc: bool = False) -> tuple[str, str] | None:
-    """Return (local ISO, UTC ISO) for a feed timestamp, or None if unparseable."""
+def _parse_time(raw: str) -> tuple[str, str] | None:
+    """Return (local ISO, UTC ISO) for a feed timestamp, or None if unparseable.
+
+    The feed's time column is UTC (see the module docstring); the local value
+    is that instant shown in Ecuador mainland time, UTC-05:00.
+    """
     value = (raw or "").strip()
     for fmt in _TIME_FORMATS:
         try:
             naive = datetime.strptime(value, fmt)  # tz applied below
         except ValueError:
             continue
-        if already_utc:
-            utc = naive.replace(tzinfo=UTC)
-            local = utc.astimezone(_ECUADOR_TZ)
-        else:
-            local = naive.replace(tzinfo=_ECUADOR_TZ)
-            utc = local.astimezone(UTC)
+        utc = naive.replace(tzinfo=UTC)
+        local = utc.astimezone(_ECUADOR_TZ)
         return local.isoformat(), utc.isoformat()
     return None
 
 
-def _detect_columns(lines: list[str]) -> tuple[list[str | None], bool, list[str]]:
+def _detect_columns(lines: list[str]) -> tuple[list[str | None], list[str]]:
     """
     Inspect the first line: if enough fields match known column names, treat
-    it as a header (returning the mapped columns, whether `time` is already
-    UTC, and the remaining data lines). Otherwise assume the events.csv guess
-    and treat all lines as data.
+    it as a header (returning the mapped columns and the remaining data
+    lines). Otherwise assume the events.csv guess and treat all lines as data.
     """
     first_fields = [f.strip() for f in lines[0].split(",")]
     mapped = [_match_column(f) for f in first_fields]
     if sum(1 for m in mapped if m) >= _HEADER_MATCH_THRESHOLD:
-        time_is_utc = False
-        if "time" in mapped:
-            time_is_utc = "utc" in first_fields[mapped.index("time")].lower()
-        return mapped, time_is_utc, lines[1:]
-    return list(_DEFAULT_COLUMNS), False, lines
+        return mapped, lines[1:]
+    return list(_DEFAULT_COLUMNS), lines
 
 
 def parse_events_csv(text: str) -> list[dict[str, Any]]:
@@ -118,7 +116,7 @@ def parse_events_csv(text: str) -> list[dict[str, Any]]:
     if not lines:
         return []
 
-    columns, time_is_utc, lines = _detect_columns(lines)
+    columns, lines = _detect_columns(lines)
     # A comma-containing place/region name spills into extra fields; merge
     # any overflow back into the place column (or the last column if no
     # place-like column was recognized).
@@ -139,7 +137,7 @@ def parse_events_csv(text: str) -> list[dict[str, Any]]:
             if col:
                 record[col] = val
 
-        times = _parse_time(record.get("time", ""), already_utc=time_is_utc)
+        times = _parse_time(record.get("time", ""))
         try:
             event = {
                 "id": record.get("id") or None,
@@ -215,9 +213,9 @@ async def list_earthquakes(
         "source": "IG-EPN catálogo sísmico (events.csv)",
         "url_fuente": _EVENTS_CSV_URL,
         "nota_horaria": (
-            "tiempo_local/tiempo_utc se calculan según la columna de hora del "
-            "feed: si su encabezado indica UTC se usa directo, si no se asume "
-            "hora continental de Ecuador (UTC-05:00)"
+            "tiempo_utc es la hora de origen que publica el feed (UTC); "
+            "tiempo_local es la misma hora en hora continental de Ecuador "
+            "(UTC-05:00)"
         ),
         "events": matched[:limit],
     }
