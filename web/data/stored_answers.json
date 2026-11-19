@@ -1,5 +1,5 @@
 {
-  "extracted_at": "2026-11-17",
+  "extracted_at": "2026-11-18",
   "server_version": "0.15.0",
   "answers": [
     {
@@ -13,10 +13,10 @@
     {
       "id": "sismos",
       "question": "¿Hubo temblores fuertes en Ecuador esta semana?",
-      "answer": "El más fuerte en territorio ecuatoriano fue de magnitud 4,1, a 48,6 km de La Libertad (Santa Elena), el 11 de noviembre a las 00:54, a 34,0 km de profundidad. También hubo uno de 3,6 cerca de Tena (Napo).",
+      "answer": "El más fuerte en territorio ecuatoriano fue de magnitud 3,6, a 32,9 km de Tena (Napo), el 15 de noviembre a las 05:53, a 5,0 km de profundidad.",
       "tools": ["search_sismos"],
       "source": "IG-EPN · catálogo sísmico",
-      "url": "https://www.igepn.edu.ec/portal/eventos/www/events/igepn2026wbtt/overview.html"
+      "url": "https://www.igepn.edu.ec/portal/eventos/www/events.csv"
     },
     {
       "id": "remesas",
