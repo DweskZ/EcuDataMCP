@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **HTTP server: shutdown no longer waits indefinitely for open connections.**
+  Restarting the Oracle VM's service on 2026-11-20 sat in uvicorn's "Waiting for
+  connections to close" for the whole 90 s systemd allows, then got SIGKILL;
+  new connections were refused for that time. uvicorn now cuts connections
+  still open after 10 s (`timeout_graceful_shutdown`), so a restart takes
+  about that long at most.
 - **Supercías rebuild: a cut download waits for the server instead of failing
   the build.** After the server closed a connection mid-file, a refused
   reconnect (`ConnectError`) was reported as "host unreachable" and ended the

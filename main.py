@@ -41,6 +41,10 @@ VERSION = get_version()
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
+# Seconds uvicorn waits for open connections on shutdown before cutting them;
+# well under the 90 s systemd allows before it sends SIGKILL.
+_GRACEFUL_SHUTDOWN_SECONDS = 10
+
 SERVER_INSTRUCTIONS = """
 Servidor MCP de datos abiertos del gobierno ecuatoriano (CKAN nacional y
 municipal, gob.ec, SRI, BCE, Supercías, IESS/SENESCYT, SIPA, IG-EPN, SERCOP,
@@ -250,6 +254,11 @@ def main(argv: list[str] | None = None) -> None:
         log_config=uvicorn_logging_config(),
         ssl_certfile=certfile,
         ssl_keyfile=keyfile,
+        # An MCP client holding a streaming connection open would otherwise
+        # keep "Waiting for connections to close" until systemd gave up and
+        # killed the process (90 s on the Oracle VM, 2026-11-20), with new
+        # connections refused for that whole time.
+        timeout_graceful_shutdown=_GRACEFUL_SHUTDOWN_SECONDS,
     )
 
 
