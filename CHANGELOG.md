@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- **Supercías rebuild: a cut download waits for the server instead of failing
+  the build.** After the server closed a connection mid-file, a refused
+  reconnect (`ConnectError`) was reported as "host unreachable" and ended the
+  whole build, which then restarted from zero (and, after repeated failures,
+  waited 1, 6 and 24 hours before the next automatic try). Seen twice in a row
+  on 2026-11-19, with the host reachable seconds earlier (a cut at 332 MB, then
+  a refused resume; a cut 7 MB into `bi_compania.csv`, then the same). A
+  connect failure after a download has already started now waits 5, 15 and 30
+  seconds and retries the resume, and only then fails with a message that says
+  the download was cut and where, without the "outside Ecuador" geo hint. A
+  host that cannot be reached on the first connection fails at once, as before.
 - **Windows: the Supercías rebuild no longer dies with the session that started
   it.** A build the server launched (or one launched from a tool shell) kept
   vanishing mid-run with no traceback, leaving only a stale lock. The build was
