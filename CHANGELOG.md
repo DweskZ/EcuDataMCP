@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+- **Windows: the Supercías rebuild no longer dies with the session that started
+  it.** A build the server launched (or one launched from a tool shell) kept
+  vanishing mid-run with no traceback, leaving only a stale lock. The build was
+  detached with `DETACHED_PROCESS | CREATE_BREAKAWAY_FROM_JOB`, which Windows
+  accepts when the *immediate* job (the venv launcher's) allows breakaway, while
+  the child still lands in an outer job that does not. Nothing fails, so the
+  `PermissionError` fallback never runs, and the build is killed when that job
+  is torn down. Reproduced in a job of our own: a plain detached child dies
+  with the job, a child created through WMI survives. On Windows the build is
+  now started through `Win32_Process.Create` (parent: `WmiPrvSE.exe`), with the
+  old detached Popen as the fallback when PowerShell or WMI is unavailable. A
+  WMI process does not inherit our environment, so
+  `helpers/supercias_detached_launch.py` restores `ECUADOR_MCP_*`, the proxy
+  and CA variables from a file it deletes as soon as it reads it, and writes
+  the log. Liveness is tracked by PID plus creation time, so a reused PID is
+  never polled as the build or killed. Also: the build asks Windows not to
+  sleep from idleness while it runs (the one sampled build froze for 17
+  minutes in Modern Standby and was gone on wake; a closed lid still
+  suspends), and a build that reclaims the lock of one that disappeared says
+  so in its log.
 - **`search_sismos`: the feed's times are UTC, not Ecuador local time.** The
   client read `events.csv`'s unlabeled `time` column as UTC-05:00, so every
   `tiempo_utc` was five hours late and every `tiempo_local` equal to the UTC
