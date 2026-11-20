@@ -286,3 +286,64 @@ def test_download_to_restarts_when_range_is_ignored(tmp_path):
     build_script._download_to(client, "bi_ranking.csv", dest, deadline=1e12)
 
     assert dest.read_bytes() == full
+
+
+def _refusing_after_a_cut(full: bytes, refusals: int):
+    """A server that cuts the first download, then refuses ``refusals`` connections."""
+    calls: list[str | None] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(request.headers.get("range"))
+        if len(calls) == 1:
+            return httpx.Response(200, stream=_CutStream(full[:2_000_000]))
+        if len(calls) <= 1 + refusals:
+            raise httpx.ConnectError("connection refused")
+        start = int(calls[-1].removeprefix("bytes=").rstrip("-"))
+        return httpx.Response(206, content=full[start:])
+
+    return calls, httpx.Client(transport=httpx.MockTransport(handler))
+
+
+def test_download_to_waits_and_retries_when_the_reconnect_is_refused(monkeypatch, tmp_path):
+    # 2026-11-19: a cut at 332 MB, then ConnectError on the resume, twice in a
+    # row. The host was reachable seconds before, so the build waits for it.
+    full = bytes(range(256)) * 12_000
+    calls, client = _refusing_after_a_cut(full, refusals=2)
+    pauses: list[float] = []
+    monkeypatch.setattr(build_script.time, "sleep", pauses.append)
+    dest = tmp_path / "bi_ranking.csv"
+
+    build_script._download_to(client, "bi_ranking.csv", dest, deadline=1e12)
+
+    assert pauses == [5, 15]
+    assert calls == [None] + [f"bytes={1024 * 1024}-"] * 3
+    assert dest.read_bytes() == full
+
+
+def test_download_to_gives_up_when_the_host_never_takes_the_reconnect(monkeypatch, tmp_path):
+    full = bytes(range(256)) * 12_000
+    _, client = _refusing_after_a_cut(full, refusals=99)
+    pauses: list[float] = []
+    monkeypatch.setattr(build_script.time, "sleep", pauses.append)
+    dest = tmp_path / "bi_ranking.csv"
+
+    with pytest.raises(RuntimeError, match="se cortó en 1 MB.*no volvió a aceptar") as exc_info:
+        build_script._download_to(client, "bi_ranking.csv", dest, deadline=1e12)
+
+    assert pauses == [5, 15, 30]
+    # A host that dropped us mid-download is not "unreachable from this region".
+    assert "ECUADOR_MCP_GEO_PROXY" not in str(exc_info.value)
+
+
+def test_download_to_reports_an_unreachable_host_at_once(monkeypatch, tmp_path):
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("no route")
+
+    pauses: list[float] = []
+    monkeypatch.setattr(build_script.time, "sleep", pauses.append)
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+
+    with pytest.raises(RuntimeError, match="No se pudo conectar a"):
+        build_script._download_to(client, "bi_ranking.csv", tmp_path / "x.csv", deadline=1e12)
+
+    assert pauses == []

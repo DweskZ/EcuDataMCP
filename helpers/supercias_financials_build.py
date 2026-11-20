@@ -177,16 +177,41 @@ def _download_to(
     t0 = time.time()
     total = 0
     attempt = 0
+    reconnects = 0
     while True:
         try:
             total = _stream_once(client, name, url, dest, deadline, total)
             break
         except (httpx.ConnectError, httpx.ConnectTimeout) as exc:
-            # Recorded as the build's ultimo_error, which get_financials shows.
-            raise RuntimeError(
-                f"No se pudo conectar a {httpx.URL(url).host} "
-                f"({type(exc).__name__}). " + unreachable_hint(url)
-            ) from exc
+            if attempt == 0:
+                # Never connected: unreachable or geo-blocked, so say so at
+                # once. Recorded as the build's ultimo_error, which
+                # get_financials shows.
+                raise RuntimeError(
+                    f"No se pudo conectar a {httpx.URL(url).host} "
+                    f"({type(exc).__name__}). " + unreachable_hint(url)
+                ) from exc
+            # The server cut the download and then refused the reconnect.
+            # Seen 2026-11-19, twice in a row (a cut at 332 MB, then
+            # ConnectError on the resume): the host was reachable seconds
+            # earlier, so wait and try again before giving up on the build.
+            reconnects += 1
+            total = dest.stat().st_size if dest.exists() else 0
+            if reconnects > len(_RECONNECT_PAUSES_SECONDS):
+                raise RuntimeError(
+                    f"La descarga de {name} se cortó en {total / (1024 * 1024):.0f} MB "
+                    f"y {httpx.URL(url).host} no volvió a aceptar conexiones tras "
+                    f"{len(_RECONNECT_PAUSES_SECONDS)} reintentos "
+                    f"({type(exc).__name__})."
+                ) from exc
+            pause = _RECONNECT_PAUSES_SECONDS[reconnects - 1]
+            print(
+                f"  {name}: sin conexión al reanudar en {total / (1024 * 1024):.0f} MB "
+                f"({type(exc).__name__}); reintento {reconnects}/"
+                f"{len(_RECONNECT_PAUSES_SECONDS)} en {pause} s",
+                flush=True,
+            )
+            time.sleep(pause)
         except (httpx.RemoteProtocolError, httpx.ReadError, httpx.ReadTimeout) as exc:
             # Seen 2026-11-10 on the runner: the server closed bi_ranking.csv
             # at 274 of 374 MB. Resume from the bytes already written rather
@@ -204,6 +229,9 @@ def _download_to(
 
 
 _RESUME_ATTEMPTS = 3
+# Waits before each reconnect after a cut download: 50 s in all, a pause long
+# enough for a host that just dropped us to take new connections again.
+_RECONNECT_PAUSES_SECONDS = (5, 15, 30)
 
 
 def _stream_once(
