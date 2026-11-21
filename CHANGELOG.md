@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **`/health` lists the hidden tools; the smoke test skips them.** Run against
+  the Oracle VM (which hides the tools its network cannot reach), `smoke_e2e.py`
+  reported `Unknown tool: search_contratos` and the two infoMIES tools as hard
+  failures, plus the SERCOP chain, 4 of the 5 failures in a clean run. `/health`
+  now carries `hidden_tools` (from `ECUADOR_MCP_HIDE_TOOLS` and
+  `ECUADOR_MCP_HIDE_GEOBLOCKED`), and the script skips the checks and chains
+  that need one, naming them in its summary. A tool missing from a host that
+  hides nothing is still a failure, so the scheduled run keeps catching a tool
+  that disappears by mistake.
 - **HTTP server: shutdown no longer waits indefinitely for open connections.**
   Restarting the Oracle VM's service on 2026-11-20 sat in uvicorn's "Waiting for
   connections to close" for the whole 90 s systemd allows, then got SIGKILL;

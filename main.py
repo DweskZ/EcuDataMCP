@@ -118,6 +118,10 @@ def with_health_endpoint(
                         "status": "ok",
                         "uptime_since": SERVER_START_TIME.isoformat(),
                         "version": VERSION,
+                        # Tools this host hides on purpose (HIDE_TOOLS /
+                        # HIDE_GEOBLOCKED): the smoke test skips them instead
+                        # of reporting "Unknown tool" as a regression.
+                        "hidden_tools": sorted(hidden_tools()),
                         "supercias_financials": financials_status(),
                     }
                 ).encode("utf-8")
