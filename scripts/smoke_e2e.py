@@ -25,6 +25,20 @@ MCP_URL = "http://127.0.0.1:8000/mcp"
 HEALTH_URL = "http://127.0.0.1:8000/health"
 FIXED_RUC = "1790016919001"
 
+# Tools this host hides on purpose (ECUADOR_MCP_HIDE_TOOLS / HIDE_GEOBLOCKED),
+# read from /health at startup. The server answers "Unknown tool" for them, so
+# their checks are skipped; a tool missing from a host that hides nothing is
+# still a failure, which is what the scheduled run needs to catch.
+HIDDEN_TOOLS: set[str] = set()
+
+
+class HiddenTool(Exception):
+    """A check needs a tool this host hides on purpose."""
+
+    def __init__(self, name: str) -> None:
+        super().__init__(name)
+        self.name = name
+
 
 def parse_sse(text: str) -> dict | None:
     for line in text.split("\n"):
@@ -97,6 +111,8 @@ async def call_tool(client: httpx.AsyncClient, name: str, args: dict) -> tuple[s
     result with ``isError: true``, so it must be threaded through explicitly
     rather than guessed from the text: see assess_response's docstring.
     """
+    if name in HIDDEN_TOOLS:
+        raise HiddenTool(name)
     data = await mcp_post(
         client,
         {
@@ -178,7 +194,11 @@ def is_geo_skipped(source: str | None) -> bool:
 
 
 def write_summary(
-    total: int, failed: int, degraded: set[str], skipped: set[str]
+    total: int,
+    failed: int,
+    degraded: set[str],
+    skipped: set[str],
+    hidden: set[str] | None = None,
 ) -> None:
     """Write a compact GitHub Actions summary while keeping local runs plain."""
     path = os.getenv("GITHUB_STEP_SUMMARY")
@@ -192,6 +212,8 @@ def write_summary(
         f"- Degraded external sources: {', '.join(sorted(degraded)) or 'none'}",
         f"- Skipped (geo-blocked, no tunnel): {', '.join(sorted(skipped)) or 'none'}",
     ]
+    if hidden:
+        lines.append(f"- Skipped (tool hidden on this host): {', '.join(sorted(hidden))}")
     with open(path, "a", encoding="utf-8") as summary:
         summary.write("\n".join(lines) + "\n")
 
@@ -202,6 +224,10 @@ async def main() -> int:
         h = await client.get(HEALTH_URL, timeout=10.0)
         h.raise_for_status()
         print(" ", h.json())
+        HIDDEN_TOOLS.clear()
+        HIDDEN_TOOLS.update(h.json().get("hidden_tools") or [])
+        if HIDDEN_TOOLS:
+            print(f"  this host hides {len(HIDDEN_TOOLS)} tool(s): {', '.join(sorted(HIDDEN_TOOLS))}")
 
         print("== initialize ==")
         client._session_id = ""
@@ -397,11 +423,15 @@ async def main() -> int:
         failed = 0
         degraded: set[str] = set()
         skipped: set[str] = set()
+        hidden_skipped: set[str] = set()
         for name, args, must in checks:
             try:
                 status, source = await check_tool(client, name, args, must)
                 if status == "degraded" and source:
                     (skipped if is_geo_skipped(source) else degraded).add(source)
+            except HiddenTool as exc:
+                hidden_skipped.add(exc.name)
+                print(f"  SKIPPED  {name}: tool hidden on this host")
             except Exception as exc:
                 failed += 1
                 print(f"  FAIL {name}: {exc}")
@@ -443,6 +473,9 @@ async def main() -> int:
             try:
                 await coro
                 print(f"  OK   {label}")
+            except HiddenTool as exc:
+                hidden_skipped.add(exc.name)
+                print(f"  SKIPPED  {label}: {exc.name} is hidden on this host")
             except DegradedChain as exc:
                 if is_geo_skipped(exc.source):
                     skipped.add(exc.source)
@@ -457,7 +490,9 @@ async def main() -> int:
         print("== done ==")
         total = len(checks) + chains
         print(f"failed={failed}/{total}; degraded={len(degraded)}; skipped={len(skipped)}")
-        write_summary(total, failed, degraded, skipped)
+        if hidden_skipped:
+            print(f"hidden on this host (skipped): {', '.join(sorted(hidden_skipped))}")
+        write_summary(total, failed, degraded, skipped, hidden_skipped)
         return 1 if failed else 0
 
 
