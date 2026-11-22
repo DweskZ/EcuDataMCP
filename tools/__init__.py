@@ -20,6 +20,7 @@ from tools.download_resource import register_download_resource_tool
 from tools.geoportal import register_geoportal_tools
 from tools.get_aip_aerodromo import register_get_aip_aerodromo_tool
 from tools.get_anda_survey_info import register_get_anda_survey_info_tool
+from tools.get_anda_materiales import register_get_anda_materiales_tool
 from tools.get_auditor_info import register_get_auditor_info_tool
 from tools.get_bce_iem_table import register_get_bce_iem_table_tool
 from tools.get_bce_indicador_diario import register_get_bce_indicador_diario_tool
@@ -171,6 +172,7 @@ def register_tools(mcp: MCPServer) -> None:
     if not hide_geoblocked():
         register_search_anda_tool(mcp)
         register_get_anda_survey_info_tool(mcp)
+        register_get_anda_materiales_tool(mcp)
         register_download_anda_microdata_tool(mcp)
 
 
