@@ -1,0 +1,7 @@
+# Series históricas de precios y canasta
+
+El INEC publica materiales agregados para operaciones sin microdatos. Busca el IPC con `search_anda`, toma el ID numérico y usa `get_anda_materiales` para obtener enlaces; revisa la página de metadatos para identificar archivo, cobertura, definiciones y fecha. La página de [IPC 2025](https://anda.inec.gob.ec/anda5/index.php/catalog/1256/related-materials) describe una serie empalmada desde 1969. La [edición de 2020](https://anda.inec.gob.ec/anda5/index.php/catalog/809/related-materials) también describe la serie histórica y archivos de canasta básica e ingreso familiar desde 1982. Las ediciones y sus archivos pueden cambiar: no suponer que el catálogo más reciente tenga el mismo contenido o cobertura.
+
+La serie anual del Banco Mundial ya existe mediante `serie_internacional(fuente="wdi", indicador="FP.CPI.TOTL.ZG", pais="ECU")`. Es la variación de promedios anuales, distinta de diciembre a diciembre. El [cuadro 8 de Análisis de Coyuntura](https://library.fes.de/pdf-files/bueros/quito/05325/coyuntura2002.pdf), pp. 59–60, atribuye al BCE y al INEC datos de inflación desde 1940. Es una fuente secundaria histórica: los valores no se empalman automáticamente con WDI ni con la serie INEC. Documentar diferencias, cambios de cobertura y definición antes de unirlas.
+
+Esta herramienta lista enlaces; no descarga ni extrae series ni verifica automáticamente el contenido de las hojas de cálculo.
