@@ -13,13 +13,38 @@
   so workbooks whose sheets are called "2023", "2024" work; the result lists
   every sheet in `sheets`, and a wrong name fails with that list) and
   `inner_member` (the file to read inside a .zip member, which must fit in
-  5 MB compressed and 20 MB expanded; left empty, the error lists the inner
+  20 MB compressed and 20 MB expanded; left empty, the error lists the inner
   files; the result's `member_name` and sizes describe the inner file and
   `outer_member` names the zip it came from). With `member=''`, the URL itself
   is read as a spreadsheet (up to 20 MB) or text file (up to 5 MB), through the
   same SSRF-guarded download as `preview_resource_data`; `inner_member` there
   is an error, not silently ignored. No new tool, so the tool count is
   unchanged.
+- **`read_zip_member`: members past 5 MB, and the `.xls`/`.xlsb`/nested-zip
+  paths checked on real data.** A scan of the 507 zips on INEC's site found
+  what the 5 MB per-member cap was blocking: 11 zips whose CSV microdata members
+  are 12-38 MB compressed (ENEMDU, ENDI, ENSANUT, hospital discharges, the
+  400 MB monthly REESS files), 7 spreadsheets of 6-12 MB (REESS, INPP, ESI,
+  ESTRA tabulados), and 7 nested zips of 5-12 MB (births, ESPAC, ENCV-LGBTI+).
+  A CSV/TSV/TXT member of any size is now read from its head: at most 5 MB of
+  it is downloaded, the output stops at 5 MB and the result is marked
+  `truncated` (the CRC32 can only be checked on a member read in full, as
+  before). Spreadsheets and nested zips are opened whole and may now be up to
+  20 MB compressed, the same bound they already had expanded and the one a
+  spreadsheet at a plain URL has. Checked against the live files: the 11.5 MB
+  REESS workbook (70 sheets), the 11 MB `ENV_2017.zip` inside its archive, a
+  7.5 MB `.xlsx` inside a nested zip, and the first rows of a 396 MB CSV (4.7 s)
+  and a 136 MB one (7.6 s). Two fixes found on the way. Member names written
+  without the UTF-8 flag were decoded as cp437, but Spanish-language Windows
+  archivers write cp850: capitals with an accent came out as box-drawing
+  characters (`R╓OS` for `RÍOS`, `VEH╓CULOS`) in 56 of the 507 INEC zips,
+  in `list_zip_contents` and `read_zip_member` alike. And `.xls`/`.xlsb`
+  stored every number as a double, so a year printed as `2024.0` and a count
+  as `1074074.0` where the same sheet as `.xlsx` gives `2024`; whole numbers
+  now lose the `.0` in every tool that reads those formats
+  (`preview_resource_data` included). New tests build `.xlsb` (a small BIFF12
+  writer in `tests/xlsb_fixture.py`) and `.xls` fixtures, since `.xlsb` sheet
+  selection had no test that opened a workbook. No new tool: 86 tools.
 - **New tool `get_anda_materiales`: the files in an ANDA study's "related
   materials".** Aggregate-only studies such as the IPC report no microdata but
   carry downloadable historical workbooks (the national CPI from 1969, the basic

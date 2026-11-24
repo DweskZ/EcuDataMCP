@@ -595,6 +595,19 @@ async def preview_json(
     }
 
 
+def _cell_text(value: Any) -> str:
+    """Text of a cell from a format that stores every number as a double.
+
+    .xls and .xlsb keep 2024 as 2024.0, which would print as "2024.0" where
+    the same sheet saved as .xlsx prints "2024": whole numbers drop the ".0".
+    """
+    if value is None:
+        return ""
+    if isinstance(value, float) and value.is_integer() and abs(value) < 1e15:
+        return str(int(value))
+    return str(value)
+
+
 def _select_sheet(names: list[str], sheet: str) -> int:
     """Index of the requested sheet: "" -> 0, else a name, else a 1-based number.
 
@@ -687,16 +700,13 @@ def _parse_xls_bytes(
             "format": "xls",
         }
 
-    def cell_str(value: Any) -> str:
-        return "" if value is None else str(value)
-
-    headers = [cell_str(v) for v in ws.row_values(0)]
+    headers = [_cell_text(v) for v in ws.row_values(0)]
     data_rows: list[list[str]] = []
     for i in range(1, ws.nrows):
         if len(data_rows) >= max_rows:
             truncated = True
             break
-        data_rows.append([cell_str(v) for v in ws.row_values(i)])
+        data_rows.append([_cell_text(v) for v in ws.row_values(i)])
 
     return {
         "headers": headers,
@@ -731,9 +741,6 @@ def _parse_xlsb_bytes(
         try:
             rows_iter = ws.rows()
 
-            def cell_str(value: Any) -> str:
-                return "" if value is None else str(value)
-
             try:
                 header_row = next(rows_iter)
             except StopIteration:
@@ -744,13 +751,13 @@ def _parse_xlsb_bytes(
                     "truncated": truncated,
                     "format": "xlsb",
                 }
-            headers = [cell_str(c.v) for c in header_row]
+            headers = [_cell_text(c.v) for c in header_row]
             data_rows: list[list[str]] = []
             for i, row in enumerate(rows_iter):
                 if i >= max_rows:
                     truncated = True
                     break
-                data_rows.append([cell_str(c.v) for c in row])
+                data_rows.append([_cell_text(c.v) for c in row])
             return {
                 "headers": headers,
                 "rows": data_rows,
@@ -1275,6 +1282,25 @@ async def _read_zip64_eocd(
     return cd_offset, cd_size, total_entries
 
 
+def _decode_zip_name(raw: bytes, flags: int) -> str:
+    """Decode a member name: UTF-8 when the archive says so, else cp850.
+
+    The zip spec says cp437 for names without the UTF-8 flag, but the archivers
+    on Spanish-language Windows (INEC's, for one) write the OEM code page 850.
+    The two agree on lowercase accents and ñ, and differ on capitals: 0xD6 is
+    "Í" in cp850 and a box-drawing "╓" in cp437, so "RÍOS" came out "R╓OS" in
+    56 of the 507 INEC archives checked.
+    """
+    return raw.decode("utf-8" if flags & 0x0800 else "cp850", errors="replace")
+
+
+def _nested_member_name(info: zipfile.ZipInfo) -> str:
+    """The same name rule for zipfile, which always decodes non-UTF-8 as cp437."""
+    if info.flag_bits & 0x0800:
+        return info.filename
+    return _decode_zip_name(info.filename.encode("cp437", errors="replace"), 0)
+
+
 def _apply_zip64_extra(extra: bytes, sizes: dict[str, int]) -> None:
     """Replace 0xFFFFFFFF sizes/offset with the 8-byte values of extra field 0x0001.
 
@@ -1325,9 +1351,7 @@ def _parse_central_directory(data: bytes, expected_entries: int) -> list[dict[st
             local_offset,
         ) = struct.unpack_from("<4sHHHHHHIIIHHHHHII", data, pos)
         pos += 46
-        name = data[pos : pos + name_len].decode(
-            "utf-8" if flags & 0x0800 else "cp437", errors="replace"
-        )
+        name = _decode_zip_name(data[pos : pos + name_len], flags)
         sizes = {
             "uncompressed_size": uncompressed_size,
             "compressed_size": compressed_size,
@@ -1567,9 +1591,10 @@ def _read_nested_member(
     with zf:
         infos = zf.infolist()
         members = [
-            {"name": i.filename, "is_dir": i.is_dir(), "size": i.file_size}
+            {"name": _nested_member_name(i), "is_dir": i.is_dir(), "size": i.file_size}
             for i in infos
         ]
+        zip_infos = {m["name"]: i for m, i in zip(members, infos, strict=True)}
         files = [m["name"] for m in members if not m["is_dir"]]
         if not inner_member.strip():
             listed = ", ".join(files[:50])
@@ -1591,14 +1616,14 @@ def _read_nested_member(
                 f"'{name}' se expande a {info['size']} bytes, por encima del "
                 f"límite de {cap // (1024 * 1024)} MB para hojas de cálculo."
             )
-        with zf.open(name) as fh:
+        with zf.open(zip_infos[name]) as fh:
             data = fh.read(cap + 1)
         truncated = len(data) > cap
         return (
             f"{outer_name}/{name}",
             data[:cap],
             truncated,
-            zf.getinfo(name).compress_size,
+            zip_infos[name].compress_size,
             info["size"],
         )
 
@@ -1644,11 +1669,11 @@ async def read_zip_member(
 
     Uses the central directory (as list_zip_contents does) to locate the
     member, then Range-fetches its local header and compressed data. Caps:
-    compressed size <= MAX_DOWNLOAD_BYTES; CSV/text output stops at
-    MAX_DOWNLOAD_BYTES (marked truncated); spreadsheets and nested .zip
-    members must fit in _MAX_DECOMPRESSED_BYTES since they are opened
-    whole. Only stored and deflate members, no encryption; ZIP64 is
-    supported.
+    a CSV/text member of any size is read from its first MAX_DOWNLOAD_BYTES
+    (compressed) and its output stops at MAX_DOWNLOAD_BYTES (marked
+    truncated); spreadsheets and nested .zip members are opened whole, so
+    they must fit in _MAX_DECOMPRESSED_BYTES both compressed and expanded.
+    Only stored and deflate members, no encryption; ZIP64 is supported.
     """
     if not member.strip():
         if inner_member.strip():
@@ -1693,12 +1718,6 @@ async def read_zip_member(
             f"'{name}': el .zip está corrupto (tamaño ZIP64 sin su campo extra)."
         )
     compressed_size = info["compressed_size"]
-    if compressed_size > MAX_DOWNLOAD_BYTES:
-        raise ValueError(
-            f"'{name}' pesa {compressed_size} bytes comprimido, por encima del "
-            f"límite de {MAX_DOWNLOAD_BYTES // (1024 * 1024)} MB. Descarga el .zip "
-            "directamente."
-        )
 
     ext = _ext_of(name)
     _check_readable_ext(name, ext, allow_zip=True)
@@ -1707,21 +1726,32 @@ async def read_zip_member(
         raise ValueError(
             f"'{name}' no es un .zip; inner_member solo aplica a un .zip dentro del .zip."
         )
-    # Spreadsheets and nested zips are opened whole, so they must be complete.
+    # Spreadsheets and nested zips are opened whole, so they must be complete
+    # and fit the 20 MB cap, compressed (what is downloaded) and expanded.
     is_sheet = ext in _ZIP_SHEET_PARSERS or is_nested
+    if is_sheet and compressed_size > _MAX_DECOMPRESSED_BYTES:
+        raise ValueError(
+            f"'{name}' pesa {compressed_size} bytes comprimido, por encima del "
+            f"límite de {_MAX_DECOMPRESSED_BYTES // (1024 * 1024)} MB para hojas de "
+            "cálculo y .zip internos. Descarga el .zip directamente."
+        )
     if is_sheet and info["uncompressed_size"] > _MAX_DECOMPRESSED_BYTES:
         raise ValueError(
             f"'{name}' se expande a {info['uncompressed_size']} bytes, por encima "
             f"del límite de {_MAX_DECOMPRESSED_BYTES // (1024 * 1024)} MB para hojas "
             "de cálculo y .zip internos."
         )
+    # Text is only previewed, so a member of any size is readable from its first
+    # bytes: fetch at most MAX_DOWNLOAD_BYTES of it and mark the result truncated.
+    head_only = not is_sheet and compressed_size > MAX_DOWNLOAD_BYTES
+    fetch_size = MAX_DOWNLOAD_BYTES if head_only else compressed_size
 
     # One request: local header, the central directory's name/extra length
     # plus slack (the local extra field can differ), and the data itself.
     start = info["local_header_offset"]
     if start + 30 > total_size:
         raise ValueError(f"'{name}': el .zip está corrupto (offset fuera del archivo).")
-    guess_len = 30 + len(name.encode("utf-8")) + _LOCAL_HEADER_SLACK + compressed_size
+    guess_len = 30 + len(name.encode("utf-8")) + _LOCAL_HEADER_SLACK + fetch_size
     end = min(start + guess_len, total_size) - 1
     buf, headers, status = await _fetch_range(
         url, f"bytes={start}-{end}", cap=end - start + 1, session=session
@@ -1731,7 +1761,7 @@ async def read_zip_member(
         raise ValueError(f"'{name}': el .zip está corrupto (cabecera local inválida).")
     local_name_len, local_extra_len = struct.unpack_from("<HH", buf, 26)
     data_start = start + 30 + local_name_len + local_extra_len
-    data_end = data_start + compressed_size
+    data_end = data_start + fetch_size
 
     if data_end <= start + len(buf):
         data = buf[data_start - start : data_end - start]
@@ -1739,11 +1769,11 @@ async def read_zip_member(
         data, headers, status = await _fetch_range(
             url,
             f"bytes={data_start}-{data_end - 1}",
-            cap=compressed_size,
+            cap=fetch_size,
             session=session,
         )
         _check_partial(status, headers, data_start)
-    if len(data) != compressed_size:
+    if len(data) != fetch_size:
         raise ValueError(f"'{name}': el .zip está corrupto (datos incompletos).")
 
     cap = _MAX_DECOMPRESSED_BYTES if is_sheet else MAX_DOWNLOAD_BYTES
@@ -1754,6 +1784,8 @@ async def read_zip_member(
             out, truncated = _inflate_capped(data, -zlib.MAX_WBITS, cap)
         except zlib.error as e:
             raise ValueError(f"'{name}': el .zip está corrupto ({e}).") from e
+    # A head is cut by construction, even when it inflates to under the cap.
+    truncated = truncated or head_only
 
     complete = not truncated and len(out) == info["uncompressed_size"]
     if not truncated and not complete:
