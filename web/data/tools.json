@@ -521,6 +521,25 @@
         "long_description": "Metadata completa de una encuesta/censo ANDA (INEC) por su idno. Obtén el idno de los resultados de search_anda — es el identificador tipo string (ej. \"IDD-ECU-INEC-CGTPE-DECON-ENESEM-2023-v1.3\"), no el id numérico. Devuelve alcance/resumen, cantidad de variables, si el microdato es realmente obtenible y cómo (tipo_acceso, verificado en la página de descarga real, con los enlaces externos si los hay; ver download_anda_microdata), términos de confidencialidad, y un email de contacto para pedir datos restringidos cuando no lo son."
       },
       {
+        "name": "get_anda_materiales",
+        "description": "Enlaces a los materiales relacionados de un estudio ANDA (series históricas de IPC y canasta, metodologías, formularios), con nombre, formato y tamaño de cada archivo.",
+        "params": [
+          {
+            "name": "id",
+            "type": "str",
+            "default": null,
+            "description": "Id numérico del catálogo ANDA (el campo \"id\" de search_anda), p. ej. \"809\""
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "Formato de salida: `text` (default) o `json`."
+          }
+        ],
+        "long_description": "Lista los archivos descargables de la página de materiales relacionados de un estudio ANDA (INEC) por su id numérico. Sirve para los estudios agregados que no tienen microdatos, como el IPC, que traen series históricas (IPC general desde 1969, canasta familiar básica desde 1982), metodologías y formularios. Cada enlace trae el nombre propio del archivo, su formato y su tamaño. Devuelve enlaces, no datos: no descarga ni lee las hojas de cálculo."
+      },
+      {
         "name": "download_anda_microdata",
         "description": "Enlaces de descarga de los microdatos de una encuesta ANDA, con su tipo_acceso (directo, enlace_externo, registro, solicitud, ninguno).",
         "params": [

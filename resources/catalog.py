@@ -182,6 +182,7 @@ def _all_fuentes() -> dict:
                 "tools": [
                     "search_anda",
                     "get_anda_survey_info",
+                    "get_anda_materiales",
                     "download_anda_microdata",
                 ],
             },
