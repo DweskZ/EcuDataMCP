@@ -21,9 +21,10 @@ def register_read_zip_member_tool(mcp: MCPServer) -> None:
         title="Leer un archivo dentro de un ZIP remoto",
         description=(
             "Read one CSV/TSV/TXT or XLSX/XLS/XLSB/ODS file inside a remote ZIP as "
-            "a table, fetching only that file's bytes via HTTP Range; any sheet, "
-            "a zip inside the zip (inner_member), or with member='' a spreadsheet "
-            "published at the URL itself. Get member names from list_zip_contents."
+            "a table, fetching only that file's bytes via HTTP Range (a CSV of any "
+            "size is read from its head); any sheet, a zip inside the zip "
+            "(inner_member), or with member='' a spreadsheet published at the URL "
+            "itself. Get member names from list_zip_contents."
         ),
         annotations=READ_ONLY,
     )
@@ -51,9 +52,11 @@ def register_read_zip_member_tool(mcp: MCPServer) -> None:
         Limits:
         - The server must honor HTTP Range (answer 206); otherwise it fails
           with a clear error.
-        - The member must be at most 5 MB compressed. CSV/TSV/TXT output stops
-          at 5 MB decompressed (marked truncated); spreadsheets must fit in
-          20 MB decompressed, since they can't be opened partially.
+        - CSV/TSV/TXT members of any size are read from their first bytes: the
+          output stops at 5 MB decompressed and is marked truncated, and no
+          more than 5 MB of the member is downloaded (a 400 MB microdata CSV
+          previews in seconds). Spreadsheets can't be opened partially, so
+          they must fit in 20 MB both compressed and decompressed.
         - Only stored or deflate members; no encrypted members. ZIP64
           archives are supported.
         - Supported formats: .csv, .tsv, .txt, .xlsx, .xls, .xlsb, .ods. The
@@ -66,9 +69,10 @@ def register_read_zip_member_tool(mcp: MCPServer) -> None:
         with that list.
 
         Zip inside a zip: INEC publishes its CSV tabulados as a .zip of .zip
-        files. When `member` is itself a .zip (at most 5 MB compressed and
+        files. When `member` is itself a .zip (at most 20 MB compressed and
         20 MB expanded), pass the file to read inside it as inner_member;
-        leaving inner_member empty fails with the inner file names.
+        leaving inner_member empty fails with the inner file names. A text
+        file inside is cut at 5 MB like any other.
 
         Files outside a zip: with member='' the URL itself is read as a
         spreadsheet or text file (e.g. SIPA's precios-agroindustria.xlsx),

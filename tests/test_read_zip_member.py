@@ -5,6 +5,7 @@ import socket
 import struct
 import zipfile
 import zlib
+from pathlib import Path
 
 import httpx
 import pytest
@@ -13,6 +14,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers import csv_reader
 from helpers.csv_reader import list_zip_contents, read_zip_member
+from tests.xlsb_fixture import make_xlsb
 from tools.read_zip_member import register_read_zip_member_tool
 
 URL = "https://example.com/tabulados.zip"
@@ -207,15 +209,15 @@ async def test_rejects_an_unsupported_compression_method(httpx_mock):
         await read_zip_member(URL, "a.csv")
 
 
-async def test_rejects_an_oversized_member(httpx_mock, monkeypatch):
-    monkeypatch.setattr(csv_reader, "MAX_DOWNLOAD_BYTES", 8)
+async def test_rejects_a_spreadsheet_too_big_to_open_whole(httpx_mock, monkeypatch):
+    monkeypatch.setattr(csv_reader, "_MAX_DECOMPRESSED_BYTES", 100)
     _serve(
         httpx_mock,
-        _make_zip({"a.csv": b"a,b\n" + b"1,2\n" * 50}, method=zipfile.ZIP_STORED),
+        _make_zip({"libro.xlsx": _workbook(_SIPA_LIKE)}, method=zipfile.ZIP_STORED),
     )
 
     with pytest.raises(ValueError, match="límite"):
-        await read_zip_member(URL, "a.csv")
+        await read_zip_member(URL, "libro.xlsx")
 
 
 async def test_rejects_a_200_instead_of_206(httpx_mock):
@@ -690,3 +692,209 @@ async def test_the_tool_returns_outer_member_for_a_nested_zip(httpx_mock):
     payload = json.loads(result.content[0].text)
     assert payload["outer_member"] == "outer.zip"
     assert payload["member_name"] == "outer.zip/a.csv"
+
+
+def _noise_csv(rows: int) -> bytes:
+    """A CSV whose rows barely compress, so its zipped size tracks its text size."""
+    import random
+
+    rng = random.Random(7)
+    lines = [f"{i},{rng.getrandbits(64):016x}" for i in range(rows)]
+    return ("id,codigo\n" + "\n".join(lines) + "\n").encode()
+
+
+def _range_lengths(httpx_mock) -> list[int]:
+    """Bytes asked for by each Range request that was not the archive's tail."""
+    lengths = []
+    for request in httpx_mock.get_requests():
+        first, last = _RANGE_RE.fullmatch(request.headers["Range"]).groups()
+        if first:
+            lengths.append(int(last) - int(first) + 1)
+    return lengths
+
+
+@pytest.mark.parametrize("method", [zipfile.ZIP_DEFLATED, zipfile.ZIP_STORED])
+async def test_a_text_member_over_the_cap_is_read_from_its_head(
+    httpx_mock, monkeypatch, method
+):
+    monkeypatch.setattr(csv_reader, "MAX_DOWNLOAD_BYTES", 2048)
+    body = _noise_csv(2000)
+    blob = _make_zip({"big.csv": body}, method=method)
+    _serve(httpx_mock, blob)
+
+    result = await read_zip_member(URL, "big.csv", max_rows=3)
+
+    assert result["headers"] == ["id", "codigo"]
+    assert [row[0] for row in result["rows"]] == ["0", "1", "2"]
+    assert result["truncated"] is True
+    assert result["uncompressed_size"] == len(body)
+    assert result["compressed_size"] > 2048
+    # Only the head crossed the wire, not the whole member.
+    assert max(_range_lengths(httpx_mock)) < 2048 + 1024 + 100
+
+
+async def test_a_member_just_under_the_cap_is_still_read_whole_and_checked(
+    httpx_mock, monkeypatch
+):
+    body = _noise_csv(300)
+    blob = _make_zip({"a.csv": body}, method=zipfile.ZIP_STORED)
+    monkeypatch.setattr(csv_reader, "MAX_DOWNLOAD_BYTES", len(body) + 10)
+    _serve(httpx_mock, blob)
+
+    result = await read_zip_member(URL, "a.csv", max_rows=500)
+
+    assert result["truncated"] is False
+    assert len(result["rows"]) == 300
+
+
+async def test_a_spreadsheet_over_the_old_5mb_cap_is_read_whole(httpx_mock, monkeypatch):
+    # A workbook is already compressed, so its member is about as big zipped as
+    # not: the 12 MB REESS tabulados failed on the 5 MB wire cap alone.
+    monkeypatch.setattr(csv_reader, "MAX_DOWNLOAD_BYTES", 100)
+    blob = _make_zip({"libro.xlsx": _workbook(_SIPA_LIKE)}, method=zipfile.ZIP_STORED)
+    assert len(blob) > 100
+    _serve(httpx_mock, blob)
+
+    result = await read_zip_member(URL, "libro.xlsx", sheet="2")
+
+    assert result["sheet"] == "Histórico Piladoras 12-25"
+    assert result["truncated"] is False
+
+
+async def test_a_nested_zip_over_the_old_5mb_cap_is_read_whole(httpx_mock, monkeypatch):
+    monkeypatch.setattr(csv_reader, "MAX_DOWNLOAD_BYTES", 100)
+    inner = _make_zip({"a.xlsx": _workbook(_SIPA_LIKE)})
+    assert len(inner) > 100
+    _serve(httpx_mock, _make_zip({"outer.zip": inner}, method=zipfile.ZIP_STORED))
+
+    result = await read_zip_member(URL, "outer.zip", inner_member="a.xlsx")
+
+    assert result["member_name"] == "outer.zip/a.xlsx"
+    assert result["sheets"] == ["ÍNDICE", "Histórico Piladoras 12-25"]
+
+
+async def test_a_nested_text_file_over_the_cap_is_cut_not_refused(httpx_mock, monkeypatch):
+    monkeypatch.setattr(csv_reader, "MAX_DOWNLOAD_BYTES", 2048)
+    inner = _make_zip({"big.csv": _noise_csv(2000)})
+    _serve(httpx_mock, _make_zip({"outer.zip": inner}, method=zipfile.ZIP_STORED))
+    monkeypatch.setattr(csv_reader, "_MAX_DECOMPRESSED_BYTES", 10 * 1024 * 1024)
+
+    result = await read_zip_member(URL, "outer.zip", inner_member="big.csv", max_rows=2)
+
+    assert [row[0] for row in result["rows"]] == ["0", "1"]
+    assert result["truncated"] is True
+
+
+def _oem_named(blob: bytes, placeholder: bytes, name: str) -> bytes:
+    """Swap an ASCII placeholder name for the cp850 bytes Windows archivers write."""
+    swapped = name.encode("cp850")
+    assert len(swapped) == len(placeholder) and blob.count(placeholder) == 2
+    return blob.replace(placeholder, swapped)
+
+
+async def test_member_names_written_in_cp850_keep_their_accented_capitals(httpx_mock):
+    # "RÍOS" is bytes 52 D6 4F 53: cp850 reads it as Í, cp437 as "╓".
+    blob = _oem_named(_make_zip({"R_OS/lista.csv": b"a\n1\n"}), b"R_OS", "RÍOS")
+    _serve(httpx_mock, blob)
+
+    listing = await list_zip_contents(URL)
+    result = await read_zip_member(URL, "RÍOS/lista.csv")
+
+    assert [m["name"] for m in listing["members"]] == ["RÍOS/lista.csv"]
+    assert result["member_name"] == "RÍOS/lista.csv"
+
+
+async def test_nested_member_names_written_in_cp850_keep_their_accented_capitals(httpx_mock):
+    inner = _oem_named(_make_zip({"1._ndice.csv": b"a;b\n1;2\n"}), b"_ndice", "Índice")
+    _serve(httpx_mock, _make_zip({"outer.zip": inner}, method=zipfile.ZIP_STORED))
+
+    with pytest.raises(ValueError, match=r"inner_member: 1\.Índice\.csv"):
+        await read_zip_member(URL, "outer.zip")
+    result = await read_zip_member(URL, "outer.zip", inner_member="1.Índice.csv")
+
+    assert result["member_name"] == "outer.zip/1.Índice.csv"
+    assert result["rows"] == [["1", "2"]]
+
+
+_LEGACY_BOOK = {
+    "ÍNDICE": [["Contenido"], ["Precios"]],
+    "Precios 2024": [["Año", "Mes", "Producto", "Precio"], [2024, "Octubre", "Arroz", 44.5]],
+}
+_XLS_TWO_SHEETS = (Path(__file__).parent / "fixtures" / "dos_hojas.xls").read_bytes()
+
+
+@pytest.mark.parametrize(
+    ("member", "blob"),
+    [
+        ("libro.xls", _XLS_TWO_SHEETS),
+        ("libro.xlsb", make_xlsb(_LEGACY_BOOK)),
+    ],
+)
+async def test_legacy_spreadsheets_list_their_sheets_and_pick_one(httpx_mock, member, blob):
+    _serve(httpx_mock, _make_zip({member: blob}))
+
+    first = await read_zip_member(URL, member)
+    by_name = await read_zip_member(URL, member, sheet="precios 2024")
+    by_number = await read_zip_member(URL, member, sheet="2")
+
+    assert first["sheet"] == "ÍNDICE"
+    assert first["sheets"] == ["ÍNDICE", "Precios 2024"]
+    assert first["headers"] == ["Contenido"]
+    for picked in (by_name, by_number):
+        assert picked["sheet"] == "Precios 2024"
+        assert picked["headers"] == ["Año", "Mes", "Producto", "Precio"]
+        assert picked["rows"] == [["2024", "Octubre", "Arroz", "44.5"]]
+
+
+@pytest.mark.parametrize(
+    ("member", "blob"),
+    [
+        ("libro.xls", _XLS_TWO_SHEETS),
+        ("libro.xlsb", make_xlsb(_LEGACY_BOOK)),
+    ],
+)
+async def test_an_unknown_sheet_in_a_legacy_spreadsheet_lists_the_sheets(
+    httpx_mock, member, blob
+):
+    _serve(httpx_mock, _make_zip({member: blob}))
+
+    with pytest.raises(ValueError, match="2. Precios 2024"):
+        await read_zip_member(URL, member, sheet="Mayoristas")
+
+
+async def test_a_legacy_spreadsheet_published_at_a_url_reads_by_sheet(httpx_mock):
+    # SIPA publishes .xls files directly: the 74-sheet agricultural census is one.
+    url = "https://example.com/descargas/censo.xls"
+    httpx_mock.add_response(url=url, content=_XLS_TWO_SHEETS)
+
+    result = await read_zip_member(url, "", sheet="Precios 2024")
+
+    assert result["member_name"] == "censo.xls"
+    assert result["rows"] == [["2024", "Octubre", "Arroz", "44.5"]]
+
+
+async def test_a_legacy_spreadsheet_inside_a_nested_zip_reads_by_sheet(httpx_mock):
+    inner = _make_zip({"libro.xlsb": make_xlsb(_LEGACY_BOOK)})
+    _serve(httpx_mock, _make_zip({"outer.zip": inner}, method=zipfile.ZIP_STORED))
+
+    result = await read_zip_member(URL, "outer.zip", inner_member="libro.xlsb", sheet="2")
+
+    assert result["member_name"] == "outer.zip/libro.xlsb"
+    assert result["sheet"] == "Precios 2024"
+
+
+@pytest.mark.parametrize(
+    ("value", "text"),
+    [
+        (2024.0, "2024"),
+        (44.5, "44.5"),
+        (-3.0, "-3"),
+        (1e20, "1e+20"),
+        (float("inf"), "inf"),
+        (True, "True"),
+        ("texto", "texto"),
+        (None, ""),
+    ],
+)
+def test_cell_text_drops_the_point_zero_of_whole_numbers_only(value, text):
+    assert csv_reader._cell_text(value) == text
