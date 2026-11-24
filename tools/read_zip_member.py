@@ -60,9 +60,10 @@ def register_read_zip_member_tool(mcp: MCPServer) -> None:
           CRC32 is checked whenever the member is read in full.
 
         Sheets: spreadsheets open on their active (usually first) sheet; pass
-        sheet as a name or a 1-based number for another one. The result lists
-        every sheet of the workbook in `sheets`, and a wrong name fails with
-        that list.
+        sheet as a name or a 1-based number for another one. A name wins over
+        a number, so a sheet called "2024" is read by that name. The result
+        lists every sheet of the workbook in `sheets`, and a wrong name fails
+        with that list.
 
         Zip inside a zip: INEC publishes its CSV tabulados as a .zip of .zip
         files. When `member` is itself a .zip (at most 5 MB compressed and
@@ -139,6 +140,8 @@ def register_read_zip_member_tool(mcp: MCPServer) -> None:
             "preamble": result.get("preamble") or [],
             "dropped_empty_columns": result.get("dropped_empty_columns", 0),
         }
+        if result.get("outer_member"):
+            payload["outer_member"] = result["outer_member"]
 
         def to_text(data: dict) -> str:
             parts = [

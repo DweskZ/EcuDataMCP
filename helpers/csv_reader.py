@@ -596,24 +596,24 @@ async def preview_json(
 
 
 def _select_sheet(names: list[str], sheet: str) -> int:
-    """Index of the requested sheet: "" -> 0, "3" -> third sheet, else by name.
+    """Index of the requested sheet: "" -> 0, else a name, else a 1-based number.
 
-    Names match exactly first, then case-insensitively and ignoring
-    surrounding spaces. A miss raises ValueError listing the workbook's sheets.
+    A name wins over a number, so a workbook whose sheets are called "2023" and
+    "2024" (common in statistical publications) is read by those names, not by
+    position. Names match exactly first, then case-insensitively and ignoring
+    surrounding spaces; only a value that names no sheet and is a number picks
+    by position. A miss raises ValueError listing the workbook's sheets.
     """
     wanted = (sheet or "").strip()
     if not wanted:
         return 0
-    if wanted.isdigit():
-        index = int(wanted) - 1
-        if 0 <= index < len(names):
-            return index
-    elif wanted in names:
+    if wanted in names:
         return names.index(wanted)
-    else:
-        folded = [n.strip().casefold() for n in names]
-        if wanted.casefold() in folded:
-            return folded.index(wanted.casefold())
+    folded = [n.strip().casefold() for n in names]
+    if wanted.casefold() in folded:
+        return folded.index(wanted.casefold())
+    if wanted.isdigit() and 1 <= int(wanted) <= len(names):
+        return int(wanted) - 1
     listed = "; ".join(f"{i + 1}. {n}" for i, n in enumerate(names))
     raise ValueError(
         f"No hay una hoja '{sheet}' en el libro. Hojas disponibles: {listed}."
@@ -1553,8 +1553,12 @@ async def _parse_table_bytes(
 
 def _read_nested_member(
     outer_name: str, outer: bytes, inner_member: str
-) -> tuple[str, bytes, bool]:
-    """Pick one file out of a .zip that was itself a member of the remote .zip."""
+) -> tuple[str, bytes, bool, int, int]:
+    """Pick one file out of a .zip that was itself a member of the remote .zip.
+
+    Returns (display name, bytes, truncated, compressed size, uncompressed
+    size) of the inner file, so the caller reports the sizes of what it read.
+    """
     _check_zip_container_size(outer, outer_name)
     try:
         zf = zipfile.ZipFile(io.BytesIO(outer))
@@ -1590,7 +1594,13 @@ def _read_nested_member(
         with zf.open(name) as fh:
             data = fh.read(cap + 1)
         truncated = len(data) > cap
-        return f"{outer_name}/{name}", data[:cap], truncated
+        return (
+            f"{outer_name}/{name}",
+            data[:cap],
+            truncated,
+            zf.getinfo(name).compress_size,
+            info["size"],
+        )
 
 
 async def _read_direct_file(
@@ -1641,6 +1651,11 @@ async def read_zip_member(
     supported.
     """
     if not member.strip():
+        if inner_member.strip():
+            raise ValueError(
+                "inner_member solo aplica a un .zip dentro del .zip; con member='' "
+                "se lee la URL misma."
+            )
         name, ext, out, truncated, size = await _read_direct_file(url, session)
         result = await _parse_table_bytes(
             name, ext, out, truncated, max_rows, skip_rows, sheet
@@ -1754,8 +1769,13 @@ async def read_zip_member(
         )
 
     read_name = name
+    sizes = (compressed_size, info["uncompressed_size"])
     if is_nested:
-        read_name, out, truncated = _read_nested_member(name, out, inner_member)
+        # Decompressing up to 20 MB is blocking work: keep it off the event loop.
+        read_name, out, truncated, *inner_sizes = await run_parser_off_loop(
+            _read_nested_member, name, out, inner_member
+        )
+        sizes = (inner_sizes[0], inner_sizes[1])
         ext = _ext_of(read_name)
 
     result = await _parse_table_bytes(
@@ -1764,11 +1784,14 @@ async def read_zip_member(
     result.update(
         {
             "member_name": read_name,
-            "compressed_size": compressed_size,
-            "uncompressed_size": info["uncompressed_size"],
+            "compressed_size": sizes[0],
+            "uncompressed_size": sizes[1],
             "url": url,
         }
     )
+    if is_nested:
+        # member_name and the sizes describe the inner file that was read.
+        result["outer_member"] = name
     return result
 
 

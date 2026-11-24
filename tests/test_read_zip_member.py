@@ -577,3 +577,116 @@ async def test_tool_passes_sheet_and_lists_sheets(httpx_mock):
     payload = json.loads(result.content[0].text)
     assert payload["sheets"] == ["ÍNDICE", "Histórico Piladoras 12-25"]
     assert payload["sheet"] == "Histórico Piladoras 12-25"
+
+
+# -- review fixes: names over numbers, ODS, inner sizes, inner_member ------------
+
+_YEAR_SHEETS = {
+    "2023": [["a"], ["x23"]],
+    "2024": [["a"], ["x24"]],
+    "Notas": [["n"], ["nota"]],
+}
+
+
+async def test_a_sheet_called_like_a_number_is_read_by_that_name(httpx_mock):
+    # "2024" names the second sheet: it must not be read as "the 2024th sheet".
+    _serve(httpx_mock, _make_zip({"libro.xlsx": _workbook(_YEAR_SHEETS)}))
+
+    result = await read_zip_member(URL, "libro.xlsx", sheet="2024")
+
+    assert result["sheet"] == "2024"
+    assert result["rows"] == [["x24"]]
+
+
+async def test_a_number_that_names_no_sheet_still_picks_by_position(httpx_mock):
+    _serve(httpx_mock, _make_zip({"libro.xlsx": _workbook(_YEAR_SHEETS)}))
+
+    result = await read_zip_member(URL, "libro.xlsx", sheet="3")
+
+    assert result["sheet"] == "Notas"
+
+
+def test_when_a_name_and_a_position_collide_the_name_wins():
+    # Sheets called "2" and "1": "2" is the first sheet by name, not the second by position.
+    assert csv_reader._select_sheet(["2", "1"], "2") == 0
+    assert csv_reader._select_sheet(["2", "1"], "1") == 1
+    assert csv_reader._select_sheet(["A", "B"], "2") == 1
+    assert csv_reader._select_sheet(["A", "B"], " b ") == 1
+
+
+@pytest.mark.parametrize("wanted", ["0", "3", "Mayoristas"])
+def test_a_sheet_that_matches_nothing_lists_the_sheets(wanted):
+    with pytest.raises(ValueError, match="1. A; 2. B"):
+        csv_reader._select_sheet(["A", "B"], wanted)
+
+
+def _ods(sheets: dict[str, list[str]]) -> bytes:
+    from odf.opendocument import OpenDocumentSpreadsheet
+    from odf.table import Table, TableCell, TableRow
+    from odf.text import P
+
+    doc = OpenDocumentSpreadsheet()
+    for name, values in sheets.items():
+        table = Table(name=name)
+        for value in values:
+            row = TableRow()
+            cell = TableCell(valuetype="string")
+            cell.addElement(P(text=value))
+            row.addElement(cell)
+            table.addElement(row)
+        doc.spreadsheet.addElement(table)
+    buf = io.BytesIO()
+    doc.write(buf)
+    return buf.getvalue()
+
+
+async def test_an_ods_sheet_is_selected_by_name_and_by_number(httpx_mock):
+    blob = _make_zip({"libro.ods": _ods({"Uno": ["col", "a1"], "Dos": ["col", "b1"]})})
+    _serve(httpx_mock, blob)
+    _serve(httpx_mock, blob)
+
+    by_name = await read_zip_member(URL, "libro.ods", sheet="Dos")
+    by_number = await read_zip_member(URL, "libro.ods", sheet="1")
+
+    assert (by_name["sheet"], by_name["sheets"], by_name["rows"]) == ("Dos", ["Uno", "Dos"], [["b1"]])
+    assert (by_number["sheet"], by_number["rows"]) == ("Uno", [["a1"]])
+
+
+async def test_a_nested_member_reports_the_inner_files_name_and_sizes(httpx_mock):
+    body = b"x;y\n" + b"1;2\n" * 1000
+    inner = _make_zip({"a.csv": body})
+    _serve(httpx_mock, _make_zip({"outer.zip": inner}, method=zipfile.ZIP_STORED))
+
+    result = await read_zip_member(URL, "outer.zip", inner_member="a.csv")
+
+    assert result["member_name"] == "outer.zip/a.csv"
+    assert result["outer_member"] == "outer.zip"
+    assert result["uncompressed_size"] == len(body)
+    assert 0 < result["compressed_size"] < len(body)
+
+
+async def test_a_plain_member_has_no_outer_member(httpx_mock):
+    _serve(httpx_mock, _make_zip({"a.csv": b"x\n1\n"}))
+
+    assert "outer_member" not in await read_zip_member(URL, "a.csv")
+
+
+async def test_inner_member_with_an_empty_member_is_an_error_not_ignored():
+    with pytest.raises(ValueError, match="inner_member solo aplica"):
+        await read_zip_member("https://example.com/a.xlsx", "", inner_member="b.csv")
+
+
+async def test_the_tool_returns_outer_member_for_a_nested_zip(httpx_mock):
+    inner = _make_zip({"a.csv": b"x;y\n1;2\n"})
+    _serve(httpx_mock, _make_zip({"outer.zip": inner}, method=zipfile.ZIP_STORED))
+    mcp = MCPServer("t")
+    register_read_zip_member_tool(mcp)
+
+    result = await mcp.call_tool(
+        "read_zip_member",
+        {"url": URL, "member": "outer.zip", "inner_member": "a.csv", "format": "json"},
+    )
+
+    payload = json.loads(result.content[0].text)
+    assert payload["outer_member"] == "outer.zip"
+    assert payload["member_name"] == "outer.zip/a.csv"
