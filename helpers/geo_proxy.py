@@ -55,6 +55,7 @@ GEOBLOCKED_TOOLS = frozenset(
     {
         "search_anda",
         "get_anda_survey_info",
+        "get_anda_materiales",
         "download_anda_microdata",
         "search_companias",
         "get_compania_info",

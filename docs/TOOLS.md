@@ -1,6 +1,6 @@
 # Herramientas disponibles
 
-Referencia detallada de las 85 herramientas MCP del perfil público (por defecto)
+Referencia detallada de las 86 herramientas MCP del perfil público (por defecto)
 de EcuDataMCP, más 2 herramientas de mantenimiento (`audit_bce_catalog` y
 `compare_bce_sources`) que solo se registran con otro `MCP_PROFILE`. Casi todas
 aceptan `format="json"` además de texto.
@@ -44,6 +44,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 |------|-------------|
 | `search_anda` | Buscar encuestas y censos en el catálogo ANDA del INEC (NADA/IHSN). Indica si cada encuesta tiene microdatos descargables. `verificar_acceso="auto"` (default) comprueba la página de descarga real de los 10 primeros resultados; `true` de todos; `false` usa el flag del catálogo. |
 | `get_anda_survey_info` | Metadata completa de una encuesta ANDA: resumen, variables, confidencialidad y contacto. |
+| `get_anda_materiales` | Enlaces a los materiales relacionados de un estudio ANDA (series históricas de IPC y canasta, metodologías), con nombre, formato y tamaño. |
 | `download_anda_microdata` | Enlaces a los microdatos de una encuesta ANDA con su `tipo_acceso` (directo, enlace externo, registro, solicitud, ninguno). |
 
 ## Macroeconomía (BCE)

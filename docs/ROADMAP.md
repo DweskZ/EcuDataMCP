@@ -192,6 +192,7 @@ de cobertura que falta en cada una.
 | API REST de publicaciones (WordPress) | `search_inec_publicaciones`, `get_inec_publicacion_archivos` | Búsqueda de texto completo sobre 1.707 posts — cubre páginas que el menú mega-menu de una sola semilla no alcanza (ENEMDU anual, etc.) → RESEARCH.md § Novena pasada |
 | Censo 2022 (censoecuador.gob.ec) | `search_archivos(fuente="censo")` (cliente `censo_client`) | ~100 archivos de `/resultados-censo/` y `/data-censo-ecuador/`: tabulados por tema en XLSX/CSV (incl. TIC de hogares por provincia y cantón), bases por cantón/sector/manzana (CSV, SPSS, REDATAM), 2010 y 2001 recodificados a 2022, diccionarios. Solo metadata + URL. El ítem de ANDA 1085 enlaza aquí → RESEARCH.md § Cuadragésima pasada |
 | ANDA — tipo de acceso real | `search_anda`, `get_anda_survey_info`, `download_anda_microdata` | `tipo_acceso` (directo, enlace_externo, registro, solicitud, ninguno) leído de la página de descarga, no del flag del catálogo → RESEARCH.md § Cuadragésima pasada. `verificar_acceso="auto"` (default) verifica los 10 primeros; caché en disco 7 días y sondas 8 a la vez → RESEARCH.md § Cuadragésima segunda pasada |
+| ANDA — materiales relacionados | `get_anda_materiales` | Enlaces de la página de materiales relacionados de un estudio (series históricas de IPC desde 1969, canasta desde 1982, metodologías), con nombre propio, formato y tamaño; no descarga ni lee los archivos → docs/ANDA_PRECIOS_HISTORICOS.md. |
 
 ### IGM (Instituto Geográfico Militar)
 

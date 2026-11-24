@@ -3,7 +3,7 @@
 Generado por `scripts/generate_catalog.py` desde `resources/catalog.py` y las
 descripciones de `tools/*.py`; no editar a mano.
 
-58 fuentes, 85 tools públicas.
+58 fuentes, 86 tools públicas.
 
 ## Datos Abiertos CKAN
 
@@ -173,6 +173,7 @@ descripciones de `tools/*.py`; no editar a mano.
 
 - `search_anda`: Search INEC's ANDA catalog of 437+ surveys and censuses; the broadest INEC index. Entries without microdata point to search_inec_estadisticas. Next: get_anda_survey_info.
 - `get_anda_survey_info`: Full metadata for one ANDA survey (string idno from search_anda): scope, variables, microdata availability and access terms.
+- `get_anda_materiales`: List downloadable related materials for one numeric INEC ANDA catalog ID, including aggregate-only studies such as IPC and canasta. Returns links, not parsed data. Discover the study with search_anda first.
 - `download_anda_microdata`: Links to an ANDA survey's microdata, with tipo_acceso (directo, enlace_externo, registro, solicitud, ninguno); accepts ANDA's research-use terms. External links point to other INEC sites. Check get_anda_survey_info first.
 
 ## Ecuador en Cifras / INEC (estadísticas publicadas)

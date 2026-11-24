@@ -9,14 +9,30 @@
   sheet ("Histórico Piladoras 12-25"), while the tool always opened the first
   ("ÍNDICE"); INEC's tabulados in CSV come as a .zip of .zip files, which the
   tool refused as an unreadable format. New parameters: `sheet` (a name,
-  matched case-insensitively, or a 1-based number; the result lists every
-  sheet in `sheets`, and a wrong name fails with that list) and
+  matched case-insensitively, or a 1-based number; a name wins over a number,
+  so workbooks whose sheets are called "2023", "2024" work; the result lists
+  every sheet in `sheets`, and a wrong name fails with that list) and
   `inner_member` (the file to read inside a .zip member, which must fit in
   5 MB compressed and 20 MB expanded; left empty, the error lists the inner
-  files). With `member=''`, the URL itself is read as a spreadsheet (up to
-  20 MB) or text file (up to 5 MB), through the same SSRF-guarded download
-  as `preview_resource_data`. No new tool, so the default profile stays at
-  85.
+  files; the result's `member_name` and sizes describe the inner file and
+  `outer_member` names the zip it came from). With `member=''`, the URL itself
+  is read as a spreadsheet (up to 20 MB) or text file (up to 5 MB), through the
+  same SSRF-guarded download as `preview_resource_data`; `inner_member` there
+  is an error, not silently ignored. No new tool, so the tool count is
+  unchanged.
+- **New tool `get_anda_materiales`: the files in an ANDA study's "related
+  materials".** Aggregate-only studies such as the IPC report no microdata but
+  carry downloadable historical workbooks (the national CPI from 1969, the basic
+  family basket from 1982, methodologies, forms), and no existing ANDA tool
+  exposed them. Given a numeric catalog id from `search_anda`, it lists each
+  file with its own name, format and size, and returns links only: it does not
+  download or parse the spreadsheets. Names come from each link's
+  `data-filename` / `title`, because the visible button text is always just
+  "Descargar [ZIP, 8.01 MB]"; checked live against catalogs 809 and 1256 (33 and
+  44 files). An id ANDA does not have (it answers 500, not 404) gets a clear
+  message. The tool is hidden with the other geoblocked ANDA tools. 86 tools.
+  `docs/ANDA_PRECIOS_HISTORICOS.md` says which historical series exist and which
+  claim could not be checked (the FES PDF link now redirects to an error page).
 - **Smoke test: `www.sri.gob.ec/datasets` network errors count as degraded, not
   failed.** The source fails intermittently from the cloud: a `ConnectError` on
   the runner on 2026-11-18 and a `ReadError` from the Oracle VM on 2026-11-20
