@@ -1,5 +1,5 @@
 {
-  "extracted_at": "2026-11-19",
+  "extracted_at": "2026-11-23",
   "server_version": "0.15.0",
   "answers": [
     {
@@ -13,7 +13,7 @@
     {
       "id": "sismos",
       "question": "¿Hubo temblores fuertes en Ecuador esta semana?",
-      "answer": "El más fuerte en territorio ecuatoriano fue de magnitud 5,5 (valor automático del IG-EPN, aún sin revisar), a 25,5 km de Guayaquil (Guayas), el 19 de noviembre a las 00:49, a 22,1 km de profundidad. También hubo uno de 4,2 cerca de Salinas (Santa Elena).",
+      "answer": "El más fuerte en territorio ecuatoriano fue de magnitud 5,1, a 19,3 km de Duran (Guayas), el 19 de noviembre a las 00:49, a 75,4 km de profundidad. También hubo uno de 3,5 cerca de Riobamba (Chimborazo).",
       "tools": ["search_sismos"],
       "source": "IG-EPN · catálogo sísmico",
       "url": "https://www.igepn.edu.ec/portal/eventos/www/events.csv"
@@ -32,7 +32,8 @@
       "answer": "RUC 1790016919001. Sociedad anónima activa, constituida el 30 de noviembre de 1957 en Quito, con capital suscrito de US$ 900 millones. Actividad: comercio al por menor (CIIU G4711.01). Último balance presentado: 2025.",
       "tools": ["search_companias"],
       "source": "Superintendencia de Compañías · directorio",
-      "url": "https://mercadodevalores.supercias.gob.ec/"
+      "url": "https://mercadodevalores.supercias.gob.ec/",
+      "extracted_at": "2026-11-19"
     },
     {
       "id": "manta-compras",
@@ -46,7 +47,7 @@
     {
       "id": "cortes-luz",
       "question": "¿Hay cortes de luz programados en Ambato o el Puyo?",
-      "answer": "Sí, 3 avisos vigentes. Por ejemplo: jueves 19 de noviembre, de 10:00 a 15:30, en Tamboloma, Mulanleo, Chiquicahua de la Parroquia Pilahuin, Santa Ana de Calamaca y San Fernando del Cantón Ambato; viernes 20, de 14:30 a 16:30, en Ciudadela del Chofer, Av. 20 de Julio, Entre Washington Mason y Av. Eloy Alfaro (paso Lateral; Puyo-pastaza).",
+      "answer": "Sí, 5 avisos vigentes. Por ejemplo: martes 24 de noviembre, de 09:00 a 13:00, en Provincia: Pastaza, Cantón: Pastaza, Parroquia: Puyo, Barrio: Recreo, Calle Edwar Travez Ruiz y Anturios; martes 24, de 10:00 a 14:00, en Sector Cunchibamba Salida a Píllaro, Ingreso a Yambo, Chasoaló.",
       "tools": ["search_cortes", "get_cortes_horarios"],
       "source": "EEASA · trabajos programados",
       "url": "https://www.eeasa.com.ec/trabajos-programados/"
@@ -57,7 +58,8 @@
       "answer": "Según el Censo 2022, el 65,0 % de los hogares de Manta dispone de internet fijo (66,6 % en el área urbana y 33,1 % en la rural), frente al 47,4 % de Manabí y el 60,9 % nacional.",
       "tools": ["search_archivos"],
       "source": "INEC · Censo 2022, tabulado TIC",
-      "url": "https://www.censoecuador.gob.ec/resultados-censo/"
+      "url": "https://www.censoecuador.gob.ec/resultados-censo/",
+      "extracted_at": "2026-11-19"
     },
     {
       "id": "censo-internet",
@@ -65,7 +67,8 @@
       "answer": "En el tabulado «Tecnologías de la información» del Censo 2022 (03_2022_CPV_TIC.xlsx), con hogares por disponibilidad de internet, computadora y celular por provincia, cantón y parroquia.",
       "tools": ["search_anda", "download_anda_microdata", "search_archivos"],
       "source": "INEC · censoecuador.gob.ec",
-      "url": "https://www.censoecuador.gob.ec/resultados-censo/"
+      "url": "https://www.censoecuador.gob.ec/resultados-censo/",
+      "extracted_at": "2026-11-19"
     }
   ]
 }

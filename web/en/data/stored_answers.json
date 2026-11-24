@@ -1,5 +1,5 @@
 {
-  "extracted_at": "2026-11-19",
+  "extracted_at": "2026-11-23",
   "server_version": "0.15.0",
   "answers": [
     {
@@ -13,7 +13,7 @@
     {
       "id": "sismos",
       "question": "Were there any strong earthquakes in Ecuador this week?",
-      "answer": "The strongest within Ecuadorian territory was magnitude 5.5 (automatic IG-EPN value, not yet reviewed), 25.5 km from Guayaquil (Guayas), on November 19 at 00:49, at a depth of 22.1 km. There was also a 4.2 near Salinas (Santa Elena).",
+      "answer": "The strongest within Ecuadorian territory was magnitude 5.1, 19.3 km from Duran (Guayas), on November 19 at 00:49, at a depth of 75.4 km. There was also a 3.5 near Riobamba (Chimborazo).",
       "tools": ["search_sismos"],
       "source": "IG-EPN · seismic catalog",
       "url": "https://www.igepn.edu.ec/portal/eventos/www/events.csv"
@@ -32,7 +32,8 @@
       "answer": "RUC 1790016919001. Active corporation (sociedad anónima), incorporated on November 30, 1957 in Quito, with subscribed capital of US$ 900 million. Activity: retail trade (CIIU G4711.01). Latest balance sheet filed: 2025.",
       "tools": ["search_companias"],
       "source": "Superintendencia de Compañías · company directory",
-      "url": "https://mercadodevalores.supercias.gob.ec/"
+      "url": "https://mercadodevalores.supercias.gob.ec/",
+      "extracted_at": "2026-11-19"
     },
     {
       "id": "manta-compras",
@@ -46,7 +47,7 @@
     {
       "id": "cortes-luz",
       "question": "Are there scheduled power outages in Ambato or Puyo?",
-      "answer": "Yes, 3 active notices. For example: Thursday, November 19, from 10:00 to 15:30, in Tamboloma, Mulanleo, Chiquicahua de la Parroquia Pilahuin, Santa Ana de Calamaca y San Fernando del Cantón Ambato; Friday, November 20, from 14:30 to 16:30, in Ciudadela del Chofer, Av. 20 de Julio, Entre Washington Mason y Av. Eloy Alfaro (paso Lateral; Puyo-pastaza).",
+      "answer": "Yes, 5 active notices. For example: Tuesday, November 24, from 09:00 to 13:00, in Provincia: Pastaza, Cantón: Pastaza, Parroquia: Puyo, Barrio: Recreo, Calle Edwar Travez Ruiz y Anturios; Tuesday, November 24, from 10:00 to 14:00, in Sector Cunchibamba Salida a Píllaro, Ingreso a Yambo, Chasoaló.",
       "tools": ["search_cortes", "get_cortes_horarios"],
       "source": "EEASA · scheduled works",
       "url": "https://www.eeasa.com.ec/trabajos-programados/"
@@ -57,7 +58,8 @@
       "answer": "According to the 2022 Census, 65.0% of households in Manta have fixed internet (66.6% in urban areas and 33.1% in rural areas), compared with 47.4% in Manabí and 60.9% nationwide.",
       "tools": ["search_archivos"],
       "source": "INEC · 2022 Census, ICT tabulation",
-      "url": "https://www.censoecuador.gob.ec/resultados-censo/"
+      "url": "https://www.censoecuador.gob.ec/resultados-censo/",
+      "extracted_at": "2026-11-19"
     },
     {
       "id": "censo-internet",
@@ -65,7 +67,8 @@
       "answer": "In the «Information technologies» tabulation of the 2022 Census (03_2022_CPV_TIC.xlsx), with households by internet, computer and cell phone availability by province, canton and parish.",
       "tools": ["search_anda", "download_anda_microdata", "search_archivos"],
       "source": "INEC · censoecuador.gob.ec",
-      "url": "https://www.censoecuador.gob.ec/resultados-censo/"
+      "url": "https://www.censoecuador.gob.ec/resultados-censo/",
+      "extracted_at": "2026-11-19"
     }
   ]
 }
