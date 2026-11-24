@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Referencia – EcuDataMCP</title>
-<meta name="description" content="Los 85 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
+<meta name="description" content="Los 86 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="canonical" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <link rel="alternate" hreflang="es" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <link rel="alternate" hreflang="en" href="https://dweskz.github.io/EcuDataMCP/en/atlas.html">
 <link rel="alternate" hreflang="x-default" href="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <meta property="og:title" content="Referencia – EcuDataMCP">
-<meta property="og:description" content="Los 85 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
+<meta property="og:description" content="Los 86 tools de EcuDataMCP, con descripción completa y enlace directo a cada uno.">
 <meta property="og:url" content="https://dweskz.github.io/EcuDataMCP/atlas.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_EC">
@@ -76,13 +76,13 @@
 <section class="landing hero">
 <div class="container-page">
 <p class="kicker">Referencia</p>
-<h1>Los <span class="accent">85 tools</span>, uno por uno.</h1>
+<h1>Los <span class="accent">86 tools</span>, uno por uno.</h1>
 <p class="hero-sub">Encuentra un tool por nombre, fuente o tarea. Abre solo el grupo y el detalle que necesitas.</p>
 <div class="atlas-filter-wrap">
 <input type="text" id="atlas-filter" class="atlas-filter" placeholder="Filtrar por nombre o palabra clave…" autocomplete="off">
 </div>
 <div class="atlas-toolbar" aria-live="polite">
-<p id="atlas-result-count">85 tools · abre un grupo para ver sus detalles.</p>
+<p id="atlas-result-count">86 tools · abre un grupo para ver sus detalles.</p>
 <div class="atlas-actions">
 <button type="button" data-atlas-action="open">Expandir grupos</button>
 <button type="button" data-atlas-action="close">Cerrar grupos</button>
@@ -516,7 +516,7 @@
 
 <details class="atlas-category">
 <summary class="atlas-category-summary">
-<span class="atlas-category-title">ANDA (INEC)<span class="tag">3</span></span>
+<span class="atlas-category-title">ANDA (INEC)<span class="tag">4</span></span>
 <span class="atlas-category-action">Mostrar</span>
 </summary>
 <div class="atlas-category-tools">
@@ -562,6 +562,28 @@
 <tbody>
 
 <tr><td><code>idno</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Identificador de la encuesta de search_anda (el campo &#34;idno&#34;)</td></tr>
+
+<tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
+
+</tbody>
+</table>
+
+</div>
+</details>
+
+<details class="atlas-tool" id="tool-get_anda_materiales" data-search="get_anda_materiales enlaces a los materiales relacionados de un estudio anda (series históricas de ipc y canasta, metodologías, formularios), con nombre, formato y tamaño de cada archivo. lista los archivos descargables de la página de materiales relacionados de un estudio anda (inec) por su id numérico. sirve para los estudios agregados que no tienen microdatos, como el ipc, que traen series históricas (ipc general desde 1969, canasta familiar básica desde 1982), metodologías y formularios. cada enlace trae el nombre propio del archivo, su formato y su tamaño. devuelve enlaces, no datos: no descarga ni lee las hojas de cálculo. id id numérico del catálogo anda (el campo &quot;id&quot; de search_anda), p. ej. &quot;809&quot; format formato de salida: `text` (default) o `json`.">
+<summary class="atlas-tool-summary">
+<code class="atlas-tool-name">get_anda_materiales</code>
+<span class="atlas-tool-desc">Enlaces a los materiales relacionados de un estudio ANDA (series históricas de IPC y canasta, metodologías, formularios), con nombre, formato y tamaño de cada archivo.</span>
+</summary>
+<div class="atlas-tool-body">
+<p class="atlas-tool-long">Lista los archivos descargables de la página de materiales relacionados de un estudio ANDA (INEC) por su id numérico. Sirve para los estudios agregados que no tienen microdatos, como el IPC, que traen series históricas (IPC general desde 1969, canasta familiar básica desde 1982), metodologías y formularios. Cada enlace trae el nombre propio del archivo, su formato y su tamaño. Devuelve enlaces, no datos: no descarga ni lee las hojas de cálculo.</p>
+
+<table class="atlas-params">
+<thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+<tbody>
+
+<tr><td><code>id</code></td><td><code>str</code></td><td><code>requerido</code></td><td>Id numérico del catálogo ANDA (el campo &#34;id&#34; de search_anda), p. ej. &#34;809&#34;</td></tr>
 
 <tr><td><code>format</code></td><td><code>Literal[&#39;text&#39;, &#39;json&#39;]</code></td><td><code>text</code></td><td>Formato de salida: `text` (default) o `json`.</td></tr>
 
@@ -2624,7 +2646,7 @@ window.SITE_SEARCH_EMPTY_LABEL = "Sin resultados.";
     var count = visibleTools().length;
     resultCount.textContent = query
       ? count + " tool" + (count === 1 ? "" : "s") + " coincide" + (count === 1 ? "" : "n") + "."
-      : "85 tools · abre un grupo para ver sus detalles.";
+      : "86 tools · abre un grupo para ver sus detalles.";
   }
 
   function applyFilter(query) {
