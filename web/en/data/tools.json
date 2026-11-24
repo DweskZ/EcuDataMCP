@@ -521,6 +521,25 @@
         "long_description": "Get full metadata for one ANDA (INEC) survey/census by its idno. Get the idno from search_anda results — it's the string identifier (e.g. \"IDD-ECU-INEC-CGTPE-DECON-ENESEM-2023-v1.3\"), not the numeric id. Returns scope/abstract, variable count, whether microdata is actually obtainable and how (tipo_acceso, checked on the real download page, with any external links; see download_anda_microdata), confidentiality terms, and a contact email for requesting restricted data when it isn't."
       },
       {
+        "name": "get_anda_materiales",
+        "description": "Links to the related materials of an ANDA study (historical CPI and basket series, methodologies, forms), with each file's name, format and size.",
+        "params": [
+          {
+            "name": "id",
+            "type": "str",
+            "default": null,
+            "description": "Numeric ANDA catalog id (the \"id\" field from search_anda), e.g. \"809\""
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "Output format: `text` (default) or `json`."
+          }
+        ],
+        "long_description": "Lists the downloadable files on the related-materials page of an ANDA (INEC) study, by its numeric id. Use it for aggregate-only studies with no microdata, such as the CPI, which carry historical series (the national CPI from 1969, the basic family basket from 1982), methodologies and forms. Each link carries the file's own name, its format and its size. It returns links, not data: it does not download or read the spreadsheets."
+      },
+      {
         "name": "download_anda_microdata",
         "description": "Download links for an ANDA survey's microdata, with its tipo_acceso (directo, enlace_externo, registro, solicitud, ninguno).",
         "params": [

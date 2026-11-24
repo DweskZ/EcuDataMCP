@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- **New tool `get_anda_materiales`: the files in an ANDA study's "related
+  materials".** Aggregate-only studies such as the IPC report no microdata but
+  carry downloadable historical workbooks (the national CPI from 1969, the basic
+  family basket from 1982, methodologies, forms), and no existing ANDA tool
+  exposed them. Given a numeric catalog id from `search_anda`, it lists each
+  file with its own name, format and size, and returns links only: it does not
+  download or parse the spreadsheets. Names come from each link's
+  `data-filename` / `title`, because the visible button text is always just
+  "Descargar [ZIP, 8.01 MB]"; checked live against catalogs 809 and 1256 (33 and
+  44 files). An id ANDA does not have (it answers 500, not 404) gets a clear
+  message. The tool is hidden with the other geoblocked ANDA tools. 86 tools.
+  `docs/ANDA_PRECIOS_HISTORICOS.md` says which historical series exist and which
+  claim could not be checked (the FES PDF link now redirects to an error page).
 - **Smoke test: `www.sri.gob.ec/datasets` network errors count as degraded, not
   failed.** The source fails intermittently from the cloud: a `ConnectError` on
   the runner on 2026-11-18 and a `ReadError` from the Oracle VM on 2026-11-20

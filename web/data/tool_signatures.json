@@ -449,6 +449,27 @@
       "format": "text | json"
     }
   },
+  "get_anda_materiales": {
+    "file": "get_anda_materiales.py",
+    "params": [
+      {
+        "name": "id",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "format",
+        "type": "Literal['text', 'json']",
+        "default": "'text'"
+      }
+    ],
+    "description": "List downloadable related materials for one numeric INEC ANDA catalog ID, including aggregate-only studies such as IPC and canasta. Returns links, not parsed data. Discover the study with search_anda first.",
+    "summary": "List related-material download links for a numeric ANDA catalog ID. Aggregate-only studies can contain historical workbooks even when they have no microdata. Each link carries the file's own name (e.g. \"1. Serie Historica del IPC.zip\"), its format and size; see the catalog entry for workbook descriptions and periods. Download access does not imply statistical comparability.",
+    "args_doc": {
+      "id": "Numeric ANDA catalog id from search_anda (its \"id\" field), e.g. \"809\"",
+      "format": "text | json"
+    }
+  },
   "get_anda_survey_info": {
     "file": "get_anda_survey_info.py",
     "params": [
@@ -1149,7 +1170,7 @@
       }
     ],
     "description": "Summarize one buyer's SERCOP procurement in a year: process count, total amount, by procedure type, by month and top suppliers. Reads up to 300 processes and says when the summary is partial.",
-    "summary": "Summarize the public procurement of one buyer (institution) in a year, from SERCOP's OCDS open data. Pages through the same search search_contratos uses, filtered by buyer, and totals what it reads: number of processes, total amount (the OCDS `amount`, awarded or estimated value) and budget, split by procedure type, by month and by supplier, plus first and last dates. `comprador` is a keyword, so several institutions can match (\"agua\" matches every water utility); each is summarized on its own, largest first, top 10. Limits: reads at most 300 processes (30 pages); past that the summary is marked `parcial` with `total_en_fuente`. Processes without an amount are counted but add nothing (`procesos_con_monto`). Supplier names are only present on some search rows. SERCOP rate-limits busy clients; a page that fails is listed in `paginas_fallidas`. For one process's full record use get_contrato_info(ocid).",
+    "summary": "Summarize the public procurement of one buyer (institution) in a year, from SERCOP's OCDS open data. Pages through the same search search_contratos uses, filtered by buyer, and totals what it reads: number of processes, total amount (the OCDS `amount`, awarded or estimated value) and budget, split by procedure type, by month and by supplier, plus first and last dates. `comprador` is a keyword, so several institutions can match (\"agua\" matches every water utility); each is summarized on its own, largest first, top 10. Limits: reads at most 300 processes (30 pages); past that the summary is marked `parcial` with `total_en_fuente`. SERCOP returns a different sample of rows for the same page on every call, so the pages are swept repeatedly and de-duplicated by OCID; `parcial` is true unless as many distinct processes as `total_en_fuente` were collected (a rate-limited or slow source can leave it short; `solicitudes` counts the calls). Processes without an amount are counted but add nothing (`procesos_con_monto`). Supplier names are only present on some search rows. A page that fails is listed in `paginas_fallidas`. For one process's full record use get_contrato_info(ocid).",
     "args_doc": {
       "comprador": "Buyer/institution keyword, min 3 chars (e.g. \"Municipio de Quito\", \"IESS\").",
       "year": "Year of the processes (2015-current). 0 = current year.",

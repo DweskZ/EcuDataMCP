@@ -10,6 +10,9 @@ from helpers import env_config
 from helpers.geo_proxy import proxy_for
 from helpers.user_agent import USER_AGENT
 
+# The visible text of every download button is "Descargar [ZIP, 474.32 KB]".
+_BUTTON_RE = re.compile(r"\[\s*([^,\]]+?)\s*,\s*([^\]]+?)\s*\]")
+
 
 class _Links(HTMLParser):
     def __init__(self):
@@ -19,8 +22,13 @@ class _Links(HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         if tag.lower() == "a":
-            attrs = dict(attrs)
-            self.current = {"href": attrs.get("href", ""), "title": attrs.get("title", ""), "text": []}
+            attrs = {key: value or "" for key, value in attrs}
+            self.current = {
+                "href": attrs.get("href", ""),
+                "title": attrs.get("title", ""),
+                "filename": attrs.get("data-filename", ""),
+                "text": [],
+            }
 
     def handle_data(self, data):
         if self.current is not None:
@@ -32,20 +40,36 @@ class _Links(HTMLParser):
             self.current = None
 
 
-def parse_material_links(html: str, base_url: str, survey_id: str) -> list[dict]:
-    """Return only ANDA downloads belonging to this catalog entry."""
+def parse_material_links(
+    html: str, page_url: str, survey_id: str, site_base: str | None = None
+) -> list[dict]:
+    """Return only ANDA downloads belonging to this catalog entry.
+
+    Each result has ``nombre`` and ``url``, plus ``formato`` and ``tamano``
+    when the download button says them. The name is the file's own name: the
+    button text is always just "Descargar [ZIP, 8.01 MB]", while the link's
+    ``data-filename`` / ``title`` carry e.g. "1. Serie Historica del IPC.zip".
+    ``site_base`` is the configured ANDA site root; by default it is taken
+    from ``page_url``.
+    """
+    site = urlsplit(site_base or page_url.split("index.php", 1)[0])
+    prefix = site.path.rstrip("/") + "/index.php/catalog/"
+    path_re = re.compile(rf"{re.escape(prefix)}{survey_id}/download/\d+/?")
     parser = _Links()
     parser.feed(html)
     found = {}
     for item in parser.links:
-        url = urljoin(base_url, item["href"])
+        url = urljoin(page_url, item["href"])
         parts = urlsplit(url)
-        if parts.hostname != "anda.inec.gob.ec":
+        if parts.hostname != site.hostname or not path_re.fullmatch(parts.path):
             continue
-        if not re.fullmatch(rf"/anda5/index\.php/catalog/{survey_id}/download/\d+/?", parts.path):
-            continue
-        name = " ".join(" ".join(item["text"]).split()) or item["title"] or "Material relacionado"
-        found.setdefault(url, {"nombre": name, "url": url})
+        text = " ".join(" ".join(item["text"]).split())
+        name = item["filename"].strip() or item["title"].strip() or text or "Material relacionado"
+        entry = {"nombre": name, "url": url}
+        button = _BUTTON_RE.search(text)
+        if button:
+            entry["formato"], entry["tamano"] = button.group(1), button.group(2)
+        found.setdefault(url, entry)
     return list(found.values())
 
 
@@ -59,8 +83,17 @@ async def get_related_materials(survey_id: str, session: httpx.AsyncClient | Non
         session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT}, proxy=proxy_for(base))
     try:
         response = await session.get(url, follow_redirects=True, timeout=20.0)
-        response.raise_for_status()
-        files = parse_material_links(response.text, str(response.url), survey_id)
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            if exc.response.status_code in (404, 500):
+                # ANDA answers 500, not 404, for a catalog id it does not have.
+                raise ValueError(
+                    f"ANDA no devolvió el catálogo {survey_id} (HTTP {exc.response.status_code}): "
+                    "el id no existe o ANDA falló; usa el id numérico que da search_anda."
+                ) from exc
+            raise
+        files = parse_material_links(response.text, str(response.url), survey_id, site_base=base)
         return {"fuente": "INEC ANDA", "url_fuente": url, "id": survey_id,
                 "total": len(files), "archivos": files,
                 "nota": "Enlaces de materiales relacionados; no implica acceso a microdatos ni lectura del contenido."}
