@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+- **`read_zip_member` reads any sheet, a zip inside a zip, and a spreadsheet
+  at a plain URL.** Three cases it could not handle on 2026-11-23, while
+  pulling rice prices for El Quantificador: SIPA's `precios-agroindustria.xlsx`
+  is published directly, not inside a .zip, and its data is on the seventh
+  sheet ("Histórico Piladoras 12-25"), while the tool always opened the first
+  ("ÍNDICE"); INEC's tabulados in CSV come as a .zip of .zip files, which the
+  tool refused as an unreadable format. New parameters: `sheet` (a name,
+  matched case-insensitively, or a 1-based number; a name wins over a number,
+  so workbooks whose sheets are called "2023", "2024" work; the result lists
+  every sheet in `sheets`, and a wrong name fails with that list) and
+  `inner_member` (the file to read inside a .zip member, which must fit in
+  5 MB compressed and 20 MB expanded; left empty, the error lists the inner
+  files; the result's `member_name` and sizes describe the inner file and
+  `outer_member` names the zip it came from). With `member=''`, the URL itself
+  is read as a spreadsheet (up to 20 MB) or text file (up to 5 MB), through the
+  same SSRF-guarded download as `preview_resource_data`; `inner_member` there
+  is an error, not silently ignored. No new tool, so the tool count is
+  unchanged.
 - **New tool `get_anda_materiales`: the files in an ANDA study's "related
   materials".** Aggregate-only studies such as the IPC report no microdata but
   carry downloadable historical workbooks (the national CPI from 1969, the basic
