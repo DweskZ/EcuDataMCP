@@ -20,6 +20,20 @@
   same SSRF-guarded download as `preview_resource_data`; `inner_member` there
   is an error, not silently ignored. No new tool, so the tool count is
   unchanged.
+- **Smoke test: a call that fails on a network blip is retried before it
+  fails the run.** The scheduled run ended red on five of its six runs between
+  2026-11-16 and 11-23, each time on a different source and a single call: a
+  `ReadTimeout` from the World Bank and from CEPALSTAT, a `ConnectTimeout` from
+  BVG and from CentroSur, a 503 from ARCONEL, a `ConnectError` from
+  `sri_datasets`, SGR's "site not initialized". Every one answered on the next
+  run, and adding a `_DEGRADED_SOURCES` entry for each host that times out on a
+  given day would never end. `call_tool` now retries a response that failed with
+  a timeout, a dropped connection or a 502/503/504 after 5 s and again after
+  15 s, and prints a `RETRY` line each time; a source that is really down still
+  fails the run, about 20 s later. A known source in `smoke_status` keeps its
+  own single retry in `check_tool`, a plain 500 or a missing page is not
+  retried, and a successful answer that merely mentions a timeout is not
+  retried either.
 - **`read_zip_member`: members past 5 MB, and the `.xls`/`.xlsb`/nested-zip
   paths checked on real data.** A scan of the 507 zips on INEC's site found
   what the 5 MB per-member cap was blocking: 11 zips whose CSV microdata members

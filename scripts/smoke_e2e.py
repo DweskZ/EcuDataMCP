@@ -12,7 +12,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import httpx
 
-from helpers.smoke_status import GEOBLOCKED_SOURCES, assess_response
+from helpers.smoke_status import (
+    GEOBLOCKED_SOURCES,
+    assess_response,
+    degraded_source,
+    is_transient_network_error,
+)
 
 # Tool output routinely contains non-ASCII text (accents, →, ⚠...) from
 # real government sources; on Windows the console defaults to cp1252,
@@ -30,6 +35,11 @@ FIXED_RUC = "1790016919001"
 # their checks are skipped; a tool missing from a host that hides nothing is
 # still a failure, which is what the scheduled run needs to catch.
 HIDDEN_TOOLS: set[str] = set()
+
+# Seconds to wait before each retry of a call that failed on a network blip
+# (a timeout, a dropped connection, a 502/503/504). Two retries, so a source
+# that is really down still fails the run after about 20 seconds more.
+TRANSIENT_RETRY_PAUSES = (5, 15)
 
 
 class HiddenTool(Exception):
@@ -113,6 +123,23 @@ async def call_tool(client: httpx.AsyncClient, name: str, args: dict) -> tuple[s
     """
     if name in HIDDEN_TOOLS:
         raise HiddenTool(name)
+    text, is_error = await _post_tool_call(client, name, args)
+    for pause in TRANSIENT_RETRY_PAUSES:
+        # A source already named in smoke_status is retried by check_tool, not
+        # here, so its known outage is not retried a second time over.
+        if not (
+            is_error and is_transient_network_error(text) and degraded_source(text) is None
+        ):
+            break
+        print(f"  RETRY    {name}: transient network error, trying again in {pause}s")
+        await asyncio.sleep(pause)
+        text, is_error = await _post_tool_call(client, name, args)
+    return text, is_error
+
+
+async def _post_tool_call(
+    client: httpx.AsyncClient, name: str, args: dict
+) -> tuple[str, bool]:
     data = await mcp_post(
         client,
         {
