@@ -258,6 +258,26 @@ _UPSTREAM_5XX_HOSTS = frozenset(
 )
 
 
+# A network blip on one call: the request timed out, the connection dropped, or
+# a gateway answered 502/503/504. The scheduled smoke run failed on a different
+# source nearly every day of 2026-11-16..23 (CEPALSTAT, World Bank, BVG,
+# CentroSur, ARCONEL's 503, ANDA, salud.gob.ec), each a single call that
+# answered normally on the next run. Retrying such a call once or twice tells a
+# blip from a source that is really down, without a per-source allowlist entry
+# for every host that happens to time out on a given day.
+_TRANSIENT_NETWORK_RE = re.compile(
+    r"ConnectTimeout|ReadTimeout|PoolTimeout|ConnectError|ReadError"
+    r"|RemoteProtocolError|la fuente no respondió a tiempo"
+    r"|Server error '50[234][^']*' for url",
+    re.IGNORECASE,
+)
+
+
+def is_transient_network_error(text: str) -> bool:
+    """True when `text` describes a timeout, dropped connection or 502/503/504."""
+    return bool(_TRANSIENT_NETWORK_RE.search(text))
+
+
 def _known_5xx_host(host: str) -> bool:
     host = host.casefold().rsplit(":", 1)[0]
     return any(
