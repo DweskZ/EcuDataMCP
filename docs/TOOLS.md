@@ -177,7 +177,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 |------|-------------|
 | `investigate_dataset` | Atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de "encuéntrame datos sobre X y muéstrame qué hay dentro" |
 | `list_zip_contents` | Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo. |
-| `read_zip_member` | Lee como tabla un archivo (CSV/TSV/TXT, XLSX/XLS/XLSB/ODS) dentro de un .zip remoto, bajando solo los bytes de ese miembro vía HTTP Range. Tope: 5 MB comprimido por miembro. Detecta el encabezado bajo el bloque de título de los tabulados y omite columnas vacías. |
+| `read_zip_member` | Lee como tabla un archivo (CSV/TSV/TXT, XLSX/XLS/XLSB/ODS) dentro de un .zip remoto, bajando solo los bytes de ese miembro vía HTTP Range. Tope: 5 MB comprimido por miembro. Detecta el encabezado bajo el bloque de título de los tabulados y omite columnas vacías. `sheet` elige la hoja por nombre o número y la respuesta lista todas; `inner_member` lee un archivo dentro de un .zip que está dentro del .zip; con `member=''` lee una hoja de cálculo publicada directamente en la URL (hasta 20 MB). |
 | `read_pdf` | Extrae texto de un documento PDF en una URL directa. |
 
 ## SEPS y economía popular
