@@ -195,27 +195,57 @@ def test_wmi_started_build_survives_its_parents_job_and_a_plain_detached_one_doe
     k32.AssignProcessToJobObject.argtypes = [wintypes.HANDLE, wintypes.HANDLE]
     k32.TerminateJobObject.argtypes = [wintypes.HANDLE, wintypes.UINT]
     job = k32.CreateJobObjectW(None, None)  # no limits: breakaway is not permitted
-    helper = subprocess.Popen(
-        [sys.executable, "-c", _HELPER_CODE, str(tmp_path)],
-        cwd=supercias_financials._PACKAGE_ROOT, stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-    )
+    helper_log = tmp_path / "helper.log"
+    with helper_log.open("wb") as log:
+        helper = subprocess.Popen(
+            [sys.executable, "-c", _HELPER_CODE, str(tmp_path)],
+            cwd=supercias_financials._PACKAGE_ROOT, stdin=subprocess.DEVNULL,
+            stdout=log, stderr=subprocess.STDOUT,
+        )
     pids: dict[str, int] = {}
+
+    def helper_output() -> str:
+        return helper_log.read_text(encoding="utf-8", errors="replace")[-1500:] or "(empty)"
+
+    def wait_until(condition, seconds: float) -> bool:
+        end = time.time() + seconds
+        while time.time() < end:
+            if condition():
+                return True
+            time.sleep(0.2)
+        return condition()
+
+    alive = supercias_financials._pid_alive
     try:
         assert k32.AssignProcessToJobObject(job, ctypes.c_void_p(int(helper._handle)))
         (tmp_path / "go").write_text("")
-        deadline = time.time() + 60
-        while not (tmp_path / "pids.json").exists() and time.time() < deadline:
-            time.sleep(0.3)
+        # WMI answers slowly when the machine is busy (a full suite run), and
+        # a helper that crashed never writes the file: say which happened.
+        assert wait_until(
+            lambda: (tmp_path / "pids.json").exists() or helper.poll() is not None, 90
+        ), f"the helper wrote no pids in 90 s; its output:\n{helper_output()}"
+        assert (tmp_path / "pids.json").exists(), (
+            f"the helper exited ({helper.poll()}) without writing pids; its output:\n"
+            f"{helper_output()}"
+        )
         pids = json.loads((tmp_path / "pids.json").read_text())
-        assert supercias_financials._pid_alive(pids["plain"])
-        assert supercias_financials._pid_alive(pids["wmi"])
+        assert alive(pids["plain"]) and alive(pids["wmi"]), (
+            f"a sleeper was already gone before the job was terminated: "
+            f"plain alive={alive(pids['plain'])}, wmi alive={alive(pids['wmi'])}"
+        )
 
         k32.TerminateJobObject(job, 1)
-        time.sleep(3)
 
-        assert not supercias_financials._pid_alive(pids["plain"])
-        assert supercias_financials._pid_alive(pids["wmi"])
+        # Termination is asynchronous: wait for the plain child instead of a
+        # fixed sleep, then check the WMI one is still there.
+        assert wait_until(lambda: not alive(pids["plain"]), 15), (
+            "the plain detached child survived its job being terminated"
+        )
+        assert alive(pids["wmi"]), (
+            "the WMI-started process died with the job (or was reaped by something "
+            f"else) while the plain one is {'alive' if alive(pids['plain']) else 'gone'}; "
+            f"helper output:\n{helper_output()}"
+        )
     finally:
         helper.kill()
         for pid in pids.values():
