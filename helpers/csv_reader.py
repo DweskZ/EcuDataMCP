@@ -13,6 +13,7 @@ import zipfile
 import zlib
 from collections.abc import Callable
 from typing import Any, TypeVar
+from urllib.parse import unquote, urlsplit
 
 import httpx
 
@@ -594,13 +595,41 @@ async def preview_json(
     }
 
 
-def _parse_xlsx_bytes(raw: bytes, max_rows: int, truncated: bool) -> dict[str, Any]:
+def _select_sheet(names: list[str], sheet: str) -> int:
+    """Index of the requested sheet: "" -> 0, "3" -> third sheet, else by name.
+
+    Names match exactly first, then case-insensitively and ignoring
+    surrounding spaces. A miss raises ValueError listing the workbook's sheets.
+    """
+    wanted = (sheet or "").strip()
+    if not wanted:
+        return 0
+    if wanted.isdigit():
+        index = int(wanted) - 1
+        if 0 <= index < len(names):
+            return index
+    elif wanted in names:
+        return names.index(wanted)
+    else:
+        folded = [n.strip().casefold() for n in names]
+        if wanted.casefold() in folded:
+            return folded.index(wanted.casefold())
+    listed = "; ".join(f"{i + 1}. {n}" for i, n in enumerate(names))
+    raise ValueError(
+        f"No hay una hoja '{sheet}' en el libro. Hojas disponibles: {listed}."
+    )
+
+
+def _parse_xlsx_bytes(
+    raw: bytes, max_rows: int, truncated: bool, sheet: str = ""
+) -> dict[str, Any]:
     from openpyxl import load_workbook
 
     _check_zip_container_size(raw, ".xlsx")
     wb = load_workbook(filename=io.BytesIO(raw), read_only=True, data_only=True)
     try:
-        ws = wb.active
+        names = list(wb.sheetnames)
+        ws = wb[names[_select_sheet(names, sheet)]] if sheet.strip() else wb.active
         if ws is None:
             return {
                 "headers": [],
@@ -634,16 +663,20 @@ def _parse_xlsx_bytes(raw: bytes, max_rows: int, truncated: bool) -> dict[str, A
             "truncated": truncated,
             "format": "xlsx",
             "sheet": ws.title,
+            "sheets": names,
         }
     finally:
         wb.close()
 
 
-def _parse_xls_bytes(raw: bytes, max_rows: int, truncated: bool) -> dict[str, Any]:
+def _parse_xls_bytes(
+    raw: bytes, max_rows: int, truncated: bool, sheet: str = ""
+) -> dict[str, Any]:
     import xlrd
 
     wb = xlrd.open_workbook(file_contents=raw)
-    ws = wb.sheet_by_index(0)
+    names = list(wb.sheet_names())
+    ws = wb.sheet_by_index(_select_sheet(names, sheet))
 
     if ws.nrows == 0:
         return {
@@ -672,10 +705,13 @@ def _parse_xls_bytes(raw: bytes, max_rows: int, truncated: bool) -> dict[str, An
         "truncated": truncated,
         "format": "xls",
         "sheet": ws.name,
+        "sheets": names,
     }
 
 
-def _parse_xlsb_bytes(raw: bytes, max_rows: int, truncated: bool) -> dict[str, Any]:
+def _parse_xlsb_bytes(
+    raw: bytes, max_rows: int, truncated: bool, sheet: str = ""
+) -> dict[str, Any]:
     from pyxlsb import open_workbook
 
     _check_zip_container_size(raw, ".xlsb")
@@ -689,7 +725,9 @@ def _parse_xlsb_bytes(raw: bytes, max_rows: int, truncated: bool) -> dict[str, A
                 "truncated": truncated,
                 "format": "xlsb",
             }
-        ws = wb.get_sheet(1)
+        names = list(wb.sheets)
+        index = _select_sheet(names, sheet)
+        ws = wb.get_sheet(index + 1)
         try:
             rows_iter = ws.rows()
 
@@ -719,7 +757,8 @@ def _parse_xlsb_bytes(raw: bytes, max_rows: int, truncated: bool) -> dict[str, A
                 "total_rows_in_preview": len(data_rows),
                 "truncated": truncated,
                 "format": "xlsb",
-                "sheet": wb.sheets[0],
+                "sheet": names[index],
+                "sheets": names,
             }
         finally:
             ws.close()
@@ -727,7 +766,9 @@ def _parse_xlsb_bytes(raw: bytes, max_rows: int, truncated: bool) -> dict[str, A
         wb.close()
 
 
-def _parse_ods_bytes(raw: bytes, max_rows: int, truncated: bool) -> dict[str, Any]:
+def _parse_ods_bytes(
+    raw: bytes, max_rows: int, truncated: bool, sheet: str = ""
+) -> dict[str, Any]:
     from odf.opendocument import load
     from odf.table import Table, TableCell, TableRow
     from odf.teletype import extractText
@@ -744,7 +785,8 @@ def _parse_ods_bytes(raw: bytes, max_rows: int, truncated: bool) -> dict[str, An
     }
     if not tables:
         return empty
-    sheet = tables[0]
+    names = [str(t.getAttribute("name")) for t in tables]
+    table = tables[_select_sheet(names, sheet)]
 
     def row_values(row: TableRow) -> list[str]:
         values: list[str] = []
@@ -759,7 +801,7 @@ def _parse_ods_bytes(raw: bytes, max_rows: int, truncated: bool) -> dict[str, An
         return values
 
     all_rows: list[list[str]] = []
-    for row in sheet.getElementsByType(TableRow):
+    for row in table.getElementsByType(TableRow):
         values = row_values(row)
         if not values:
             continue
@@ -785,7 +827,8 @@ def _parse_ods_bytes(raw: bytes, max_rows: int, truncated: bool) -> dict[str, An
         "total_rows_in_preview": len(data_rows),
         "truncated": truncated,
         "format": "ods",
-        "sheet": sheet.getAttribute("name"),
+        "sheet": table.getAttribute("name"),
+        "sheets": names,
     }
 
 
@@ -1402,7 +1445,7 @@ async def list_zip_contents(
 
 
 _ZIP_TEXT_EXTS = (".csv", ".tsv", ".txt")
-_ZIP_SHEET_PARSERS: dict[str, Callable[[bytes, int, bool], dict[str, Any]]] = {
+_ZIP_SHEET_PARSERS: dict[str, Callable[..., dict[str, Any]]] = {
     ".xlsx": _parse_xlsx_bytes,
     ".xls": _parse_xls_bytes,
     ".xlsb": _parse_xlsb_bytes,
@@ -1448,25 +1491,170 @@ def _check_partial(status: int, headers: httpx.Headers, expected_start: int) -> 
         raise ValueError(_RANGE_UNSUPPORTED)
 
 
+def _ext_of(name: str) -> str:
+    base = name.rsplit("/", 1)[-1]
+    return "." + base.rsplit(".", 1)[-1].lower() if "." in base else ""
+
+
+_ZIP_NESTED_EXTS = (".zip",)
+
+
+def _check_readable_ext(name: str, ext: str, *, allow_zip: bool) -> None:
+    allowed = (*_ZIP_TEXT_EXTS, *_ZIP_SHEET_PARSERS, *(_ZIP_NESTED_EXTS if allow_zip else ()))
+    if ext not in allowed:
+        raise ValueError(
+            f"'{name}' no tiene un formato legible ({ext or 'sin extensión'}). "
+            f"Formatos soportados: {', '.join(allowed)}."
+        )
+
+
+async def _parse_table_bytes(
+    name: str,
+    ext: str,
+    out: bytes,
+    truncated: bool,
+    max_rows: int,
+    skip_rows: int,
+    sheet: str,
+) -> dict[str, Any]:
+    """Parse a text or spreadsheet file and tidy its report layout."""
+    # Read past max_rows so a title block above the real header still leaves
+    # max_rows data rows once it is skipped.
+    parse_rows = max_rows + (_HEADER_SCAN_ROWS if skip_rows < 0 else skip_rows)
+    if ext in _ZIP_SHEET_PARSERS:
+        result = await run_parser_off_loop(
+            _ZIP_SHEET_PARSERS[ext], out, parse_rows, False, sheet
+        )
+    else:
+        if sheet.strip():
+            raise ValueError(
+                f"'{name}' es un archivo de texto ({ext}); el parámetro sheet solo "
+                "aplica a hojas de cálculo."
+            )
+        result = _parse_csv_bytes(out, parse_rows, truncated=truncated)
+        result["format"] = ext.lstrip(".")
+
+    more = result["truncated"]
+    tidy = _tidy_report_table([result["headers"], *result["rows"]], skip_rows)
+    rows = tidy["rows"]
+    result.update(
+        {
+            "headers": tidy["headers"],
+            "rows": rows[:max_rows],
+            "total_rows_in_preview": min(len(rows), max_rows),
+            "truncated": more or len(rows) > max_rows,
+            "header_row": tidy["header_row"],
+            "preamble": tidy["preamble"],
+            "dropped_empty_columns": tidy["dropped_empty_columns"],
+        }
+    )
+    return result
+
+
+def _read_nested_member(
+    outer_name: str, outer: bytes, inner_member: str
+) -> tuple[str, bytes, bool]:
+    """Pick one file out of a .zip that was itself a member of the remote .zip."""
+    _check_zip_container_size(outer, outer_name)
+    try:
+        zf = zipfile.ZipFile(io.BytesIO(outer))
+    except zipfile.BadZipFile as e:
+        raise ValueError(f"'{outer_name}' no es un .zip válido ({e}).") from e
+    with zf:
+        infos = zf.infolist()
+        members = [
+            {"name": i.filename, "is_dir": i.is_dir(), "size": i.file_size}
+            for i in infos
+        ]
+        files = [m["name"] for m in members if not m["is_dir"]]
+        if not inner_member.strip():
+            listed = ", ".join(files[:50])
+            more = f" (y {len(files) - 50} más)" if len(files) > 50 else ""
+            raise ValueError(
+                f"'{outer_name}' es un .zip dentro del .zip. Indica cuál de sus "
+                f"archivos leer con inner_member: {listed}{more}."
+            )
+        info = _resolve_member(members, inner_member)
+        name = info["name"]
+        if info["is_dir"]:
+            raise ValueError(f"'{name}' es una carpeta dentro de '{outer_name}'.")
+        ext = _ext_of(name)
+        _check_readable_ext(name, ext, allow_zip=False)
+        is_sheet = ext in _ZIP_SHEET_PARSERS
+        cap = _MAX_DECOMPRESSED_BYTES if is_sheet else MAX_DOWNLOAD_BYTES
+        if is_sheet and info["size"] > cap:
+            raise ValueError(
+                f"'{name}' se expande a {info['size']} bytes, por encima del "
+                f"límite de {cap // (1024 * 1024)} MB para hojas de cálculo."
+            )
+        with zf.open(name) as fh:
+            data = fh.read(cap + 1)
+        truncated = len(data) > cap
+        return f"{outer_name}/{name}", data[:cap], truncated
+
+
+async def _read_direct_file(
+    url: str, session: httpx.AsyncClient | None
+) -> tuple[str, str, bytes, bool, int]:
+    """Download a spreadsheet or text file published directly at `url`."""
+    path = urlsplit(url).path
+    name = unquote(path.rsplit("/", 1)[-1]) or url
+    ext = _ext_of(path)
+    _check_readable_ext(name, ext, allow_zip=False)
+    is_sheet = ext in _ZIP_SHEET_PARSERS
+    cap = _MAX_DECOMPRESSED_BYTES if is_sheet else MAX_DOWNLOAD_BYTES
+    raw, truncated = await download_bytes(url, session=session, max_bytes=cap)
+    if is_sheet and truncated:
+        raise ValueError(
+            f"'{name}' supera el límite de {cap // (1024 * 1024)} MB; una hoja de "
+            "cálculo no se puede abrir incompleta."
+        )
+    return name, ext, raw, truncated, len(raw)
+
+
 async def read_zip_member(
     url: str,
     member: str,
     max_rows: int = 50,
     session: httpx.AsyncClient | None = None,
     skip_rows: int = -1,
+    sheet: str = "",
+    inner_member: str = "",
 ) -> dict[str, Any]:
     """Read one member of a remote .zip by fetching only that member's bytes.
 
     `skip_rows`: rows above the column header (-1 detects it, see
     _tidy_report_table). Empty columns are dropped from the result.
+    `sheet`: for spreadsheets, a sheet name or 1-based number ("" = the
+    workbook's active/first sheet). The result lists every sheet in `sheets`.
+    `inner_member`: when `member` is itself a .zip (INEC publishes CSV
+    tabulados as a zip of zips), the file to read inside it.
+    An empty `member` reads `url` itself as a spreadsheet or text file
+    (e.g. a .xlsx published directly, outside any .zip).
 
     Uses the central directory (as list_zip_contents does) to locate the
     member, then Range-fetches its local header and compressed data. Caps:
     compressed size <= MAX_DOWNLOAD_BYTES; CSV/text output stops at
-    MAX_DOWNLOAD_BYTES (marked truncated); spreadsheets must fit in
-    _MAX_DECOMPRESSED_BYTES since their parsers need the whole file. Only
-    stored and deflate members, no encryption; ZIP64 is supported.
+    MAX_DOWNLOAD_BYTES (marked truncated); spreadsheets and nested .zip
+    members must fit in _MAX_DECOMPRESSED_BYTES since they are opened
+    whole. Only stored and deflate members, no encryption; ZIP64 is
+    supported.
     """
+    if not member.strip():
+        name, ext, out, truncated, size = await _read_direct_file(url, session)
+        result = await _parse_table_bytes(
+            name, ext, out, truncated, max_rows, skip_rows, sheet
+        )
+        result.update(
+            {
+                "member_name": name,
+                "compressed_size": size,
+                "uncompressed_size": size,
+                "url": url,
+            }
+        )
+        return result
+
     members, total_size, _entries = await _fetch_central_directory(url, session)
     info = _resolve_member(members, member)
     name = info["name"]
@@ -1497,21 +1685,20 @@ async def read_zip_member(
             "directamente."
         )
 
-    ext = (
-        "." + name.rsplit(".", 1)[-1].lower() if "." in name.rsplit("/", 1)[-1] else ""
-    )
-    if ext not in _ZIP_TEXT_EXTS and ext not in _ZIP_SHEET_PARSERS:
-        supported = ", ".join((*_ZIP_TEXT_EXTS, *_ZIP_SHEET_PARSERS))
+    ext = _ext_of(name)
+    _check_readable_ext(name, ext, allow_zip=True)
+    is_nested = ext in _ZIP_NESTED_EXTS
+    if inner_member.strip() and not is_nested:
         raise ValueError(
-            f"'{name}' no tiene un formato legible ({ext or 'sin extensión'}). "
-            f"Formatos soportados: {supported}."
+            f"'{name}' no es un .zip; inner_member solo aplica a un .zip dentro del .zip."
         )
-    is_sheet = ext in _ZIP_SHEET_PARSERS
+    # Spreadsheets and nested zips are opened whole, so they must be complete.
+    is_sheet = ext in _ZIP_SHEET_PARSERS or is_nested
     if is_sheet and info["uncompressed_size"] > _MAX_DECOMPRESSED_BYTES:
         raise ValueError(
             f"'{name}' se expande a {info['uncompressed_size']} bytes, por encima "
             f"del límite de {_MAX_DECOMPRESSED_BYTES // (1024 * 1024)} MB para hojas "
-            "de cálculo."
+            "de cálculo y .zip internos."
         )
 
     # One request: local header, the central directory's name/extra length
@@ -1566,36 +1753,24 @@ async def read_zip_member(
             "descomprimido; una hoja de cálculo no se puede abrir incompleta."
         )
 
-    # Read past max_rows so a title block above the real header still leaves
-    # max_rows data rows once it is skipped.
-    parse_rows = max_rows + (_HEADER_SCAN_ROWS if skip_rows < 0 else skip_rows)
-    if is_sheet:
-        result = await run_parser_off_loop(
-            _ZIP_SHEET_PARSERS[ext], out, parse_rows, False
-        )
-    else:
-        result = _parse_csv_bytes(out, parse_rows, truncated=truncated)
-        result["format"] = ext.lstrip(".")
+    read_name = name
+    if is_nested:
+        read_name, out, truncated = _read_nested_member(name, out, inner_member)
+        ext = _ext_of(read_name)
 
-    more = result["truncated"]
-    tidy = _tidy_report_table([result["headers"], *result["rows"]], skip_rows)
-    rows = tidy["rows"]
+    result = await _parse_table_bytes(
+        read_name, ext, out, truncated, max_rows, skip_rows, sheet
+    )
     result.update(
         {
-            "headers": tidy["headers"],
-            "rows": rows[:max_rows],
-            "total_rows_in_preview": min(len(rows), max_rows),
-            "truncated": more or len(rows) > max_rows,
-            "header_row": tidy["header_row"],
-            "preamble": tidy["preamble"],
-            "dropped_empty_columns": tidy["dropped_empty_columns"],
-            "member_name": name,
+            "member_name": read_name,
             "compressed_size": compressed_size,
             "uncompressed_size": info["uncompressed_size"],
             "url": url,
         }
     )
     return result
+
 
 
 _HEADER_SCAN_ROWS = 30
