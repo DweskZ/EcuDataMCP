@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+- **`read_zip_member` reads any sheet, a zip inside a zip, and a spreadsheet
+  at a plain URL.** Three cases it could not handle on 2026-11-23, while
+  pulling rice prices for El Quantificador: SIPA's `precios-agroindustria.xlsx`
+  is published directly, not inside a .zip, and its data is on the seventh
+  sheet ("Histórico Piladoras 12-25"), while the tool always opened the first
+  ("ÍNDICE"); INEC's tabulados in CSV come as a .zip of .zip files, which the
+  tool refused as an unreadable format. New parameters: `sheet` (a name,
+  matched case-insensitively, or a 1-based number; the result lists every
+  sheet in `sheets`, and a wrong name fails with that list) and
+  `inner_member` (the file to read inside a .zip member, which must fit in
+  5 MB compressed and 20 MB expanded; left empty, the error lists the inner
+  files). With `member=''`, the URL itself is read as a spreadsheet (up to
+  20 MB) or text file (up to 5 MB), through the same SSRF-guarded download
+  as `preview_resource_data`. No new tool, so the default profile stays at
+  85.
 - **Smoke test: `www.sri.gob.ec/datasets` network errors count as degraded, not
   failed.** The source fails intermittently from the cloud: a `ConnectError` on
   the runner on 2026-11-18 and a `ReadError` from the Oracle VM on 2026-11-20
