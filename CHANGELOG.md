@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **Smoke test: `www.sri.gob.ec/datasets` network errors count as degraded, not
+  failed.** The source fails intermittently from the cloud: a `ConnectError` on
+  the runner on 2026-11-18 and a `ReadError` from the Oracle VM on 2026-11-20
+  and 11-21, while the same call loaded all 130 files from the VM and from a
+  Colombian VPN exit on 2026-11-23/24. It is not an outage and not a block;
+  curl cannot probe it because the page needs the repo's legacy-cipher TLS
+  client, which is also why a plain `curl` made it look down. Only the two
+  observed shapes of the `sri_datasets` error are classified, so a page that
+  loads but parses wrong, or another source's `ConnectError`, still fails.
 - **`/health` lists the hidden tools; the smoke test skips them.** Run against
   the Oracle VM (which hides the tools its network cannot reach), `smoke_e2e.py`
   reported `Unknown tool: search_contratos` and the two infoMIES tools as hard

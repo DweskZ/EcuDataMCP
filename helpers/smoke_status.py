@@ -197,6 +197,25 @@ _DEGRADED_SOURCES = (
         "error al consultar wdi",
         "readtimeout",
     ),
+    (
+        # www.sri.gob.ec/datasets fails intermittently from the cloud: a
+        # ConnectError on the runner 2026-11-18 and a ReadError from the Oracle
+        # VM on 2026-11-20 and 11-21, while the same call (130 files) loaded
+        # from the VM and from a Colombian VPN exit on 2026-11-23/24. Not an
+        # outage and not a block: the page needs this repo's legacy-cipher TLS
+        # client (curl cannot even handshake with it), and the host drops
+        # connections now and then. Only these two observed shapes of the
+        # sri_datasets error count; a page that loads but parses wrong, or
+        # another source's ConnectError, stays a failure.
+        "sri_datasets_intermittent",
+        "archivos de sri_datasets",
+        "connecterror",
+    ),
+    (
+        "sri_datasets_intermittent",
+        "archivos de sri_datasets",
+        "readerror",
+    ),
 )
 
 # Sources blocked by country or datacenter IP. Without a LatAm egress

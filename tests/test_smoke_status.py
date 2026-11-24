@@ -338,6 +338,40 @@ def test_other_source_read_timeout_is_not_classified_as_wdi():
     assert degraded_source(text) is None
 
 
+@pytest.mark.parametrize("error", ["ConnectError", "ReadError"])
+def test_classifies_intermittent_sri_datasets_network_errors_as_degraded(error):
+    # Seen from the runner (ConnectError, 2026-11-18) and the Oracle VM
+    # (ReadError, 2026-11-20 and 11-21); the same call loaded 130 files later.
+    text = (
+        "Error executing tool search_archivos: "
+        f"Error al buscar archivos de sri_datasets: {error}"
+    )
+
+    assessment = assess_response(text, [], is_error=True)
+
+    assert assessment.status == "degraded"
+    assert assessment.source == "sri_datasets_intermittent"
+
+
+def test_sri_datasets_that_loads_but_fails_to_parse_stays_a_failure():
+    text = (
+        "Error executing tool search_archivos: "
+        "Error al buscar archivos de sri_datasets: no se encontraron enlaces"
+    )
+
+    assert degraded_source(text) is None
+    assert assess_response(text, [], is_error=True).status == "failed"
+
+
+def test_another_sources_connect_error_is_not_classified_as_sri_datasets():
+    text = (
+        "Error executing tool search_archivos: "
+        "Error al buscar archivos de censo_ecuador: ConnectError"
+    )
+
+    assert degraded_source(text) is None
+
+
 def test_classifies_elecgalapagos_503_as_degraded():
     text = (
         "Error executing tool search_cortes: Error al consultar el archivo de "
