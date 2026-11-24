@@ -744,6 +744,15 @@
             "coverage": "ambienteyenergia.gob.ec",
             "url": "https://www.ambienteyenergia.gob.ec",
             "status": "live"
+          },
+          {
+            "id": "mae-ide",
+            "name": "Environmental spatial data infrastructure (IDE)",
+            "tag": "Environment",
+            "description": "93 open WFS layers: land cover 1990-2024, deforestation by period 1990-2024, protected areas (SNAP), protective forests, carbon and mining contamination",
+            "coverage": "ide.ambiente.gob.ec",
+            "url": "http://ide.ambiente.gob.ec/mapainteractivo/",
+            "status": "live"
           }
         ]
       },

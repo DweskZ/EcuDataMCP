@@ -744,6 +744,15 @@
             "coverage": "ambienteyenergia.gob.ec",
             "url": "https://www.ambienteyenergia.gob.ec",
             "status": "live"
+          },
+          {
+            "id": "mae-ide",
+            "name": "Infraestructura de datos espaciales ambiental (IDE)",
+            "tag": "Ambiente",
+            "description": "93 capas WFS abiertas: cobertura de la tierra 1990-2024, deforestación por período 1990-2024, áreas protegidas (SNAP), bosques protectores, carbono y contaminación minera",
+            "coverage": "ide.ambiente.gob.ec",
+            "url": "http://ide.ambiente.gob.ec/mapainteractivo/",
+            "status": "live"
           }
         ]
       },

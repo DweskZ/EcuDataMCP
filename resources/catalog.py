@@ -145,6 +145,12 @@ def _all_fuentes() -> dict:
                 "tools": ["search_capas_geo", "get_capa_geo_datos"],
             },
             {
+                "id": "maate",
+                "nombre": "Ministerio de Ambiente y Energía (IDE ambiental: 93 capas WFS de deforestación, cobertura de la tierra 1990-2024 y áreas protegidas)",
+                "base": "http://ide.ambiente.gob.ec:8080/geoserver",
+                "tools": ["search_capas_geo", "get_capa_geo_datos"],
+            },
+            {
                 "id": "turismo",
                 "nombre": "Turismo (Boletín de Cifras del Sector Turismo, Ministerio de Producción)",
                 "base": "https://www.produccion.gob.ec/boletin-de-cifras-sector-turismo/",

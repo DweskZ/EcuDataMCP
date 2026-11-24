@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+- **`search_capas_geo` / `get_capa_geo_datos`: new source `fuente="maate"`, the
+  Ministry of Environment's open GeoServer.** The server had no environmental
+  data. `ide.ambiente.gob.ec:8080/geoserver` (found through the `config.js` of
+  the ministry's interactive map; no login) serves 93 WFS layers in its
+  `mae_ide` workspace: land cover for nine years between 1990 and 2024 (up to
+  290,004 polygons), deforestation by period from 1990-2000 to 2022-2024
+  (47,895 polygons in the last), the protected-area system SNAP (81 areas),
+  protective forests, carbon by forest stratum, ecosystems and mining
+  contamination 2009-2023. As with IGM, a sample returns attributes only
+  (geometry would be megabytes), the catalog is cached on disk and served
+  stale if the host goes down, and GeoServer's `tiger` demo workspace is left
+  out. The service answers over plain HTTP on port 8080 only; the HTTPS host
+  does not answer. Checked live on 2026-11-24 against the SNAP and 2022-2024
+  deforestation layers. No new tool: still 86.
+
 - **`read_zip_member` reads any sheet, a zip inside a zip, and a spreadsheet
   at a plain URL.** Three cases it could not handle on 2026-11-23, while
   pulling rice prices for El Quantificador: SIPA's `precios-agroindustria.xlsx`

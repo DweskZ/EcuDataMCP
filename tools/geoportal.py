@@ -1,4 +1,4 @@
-"""The geoportals (INAMHI, MAG, IGM, ARCONEL, CELEC) behind one search/query pair.
+"""The geoportals (INAMHI, MAG, IGM, MAATE, ARCONEL, CELEC, MSP) behind one search/query pair.
 
 INAMHI's hydrometeorology geoportal and the Ministry of Agriculture's
 "Geoportal del Agro" each had a layer-catalog search and a WFS feature
@@ -17,18 +17,25 @@ from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import CallToolResult
 
-from helpers import arcgis_client, igm_client, inamhi_client, sipa_geoportal_client
+from helpers import (
+    arcgis_client,
+    igm_client,
+    inamhi_client,
+    maate_client,
+    sipa_geoportal_client,
+)
 from helpers.format_out import render_structured
 from helpers.logging import log_tool
 from helpers.result_types import ResultadoBusqueda, ResultadoTabla
 from helpers.tool_meta import READ_ONLY
 
-Fuente = Literal["inamhi", "mag", "igm", "arconel", "celec", "msp"]
+Fuente = Literal["inamhi", "mag", "igm", "maate", "arconel", "celec", "msp"]
 
 _NOMBRES = {
     "inamhi": "Geoportal INAMHI",
     "mag": "Geoportal MAG (agro)",
     "igm": "Geoportal IGM (cartografía oficial)",
+    "maate": "Ministerio de Ambiente y Energía (IDE ambiental)",
     "arconel": "ARCONEL (ArcGIS, SISDAT)",
     "celec": "CELEC EP (ArcGIS)",
     "msp": "Ministerio de Salud Pública (ArcGIS)",
@@ -45,6 +52,9 @@ async def _search(fuente: str, query: str, solo_wfs: bool, categoria: str) -> di
         id_key = "name"
     elif fuente == "igm":
         result = await igm_client.search_capas(query=query, servicio=categoria)
+        id_key = "name"
+    elif fuente == "maate":
+        result = await maate_client.search_capas(query=query)
         id_key = "name"
     else:
         result = await sipa_geoportal_client.search_capas(
@@ -73,20 +83,22 @@ async def _sample(
         raise ValueError(
             "filtro, offset, agrupar y sumar solo aplican a las fuentes arconel, celec y msp."
         )
-    client = {"inamhi": inamhi_client, "igm": igm_client}.get(fuente, sipa_geoportal_client)
+    client = {"inamhi": inamhi_client, "igm": igm_client, "maate": maate_client}.get(
+        fuente, sipa_geoportal_client
+    )
     result = await client.get_layer_features(capa, count=count)
     return {**result, "fuente": fuente}
 
 
 def register_geoportal_tools(mcp: MCPServer) -> None:
     @mcp.tool(
-        title="Buscar capas de un geoportal (INAMHI, MAG, IGM, ARCONEL, CELEC o MSP)",
+        title="Buscar capas de un geoportal (INAMHI, MAG, IGM, MAATE, ARCONEL, CELEC o MSP)",
         description=(
-            "Search layers of a geoportal: inamhi (rainfall normals, anomalies, "
-            "watersheds), mag (agro zoning, land cover, rural cadastre), igm "
-            "(official base cartography 1:1M/1:50k/1:25k), arconel (energy balance, "
-            "billing, production by plant 1999-2026, lighting, grid) or celec "
-            "(plants, transmission) or msp (health facilities, indicators)."
+            "Search layers of a geoportal: inamhi (rainfall, watersheds), mag (agro "
+            "zoning, rural cadastre), igm (base cartography 1:1M to 1:25k), maate "
+            "(deforestation, land cover 1990-2024, protected areas), arconel (energy "
+            "balance, billing, plants, grid), celec (plants, transmission) or msp "
+            "(health facilities, indicators)."
         ),
         annotations=READ_ONLY,
     )
@@ -117,6 +129,13 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
           EEZ), 505 at 1:50,000 and 164 at 1:25,000. The reserved
           igm_reservada workspace is left out. `categoria` picks the scale:
           nacional, 50k or 25k.
+        - maate: Ministerio de Ambiente y Energía's open GeoServer
+          (ide.ambiente.gob.ec:8080, plain HTTP), 93 WFS layers in the
+          mae_ide workspace: land cover for nine years from 1990 to 2024,
+          deforestation by period 1990-2024, the protected-area system
+          (SNAP), protective forests, carbon by forest stratum, ecosystems
+          and mining contamination 2009-2023. Layers are large polygon
+          sets; the sample returns attributes only.
         - arconel: ARCONEL's SISDAT layers on ArcGIS (12 curated):
           balance_energia (energy available, technical/non-technical losses
           and billed energy by distributor and month, Jan 1999-Apr 2024),
@@ -145,7 +164,7 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
         no attribute data); every ArcGIS layer is queryable.
 
         Args:
-            fuente: inamhi, mag, igm, arconel, celec or msp.
+            fuente: inamhi, mag, igm, maate, arconel, celec or msp.
             query: Free text matched (accent-insensitive) against the layer's
                 id, name, title or abstract. Empty returns all layers.
             solo_wfs: Only return layers with WFS (attribute data). Ignored
@@ -193,7 +212,7 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
         title="Ver datos de una capa de geoportal",
         description=(
             "Attributes of a layer from search_capas_geo, geometry dropped. "
-            "GeoServer (inamhi, mag, igm): a sample of up to 20 features. ArcGIS "
+            "GeoServer (inamhi, mag, igm, maate): a sample of up to 20 features. ArcGIS "
             "(arconel, celec, msp): up to 500 rows with a SQL filtro and offset, or "
             "server-side sums by group (sumar, agrupar)."
         ),
@@ -213,7 +232,7 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
         """
         Fetch one geoportal layer's feature attributes.
 
-        inamhi, mag, igm: WFS GetFeature (JSON), a small sample to confirm what a
+        inamhi, mag, igm, maate: WFS GetFeature (JSON), a small sample to confirm what a
         vector layer contains; no filters. Layers without WFS (rasters such
         as INAMHI's wrf_tiempo_* grids, or MAG stores with WFS disabled)
         raise an error.
@@ -233,12 +252,13 @@ def register_geoportal_tools(mcp: MCPServer) -> None:
         type is kept.
 
         Args:
-            fuente: inamhi, mag, igm, arconel, celec or msp.
+            fuente: inamhi, mag, igm, maate, arconel, celec or msp.
             capa: The layer's `capa` from search_capas_geo (INAMHI:
                 "geonode:..." name; IGM: "workspace:name", e.g.
-                nacional_2024:poblado_p_2024; MAG: "categoria/store/name"; ArcGIS: the
+                nacional_2024:poblado_p_2024; MAATE: "mae_ide:name", e.g.
+                mae_ide:v_fa210_snap_a; MAG: "categoria/store/name"; ArcGIS: the
                 short id, e.g. balance_energia).
-            count: Features to fetch: 1-20 for inamhi/mag/igm, 1-500 for
+            count: Features to fetch: 1-20 for inamhi/mag/igm/maate, 1-500 for
                 arconel/celec/msp (default 5).
             filtro: arconel/celec/msp only: SQL where clause; empty for all rows.
             offset: arconel/celec/msp only: rows (or groups) to skip when paging.
