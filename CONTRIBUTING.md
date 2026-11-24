@@ -61,8 +61,8 @@ uv run python -m helpers.supercias_financials_build  # reconstruir la base de Su
   de la URL manda cuando es reconocible, y un sniff del `Content-Type`
   (`helpers/csv_reader.sniff_content_type`) es el último recurso. Varios
   bugs reales del portal (`.tar.gz` declarado como CSV, `.xlsx` declarado
-  como CSV) vinieron de fiarse del `format` — ver la sección "Formatos y
-  tipos de recursos" de docs/ROADMAP.md.
+  como CSV) vinieron de fiarse del `format` — ver la fila "Formatos de
+  archivo" en "Calidad, formatos y operación" de docs/ROADMAP.md.
 - Los previews de archivos comprimidos (`.zip`, `.tar.gz`) eligen el
   miembro con `helpers/csv_reader._pick_member` (`.csv` > `.tsv` > `.txt`,
   `None` si no hay nada tabular); no caer en "el primer archivo del zip".
