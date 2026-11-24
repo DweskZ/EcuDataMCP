@@ -21,9 +21,9 @@ def register_read_zip_member_tool(mcp: MCPServer) -> None:
         title="Leer un archivo dentro de un ZIP remoto",
         description=(
             "Read one CSV/TSV/TXT or XLSX/XLS/XLSB/ODS file inside a remote ZIP as "
-            "a table, fetching only that file's bytes via HTTP Range. Get member "
-            "names from list_zip_contents first. Max 5 MB compressed per member. "
-            "Detects the header below a report's title block."
+            "a table, fetching only that file's bytes via HTTP Range; any sheet, "
+            "a zip inside the zip (inner_member), or with member='' a spreadsheet "
+            "published at the URL itself. Get member names from list_zip_contents."
         ),
         annotations=READ_ONLY,
     )
@@ -34,6 +34,8 @@ def register_read_zip_member_tool(mcp: MCPServer) -> None:
         rows: int = 50,
         offset: int = 0,
         skip_rows: int = -1,
+        sheet: str = "",
+        inner_member: str = "",
         format: Literal["text", "json"] = "text",
     ) -> Annotated[CallToolResult, ResultadoTabla]:
         """
@@ -54,8 +56,22 @@ def register_read_zip_member_tool(mcp: MCPServer) -> None:
           20 MB decompressed, since they can't be opened partially.
         - Only stored or deflate members; no encrypted members. ZIP64
           archives are supported.
-        - Supported formats: .csv, .tsv, .txt, .xlsx, .xls, .xlsb, .ods (first
-          sheet). The CRC32 is checked whenever the member is read in full.
+        - Supported formats: .csv, .tsv, .txt, .xlsx, .xls, .xlsb, .ods. The
+          CRC32 is checked whenever the member is read in full.
+
+        Sheets: spreadsheets open on their active (usually first) sheet; pass
+        sheet as a name or a 1-based number for another one. The result lists
+        every sheet of the workbook in `sheets`, and a wrong name fails with
+        that list.
+
+        Zip inside a zip: INEC publishes its CSV tabulados as a .zip of .zip
+        files. When `member` is itself a .zip (at most 5 MB compressed and
+        20 MB expanded), pass the file to read inside it as inner_member;
+        leaving inner_member empty fails with the inner file names.
+
+        Files outside a zip: with member='' the URL itself is read as a
+        spreadsheet or text file (e.g. SIPA's precios-agroindustria.xlsx),
+        downloaded whole up to 20 MB for spreadsheets and 5 MB for text.
 
         Matching: exact name first, then a unique case-insensitive or
         basename match; otherwise the error suggests close names.
@@ -75,6 +91,8 @@ def register_read_zip_member_tool(mcp: MCPServer) -> None:
             rows: Data rows to return (default 50, max 500).
             offset: Data rows to skip before returning, for pagination.
             skip_rows: Rows above the column header; -1 (default) detects them, 0 keeps row 1.
+            sheet: Spreadsheet sheet name or 1-based number; empty reads the active sheet.
+            inner_member: File to read inside a .zip member; only when member is a .zip.
             format: text | json
         """
         rows = min(max(rows, 1), 500)
@@ -82,7 +100,12 @@ def register_read_zip_member_tool(mcp: MCPServer) -> None:
 
         try:
             result = await _read_zip_member(
-                url, member, max_rows=offset + rows, skip_rows=skip_rows
+                url,
+                member,
+                max_rows=offset + rows,
+                skip_rows=skip_rows,
+                sheet=sheet,
+                inner_member=inner_member,
             )
         except UnsafeUrlError as e:
             # The guard's message names the resolved private IP: keep that
@@ -109,6 +132,7 @@ def register_read_zip_member_tool(mcp: MCPServer) -> None:
             "total_rows_in_preview": len(page),
             "truncated": result.get("truncated", False),
             "sheet": result.get("sheet"),
+            "sheets": result.get("sheets") or [],
             "dropped_columns": result.get("dropped_columns"),
             "converted_decimal_columns": result.get("converted_decimal_columns"),
             "header_row": result.get("header_row", 0),
@@ -119,13 +143,18 @@ def register_read_zip_member_tool(mcp: MCPServer) -> None:
         def to_text(data: dict) -> str:
             parts = [
                 f"Archivo interno: {data['member_name']}",
-                f"ZIP: {data['url']}",
+                f"URL: {data['url']}",
                 f"Formato: {data.get('format')}",
                 f"Columnas: {len(data.get('headers') or [])}",
                 f"Filas mostradas: {data['total_rows_in_preview']} desde offset={data['offset']}",
             ]
             if data.get("sheet"):
                 parts.append(f"Hoja: {data['sheet']}")
+            if len(data.get("sheets") or []) > 1:
+                parts.append(
+                    "Hojas del libro: "
+                    + "; ".join(f"{i + 1}. {n}" for i, n in enumerate(data["sheets"]))
+                )
             if data.get("preamble"):
                 parts.append(
                     f"Encabezado detectado en la fila {data['header_row'] + 1}; "
