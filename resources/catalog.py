@@ -571,6 +571,12 @@ def _all_fuentes() -> dict:
                 "tools": ["get_serie_internacional"],
             },
             {
+                "id": "nasa_power",
+                "nombre": "NASA POWER (clima diario y mensual de satélite y modelo, por cantón o coordenada)",
+                "base": "https://power.larc.nasa.gov/api/temporal",
+                "tools": ["get_clima_nasa_power"],
+            },
+            {
                 "id": "utilidades",
                 "nombre": "Utilidades transversales (búsqueda global, archivos, orientación)",
                 "tools": [

@@ -1,6 +1,6 @@
 # Herramientas disponibles
 
-Referencia detallada de las 86 herramientas MCP del perfil público (por defecto)
+Referencia detallada de las 87 herramientas MCP del perfil público (por defecto)
 de EcuDataMCP, más 2 herramientas de mantenimiento (`audit_bce_catalog` y
 `compare_bce_sources`) que solo se registran con otro `MCP_PROFILE`. Casi todas
 aceptan `format="json"` además de texto.
@@ -258,6 +258,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 |------|-------------|
 | `search_cepalstat_indicadores` | Busca un indicador en el catálogo regional de CEPALSTAT (CEPAL). |
 | `get_cepalstat_indicador` | Observaciones de un indicador de CEPALSTAT, filtradas a un país (Ecuador por defecto). |
+| `get_clima_nasa_power` | Clima diario o mensual desde 1981 de un cantón (en el centroide de su polígono) o de unas coordenadas: lluvia, temperatura, humedad, viento y radiación solar de NASA POWER. Es una rejilla de satélite y modelo, no una estación. |
 
 ## Flujo de trabajo típico
 

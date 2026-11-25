@@ -1093,6 +1093,20 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "NASA",
+        "sources": [
+          {
+            "id": "nasa-power",
+            "name": "NASA POWER",
+            "tag": "NASA",
+            "description": "Daily and monthly climate since 1981 (rainfall, temperature, humidity, wind, solar radiation) by canton or coordinate, from a satellite and model grid; not weather stations",
+            "coverage": "power.larc.nasa.gov",
+            "url": "https://power.larc.nasa.gov/",
+            "status": "live"
+          }
+        ]
       }
     ],
     "color": "#64748b"
