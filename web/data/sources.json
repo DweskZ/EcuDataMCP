@@ -868,6 +868,20 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "Sistema Nacional de Información (SNI)",
+        "sources": [
+          {
+            "id": "sni-evaluaciones",
+            "name": "Banco de evaluaciones de intervenciones públicas",
+            "tag": "SNI",
+            "description": "108 informes de evaluación de programas y proyectos públicos, 2011-2026, con sector, entidad ejecutora y evaluadora, tipo y objetivo (en su mayoría PDF)",
+            "coverage": "sni.gob.ec",
+            "url": "https://www.sni.gob.ec/informacion-para-la-planificacion/informacion-estadistica/banco-de-evaluaciones/",
+            "status": "live"
+          }
+        ]
       }
     ],
     "color": "#9f1239"

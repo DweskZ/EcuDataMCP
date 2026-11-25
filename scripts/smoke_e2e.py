@@ -393,6 +393,11 @@ async def main() -> int:
             ("search_archivos", {"fuente": "arcotel_series", "query": "1.1.1"}, ["Lineas activas"]),
             ("search_archivos", {"fuente": "msp_precios", "limit": 2}, ["precios"]),
             ("search_archivos", {"fuente": "mit_vias"}, ["mit.gob.ec"]),
+            (
+                "search_archivos",
+                {"fuente": "sni_evaluaciones", "query": "agropecuaria", "limit": 3},
+                ["Banco de evaluaciones"],
+            ),
             ("search_archivos", {"fuente": "minedec_bases", "query": "csv 2024-2025"}, ["2024-2025"]),
             ("search_capas_geo", {"fuente": "msp"}, ["indicadores_ssr"]),
             (

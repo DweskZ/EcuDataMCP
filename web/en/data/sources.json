@@ -868,6 +868,20 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "National Information System (SNI)",
+        "sources": [
+          {
+            "id": "sni-evaluaciones",
+            "name": "Public-intervention evaluation bank",
+            "tag": "SNI",
+            "description": "108 evaluation reports of public programs and projects, 2011-2026, with sector, executing and evaluating entity, type and objective (mostly PDF)",
+            "coverage": "sni.gob.ec",
+            "url": "https://www.sni.gob.ec/informacion-para-la-planificacion/informacion-estadistica/banco-de-evaluaciones/",
+            "status": "live"
+          }
+        ]
       }
     ],
     "color": "#9f1239"

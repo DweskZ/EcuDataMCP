@@ -157,6 +157,12 @@ def _all_fuentes() -> dict:
                 "tools": ["search_archivos"],
             },
             {
+                "id": "sni_evaluaciones",
+                "nombre": "SNI (Banco de evaluaciones de intervenciones públicas: 108 informes 2011-2026)",
+                "base": "https://www.sni.gob.ec/informacion-para-la-planificacion/informacion-estadistica/banco-de-evaluaciones/",
+                "tools": ["search_archivos"],
+            },
+            {
                 "id": "aviacion",
                 "nombre": "DGAC / AIS Ecuador (AIP de aeródromos, METAR, NOTAM, SIGMET)",
                 "base": "https://www.ais.aviacioncivil.gob.ec/",

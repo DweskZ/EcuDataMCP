@@ -7250,6 +7250,81 @@ no trae coordenadas, así que haría falta una tabla de centroides. Daniel
 decidió el 2026-11-24 que vale la pena: se construye como
 `get_clima_nasa_power` y queda registrada en la cuadragésima séptima pasada.
 
+## Cuadragésima sexta pasada — SNI: el Banco de evaluaciones se cataloga y el resto del sitio carga por AJAX (2026-11-24)
+
+Daniel dio por válido el SNI (`sni.gob.ec`, Secretaría Nacional de Planificación)
+como fuente. La revisión previa lo había dejado fuera por ser "inventarios y
+PDF de planes"; al abrirlo de nuevo, una sección sí trae datos propios que
+ninguna otra fuente integrada tiene, y es la que se construyó. El sitio es
+WordPress con Divi; `sni.gob.ec` y `www.sni.gob.ec` responden igual.
+
+### Banco de evaluaciones — construido
+
+La página `/informacion-para-la-planificacion/informacion-estadistica/banco-de-evaluaciones/`
+lleva una tabla TablePress (`tablepress-1`) en el HTML, UTF-8, sin login ni
+JavaScript: 108 filas (Nro 1 a 108), todas con enlace al informe (104 PDF, tres
+`.rar` y un `.zip`). Años de emisión: 2011 (1), 2013 (1), 2014 (2), 2015 (8),
+2016 (4), 2017 (18), 2018 (4), 2019 (8), 2020 (9), 2021 (7), 2022 (16), 2023
+(12), 2024 (12), 2025 (5) y 2026 (1).
+
+- **Columnas:** Nro, Sector, Entidad ejecutora de la intervención, Entidad
+  ejecutora de la evaluación, Tipo de evaluación, Nombre de la intervención
+  evaluada, Año de emisión de la evaluación, Objetivo de la evaluación y Archivo.
+  Varias celdas llevan `<br />` (el tipo de evaluación se lista en líneas
+  sueltas: "Diseño / Implementación / Resultados"), que el cliente reduce a
+  espacios.
+- **Enlaces:** casi todos son relativos (`/wp-content/uploads/...`); dos apuntan
+  a `https://sni.gob.ec/...` sin `www` y responden 200 igual.
+- **Lectura:** `read_pdf` abrió el informe de 2026 de la Estrategia Nacional
+  Agropecuaria para Mujeres Rurales (97 páginas, 1,4 MB) y extrajo el texto; la
+  portada sale vacía porque es una imagen. No se midió el tamaño de los demás
+  informes contra el tope de 5 MB de `read_pdf`.
+
+Construido como `fuente="sni_evaluaciones"` en `search_archivos`
+(`helpers/sni_client.py`, con caché en disco de seis horas y copia obsoleta si
+el sitio falla). El título es la intervención evaluada; `categoria` guarda el
+sector y `tipo` el tipo de evaluación. No suma tools: siguen siendo 86.
+
+### Lo que no se construyó
+
+- **Listas paginadas por AJAX.** Información de apoyo (28 archivos, de a 4 por
+  página en 7 páginas; los cuatro de la primera son planillas XLSX de
+  proyecciones de población parroquiales, cantonales y provinciales y de
+  nacimientos cantonales), Inventario de información estadística (11 archivos,
+  de a 3; los de la primera son el Inventario de Fuentes de Información 2025 en
+  XLS, el de operaciones estadísticas 2017 en ZIP y el de 2018 en XLS) y
+  Documentos técnicos y normativos (41 archivos, de a 3 en 14 páginas; los de
+  la primera son las normas SIL SNPD-052-2015, 056-2015 y 006-2018 en PDF). Usan el
+  módulo "Divi Machine" (`divi-ajax-filter`): el HTML trae `ajax_url`
+  (`wp-admin/admin-ajax.php`) y un `security` (nonce) por página, y consultan
+  tipos de entrada propios (`proyecciones_poblaci`, 20 caracteres, el máximo de
+  WordPress). El HTML contiene solo la primera página de cada lista. Un cliente
+  tendría que leer el nonce y repetir el POST de AJAX; no se intentó.
+- **API de WordPress.** `/wp-json/wp/v2/types` solo expone `post`, `page`,
+  `attachment` (`media`) y `project`; las listas anteriores no están (por
+  ejemplo, `/wp-json/wp/v2/proyecciones_poblaci` responde 404).
+  `/wp-json/wp/v2/media` reporta 716 adjuntos (`X-WP-Total`, 8 páginas de 100)
+  con el nombre del archivo como título. Filtrando por tipo MIME aparece un
+  solo `.xlsx` (`1.Proyeccion-de-poblacion-por-provincia-2020-2025-areas-urbana-y-rural.xlsx`),
+  ningún `.xls` ni `.doc(x)` y un `.zip` (`36.-Evaluacion_plandetur2020.pdf.zip`):
+  las planillas que enlazan las páginas, como `Inventario_de_Fuentes_de_Informacion_2025.xls`,
+  no están en la biblioteca de medios, así que no sirve para completar el catálogo.
+- **Inventario Nacional de Datos Geográficos y Sensores Remotos.** Dos XLS
+  estáticos (`Inventario_Nacional_Datos_Geograficos_2017-2025.xls` e
+  `Inventario_Productos_Sensores_Remotos_2017-2025.xls`, subidos en abril de
+  2026) y un tablero de Power BI. Son inventarios de qué datos geográficos
+  existen, no los datos, y un catálogo propio de dos archivos no se justificó.
+  No se abrieron los XLS ni el tablero.
+- **Páginas sin archivos.** La de planes de desarrollo y ordenamiento
+  territorial (PDOT) no trae enlaces ni iframes en el HTML, solo el título y el
+  menú. "Datos abiertos" solo enlaza a `datosabiertos.gob.ec`. "Instrumentos de
+  planificación nacional" ofrece botones de "ir al sitio web" o "ver planes"
+  (visor del Plan Nacional de Desarrollo, planes sectoriales e institucionales,
+  agendas intersectoriales) y "Instrumentos internacionales" los de los ODS y el
+  Sistema Binacional Ecuador-Colombia, sin archivos en la página; "Sistemas de
+  información local" enlaza a sitios de tres GAD (El Oro, Guayas e Imbabura).
+  Ninguno de esos destinos se siguió, ni la IEDG (`iedg.presidencia.gob.ec`).
+
 ## Archivo del roadmap (2026-11-24)
 
 El 2026-11-24 se limpió [ROADMAP.md](ROADMAP.md). Las filas de ese archivo que ya

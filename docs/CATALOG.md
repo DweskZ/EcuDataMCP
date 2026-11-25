@@ -3,7 +3,7 @@
 Generado por `scripts/generate_catalog.py` desde `resources/catalog.py` y las
 descripciones de `tools/*.py`; no editar a mano.
 
-59 fuentes, 86 tools públicas.
+60 fuentes, 86 tools públicas.
 
 ## Datos Abiertos CKAN
 
@@ -67,7 +67,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `sri`
 - Base: https://www.sri.gob.ec/datasets
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status. Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status, SNI public-policy evaluations. Links, not contents.
 - `get_sri_ruc_info`: Public SRI record for one 13-digit RUC: name, status, type, activity, dates and registered establishments. No tax amounts.
 - `search_sri_ruc`: Find SRI taxpayers by partial razón social or trade name (min 4 characters) when the RUC is unknown. SRI caps results at 100.
 
@@ -148,7 +148,14 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `turismo`
 - Base: https://www.produccion.gob.ec/boletin-de-cifras-sector-turismo/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status. Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status, SNI public-policy evaluations. Links, not contents.
+
+## SNI (Banco de evaluaciones de intervenciones públicas: 108 informes 2011-2026)
+
+- Id: `sni_evaluaciones`
+- Base: https://www.sni.gob.ec/informacion-para-la-planificacion/informacion-estadistica/banco-de-evaluaciones/
+
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status, SNI public-policy evaluations. Links, not contents.
 
 ## DGAC / AIS Ecuador (AIP de aeródromos, METAR, NOTAM, SIGMET)
 
@@ -213,7 +220,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `inec-censo`
 - Base: https://www.censoecuador.gob.ec/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status. Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status, SNI public-policy evaluations. Links, not contents.
 
 ## Banco Central del Ecuador (BCEData, Información Estadística Mensual, indicadores diarios en línea y remesas de trabajadores)
 
@@ -404,7 +411,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `gremios`
 - Base: https://www.fedexpor.com/inteligencia-comercial/reporte-expordata/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status. Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status, SNI public-policy evaluations. Links, not contents.
 
 ## Consejo de la Judicatura (Portal de Estadística Judicial: tableros Power BI en vivo de audiencias, mediación, notarial, productividad de jueces, SUPA)
 
@@ -420,14 +427,14 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `arcotel`
 - Base: https://www.arcotel.gob.ec/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status. Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status, SNI public-policy evaluations. Links, not contents.
 
 ## Ministerio del Trabajo (salarios sectoriales y boletín estadístico anual)
 
 - Id: `trabajo`
 - Base: https://www.trabajo.gob.ec/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status. Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status, SNI public-policy evaluations. Links, not contents.
 
 ## IESS (boletines y documentos estadísticos, certificado de cumplimiento patronal)
 
@@ -451,14 +458,14 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `mef`
 - Base: https://www.economicoproductivo.gob.ec/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status. Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status, SNI public-policy evaluations. Links, not contents.
 
 ## SENESCYT / Educación Superior (estadísticas SIAU y Biblioteca)
 
 - Id: `senescyt`
 - Base: https://siau.senescyt.gob.ec/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status. Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status, SNI public-policy evaluations. Links, not contents.
 - `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE, ARCONEL). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 
@@ -467,7 +474,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `minedec`
 - Base: https://educacion.gob.ec/datos-abiertos-minedec/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status. Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status, SNI public-policy evaluations. Links, not contents.
 
 ## INEVAL (resultados de evaluaciones educativas)
 
@@ -498,7 +505,7 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `msp`
 - Base: https://www.salud.gob.ec/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status. Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status, SNI public-policy evaluations. Links, not contents.
 - `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall, watersheds), mag (agro zoning, rural cadastre), igm (base cartography 1:1M to 1:25k), maate (deforestation, land cover 1990-2024, protected areas), arconel (energy balance, billing, plants, grid), celec (plants, transmission) or msp (health facilities, indicators).
 - `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm, maate): a sample of up to 20 features. ArcGIS (arconel, celec, msp): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
 
@@ -507,14 +514,14 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `mit`
 - Base: https://www.mit.gob.ec/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status. Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status, SNI public-policy evaluations. Links, not contents.
 
 ## CNIG (estadísticas de violencia de género y femicidios)
 
 - Id: `cnig`
 - Base: https://www.igualdadgenero.gob.ec/violencia/
 
-- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status. Links, not contents.
+- `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status, SNI public-policy evaluations. Links, not contents.
 
 ## CEPALSTAT (indicadores de CEPAL filtrados a Ecuador)
 
