@@ -7325,6 +7325,78 @@ sector y `tipo` el tipo de evaluación. No suma tools: siguen siendo 86.
   información local" enlaza a sitios de tres GAD (El Oro, Guayas e Imbabura).
   Ninguno de esos destinos se siguió, ni la IEDG (`iedg.presidencia.gob.ec`).
 
+## Cuadragésima séptima pasada — clima por cantón con NASA POWER (2026-11-24)
+
+Decisión de Daniel (2026-11-24): NASA POWER vale la pena. Era la candidata
+verificada de la cuadragésima quinta pasada: no hay en las fuentes integradas
+una serie de lluvia o temperatura con lugar y rango de fechas (las capas del
+INAMHI son mapas, no series).
+
+### Lo verificado en vivo (desde Canadá, sin llave)
+
+- **Diaria** (`/api/temporal/daily/point`, v2.10.5): un valor por día desde
+  1981-01-01. El 2026-11-24 el último día con dato era el 2026-11-20 (unos
+  cuatro días de rezago). Los días posteriores **no dan error**: la respuesta
+  es HTTP 200 con el valor de relleno `-999`, que el cliente convierte en
+  `None` y recorta del final. Un `start` anterior a 1981 y un parámetro
+  inexistente dan HTTP 422 con la razón en `messages`.
+- **Mensual** (`/api/temporal/monthly/point`, v2.10.1): pide años enteros
+  (`start=2023&end=2024`) y agrega una clave de "mes 13" por año (`202313`)
+  que es el promedio anual (3,93 mm/día para la lluvia de Quito en 2023, con
+  un promedio de los doce meses de 3,92). El cliente la descarta y calcula su
+  propio resumen.
+- **Variables probadas:** `PRECTOTCORR` (mm/día), `T2M`, `T2M_MAX`, `T2M_MIN`
+  (°C), `RH2M` (%), `WS2M` (m/s), `ALLSKY_SFC_SW_DWN` (MJ/m²/día) y `PS`
+  (kPa; no se expone). Todas con `community=AG`.
+- **Fuente del dato.** Las cabeceras nombran `MERRA2` para lo mensual y
+  `GEOSIT` (y `POWER`) para lo diario reciente; una consulta diaria larga
+  lista varias. Las celdas son de decenas de km, no estaciones: el punto de
+  Quito (centroide del cantón, -0,104 / -78,5192) cae en una celda con
+  elevación de 1.863 m, bien por debajo de los unos 2.850 m de la ciudad.
+- Quito, enero a junio de 2024, mensual: lluvia de 3,1 a 6,28 mm/día y
+  temperatura media de 18,07 a 18,95 °C.
+
+### Coordenadas de los cantones
+
+La capa ArcGIS `Cantones_del_Ecuador` que ya usa `scripts/fetch_cantones.py`
+devuelve el centroide de cada polígono con `returnCentroid=true&outSR=4326`.
+`scripts/fetch_canton_centroides.py` lo guarda en
+`helpers/data/cantones_centroides.json`: 224 cantones.
+
+- La capa todavía lista La Concordia como `0808` (Esmeraldas); el clasificador
+  de `cantones.json` la tiene como `2302` (Santo Domingo de los Tsáchilas). El
+  script traduce el código.
+- Faltan Sevilla Don Bosco (`1413`) y Juval (`9006`, Zona No Delimitada); las
+  otras tres zonas no delimitadas de `cantones.json` sí tienen. La herramienta
+  pide coordenadas en esos dos casos.
+- Es el centro geométrico del polígono, no la cabecera cantonal. El de
+  Guayaquil (-2,4919 / -80,0931) está lejos de la ciudad.
+
+### Una anomalía reciente que no se resolvió
+
+Con el centroide de Guayaquil, el promedio diario de lluvia fue de 21,05
+mm/día en octubre de 2026 y de 29,49 mm/día del 1 al 21 de noviembre (máximo
+de 124,35 mm en un día). La serie mensual de 2016 a 2025 para octubre y
+noviembre va de 0,1 a 1,4 mm/día en ese punto. En Quito, entre el 15 de
+septiembre y el 21 de noviembre, los valores diarios pasan de octubre en
+adelante a decenas de mm (36 el 2 de noviembre), frente a promedios
+mensuales de 0,7 a 7,6 mm/día en 2023 y 2024. No parece un error aislado de
+una variable: en Guayaquil la humedad relativa sube de 66-68 % a 85-94 % y la
+temperatura baja de unos 29 °C a 25-27 °C en el mismo período.
+
+Hasta septiembre de 2026 los promedios diarios coinciden con los mensuales
+(febrero de 2025: 12,63 en ambos). No se contrastó con estaciones del INAMHI
+ni con noticias, así que no se sabe si es un episodio real o un salto en el
+flujo reciente del modelo. La herramienta devuelve lo que NASA publica y su
+nota dice que los valores son de una rejilla de modelo, no de estación; los
+datos de las últimas semanas conviene tratarlos como provisionales.
+
+### No construido
+
+- Serie horaria, varios puntos por consulta, promedios climatológicos
+  (`/temporal/climatology`), presión (`PS`) y la elección de `community`.
+- Centroides de parroquias (el índice de cantones basta para el uso previsto).
+
 ## Archivo del roadmap (2026-11-24)
 
 El 2026-11-24 se limpió [ROADMAP.md](ROADMAP.md). Las filas de ese archivo que ya

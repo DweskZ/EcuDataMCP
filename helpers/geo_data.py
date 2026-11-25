@@ -14,6 +14,7 @@ _PROVINCIAS_PATH = _DATA_DIR / "provincias.json"
 _CANTONES_PATH = _DATA_DIR / "cantones.json"
 _PARROQUIAS_PATH = _DATA_DIR / "parroquias.json"
 _PARROQUIAS_URBANAS_PATH = _DATA_DIR / "parroquias_urbanas.json"
+_CENTROIDES_PATH = _DATA_DIR / "cantones_centroides.json"
 
 # Year of the INEC classifier (CODIFICACIÓN_2026.xlsx, sheet PARROQUIAS) that
 # parroquias_urbanas.json was built from.
@@ -30,6 +31,23 @@ def list_provincias() -> list[dict[str, Any]]:
 def list_cantones() -> list[dict[str, Any]]:
     with _CANTONES_PATH.open(encoding="utf-8") as fh:
         return list(json.load(fh))
+
+
+@lru_cache(maxsize=1)
+def _list_centroides() -> dict[str, dict[str, float]]:
+    with _CENTROIDES_PATH.open(encoding="utf-8") as fh:
+        return dict(json.load(fh))
+
+
+def canton_centroide(codigo: str) -> dict[str, float] | None:
+    """Latitude and longitude of a canton's polygon centroid (WGS84), by INEC code.
+
+    Built by scripts/fetch_canton_centroides.py. It is the geometric centre of
+    the canton, not its seat, so it can sit in the sea for a canton with a
+    coastline or islands. Sevilla Don Bosco (1413) and Juval (9006) have
+    none.
+    """
+    return _list_centroides().get(codigo)
 
 
 @lru_cache(maxsize=1)

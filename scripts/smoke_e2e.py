@@ -431,6 +431,11 @@ async def main() -> int:
                 ["Hydropower"],
             ),
             ("search_cepalstat_indicadores", {"query": "poblacion"}, []),
+            (
+                "get_clima_nasa_power",
+                {"canton": "Quito", "desde": "2024-01", "hasta": "2024-03", "format": "json"},
+                ["lluvia"],
+            ),
             ("search_cortes", {"distribuidora": "eeq", "format": "json"}, []),
             ("search_cortes", {"distribuidora": "centrosur", "format": "json"}, []),
             ("search_infomies_bases_mensuales", {"serie": "anc", "format": "json"}, []),

@@ -33,6 +33,22 @@
   holds only their first three or four items. Checked live on 2026-11-24. No new
   tool: still 86.
 
+- **New tool `get_clima_nasa_power`: daily and monthly rainfall, temperature,
+  humidity, wind and solar radiation for any canton or coordinate, from NASA
+  POWER.** The server had no climate series for a place and a date range:
+  INAMHI's layers are maps, not series. NASA POWER (`power.larc.nasa.gov`, no
+  key) serves satellite- and model-derived meteorology on a global grid, daily
+  from 1981 to a few days before today (the last day was 2026-11-20 on
+  2026-11-24). A canton is queried at its polygon centroid, from a new table
+  `helpers/data/cantones_centroides.json` (224 of the 226 cantons in
+  `cantones.json`; Sevilla Don Bosco and Juval have none, so those take
+  coordinates); `latitud`/`longitud` query any point. Daily answers
+  hold at most 366 days, monthly ones run back to 1981, and days NASA has not
+  published yet (it answers them with -999) are dropped from the end instead of
+  being shown as numbers. A value describes a grid cell of tens of kilometres,
+  not a weather station, and the answer says so. 87 tools.
+
+
 - **`read_zip_member` reads any sheet, a zip inside a zip, and a spreadsheet
   at a plain URL.** Three cases it could not handle on 2026-11-23, while
   pulling rice prices for El Quantificador: SIPA's `precios-agroindustria.xlsx`

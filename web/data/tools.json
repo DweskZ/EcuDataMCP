@@ -2613,6 +2613,67 @@
           }
         ],
         "long_description": "Trae una serie de una fuente internacional filtrada a Ecuador. wdi: World Development Indicators del Banco Mundial (más de 1.400 series anuales); con indicador (p. ej. EG.ELC.ACCS.ZS acceso a electricidad) devuelve la serie, con solo query (en inglés) busca en el catálogo; los años sin valor se omiten y se cuentan. irena: capacidad instalada (MW) y generación (GWh) por tecnología de IRENASTAT, desde 2000, conectada o no a la red. xm: energía horaria en la interconexión Colombia-Ecuador según XM, sumada por día o mes desde 2003; requiere desde y hasta (máximo 366 días); los días sin flujo aparecen con 0 GWh, así que la suspensión de octubre de 2024 se ve como ceros. comtrade: comercio de mercancías de Ecuador con un socio en USD (UN Comtrade, vista previa pública sin clave): un solo período por llamada (periodo), tope de 500 filas, un límite de ~1 llamada cada 2 s que se reintenta solo, y solo códigos (sin nombres); socio 0 = Mundo, cmd = TOTAL o código HS. imf: estadísticas del FMI vía SDMX (190 flujos: precios, balanza de pagos, tipo de cambio, finanzas públicas, dinero y banca); indicador es el id del flujo (vacío con query lista los flujos) y clave la clave SDMX, cuyo orden de dimensiones cambia por flujo y viene en la respuesta; sin clave trae todo el país, con las últimas observaciones. who: Global Health Observatory de la OMS (~3.000 indicadores anuales por sexo y edad, p. ej. WHOSIS_000001 esperanza de vida al nacer); vacío con query busca indicadores. ilo: estadísticas laborales de ILOSTAT (>1.200 flujos, p. ej. UNE_DEAP_SEX_AGE_RT desempleo por sexo y edad); las claves cortas se completan con comodines. unhcr: población refugiada y solicitante de asilo en Ecuador por año, desde desde/hasta; socio = país de origen (VEN) o 'todos' para una fila por origen. Fuente ember: datos eléctricos de Ember vía Our World in Data (CC BY 4.0), anuales o mensuales desde 2019: generación y participación por fuente, per cápita, demanda, importaciones netas e intensidad de carbono; indicador = métrica/fuente (generation/hydro, by_source/total, carbon_intensity)."
+      },
+      {
+        "name": "get_clima_nasa_power",
+        "description": "Clima diario o mensual desde 1981 de un cantón (en el centroide de su polígono) o de unas coordenadas: lluvia, temperatura, humedad, viento y radiación solar de NASA POWER.",
+        "params": [
+          {
+            "name": "canton",
+            "type": "str",
+            "default": "''",
+            "description": "Nombre del cantón o código INEC de 4 dígitos (p. ej. \"Quito\", \"1701\"). Usa este o latitud/longitud."
+          },
+          {
+            "name": "provincia",
+            "type": "str",
+            "default": "''",
+            "description": "Provincia opcional para distinguir cantones con el mismo nombre (Bolívar, Sucre...)."
+          },
+          {
+            "name": "latitud",
+            "type": "float | None",
+            "default": "None",
+            "description": "Latitud en grados decimales (el sur es negativo), junto con longitud, en lugar de canton."
+          },
+          {
+            "name": "longitud",
+            "type": "float | None",
+            "default": "None",
+            "description": "Longitud en grados decimales (el oeste es negativo), junto con latitud, en lugar de canton."
+          },
+          {
+            "name": "desde",
+            "type": "str",
+            "default": "''",
+            "description": "Inicio del período: AAAA, AAAA-MM o AAAA-MM-DD. Desde 1981."
+          },
+          {
+            "name": "hasta",
+            "type": "str",
+            "default": "''",
+            "description": "Fin del período, mismo formato. Por defecto hoy."
+          },
+          {
+            "name": "frecuencia",
+            "type": "Literal['mensual', 'diaria']",
+            "default": "'mensual'",
+            "description": "mensual o diaria."
+          },
+          {
+            "name": "variables",
+            "type": "str",
+            "default": "'lluvia,temperatura'",
+            "description": "Separadas por comas: lluvia, temperatura, temp_max, temp_min, humedad, viento, radiacion."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "Formato de salida: `text` (default) o `json`."
+          }
+        ],
+        "long_description": "Serie de clima de NASA POWER para un cantón o un punto de Ecuador. NASA POWER calcula la meteorología con satélites y modelos sobre una rejilla de celdas de decenas de kilómetros, así que un cantón recibe el valor de la celda que rodea su centroide, no la lectura de una estación. El centroide es el centro geométrico del polígono del cantón: en uno costero puede caer en el mar, y un cantón con valle y páramo recibe un solo valor para ambos; para un lugar preciso pasa latitud y longitud. Sirve para tendencias, estacionalidad y comparar regiones. La frecuencia mensual da un valor por mes (la lluvia en mm/día, un promedio mensual, con el total del período en resumen.acumulado_mm); la diaria da un valor por día, hasta 366 días por consulta, y omite al final los días que NASA aún no publica (el último con dato figura en ultimo_periodo_con_dato). Los datos empiezan el 1981-01-01. Sevilla Don Bosco y Juval no tienen centroide en la tabla local: se consultan por coordenadas."
       }
     ]
   },

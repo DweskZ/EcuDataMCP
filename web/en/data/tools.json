@@ -2613,6 +2613,67 @@
           }
         ],
         "long_description": "Fetches a series from an international source, filtered to Ecuador. wdi: World Bank World Development Indicators (1,400+ yearly series); with indicador (e.g. EG.ELC.ACCS.ZS access to electricity) returns the series, with only query (English) searches the catalog; years without a value are dropped and counted. irena: IRENASTAT installed capacity (MW) and generation (GWh) by technology, 2000 on, on/off-grid. xm: XM's hourly energy on the Colombia-Ecuador interconnection, summed by day or month since 2003; needs desde and hasta (at most 366 days); days without flow show as 0 GWh, so the October 2024 suspension appears as zeros. comtrade: Ecuador's merchandise trade with one partner in USD (UN Comtrade public preview, no key): one period per call (periodo), capped at 500 rows, a ~1 call per 2 s rate limit that is retried automatically, and codes only (no names); socio 0 = World, cmd = TOTAL or an HS code. imf: IMF statistics via SDMX (190 flows: prices, balance of payments, exchange rates, fiscal, monetary and banking); indicador is the flow id (empty with query lists flows) and clave the SDMX key, whose dimension order differs per flow and is returned in the response; without clave it returns the whole country, latest observations. who: WHO Global Health Observatory (~3,000 yearly indicators by sex and age, e.g. WHOSIS_000001 life expectancy at birth); empty with query searches indicators. ilo: ILOSTAT labour statistics (1,200+ flows, e.g. UNE_DEAP_SEX_AGE_RT unemployment by sex and age); short keys are padded with wildcards. unhcr: refugees and asylum seekers hosted in Ecuador by year, from desde/hasta; socio = origin country (VEN) or 'todos' for one row per origin. Source ember: Ember's electricity data via Our World in Data (CC BY 4.0), yearly or monthly from 2019: generation and share by source, per capita, demand, net imports and carbon intensity; indicador = metric/source (generation/hydro, by_source/total, carbon_intensity)."
+      },
+      {
+        "name": "get_clima_nasa_power",
+        "description": "Daily or monthly climate since 1981 for a canton (at its polygon centroid) or a coordinate: rainfall, temperature, humidity, wind and solar radiation from NASA POWER.",
+        "params": [
+          {
+            "name": "canton",
+            "type": "str",
+            "default": "''",
+            "description": "Canton name or 4-digit INEC code (e.g. \"Quito\", \"1701\"). Use this or latitud/longitud."
+          },
+          {
+            "name": "provincia",
+            "type": "str",
+            "default": "''",
+            "description": "Optional province to tell apart cantons that share a name (Bolívar, Sucre...)."
+          },
+          {
+            "name": "latitud",
+            "type": "float | None",
+            "default": "None",
+            "description": "Latitude in decimal degrees (south is negative), with longitud, instead of canton."
+          },
+          {
+            "name": "longitud",
+            "type": "float | None",
+            "default": "None",
+            "description": "Longitude in decimal degrees (west is negative), with latitud, instead of canton."
+          },
+          {
+            "name": "desde",
+            "type": "str",
+            "default": "''",
+            "description": "Start of the period: AAAA, AAAA-MM or AAAA-MM-DD. From 1981."
+          },
+          {
+            "name": "hasta",
+            "type": "str",
+            "default": "''",
+            "description": "End of the period, same format. Default today."
+          },
+          {
+            "name": "frecuencia",
+            "type": "Literal['mensual', 'diaria']",
+            "default": "'mensual'",
+            "description": "mensual or diaria."
+          },
+          {
+            "name": "variables",
+            "type": "str",
+            "default": "'lluvia,temperatura'",
+            "description": "Comma-separated: lluvia, temperatura, temp_max, temp_min, humedad, viento, radiacion."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "Output format: `text` (default) or `json`."
+          }
+        ],
+        "long_description": "A NASA POWER climate series for a canton or a point in Ecuador. NASA POWER computes meteorology from satellites and weather models on a grid with cells of tens of kilometres, so a canton gets the value of the cell around its centroid, not a station reading. The centroid is the geometric centre of the canton's polygon: for a coastal canton it can fall in the sea, and a canton with a valley and a páramo gets one value for both; for a precise place pass latitud and longitud. Use it for trends, seasonality and comparing regions. Monthly frequency gives one value per month (rain in mm/day, a monthly mean, with the period's total in resumen.acumulado_mm); daily gives one value per day, up to 366 days per call, and drops from the end the days NASA has not published yet (the last one with data is in ultimo_periodo_con_dato). Data starts on 1981-01-01. Sevilla Don Bosco and Juval have no centroid in the local table: query them by coordinates."
       }
     ]
   },

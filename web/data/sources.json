@@ -1093,6 +1093,20 @@
             "status": "live"
           }
         ]
+      },
+      {
+        "name": "NASA",
+        "sources": [
+          {
+            "id": "nasa-power",
+            "name": "NASA POWER",
+            "tag": "NASA",
+            "description": "Clima diario y mensual desde 1981 (lluvia, temperatura, humedad, viento, radiación solar) por cantón o coordenada, de una rejilla de satélite y modelo; no son estaciones",
+            "coverage": "power.larc.nasa.gov",
+            "url": "https://power.larc.nasa.gov/",
+            "status": "live"
+          }
+        ]
       }
     ],
     "color": "#64748b"

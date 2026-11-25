@@ -737,6 +737,69 @@
       "format": "text | json"
     }
   },
+  "get_clima_nasa_power": {
+    "file": "get_clima_nasa_power.py",
+    "params": [
+      {
+        "name": "canton",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "provincia",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "latitud",
+        "type": "float | None",
+        "default": "None"
+      },
+      {
+        "name": "longitud",
+        "type": "float | None",
+        "default": "None"
+      },
+      {
+        "name": "desde",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "hasta",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "frecuencia",
+        "type": "Literal['mensual', 'diaria']",
+        "default": "'mensual'"
+      },
+      {
+        "name": "variables",
+        "type": "str",
+        "default": "'lluvia,temperatura'"
+      },
+      {
+        "name": "format",
+        "type": "Literal['text', 'json']",
+        "default": "'text'"
+      }
+    ],
+    "description": "Daily or monthly rainfall, temperature, humidity, wind and solar radiation for an Ecuadorian canton (its centroid) or a latitude/longitude, 1981 to a few days ago, from NASA POWER. A satellite and model grid, not weather stations.",
+    "summary": "Climate series from NASA POWER for a canton or a point in Ecuador. NASA POWER computes meteorology from satellites and weather models on a grid with cells of tens of kilometres, so a canton gets the value of the cell around its centroid, not a station reading. The centroid is the geometric centre of the canton's polygon: for a coastal canton it can fall in the sea, and a canton with a valley and a páramo gets one value for both. For a precise place pass `latitud` and `longitud`. Use it for trends, seasonality and comparing regions; stations are more exact at one site. - frecuencia='mensual' (default): one value per month; rain in mm/day (a monthly mean), with the period's total in `resumen.acumulado_mm`. Default period: the last two full years plus the current one. - frecuencia='diaria': one value per day, at most 366 days per call. Default period: the last 30 days. The latest days are empty (NASA publishes with a lag of a few days) and are dropped from the end of `registros`; `ultimo_periodo_con_dato` says where it stops. - Variables (`variables`, comma-separated): lluvia (mm/día), temperatura, temp_max, temp_min (°C), humedad (%), viento (m/s), radiacion (MJ/m²/día). Default: lluvia,temperatura. - Data starts on 1981-01-01. `desde`/`hasta` accept AAAA, AAAA-MM or AAAA-MM-DD; `hasta` is held to today. - Sevilla Don Bosco (1413) and Juval (9006) have no centroid in the local table: pass their coordinates.",
+    "args_doc": {
+      "canton": "Canton name or 4-digit INEC code (e.g. \"Quito\", \"1701\"). Use this or latitud/longitud.",
+      "provincia": "Optional province to tell apart cantons that share a name (Bolívar, Sucre...).",
+      "latitud": "Latitude in decimal degrees (south is negative), with longitud, instead of canton.",
+      "longitud": "Longitude in decimal degrees (west is negative), with latitud, instead of canton.",
+      "desde": "Start of the period: AAAA, AAAA-MM or AAAA-MM-DD. From 1981.",
+      "hasta": "End of the period, same format. Default today.",
+      "frecuencia": "mensual or diaria.",
+      "variables": "Comma-separated: lluvia, temperatura, temp_max, temp_min, humedad, viento, radiacion.",
+      "format": "text | json"
+    }
+  },
   "get_compania_info": {
     "file": "get_compania_info.py",
     "params": [

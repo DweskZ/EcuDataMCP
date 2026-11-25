@@ -3,7 +3,7 @@
 Generado por `scripts/generate_catalog.py` desde `resources/catalog.py` y las
 descripciones de `tools/*.py`; no editar a mano.
 
-60 fuentes, 86 tools públicas.
+61 fuentes, 87 tools públicas.
 
 ## Datos Abiertos CKAN
 
@@ -537,6 +537,13 @@ descripciones de `tools/*.py`; no editar a mano.
 - Base: https://api.worldbank.org/v2
 
 - `get_serie_internacional`: International series for Ecuador via `fuente`: wdi (World Bank), irena (electricity), ember (monthly power mix), xm (Colombia-Ecuador flows), comtrade (UN bilateral trade), imf (IMF SDMX), who (health), ilo (ILOSTAT labour), unhcr (refugees/asylum). Without indicador/flow, wdi/who/imf/ilo list their catalog (set query).
+
+## NASA POWER (clima diario y mensual de satélite y modelo, por cantón o coordenada)
+
+- Id: `nasa_power`
+- Base: https://power.larc.nasa.gov/api/temporal
+
+- `get_clima_nasa_power`: Daily or monthly rainfall, temperature, humidity, wind and solar radiation for an Ecuadorian canton (its centroid) or a latitude/longitude, 1981 to a few days ago, from NASA POWER. A satellite and model grid, not weather stations.
 
 ## Utilidades transversales (búsqueda global, archivos, orientación)
 
