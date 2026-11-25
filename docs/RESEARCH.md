@@ -7239,15 +7239,16 @@ deflactores) son también republicación.
   (la prensa habla de unas 90 estaciones); los anuarios son PDF.
   `servicios.inamhi.gob.ec` responde 200 pero no se llegó a inspeccionar.
 
-### Candidata verificada, sin decidir: NASA POWER
+### NASA POWER — decidida y construida aparte
 
 `power.larc.nasa.gov/api/temporal/daily/point` (v2.10.5) devuelve lluvia
 (`PRECTOTCORR`) y temperatura (`T2M`) diarias por coordenada, sin llave.
 Quito, 1-3 de enero de 2024: 0,74, 2,25 y 8,62 mm; 18,13, 18,27 y 17,59 °C.
 No hay una serie equivalente en las fuentes ya integradas, pero es una
 rejilla satelital y de modelo, no estaciones, y `helpers/data/cantones.json`
-no trae coordenadas, así que haría falta una tabla de centroides. Queda a
-decisión de Daniel.
+no trae coordenadas, así que haría falta una tabla de centroides. Daniel
+decidió el 2026-11-24 que vale la pena: se construye como
+`get_clima_nasa_power` y queda registrada en la cuadragésima séptima pasada.
 
 ## Archivo del roadmap (2026-11-24)
 
