@@ -7132,6 +7132,124 @@ la tercera `parcial=false` con USD 34.713.874,47 y 211 procesos con monto. Coste
 ~150 s por llamada cuando SERCOP está limitando (429), porque completar el
 conjunto exige varias pasadas sobre un muestreo aleatorio.
 
+## Cuadragésima quinta pasada — los mayores vacíos de cobertura: IDE ambiental construida, el resto verificado (2026-11-24)
+
+Pedido de Daniel: encontrar las 2-3 fuentes nuevas que más faltan. Método: se
+cruzaron unos veinte temas contra ROADMAP.md, esta nota y el código (once no
+aparecían con las palabras clave buscadas: finanzas de GAD, planificación/SNI,
+combustibles ARCH, patrimonio INPC, FAOSTAT, Global Forest Watch, los portales
+de datos abiertos de Quito y de Guayaquil, comercio por partida, DINARDAP y
+Registro Social) y las candidatas se verificaron en vivo desde Canadá. Criterio de Daniel: una
+fuente que solo republica datos que ya se alcanzan no sirve, salvo que
+traiga datos nuevos.
+
+### IDE del Ministerio de Ambiente y Energía — construida
+
+El mapa interactivo del ministerio (`http://ide.ambiente.gob.ec/mapainteractivo/`,
+un portal nfms4redd de la FAO) lleva en su `config.js` público la dirección
+de su GeoServer: `http://ide.ambiente.gob.ec:8080/geoserver`. Solo responde
+por HTTP y por el puerto 8080: el HTTPS de `ide.ambiente.gob.ec` y los hosts
+`mapainteractivo.`, `geoportal.` y `sigmaa.ambiente.gob.ec` no contestan, y por
+eso las pruebas iniciales sin el puerto dieron `404` o fallo de conexión.
+
+- **WFS 2.0.0 `GetCapabilities`** (145 KB, sin login): 94 tipos de entidad,
+  93 en el espacio `mae_ide` y uno del espacio de demostración `tiger`
+  (`giant_polygon`), que se deja fuera. El WMS pesa 347 KB.
+- **Capas que importan** (27 de los 94 tipos por palabra clave): cobertura de
+  la tierra `v_ff010_cobertura_vegetal_<año>_a` para 1990, 2000, 2008, 2014,
+  2016, 2018, 2020, 2022 y 2024 (290.004 polígonos en 2024); deforestación
+  `v_fc010_deforestacion_<desde>_<hasta>_a` para 1990-2000, 2000-2008,
+  2008-2014, 2014-2016, 2016-2018, 2018-2020, 2020-2022 y 2022-2024 (47.895
+  polígonos en el último; ojo con los nombres, `90_20` es 1990-2000 y `20_08`
+  es 2000-2008); SNAP `v_fa210_snap_a` (81 áreas; `_d` es la versión de
+  descarga y hay una capa de Galápagos); bosque y vegetación protectores;
+  carbono por estrato de bosque, actual y potencial; ecosistemas; vertientes
+  protegidas; contaminación minera 2009-2023 (25 registros).
+- **Atributos verificados.** SNAP: `fcode`, `csnap` (código, p. ej. HB01003),
+  `nam` (nombre), `map` (p. ej. PARQUE NACIONAL), `ror` y `rom` (decreto o
+  registro oficial de creación y de modificaciones), `psj` (p. ej.
+  TERRESTRE), `subap` (p. ej. ESTATAL), `esc` (escala), `edel` (p. ej.
+  CONCLUIDO o EN REVISIÓN), `txt`, `are` y `orden`. Deforestación 2022-2024:
+  `fcode`, `peri` (el período), `cbos` (la transición, p. ej. "BOSQUE NATIVO A
+  MOSAICO AGROPECUARIO"), `are` y `txt`. No se verificaron las unidades de
+  `are`. **La capa de deforestación 2022-2024 no trae provincia ni cantón**
+  (no se inspeccionaron los demás períodos), así que no hay corte territorial
+  sin geometría.
+- **Muestras con atributos solamente**, como el cliente del IGM: pedir la
+  geometría de 290.004 polígonos no cabe en el tope de descarga. El texto
+  llega en UTF-8 correcto (`GALÁPAGOS`).
+- El `config.js` público del portal incluye además una credencial de correo
+  de un servicio de comentarios. No se usó ni se reproduce aquí.
+- No se calculan superficies agregadas (p. ej. hectáreas deforestadas por
+  período): el WFS no suma y la cuenta exigiría descargar los polígonos. Si
+  se quisiera, sería un agregado preconstruido fuera de línea.
+
+Construido como `fuente="maate"` en `search_capas_geo` y `get_capa_geo_datos`
+(`helpers/maate_client.py`, con la misma lógica de catálogo en disco y copia
+obsoleta que `helpers/igm_client.py`). No suma tools: siguen siendo 86.
+
+### Precios de alimentos de WFP y FAO en HDX — descartada
+
+`wfp-food-prices-for-ecuador` (CC BY-IGO, CSV de 1,15 MB, metadatos
+actualizados el 2026-11-22): 9.184 filas, 2005-01 a 2026-08, 78 productos,
+seis mercados (Quito, Guayaquil, Cuenca, Ambato, Portoviejo, Riobamba). Pero
+el propio metadato de HDX declara como fuentes el MAG (SIPA), SINAGAP e INEC
+"via FAO: GIEWS, FPMA": es una republicación. Lo que trae de 2024 en adelante
+(2.011 filas, 33 productos) es solo precio minorista de Quito y Guayaquil, y
+ninguna serie nace en 2024 o después; el mayorista de arroz de grano largo
+termina en septiembre de 2023. Lo único que no se alcanza hoy
+en forma estructurada es el histórico mayorista 2005-2023, que el SIPA
+publica en PDF mensuales. Decisión de Daniel (2026-11-24): sin datos nuevos
+no vale la pena.
+
+FAOSTAT por API: `faostatservices.fao.org` responde `Missing Authorization
+Header` (exige token) y el host anterior `fenixservices.fao.org` responde 521.
+Los archivos masivos (`bulks-faostat.fao.org`, p. ej. 34 MB para
+producción de cultivos, con `Accept-Ranges`) y los extractos de HDX
+(`ecu-faostat-food-prices`: precios al productor de 2 MB, IPC de alimentos,
+deflactores) son también republicación.
+
+### Verificadas y sin construir
+
+- **Finanzas por GAD.** El MEF publica solo PDF agregados ("Presupuesto
+  Ciudadano", con totales de GAD parroquiales y municipales); los GAD envían
+  sus cédulas presupuestarias al MEF en PDF firmado cada trimestre (circular
+  MEF-VGF-2026-0005-C). No hay datos por GAD publicados como datos.
+- **Comercio por subpartida.** `wits.worldbank.org` `tradestats-trade` responde
+  sin llave en SDMX-JSON, pero para Ecuador solo trae 29 grupos de producto,
+  no HS de 6 dígitos. SENAE entrega la estadística por trámite
+  (SENAE-008-001-001) y el BCE no publica NANDINA; ya estaba en Descartado.
+- **Catastro minero.** Cerrado desde 2018; la reapertura gradual ordenada por
+  acuerdo ministerial seguía estancada según prensa de julio de 2026. ARCOM
+  emite un reporte gráfico catastral (PDF o shapefile) por solicitud y pago
+  (15% de una RBU). Desde Canadá no responden `geo.controlminero.gob.ec` ni
+  `recursosyenergia.gob.ec`.
+- **Instituto Espacial Ecuatoriano.** Los trámites de geoinformación exigen una
+  solicitud y una carta de compromiso de buen uso; la búsqueda ubica su
+  geoportal en `institutoespacial.gob.ec`, que no se probó (se probó
+  `espacial.gob.ec`, que no responde).
+- **SNI (`sni.gob.ec`).** Vivo, pero son inventarios (el Inventario de Fuentes
+  de Información 2025 en XLS) y PDF de planes de desarrollo y ordenamiento
+  territorial; la página "Datos abiertos" está vacía.
+- **Quito.** `aireambiente.quito.gob.ec` está vivo (ASP.NET con DevExpress y
+  Google Maps) pero sin una API visible en el HTML; `datosambiente.quito.gob.ec`
+  y `geoportal.quito.gob.ec` responden 403 desde Canadá; `datos.quito.gob.ec`,
+  `datosabiertos.quito.gob.ec` y `datos.guayaquil.gob.ec` no responden.
+- **INAMHI.** La búsqueda no encontró API ni descarga de series de estación
+  (la prensa habla de unas 90 estaciones); los anuarios son PDF.
+  `servicios.inamhi.gob.ec` responde 200 pero no se llegó a inspeccionar.
+
+### NASA POWER — decidida y construida aparte
+
+`power.larc.nasa.gov/api/temporal/daily/point` (v2.10.5) devuelve lluvia
+(`PRECTOTCORR`) y temperatura (`T2M`) diarias por coordenada, sin llave.
+Quito, 1-3 de enero de 2024: 0,74, 2,25 y 8,62 mm; 18,13, 18,27 y 17,59 °C.
+No hay una serie equivalente en las fuentes ya integradas, pero es una
+rejilla satelital y de modelo, no estaciones, y `helpers/data/cantones.json`
+no trae coordenadas, así que haría falta una tabla de centroides. Daniel
+decidió el 2026-11-24 que vale la pena: se construye como
+`get_clima_nasa_power` y queda registrada en la cuadragésima séptima pasada.
+
 ## Archivo del roadmap (2026-11-24)
 
 El 2026-11-24 se limpió [ROADMAP.md](ROADMAP.md). Las filas de ese archivo que ya

@@ -86,7 +86,7 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 | `get_sgr_sitrep_archivos` | Reportes SITREP en PDF de un evento adverso de la SGR. |
 | `list_archivo_secciones` (`fuente="sgr"`) | Categorías de la biblioteca documental de la SGR (~1660 documentos). |
 | `get_archivo_seccion` (`fuente="sgr"`) | Documentos de una categoría de la biblioteca de la SGR. |
-| `search_capas_geo` (`fuente="inamhi"`) | Catálogo de capas del geoportal de INAMHI (meteorología e hidrología). Incluye `fuente="igm"`: 737 capas WFS de cartografía oficial del IGM (1:1M, 1:50.000, 1:25.000; `categoria` elige la escala). `fuente="msp"`: 9 capas ArcGIS del MSP (establecimientos de la red pública, indicadores de salud sexual y reproductiva por cantón, atenciones y egresos por establecimiento). |
+| `search_capas_geo` (`fuente="inamhi"`) | Catálogo de capas del geoportal de INAMHI (meteorología e hidrología). Incluye `fuente="igm"`: 737 capas WFS de cartografía oficial del IGM (1:1M, 1:50.000, 1:25.000; `categoria` elige la escala). `fuente="msp"`: 9 capas ArcGIS del MSP (establecimientos de la red pública, indicadores de salud sexual y reproductiva por cantón, atenciones y egresos por establecimiento). `fuente="maate"`: 93 capas WFS del GeoServer abierto del Ministerio de Ambiente y Energía (cobertura de la tierra 1990-2024, deforestación por período, áreas protegidas SNAP, bosques protectores, carbono, contaminación minera); solo atributos, el servicio responde por HTTP en el puerto 8080. |
 | `get_capa_geo_datos` (`fuente="inamhi"`) | Muestra de atributos reales de una capa del geoportal de INAMHI. |
 
 ## Exploración

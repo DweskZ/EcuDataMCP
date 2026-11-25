@@ -382,6 +382,12 @@ async def main() -> int:
                 {"fuente": "igm", "capa": "nacional_2024:poblado_p_2024", "count": 2},
                 ["poblado"],
             ),
+            ("search_capas_geo", {"fuente": "maate", "query": "snap"}, ["mae_ide:v_fa210_snap_a"]),
+            (
+                "get_capa_geo_datos",
+                {"fuente": "maate", "capa": "mae_ide:v_fa210_snap_a", "count": 2},
+                ["csnap"],
+            ),
             ("search_archivos", {"fuente": "turismo", "limit": 3}, ["Turismo"]),
             ("search_archivos", {"fuente": "fedexpor", "limit": 3}, ["Expordata"]),
             ("search_archivos", {"fuente": "arcotel_series", "query": "1.1.1"}, ["Lineas activas"]),

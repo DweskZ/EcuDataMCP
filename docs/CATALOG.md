@@ -3,7 +3,7 @@
 Generado por `scripts/generate_catalog.py` desde `resources/catalog.py` y las
 descripciones de `tools/*.py`; no editar a mano.
 
-58 fuentes, 86 tools públicas.
+59 fuentes, 86 tools públicas.
 
 ## Datos Abiertos CKAN
 
@@ -124,16 +124,24 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `inamhi`
 - Base: https://geoservicios.inamhi.gob.ec/geoserver
 
-- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals, anomalies, watersheds), mag (agro zoning, land cover, rural cadastre), igm (official base cartography 1:1M/1:50k/1:25k), arconel (energy balance, billing, production by plant 1999-2026, lighting, grid) or celec (plants, transmission) or msp (health facilities, indicators).
-- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm): a sample of up to 20 features. ArcGIS (arconel, celec, msp): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
+- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall, watersheds), mag (agro zoning, rural cadastre), igm (base cartography 1:1M to 1:25k), maate (deforestation, land cover 1990-2024, protected areas), arconel (energy balance, billing, plants, grid), celec (plants, transmission) or msp (health facilities, indicators).
+- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm, maate): a sample of up to 20 features. ArcGIS (arconel, celec, msp): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
 
 ## IGM (cartografía oficial: 737 capas WFS a 1:1M, 1:50.000 y 1:25.000)
 
 - Id: `igm`
 - Base: https://www.geoportaligm.gob.ec
 
-- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals, anomalies, watersheds), mag (agro zoning, land cover, rural cadastre), igm (official base cartography 1:1M/1:50k/1:25k), arconel (energy balance, billing, production by plant 1999-2026, lighting, grid) or celec (plants, transmission) or msp (health facilities, indicators).
-- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm): a sample of up to 20 features. ArcGIS (arconel, celec, msp): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
+- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall, watersheds), mag (agro zoning, rural cadastre), igm (base cartography 1:1M to 1:25k), maate (deforestation, land cover 1990-2024, protected areas), arconel (energy balance, billing, plants, grid), celec (plants, transmission) or msp (health facilities, indicators).
+- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm, maate): a sample of up to 20 features. ArcGIS (arconel, celec, msp): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
+
+## Ministerio de Ambiente y Energía (IDE ambiental: 93 capas WFS de deforestación, cobertura de la tierra 1990-2024 y áreas protegidas)
+
+- Id: `maate`
+- Base: http://ide.ambiente.gob.ec:8080/geoserver
+
+- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall, watersheds), mag (agro zoning, rural cadastre), igm (base cartography 1:1M to 1:25k), maate (deforestation, land cover 1990-2024, protected areas), arconel (energy balance, billing, plants, grid), celec (plants, transmission) or msp (health facilities, indicators).
+- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm, maate): a sample of up to 20 features. ArcGIS (arconel, celec, msp): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
 
 ## Turismo (Boletín de Cifras del Sector Turismo, Ministerio de Producción)
 
@@ -232,8 +240,8 @@ descripciones de `tools/*.py`; no editar a mano.
 - `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE, ARCONEL). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 - `get_sipa_resumen_indicadores`: Monthly PDF links of SIPA's (MAG) "Resumen de Indicadores" for one year, 2018 onward.
-- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals, anomalies, watersheds), mag (agro zoning, land cover, rural cadastre), igm (official base cartography 1:1M/1:50k/1:25k), arconel (energy balance, billing, production by plant 1999-2026, lighting, grid) or celec (plants, transmission) or msp (health facilities, indicators).
-- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm): a sample of up to 20 features. ArcGIS (arconel, celec, msp): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
+- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall, watersheds), mag (agro zoning, rural cadastre), igm (base cartography 1:1M to 1:25k), maate (deforestation, land cover 1990-2024, protected areas), arconel (energy balance, billing, plants, grid), celec (plants, transmission) or msp (health facilities, indicators).
+- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm, maate): a sample of up to 20 features. ArcGIS (arconel, celec, msp): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
 
 ## EP Petroecuador (Cifras Institucionales)
 
@@ -320,8 +328,8 @@ descripciones de `tools/*.py`; no editar a mano.
 
 - `list_catalogo`: List one source's catalog, the step before its get tool: arconel (get_arconel_reporte), bce_diarios (get_bce_indicador_diario), contraloria (get_contraloria_informe), iess (get_iess_archivos), sut, judicatura and cfn (get_sut_indicador_schema, query_sut_indicador with the same fuente).
 - `get_arconel_reporte`: Run one ARCONEL report (e.g. "Balance Energía" for a year) and return its rows. Slow, ~50 rows per page; max_paginas caps work and completo says if everything was read.
-- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals, anomalies, watersheds), mag (agro zoning, land cover, rural cadastre), igm (official base cartography 1:1M/1:50k/1:25k), arconel (energy balance, billing, production by plant 1999-2026, lighting, grid) or celec (plants, transmission) or msp (health facilities, indicators).
-- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm): a sample of up to 20 features. ArcGIS (arconel, celec, msp): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
+- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall, watersheds), mag (agro zoning, rural cadastre), igm (base cartography 1:1M to 1:25k), maate (deforestation, land cover 1990-2024, protected areas), arconel (energy balance, billing, plants, grid), celec (plants, transmission) or msp (health facilities, indicators).
+- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm, maate): a sample of up to 20 features. ArcGIS (arconel, celec, msp): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
 - `list_archivo_secciones`: List the sections of one institution's document archive (ARCSA, Superbancos, SEPS, INEVAL, SGR, Educación Superior, SIPA, Petroecuador, Energy Ministry, CNE, BVG, BVQ, CENACE, ARCONEL). Next: get_archivo_seccion(fuente, seccion).
 - `get_archivo_seccion`: List the downloadable files (title, URL, format) in one section from list_archivo_secciones. Returns links, not file contents; download large files directly (preview/download tools cap at 5 MB).
 
@@ -330,8 +338,8 @@ descripciones de `tools/*.py`; no editar a mano.
 - Id: `celec`
 - Base: https://portalarcgis.celec.gob.ec/server/rest/services/Hosted
 
-- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals, anomalies, watersheds), mag (agro zoning, land cover, rural cadastre), igm (official base cartography 1:1M/1:50k/1:25k), arconel (energy balance, billing, production by plant 1999-2026, lighting, grid) or celec (plants, transmission) or msp (health facilities, indicators).
-- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm): a sample of up to 20 features. ArcGIS (arconel, celec, msp): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
+- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall, watersheds), mag (agro zoning, rural cadastre), igm (base cartography 1:1M to 1:25k), maate (deforestation, land cover 1990-2024, protected areas), arconel (energy balance, billing, plants, grid), celec (plants, transmission) or msp (health facilities, indicators).
+- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm, maate): a sample of up to 20 features. ArcGIS (arconel, celec, msp): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
 
 ## Empresa Eléctrica Quito (cronogramas de cortes de luz en PDF)
 
@@ -491,8 +499,8 @@ descripciones de `tools/*.py`; no editar a mano.
 - Base: https://www.salud.gob.ec/
 
 - `search_archivos`: File links from one institution's catalog, filtered by text: SRI, MEF, SENAE, Census 2022, MINEDEC, SENESCYT, MSP, CNIG, Trabajo, ARCOTEL and BCE, Turismo, FEDEXPOR, AEADE, ARCOTEL series, MSP drug prices, MIT road status. Links, not contents.
-- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall normals, anomalies, watersheds), mag (agro zoning, land cover, rural cadastre), igm (official base cartography 1:1M/1:50k/1:25k), arconel (energy balance, billing, production by plant 1999-2026, lighting, grid) or celec (plants, transmission) or msp (health facilities, indicators).
-- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm): a sample of up to 20 features. ArcGIS (arconel, celec, msp): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
+- `search_capas_geo`: Search layers of a geoportal: inamhi (rainfall, watersheds), mag (agro zoning, rural cadastre), igm (base cartography 1:1M to 1:25k), maate (deforestation, land cover 1990-2024, protected areas), arconel (energy balance, billing, plants, grid), celec (plants, transmission) or msp (health facilities, indicators).
+- `get_capa_geo_datos`: Attributes of a layer from search_capas_geo, geometry dropped. GeoServer (inamhi, mag, igm, maate): a sample of up to 20 features. ArcGIS (arconel, celec, msp): up to 500 rows with a SQL filtro and offset, or server-side sums by group (sumar, agrupar).
 
 ## MIT (ex MTOP: informe diario de la Red Vial Estatal)
 

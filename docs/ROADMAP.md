@@ -100,6 +100,12 @@ de cobertura que falta en cada una.
 |---|---|---|
 | Cifras Institucionales (`eppetroecuador.ec/?p=3721`) | `list_archivo_secciones(fuente="petroecuador")`, `get_archivo_seccion(fuente="petroecuador", …)` | 8 secciones (estados financieros 2015-2025, informes estadísticos mensuales y anuales 2006-presente, exploración y producción con la producción diaria de campo, comercialización, refinación, WTI, gestión de riesgos), enlaces a PDF; solo enlaces, el contenido se lee con `read_pdf` → RESEARCH.md § EP Petroecuador — Cifras Institucionales |
 
+### Ministerio de Ambiente y Energía — IDE ambiental
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| GeoServer abierto (`ide.ambiente.gob.ec:8080`) | `search_capas_geo(fuente="maate")`, `get_capa_geo_datos(fuente="maate")` | 93 capas WFS del espacio `mae_ide`, sin login: cobertura de la tierra de nueve años entre 1990 y 2024 (hasta 290.004 polígonos), deforestación por período 1990-2024 (47.895 polígonos en 2022-2024), áreas protegidas del SNAP (81), bosques protectores, carbono por estrato de bosque, ecosistemas y contaminación minera 2009-2023. Solo atributos; el servicio responde únicamente por HTTP en el puerto 8080; la capa de deforestación 2022-2024 no trae provincia ni cantón → RESEARCH.md § Cuadragésima quinta pasada |
+
 ### CNT/ARCOTEL (telecomunicaciones)
 
 | Fuente | Herramientas | Qué cubre |
