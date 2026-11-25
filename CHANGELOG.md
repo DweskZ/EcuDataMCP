@@ -1,6 +1,19 @@
 # Changelog
 
-## Unreleased
+## 0.15.1 — 2026-11-24
+
+87 tools in the default profile (`get_anda_materiales` and `get_clima_nasa_power`
+are new). `get_clima_nasa_power` gives daily and monthly rainfall, temperature,
+humidity, wind and solar radiation for any canton or coordinate since 1981;
+`search_capas_geo` gains the Ministry of Environment's layers
+(`fuente="maate"`: land cover, deforestation, protected areas) and
+`search_archivos` the SNI's bank of public-policy evaluations
+(`fuente="sni_evaluaciones"`). `read_zip_member` now reads any sheet, a zip
+inside a zip, a spreadsheet at a plain URL and members past 5 MB; the 2022
+Census tabulados are searchable by table title, level and column; Supercías
+ratios it could not calculate are empty instead of a false 0, compared against
+sector quartiles; `search_sismos` times were five hours off; and the HTTP
+server, the smoke test and the Supercías rebuild are sturdier.
 
 - **`search_capas_geo` / `get_capa_geo_datos`: new source `fuente="maate"`, the
   Ministry of Environment's open GeoServer.** The server had no environmental
@@ -15,7 +28,7 @@
   stale if the host goes down, and GeoServer's `tiger` demo workspace is left
   out. The service answers over plain HTTP on port 8080 only; the HTTPS host
   does not answer. Checked live on 2026-11-24 against the SNAP and 2022-2024
-  deforestation layers. No new tool: still 86.
+  deforestation layers. No new tool.
 
 - **`search_archivos`: new source `fuente="sni_evaluaciones"`, the SNI's bank
   of public-policy evaluations.** The Sistema Nacional de Información
@@ -31,7 +44,7 @@
   cataloged: its lists of population projections, statistical inventories and
   technical norms load through an AJAX filter with a per-page nonce, so the HTML
   holds only their first three or four items. Checked live on 2026-11-24. No new
-  tool: still 86.
+  tool.
 
 - **New tool `get_clima_nasa_power`: daily and monthly rainfall, temperature,
   humidity, wind and solar radiation for any canton or coordinate, from NASA
