@@ -218,6 +218,12 @@ de cobertura que falta en cada una.
 |---|---|---|
 | Boletín de Cifras del Sector Turismo | `search_archivos(fuente="turismo")` | 12 boletines mensuales en PDF, noviembre 2025 a octubre 2026 (~33 páginas: barómetro ONU Turismo, llegadas y salidas por nacionalidad, ocupación en feriados, áreas protegidas, catastro). Listados desde la API de medios de WordPress de `produccion.gob.ec` (el post enlaza por acortadores, uno con TLS roto); cada archivo trae `anio`, `mes` y `periodo`; las tablas se leen con `read_pdf` (2026-11-07) → RESEARCH.md § Trigésimo séptima pasada |
 
+### SNI (Secretaría Nacional de Planificación)
+
+| Fuente | Herramientas | Qué cubre |
+|---|---|---|
+| Banco de evaluaciones | `search_archivos(fuente="sni_evaluaciones")` | 108 informes de evaluación de programas y proyectos públicos, 2011-2026, de una tabla estática de `sni.gob.ec`: sector (`categoria`), entidad ejecutora y evaluadora, `tipo` de evaluación, `anio` y `objetivo`; 104 PDF (`read_pdf` los lee), tres `.rar` y un `.zip`. Las demás secciones del SNI cargan por AJAX con nonce y no están catalogadas → RESEARCH.md § Cuadragésima sexta pasada |
+
 ### CFN y gremios privados
 
 | Fuente | Herramientas | Qué cubre |

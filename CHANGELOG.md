@@ -17,6 +17,22 @@
   does not answer. Checked live on 2026-11-24 against the SNAP and 2022-2024
   deforestation layers. No new tool: still 86.
 
+- **`search_archivos`: new source `fuente="sni_evaluaciones"`, the SNI's bank
+  of public-policy evaluations.** The Sistema Nacional de Información
+  (sni.gob.ec, Secretaría Nacional de Planificación) publishes 108 evaluation
+  reports of public programs and projects, 2011 to 2026, in one table on its
+  "Banco de evaluaciones" page. Each row names the sector, the entity that ran
+  the intervention, the entity that evaluated it, the evaluation type, the year
+  and the objective, and links the report (104 PDF, three .rar, one .zip);
+  `read_pdf` opens the PDFs (checked on a 97-page 2026 report). The catalog is
+  cached on disk for six hours and served stale if the site goes down. A query
+  needs every word to appear in one of those fields, ignoring accents, and
+  `formato` filters as for the other sources. The rest of the SNI site is not
+  cataloged: its lists of population projections, statistical inventories and
+  technical norms load through an AJAX filter with a per-page nonce, so the HTML
+  holds only their first three or four items. Checked live on 2026-11-24. No new
+  tool: still 86.
+
 - **`read_zip_member` reads any sheet, a zip inside a zip, and a spreadsheet
   at a plain URL.** Three cases it could not handle on 2026-11-23, while
   pulling rice prices for El Quantificador: SIPA's `precios-agroindustria.xlsx`
