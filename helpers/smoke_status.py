@@ -65,9 +65,12 @@ _DEGRADED_SOURCES = (
     ),
     (
         # Seen 2026-11-04 from a home connection in Ecuador: the SRI's public
-        # RUC page answers every RUC with its own "Error en el Sistema"
+        # RUC pages answer every RUC with their own "Error en el Sistema"
         # page and HTTP 500 (tried 1790016919001 and 0990004196001 by
-        # hand). The SRI's system, not this repo.
+        # hand). The SRI's system, not this repo. On 2026-11-25 only the
+        # establishments page (ruc-establec.jspa) did, from both hosted
+        # servers; get_sri_ruc_info now returns the registry record without
+        # establishments in that case, so this entry covers the registry page.
         "sri_ficha_ruc_down",
         "ruc-establec.jspa",
         "500 internal server error",
@@ -84,8 +87,11 @@ _DEGRADED_SOURCES = (
     (
         # Seen 2026-11-05 to 2026-11-07 on the runner: the IESS certificate
         # form never answers in time, while the same call from Render (no
-        # proxy for iess.gob.ec) returned the certificate on 2026-11-07. The
-        # IESS host throttling datacenter IPs, not a regression.
+        # proxy for iess.gob.ec) returned the certificate on 2026-11-07. On
+        # 2026-11-25 the submit took 12 to 30 s or more from a home connection
+        # as well, so this is the IESS generating the PDF slowly rather than a
+        # block; the client waits 75 s since then, and this entry covers what
+        # still outlasts it.
         "iess_certificado_timeout",
         "certificado de cumplimiento patronal del iess",
         "readtimeout",

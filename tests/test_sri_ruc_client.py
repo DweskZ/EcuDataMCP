@@ -1,3 +1,4 @@
+import httpx
 import pytest
 
 from helpers import sri_ruc_client
@@ -71,6 +72,43 @@ async def test_get_ruc_info_can_skip_establishments(httpx_mock):
 
     assert "establecimientos" not in result
     assert len(httpx_mock.get_requests()) == 1
+
+
+@pytest.mark.asyncio
+async def test_get_ruc_info_keeps_record_when_establishments_page_fails(httpx_mock):
+    httpx_mock.add_response(
+        url=f"{sri_ruc_client.SRI_RUC_INFO_URL}?ruc=1718647215001",
+        html=_INFO_HTML,
+    )
+    httpx_mock.add_response(
+        url=f"{sri_ruc_client.SRI_RUC_ESTABLECIMIENTOS_URL}?ruc=1718647215001",
+        status_code=500,
+    )
+
+    result = await sri_ruc_client.get_ruc_info("1718647215001")
+
+    assert result["razon_social"] == "SANCHEZ PAZMIÑO DANIEL HERNAN"
+    assert "establecimientos" not in result
+    assert "HTTPStatusError" in result["establecimientos_no_disponibles"]
+    assert result["url_establecimientos"] == sri_ruc_client.SRI_RUC_ESTABLECIMIENTOS_URL
+
+
+@pytest.mark.asyncio
+async def test_get_ruc_info_still_raises_on_a_client_error_from_establishments(
+    httpx_mock,
+):
+    # A 4xx means this client builds the request wrongly, not that the SRI is down.
+    httpx_mock.add_response(
+        url=f"{sri_ruc_client.SRI_RUC_INFO_URL}?ruc=1718647215001",
+        html=_INFO_HTML,
+    )
+    httpx_mock.add_response(
+        url=f"{sri_ruc_client.SRI_RUC_ESTABLECIMIENTOS_URL}?ruc=1718647215001",
+        status_code=404,
+    )
+
+    with pytest.raises(httpx.HTTPStatusError):
+        await sri_ruc_client.get_ruc_info("1718647215001")
 
 
 @pytest.mark.asyncio

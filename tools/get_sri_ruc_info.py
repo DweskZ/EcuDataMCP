@@ -73,7 +73,11 @@ def register_get_sri_ruc_info_tool(mcp: MCPServer) -> None:
                 if result.get(key) is not None:
                     parts.append(f"{label}: {result[key]}")
 
-            if "establecimientos" in result:
+            if result.get("establecimientos_no_disponibles"):
+                parts.extend(
+                    ["", f"Establecimientos: {result['establecimientos_no_disponibles']}"]
+                )
+            elif "establecimientos" in result:
                 parts.extend(["", "Establecimientos registrados:"])
                 establishments = result["establecimientos"]
                 if not establishments:

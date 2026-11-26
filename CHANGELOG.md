@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+- **`get_sri_ruc_info`: a failing establishments page no longer discards the
+  RUC record.** On 2026-11-25 the SRI's `ruc-establec.jspa` answered HTTP 500
+  for two RUCs from two different hosts while the registry page
+  (`ruc-datos2.jspa`) answered normally, and the tool failed whole because
+  `include_establecimientos` is on by default. It now returns the record
+  without `establecimientos` and adds `establecimientos_no_disponibles` saying
+  the establishments page did not respond (a 5xx or a network error; a 4xx
+  still fails). No new tool.
+
+- **`get_certificado_cumplimiento_patronal`: waits 75 s for the certificate
+  instead of 30 s.** The IESS form loads in about 1 s but generating the PDF
+  took 12 to 30 s or more when timed on 2026-11-25 (26, 12.6, 13.2 and 30.2 s
+  from one machine, one call past 30 s), so the flat 30 s limit cut off about
+  half the calls from the GitHub runners and both hosted servers. The earlier
+  explanation, the IESS throttling datacenter IPs, did not hold: the same
+  slowness shows from a home connection. No new tool.
+
 ## 0.15.1 — 2026-11-24
 
 87 tools in the default profile (`get_anda_materiales` and `get_clima_nasa_power`

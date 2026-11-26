@@ -76,7 +76,14 @@ CERTIFICADO_URL = (
     "https://www.iess.gob.ec/empleador-web/pages/morapatronal/"
     "certificadoCumplimientoPublico.jsf"
 )
-_TIMEOUT = 30.0
+# The form loads in about 1 s, but the submit generates the PDF on the IESS
+# side and took 12 to 30 s or more when timed on 2026-11-25 (26, 12.6, 13.2 and
+# 30.2 s, plus one call that did not finish in 30 s). The former flat 30 s limit
+# cut off roughly half the calls, from the GitHub runners and both hosted
+# servers alike. One attempt only: the ViewState is bound to the session, so a
+# retry would need a new form fetch and triple the worst case. 75 s keeps the
+# whole call under the smoke test's 90 s request timeout.
+_TIMEOUT = httpx.Timeout(connect=15.0, read=75.0, write=15.0, pool=15.0)
 
 _FORM_ID = "frmCertificadoCumplimiento"
 _FORM_RE = re.compile(

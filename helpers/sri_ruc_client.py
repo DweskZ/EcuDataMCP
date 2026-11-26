@@ -209,11 +209,28 @@ async def get_ruc_info(
     )
 
     if include_establecimientos:
-        establishments_html = await _fetch_public_page(
-            SRI_RUC_ESTABLECIMIENTOS_URL, ruc
-        )
-        data["establecimientos"] = _parse_establishments_page(establishments_html)
         data["url_establecimientos"] = SRI_RUC_ESTABLECIMIENTOS_URL
+        try:
+            establishments_html = await _fetch_public_page(
+                SRI_RUC_ESTABLECIMIENTOS_URL, ruc
+            )
+        except (httpx.TransportError, httpx.HTTPStatusError) as exc:
+            # The establishments page answers HTTP 500 for every RUC on days
+            # the registry page itself works (seen 2026-11-25 for two RUCs from
+            # two hosts). The registry record is the answer; say what is
+            # missing instead of discarding it.
+            if isinstance(exc, httpx.HTTPStatusError) and exc.response.status_code < 500:
+                raise
+            logger.warning("Establecimientos no disponibles para %s: %s", ruc, exc)
+            data["establecimientos_no_disponibles"] = (
+                "La página de establecimientos del SRI no respondió "
+                f"({type(exc).__name__}); la ficha del RUC sí. Reintenta más tarde "
+                "o consulta los establecimientos en srienlinea.sri.gob.ec."
+            )
+        else:
+            data["establecimientos"] = _parse_establishments_page(
+                establishments_html
+            )
 
     return data
 
