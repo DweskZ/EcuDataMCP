@@ -100,7 +100,11 @@ def test_totals_are_exact_where_floats_drift():
     result = _agg(raw, group_by=["g"], sum_columns=["v"])
 
     assert result["rows"][0][2] == 1.0
-    assert sum([0.1] * 10) != 1.0
+    # sum() of floats is compensated from Python 3.12, so add them one by one.
+    naive = 0.0
+    for _ in range(10):
+        naive += 0.1
+    assert naive != 1.0
 
 
 def test_column_names_ignore_case_and_accents():
