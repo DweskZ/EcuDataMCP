@@ -161,14 +161,26 @@ async def _search(
         total = len(items)
         items = items[offset : offset + limit]
 
+    archivos = [_normalize_file(item) for item in items]
     nota = result.get("nota") or result.get("nota_cobertura") or result.get("aviso")
+    if not nota and fuente == "sri_datasets" and any(
+        str(a.get("url") or "").lower().endswith(".csv") for a in archivos
+    ):
+        # The yearly sales CSVs are about 5.5 MB: read_zip_member and
+        # preview_resource_data stop at 5 MB, so only a whole-file read answers
+        # a question about totals.
+        nota = (
+            "Los CSV del SRI pesan unos 5 MB y read_zip_member solo lee los primeros "
+            "5 MB: para totales por provincia, cantón o sector usa aggregate_csv con "
+            "la URL del archivo."
+        )
     return {
         "fuente": fuente,
         "nombre_fuente": result.get("source"),
         "url_fuente": result.get("url_fuente") or result.get("url_indice") or result.get("source_url"),
         "total": total,
         "offset": offset,
-        "archivos": [_normalize_file(item) for item in items],
+        "archivos": archivos,
         **({"nota": nota} if nota else {}),
     }
 

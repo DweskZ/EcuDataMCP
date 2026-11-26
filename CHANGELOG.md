@@ -2,6 +2,37 @@
 
 ## Unreleased
 
+88 tools in the default profile (`aggregate_csv` is new).
+
+- **New tool `aggregate_csv`: totals and groups over a whole CSV.** The yearly
+  SRI sales files (`search_archivos(fuente="sri_datasets", query="ventas")`,
+  2017 to 2026) weigh 5.2 to 5.7 MB each, not the 12 to 24 MB the SRI's catalog
+  shows, so `read_zip_member` read the first 5 MB and left out about a tenth of
+  the rows, and the host does not honour HTTP Range, so nothing could page
+  through the rest. `aggregate_csv` downloads a CSV/TSV/TXT at a URL whole (up to
+  30 MB; a bigger file is refused rather than summed in part) and returns one row
+  per group with the row count and the total of each `sum_columns` column, plus
+  the totals over every row that passes `filters_json`. It reads what the files
+  actually are: `|`, comma, `;` or tab delimiters, a BOM, UTF-8 or Windows 1252
+  (the 2018 file), decimal commas (`194488,1500`, `"36631,46"`), and column names
+  that differ by year, matched without case or accents. Sums are exact
+  (`Decimal`), and blank or non-numeric cells are counted, not turned into zeros.
+  Checked live against 2018 (50,334 rows, total sales 188,851,629,437.72,
+  identical to a separate sum) and 2025. A `.zip` or a spreadsheet still goes
+  through `read_zip_member`. `search_archivos(fuente="sri_datasets")` now says so
+  when it lists CSV files, and `read_zip_member`'s description points to it.
+
+- **`list_zip_contents` / `read_zip_member`: a host without HTTP Range no longer
+  fails.** A server that answers 200 to a range request (the SRI's does) made both
+  tools stop with "no soporta HTTP Range". Now a .zip of up to 20 MB is downloaded
+  whole once (kept 5 minutes, so reading a member after listing the archive does
+  not download it twice) and the ranges are served from memory through the same
+  checks as before (CRC, sizes, encryption, ZIP64). A bigger .zip on such a host
+  fails with a message that says so; `ECUADOR_MCP_NO_RANGE_ZIP_MB` raises the 20 MB
+  cap (the SRI's province RUC files run from 2 to 156 MB). The previews that told the user to use
+  `download_resource`, itself capped at 5 MB, now point to `list_zip_contents` and
+  `read_zip_member`, or to the direct link.
+
 - **`get_sri_ruc_info`: a failing establishments page no longer discards the
   RUC record.** On 2026-11-25 the SRI's `ruc-establec.jspa` answered HTTP 500
   for two RUCs from two different hosts while the registry page

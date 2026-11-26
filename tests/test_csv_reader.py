@@ -613,14 +613,45 @@ async def test_list_zip_contents_fetches_central_directory_separately_when_outsi
     assert {m["name"] for m in result["members"]} == {"data.csv", "readme.txt"}
 
 
-async def test_list_zip_contents_requires_range_support(httpx_mock, monkeypatch):
+async def test_list_zip_contents_falls_back_to_a_whole_download_without_range(
+    httpx_mock, monkeypatch
+):
     def _fake_getaddrinfo(host, port, *args, **kwargs):
         return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
 
     monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+    csv_reader_module._blob_cache.clear()
 
+    # A host that ignores Range answers 200 with the whole file every time.
     url = "https://example.com/no-range.zip"
-    httpx_mock.add_response(url=url, status_code=200, content=b"whatever bytes")
+    blob = _make_zip({"data.csv": b"a,b\n1,2\n", "readme.txt": b"hola"})
+    httpx_mock.add_response(url=url, status_code=200, content=blob, is_reusable=True)
+
+    result = await list_zip_contents(url)
+    csv_reader_module._blob_cache.clear()
+
+    assert result["total_entries"] == 2
+    assert result["total_size_bytes"] == len(blob)
+    assert {m["name"] for m in result["members"]} == {"data.csv", "readme.txt"}
+
+
+async def test_list_zip_contents_over_the_no_range_cap_points_to_the_direct_link(
+    httpx_mock, monkeypatch
+):
+    def _fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _fake_getaddrinfo)
+    monkeypatch.setattr(csv_reader_module, "_MAX_NO_RANGE_ZIP_BYTES", 64)
+    csv_reader_module._blob_cache.clear()
+
+    url = "https://example.com/no-range-grande.zip"
+    httpx_mock.add_response(
+        url=url,
+        status_code=200,
+        content=_make_zip({"data.csv": b"a,b\n" * 100}),
+        is_reusable=True,
+    )
 
     with pytest.raises(ValueError, match="no soporta HTTP Range"):
         await list_zip_contents(url)

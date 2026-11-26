@@ -2175,6 +2175,61 @@
         "long_description": "Lee las filas de UN archivo dentro de un .zip remoto sin descargar el .zip. Primero usa list_zip_contents para obtener el nombre exacto del miembro. Lee el directorio central del .zip y luego baja solo la cabecera local y los bytes comprimidos de ese miembro vía peticiones HTTP Range, así que funciona dentro de archivos mucho más grandes que el tope de 5 MB de preview_resource_data/download_resource -- ej. los 90 tabulados CSV de la ENDI R3 del INEC. Límites: el servidor debe respetar HTTP Range (responder 206); un CSV/TSV/TXT de cualquier tamaño se lee desde su inicio (baja a lo más 5 MB, la salida se corta a 5 MB descomprimidos y se marca como truncada), mientras que las hojas de cálculo y los .zip internos se abren completos y deben caber en 20 MB comprimidos y descomprimidos; solo miembros sin comprimir o deflate, sin cifrado; ZIP64 soportado. Formatos: .csv, .tsv, .txt, .xlsx, .xls, .xlsb, .ods; sheet elige la hoja por nombre o número (la respuesta lista todas), inner_member lee un archivo dentro de un .zip que está dentro del .zip (como los tabulados CSV del INEC) y con member='' lee una hoja de cálculo publicada directamente en la URL. Verifica el CRC32 cuando el miembro se lee completo. Busca el nombre exacto, luego una coincidencia única sin distinguir mayúsculas o por nombre base; si no encuentra, el error sugiere nombres parecidos. En tabulados con un bloque de título arriba (INEC, BCE) detecta la fila de encabezado real (la primera al menos la mitad de llena que la más llena de las primeras 30), devuelve las filas de título en preamble y elimina las columnas vacías; skip_rows=0 conserva la fila 1 y skip_rows=n salta n filas."
       },
       {
+        "name": "aggregate_csv",
+        "description": "Agrupa y suma un CSV/TSV/TXT completo desde una URL (hasta 30 MB, no solo su inicio): columnas de grupo, sumas, filtros exactos y orden.",
+        "params": [
+          {
+            "name": "url",
+            "type": "str",
+            "default": null,
+            "description": "URL directa a un CSV/TSV/TXT de texto plano (de search_archivos o de un recurso CKAN)."
+          },
+          {
+            "name": "group_by",
+            "type": "str",
+            "default": "''",
+            "description": "Nombres de columna separados por coma para agrupar; vacío da una sola fila de total."
+          },
+          {
+            "name": "sum_columns",
+            "type": "str",
+            "default": "''",
+            "description": "Columnas numéricas a sumar, separadas por coma; vacío solo cuenta filas."
+          },
+          {
+            "name": "filters_json",
+            "type": "str",
+            "default": "''",
+            "description": "Objeto JSON opcional de filtros exactos, p. ej. '{\"PROVINCIA\": \"PICHINCHA\", \"MES\": [1, 2]}'."
+          },
+          {
+            "name": "order_by",
+            "type": "str",
+            "default": "''",
+            "description": "Columna del resultado por la cual ordenar, con asc o desc opcional; por defecto la primera suma, de mayor a menor."
+          },
+          {
+            "name": "limit",
+            "type": "int",
+            "default": "50",
+            "description": "Grupos a devolver (default 50, máx. 500); los totales siempre cubren todos."
+          },
+          {
+            "name": "skip_rows",
+            "type": "int",
+            "default": "0",
+            "description": "Líneas sobre la línea de encabezado (default 0)."
+          },
+          {
+            "name": "format",
+            "type": "Literal['text', 'json']",
+            "default": "'text'",
+            "description": "text | json"
+          }
+        ],
+        "long_description": "Agrupa las filas de un archivo de texto delimitado completo y suma sus columnas numéricas. read_zip_member y preview_resource_data leen solo los primeros 5 MB de un archivo, así que un total sobre un archivo de 5 a 30 MB dejaría filas fuera; este tool lo baja entero y devuelve una fila por grupo con los valores del grupo, el número de filas (`filas`) y la suma de cada columna, más los totales sobre todas las filas que cumplen los filtros. Los nombres de columna se emparejan sin mayúsculas ni tildes (AÑO, año y ano son la misma). El delimitador (coma, `|`, `;` o tabulador) y la codificación (UTF-8 con o sin BOM, o Windows 1252) se detectan; los números pueden traer coma decimal (\"1234,56\") o punto, y una coma suelta es decimal (\"1,234\" es 1,234). Las celdas vacías y las que no son número quedan fuera de las sumas y se cuentan en `celdas_vacias` y `celdas_no_numericas`. Las sumas son exactas (`Decimal`). Un archivo de más de 30 MB se rechaza en vez de sumarlo incompleto; un .zip o una hoja de cálculo se leen con list_zip_contents y read_zip_member. Ejemplo: los CSV de ventas del SRI (search_archivos con fuente=\"sri_datasets\" y query=\"ventas\"; ~5,5 MB por año, 2017-2026) con group_by=\"PROVINCIA\" y sum_columns=\"TOTAL_VENTAS,TOTAL_COMPRAS\"; filters_json='{\"MES\": [1, 2, 3]}' da el primer trimestre y group_by=\"MES\" el año por mes. Los nombres de columna cambian entre años (VENTAS_NETAS_TARIFA_12 en 2018, VENTAS_NETAS_TARIFA_GRAVADA en 2026): si uno no se encuentra, la respuesta lista las columnas del archivo."
+      },
+      {
         "name": "read_pdf",
         "description": "Extrae texto de un documento PDF en una URL directa.",
         "params": [

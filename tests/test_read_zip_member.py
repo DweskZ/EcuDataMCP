@@ -22,6 +22,14 @@ _RANGE_RE = re.compile(r"bytes=(\d*)-(\d*)")
 
 
 @pytest.fixture(autouse=True)
+def fresh_zip_blob_cache():
+    # Every test uses the same URL; a .zip kept from a Range-less host must not leak.
+    csv_reader._blob_cache.clear()
+    yield
+    csv_reader._blob_cache.clear()
+
+
+@pytest.fixture(autouse=True)
 def public_dns(monkeypatch):
     def _fake_getaddrinfo(host, port, *args, **kwargs):
         return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
@@ -98,7 +106,14 @@ def _raw_zip(
     return local + cd + eocd
 
 
-def _serve(httpx_mock, blob: bytes, *, full_body: bool = False, shift: int = 0) -> None:
+def _serve(
+    httpx_mock,
+    blob: bytes,
+    *,
+    full_body: bool = False,
+    shift: int = 0,
+    url: str = URL,
+) -> None:
     """Answer Range requests from `blob`; optionally misbehave like real servers."""
     total = len(blob)
 
@@ -117,7 +132,7 @@ def _serve(httpx_mock, blob: bytes, *, full_body: bool = False, shift: int = 0) 
             headers={"Content-Range": f"bytes {start}-{end}/{total}"},
         )
 
-    httpx_mock.add_callback(callback, url=URL, is_reusable=True)
+    httpx_mock.add_callback(callback, url=url, is_reusable=True)
 
 
 async def test_reads_a_deflate_csv_member(httpx_mock):
@@ -220,11 +235,169 @@ async def test_rejects_a_spreadsheet_too_big_to_open_whole(httpx_mock, monkeypat
         await read_zip_member(URL, "libro.xlsx")
 
 
-async def test_rejects_a_200_instead_of_206(httpx_mock):
+# -- hosts that ignore Range ---------------------------------------------------
+#
+# The SRI's file host answers 200 with the whole file to a Range request. Up to
+# _MAX_NO_RANGE_ZIP_BYTES the .zip is then downloaded whole and read from memory
+# through the same parsing as the Range path.
+
+
+async def test_lists_a_zip_on_a_host_that_ignores_range(httpx_mock):
+    blob = _make_zip({"a.csv": b"a\n1\n", "d/": b""})
+    _serve(httpx_mock, blob, full_body=True)
+
+    result = await list_zip_contents(URL)
+
+    assert result["total_size_bytes"] == len(blob)
+    assert result["total_entries"] == 2
+    assert {m["name"]: m["is_dir"] for m in result["members"]} == {
+        "a.csv": False,
+        "d/": True,
+    }
+
+
+async def test_a_range_less_host_lists_the_same_members_as_a_range_host(httpx_mock):
+    blob = _make_zip({"T/INDICE.csv": b"x\n1\n", "T/T1_i1.csv": b"a,b\n1,2\n"})
+    other = "https://example.com/otro.zip"
+    _serve(httpx_mock, blob)
+    _serve(httpx_mock, blob, full_body=True, url=other)
+
+    from_range = await list_zip_contents(URL)
+    from_memory = await list_zip_contents(other)
+
+    assert from_memory == {**from_range, "url": other}
+
+
+@pytest.mark.parametrize("method", [zipfile.ZIP_DEFLATED, zipfile.ZIP_STORED])
+async def test_reads_a_member_on_a_host_that_ignores_range(httpx_mock, method):
+    blob = _make_zip({"x.csv": b"n\n0\n", "a.csv": b"col,v\nA,1\nB,2\n"}, method=method)
+    _serve(httpx_mock, blob, full_body=True)
+
+    result = await read_zip_member(URL, "a.csv")
+
+    assert result["headers"] == ["col", "v"]
+    assert result["rows"] == [["A", "1"], ["B", "2"]]
+    assert result["uncompressed_size"] == len(b"col,v\nA,1\nB,2\n")
+
+
+async def test_a_range_less_host_still_checks_the_crc(httpx_mock):
+    _serve(httpx_mock, _raw_zip("a.csv", b"a\n1\n", crc=0xDEADBEEF), full_body=True)
+
+    with pytest.raises(ValueError, match="CRC32"):
+        await read_zip_member(URL, "a.csv")
+
+
+async def test_a_range_less_host_still_rejects_an_encrypted_member(httpx_mock):
+    _serve(httpx_mock, _raw_zip("a.csv", b"a\n1\n", flags=0x1), full_body=True)
+
+    with pytest.raises(ValueError, match="cifrado"):
+        await read_zip_member(URL, "a.csv")
+
+
+async def test_a_range_less_host_reads_a_text_member_from_its_head(
+    httpx_mock, monkeypatch
+):
+    monkeypatch.setattr(csv_reader, "MAX_DOWNLOAD_BYTES", 2048)
+    body = _noise_csv(2000)
+    _serve(httpx_mock, _make_zip({"big.csv": body}), full_body=True)
+
+    result = await read_zip_member(URL, "big.csv", max_rows=3)
+
+    assert [row[0] for row in result["rows"]] == ["0", "1", "2"]
+    assert result["truncated"] is True
+    assert result["uncompressed_size"] == len(body)
+
+
+async def test_a_range_less_host_reads_zip64_extra_fields(httpx_mock, monkeypatch):
+    with monkeypatch.context() as patch:
+        patch.setattr(zipfile, "ZIP64_LIMIT", 8)
+        blob = _make_zip({"a.csv": b"x,y\n1,2\n", "b.csv": b"n\n" + b"7\n" * 20})
+    _serve(httpx_mock, blob, full_body=True)
+
+    listing = await list_zip_contents(URL)
+    result = await read_zip_member(URL, "b.csv")
+
+    assert {m["name"]: m["uncompressed_size"] for m in listing["members"]} == {
+        "a.csv": 8,
+        "b.csv": 42,
+    }
+    assert result["rows"][0] == ["7"]
+
+
+async def test_a_range_less_host_reads_the_zip64_end_of_central_directory(
+    httpx_mock, monkeypatch
+):
+    # The 56-byte ZIP64 record sits outside the tail, so it is a range of its own.
+    monkeypatch.setattr(csv_reader, "_EOCD_TAIL_BYTES", 42)
+    _serve(httpx_mock, _zip64_eocd_zip("datos.csv", b"a,b\n1,2\n"), full_body=True)
+
+    result = await read_zip_member(URL, "datos.csv")
+
+    assert result["rows"] == [["1", "2"]]
+
+
+async def test_a_range_less_host_with_a_zip_over_the_cap_says_so(
+    httpx_mock, monkeypatch
+):
+    monkeypatch.setattr(csv_reader, "_MAX_NO_RANGE_ZIP_BYTES", 1024 * 1024)
+    blob = _make_zip({"a.csv": b"x" * (1024 * 1024 + 10)}, method=zipfile.ZIP_STORED)
+    _serve(httpx_mock, blob, full_body=True)
+
+    with pytest.raises(ValueError, match="no soporta HTTP Range") as raised:
+        await read_zip_member(URL, "a.csv")
+
+    assert "más de 1 MB" in str(raised.value)
+    assert "enlace directo" in str(raised.value)
+
+
+async def test_listing_then_reading_downloads_a_range_less_zip_once(httpx_mock):
     _serve(httpx_mock, _make_zip({"a.csv": b"a\n1\n"}), full_body=True)
 
-    with pytest.raises(ValueError, match="Range"):
-        await read_zip_member(URL, "a.csv")
+    await list_zip_contents(URL)
+    result = await read_zip_member(URL, "a.csv")
+
+    assert result["rows"] == [["1"]]
+    # The Range probe, then the one whole download both calls share.
+    assert len(httpx_mock.get_requests()) == 2
+
+
+async def test_a_range_failure_that_is_not_about_range_does_not_fall_back(httpx_mock):
+    httpx_mock.add_response(url=URL, status_code=404, is_reusable=True)
+
+    with pytest.raises(httpx.HTTPStatusError):
+        await list_zip_contents(URL)
+
+    assert len(httpx_mock.get_requests()) == 1
+
+
+async def test_a_corrupt_zip_on_a_range_less_host_is_reported_as_not_a_zip(httpx_mock):
+    httpx_mock.add_response(url=URL, content=b"whatever bytes", is_reusable=True)
+
+    with pytest.raises(ValueError, match="End Of Central Directory"):
+        await list_zip_contents(URL)
+
+    # Nothing was cached for it: the next call downloads again.
+    with pytest.raises(ValueError, match="End Of Central Directory"):
+        await list_zip_contents(URL)
+    assert len(httpx_mock.get_requests()) == 4
+
+
+async def test_the_in_memory_ranges_match_a_range_server():
+    blob = bytes(range(100))
+
+    suffix = await csv_reader._ranged(URL, "bytes=-10", 100, None, blob)
+    assert suffix[0] == blob[-10:]
+    assert suffix[1]["content-range"] == "bytes 90-99/100"
+    assert suffix[2] == 206
+
+    # A suffix longer than the file is the whole file; the end is clamped.
+    assert (await csv_reader._ranged(URL, "bytes=-500", 500, None, blob))[0] == blob
+    assert (await csv_reader._ranged(URL, "bytes=95-200", 500, None, blob))[0] == blob[95:]
+    # The cap truncates the body like the network path does.
+    assert (await csv_reader._ranged(URL, "bytes=10-50", 5, None, blob))[0] == blob[10:15]
+
+    with pytest.raises(ValueError, match="corrupto"):
+        await csv_reader._ranged(URL, "bytes=100-120", 50, None, blob)
 
 
 async def test_rejects_a_mismatched_content_range_start(httpx_mock):
@@ -898,3 +1071,13 @@ async def test_a_legacy_spreadsheet_inside_a_nested_zip_reads_by_sheet(httpx_moc
 )
 def test_cell_text_drops_the_point_zero_of_whole_numbers_only(value, text):
     assert csv_reader._cell_text(value) == text
+
+
+@pytest.mark.parametrize(
+    ("value", "expected_mb"),
+    [("", 20), ("  ", 20), ("abc", 20), ("0", 20), ("-5", 20), ("64", 64), ("9999", 400)],
+)
+def test_the_no_range_cap_reads_its_environment_variable(monkeypatch, value, expected_mb):
+    monkeypatch.setenv("ECUADOR_MCP_NO_RANGE_ZIP_MB", value)
+
+    assert csv_reader._no_range_zip_limit() == expected_mb * 1024 * 1024

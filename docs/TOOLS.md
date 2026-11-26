@@ -1,6 +1,6 @@
 # Herramientas disponibles
 
-Referencia detallada de las 87 herramientas MCP del perfil público (por defecto)
+Referencia detallada de las 88 herramientas MCP del perfil público (por defecto)
 de EcuDataMCP, más 2 herramientas de mantenimiento (`audit_bce_catalog` y
 `compare_bce_sources`) que solo se registran con otro `MCP_PROFILE`. Casi todas
 aceptan `format="json"` además de texto.
@@ -178,7 +178,8 @@ Los tools CKAN genéricos aceptan `source="nacional"` (default), `source="cuenca
 |------|-------------|
 | `investigate_dataset` | Atajo de investigación en un solo paso: busca un dataset, lista sus recursos, y previsualiza los datos reales del más prometedor -- el flujo search_datasets -> list_dataset_resources -> preview_resource_data en una sola llamada, para el caso común de "encuéntrame datos sobre X y muéstrame qué hay dentro" |
 | `list_zip_contents` | Lista los archivos miembro (nombre, tamaño) de un .zip desde una URL directa, sin descargar el archivo completo. |
-| `read_zip_member` | Lee como tabla un archivo (CSV/TSV/TXT, XLSX/XLS/XLSB/ODS) dentro de un .zip remoto, bajando solo los bytes de ese miembro vía HTTP Range. Un CSV/TSV/TXT de cualquier tamaño se lee desde su inicio (baja a lo más 5 MB y marca `truncated`); las hojas de cálculo y los .zip internos se abren completos y pueden pesar hasta 20 MB. Detecta el encabezado bajo el bloque de título de los tabulados y omite columnas vacías. `sheet` elige la hoja por nombre o número y la respuesta lista todas; `inner_member` lee un archivo dentro de un .zip que está dentro del .zip; con `member=''` lee una hoja de cálculo publicada directamente en la URL (hasta 20 MB). |
+| `read_zip_member` | Lee como tabla un archivo (CSV/TSV/TXT, XLSX/XLS/XLSB/ODS) dentro de un .zip remoto, bajando solo los bytes de ese miembro vía HTTP Range. Un CSV/TSV/TXT de cualquier tamaño se lee desde su inicio (baja a lo más 5 MB y marca `truncated`; para totales sobre un CSV entero, `aggregate_csv`); las hojas de cálculo y los .zip internos se abren completos y pueden pesar hasta 20 MB. Detecta el encabezado bajo el bloque de título de los tabulados y omite columnas vacías. `sheet` elige la hoja por nombre o número y la respuesta lista todas; `inner_member` lee un archivo dentro de un .zip que está dentro del .zip; con `member=''` lee una hoja de cálculo publicada directamente en la URL (hasta 20 MB). |
+| `aggregate_csv` | Agrupa y suma un CSV/TSV/TXT completo desde una URL (hasta 30 MB, no solo su inicio): `group_by`, `sum_columns`, filtros exactos (`filters_json`), orden y `limit`. Lee coma decimal, delimitador `\|`, `;`, coma o tabulador y BOM, y ajusta la codificación (UTF-8 o Windows 1252); las columnas se nombran sin importar mayúsculas ni tildes. Suma con precisión decimal exacta y cuenta aparte las celdas vacías y no numéricas. Pensado para los CSV de ventas del SRI (`sri_ventas_AAAA.csv`, ~5,5 MB cada uno): ventas y compras por provincia, cantón y sector. No lee .zip ni hojas de cálculo (para esos, `read_zip_member`). |
 | `read_pdf` | Extrae texto de un documento PDF en una URL directa. |
 
 ## SEPS y economía popular

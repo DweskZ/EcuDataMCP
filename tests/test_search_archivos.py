@@ -57,3 +57,40 @@ async def test_salarios_query_filters_titles_and_years(monkeypatch):
     result = await sa._search("salarios", "2025", limit=50, offset=0)
     assert [a["url"] for a in result["archivos"]] == ["https://b"]
     assert result["nota"] == "No hay tabla 2026."
+
+
+async def test_sri_csv_files_point_to_aggregate_csv(monkeypatch):
+    async def fake(query="", limit=50, offset=0):
+        return {
+            "source": "SRI",
+            "archivos": [
+                {"title": "Diccionario", "url": "https://sri/d.xlsx", "format": "XLSX"},
+                {"title": "SRI_Ventas_2025", "url": "https://sri/sri_ventas_2025.csv", "format": "CSV"},
+            ],
+        }
+
+    monkeypatch.setitem(sa._PAGINATED, "sri_datasets", fake)
+    result = await sa._search("sri_datasets", "ventas", limit=50, offset=0)
+    assert "aggregate_csv" in result["nota"]
+
+
+async def test_sri_listing_without_csv_has_no_note(monkeypatch):
+    async def fake(query="", limit=50, offset=0):
+        return {"source": "SRI", "archivos": [{"title": "RUC Azuay", "url": "https://sri/a.zip"}]}
+
+    monkeypatch.setitem(sa._PAGINATED, "sri_datasets", fake)
+    result = await sa._search("sri_datasets", "ruc", limit=50, offset=0)
+    assert "nota" not in result
+
+
+async def test_a_source_note_wins_over_the_sri_hint(monkeypatch):
+    async def fake(query="", limit=50, offset=0):
+        return {
+            "source": "SRI",
+            "archivos": [{"title": "v", "url": "https://sri/v.csv"}],
+            "nota": "Nota propia.",
+        }
+
+    monkeypatch.setitem(sa._PAGINATED, "sri_datasets", fake)
+    result = await sa._search("sri_datasets", "", limit=50, offset=0)
+    assert result["nota"] == "Nota propia."
