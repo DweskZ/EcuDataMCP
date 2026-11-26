@@ -1,8 +1,13 @@
 # Changelog
 
-## Unreleased
+## 0.15.2 — 2026-11-25
 
-88 tools in the default profile (`aggregate_csv` is new).
+88 tools in the default profile (`aggregate_csv` is new). `aggregate_csv` groups
+and totals a whole CSV at a URL, built for the SRI's yearly sales files, which
+`read_zip_member` could only read to 5 MB; `list_zip_contents` and
+`read_zip_member` now read a zip from a host without HTTP Range; `get_sri_ruc_info`
+keeps the registry record when the SRI's establishments page fails; and the IESS
+certificate waits 75 s instead of 30.
 
 - **New tool `aggregate_csv`: totals and groups over a whole CSV.** The yearly
   SRI sales files (`search_archivos(fuente="sri_datasets", query="ventas")`,
