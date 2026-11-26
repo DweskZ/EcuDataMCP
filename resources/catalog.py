@@ -584,6 +584,7 @@ def _all_fuentes() -> dict:
                     "investigate_dataset",
                     "list_zip_contents",
                     "read_zip_member",
+                    "aggregate_csv",
                 ],
             },
         ]

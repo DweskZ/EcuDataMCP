@@ -7397,6 +7397,75 @@ datos de las últimas semanas conviene tratarlos como provisionales.
   (`/temporal/climatology`), presión (`PS`) y la elección de `community`.
 - Centroides de parroquias (el índice de cantones basta para el uso previsto).
 
+## Cuadragésima octava pasada — archivos grandes, fuentes degradadas y las ventas del SRI (2026-11-25)
+
+Punto de partida: el smoke del 2026-11-25 marcó `get_sri_ruc_info` y
+`get_certificado_cumplimiento_patronal` como degradadas, y un agente no pudo
+bajar las ventas del SRI desde el servidor alojado.
+
+### Las dos fuentes degradadas (#159)
+
+- **Ficha del RUC.** La página de establecimientos (`ruc-establec.jspa`) dio
+  HTTP 500 para dos RUC (1790016919001 y 0990004196001) desde los dos servidores
+  alojados, mientras la ficha (`ruc-datos2.jspa`) respondía bien. El tool trae
+  los establecimientos por defecto y fallaba entero. Ahora devuelve la ficha con
+  `establecimientos_no_disponibles`. La nota de `smoke_status.py` decía que
+  *toda* la página daba 500; era solo esa.
+- **Certificado patronal del IESS.** El formulario carga en ~1 s; el envío, que
+  genera el PDF, tardó 26, 12,6, 13,2 y 30,2 s medidos desde una máquina, y una
+  llamada no terminó en 30 s. El límite plano de 30 s cortaba cerca de la
+  mitad de las llamadas, también desde casa: no es un bloqueo a IP de
+  datacenter, como decía la nota anterior. La lectura espera ahora 75 s (el
+  smoke corta a los 90 s).
+
+### Las ventas del SRI (`search_archivos(fuente="sri_datasets", query="ventas")`)
+
+- Ocho CSV anuales (2017-2025) más el de 2026, y un diccionario. **Pesan entre
+  5,2 y 5,7 MB cada uno**, no los 12-24 MB que anuncia el catálogo del SRI ("0,4
+  Mb" para 2026, "24 Mb" para 2018): `read_zip_member` los leía hasta los 5 MB y
+  perdía la última décima parte de las filas, sin forma de paginar el resto
+  porque el host no admite HTTP Range (responde 200, no 206). Unas 48.000 a
+  50.000 filas por año, una por año-mes-sector-provincia-cantón. A 1,4 MB/s
+  bajan en 3 a 6 s.
+- **Los formatos cambian entre años**, y eso decidió el diseño. 2017-2024:
+  delimitador `|`, coma decimal ("194488,1500"), sin comillas; 2018 en Windows
+  1252 (`AÑO` como 0xD1). 2025: delimitador coma, BOM UTF-8, valores entre
+  comillas con coma decimal ("36631,46") y las columnas `TOTAL_VENTAS` y
+  `TOTAL_COMPRAS` en el orden contrario. 2026: `|` otra vez. Las columnas de
+  tarifa pasan de `VENTAS_NETAS_TARIFA_12` (2018) a `..._GRAVADA`, `..._VARIABLE`
+  y `..._5` (2025 y 2026). Hay celdas vacías (2017) y ninguna con miles.
+- **Decisión: `aggregate_csv`, un tool nuevo (88).** Baja el archivo entero (hasta
+  30 MB; más se rechaza en vez de sumarlo incompleto), lo lee en un hilo y devuelve
+  una fila por grupo con el número de filas y las sumas. Detecta delimitador,
+  codificación y coma decimal; empareja columnas sin mayúsculas ni tildes; suma
+  con `Decimal`; cuenta aparte celdas vacías y no numéricas. No lee un .zip ni
+  una hoja de cálculo (para eso `read_zip_member`). Se descartó guardar el
+  archivo en disco entre llamadas (el resultado de cada pregunta se guarda 30
+  minutos en memoria) y un modo "streaming" por bloques: a estos tamaños no lo
+  justifican, y un miembro de .zip seguiría el camino de `read_zip_member`.
+- **Verificación independiente (2018):** una suma aparte con `Decimal` sobre el
+  mismo archivo da 50.334 filas, 188.851.629.437,72 de `TOTAL_VENTAS` y
+  79.478.758.026,36 para Pichincha, idéntico a `aggregate_csv`. 2025:
+  265.976.992.905,41 de ventas y 217.307.142.012,08 de compras, con 47.784 filas.
+
+### ZIP en hosts sin HTTP Range
+
+`list_zip_contents` y `read_zip_member` fallaban con cualquier host que
+respondiera 200 a una petición de rango (el del SRI es uno). Ahora, si el
+.zip pesa hasta 20 MB, se baja entero una vez (se guarda 5 minutos para que
+`read_zip_member` tras `list_zip_contents` no lo baje dos veces) y se sirven
+los rangos desde memoria, con la misma validación (CRC, tamaños, cifrado,
+ZIP64). Pasado ese tamaño el error dice que el host no admite Range y que el
+.zip pesa más de 20 MB. Los mensajes de los previews que mandaban a
+`download_resource` (también de 5 MB) ahora mandan a `list_zip_contents` y
+`read_zip_member`, o al enlace directo.
+
+### Abierto
+
+- `aggregate_csv` no entra en un miembro de .zip: los CSV de INEC dentro de
+  .zip enormes siguen leyéndose por la cabeza con `read_zip_member`.
+- Un host sin Range con un .zip de más de 20 MB sigue sin lectura parcial.
+
 ## Archivo del roadmap (2026-11-24)
 
 El 2026-11-24 se limpió [ROADMAP.md](ROADMAP.md). Las filas de ese archivo que ya

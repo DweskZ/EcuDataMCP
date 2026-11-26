@@ -1,4 +1,61 @@
 {
+  "aggregate_csv": {
+    "file": "aggregate_csv.py",
+    "params": [
+      {
+        "name": "url",
+        "type": "str",
+        "default": null
+      },
+      {
+        "name": "group_by",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "sum_columns",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "filters_json",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "order_by",
+        "type": "str",
+        "default": "''"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": "50"
+      },
+      {
+        "name": "skip_rows",
+        "type": "int",
+        "default": "0"
+      },
+      {
+        "name": "format",
+        "type": "Literal['text', 'json']",
+        "default": "'text'"
+      }
+    ],
+    "description": "Group and total a CSV/TSV/TXT at a URL by reading all of it (up to 30 MB, not just its head): group_by columns, sum_columns, exact filters, ordering. Reads decimal commas, pipe or semicolon delimiters and a BOM. Built for files like SRI's sri_ventas_AAAA.csv (sales by province, canton and sector).",
+    "summary": "Group the rows of a whole delimited text file and total its numeric columns. read_zip_member and preview_resource_data read only the first 5 MB of a file, so a total over a file of 5 to 30 MB would leave rows out. This downloads the file whole and returns one row per group: the group values, the number of rows (`filas`) and the total of each sum column, plus the totals over every matching row. Numbers are summed exactly. Reads plain text only (.csv, .tsv, .txt, no extension). A .zip or a spreadsheet goes through list_zip_contents and read_zip_member; a file over 30 MB is refused rather than summed incompletely. Column names match ignoring case and accents (AÑO, año and ano are the same). The delimiter (comma, pipe, semicolon or tab) is read from the header line, and the encoding (UTF-8, with or without BOM, or Windows 1252) from the file. Numbers may use a decimal comma (\"1234,56\") or a point; a lone comma is a decimal mark, so \"1,234\" reads as 1.234. Blank cells and cells that are not numbers are left out of the totals and counted in `celdas_vacias` and `celdas_no_numericas`. Example, SRI sales by province in 2025 (search_archivos with fuente=\"sri_datasets\" and query=\"ventas\" lists the yearly files): group_by=\"PROVINCIA\", sum_columns=\"TOTAL_VENTAS,TOTAL_COMPRAS\". Add filters_json='{\"MES\": [1, 2, 3]}' for the first quarter, or group_by= \"MES\" to see the year by month. Column names differ between years (VENTAS_NETAS_TARIFA_12 in 2018, VENTAS_NETAS_TARIFA_GRAVADA in 2026), so read the `columnas` of the answer when a name is not found.",
+    "args_doc": {
+      "url": "Direct URL to a plain-text CSV/TSV/TXT file (from search_archivos or a CKAN resource).",
+      "group_by": "Comma-separated column names to group by; empty gives one total row.",
+      "sum_columns": "Comma-separated numeric columns to total; empty only counts rows.",
+      "filters_json": "Optional JSON object of exact filters, e.g. '{\"PROVINCIA\": \"PICHINCHA\", \"MES\": [1, 2]}'.",
+      "order_by": "Result column to sort by, optionally with asc or desc; default is the first total, biggest first.",
+      "limit": "Groups to return (default 50, max 500); the totals always cover all of them.",
+      "skip_rows": "Lines above the header line (default 0).",
+      "format": "text | json"
+    }
+  },
   "list_archivo_secciones": {
     "file": "archivo_secciones.py",
     "params": [
@@ -1828,7 +1885,7 @@
         "default": "'text'"
       }
     ],
-    "description": "Read one CSV/TSV/TXT or XLSX/XLS/XLSB/ODS file inside a remote ZIP as a table, fetching only that file's bytes via HTTP Range (a CSV of any size is read from its head); any sheet, a zip inside the zip (inner_member), or with member='' a spreadsheet published at the URL itself. Get member names from list_zip_contents.",
+    "description": "Read one CSV/TSV/TXT or XLSX/XLS/XLSB/ODS file inside a remote ZIP as a table, fetching only that file's bytes via HTTP Range (a CSV is read from its first 5 MB; for totals over a whole CSV use aggregate_csv); any sheet, a zip inside the zip (inner_member), or with member='' a spreadsheet published at the URL itself. Names from list_zip_contents.",
     "summary": "Read the rows of ONE file inside a remote .zip archive, without downloading the archive. Run list_zip_contents first to get the member's exact name. This tool reads the archive's central directory, then fetches only that member's local header and compressed bytes via HTTP Range requests, so it works inside archives far larger than the 5 MB cap of preview_resource_data/download_resource (e.g. INEC's tabulados ZIPs). Limits: - The server must honor HTTP Range (answer 206); otherwise it fails with a clear error. - CSV/TSV/TXT members of any size are read from their first bytes: the output stops at 5 MB decompressed and is marked truncated, and no more than 5 MB of the member is downloaded (a 400 MB microdata CSV previews in seconds). Spreadsheets can't be opened partially, so they must fit in 20 MB both compressed and decompressed. - Only stored or deflate members; no encrypted members. ZIP64 archives are supported. - Supported formats: .csv, .tsv, .txt, .xlsx, .xls, .xlsb, .ods. The CRC32 is checked whenever the member is read in full. Sheets: spreadsheets open on their active (usually first) sheet; pass sheet as a name or a 1-based number for another one. A name wins over a number, so a sheet called \"2024\" is read by that name. The result lists every sheet of the workbook in `sheets`, and a wrong name fails with that list. Zip inside a zip: INEC publishes its CSV tabulados as a .zip of .zip files. When `member` is itself a .zip (at most 20 MB compressed and 20 MB expanded), pass the file to read inside it as inner_member; leaving inner_member empty fails with the inner file names. A text file inside is cut at 5 MB like any other. Files outside a zip: with member='' the URL itself is read as a spreadsheet or text file (e.g. SIPA's precios-agroindustria.xlsx), downloaded whole up to 20 MB for spreadsheets and 5 MB for text. Matching: exact name first, then a unique case-insensitive or basename match; otherwise the error suggests close names. Report tables: statistical tabulados (INEC, BCE) open with a title block (table number, indicator, population, source) above the column header. By default the header is detected as the first row at least half as full as the fullest of the first 30 rows; the rows above it come back as `preamble` and their count as `header_row`. Set skip_rows to 0 to keep row 1 as the header, or to n to skip exactly n rows. Lines the source quoted whole are split back into fields, and columns empty in every row are dropped.",
     "args_doc": {
       "url": "Direct URL to a .zip file (the same URL given to list_zip_contents).",

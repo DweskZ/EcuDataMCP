@@ -503,6 +503,7 @@ async def main() -> int:
             ("bce: diarios -> indicador", chain_bce_diario(client)),
             ("bce: paginas -> archivos", chain_bce_paginas(client)),
             ("cepalstat: search -> indicador", chain_cepalstat(client)),
+            ("sri: ventas -> aggregate_csv", chain_sri_ventas(client)),
             ("contraloria: list -> informe", chain_contraloria(client)),
             ("arconel: list -> reporte", chain_arconel(client)),
             ("inec: estadistica -> files -> zip", chain_inec_estadistica(client)),
@@ -785,6 +786,40 @@ async def chain_cepalstat(client: httpx.AsyncClient) -> None:
         "get_cepalstat_indicador",
         {"indicator_id": int(indicador["indicator_id"]), "format": "json"},
     )
+
+
+async def chain_sri_ventas(client: httpx.AsyncClient) -> None:
+    # The file's URL carries an id that changes when the SRI re-uploads it, so
+    # it is read from the listing, never hardcoded.
+    listing = json.loads(
+        await call_chain_step(
+            client,
+            "search_archivos",
+            {"fuente": "sri_datasets", "query": "ventas", "format": "json"},
+        )
+    )
+    urls = [
+        a["url"]
+        for a in listing.get("archivos") or []
+        if str(a.get("url") or "").lower().endswith(".csv")
+    ]
+    if not urls:
+        raise AssertionError("El SRI no listó ningún CSV de ventas")
+    result = json.loads(
+        await call_chain_step(
+            client,
+            "aggregate_csv",
+            {
+                "url": urls[0],
+                "group_by": "PROVINCIA",
+                "sum_columns": "TOTAL_VENTAS",
+                "limit": 3,
+                "format": "json",
+            },
+        )
+    )
+    if not result.get("rows") or result.get("filas_leidas", 0) < 1000:
+        raise AssertionError(f"aggregate_csv leyó muy pocas filas: {result.get('filas_leidas')}")
 
 
 async def chain_contraloria(client: httpx.AsyncClient) -> None:

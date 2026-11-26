@@ -21,10 +21,10 @@ def register_read_zip_member_tool(mcp: MCPServer) -> None:
         title="Leer un archivo dentro de un ZIP remoto",
         description=(
             "Read one CSV/TSV/TXT or XLSX/XLS/XLSB/ODS file inside a remote ZIP as "
-            "a table, fetching only that file's bytes via HTTP Range (a CSV of any "
-            "size is read from its head); any sheet, a zip inside the zip "
-            "(inner_member), or with member='' a spreadsheet published at the URL "
-            "itself. Get member names from list_zip_contents."
+            "a table, fetching only that file's bytes via HTTP Range (a CSV is read "
+            "from its first 5 MB; for totals over a whole CSV use aggregate_csv); "
+            "any sheet, a zip inside the zip (inner_member), or with member='' a "
+            "spreadsheet published at the URL itself. Names from list_zip_contents."
         ),
         annotations=READ_ONLY,
     )

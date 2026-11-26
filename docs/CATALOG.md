@@ -3,7 +3,7 @@
 Generado por `scripts/generate_catalog.py` desde `resources/catalog.py` y las
 descripciones de `tools/*.py`; no editar a mano.
 
-61 fuentes, 87 tools públicas.
+61 fuentes, 88 tools públicas.
 
 ## Datos Abiertos CKAN
 
@@ -552,4 +552,5 @@ descripciones de `tools/*.py`; no editar a mano.
 - `search_ecuador`: Unified first-step search across CKAN datasets, organizations, gob.ec trámites and regulations, SERCOP contracts and SGR risk events, a few hits per source. Drill down with the source-specific get_* tools; for CKAN datasets alone use search_datasets.
 - `investigate_dataset`: One-step shortcut: search CKAN, pick the top dataset and preview its first readable resource. Use the individual tools when the top hit isn't the right one.
 - `list_zip_contents`: List a remote ZIP's members (name, size) via HTTP Range requests, without downloading it; works for archives far beyond 5 MB, ZIP64 included.
-- `read_zip_member`: Read one CSV/TSV/TXT or XLSX/XLS/XLSB/ODS file inside a remote ZIP as a table, fetching only that file's bytes via HTTP Range (a CSV of any size is read from its head); any sheet, a zip inside the zip (inner_member), or with member='' a spreadsheet published at the URL itself. Get member names from list_zip_contents.
+- `read_zip_member`: Read one CSV/TSV/TXT or XLSX/XLS/XLSB/ODS file inside a remote ZIP as a table, fetching only that file's bytes via HTTP Range (a CSV is read from its first 5 MB; for totals over a whole CSV use aggregate_csv); any sheet, a zip inside the zip (inner_member), or with member='' a spreadsheet published at the URL itself. Names from list_zip_contents.
+- `aggregate_csv`: Group and total a CSV/TSV/TXT at a URL by reading all of it (up to 30 MB, not just its head): group_by columns, sum_columns, exact filters, ordering. Reads decimal commas, pipe or semicolon delimiters and a BOM. Built for files like SRI's sri_ventas_AAAA.csv (sales by province, canton and sector).

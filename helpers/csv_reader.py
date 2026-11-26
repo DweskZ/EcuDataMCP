@@ -5,6 +5,7 @@ import difflib
 import io
 import json
 import logging
+import os
 import re
 import ssl
 import struct
@@ -17,6 +18,7 @@ from urllib.parse import unquote, urlsplit
 
 import httpx
 
+from helpers.cache import TtlCache
 from helpers.geo_proxy import proxy_for
 from helpers.logging import MAIN_LOGGER_NAME
 from helpers.safe_download import UnsafeUrlError, safe_stream
@@ -405,7 +407,8 @@ def _check_zip_container_size(raw: bytes, label: str) -> None:
         raise ValueError(
             f"El archivo {label} se expande a más de "
             f"{_MAX_CONTAINER_UNCOMPRESSED_BYTES // (1024 * 1024)} MB al "
-            "descomprimirse; el preview lo rechaza. Usa download_resource."
+            "descomprimirse; el preview lo rechaza. Descarga el enlace directo del "
+            "recurso."
         )
 
 
@@ -505,7 +508,7 @@ async def preview_json(
         raise ValueError(
             "El archivo JSON supera el límite de 5 MB de este preview, así que "
             "se descargó incompleto y no se puede interpretar. Usa "
-            "download_resource para bajarlo completo, o el enlace directo."
+            "el enlace directo del recurso para bajarlo completo."
         )
     text = _decode_text(raw, truncated)
     data = json.loads(text)
@@ -858,7 +861,7 @@ async def preview_xlsx(
             "El archivo .xlsx supera el límite de 20 MB de este preview, así "
             "que se descargó incompleto y no se puede abrir (el índice del "
             "contenedor ZIP interno vive al final del archivo). Usa "
-            "download_resource para bajarlo completo, o el enlace directo."
+            "el enlace directo del recurso para bajarlo completo."
         )
 
     return await run_parser_off_loop(_parse_xlsx_bytes, raw, max_rows, truncated)
@@ -875,7 +878,7 @@ async def preview_xls(
         raise ValueError(
             "El archivo .xls supera el límite de 20 MB de este preview, así "
             "que se descargó incompleto y no se puede abrir. Usa "
-            "download_resource para bajarlo completo, o el enlace directo."
+            "el enlace directo del recurso para bajarlo completo."
         )
     return await run_parser_off_loop(_parse_xls_bytes, raw, max_rows, truncated)
 
@@ -904,7 +907,7 @@ async def preview_xlsb(
             "El archivo .xlsb supera el límite de 20 MB de este preview, así "
             "que se descargó incompleto y no se puede abrir (el índice del "
             "contenedor ZIP interno vive al final del archivo). Usa "
-            "download_resource para bajarlo completo, o el enlace directo."
+            "el enlace directo del recurso para bajarlo completo."
         )
 
     return await run_parser_off_loop(_parse_xlsb_bytes, raw, max_rows, truncated)
@@ -929,7 +932,7 @@ async def preview_ods(
             "El archivo .ods supera el límite de 20 MB de este preview, así "
             "que se descargó incompleto y no se puede abrir (el índice del "
             "contenedor ZIP interno vive al final del archivo). Usa "
-            "download_resource para bajarlo completo, o el enlace directo."
+            "el enlace directo del recurso para bajarlo completo."
         )
 
     return await run_parser_off_loop(_parse_ods_bytes, raw, max_rows, truncated)
@@ -1034,8 +1037,8 @@ async def preview_targz(
                 raise ValueError(
                     "Este .tar.gz no contiene ningún archivo .csv/.tsv/.txt "
                     f"identificable (archivos internos: {sample}). Puede que "
-                    "no sea un dataset tabular. Usa download_resource para "
-                    "bajarlo completo."
+                    "no sea un dataset tabular. Descarga el enlace directo del "
+                    "recurso (un .tar.gz no se puede leer por partes)."
                 )
             extracted = tar.extractfile(members[member_name])
             inner_raw = extracted.read(MAX_DOWNLOAD_BYTES + 1) if extracted else b""
@@ -1047,8 +1050,8 @@ async def preview_targz(
             # tarfile. We already know why, so say that instead of guessing.
             raise ValueError(
                 "El archivo .tar.gz descomprimido supera el límite de 5 MB de "
-                "este preview y se cortó a la mitad. Usa download_resource "
-                "para bajarlo completo, o el enlace directo."
+                "este preview y se cortó a la mitad. Descarga el enlace "
+                "directo del recurso (un .tar.gz no se puede leer por partes)."
             ) from e
         raise ValueError(
             "El archivo .tar.gz no se pudo leer: está corrupto"
@@ -1084,8 +1087,12 @@ async def preview_zip(
         raise ValueError(
             "El archivo .zip supera el límite de 5 MB de este preview, así "
             "que se descargó incompleto y no se puede abrir (el índice del "
-            ".zip vive al final del archivo). Usa download_resource para "
-            "bajarlo completo, o el enlace directo."
+            ".zip vive al final del archivo). Para leer un archivo de su interior "
+            "sin bajarlo entero, pasa la URL del recurso a list_zip_contents y "
+            "luego a read_zip_member (sirve cuando el servidor admite HTTP Range y, "
+            "si no, hasta "
+            f"{_no_range_zip_limit() // (1024 * 1024)} MB); o descarga el enlace "
+            "directo."
         )
 
     try:
@@ -1106,7 +1113,8 @@ async def preview_zip(
                     "Este .zip no contiene ningún archivo .csv/.tsv/.txt "
                     f"identificable (archivos internos: {sample}). Puede que "
                     "no sea un dataset tabular (ej. un paquete GIS/raster). "
-                    "Usa download_resource para bajarlo completo."
+                    "Descarga el enlace directo del recurso, o lee un archivo "
+                    "concreto con list_zip_contents y read_zip_member."
                 )
             with zf.open(member_name) as f:
                 inner_raw = f.read(MAX_DOWNLOAD_BYTES + 1)
@@ -1136,6 +1144,19 @@ _EOCD_TAIL_BYTES = 65557 + 22  # max comment (65535) + EOCD record, plus slack
 _MAX_CENTRAL_DIR_BYTES = 20 * 1024 * 1024  # same bound as _gunzip_capped's cap
 
 _CONTENT_RANGE_RE = re.compile(r"bytes\s+(\d+)-(\d+)/(\d+)")
+
+# A host that ignores Range (the SRI's, for one, answers 200 with the whole
+# file) cannot be read piece by piece. Up to this size the .zip is downloaded
+# whole and read from memory, through the same parsing as the Range path.
+_MAX_NO_RANGE_ZIP_BYTES = 20 * 1024 * 1024
+_NO_RANGE_ZIP_ENV = "ECUADOR_MCP_NO_RANGE_ZIP_MB"
+_NO_RANGE_ZIP_MAX_MB = 400
+# So that list_zip_contents followed by read_zip_member downloads it once.
+_blob_cache = TtlCache(ttl_seconds=300.0, max_entries=2, stale_seconds=0.0)
+
+
+class _RangeUnsupported(ValueError):
+    """The host did not honor an HTTP Range request (no 206, or the wrong range)."""
 
 
 async def _fetch_range(
@@ -1206,11 +1227,97 @@ async def _fetch_range(
             await session.aclose()
 
 
+async def _ranged(
+    url: str,
+    range_header: str,
+    cap: int,
+    session: httpx.AsyncClient | None,
+    blob: bytes | None,
+) -> tuple[bytes, httpx.Headers, int]:
+    """_fetch_range, or the same answer served from `blob` (a whole .zip in memory).
+
+    The in-memory answer is always a well-formed 206, so every check and parse
+    built on the Range path runs unchanged on a zip that was downloaded whole.
+    """
+    if blob is None:
+        return await _fetch_range(url, range_header, cap=cap, session=session)
+    total = len(blob)
+    match = re.fullmatch(r"bytes=(\d*)-(\d*)", range_header)
+    if match is None or match.group(1) == match.group(2) == "":
+        raise ValueError(f"Rango no válido: {range_header!r}.")
+    first, last = match.groups()
+    if first == "":  # suffix form: the last N bytes
+        start, end = max(total - int(last), 0), total - 1
+    else:
+        start, end = int(first), min(int(last or total - 1), total - 1)
+    if start >= total or end < start:
+        raise ValueError(
+            f"El .zip está corrupto (el rango {range_header} queda fuera del "
+            f"archivo, de {total} bytes)."
+        )
+    body = blob[start : end + 1][:cap]
+    return body, httpx.Headers({"content-range": f"bytes {start}-{end}/{total}"}), 206
+
+
+def _no_range_zip_limit() -> int:
+    """Cap for a .zip downloaded whole: 20 MB, or ECUADOR_MCP_NO_RANGE_ZIP_MB.
+
+    The SRI's province RUC files are 2 to 156 MB on a host without Range; an
+    operator with the memory for it can raise the cap. The bytes stay in memory
+    (and in the 5-minute cache, up to two files), so the ceiling is 400 MB.
+    """
+    raw = os.getenv(_NO_RANGE_ZIP_ENV, "").strip()
+    if raw.isdigit() and int(raw) > 0:
+        return min(int(raw), _NO_RANGE_ZIP_MAX_MB) * 1024 * 1024
+    return _MAX_NO_RANGE_ZIP_BYTES
+
+
+async def _download_whole_zip(url: str, session: httpx.AsyncClient | None) -> bytes:
+    """Download a .zip whose host does not support Range, up to the no-Range cap."""
+    limit = _no_range_zip_limit()
+    raw, truncated = await download_bytes(url, session=session, max_bytes=limit)
+    if truncated:
+        raise ValueError(
+            "El servidor no soporta HTTP Range y este .zip pesa más de "
+            f"{limit // (1024 * 1024)} MB, así que no se puede leer sin "
+            "descargarlo completo. Descarga el enlace directo del archivo."
+        )
+    return raw
+
+
+async def _zip_source(
+    url: str, session: httpx.AsyncClient | None
+) -> tuple[list[dict[str, Any]], int, int, bytes | None]:
+    """Return (members, total_size, total_entries, blob) for a remote .zip.
+
+    The central directory is read with Range requests (blob is None). When the
+    host does not honor Range, the .zip is downloaded whole (see
+    _MAX_NO_RANGE_ZIP_BYTES) and kept for five minutes; blob is those bytes and
+    later reads of the same .zip are served from them. Only a Range failure
+    triggers the fallback; any other error propagates.
+    """
+    blob = _blob_cache.get(url)
+    if blob is None:
+        try:
+            members, total_size, entries = await _fetch_central_directory(url, session)
+            return members, total_size, entries, None
+        except _RangeUnsupported:
+            logger.info("%s no soporta HTTP Range; descargando el .zip completo", url)
+            blob = await _download_whole_zip(url, session)
+            members, total_size, entries = await _fetch_central_directory(
+                url, session, blob=blob
+            )
+            _blob_cache.set(url, blob)
+            return members, total_size, entries, blob
+    members, total_size, entries = await _fetch_central_directory(url, session, blob=blob)
+    return members, total_size, entries, blob
+
+
 def _parse_content_range(headers: httpx.Headers) -> tuple[int, int]:
     """Return (range_start, total_size) from a 206 response's Content-Range header."""
     header = headers.get("content-range")
     if not header:
-        raise ValueError(
+        raise _RangeUnsupported(
             "El servidor no devolvió un rango parcial (falta el header "
             "Content-Range) -- no soporta HTTP Range requests, así que este "
             ".zip no se puede listar sin descargarlo completo."
@@ -1261,6 +1368,7 @@ async def _read_zip64_eocd(
     tail_start: int,
     eocd_index: int,
     session: httpx.AsyncClient | None,
+    blob: bytes | None = None,
 ) -> tuple[int, int, int]:
     """Return (cd_offset, cd_size, total_entries) from the ZIP64 EOCD record."""
     loc = eocd_index - 20
@@ -1271,8 +1379,12 @@ async def _read_zip64_eocd(
     if tail_start <= record_offset and record_offset + 56 <= tail_start + len(tail):
         record = tail[record_offset - tail_start : record_offset - tail_start + 56]
     else:
-        record, headers, status = await _fetch_range(
-            url, f"bytes={record_offset}-{record_offset + 55}", cap=56, session=session
+        record, headers, status = await _ranged(
+            url,
+            f"bytes={record_offset}-{record_offset + 55}",
+            cap=56,
+            session=session,
+            blob=blob,
         )
         _check_partial(status, headers, record_offset)
     if len(record) < 56 or record[:4] != _ZIP64_EOCD_SIGNATURE:
@@ -1399,14 +1511,21 @@ _RANGE_UNSUPPORTED = (
 
 
 async def _fetch_central_directory(
-    url: str, session: httpx.AsyncClient | None = None
+    url: str, session: httpx.AsyncClient | None = None, blob: bytes | None = None
 ) -> tuple[list[dict[str, Any]], int, int]:
-    """Return (members with internal fields, total_size, total_entries) via Range requests."""
-    tail, tail_headers, tail_status = await _fetch_range(
-        url, f"bytes=-{_EOCD_TAIL_BYTES}", cap=_EOCD_TAIL_BYTES, session=session
+    """Return (members with internal fields, total_size, total_entries).
+
+    Read with Range requests, or from `blob` when the .zip was downloaded whole.
+    """
+    tail, tail_headers, tail_status = await _ranged(
+        url,
+        f"bytes=-{_EOCD_TAIL_BYTES}",
+        cap=_EOCD_TAIL_BYTES,
+        session=session,
+        blob=blob,
     )
     if tail_status != 206:
-        raise ValueError(
+        raise _RangeUnsupported(
             "El servidor respondió con HTTP 200 en vez de 206 (Partial "
             "Content) -- no soporta HTTP Range requests, así que este .zip "
             "no se puede listar sin descargarlo completo."
@@ -1417,7 +1536,7 @@ async def _fetch_central_directory(
         cd_offset, cd_size, total_entries = _parse_eocd(tail)
     except _Zip64Required as zip64:
         cd_offset, cd_size, total_entries = await _read_zip64_eocd(
-            url, tail, tail_start, zip64.eocd_index, session
+            url, tail, tail_start, zip64.eocd_index, session, blob
         )
 
     if cd_offset >= tail_start:
@@ -1429,14 +1548,15 @@ async def _fetch_central_directory(
                 f"por encima del límite de {_MAX_CENTRAL_DIR_BYTES} bytes "
                 "que este listado soporta."
             )
-        cd_data, _cd_headers, cd_status = await _fetch_range(
+        cd_data, _cd_headers, cd_status = await _ranged(
             url,
             f"bytes={cd_offset}-{cd_offset + cd_size - 1}",
             cap=_MAX_CENTRAL_DIR_BYTES,
             session=session,
+            blob=blob,
         )
         if cd_status != 206:
-            raise ValueError(
+            raise _RangeUnsupported(
                 "El servidor respondió con HTTP 200 en vez de 206 (Partial "
                 "Content) al pedir el directorio central -- no se puede "
                 "listar este .zip sin descargarlo completo."
@@ -1459,7 +1579,7 @@ async def list_zip_contents(
     HTTP 206); raises ValueError otherwise. Reads ZIP64 end records and
     extra fields, so archives past 4 GB or 65535 entries list too.
     """
-    members, total_size, total_entries = await _fetch_central_directory(url, session)
+    members, total_size, total_entries, _blob = await _zip_source(url, session)
     return {
         "url": url,
         "total_size_bytes": total_size,
@@ -1509,10 +1629,10 @@ def _resolve_member(members: list[dict[str, Any]], member: str) -> dict[str, Any
 def _check_partial(status: int, headers: httpx.Headers, expected_start: int) -> None:
     """Require a 206 whose Content-Range starts where we asked."""
     if status != 206:
-        raise ValueError(_RANGE_UNSUPPORTED)
+        raise _RangeUnsupported(_RANGE_UNSUPPORTED)
     start, _total = _parse_content_range(headers)
     if start != expected_start:
-        raise ValueError(_RANGE_UNSUPPORTED)
+        raise _RangeUnsupported(_RANGE_UNSUPPORTED)
 
 
 def _ext_of(name: str) -> str:
@@ -1695,7 +1815,7 @@ async def read_zip_member(
         )
         return result
 
-    members, total_size, _entries = await _fetch_central_directory(url, session)
+    members, total_size, _entries, blob = await _zip_source(url, session)
     info = _resolve_member(members, member)
     name = info["name"]
 
@@ -1753,8 +1873,8 @@ async def read_zip_member(
         raise ValueError(f"'{name}': el .zip está corrupto (offset fuera del archivo).")
     guess_len = 30 + len(name.encode("utf-8")) + _LOCAL_HEADER_SLACK + fetch_size
     end = min(start + guess_len, total_size) - 1
-    buf, headers, status = await _fetch_range(
-        url, f"bytes={start}-{end}", cap=end - start + 1, session=session
+    buf, headers, status = await _ranged(
+        url, f"bytes={start}-{end}", cap=end - start + 1, session=session, blob=blob
     )
     _check_partial(status, headers, start)
     if len(buf) < 30 or buf[:4] != _LOCAL_HEADER_SIGNATURE:
@@ -1766,11 +1886,12 @@ async def read_zip_member(
     if data_end <= start + len(buf):
         data = buf[data_start - start : data_end - start]
     else:
-        data, headers, status = await _fetch_range(
+        data, headers, status = await _ranged(
             url,
             f"bytes={data_start}-{data_end - 1}",
             cap=fetch_size,
             session=session,
+            blob=blob,
         )
         _check_partial(status, headers, data_start)
     if len(data) != fetch_size:

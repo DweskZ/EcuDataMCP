@@ -5,6 +5,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 
 from helpers.geo_proxy import GEOBLOCKED_TOOLS, explicit_hidden_tools, hide_geoblocked
 from helpers.logging import MAIN_LOGGER_NAME
+from tools.aggregate_csv import register_aggregate_csv_tool
 from tools.archivo_secciones import register_archivo_secciones_tools
 from tools.arconel_reportes import (
     register_get_arconel_reporte_tool,
@@ -159,6 +160,7 @@ def register_tools(mcp: MCPServer) -> None:
     register_read_pdf_tool(mcp)
     register_list_zip_contents_tool(mcp)
     register_read_zip_member_tool(mcp)
+    register_aggregate_csv_tool(mcp)
     register_investigate_dataset_tool(mcp)
 
     register_search_tramites_tool(mcp)
