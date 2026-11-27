@@ -7,7 +7,13 @@ GEOS-IT), on a global grid, free and without a key. Checked live 2026-11-24:
 - `/api/temporal/daily/point` returns one value per day from 1981-01-01 to a
   few days before today (the last real day was 2026-11-20 on 2026-11-24).
   Days after that come back with HTTP 200 and the fill value -999, not as an
-  error. Daily responses name `GEOSIT` as their source.
+  error. `header.sources` lists the products behind the requested days:
+  `MERRA2` up to its latest complete month and `GEOSIT` (a near-real-time run,
+  provisional) for the days after it. Checked 2026-11-27: a range ending
+  2026-10-31 named only MERRA2, one ending 2026-11-01 named both, and at the
+  Quito point the daily rain went from 4.9 mm on 2026-10-31 to 40.6 mm on
+  2026-11-01 while Open-Meteo showed no step. GEOS-IT gives far more rain than
+  MERRA-2 in Ecuador, so `_GEOSIT_NOTE` warns about it.
 - `/api/temporal/monthly/point` takes whole years (start=2023&end=2024) and
   adds a 13th "month" per year (202313) that is the annual mean; it is
   dropped here. Monthly responses name `MERRA2`.
@@ -38,6 +44,27 @@ logger = logging.getLogger(MAIN_LOGGER_NAME)
 
 _API = "https://power.larc.nasa.gov/api/temporal"
 _PORTAL = "https://power.larc.nasa.gov/"
+
+_NOTA = (
+    "Valores de una celda de rejilla de satélite y modelo (decenas de km), no de una "
+    "estación meteorológica: sirven para tendencia y contraste regional, no para el "
+    "punto exacto. Los días recientes pueden faltar: NASA publica con unos días de rezago."
+)
+
+# Seen 2026-11-24 to 11-27. On the 24th the Guayaquil cell's October rain averaged
+# 21 mm/day and Quito showed tens of mm a day from October; by the 27th a range
+# ending 31 October named only MERRA2 and the same October averaged 8 mm/day in
+# Guayaquil and 2.75 in Quito. November, still GEOS-IT, kept 29 and 23 mm/day
+# (Open-Meteo: 10 at Quito, with no step on 1 November).
+_GEOSIT_NOTE = (
+    "Los días más recientes (`fuentes_datos` incluye GEOSIT) son provisionales: NASA los "
+    "calcula con GEOS-IT hasta que llega MERRA-2 y entonces los reemplaza. En Ecuador "
+    "GEOS-IT da mucha más lluvia: el 1 de noviembre de 2026 la lluvia diaria de la celda de "
+    "Quito pasó de 4,9 a 40,6 mm sin que Open-Meteo registrara salto alguno, y la de octubre "
+    "en la celda de Guayaquil figuraba con 21 mm/día el 24 de noviembre y con 8 mm/día el 27, "
+    "ya con MERRA-2. No compares esos días con los anteriores ni los tomes como un episodio "
+    "sin otra fuente."
+)
 
 # clave -> (POWER parameter, unit, name). The units are the ones the API
 # returns for community=AG.
@@ -260,6 +287,10 @@ async def get_clima(
     rows = build_rows(parameter, claves, frecuencia, start, stop)
     coordinates = (payload.get("geometry") or {}).get("coordinates") or []
     last = rows[-1]["periodo"] if rows else None
+    sources = (payload.get("header") or {}).get("sources")
+    nota = _NOTA
+    if daily and "lluvia" in claves and "GEOSIT" in (sources or []):
+        nota = f"{_NOTA} {_GEOSIT_NOTE}"
     return {
         "source": "NASA POWER (Prediction Of Worldwide Energy Resources)",
         "url_fuente": _PORTAL,
@@ -279,12 +310,8 @@ async def get_clima(
         "total_registros": len(rows),
         "registros": rows,
         "resumen": summarize(rows, claves, frecuencia),
-        "fuentes_datos": (payload.get("header") or {}).get("sources"),
-        "nota": (
-            "Valores de una celda de rejilla de satélite y modelo (decenas de km), no de una "
-            "estación meteorológica: sirven para tendencia y contraste regional, no para el "
-            "punto exacto. Los días recientes pueden faltar: NASA publica con unos días de rezago."
-        ),
+        "fuentes_datos": sources,
+        "nota": nota,
         "url_consulta": url,
         "metadatos": {"fecha_corte": last},
     }
