@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased
+
+- **Smoke test: a check that only timed out gets a second try after the other
+  checks, and is degraded if it then answers.** The in-call retries (5 s and
+  15 s) only span 20 s, so a host that was unreachable for a minute still failed
+  the run. On 2026-11-25 `get_cortes_horarios` for EEASA hit a `ConnectTimeout`
+  three times from the runner and ended the scheduled run red, while the same
+  call answered from Render, the Oracle VM and a home connection that day, and
+  had passed in every other run since 2026-11-09. Twelve of the last twenty
+  scheduled runs failed, each on a different host's timeout. A check whose final
+  answer is still a timeout, a dropped connection or a 502/503/504 is now held
+  back (`DEFER`), re-run once after 60 s and after the last check (`== second
+  pass ==`), and reported as `RECOVERED` and counted as degraded
+  (`timeout:<tool>` in the Actions summary) if it answers. Timing out again, or
+  any other failure, still fails the run, and a source already named in
+  `smoke_status` keeps its own handling. Flat checks and chains share the same
+  path through `run_check` and `run_chain`.
+
 ## 0.15.2 — 2026-11-25
 
 88 tools in the default profile (`aggregate_csv` is new). `aggregate_csv` groups

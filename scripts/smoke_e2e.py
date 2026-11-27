@@ -6,6 +6,9 @@ import asyncio
 import json
 import os
 import sys
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass, field
+from functools import partial
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -40,6 +43,12 @@ HIDDEN_TOOLS: set[str] = set()
 # (a timeout, a dropped connection, a 502/503/504). Two retries, so a source
 # that is really down still fails the run after about 20 seconds more.
 TRANSIENT_RETRY_PAUSES = (5, 15)
+
+# A check that still timed out after those retries is held back and run once more
+# after every other check, so the second try comes minutes after the first, not
+# seconds. 2026-11-25: EEASA never completed the handshake from the runner in
+# 20 s, and answered from both hosted servers and a home connection the same day.
+SECOND_PASS_PAUSE = 60
 
 
 class HiddenTool(Exception):
@@ -176,8 +185,23 @@ async def check_tool(
     elif assessment.status == "degraded":
         print(f"  DEGRADED {name} [{assessment.source}]: {assessment.detail[:160]}")
     else:
-        raise AssertionError(assessment.detail)
+        raise failure(text, is_error, assessment.detail)
     return assessment.status, assessment.source
+
+
+class TransientFailure(AssertionError):
+    """A check whose only fault is a timeout or dropped connection.
+
+    Still an AssertionError, so anything that catches that sees a failure; the
+    smoke run holds these back for a second pass before counting them.
+    """
+
+
+def failure(text: str, is_error: bool, detail: str) -> AssertionError:
+    """Choose the exception for a failed assertion, by the same test call_tool retries on."""
+    if is_error and is_transient_network_error(text):
+        return TransientFailure(detail)
+    return AssertionError(detail)
 
 
 class DegradedChain(Exception):
@@ -203,7 +227,7 @@ def chain_step(
     if assessment.status == "degraded":
         raise DegradedChain(assessment.source or "unknown", assessment.detail)
     if assessment.status == "failed":
-        raise AssertionError(assessment.detail)
+        raise failure(text, is_error, assessment.detail)
     return text
 
 
@@ -243,6 +267,94 @@ def write_summary(
         lines.append(f"- Skipped (tool hidden on this host): {', '.join(sorted(hidden))}")
     with open(path, "a", encoding="utf-8") as summary:
         summary.write("\n".join(lines) + "\n")
+
+
+@dataclass
+class Tally:
+    """What the run has found so far, shared by the first pass and the second."""
+
+    failed: int = 0
+    degraded: set[str] = field(default_factory=set)
+    skipped: set[str] = field(default_factory=set)
+    hidden: set[str] = field(default_factory=set)
+    timed_out: list[Callable[[], Awaitable[None]]] = field(default_factory=list)
+
+
+def hold_back(
+    tally: Tally,
+    label: str,
+    exc: TransientFailure,
+    rerun: Callable[[], Awaitable[None]],
+    second_pass: bool,
+) -> None:
+    """Hold a timed-out check for the second pass; on the second pass it fails."""
+    if second_pass:
+        tally.failed += 1
+        print(f"  FAIL {label}: {exc}")
+        return
+    tally.timed_out.append(rerun)
+    print(f"  DEFER    {label}: timed out; trying again after the other checks")
+
+
+def mark_recovered(tally: Tally, label: str) -> None:
+    """A check that timed out and then answered is degraded, not failed."""
+    tally.degraded.add(f"timeout:{label}")
+    print(f"  RECOVERED {label}: answered on the second pass; counted as degraded")
+
+
+async def run_check(
+    client: httpx.AsyncClient,
+    tally: Tally,
+    name: str,
+    args: dict,
+    required: list[str],
+    second_pass: bool = False,
+) -> None:
+    try:
+        status, source = await check_tool(client, name, args, required)
+        if status == "degraded" and source:
+            (tally.skipped if is_geo_skipped(source) else tally.degraded).add(source)
+        elif status == "ok" and second_pass:
+            mark_recovered(tally, name)
+    except HiddenTool as exc:
+        tally.hidden.add(exc.name)
+        print(f"  SKIPPED  {name}: tool hidden on this host")
+    except TransientFailure as exc:
+        rerun = partial(run_check, client, tally, name, args, required, True)
+        hold_back(tally, name, exc, rerun, second_pass)
+    except Exception as exc:
+        tally.failed += 1
+        print(f"  FAIL {name}: {exc}")
+
+
+async def run_chain(
+    client: httpx.AsyncClient,
+    tally: Tally,
+    label: str,
+    chain: Callable[[httpx.AsyncClient], Awaitable[None]],
+    second_pass: bool = False,
+) -> None:
+    try:
+        await chain(client)
+        print(f"  OK   {label}")
+        if second_pass:
+            mark_recovered(tally, label)
+    except HiddenTool as exc:
+        tally.hidden.add(exc.name)
+        print(f"  SKIPPED  {label}: {exc.name} is hidden on this host")
+    except DegradedChain as exc:
+        if is_geo_skipped(exc.source):
+            tally.skipped.add(exc.source)
+            print(f"  SKIPPED  {label} [{exc.source}]: geo-blocked, no tunnel")
+        else:
+            tally.degraded.add(exc.source)
+            print(f"  DEGRADED {label} [{exc.source}]: {str(exc)[:160]}")
+    except TransientFailure as exc:
+        rerun = partial(run_chain, client, tally, label, chain, True)
+        hold_back(tally, label, exc, rerun, second_pass)
+    except Exception as exc:
+        tally.failed += 1
+        print(f"  FAIL {label}: {exc}")
 
 
 async def main() -> int:
@@ -463,21 +575,9 @@ async def main() -> int:
         ]
 
         print("== tools ==")
-        failed = 0
-        degraded: set[str] = set()
-        skipped: set[str] = set()
-        hidden_skipped: set[str] = set()
+        tally = Tally()
         for name, args, must in checks:
-            try:
-                status, source = await check_tool(client, name, args, must)
-                if status == "degraded" and source:
-                    (skipped if is_geo_skipped(source) else degraded).add(source)
-            except HiddenTool as exc:
-                hidden_skipped.add(exc.name)
-                print(f"  SKIPPED  {name}: tool hidden on this host")
-            except Exception as exc:
-                failed += 1
-                print(f"  FAIL {name}: {exc}")
+            await run_check(client, tally, name, args, must)
 
         # -- dynamic list -> get chains -----------------------------------
         # A handful of the trickiest integrations (undocumented internal
@@ -487,57 +587,53 @@ async def main() -> int:
         # IDs are discovered live, not hardcoded, so this doesn't rot when
         # the underlying site's IDs change.
         print("== chains ==")
-        chains = 0
-        for label, coro in [
-            ("sut: list -> schema", chain_sut(client)),
-            ("superbancos: list -> archivos", chain_superbancos(client)),
-            ("igepn: search -> informe", chain_igepn(client)),
-            ("ckan: search -> resources -> preview", chain_ckan_preview(client)),
-            ("ckan: search -> dataset/resource info -> query", chain_ckan_info(client)),
-            ("tramites: search -> info -> estadisticas", chain_tramites(client)),
-            ("instituciones: list -> info", chain_instituciones(client)),
-            ("organizations: search -> info", chain_organizations(client)),
-            ("ckan: search -> series pattern -> download", chain_ckan_download(client)),
-            ("bce: search -> indicador", chain_bce_indicador(client)),
-            ("bce: iem -> table", chain_bce_iem(client)),
-            ("bce: diarios -> indicador", chain_bce_diario(client)),
-            ("bce: paginas -> archivos", chain_bce_paginas(client)),
-            ("cepalstat: search -> indicador", chain_cepalstat(client)),
-            ("sri: ventas -> aggregate_csv", chain_sri_ventas(client)),
-            ("contraloria: list -> informe", chain_contraloria(client)),
-            ("arconel: list -> reporte", chain_arconel(client)),
-            ("inec: estadistica -> files -> zip", chain_inec_estadistica(client)),
-            ("inec: publicacion -> archivos", chain_inec_publicacion(client)),
-            ("sgr: sitreps -> archivos -> pdf", chain_sgr_pdf(client)),
-            ("anda: search -> info -> microdata", chain_anda(client)),
-            ("supercias: auditores -> auditor", chain_auditor(client)),
-            ("sercop: search -> contrato", chain_contrato(client)),
-        ]:
-            chains += 1
-            try:
-                await coro
-                print(f"  OK   {label}")
-            except HiddenTool as exc:
-                hidden_skipped.add(exc.name)
-                print(f"  SKIPPED  {label}: {exc.name} is hidden on this host")
-            except DegradedChain as exc:
-                if is_geo_skipped(exc.source):
-                    skipped.add(exc.source)
-                    print(f"  SKIPPED  {label} [{exc.source}]: geo-blocked, no tunnel")
-                else:
-                    degraded.add(exc.source)
-                    print(f"  DEGRADED {label} [{exc.source}]: {str(exc)[:160]}")
-            except Exception as exc:
-                failed += 1
-                print(f"  FAIL {label}: {exc}")
+        chain_checks = [
+            ("sut: list -> schema", chain_sut),
+            ("superbancos: list -> archivos", chain_superbancos),
+            ("igepn: search -> informe", chain_igepn),
+            ("ckan: search -> resources -> preview", chain_ckan_preview),
+            ("ckan: search -> dataset/resource info -> query", chain_ckan_info),
+            ("tramites: search -> info -> estadisticas", chain_tramites),
+            ("instituciones: list -> info", chain_instituciones),
+            ("organizations: search -> info", chain_organizations),
+            ("ckan: search -> series pattern -> download", chain_ckan_download),
+            ("bce: search -> indicador", chain_bce_indicador),
+            ("bce: iem -> table", chain_bce_iem),
+            ("bce: diarios -> indicador", chain_bce_diario),
+            ("bce: paginas -> archivos", chain_bce_paginas),
+            ("cepalstat: search -> indicador", chain_cepalstat),
+            ("sri: ventas -> aggregate_csv", chain_sri_ventas),
+            ("contraloria: list -> informe", chain_contraloria),
+            ("arconel: list -> reporte", chain_arconel),
+            ("inec: estadistica -> files -> zip", chain_inec_estadistica),
+            ("inec: publicacion -> archivos", chain_inec_publicacion),
+            ("sgr: sitreps -> archivos -> pdf", chain_sgr_pdf),
+            ("anda: search -> info -> microdata", chain_anda),
+            ("supercias: auditores -> auditor", chain_auditor),
+            ("sercop: search -> contrato", chain_contrato),
+        ]
+        for label, chain in chain_checks:
+            await run_chain(client, tally, label, chain)
+
+        # A check that timed out even after its retries gets one more try now,
+        # minutes after the first. Answering the second time makes it degraded;
+        # timing out again is a failure, as before.
+        if tally.timed_out:
+            print(f"== second pass: {len(tally.timed_out)} check(s) that timed out ==")
+            await asyncio.sleep(SECOND_PASS_PAUSE)
+            for rerun in tally.timed_out:
+                await rerun()
 
         print("== done ==")
-        total = len(checks) + chains
-        print(f"failed={failed}/{total}; degraded={len(degraded)}; skipped={len(skipped)}")
-        if hidden_skipped:
-            print(f"hidden on this host (skipped): {', '.join(sorted(hidden_skipped))}")
-        write_summary(total, failed, degraded, skipped, hidden_skipped)
-        return 1 if failed else 0
+        total = len(checks) + len(chain_checks)
+        print(
+            f"failed={tally.failed}/{total}; degraded={len(tally.degraded)}; "
+            f"skipped={len(tally.skipped)}"
+        )
+        if tally.hidden:
+            print(f"hidden on this host (skipped): {', '.join(sorted(tally.hidden))}")
+        write_summary(total, tally.failed, tally.degraded, tally.skipped, tally.hidden)
+        return 1 if tally.failed else 0
 
 
 async def chain_sut(client: httpx.AsyncClient) -> None:
