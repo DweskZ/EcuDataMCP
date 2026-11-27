@@ -1,6 +1,13 @@
 # Changelog
 
-## Unreleased
+## 0.15.3 — 2026-11-27
+
+88 tools in the default profile (none new). `aggregate_csv` takes a new `member`
+parameter and reads a CSV inside a .zip however large (the SRI's RUC file for
+Pichincha is 156 MB zipped and 741 MiB of text); the SRI's download host is read
+by Range after all; a .zip from a host that ignores Range can now be bigger than
+memory; `get_clima_nasa_power` warns that the latest days of a daily rain series
+are provisional; and the smoke test gives a check that timed out a second try.
 
 - **`get_clima_nasa_power`: the latest days of a daily rain series now carry a
   warning that they are provisional.** NASA POWER serves MERRA-2 up to its
