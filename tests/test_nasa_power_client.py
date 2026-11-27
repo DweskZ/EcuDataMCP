@@ -109,6 +109,45 @@ async def test_daily_fill_values_become_none_and_trailing_days_are_dropped(httpx
     assert result["fuentes_datos"] == ["GEOSIT"]
 
 
+async def test_daily_rain_from_geos_it_carries_the_provisional_source_warning(httpx_mock):
+    httpx_mock.add_response(url=_DAILY_URL, json=_daily_payload())
+
+    result = await nasa_power_client.get_clima(
+        -0.104, -78.5192, desde="2024-01-01", hasta="2024-01-05", frecuencia="diaria"
+    )
+
+    assert result["nota"].startswith(nasa_power_client._NOTA)
+    assert "GEOS-IT" in result["nota"]
+    assert "provisionales" in result["nota"]
+
+
+async def test_daily_rain_from_merra2_alone_has_no_warning(httpx_mock):
+    payload = _daily_payload()
+    payload["header"]["sources"] = ["MERRA2"]
+    httpx_mock.add_response(url=_DAILY_URL, json=payload)
+
+    result = await nasa_power_client.get_clima(
+        -0.104, -78.5192, desde="2024-01-01", hasta="2024-01-05", frecuencia="diaria"
+    )
+
+    assert result["nota"] == nasa_power_client._NOTA
+
+
+async def test_the_warning_is_about_rain_so_a_temperature_only_query_has_none(httpx_mock):
+    httpx_mock.add_response(url=_DAILY_URL, json=_daily_payload())
+
+    result = await nasa_power_client.get_clima(
+        -0.104,
+        -78.5192,
+        desde="2024-01-01",
+        hasta="2024-01-05",
+        frecuencia="diaria",
+        variables="temperatura",
+    )
+
+    assert result["nota"] == nasa_power_client._NOTA
+
+
 async def test_monthly_drops_the_annual_mean_and_months_outside_the_period(httpx_mock):
     httpx_mock.add_response(url=_MONTHLY_URL, json=_monthly_payload())
 

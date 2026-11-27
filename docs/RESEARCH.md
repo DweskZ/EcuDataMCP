@@ -7372,24 +7372,54 @@ devuelve el centroide de cada polígono con `returnCentroid=true&outSR=4326`.
 - Es el centro geométrico del polígono, no la cabecera cantonal. El de
   Guayaquil (-2,4919 / -80,0931) está lejos de la ciudad.
 
-### Una anomalía reciente que no se resolvió
+### Una anomalía reciente (resuelta el 2026-11-27)
 
-Con el centroide de Guayaquil, el promedio diario de lluvia fue de 21,05
-mm/día en octubre de 2026 y de 29,49 mm/día del 1 al 21 de noviembre (máximo
-de 124,35 mm en un día). La serie mensual de 2016 a 2025 para octubre y
+El 2026-11-24, con el centroide de Guayaquil, el promedio diario de lluvia fue
+de 21,05 mm/día en octubre de 2026 y de 29,49 mm/día del 1 al 21 de noviembre
+(máximo de 124,35 mm en un día). La serie mensual de 2016 a 2025 para octubre y
 noviembre va de 0,1 a 1,4 mm/día en ese punto. En Quito, entre el 15 de
 septiembre y el 21 de noviembre, los valores diarios pasan de octubre en
 adelante a decenas de mm (36 el 2 de noviembre), frente a promedios
-mensuales de 0,7 a 7,6 mm/día en 2023 y 2024. No parece un error aislado de
-una variable: en Guayaquil la humedad relativa sube de 66-68 % a 85-94 % y la
-temperatura baja de unos 29 °C a 25-27 °C en el mismo período.
+mensuales de 0,7 a 7,6 mm/día en 2023 y 2024. En Guayaquil la humedad relativa
+subía de 66-68 % a 85-94 % y la temperatura bajaba de unos 29 °C a 25-27 °C en
+el mismo período.
 
-Hasta septiembre de 2026 los promedios diarios coinciden con los mensuales
-(febrero de 2025: 12,63 en ambos). No se contrastó con estaciones del INAMHI
-ni con noticias, así que no se sabe si es un episodio real o un salto en el
-flujo reciente del modelo. La herramienta devuelve lo que NASA publica y su
-nota dice que los valores son de una rejilla de modelo, no de estación; los
-datos de las últimas semanas conviene tratarlos como provisionales.
+**Qué es.** Son dos cosas distintas, y la herramienta no avisaba de ninguna.
+
+1. **Un episodio real en Guayaquil, de septiembre a octubre.** El 2026-10-19 el
+   COE cantonal registró 170,37 mm hasta las 08:00 y 57 zonas inundadas (El
+   Comercio, publicado ese día 08:57; titular "Guayaquil acumula 170 litros de
+   lluvia por metro cuadrado y 57 zonas están afectadas"). NASA da 34,5 mm ese
+   día para la celda del centroide, que está lejos de la ciudad. Open-Meteo
+   (reanálisis, otro modelo) coincide en el sentido, con promedios de 5,75
+   mm/día en septiembre y 12,41 en octubre en el mismo punto, frente a 0,06-1,18
+   en los octubres de 2019 a 2025; la correlación diaria entre los dos del 20 de
+   septiembre al 21 de noviembre es 0,59.
+2. **Un salto de producto el 1 de noviembre.** `header.sources` de la API diaria
+   lista `MERRA2` hasta el último mes completo y `GEOSIT` (corrida casi en
+   tiempo real, provisional) para los días siguientes. Una consulta que termina
+   el 2026-10-31 nombra solo `MERRA2`; una que termina el 11-01 nombra los dos.
+   En Quito la lluvia diaria pasa de 4,88 mm el 10-31 a 40,59 mm el 11-01, y el
+   promedio del 1 al 21 de noviembre es de 23,0 mm/día frente a 1,6-5,9 en los
+   noviembres de 2019 a 2025, mientras Open-Meteo da 9,5 mm/día para el mismo
+   punto (3,4-10,2 en esos años) y no tiene escalón. En Guayaquil noviembre
+   queda en 29,5 mm/día (Open-Meteo: 26,5), así que ahí el salto de producto se
+   suma a un mes también lluvioso.
+
+**Los 21 mm/día de octubre ya no se reproducen.** El 11-27 la API da 8,02
+mm/día para todo octubre en la celda de Guayaquil (19,3 del 18 al 28) y 2,75 en
+la de Quito, con `MERRA2` como única fuente; el 11-24 eran 21,05 en Guayaquil y
+decenas de mm en Quito. Lo más probable es que octubre fuera entonces de GEOS-IT
+y que NASA lo reemplazara por MERRA-2 en esos tres días (no se guardó la
+cabecera del 11-24, así que no está comprobado). Noviembre sigue en GEOS-IT y
+es de esperar que baje cuando llegue MERRA-2.
+
+**Qué hace ahora la herramienta.** Una consulta diaria con lluvia cuyo
+`fuentes_datos` incluye GEOSIT agrega a `nota` que esos días son provisionales y
+que GEOS-IT da mucha más lluvia en Ecuador, con los números de arriba. No se
+verificó contra estaciones del INAMHI: sus series no están integradas y el
+reporte periodístico es de un solo día. Open-Meteo no es una fuente integrada;
+se usó solo para esta comprobación.
 
 ### No construido
 

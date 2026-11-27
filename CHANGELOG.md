@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- **`get_clima_nasa_power`: the latest days of a daily rain series now carry a
+  warning that they are provisional.** NASA POWER serves MERRA-2 up to its
+  latest complete month and the near-real-time GEOS-IT run for the days after
+  it (`fuentes_datos` lists both), and GEOS-IT gives far more rain in Ecuador.
+  At the Quito point the daily rain went from 4.9 mm on 2026-10-31 to 40.6 mm on
+  2026-11-01, and the November average was 23 mm/day against 9.5 in Open-Meteo,
+  which shows no step; October's Guayaquil average read 21 mm/day on
+  2026-11-24 and 8 mm/day on 11-27, once MERRA-2 covered it. This was the
+  "unresolved oddity" in the 47th RESEARCH pass. The wet September and October
+  at Guayaquil are real: the COE reported 170 mm and 57 flooded zones on
+  2026-10-19, and Open-Meteo agrees. A daily query with rain whose sources
+  include GEOSIT adds that to `nota`; monthly answers, MERRA-2-only ranges and
+  queries without rain are unchanged.
+
 - **Smoke test: a check that only timed out gets a second try after the other
   checks, and is degraded if it then answers.** The in-call retries (5 s and
   15 s) only span 20 s, so a host that was unreachable for a minute still failed
