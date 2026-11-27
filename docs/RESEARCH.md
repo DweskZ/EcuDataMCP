@@ -7492,9 +7492,77 @@ ZIP64). Pasado ese tamaño el error dice que el host no admite Range y que el
 
 ### Abierto
 
-- `aggregate_csv` no entra en un miembro de .zip: los CSV de INEC dentro de
-  .zip enormes siguen leyéndose por la cabeza con `read_zip_member`.
-- Un host sin Range con un .zip de más de 20 MB sigue sin lectura parcial.
+Los dos pendientes de esta pasada se resolvieron en la cuadragésima novena.
+
+## Cuadragésima novena pasada — .zip grandes: Range del SRI, respaldo en disco y `aggregate_csv` sobre un miembro (2026-11-27)
+
+Punto de partida: los dos pendientes de la pasada anterior. `aggregate_csv` no
+entraba en un miembro de .zip (el CSV de Pichincha pesa 740 MB y solo se leía
+por la cabeza), y un host sin Range con un .zip de más de 20 MB no tenía lectura
+parcial (los RUC de Guayas y Pichincha, 148 y 156 MB, exigían subir
+`ECUADOR_MCP_NO_RANGE_ZIP_MB`).
+
+### El host de los RUC sí admite Range
+
+- Los .zip de RUC están en
+  `descargas.sri.gob.ec/download/datosAbiertos/SRI_RUC_<Provincia>.zip`. Con
+  `curl -H "Range: bytes=-65579"` responde 206. Con
+  `Accept-Encoding: gzip, deflate`, que es lo que httpx manda por defecto,
+  responde 200 con el archivo entero (10,8 MB recibidos en 25 s antes de cortar);
+  con `Accept-Encoding: identity` vuelve a dar 206. Por eso el cliente lo tomaba
+  por un host sin Range y bajaba el .zip completo: en Azuay (29 MB)
+  `list_zip_contents` tardaba 51 s.
+- `_fetch_range` manda ahora `Accept-Encoding: identity`: Azuay lista en 3,1 s y
+  nada se baja entero. Los offsets de un .zip son de los bytes guardados, así
+  que `identity` es también lo correcto en general.
+- Velocidad medida desde una conexión doméstica el 2026-11-27: 0,5 MB/s con
+  `curl` y de 0,16 a 0,23 MB/s dentro de las dos lecturas completas de Azuay. A
+  ese ritmo Pichincha (156 MB) tardaría de 5 a 16 minutos y pasaría el plazo de
+  10; no se midió desde Render, y desde Oracle el SRI no responde.
+- `www.sri.gob.ec` (los CSV de ventas) no contestó a `curl` desde esta máquina,
+  con ni sin `identity`: no se pudo ver si ese host también depende del
+  encabezado. Esos CSV no son .zip y `aggregate_csv` los baja enteros.
+
+### Respaldo en disco para hosts que sí ignoran Range
+
+- El .zip entero se baja a un `tempfile.SpooledTemporaryFile`: en memoria hasta
+  20 MB y en un archivo temporal sin nombre más allá. El sistema operativo lo
+  borra al cerrarlo o al terminar el proceso, también tras un fallo, así que no
+  queda nada que barrer. `helpers/zip_blob.SpooledBlob` se corta con `blob[a:b]`
+  igual que `bytes`, y todo el análisis del directorio central y de los miembros
+  sigue como estaba.
+- El tope de la descarga pasa de 20 a 400 MB (`ECUADOR_MCP_NO_RANGE_ZIP_MB`,
+  máximo 1024) y tiene un plazo de 10 minutos; una lectura detenida sigue
+  fallando a los 30 s. Dos llamadas por el mismo .zip comparten una descarga. La
+  caché de 5 minutos guarda hasta dos archivos y un `call_later` suelta el
+  temporal cuando vence la entrada.
+
+### `aggregate_csv` sobre un miembro (`member`)
+
+- `locate_zip_member` busca el miembro (solo `.csv`, `.tsv`, `.txt`; rechaza
+  carpetas, cifrados, métodos distintos de stored y deflate, y tamaños fuera de
+  300 MB comprimido o 2 GB descomprimido) y deja sus bytes comprimidos a mano:
+  el .zip entero si el host no admite Range, o solo los del miembro, bajados con
+  Range a un archivo temporal, si lo admite. `iter_zip_member` los descomprime en
+  trozos de 4 MB sin pasar del tamaño declarado y, al final, comprueba tamaño y
+  CRC32: un .zip dañado falla en vez de dar un total sobre filas equivocadas.
+- `aggregate_stream` es el mismo agrupador que `aggregate_bytes`, pero sobre un
+  flujo, con un plazo de lectura de 180 s que revisa cada 65.536 filas.
+- Medido con un CSV sintético de 734 MB y 4,6 millones de filas (67 MB
+  comprimido, nueve columnas con el aspecto del RUC): 23,5 s (31 MB/s) y una
+  memoria de proceso de 38 a 48 MB. Con datos reales, el RUC de Azuay (29 MB
+  comprimido, 143 MB de texto, 413.846 filas) agrupado por
+  `ESTADO_CONTRIBUYENTE`: ACTIVO 199.493, SUSPENDIDO 180.065, PASIVO 34.288
+  (suman las 413.846 filas). Dos lecturas completas dieron los mismos totales, en
+  127 y 183 s, casi todo descarga a la velocidad de arriba.
+
+### Sin probar
+
+- El miembro de Pichincha completo (740 MB) no se leyó de verdad: desde esta
+  conexión la descarga sola pasaría de 5 minutos. Las cifras de 740 MB son del
+  archivo sintético.
+- Ni Render ni Oracle: no se sabe cuánto disco temporal permiten ni a qué
+  velocidad les llega el SRI. Oracle no alcanza al SRI.
 
 ## Archivo del roadmap (2026-11-24)
 

@@ -95,7 +95,7 @@ es obligatoria salvo `MCP_AUTH_TOKEN` cuando `MCP_REQUIRE_AUTH=1`.
 | `IEM_CATALOG_DIR` | Catálogo IEM persistido para inspección | `<data_dir>/iem_catalog_snapshots` |
 | `ECUADOR_MCP_DISK_CACHE` | `0` deja todos los cachés en memoria; con `1` los catálogos caros se guardan en `<data_dir>/cache/` y sobreviven reinicios, y una copia vencida (hasta 7 días) responde, marcada `frescura: "obsoleta"`, cuando su fuente falla | `1` |
 | `ECUADOR_MCP_MAX_RESPONSE_BYTES` | Tope de bytes del `structuredContent` de cualquier tool; pasado el tope se recorta la lista principal y se declara en `metadatos.truncado` | `200000` |
-| `ECUADOR_MCP_NO_RANGE_ZIP_MB` | Tamaño máximo, en MB, de un .zip que `list_zip_contents` y `read_zip_member` bajan entero cuando el servidor del archivo no admite HTTP Range (el del SRI no). Se guarda en memoria, y hasta dos archivos 5 minutos; tope 400. Los .zip de RUC por provincia del SRI pesan de 2 a 156 MB (Guayas 148, Pichincha 156) | `20` |
+| `ECUADOR_MCP_NO_RANGE_ZIP_MB` | Tamaño máximo, en MB, de un .zip que `list_zip_contents`, `read_zip_member` y `aggregate_csv` (con `member`) bajan entero cuando el servidor del archivo no admite HTTP Range. Hasta 20 MB se guarda en memoria; más va a un archivo temporal en el disco del servidor, que se borra solo, y hasta dos archivos se conservan 5 minutos; tope 1024. Los .zip de RUC por provincia del SRI pesan de 2 a 156 MB (Guayas 148, Pichincha 156), así que el valor por defecto los cubre | `400` |
 | `ECUADOR_MCP_USAGE_LOG` | `1` guarda cada llamada (tool, resultado, duración; nunca argumentos) en `<data_dir>/usage.jsonl`; `scripts/usage_report.py` lo resume | vacío |
 
 ### Geobloqueo y TLS

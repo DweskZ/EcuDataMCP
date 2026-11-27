@@ -1075,7 +1075,7 @@ def test_cell_text_drops_the_point_zero_of_whole_numbers_only(value, text):
 
 @pytest.mark.parametrize(
     ("value", "expected_mb"),
-    [("", 20), ("  ", 20), ("abc", 20), ("0", 20), ("-5", 20), ("64", 64), ("9999", 400)],
+    [("", 400), ("  ", 400), ("abc", 400), ("0", 400), ("-5", 400), ("64", 64), ("9999", 1024)],
 )
 def test_the_no_range_cap_reads_its_environment_variable(monkeypatch, value, expected_mb):
     monkeypatch.setenv("ECUADOR_MCP_NO_RANGE_ZIP_MB", value)
