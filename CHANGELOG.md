@@ -15,6 +15,34 @@
   2026-10-19, and Open-Meteo agrees. A daily query with rain whose sources
   include GEOSIT adds that to `nota`; monthly answers, MERRA-2-only ranges and
   queries without rain are unchanged.
+- **`aggregate_csv` reads a CSV inside a .zip, however large (new `member`
+  parameter).** The SRI's RUC file for Pichincha is 156 MB zipped and 740 MB of
+  text, so `read_zip_member` could only show its first 5 MB and `aggregate_csv`
+  refused any .zip. With `url` set to the .zip and `member` to the file's name
+  (`list_zip_contents` lists them), the member is decompressed in 4 MB pieces
+  and only the group totals are kept: a synthetic 734 MB, 4.6 million row file
+  grouped in 23.5 s with the process memory staying near 48 MB. The stream
+  checks the declared size and the CRC32 at the end, so a damaged .zip fails
+  instead of giving a total over wrong rows; a member over 300 MB zipped, 2 GB
+  unzipped or 3 minutes of reading is refused rather than summed in part. A host
+  that honors Range sends only that member's bytes, to a temporary file.
+- **A .zip from a host without Range can now be bigger than memory.** The
+  whole-download fallback of 0.15.2 kept the file in memory up to 20 MB and
+  refused anything larger unless `ECUADOR_MCP_NO_RANGE_ZIP_MB` was raised, which
+  left the Guayas (148 MB) and Pichincha (156 MB) RUC zips out. The download now
+  stays in memory up to 20 MB and goes to an unnamed temporary file beyond that
+  (the operating system removes it when it is closed, even after a crash); the
+  default cap is 400 MB (the variable now goes up to 1024), the download has a
+  10-minute deadline (a stalled read still fails after 30 s), two calls for the
+  same .zip share one download, and the file is released when its 5-minute cache
+  entry expires.
+- **The SRI's download host honors Range after all.** `descargas.sri.gob.ec`
+  (the RUC zips) answers 200 with the whole file whenever the request offers
+  `Accept-Encoding: gzip, deflate`, which httpx sends by default, and 206 once
+  it says `identity`; that is why the zips looked range-less. Range requests now
+  send `Accept-Encoding: identity`. On the Azuay RUC zip (29 MB)
+  `list_zip_contents` went from 51 s, by downloading it whole, to 3 s. The whole-
+  download fallback stays for hosts that really ignore Range.
 
 - **Smoke test: a check that only timed out gets a second try after the other
   checks, and is degraded if it then answers.** The in-call retries (5 s and

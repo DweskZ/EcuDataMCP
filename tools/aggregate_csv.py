@@ -49,11 +49,11 @@ def register_aggregate_csv_tool(mcp: MCPServer) -> None:
     @mcp.tool(
         title="Sumar y agrupar un CSV completo",
         description=(
-            "Group and total a CSV/TSV/TXT at a URL by reading all of it (up to "
-            "30 MB, not just its head): group_by columns, sum_columns, exact "
-            "filters, ordering. Reads decimal commas, pipe or semicolon "
-            "delimiters and a BOM. Built for files like SRI's sri_ventas_AAAA.csv "
-            "(sales by province, canton and sector)."
+            "Group and total a CSV/TSV/TXT at a URL by reading all of it, not just "
+            "its head: up to 30 MB, or a CSV inside a .zip (member) up to 2 GB "
+            "unzipped. group_by, sum_columns, exact filters, ordering; reads "
+            "decimal commas, pipe or semicolon delimiters and a BOM. Built for "
+            "SRI's sales (sri_ventas_AAAA.csv) and RUC files."
         ),
         annotations=READ_ONLY,
     )
@@ -66,6 +66,7 @@ def register_aggregate_csv_tool(mcp: MCPServer) -> None:
         order_by: str = "",
         limit: int = 50,
         skip_rows: int = 0,
+        member: str = "",
         format: Literal["text", "json"] = "text",
     ) -> Annotated[CallToolResult, ResultadoTabla]:
         """
@@ -77,9 +78,15 @@ def register_aggregate_csv_tool(mcp: MCPServer) -> None:
         values, the number of rows (`filas`) and the total of each sum column,
         plus the totals over every matching row. Numbers are summed exactly.
 
-        Reads plain text only (.csv, .tsv, .txt, no extension). A .zip or a
-        spreadsheet goes through list_zip_contents and read_zip_member; a file
-        over 30 MB is refused rather than summed incompletely.
+        Reads plain text (.csv, .tsv, .txt, no extension); a spreadsheet goes
+        through read_zip_member, and a plain file over 30 MB is refused rather
+        than summed incompletely. For a CSV inside a .zip, pass the .zip as url
+        and the file's name (from list_zip_contents) as member: it is
+        decompressed as it is read, so a member of hundreds of MB works (the
+        SRI's RUC file for Pichincha is 156 MB zipped and 740 MB of text), up
+        to 300 MB zipped, 2 GB unzipped and 3 minutes of reading; a bigger one
+        is refused. A host that cannot send part of a .zip is downloaded whole
+        first, which adds time.
 
         Column names match ignoring case and accents (AÑO, año and ano are the
         same). The delimiter (comma, pipe, semicolon or tab) is read from the
@@ -98,7 +105,8 @@ def register_aggregate_csv_tool(mcp: MCPServer) -> None:
         so read the `columnas` of the answer when a name is not found.
 
         Args:
-            url: Direct URL to a plain-text CSV/TSV/TXT file (from search_archivos or a CKAN resource).
+            url: Direct URL to a plain-text CSV/TSV/TXT file (from search_archivos or a CKAN resource), or to a .zip when member is given.
+            member: File inside the .zip at url (exact name, or a unique basename); empty when url is the CSV itself.
             group_by: Comma-separated column names to group by; empty gives one total row.
             sum_columns: Comma-separated numeric columns to total; empty only counts rows.
             filters_json: Optional JSON object of exact filters, e.g. '{"PROVINCIA": "PICHINCHA", "MES": [1, 2]}'.
@@ -121,6 +129,7 @@ def register_aggregate_csv_tool(mcp: MCPServer) -> None:
                 order_by=order_by,
                 limit=limit,
                 skip_rows=max(skip_rows, 0),
+                member=member,
             )
         except UnsafeUrlError as e:
             logger.warning("aggregate_csv rechazó la URL %s: %s", url, e)
@@ -144,6 +153,7 @@ def register_aggregate_csv_tool(mcp: MCPServer) -> None:
         def to_text(data: dict) -> str:
             parts = [
                 f"Archivo: {data['url']}",
+                *([f"Miembro del .zip: {data['miembro']}"] if data.get("miembro") else []),
                 (
                     f"Filas leídas: {data['filas_leidas']:,} "
                     f"({data['filas_coinciden']:,} cumplen los filtros)"

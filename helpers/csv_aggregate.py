@@ -20,6 +20,7 @@ import csv
 import io
 import itertools
 import json
+import time
 from collections import defaultdict
 from collections.abc import Iterator
 from decimal import Decimal, InvalidOperation
@@ -27,15 +28,31 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from helpers.cache import TtlCache
-from helpers.csv_reader import download_bytes, run_parser_off_loop
+from helpers.csv_reader import (
+    ZipMemberSpan,
+    download_bytes,
+    iter_zip_member,
+    locate_zip_member,
+    run_parser_off_loop,
+)
 from helpers.text_utils import strip_accents
 
 MAX_BYTES = 30 * 1024 * 1024
 MAX_GROUPS = 100_000
 _DOWNLOAD_DEADLINE_SECONDS = 75.0
+# A member of a .zip is read as a stream, so it can be far bigger than a plain
+# file: SRI's RUC file for Pichincha is 156 MB zipped and 740 MB of text. The
+# time limit is what bounds the work; the thread checks it every 65,536 rows.
+ZIP_MAX_COMPRESSED_BYTES = 300 * 1024 * 1024
+ZIP_MAX_UNCOMPRESSED_BYTES = 2 * 1024 * 1024 * 1024
+ZIP_PARSE_SECONDS = 180.0
+_STREAM_BUFFER_BYTES = 1024 * 1024
 _DELIMITERS = (",", "|", ";", "\t")
 _NOT_TEXT_EXTENSIONS = {
-    ".zip": "es un .zip; usa list_zip_contents y read_zip_member",
+    ".zip": (
+        "es un .zip; pasa en member el nombre del CSV que contiene "
+        "(list_zip_contents lista los miembros)"
+    ),
     ".xlsx": "es una hoja de cálculo; usa read_zip_member con member=''",
     ".xls": "es una hoja de cálculo; usa read_zip_member con member=''",
     ".xlsb": "es una hoja de cálculo; usa read_zip_member con member=''",
@@ -144,16 +161,42 @@ def aggregate_bytes(
     limit: int = 50,
     skip_rows: int = 0,
 ) -> dict[str, Any]:
+    """Group the rows of a delimited text file held in memory; see `aggregate_stream`."""
+    return aggregate_stream(
+        io.BytesIO(raw),
+        encoding=_detect_encoding(raw),
+        group_by=group_by,
+        sum_columns=sum_columns,
+        filters=filters,
+        order_by=order_by,
+        limit=limit,
+        skip_rows=skip_rows,
+    )
+
+
+def aggregate_stream(
+    binary: io.BufferedIOBase,
+    *,
+    encoding: str,
+    group_by: list[str],
+    sum_columns: list[str],
+    filters: dict[str, list[str]],
+    order_by: str = "",
+    limit: int = 50,
+    skip_rows: int = 0,
+    deadline_seconds: float | None = None,
+) -> dict[str, Any]:
     """Group the rows of a delimited text file and total its numeric columns.
 
     `filters` keeps the rows whose cell equals one of the listed values, ignoring
     case and accents, or equals it as a number ("1" matches "01"). The header is
     the first line after `skip_rows` physical lines. Blank cells and cells that
     are not numbers are left out of the totals and counted in the result.
+    `deadline_seconds` stops a read that takes longer, for a file too big to
+    finish in a reasonable time.
     """
-    stream = io.TextIOWrapper(
-        io.BytesIO(raw), encoding=_detect_encoding(raw), errors="replace", newline=""
-    )
+    deadline = None if deadline_seconds is None else time.monotonic() + deadline_seconds
+    stream = io.TextIOWrapper(binary, encoding=encoding, errors="replace", newline="")
     for _ in range(max(skip_rows, 0)):
         stream.readline()
     header_line = stream.readline()
@@ -179,7 +222,12 @@ def aggregate_bytes(
     rows_read = rows_matched = 0
     width = len(headers)
 
-    for row in _rows(reader):
+    for count, row in enumerate(_rows(reader)):
+        if deadline is not None and not count & 0xFFFF and time.monotonic() > deadline:
+            raise ValueError(
+                f"El archivo tardó más de {int(deadline_seconds or 0)} s en leerse "
+                f"(van {rows_read:,} filas); es demasiado grande para sumarlo aquí."
+            )
         if not row or not any(cell.strip() for cell in row):
             continue
         rows_read += 1
@@ -290,6 +338,104 @@ def _check_payload(raw: bytes) -> None:
         )
 
 
+class _ChunkStream(io.RawIOBase):
+    """Present an iterator of byte chunks as a readable binary stream."""
+
+    def __init__(self, chunks: Iterator[bytes]) -> None:
+        self._chunks = chunks
+        self._left = memoryview(b"")
+
+    def readable(self) -> bool:
+        return True
+
+    def readinto(self, buffer: Any) -> int:
+        view = memoryview(buffer).cast("B")
+        filled = 0
+        while filled < len(view):
+            if not len(self._left):
+                self._left = memoryview(next(self._chunks, b""))
+                if not len(self._left):
+                    break
+            taken = min(len(view) - filled, len(self._left))
+            view[filled : filled + taken] = self._left[:taken]
+            self._left = self._left[taken:]
+            filled += taken
+        return filled
+
+
+def aggregate_span(
+    span: ZipMemberSpan,
+    *,
+    group_by: list[str],
+    sum_columns: list[str],
+    filters: dict[str, list[str]],
+    order_by: str = "",
+    limit: int = 50,
+    skip_rows: int = 0,
+    deadline_seconds: float | None = ZIP_PARSE_SECONDS,
+) -> dict[str, Any]:
+    """Group a zip member as it is decompressed; see `aggregate_stream`.
+
+    Blocking: run it in a thread. Nothing but the group totals is kept.
+    """
+    binary = io.BufferedReader(
+        _ChunkStream(iter_zip_member(span)), buffer_size=_STREAM_BUFFER_BYTES
+    )
+    return aggregate_stream(
+        binary,
+        encoding=_detect_encoding(binary.peek(65536)[:65536]),
+        group_by=group_by,
+        sum_columns=sum_columns,
+        filters=filters,
+        order_by=order_by,
+        limit=limit,
+        skip_rows=skip_rows,
+        deadline_seconds=deadline_seconds,
+    )
+
+
+async def _aggregate_member(
+    url: str,
+    member: str,
+    *,
+    group_by: list[str],
+    sum_columns: list[str],
+    filters: dict[str, list[str]],
+    order_by: str,
+    limit: int,
+    skip_rows: int,
+) -> dict[str, Any]:
+    span = await locate_zip_member(
+        url,
+        member,
+        max_compressed=ZIP_MAX_COMPRESSED_BYTES,
+        max_uncompressed=ZIP_MAX_UNCOMPRESSED_BYTES,
+    )
+    try:
+        result = await asyncio.wait_for(
+            asyncio.to_thread(
+                aggregate_span,
+                span,
+                group_by=group_by,
+                sum_columns=sum_columns,
+                filters=filters,
+                order_by=order_by,
+                limit=limit,
+                skip_rows=skip_rows,
+            ),
+            timeout=ZIP_PARSE_SECONDS + 15,
+        )
+    except TimeoutError as exc:
+        raise ValueError(
+            f"El archivo tardó más de {int(ZIP_PARSE_SECONDS)} s en leerse; es demasiado "
+            "grande para sumarlo aquí."
+        ) from exc
+    result["miembro"] = span.name
+    result["bytes_leidos"] = span.uncompressed_size
+    result["bytes_comprimidos"] = span.compressed_size
+    return result
+
+
 async def aggregate_url(
     url: str,
     *,
@@ -299,11 +445,19 @@ async def aggregate_url(
     order_by: str = "",
     limit: int = 50,
     skip_rows: int = 0,
+    member: str = "",
 ) -> dict[str, Any]:
-    """Download `url` whole and aggregate it; see `aggregate_bytes`."""
-    _check_url(url)
+    """Aggregate a file at `url`, or a CSV inside the .zip at `url` named by `member`.
+
+    A plain file is downloaded whole (up to `MAX_BYTES`); a zip member is
+    decompressed as a stream. See `aggregate_stream`.
+    """
+    member = member.strip()
+    if not member:
+        _check_url(url)
     key = (
         url,
+        member,
         tuple(group_by),
         tuple(sum_columns),
         json.dumps(filters, sort_keys=True, ensure_ascii=False),
@@ -314,6 +468,20 @@ async def aggregate_url(
     cached = _cache.get(key)
     if cached is not None:
         return copy.deepcopy(cached)
+
+    if member:
+        result = await _aggregate_member(
+            url,
+            member,
+            group_by=group_by,
+            sum_columns=sum_columns,
+            filters=filters,
+            order_by=order_by,
+            limit=limit,
+            skip_rows=skip_rows,
+        )
+        _cache.set(key, copy.deepcopy(result))
+        return result
 
     try:
         raw, truncated = await asyncio.wait_for(

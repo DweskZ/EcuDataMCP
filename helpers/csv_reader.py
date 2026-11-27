@@ -10,9 +10,11 @@ import re
 import ssl
 import struct
 import tarfile
+import weakref
 import zipfile
 import zlib
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from dataclasses import dataclass
 from typing import Any, TypeVar
 from urllib.parse import unquote, urlsplit
 
@@ -31,6 +33,7 @@ from helpers.tls import (
     should_retry_with_os_trust,
 )
 from helpers.user_agent import USER_AGENT
+from helpers.zip_blob import SpooledBlob
 
 logger = logging.getLogger(MAIN_LOGGER_NAME)
 
@@ -203,6 +206,7 @@ async def _download(
     *,
     raise_for_status: bool | frozenset[int] = True,
     max_bytes: int = MAX_DOWNLOAD_BYTES,
+    on_chunk: Callable[[bytes], None] | None = None,
 ) -> tuple[bytes, bool]:
     truncated = False
     # `url` comes from CKAN resource metadata -- external, not first-party --
@@ -218,7 +222,10 @@ async def _download(
         chunks: list[bytes] = []
         total = 0
         async for chunk in resp.aiter_bytes(chunk_size=64 * 1024):
-            chunks.append(chunk)
+            if on_chunk is None:
+                chunks.append(chunk)
+            else:
+                on_chunk(chunk)
             total += len(chunk)
             if total > max_bytes:
                 truncated = True
@@ -233,6 +240,7 @@ async def download_bytes(
     *,
     raise_for_status: bool | frozenset[int] = True,
     max_bytes: int = MAX_DOWNLOAD_BYTES,
+    on_chunk: Callable[[bytes], None] | None = None,
 ) -> tuple[bytes, bool]:
     """Download up to `max_bytes` (default MAX_DOWNLOAD_BYTES) with TLS
     fallback for portal hosts.
@@ -253,6 +261,11 @@ async def download_bytes(
     Raising the cap for those formats specifically (see preview_xlsx/
     preview_xlsb/preview_ods) trades a bounded amount of extra worst-case
     bandwidth for turning a guaranteed failure into a successful preview.
+
+    on_chunk hands every 64 KB chunk to a callback (a file or a SpooledBlob)
+    instead of keeping it, and the returned bytes are then empty, so a file far
+    past memory can be downloaded. A TLS retry only happens when the handshake
+    fails, before any chunk, so the callback never sees a partial first attempt.
     """
     own = session is None
     if own:
@@ -273,7 +286,11 @@ async def download_bytes(
         logger.debug("Downloading from %s (max %d bytes)", url, max_bytes)
         try:
             return await _download(
-                session, url, raise_for_status=raise_for_status, max_bytes=max_bytes
+                session,
+                url,
+                raise_for_status=raise_for_status,
+                max_bytes=max_bytes,
+                on_chunk=on_chunk,
             )
         except httpx.ConnectError as exc:
             if should_retry_with_os_trust(exc, url):
@@ -293,6 +310,7 @@ async def download_bytes(
                         url,
                         raise_for_status=raise_for_status,
                         max_bytes=max_bytes,
+                        on_chunk=on_chunk,
                     )
             if not should_retry_insecure(exc, url):
                 raise
@@ -307,6 +325,7 @@ async def download_bytes(
                     url,
                     raise_for_status=raise_for_status,
                     max_bytes=max_bytes,
+                    on_chunk=on_chunk,
                 )
     finally:
         if own:
@@ -1146,13 +1165,23 @@ _MAX_CENTRAL_DIR_BYTES = 20 * 1024 * 1024  # same bound as _gunzip_capped's cap
 _CONTENT_RANGE_RE = re.compile(r"bytes\s+(\d+)-(\d+)/(\d+)")
 
 # A host that ignores Range (the SRI's, for one, answers 200 with the whole
-# file) cannot be read piece by piece. Up to this size the .zip is downloaded
-# whole and read from memory, through the same parsing as the Range path.
-_MAX_NO_RANGE_ZIP_BYTES = 20 * 1024 * 1024
+# file) cannot be read piece by piece. The .zip is downloaded whole, kept in
+# memory up to _NO_RANGE_ZIP_RAM_BYTES and in a temporary file beyond that, and
+# read through the same parsing as the Range path. _MAX_NO_RANGE_ZIP_BYTES is
+# the largest download accepted: the SRI's province RUC zips are 2 to 156 MB.
+_NO_RANGE_ZIP_RAM_BYTES = 20 * 1024 * 1024
+_MAX_NO_RANGE_ZIP_BYTES = 400 * 1024 * 1024
 _NO_RANGE_ZIP_ENV = "ECUADOR_MCP_NO_RANGE_ZIP_MB"
-_NO_RANGE_ZIP_MAX_MB = 400
+_NO_RANGE_ZIP_MAX_MB = 1024
+# The SRI's host gave 0.16 to 0.5 MB/s from a home connection on 2026-11-27, so the
+# 156 MB Pichincha zip needs 5 to 16 minutes there; a stalled read still fails at
+# _TIMEOUT, and this only bounds a transfer that keeps trickling in.
+_NO_RANGE_ZIP_DEADLINE_SECONDS = 600.0
 # So that list_zip_contents followed by read_zip_member downloads it once.
-_blob_cache = TtlCache(ttl_seconds=300.0, max_entries=2, stale_seconds=0.0)
+_BLOB_CACHE_SECONDS = 300.0
+_blob_cache = TtlCache(ttl_seconds=_BLOB_CACHE_SECONDS, max_entries=2, stale_seconds=0.0)
+# One download per URL at a time: two calls for the same 150 MB zip share it.
+_zip_locks: weakref.WeakValueDictionary[str, asyncio.Lock] = weakref.WeakValueDictionary()
 
 
 class _RangeUnsupported(ValueError):
@@ -1176,8 +1205,15 @@ async def _fetch_range(
     """
 
     async def _do(sess: httpx.AsyncClient) -> tuple[bytes, httpx.Headers, int]:
+        # httpx offers gzip by default, and the SRI's download host (descargas.sri.gob.ec,
+        # checked 2026-11-27) answers 200 with the whole file when it sees that offer,
+        # then honors the same Range with 206 once the request says identity. Byte
+        # offsets into a .zip mean the stored bytes, so identity is also the right ask.
         async with safe_stream(
-            sess, url, timeout=_TIMEOUT, headers={"Range": range_header}
+            sess,
+            url,
+            timeout=_TIMEOUT,
+            headers={"Range": range_header, "Accept-Encoding": "identity"},
         ) as resp:
             if resp.status_code not in (200, 206):
                 resp.raise_for_status()
@@ -1232,9 +1268,10 @@ async def _ranged(
     range_header: str,
     cap: int,
     session: httpx.AsyncClient | None,
-    blob: bytes | None,
+    blob: bytes | SpooledBlob | None,
 ) -> tuple[bytes, httpx.Headers, int]:
-    """_fetch_range, or the same answer served from `blob` (a whole .zip in memory).
+    """_fetch_range, or the same answer served from `blob` (a whole .zip, kept
+    in memory or in a temporary file).
 
     The in-memory answer is always a well-formed 206, so every check and parse
     built on the Range path runs unchanged on a zip that was downloaded whole.
@@ -1260,11 +1297,12 @@ async def _ranged(
 
 
 def _no_range_zip_limit() -> int:
-    """Cap for a .zip downloaded whole: 20 MB, or ECUADOR_MCP_NO_RANGE_ZIP_MB.
+    """Cap for a .zip downloaded whole: 400 MB, or ECUADOR_MCP_NO_RANGE_ZIP_MB.
 
-    The SRI's province RUC files are 2 to 156 MB on a host without Range; an
-    operator with the memory for it can raise the cap. The bytes stay in memory
-    (and in the 5-minute cache, up to two files), so the ceiling is 400 MB.
+    The SRI's province RUC files are 2 to 156 MB on a host without Range. Up to
+    20 MB they stay in memory; beyond that they go to a temporary file (and stay
+    there for the 5-minute cache, up to two files), so the ceiling is a disk
+    size, 1024 MB, that an operator can lower or raise.
     """
     raw = os.getenv(_NO_RANGE_ZIP_ENV, "").strip()
     if raw.isdigit() and int(raw) > 0:
@@ -1272,29 +1310,45 @@ def _no_range_zip_limit() -> int:
     return _MAX_NO_RANGE_ZIP_BYTES
 
 
-async def _download_whole_zip(url: str, session: httpx.AsyncClient | None) -> bytes:
+async def _download_whole_zip(url: str, session: httpx.AsyncClient | None) -> SpooledBlob:
     """Download a .zip whose host does not support Range, up to the no-Range cap."""
     limit = _no_range_zip_limit()
-    raw, truncated = await download_bytes(url, session=session, max_bytes=limit)
+    blob = SpooledBlob(_NO_RANGE_ZIP_RAM_BYTES)
+    try:
+        _empty, truncated = await asyncio.wait_for(
+            download_bytes(url, session=session, max_bytes=limit, on_chunk=blob.write),
+            timeout=_NO_RANGE_ZIP_DEADLINE_SECONDS,
+        )
+    except TimeoutError as exc:
+        blob.close()
+        raise ValueError(
+            "El servidor no soporta HTTP Range y la descarga completa del .zip no "
+            f"terminó en {int(_NO_RANGE_ZIP_DEADLINE_SECONDS)} s; reintenta en unos minutos."
+        ) from exc
+    except BaseException:
+        blob.close()
+        raise
     if truncated:
+        blob.close()
         raise ValueError(
             "El servidor no soporta HTTP Range y este .zip pesa más de "
             f"{limit // (1024 * 1024)} MB, así que no se puede leer sin "
             "descargarlo completo. Descarga el enlace directo del archivo."
         )
-    return raw
+    return blob
 
 
 async def _zip_source(
     url: str, session: httpx.AsyncClient | None
-) -> tuple[list[dict[str, Any]], int, int, bytes | None]:
+) -> tuple[list[dict[str, Any]], int, int, bytes | SpooledBlob | None]:
     """Return (members, total_size, total_entries, blob) for a remote .zip.
 
     The central directory is read with Range requests (blob is None). When the
     host does not honor Range, the .zip is downloaded whole (see
-    _MAX_NO_RANGE_ZIP_BYTES) and kept for five minutes; blob is those bytes and
-    later reads of the same .zip are served from them. Only a Range failure
-    triggers the fallback; any other error propagates.
+    _MAX_NO_RANGE_ZIP_BYTES), in memory or in a temporary file, and kept for
+    five minutes; blob holds those bytes and later reads of the same .zip are
+    served from them. Only a Range failure triggers the fallback; any other
+    error propagates.
     """
     blob = _blob_cache.get(url)
     if blob is None:
@@ -1302,13 +1356,29 @@ async def _zip_source(
             members, total_size, entries = await _fetch_central_directory(url, session)
             return members, total_size, entries, None
         except _RangeUnsupported:
-            logger.info("%s no soporta HTTP Range; descargando el .zip completo", url)
-            blob = await _download_whole_zip(url, session)
-            members, total_size, entries = await _fetch_central_directory(
-                url, session, blob=blob
-            )
-            _blob_cache.set(url, blob)
-            return members, total_size, entries, blob
+            lock = _zip_locks.get(url)
+            if lock is None:
+                lock = _zip_locks[url] = asyncio.Lock()
+            async with lock:
+                blob = _blob_cache.get(url)
+                if blob is None:
+                    logger.info("%s no soporta HTTP Range; descargando el .zip completo", url)
+                    blob = await _download_whole_zip(url, session)
+                    try:
+                        members, total_size, entries = await _fetch_central_directory(
+                            url, session, blob=blob
+                        )
+                    except BaseException:
+                        blob.close()  # not a readable .zip: free the file now
+                        raise
+                    _blob_cache.set(url, blob)
+                    if blob.on_disk:
+                        # Free the temporary file when the entry expires, not
+                        # only when another .zip happens to need the slot.
+                        asyncio.get_running_loop().call_later(
+                            _BLOB_CACHE_SECONDS + 5, _blob_cache.get, url
+                        )
+                    return members, total_size, entries, blob
     members, total_size, entries = await _fetch_central_directory(url, session, blob=blob)
     return members, total_size, entries, blob
 
@@ -1368,7 +1438,7 @@ async def _read_zip64_eocd(
     tail_start: int,
     eocd_index: int,
     session: httpx.AsyncClient | None,
-    blob: bytes | None = None,
+    blob: bytes | SpooledBlob | None = None,
 ) -> tuple[int, int, int]:
     """Return (cd_offset, cd_size, total_entries) from the ZIP64 EOCD record."""
     loc = eocd_index - 20
@@ -1511,7 +1581,9 @@ _RANGE_UNSUPPORTED = (
 
 
 async def _fetch_central_directory(
-    url: str, session: httpx.AsyncClient | None = None, blob: bytes | None = None
+    url: str,
+    session: httpx.AsyncClient | None = None,
+    blob: bytes | SpooledBlob | None = None,
 ) -> tuple[list[dict[str, Any]], int, int]:
     """Return (members with internal fields, total_size, total_entries).
 
@@ -1947,6 +2019,211 @@ async def read_zip_member(
         result["outer_member"] = name
     return result
 
+
+
+@dataclass(frozen=True)
+class ZipMemberSpan:
+    """A text member of a remote .zip whose compressed bytes can be read here.
+
+    `source[offset : offset + compressed_size]` is the member's stored or
+    deflate data: the whole .zip held by a host without Range, or the member
+    alone, fetched with Range requests into a temporary file (offset 0).
+    """
+
+    name: str
+    method: int
+    compressed_size: int
+    uncompressed_size: int
+    crc32: int
+    source: bytes | SpooledBlob
+    offset: int
+
+
+_SPAN_REQUEST_BYTES = 8 * 1024 * 1024
+_SPAN_DEADLINE_SECONDS = 600.0
+_STREAM_READ_BYTES = 1024 * 1024
+_STREAM_OUT_BYTES = 4 * 1024 * 1024
+
+
+async def _spool_member_data(
+    url: str, start: int, end: int, session: httpx.AsyncClient | None
+) -> SpooledBlob:
+    """Range-fetch bytes [start, end) of a remote .zip into a SpooledBlob."""
+    spool = SpooledBlob(_NO_RANGE_ZIP_RAM_BYTES)
+    # One connection for the whole span, not a TLS handshake per request.
+    own = session is None
+    if own:
+        session = httpx.AsyncClient(headers={"User-Agent": USER_AGENT}, proxy=proxy_for(url))
+    try:
+        position = start
+        while position < end:
+            last = min(position + _SPAN_REQUEST_BYTES, end) - 1
+            chunk, headers, status = await _ranged(
+                url, f"bytes={position}-{last}", cap=last - position + 1, session=session, blob=None
+            )
+            _check_partial(status, headers, position)
+            if len(chunk) != last - position + 1:
+                raise ValueError("El .zip está corrupto (datos incompletos).")
+            spool.write(chunk)
+            position = last + 1
+    except BaseException:
+        spool.close()
+        raise
+    finally:
+        if own and session is not None:
+            await session.aclose()
+    return spool
+
+
+async def locate_zip_member(
+    url: str,
+    member: str,
+    *,
+    max_compressed: int,
+    max_uncompressed: int,
+    session: httpx.AsyncClient | None = None,
+) -> ZipMemberSpan:
+    """Find a CSV/TSV/TXT member of a remote .zip and get its bytes within reach.
+
+    Meant for reading the whole member (iter_zip_member), however large: a
+    member over `max_compressed` or `max_uncompressed` bytes is refused rather
+    than read in part. A host that honors Range sends only this member's
+    compressed bytes, to a temporary file; one that does not has already
+    handed over the whole .zip (see _zip_source).
+    """
+    members, total_size, _entries, blob = await _zip_source(url, session)
+    info = _resolve_member(members, member)
+    name = info["name"]
+    if info["is_dir"]:
+        raise ValueError(f"'{name}' es una carpeta dentro del .zip, no un archivo.")
+    if info["flags"] & 0x1:
+        raise ValueError(f"'{name}' está cifrado con contraseña; no se puede leer.")
+    method = info["compression_method"]
+    if method not in (0, 8):
+        raise ValueError(
+            f"'{name}' usa un método de compresión no soportado ({method}); "
+            "solo se leen miembros sin comprimir (stored) o deflate."
+        )
+    compressed_size = info["compressed_size"]
+    uncompressed_size = info["uncompressed_size"]
+    if 0xFFFFFFFF in (compressed_size, uncompressed_size, info["local_header_offset"]):
+        raise ValueError(f"'{name}': el .zip está corrupto (tamaño ZIP64 sin su campo extra).")
+    ext = _ext_of(name)
+    if ext not in _ZIP_TEXT_EXTS:
+        raise ValueError(
+            f"'{name}' no es texto delimitado ({ext or 'sin extensión'}); este tool lee "
+            f"{', '.join(_ZIP_TEXT_EXTS)}. Una hoja de cálculo va por read_zip_member."
+        )
+    for size, limit, what in (
+        (compressed_size, max_compressed, "comprimido"),
+        (uncompressed_size, max_uncompressed, "descomprimido"),
+    ):
+        if size > limit:
+            raise ValueError(
+                f"'{name}' pesa {size / (1024 * 1024):,.0f} MB {what}, por encima del "
+                f"límite de {limit // (1024 * 1024)} MB: sumarlo incompleto daría "
+                "totales falsos, así que no se lee."
+            )
+
+    start = info["local_header_offset"]
+    if start + 30 > total_size:
+        raise ValueError(f"'{name}': el .zip está corrupto (offset fuera del archivo).")
+    header, headers, status = await _ranged(
+        url, f"bytes={start}-{start + 29}", cap=30, session=session, blob=blob
+    )
+    _check_partial(status, headers, start)
+    if len(header) < 30 or header[:4] != _LOCAL_HEADER_SIGNATURE:
+        raise ValueError(f"'{name}': el .zip está corrupto (cabecera local inválida).")
+    local_name_len, local_extra_len = struct.unpack_from("<HH", header, 26)
+    data_start = start + 30 + local_name_len + local_extra_len
+    data_end = data_start + compressed_size
+    if data_end > total_size:
+        raise ValueError(f"'{name}': el .zip está corrupto (datos fuera del archivo).")
+
+    if blob is not None:
+        source: bytes | SpooledBlob = blob
+        offset = data_start
+    else:
+        try:
+            source = await asyncio.wait_for(
+                _spool_member_data(url, data_start, data_end, session),
+                timeout=_SPAN_DEADLINE_SECONDS,
+            )
+        except TimeoutError as exc:
+            raise ValueError(
+                f"La descarga de '{name}' no terminó en {int(_SPAN_DEADLINE_SECONDS)} s; "
+                "reintenta en unos minutos."
+            ) from exc
+        offset = 0
+    return ZipMemberSpan(
+        name=name,
+        method=method,
+        compressed_size=compressed_size,
+        uncompressed_size=uncompressed_size,
+        crc32=info["crc32"],
+        source=source,
+        offset=offset,
+    )
+
+
+def iter_zip_member(span: ZipMemberSpan) -> Iterator[bytes]:
+    """Yield a member's decompressed bytes in chunks, whatever its size.
+
+    Blocking (disk reads, zlib): run it in a thread. Memory stays at a few
+    megabytes, and no more output than the declared size is accepted, so a
+    member that expands past it fails instead of filling the disk or memory.
+    Once the data ends the size and the CRC32 are checked, so a damaged .zip
+    raises ValueError rather than giving a total over wrong rows.
+    """
+    name = span.name
+    corrupt = f"'{name}': el .zip está corrupto"
+    inflater = zlib.decompressobj(-zlib.MAX_WBITS) if span.method == 8 else None
+    produced = 0
+    crc = 0
+    position = span.offset
+    end = span.offset + span.compressed_size
+
+    def checked(out: bytes) -> bytes:
+        nonlocal produced, crc
+        produced += len(out)
+        if produced > span.uncompressed_size:
+            raise ValueError(f"{corrupt} (más datos que el tamaño declarado).")
+        crc = zlib.crc32(out, crc)
+        return out
+
+    while position < end:
+        raw = span.source[position : min(position + _STREAM_READ_BYTES, end)]
+        if not raw:
+            raise ValueError(f"{corrupt} (datos incompletos).")
+        position += len(raw)
+        if inflater is None:
+            yield checked(raw)
+            continue
+        pending = raw
+        while pending:
+            before = len(pending)
+            try:
+                out = inflater.decompress(pending, _STREAM_OUT_BYTES)
+            except zlib.error as exc:
+                raise ValueError(f"{corrupt} ({exc}).") from exc
+            pending = inflater.unconsumed_tail
+            if out:
+                yield checked(out)
+            elif len(pending) >= before:
+                raise ValueError(f"{corrupt} (flujo deflate detenido).")
+    if inflater is not None:
+        try:
+            out = inflater.flush()
+        except zlib.error as exc:
+            raise ValueError(f"{corrupt} ({exc}).") from exc
+        if out:
+            yield checked(out)
+        if not inflater.eof:
+            raise ValueError(f"{corrupt} (datos incompletos).")
+    if produced != span.uncompressed_size:
+        raise ValueError(f"{corrupt} (tamaño descomprimido inesperado).")
+    if crc != span.crc32:
+        raise ValueError(f"{corrupt} (CRC32 no coincide).")
 
 
 _HEADER_SCAN_ROWS = 30

@@ -2176,13 +2176,13 @@
       },
       {
         "name": "aggregate_csv",
-        "description": "Group and total a CSV/TSV/TXT at a URL by reading all of it (up to 30 MB, not just its head): group columns, sums, exact filters and ordering.",
+        "description": "Group and total a CSV/TSV/TXT at a URL by reading all of it (up to 30 MB, not just its head; or a CSV inside a .zip, up to 2 GB unzipped): group columns, sums, exact filters and ordering.",
         "params": [
           {
             "name": "url",
             "type": "str",
             "default": null,
-            "description": "Direct URL to a plain-text CSV/TSV/TXT file (from search_archivos or a CKAN resource)."
+            "description": "Direct URL to a plain-text CSV/TSV/TXT file (from search_archivos or a CKAN resource), or to a .zip when member is given."
           },
           {
             "name": "group_by",
@@ -2221,13 +2221,19 @@
             "description": "Lines above the header line (default 0)."
           },
           {
+            "name": "member",
+            "type": "str",
+            "default": "''",
+            "description": "File inside the .zip at url (exact name, or a unique basename); empty when url is the CSV itself."
+          },
+          {
             "name": "format",
             "type": "Literal['text', 'json']",
             "default": "'text'",
             "description": "text | json"
           }
         ],
-        "long_description": "Groups the rows of a whole delimited text file and totals its numeric columns. read_zip_member and preview_resource_data read only the first 5 MB of a file, so a total over a file of 5 to 30 MB would leave rows out; this tool downloads the file whole and returns one row per group with the group values, the row count (`filas`) and the total of each column, plus the totals over every row that passes the filters. Column names match ignoring case and accents (AÑO, año and ano are the same). The delimiter (comma, `|`, `;` or tab) and the encoding (UTF-8 with or without a BOM, or Windows 1252) are detected; numbers may use a decimal comma (\"1234,56\") or a point, and a lone comma is a decimal mark (\"1,234\" is 1.234). Blank cells and cells that are not numbers are left out of the sums and counted in `celdas_vacias` and `celdas_no_numericas`. Sums are exact (`Decimal`). A file over 30 MB is refused rather than summed in part; a .zip or a spreadsheet is read with list_zip_contents and read_zip_member. Example: SRI's sales CSVs (search_archivos with fuente=\"sri_datasets\" and query=\"ventas\"; about 5.5 MB per year, 2017 to 2026) with group_by=\"PROVINCIA\" and sum_columns=\"TOTAL_VENTAS,TOTAL_COMPRAS\"; filters_json='{\"MES\": [1, 2, 3]}' gives the first quarter and group_by=\"MES\" the year by month. Column names change between years (VENTAS_NETAS_TARIFA_12 in 2018, VENTAS_NETAS_TARIFA_GRAVADA in 2026): when one is not found, the answer lists the file's columns."
+        "long_description": "Groups the rows of a whole delimited text file and totals its numeric columns. read_zip_member and preview_resource_data read only the first 5 MB of a file, so a total over a file of 5 to 30 MB would leave rows out; this tool downloads the file whole and returns one row per group with the group values, the row count (`filas`) and the total of each column, plus the totals over every row that passes the filters. Column names match ignoring case and accents (AÑO, año and ano are the same). The delimiter (comma, `|`, `;` or tab) and the encoding (UTF-8 with or without a BOM, or Windows 1252) are detected; numbers may use a decimal comma (\"1234,56\") or a point, and a lone comma is a decimal mark (\"1,234\" is 1.234). Blank cells and cells that are not numbers are left out of the sums and counted in `celdas_vacias` and `celdas_no_numericas`. Sums are exact (`Decimal`). A file over 30 MB is refused rather than summed in part; a spreadsheet is read with read_zip_member. For a CSV inside a .zip, pass the .zip as url and the file's name as member (list_zip_contents lists them): it is decompressed as it is read, so a member of hundreds of MB works (SRI's RUC file for Pichincha is 156 MB zipped and 740 MB of text), up to 300 MB zipped, 2 GB unzipped and 3 minutes of reading; a bigger one is refused. A host that cannot send part of a .zip is downloaded whole first, which adds time. Example: SRI's sales CSVs (search_archivos with fuente=\"sri_datasets\" and query=\"ventas\"; about 5.5 MB per year, 2017 to 2026) with group_by=\"PROVINCIA\" and sum_columns=\"TOTAL_VENTAS,TOTAL_COMPRAS\"; filters_json='{\"MES\": [1, 2, 3]}' gives the first quarter and group_by=\"MES\" the year by month. Column names change between years (VENTAS_NETAS_TARIFA_12 in 2018, VENTAS_NETAS_TARIFA_GRAVADA in 2026): when one is not found, the answer lists the file's columns."
       },
       {
         "name": "read_pdf",
