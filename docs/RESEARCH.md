@@ -7556,13 +7556,19 @@ parcial (los RUC de Guayas y Pichincha, 148 y 156 MB, exigían subir
   (suman las 413.846 filas). Dos lecturas completas dieron los mismos totales, en
   127 y 183 s, casi todo descarga a la velocidad de arriba.
 
-### Sin probar
+### Probado en Render (2026-11-27, tras el despliegue)
 
-- El miembro de Pichincha completo (740 MB) no se leyó de verdad: desde esta
-  conexión la descarga sola pasaría de 5 minutos. Las cifras de 740 MB son del
-  archivo sintético.
-- Ni Render ni Oracle: no se sabe cuánto disco temporal permiten ni a qué
-  velocidad les llega el SRI. Oracle no alcanza al SRI.
+- Azuay: 67,5 s (unos 0,43 MB/s), con los mismos totales que desde la conexión
+  doméstica.
+- **Pichincha completo**, miembro `SRI_RUC_Pichincha.csv`: 155.882.985 bytes
+  comprimidos y 776.776.049 de texto (741 MiB), 2.164.275 filas, agrupadas por
+  `ESTADO_CONTRIBUYENTE` en 338,3 s con una sola llamada MCP: ACTIVO 1.034.847,
+  SUSPENDIDO 922.313, PASIVO 207.115 (suman las 2.164.275 filas). Son unos
+  0,46 MB/s de .zip por segundo entre descarga y lectura; no se separó cuánto fue
+  de cada una. `/health` siguió respondiendo y Render no se reinició. El
+  temporal de 156 MB cupo en su disco.
+- Sin probar: Oracle (no alcanza al SRI), dos llamadas a la vez sobre el mismo
+  .zip contra el servidor real, y el límite de disco temporal de Render.
 
 ## Archivo del roadmap (2026-11-24)
 

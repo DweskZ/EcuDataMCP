@@ -21,7 +21,9 @@
   refused any .zip. With `url` set to the .zip and `member` to the file's name
   (`list_zip_contents` lists them), the member is decompressed in 4 MB pieces
   and only the group totals are kept: a synthetic 734 MB, 4.6 million row file
-  grouped in 23.5 s with the process memory staying near 48 MB. The stream
+  grouped in 23.5 s with the process memory staying near 48 MB, and on Render the
+  real Pichincha file (156 MB zipped, 741 MiB of text, 2,164,275 rows) grouped in
+  338 s, download included, at about 0.46 MB/s of zip. The stream
   checks the declared size and the CRC32 at the end, so a damaged .zip fails
   instead of giving a total over wrong rows; a member over 300 MB zipped, 2 GB
   unzipped or 3 minutes of reading is refused rather than summed in part. A host
