@@ -85,6 +85,11 @@
 <div class="container-page">
 
 <div class="release-row">
+<div class="release-meta"><span class="release-version">v0.15.3</span><span class="release-date">2026-11-27</span></div>
+<p class="release-summary">88 tools in the default profile (none new). aggregate_csv takes member and reads a CSV inside a .zip however large, decompressing it as it reads and checking size and CRC32 at the end: the SRI&#39;s RUC file for Pichincha (156 MB zipped, 741 MiB of text, 2.16 million rows) grouped in 338 s on Render. Range requests send Accept-Encoding: identity, so descargas.sri.gob.ec honors them after all (listing the Azuay .zip went from 51 s to 3 s). A .zip from a server that ignores Range can weigh up to 400 MB and goes to a temporary file beyond 20 MB. get_clima_nasa_power warns that the latest days of the daily rain series are provisional (GEOS-IT), with a change of product on 2026-11-01 that is not weather. The smoke test gives a check that only timed out a second try.</p>
+</div>
+
+<div class="release-row">
 <div class="release-meta"><span class="release-version">v0.15.2</span><span class="release-date">2026-11-25</span></div>
 <p class="release-summary">88 tools in the default profile. New aggregate_csv: groups and totals a whole CSV/TSV/TXT at a URL (up to 30 MB), with group_by, sum_columns and exact filters; it reads |, comma, ; or tab delimiters, a BOM, UTF-8 or Windows 1252 and decimal commas, and sums exactly. Built for the SRI&#39;s yearly sales files (about 5.5 MB each, which read_zip_member could only read to 5 MB); search_archivos(fuente=&#34;sri_datasets&#34;) now points to it. list_zip_contents and read_zip_member now read a zip from a host without HTTP Range (the SRI&#39;s) by downloading it whole once, up to 20 MB (ECUADOR_MCP_NO_RANGE_ZIP_MB raises the cap). get_sri_ruc_info keeps the RUC record when the SRI&#39;s establishments page fails, and get_certificado_cumplimiento_patronal waits 75 s for the IESS certificate instead of 30.</p>
 </div>
